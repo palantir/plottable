@@ -1,0 +1,20 @@
+{
+  "name": "linkedaxisprototype",
+  "version": "0.0.0",
+  "description": "Prototype linked axis timeseriescharts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danmane/LinkedChartPrototype.git"
+  },
+  "author": "daniel mane",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-typescript": "~0.2.0",
+    "grunt-cli": "0.1.6",
+    "grunt-contrib-watch": "~0.5.3",
+    "load-grunt-tasks": "~0.2.0"
+  }
+}
