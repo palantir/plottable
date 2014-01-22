@@ -1,0 +1,56 @@
+
+body {
+  font: 10px sans-serif;
+}
+
+div {
+  display: inline;
+}
+
+svg {
+  display: block;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis path {
+  fill: none;
+  stroke: black;
+}
+
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+.avg {
+  stroke: black;
+}
+.avgh {
+  stroke:pink;
+}
+.avgl {
+  stroke: powderblue;
+}
+.hi {
+  stroke: orange;
+}
+.hih {
+  stroke: orangered;
+}
+.hil {
+  stroke: coral;
+}
+.lo {
+  stroke: steelblue;
+}
+.loh {
+  stroke: plum;
+}
+.lol {
+  stroke: royalblue;
+}
