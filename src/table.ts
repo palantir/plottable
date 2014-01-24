@@ -62,8 +62,39 @@ class Table implements IRenderable {
     this.colWeightSum = d3.sum(colWeights);
   }
 
-  public render(element: D3.Selection, availableHeight: number, availableWidth: number) {
+  public render(element: D3.Selection, availableWidth: number, availableHeight: number) {
+    var freeWidth = availableWidth - this.minWidth;
+    var freeHeight = availableHeight - this.minHeight;
 
+    if (freeWidth < 0 || freeHeight < 0) {throw "InsufficientSpaceError";}
+    var rowProportionalSpace = this.rowWeights.map((w: number) => w / this.rowWeightSum * availableHeight);
+    var colProportionalSpace = this.colWeights.map((w: number) => w / this.colWeightSum * availableWidth);
+    var sumPair = (p: number[]) => p[0] + p[1];
+    var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
+    var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
+
+    var yOffset = 0;
+    this.rows.forEach((row: IRenderable[], i) {
+      var xOffset = 0;
+      row.forEach((renderable, j) {
+        Table.renderChild(element, renderable, xOffset, yOffset, rowHeights[i], colWidths[j]);
+        xOffset += colWidths[j];
+      });
+      yOffset += rowHeights[i];
+    });
+  }
+
+  private static renderChild(
+    parentElement: D3.Selection,
+    renderable: IRenderable,
+    xOffset: number,
+    yOffset: number,
+    width: number,
+    height: number
+    ) {
+    var childElement = parentElement.append("g").classed(renderable.className, true);
+    Utils.translate(childElement, [xOffset, yOffset]);
+    renderable.render(childElement, width, height);
   }
 
 
