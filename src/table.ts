@@ -1,5 +1,6 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
+///<reference path="../lib/chai/chai-assert.d.ts" />
 ///<reference path="utils.ts" />
 
 
@@ -59,6 +60,8 @@ class Table implements IRenderable {
   }
 
   public render(element: D3.Selection, availableWidth: number, availableHeight: number) {
+    chai.assert.operator(availableWidth, '>=', 0, "availableWidth is >= 0");
+    chai.assert.operator(availableHeight, '>=', 0, "availableHeight is >= 0");
     this.computeLayout();
     var freeWidth = availableWidth - this.minWidth;
     var freeHeight = availableHeight - this.minHeight;

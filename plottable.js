@@ -199,6 +199,8 @@ var Table = (function () {
 
     Table.prototype.render = function (element, availableWidth, availableHeight) {
         var _this = this;
+        chai.assert.operator(availableWidth, '>=', 0, "availableWidth is >= 0");
+        chai.assert.operator(availableHeight, '>=', 0, "availableHeight is >= 0");
         this.computeLayout();
         var freeWidth = availableWidth - this.minWidth;
         var freeHeight = availableHeight - this.minHeight;
@@ -273,6 +275,8 @@ var Renderer = (function () {
 
     Renderer.prototype.render = function (element, width, height) {
         this.element = element;
+        chai.assert.operator(width, '>=', 0, "width is >= 0");
+        chai.assert.operator(height, '>=', 0, "height is >= 0");
         return;
     };
 
