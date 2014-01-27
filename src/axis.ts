@@ -1,4 +1,5 @@
 ///<reference path="../lib/d3.d.ts" />
+///<reference path="../lib/chai/chai.d.ts" />
 
 class Axis implements IRenderable {
   public static yWidth = 30;
