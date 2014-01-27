@@ -1,4 +1,5 @@
 ///<reference path="../lib/d3.d.ts" />
+///<reference path="../lib/lodash.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
 ///<reference path="../lib/chai/chai-assert.d.ts" />
 ///<reference path="utils.ts" />
@@ -6,6 +7,9 @@
 
 class Table implements IRenderable {
   public className: string;
+
+  private renderables: IRenderable[];
+  private tables: Table[];
 
   private rows: IRenderable[][];
   private cols: IRenderable[][];
@@ -39,15 +43,18 @@ class Table implements IRenderable {
     return this.colWeightVal;
   }
 
-  constructor(rows: IRenderable[][], rowWeightVal=0, colWeightVal=0) {
+  constructor(rows: IRenderable[][], rowWeightVal=1, colWeightVal=1) {
     this.rows = rows;
     this.cols = d3.transpose(rows);
+    this.renderables = <IRenderable[]> _.flatten(this.rows);
+    this.tables = <Table[]> this.renderables.filter((x) => x != null && x.computeLayout != null)
     this.rowWeightVal = rowWeightVal;
     this.colWeightVal = colWeightVal;
     this.className = "table";
   }
 
-  private computeLayout() {
+  public computeLayout() {
+    this.tables.forEach((t) => t.computeLayout());
     this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowMinimum() : 0));
     this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colMinimum() : 0));
     this.minWidth  = d3.sum(this.rowMinimums);

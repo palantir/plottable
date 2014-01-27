@@ -6,6 +6,7 @@ interface IRenderable {
   rowMinimum: () => number;
   colMinimum: () => number;
   className: string;
+  computeLayout?: () => void;
 }
 
 interface IDatum {

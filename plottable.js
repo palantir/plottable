@@ -138,10 +138,14 @@ var Utils;
 })(Utils || (Utils = {}));
 var Table = (function () {
     function Table(rows, rowWeightVal, colWeightVal) {
-        if (typeof rowWeightVal === "undefined") { rowWeightVal = 0; }
-        if (typeof colWeightVal === "undefined") { colWeightVal = 0; }
+        if (typeof rowWeightVal === "undefined") { rowWeightVal = 1; }
+        if (typeof colWeightVal === "undefined") { colWeightVal = 1; }
         this.rows = rows;
         this.cols = d3.transpose(rows);
+        this.renderables = _.flatten(this.rows);
+        this.tables = this.renderables.filter(function (x) {
+            return x != null && x.computeLayout != null;
+        });
         this.rowWeightVal = rowWeightVal;
         this.colWeightVal = colWeightVal;
         this.className = "table";
@@ -170,6 +174,9 @@ var Table = (function () {
     };
 
     Table.prototype.computeLayout = function () {
+        this.tables.forEach(function (t) {
+            return t.computeLayout();
+        });
         this.rowMinimums = this.rows.map(function (row) {
             return d3.max(row, function (r) {
                 return (r != null) ? r.rowMinimum() : 0;
@@ -350,16 +357,29 @@ function makeRandomData(numPoints) {
     return { "data": data, "seriesName": "random-data" };
 }
 
-var xScale = d3.scale.linear();
-var xAxis = new XAxis(xScale, "bottom");
-var yScale = d3.scale.linear();
-var yAxis = new YAxis(yScale, "right");
-var data = makeRandomData(100);
-var renderArea = new LineRenderer(data, xScale, yScale);
-var rootTable = new Table([[renderArea, yAxis], [xAxis, null]]);
+function makeBasicChartTable() {
+    var xScale = d3.scale.linear();
+    var xAxis = new XAxis(xScale, "bottom");
+    var yScale = d3.scale.linear();
+    var yAxis = new YAxis(yScale, "right");
+    var data = makeRandomData(30);
+    var renderArea = new LineRenderer(data, xScale, yScale);
+    var rootTable = new Table([[renderArea, yAxis], [xAxis, null]]);
+    return rootTable;
+}
 
 var svg1 = d3.select("#svg1");
-rootTable.render(svg1, 500, 500);
+makeBasicChartTable().render(svg1, 500, 500);
+
+var svg2 = d3.select("#svg2");
+
+var t1 = makeBasicChartTable();
+var t2 = makeBasicChartTable();
+var t3 = makeBasicChartTable();
+var t4 = makeBasicChartTable();
+
+var metaTable = new Table([[t1, t2], [t3, t4]]);
+metaTable.render(svg2, 800, 800);
 var PerfDiagnostics;
 (function (_PerfDiagnostics) {
     var PerfDiagnostics = (function () {
