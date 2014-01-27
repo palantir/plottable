@@ -37,6 +37,7 @@ class Axis extends Renderable {
     this.cachedScale = 1;
     this.cachedTranslate = 0;
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
+    this.className = "axis";
   }
 
   private transformString(translate: number, scale: number) {

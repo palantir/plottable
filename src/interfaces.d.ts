@@ -5,6 +5,7 @@ interface IRenderable {
   colWeight: (newVal?: number) => number;
   rowMinimum: () => number;
   colMinimum: () => number;
+  className: string;
 
 }
 

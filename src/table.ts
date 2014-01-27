@@ -2,6 +2,8 @@
 
 
 class Table implements IRenderable {
+  public className: string;
+
   private rows: IRenderable[][];
   private cols: IRenderable[][];
   private rowMinimums: number[];
@@ -13,8 +15,8 @@ class Table implements IRenderable {
   private rowWeights: number[];
   private colWeights: number[];
 
-  private rowWeight: number;
-  private colWeight: number;
+  private rowWeightVal: number;
+  private colWeightVal: number;
 
   private rowWeightSum: number;
   private colWeightSum: number;
@@ -24,33 +26,34 @@ class Table implements IRenderable {
   public colMinimum() {return this.minWidth;}
 
   /* GetterSetters */
-  public rowWeight(newVal=null) {
-    if (newVal != null) {this.rowWeight = newVal;}
-    return this.rowWeight;
+  public rowWeight(newVal: number=null): number {
+    if (newVal != null) {this.rowWeightVal = newVal;}
+    return this.rowWeightVal;
   }
 
-  public colWeight(newVal=null) {
-    if (newVal != null) {this.colWeight = newVal;}
-    return this.colWeight;
+  public colWeight(newVal: number=null): number {
+    if (newVal != null) {this.colWeightVal = newVal;}
+    return this.colWeightVal;
   }
 
-  constructor(rows: IRenderable[][], rowWeight=0, colWeight=0) {
+  constructor(rows: IRenderable[][], rowWeightVal=0, colWeightVal=0) {
     this.rows = rows;
     this.cols = d3.transpose(rows);
-    this.rowWeight = rowWeight;
-    this.colWeight = colWeight;
+    this.rowWeightVal = rowWeightVal;
+    this.colWeightVal = colWeightVal;
+    this.className = "table";
   }
 
   private computeLayout() {
-    this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.minHeight()));
-    this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.minWidth()));
+    this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.rowMinimum()));
+    this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.colMinimum()));
     this.minWidth  = d3.sum(this.rowMinimums);
     this.minHeight = d3.sum(this.colMinimums);
 
     this.rowWeights = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.rowWeight()));
     this.colWeights = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.colWeight()));
-    this.rowWeightSum = d3.sum(rowWeights);
-    this.colWeightSum = d3.sum(colWeights);
+    this.rowWeightSum = d3.sum(this.rowWeights);
+    this.colWeightSum = d3.sum(this.colWeights);
   }
 
   public render(element: D3.Selection, availableWidth: number, availableHeight: number) {
