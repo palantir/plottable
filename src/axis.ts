@@ -24,8 +24,11 @@ class Axis extends Renderable {
   constructor(
     public scale: D3.Scale.Scale,
     public orientation: string,
-    public formatter: any
+    public formatter: any,
+    rowMinimum: number,
+    colMinimum: number
   ) {
+    super(0, 0, rowMinimum, colMinimum);
     // this.orientation = attachmentTypeToString(this.attachmentPoint);
     this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
     if (this.formatter != null) {
