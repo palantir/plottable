@@ -1,4 +1,6 @@
 class Renderable implements IRenderable {
+  public className: string;
+
   constructor(private rowWeight, private colWeight, private rowMinimum, private colMinimum) {
 
   }
