@@ -1,18 +1,18 @@
 class Renderable implements IRenderable {
   public className: string;
 
-  constructor(private rowWeight, private colWeight, private rowMinimum, private colMinimum) {
+  constructor(private rowWeight: number, private colWeight: number, private rowMinimum: number, private colMinimum: number) {
 
   }
 
-  public rowWeight(newVal?: number) {
+  public rowWeight(newVal?: number): number {
     if (newVal != null) {
       this.rowWeight = newVal;
     }
     return this.rowWeight;
   }
 
-  public colWeight(newVal?: number) {
+  public colWeight(newVal?: number): number {
     if (newVal != null) {
       this.colWeight = newVal;
     }
@@ -25,6 +25,10 @@ class Renderable implements IRenderable {
 
   public colMinimum(){
     return this.colMinimum;
+  }
+
+  public render(element: D3.Selection, width: number, height: number) {
+    // no-op
   }
 
 

@@ -29,6 +29,9 @@ class Axis extends Renderable {
     colMinimum: number
   ) {
     super(0, 0, rowMinimum, colMinimum);
+    this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
+    var rowMinimum = this.isXAligned ? Axis.xHeight : 0;
+    var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
     // this.orientation = attachmentTypeToString(this.attachmentPoint);
     this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
     if (this.formatter != null) {
@@ -36,7 +39,6 @@ class Axis extends Renderable {
     }
     this.cachedScale = 1;
     this.cachedTranslate = 0;
-    this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     this.className = "axis";
   }
 
@@ -89,3 +91,14 @@ class Axis extends Renderable {
   }
 }
 
+class XAxis extends Axis {
+  constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
+    super(scale, orientation, formatter, 30, 0);
+  }
+}
+
+class YAxis extends Axis {
+  constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
+    super(scale, orientation, formatter, 0, 30);
+  }
+}

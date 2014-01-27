@@ -2,13 +2,13 @@
 ///<reference path="table.ts" />
 ///<reference path="renderer.ts" />
 
-function makeRandomData(numPoints) {
-  var outArray = [];
+function makeRandomData(numPoints): IDataset {
+  var data = [];
   for (var i = 0; i < numPoints; i++) {
     var r = {x: Math.random(), y: Math.random() * Math.random()}
-    outArray.push(r);
+    data.push(r);
   }
-  return outArray;
+  return {"data": data, "seriesName": "randomData"};
 }
 
 // make a regular table with 1 axis on bottom, 1 axis on left, renderer in center

@@ -1,16 +1,43 @@
 ///<reference path="../lib/d3.d.ts" />
 
-class Renderer extends Renderable {
+class Renderer implements IRenderable {
   public renderArea: D3.Selection;
   public element: D3.Selection;
+  public className: string;
   public width: number;
   public height: number;
   public scales: any;
 
+  private rowWeightVal: number;
+  private colWeightVal: number;
+  private rowMinimumVal: number;
+  private colMinimumVal: number;
+
   constructor(
-    public dataset: any[]
+    public dataset: IDataset
   ) {
-    super(1, 1, 0, 0);
+  }
+
+  public rowWeight(newVal: number = null) {
+    if (newVal != null) {
+      this.rowWeightVal = newVal;
+    }
+    return this.rowWeightVal;
+  }
+
+  public colWeight(newVal: number = null) {
+    if (newVal != null) {
+      this.colWeightVal = newVal;
+    }
+    return this.colWeightVal;
+  }
+
+  public rowMinimum(): number {
+    return this.rowMinimumVal;
+  }
+
+  public colMinimum(): number {
+    return this.colMinimumVal;
   }
 
   public transform(translate: number[], scale: number) {
