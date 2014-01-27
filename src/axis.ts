@@ -1,8 +1,9 @@
 ///<reference path="../lib/d3.d.ts" />
 
-class Axis extends Renderable {
+class Axis implements IRenderable {
   public static yWidth = 30;
   public static xHeight = 30;
+  public className: string;
   public element: D3.Selection;
   public d3axis: D3.Svg.Axis;
   private cachedScale: number;
@@ -25,10 +26,9 @@ class Axis extends Renderable {
     public scale: D3.Scale.Scale,
     public orientation: string,
     public formatter: any,
-    rowMinimum: number,
-    colMinimum: number
+    private rowMinimumVal: number,
+    private colMinimumVal: number
   ) {
-    super(0, 0, rowMinimum, colMinimum);
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     var rowMinimum = this.isXAligned ? Axis.xHeight : 0;
     var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
@@ -45,6 +45,20 @@ class Axis extends Renderable {
   private transformString(translate: number, scale: number) {
     var translateS = this.isXAligned ? "" + translate : "0," + translate;
     return "translate(" + translateS + ")";
+  }
+
+  public rowWeight(newVal: number = null) {
+    return 0;
+  }
+  public colWeight(newVal: number = null) {
+    return 0;
+  }
+
+  public rowMinimum(): number {
+    return this.rowMinimumVal;
+  }
+  public colMinimum(): number {
+    return this.colMinimumVal;
   }
 
   public render(element: D3.Selection, width: number, height: number) {
