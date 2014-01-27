@@ -1,14 +1,5 @@
 ///<reference path="../lib/d3.d.ts" />
 
-interface IRenderable {
-  render: (element: D3.Selection, width: number, height: number) => ();
-
-  rowWeight: (newVal?: number) => number;
-  colWeight: (newVal?: number) => number;
-  rowMinimum: () => number;
-  colMinimum: () => number;
-
-}
 
 class Table implements IRenderable {
   private rows: IRenderable[][];
@@ -91,7 +82,7 @@ class Table implements IRenderable {
     yOffset: number,
     width: number,
     height: number
-    ) {
+  ) {
     var childElement = parentElement.append("g").classed(renderable.className, true);
     Utils.translate(childElement, [xOffset, yOffset]);
     renderable.render(childElement, width, height);
