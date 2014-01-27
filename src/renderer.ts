@@ -85,7 +85,6 @@ class XYRenderer extends Renderer {
   }
 
   public setDimensions(width: number, height: number) {
-    console.log("setDimensions", width, height)
     super.setDimensions(width, height);
     this.xScale.range([0, width]);
     this.yScale.range([height, 0]);
