@@ -64,16 +64,6 @@ class Axis extends Renderable {
     this.element.call(this.d3axis);
   }
 
-  public rowWeight
-
-  public getRequestedWidth(availableWidth: number, availableHeight: number) {
-    return this.isXAligned ? availableWidth : Axis.yWidth;
-  }
-
-  public getRequestedHeight(availableWidth: number, availableHeight: number) {
-    return this.isXAligned ? Axis.xHeight : availableHeight;
-  }
-
   public rescale() {
     var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
     var tickSelection = this.element.selectAll(".tick");
