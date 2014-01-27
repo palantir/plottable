@@ -42,13 +42,13 @@ class Table implements IRenderable {
   }
 
   private computeLayout() {
-    this.rowMinimums: number[] = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.minHeight()));
-    this.colMinimums: number[] = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.minWidth()));
+    this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.minHeight()));
+    this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.minWidth()));
     this.minWidth  = d3.sum(this.rowMinimums);
     this.minHeight = d3.sum(this.colMinimums);
 
-    this.rowWeights: number[] = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.rowWeight()));
-    this.colWeights: number[] = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.colWeight()));
+    this.rowWeights = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.rowWeight()));
+    this.colWeights = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.colWeight()));
     this.rowWeightSum = d3.sum(rowWeights);
     this.colWeightSum = d3.sum(colWeights);
   }
@@ -65,9 +65,9 @@ class Table implements IRenderable {
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
 
     var yOffset = 0;
-    this.rows.forEach((row: IRenderable[], i) {
+    this.rows.forEach((row: IRenderable[], i) => {
       var xOffset = 0;
-      row.forEach((renderable, j) {
+      row.forEach((renderable, j) => {
         Table.renderChild(element, renderable, xOffset, yOffset, rowHeights[i], colWidths[j]);
         xOffset += colWidths[j];
       });
