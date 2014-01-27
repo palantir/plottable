@@ -17,6 +17,8 @@ class Renderer implements IRenderable {
   constructor(
     public dataset: IDataset
   ) {
+    this.rowWeightVal = 1;
+    this.colWeightVal = 1;
   }
 
   public rowWeight(newVal: number = null) {
