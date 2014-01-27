@@ -1,6 +1,6 @@
 ///<reference path="../lib/d3.d.ts" />
 
-class Axis implements IRenderable {
+class Axis extends Renderable {
   public static yWidth = 30;
   public static xHeight = 30;
   public element: D3.Selection;
@@ -63,6 +63,8 @@ class Axis implements IRenderable {
     // a = [0,100]; extent = 100; 0 - 100 = -100, 100 - 100
     this.element.call(this.d3axis);
   }
+
+  public rowWeight
 
   public getRequestedWidth(availableWidth: number, availableHeight: number) {
     return this.isXAligned ? availableWidth : Axis.yWidth;

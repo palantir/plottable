@@ -1,6 +1,6 @@
 ///<reference path="../lib/d3.d.ts" />
 
-class Renderer implements IRenderable {
+class Renderer extends Renderable {
   public renderArea: D3.Selection;
   public element: D3.Selection;
   public width: number;
@@ -8,8 +8,9 @@ class Renderer implements IRenderable {
   public scales: any;
 
   constructor(
-    public dataset: IDataset
+    public dataset: any[],
   ) {
+    super(1, 1, 0, 0);
   }
 
   public transform(translate: number[], scale: number) {
@@ -29,14 +30,6 @@ class Renderer implements IRenderable {
   public generateElement(container: D3.Selection) {
     this.element = container.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
   }
-
-  public getRequestedWidth(availableWidth: number, availableHeight: number) {
-    return availableWidth;
-  }
-
-  public getRequestedHeight(availableWidth: number, availableHeight: number) {
-    return availableHeight;
-  }
 }
 
 class XYRenderer extends Renderer {
@@ -47,10 +40,10 @@ class XYRenderer extends Renderer {
     this.xScale = xScale;
     this.yScale = yScale;
     var data = dataset.data;
-    var dateDomain = d3.extent(data, (d) => d.x);
-    var rangeDomain = [100, 0];
-    this.xScale.domain(dateDomain);
-    this.yScale.domain(rangeDomain);
+    var xDomain = d3.extent(data, (d) => d.x);
+    var yDomain = d3.extent(data, (d) => d.y);
+    this.xScale.domain(xDomain);
+    this.yScale.domain(yDomain);
   }
 
   public render(element: D3.Selection, width: number, height: number) {
