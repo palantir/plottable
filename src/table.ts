@@ -1,4 +1,5 @@
 ///<reference path="../lib/d3.d.ts" />
+///<reference path="utils.ts" />
 
 
 class Table implements IRenderable {
@@ -45,18 +46,19 @@ class Table implements IRenderable {
   }
 
   private computeLayout() {
-    this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.rowMinimum()));
-    this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.colMinimum()));
+    this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowMinimum() : 0));
+    this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colMinimum() : 0));
     this.minWidth  = d3.sum(this.rowMinimums);
     this.minHeight = d3.sum(this.colMinimums);
 
-    this.rowWeights = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => r.rowWeight()));
-    this.colWeights = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => r.colWeight()));
+    this.rowWeights = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowWeight() : 0));
+    this.colWeights = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colWeight() : 0));
     this.rowWeightSum = d3.sum(this.rowWeights);
     this.colWeightSum = d3.sum(this.colWeights);
   }
 
   public render(element: D3.Selection, availableWidth: number, availableHeight: number) {
+    this.computeLayout();
     var freeWidth = availableWidth - this.minWidth;
     var freeHeight = availableHeight - this.minHeight;
 
@@ -71,6 +73,9 @@ class Table implements IRenderable {
     this.rows.forEach((row: IRenderable[], i) => {
       var xOffset = 0;
       row.forEach((renderable, j) => {
+        if (renderable == null) {
+          return;
+        }
         Table.renderChild(element, renderable, xOffset, yOffset, rowHeights[i], colWidths[j]);
         xOffset += colWidths[j];
       });
