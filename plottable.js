@@ -244,6 +244,8 @@ var Table = (function () {
 var Renderer = (function () {
     function Renderer(dataset) {
         this.dataset = dataset;
+        this.rowWeightVal = 1;
+        this.colWeightVal = 1;
     }
     Renderer.prototype.rowWeight = function (newVal) {
         if (typeof newVal === "undefined") { newVal = null; }
