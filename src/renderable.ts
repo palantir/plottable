@@ -1,5 +1,7 @@
 class Renderable implements IRenderable {
-  constructor(private rowWeight, private colWeight, private rowMinimum, private colMinimum)
+  constructor(private rowWeight, private colWeight, private rowMinimum, private colMinimum) {
+
+  }
 
   public rowWeight(newVal?: number) {
     if (newVal != null) {

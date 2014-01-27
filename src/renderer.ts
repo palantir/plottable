@@ -8,7 +8,7 @@ class Renderer extends Renderable {
   public scales: any;
 
   constructor(
-    public dataset: any[],
+    public dataset: any[]
   ) {
     super(1, 1, 0, 0);
   }
