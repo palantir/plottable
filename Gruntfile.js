@@ -22,7 +22,7 @@ module.exports = function(grunt) {
           target: "ES5"
         },
         src: ["Src/*.ts"],
-        dest: "."
+        dest: "plottable.js"
       }
     },
     watch: {
