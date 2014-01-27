@@ -19,3 +19,6 @@ var yAxis = new YAxis(yScale, "right");
 var data = makeRandomData(100);
 var renderArea = new XYRenderer(data, xScale, yScale);
 var rootTable = new Table([[renderArea, yAxis], [xAxis, null]])
+
+var svg1 = d3.select("#svg1");
+rootTable.render(svg1, 500, 500);

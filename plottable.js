@@ -118,6 +118,24 @@ var YAxis = (function (_super) {
     }
     return YAxis;
 })(Axis);
+var Utils;
+(function (Utils) {
+    function readyCallback(numToTrigger, callbackWhenReady) {
+        var timesCalled = 0;
+        return function () {
+            timesCalled++;
+            if (timesCalled === numToTrigger) {
+                callbackWhenReady();
+            }
+        };
+    }
+    Utils.readyCallback = readyCallback;
+
+    function translate(element, translatePair) {
+        return element.attr("transform", "translate(" + translatePair + ")");
+    }
+    Utils.translate = translate;
+})(Utils || (Utils = {}));
 var Table = (function () {
     function Table(rows, rowWeightVal, colWeightVal) {
         if (typeof rowWeightVal === "undefined") { rowWeightVal = 0; }
@@ -154,12 +172,12 @@ var Table = (function () {
     Table.prototype.computeLayout = function () {
         this.rowMinimums = this.rows.map(function (row) {
             return d3.max(row, function (r) {
-                return r.rowMinimum();
+                return (r != null) ? r.rowMinimum() : 0;
             });
         });
         this.colMinimums = this.cols.map(function (col) {
             return d3.max(col, function (r) {
-                return r.colMinimum();
+                return (r != null) ? r.colMinimum() : 0;
             });
         });
         this.minWidth = d3.sum(this.rowMinimums);
@@ -167,12 +185,12 @@ var Table = (function () {
 
         this.rowWeights = this.rows.map(function (row) {
             return d3.max(row, function (r) {
-                return r.rowWeight();
+                return (r != null) ? r.rowWeight() : 0;
             });
         });
         this.colWeights = this.cols.map(function (col) {
             return d3.max(col, function (r) {
-                return r.colWeight();
+                return (r != null) ? r.colWeight() : 0;
             });
         });
         this.rowWeightSum = d3.sum(this.rowWeights);
@@ -181,6 +199,7 @@ var Table = (function () {
 
     Table.prototype.render = function (element, availableWidth, availableHeight) {
         var _this = this;
+        this.computeLayout();
         var freeWidth = availableWidth - this.minWidth;
         var freeHeight = availableHeight - this.minHeight;
 
@@ -203,6 +222,9 @@ var Table = (function () {
         this.rows.forEach(function (row, i) {
             var xOffset = 0;
             row.forEach(function (renderable, j) {
+                if (renderable == null) {
+                    return;
+                }
                 Table.renderChild(element, renderable, xOffset, yOffset, rowHeights[i], colWidths[j]);
                 xOffset += colWidths[j];
             });
@@ -269,6 +291,7 @@ var XYRenderer = (function (_super) {
     __extends(XYRenderer, _super);
     function XYRenderer(dataset, xScale, yScale) {
         _super.call(this, dataset);
+        this.className = "XYRenderer";
         this.xScale = xScale;
         this.yScale = yScale;
         var data = dataset.data;
@@ -329,6 +352,9 @@ var yAxis = new YAxis(yScale, "right");
 var data = makeRandomData(100);
 var renderArea = new XYRenderer(data, xScale, yScale);
 var rootTable = new Table([[renderArea, yAxis], [xAxis, null]]);
+
+var svg1 = d3.select("#svg1");
+rootTable.render(svg1, 500, 500);
 var PerfDiagnostics;
 (function (_PerfDiagnostics) {
     var PerfDiagnostics = (function () {
@@ -392,22 +418,4 @@ var PerfDiagnostics;
     ;
 })(PerfDiagnostics || (PerfDiagnostics = {}));
 window.report = PerfDiagnostics.logResults;
-var Utils;
-(function (Utils) {
-    function readyCallback(numToTrigger, callbackWhenReady) {
-        var timesCalled = 0;
-        return function () {
-            timesCalled++;
-            if (timesCalled === numToTrigger) {
-                callbackWhenReady();
-            }
-        };
-    }
-    Utils.readyCallback = readyCallback;
-
-    function translate(element, translatePair) {
-        return element.attr("transform", "translate(" + translatePair + ")");
-    }
-    Utils.translate = translate;
-})(Utils || (Utils = {}));
 //# sourceMappingURL=plottable.js.map

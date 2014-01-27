@@ -64,6 +64,7 @@ class XYRenderer extends Renderer {
   public yScale: D3.Scale.Scale;
   constructor(dataset: IDataset, xScale: D3.Scale.Scale, yScale: D3.Scale.Scale) {
     super(dataset);
+    this.className = "XYRenderer";
     this.xScale = xScale;
     this.yScale = yScale;
     var data = dataset.data;
