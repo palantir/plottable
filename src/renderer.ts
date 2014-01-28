@@ -49,6 +49,7 @@ class Renderer implements IRenderable {
 
   public render(element: D3.Selection, width: number, height: number) {
     this.element = element;
+    var bb = this.element.append("rect").attr("width", width).attr("height", height).classed("renderer-box", true);
     chai.assert.operator(width, '>=', 0, "width is >= 0");
     chai.assert.operator(height, '>=', 0, "height is >= 0");
     return; // no-op

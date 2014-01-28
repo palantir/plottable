@@ -58,6 +58,7 @@ var Axis = (function () {
 
     Axis.prototype.render = function (element, width, height) {
         this.element = element.append("g").classed("axis", true);
+        this.element.append("rect").attr("width", width).attr("height", height).classed("axis-box", true);
         if (this.orientation === "left")
             this.element.attr("transform", "translate(" + Axis.yWidth + ")");
         if (this.orientation === "top")
@@ -250,6 +251,7 @@ var Table = (function () {
             var xOffset = 0;
             row.forEach(function (renderable, j) {
                 if (renderable == null) {
+                    xOffset += colWidths[j];
                     return;
                 }
                 Table.renderChild(element, renderable, xOffset, yOffset, colWidths[j], rowHeights[i]);
@@ -304,6 +306,7 @@ var Renderer = (function () {
 
     Renderer.prototype.render = function (element, width, height) {
         this.element = element;
+        var bb = this.element.append("rect").attr("width", width).attr("height", height).classed("renderer-box", true);
         chai.assert.operator(width, '>=', 0, "width is >= 0");
         chai.assert.operator(height, '>=', 0, "height is >= 0");
         return;
@@ -393,6 +396,7 @@ function makeBasicChartTable() {
 
 var svg1 = d3.select("#svg1");
 svg1.attr("width", 500).attr("height", 500);
+makeBasicChartTable().render(svg1, 500, 500);
 
 var svg2 = d3.select("#svg2");
 
@@ -403,6 +407,7 @@ var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
 svg2.attr("width", 800).attr("height", 800);
+metaTable.render(svg2, 800, 800);
 
 function makeMultiAxisChart() {
     var xScale = d3.scale.linear();
