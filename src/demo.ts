@@ -4,10 +4,10 @@
 ///<reference path="table.ts" />
 ///<reference path="renderer.ts" />
 
-function makeRandomData(numPoints): IDataset {
+function makeRandomData(numPoints, scaleFactor=1): IDataset {
   var data = [];
   for (var i = 0; i < numPoints; i++) {
-    var r = {x: Math.random(), y: Math.random() * Math.random()}
+    var r = {x: Math.random(), y: Math.random() * Math.random() * scaleFactor}
     data.push(r);
   }
   data = _.sortBy(data, (d) => d.x);
@@ -69,18 +69,18 @@ multiaxischart.render(svg3, 400, 400);
 function makeSparklineMultichart() {
   var xScale1 = d3.scale.linear();
   var yScale1 = d3.scale.linear();
-  var leftAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
+  var leftAxes = [new YAxis(yScale1, "left"), new YAxis(yScale1, "left")];
   var leftAxesTable = new Table([leftAxes]);
   leftAxesTable.colWeight(0);
   var rightAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
   var rightAxesTable = new Table([rightAxes]);
   rightAxesTable.colWeight(0);
-  var data1 = makeRandomData(3);
+  var data1 = makeRandomData(30, .0005);
   var renderer1 = new LineRenderer(data1, xScale1, yScale1);
   var row1: IRenderable[] = [rightAxesTable, renderer1, leftAxesTable];
   var yScale2 = d3.scale.linear();
-  var leftAxis = new YAxis(yScale2, "right");
-  var data2 = makeRandomData(100);
+  var leftAxis = new YAxis(yScale2, "left");
+  var data2 = makeRandomData(100, 100000);
   var renderer2 = new LineRenderer(data2, xScale1, yScale2);
   var row2: IRenderable[] = [leftAxis, renderer2, null];
   var bottomAxis = new XAxis(xScale1, "bottom");
