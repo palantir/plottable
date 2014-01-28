@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="google" value="notranslate">
+    <title>plottable Tests</title>
+    <!-- load mocha -->
+    <link rel="stylesheet" href="../lib/mocha/mocha.css">
+    <script src="../lib/mocha/mocha.js"></script>
+    <script>mocha.setup("bdd")</script>
+
+    <!-- load chai and chai-as-promised-->
+    <script src="../lib/chai/chai.js"></script>
+    <script src="axisTests.js"></script>
+  </head>
+  <body>
+    <!-- mocha results will be added to this div -->
+    <div id="mocha"></div>
+    <script>
+      mocha.checkLeaks();
+      mocha.run();
+    </script>
+  </body>
+</html>

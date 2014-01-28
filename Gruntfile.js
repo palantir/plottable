@@ -21,8 +21,10 @@ module.exports = function(grunt) {
           sourcemap: true,
           target: "ES5"
         },
-        src: ["Src/*.ts"],
-        dest: "."
+        files: [
+          { src: ["src/*.ts"], dest: "plottable.js" },
+          { src: ["test/*.ts"], dest: "." }
+        ]
       }
     },
     watch: {
@@ -32,7 +34,8 @@ module.exports = function(grunt) {
         ],
         "files": [
           "Gruntfile.js",
-          "Src/*.ts"
+          "src/*.ts",
+          "test/*.ts"
         ]
       }
     }
