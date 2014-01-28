@@ -62,4 +62,31 @@ describe("Table layout", () => {
       });
   });
 
+  it("table with 2 rows 2 cols and margin/padding lays out properly", () => {
+    var tableAndRenderers = generateBasicTable(2,2);
+    var table = tableAndRenderers.table;
+    var renderers = tableAndRenderers.renderers;
+
+    table.xMargin = 10;
+    table.yMargin = 10;
+    table.rowPadding = 5;
+    table.colPadding = 5;
+
+    var svg = generateSVG(425,425);
+    table.computeLayout();
+    table.render(svg, 425, 425);
+
+    var elements = renderers.map((r) => r.element);
+    var translates = elements.map((e) => Utils.getTranslate(e));
+    chai.assert.deepEqual(translates[0], [10, 10], "first element is centered properly");
+    chai.assert.deepEqual(translates[1], [215, 10], "second element is located properly");
+    chai.assert.deepEqual(translates[2], [10, 215], "third element is located properly");
+    chai.assert.deepEqual(translates[3], [215, 215], "fourth element is located properly");
+    var bboxes = elements.map((e) => Utils.getBBox(e));
+    bboxes.forEach((b) => {
+      chai.assert.equal(b.width, 200, "bbox is 200 pixels wide");
+      chai.assert.equal(b.height, 200, "bbox is 200 pixels tall");
+      });
+  });
+
 })
