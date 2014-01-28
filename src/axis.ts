@@ -2,7 +2,7 @@
 ///<reference path="../lib/chai/chai.d.ts" />
 
 class Axis implements IRenderable {
-  public static yWidth = 30;
+  public static yWidth = 50;
   public static xHeight = 30;
   public className: string;
   public element: D3.Selection;
@@ -33,11 +33,12 @@ class Axis implements IRenderable {
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     var rowMinimum = this.isXAligned ? Axis.xHeight : 0;
     var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
-    // this.orientation = attachmentTypeToString(this.attachmentPoint);
+    // this.orientation = attachmentTypeToString(this.attachmentTypeToStringt);
     this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
-    if (this.formatter != null) {
-      this.d3axis.tickFormat(formatter);
+    if (this.formatter == null) {
+      this.formatter = d3.format("s3");
     }
+    this.d3axis.tickFormat(this.formatter);
     this.cachedScale = 1;
     this.cachedTranslate = 0;
     this.className = "axis";
@@ -109,12 +110,12 @@ class Axis implements IRenderable {
 
 class XAxis extends Axis {
   constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
-    super(scale, orientation, formatter, 30, 0);
+    super(scale, orientation, formatter, Axis.xHeight, 0);
   }
 }
 
 class YAxis extends Axis {
   constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
-    super(scale, orientation, formatter, 0, 30);
+    super(scale, orientation, formatter, 0, Axis.yWidth);
   }
 }

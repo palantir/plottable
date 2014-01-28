@@ -16,9 +16,10 @@ var Axis = (function () {
         var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
 
         this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
-        if (this.formatter != null) {
-            this.d3axis.tickFormat(formatter);
+        if (this.formatter == null) {
+            this.formatter = d3.format("s3");
         }
+        this.d3axis.tickFormat(this.formatter);
         this.cachedScale = 1;
         this.cachedTranslate = 0;
         this.className = "axis";
@@ -97,7 +98,7 @@ var Axis = (function () {
             this.element.attr("transform", transform);
         }
     };
-    Axis.yWidth = 30;
+    Axis.yWidth = 50;
     Axis.xHeight = 30;
     return Axis;
 })();
@@ -106,7 +107,7 @@ var XAxis = (function (_super) {
     __extends(XAxis, _super);
     function XAxis(scale, orientation, formatter) {
         if (typeof formatter === "undefined") { formatter = null; }
-        _super.call(this, scale, orientation, formatter, 30, 0);
+        _super.call(this, scale, orientation, formatter, Axis.xHeight, 0);
     }
     return XAxis;
 })(Axis);
@@ -115,7 +116,7 @@ var YAxis = (function (_super) {
     __extends(YAxis, _super);
     function YAxis(scale, orientation, formatter) {
         if (typeof formatter === "undefined") { formatter = null; }
-        _super.call(this, scale, orientation, formatter, 0, 30);
+        _super.call(this, scale, orientation, formatter, 0, Axis.yWidth);
     }
     return YAxis;
 })(Axis);
@@ -371,10 +372,11 @@ var LineRenderer = (function (_super) {
     };
     return LineRenderer;
 })(XYRenderer);
-function makeRandomData(numPoints) {
+function makeRandomData(numPoints, scaleFactor) {
+    if (typeof scaleFactor === "undefined") { scaleFactor = 1; }
     var data = [];
     for (var i = 0; i < numPoints; i++) {
-        var r = { x: Math.random(), y: Math.random() * Math.random() };
+        var r = { x: Math.random(), y: Math.random() * Math.random() * scaleFactor };
         data.push(r);
     }
     data = _.sortBy(data, function (d) {
@@ -431,18 +433,18 @@ multiaxischart.render(svg3, 400, 400);
 function makeSparklineMultichart() {
     var xScale1 = d3.scale.linear();
     var yScale1 = d3.scale.linear();
-    var leftAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
+    var leftAxes = [new YAxis(yScale1, "left"), new YAxis(yScale1, "left")];
     var leftAxesTable = new Table([leftAxes]);
     leftAxesTable.colWeight(0);
     var rightAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
     var rightAxesTable = new Table([rightAxes]);
     rightAxesTable.colWeight(0);
-    var data1 = makeRandomData(3);
+    var data1 = makeRandomData(30, .0005);
     var renderer1 = new LineRenderer(data1, xScale1, yScale1);
     var row1 = [rightAxesTable, renderer1, leftAxesTable];
     var yScale2 = d3.scale.linear();
-    var leftAxis = new YAxis(yScale2, "right");
-    var data2 = makeRandomData(100);
+    var leftAxis = new YAxis(yScale2, "left");
+    var data2 = makeRandomData(100, 100000);
     var renderer2 = new LineRenderer(data2, xScale1, yScale2);
     var row2 = [leftAxis, renderer2, null];
     var bottomAxis = new XAxis(xScale1, "bottom");
