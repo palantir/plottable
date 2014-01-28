@@ -406,8 +406,8 @@ var t3 = makeBasicChartTable();
 var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
-svg2.attr("width", 800).attr("height", 800);
-metaTable.render(svg2, 800, 800);
+svg2.attr("width", 800).attr("height", 600);
+metaTable.render(svg2, 800, 600);
 
 function makeMultiAxisChart() {
     var xScale = d3.scale.linear();
@@ -447,16 +447,20 @@ function makeSparklineMultichart() {
     var row2 = [leftAxis, renderer2, null];
     var bottomAxis = new XAxis(xScale1, "bottom");
     var row3 = [null, bottomAxis, null];
-    var multiChart = new Table([row1, row2, row3]);
+    var yScaleSpark = d3.scale.linear();
+    var sparkline = new LineRenderer(data2, xScale1, yScaleSpark);
+    sparkline.rowWeight(0.25);
+    var row4 = [null, sparkline, null];
+    var multiChart = new Table([row1, row2, row3, row4]);
     return multiChart;
 }
 
 var svg4 = d3.select("#svg4");
-svg4.attr("width", 800).attr("height", 800);
+svg4.attr("width", 800).attr("height", 600);
 var multichart = makeSparklineMultichart();
-multichart.render(svg4, 800, 800);
+multichart.render(svg4, 800, 600);
 svg4.selectAll("g").remove();
-multichart.render(svg4, 800, 800);
+multichart.render(svg4, 800, 600);
 
 function iterate(n, fn) {
     var out = [];
