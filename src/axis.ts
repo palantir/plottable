@@ -67,8 +67,8 @@ class Axis extends Component {
   }
 
   public render(element: D3.Selection, width: number, height: number) {
+    element.append("rect").attr("width", width).attr("height", height).classed("axis-box", true);
     this.element = element.append("g").classed("axis", true);
-    this.element.append("rect").attr("width", width).attr("height", height).classed("axis-box", true);
     if (this.orientation === "left") this.element.attr("transform", "translate(" + Axis.yWidth + ")");
     if (this.orientation === "top")  this.element.attr("transform", "translate(0," + Axis.xHeight + ")");
     var domain = this.scale.domain();
