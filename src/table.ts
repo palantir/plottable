@@ -9,6 +9,8 @@ class Table implements IRenderable {
   public className: string;
   public rowPadding = 5;
   public colPadding = 5;
+  public xMargin = 5;
+  public yMargin = 5;
 
   private renderables: IRenderable[];
   private tables: Table[];
@@ -63,8 +65,8 @@ class Table implements IRenderable {
     this.tables.forEach((t) => t.computeLayout());
     this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowMinimum() : 0));
     this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colMinimum() : 0));
-    this.minWidth  = d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);
-    this.minHeight = d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
+    this.minWidth  = d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1) + 2 * this.xMargin;
+    this.minHeight = d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1) + 2 * this.yMargin;
 
     this.rowWeights = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowWeight() : 0));
     this.colWeights = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colWeight() : 0));
@@ -98,11 +100,11 @@ class Table implements IRenderable {
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
 
-    chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding, availableHeight, 1, "row heights sum to available height");
-    chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding, availableWidth, 1, "col widths sum to available width");
-    var yOffset = 0;
+    chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding + 2 * this.yMargin, availableHeight, 1, "row heights sum to available height");
+    chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, availableWidth, 1, "col widths sum to available width");
+    var yOffset = this.yMargin;
     this.rows.forEach((row: IRenderable[], i) => {
-      var xOffset = 0;
+      var xOffset = this.xMargin;
       row.forEach((renderable, j) => {
         if (renderable == null) {
           xOffset += colWidths[j];
@@ -111,10 +113,10 @@ class Table implements IRenderable {
         Table.renderChild(element, renderable, xOffset, yOffset, colWidths[j], rowHeights[i]);
         xOffset += colWidths[j] + this.colPadding;
       });
-      chai.assert.operator(xOffset - this.colPadding, "<=", availableWidth, "final xOffset was <= availableWidth");
+      chai.assert.operator(xOffset - this.colPadding - this.xMargin, "<=", availableWidth, "final xOffset was <= availableWidth");
       yOffset += rowHeights[i] + this.rowPadding;
     });
-    chai.assert.operator(yOffset - this.rowPadding, "<=", availableHeight, "final xOffset was <= availableHeight");
+    chai.assert.operator(yOffset - this.rowPadding - this.yMargin, "<=", availableHeight, "final xOffset was <= availableHeight");
   }
 
   private static renderChild(
