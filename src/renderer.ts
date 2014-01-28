@@ -1,5 +1,6 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
+///<reference path="scale.ts" />
 
 class Renderer extends Component {
   public renderArea: D3.Selection;
@@ -7,7 +8,7 @@ class Renderer extends Component {
   public className: string;
   public width: number;
   public height: number;
-  public scales: any;
+  public scales: Scale[];
 
   constructor(
     public dataset: IDataset
@@ -38,18 +39,18 @@ class Renderer extends Component {
 }
 
 class XYRenderer extends Renderer {
-  public xScale: D3.Scale.Scale;
-  public yScale: D3.Scale.Scale;
-  constructor(dataset: IDataset, xScale: D3.Scale.Scale, yScale: D3.Scale.Scale) {
+  public xScale: Scale;
+  public yScale: Scale;
+  constructor(dataset: IDataset, xScale: Scale, yScale: Scale) {
     super(dataset);
     this.className = "XYRenderer";
     this.xScale = xScale;
     this.yScale = yScale;
     var data = dataset.data;
     var xDomain = d3.extent(data, (d) => d.x);
+    this.xScale.widenDomain(xDomain);
     var yDomain = d3.extent(data, (d) => d.y);
-    this.xScale.domain(xDomain);
-    this.yScale.domain(yDomain);
+    this.yScale.widenDomain(yDomain);
   }
 
   public render(element: D3.Selection, width: number, height: number) {
@@ -69,15 +70,15 @@ class XYRenderer extends Renderer {
 class LineRenderer extends XYRenderer {
   private line: D3.Svg.Line;
 
-  constructor(dataset: IDataset, xScale: D3.Scale.Scale, yScale: D3.Scale.Scale) {
+  constructor(dataset: IDataset, xScale: Scale, yScale: Scale) {
     super(dataset, xScale, yScale);
   }
 
   public render(element: D3.Selection, width: number, height: number) {
     super.render(element, width, height);
     this.line = d3.svg.line()
-      .x((d) => this.xScale(d.x))
-      .y((d) => this.yScale(d.y));
+      .x((d) => this.xScale.scale(d.x))
+      .y((d) => this.yScale.scale(d.y));
     this.renderArea = this.element.append("path")
       .classed("line", true)
       .classed(this.dataset.seriesName, true)
