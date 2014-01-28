@@ -24,13 +24,13 @@ class Axis extends Component {
   }
 
   constructor(
-    public scale: D3.Scale.Scale,
+    public scale: Scale,
     public orientation: string,
     public formatter: any
   ) {
     super();
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
-    this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
+    this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
     if (this.formatter == null) {
       this.formatter = d3.format("s3");
     }
@@ -99,7 +99,7 @@ class Axis extends Component {
   public rescale() {
     var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
     var tickSelection = this.element.selectAll(".tick");
-    (<any> tickSelection).call(tickTransform, this.scale);
+    (<any> tickSelection).call(tickTransform, this.scale.scale);
     this.element.attr("transform","");
   }
 
@@ -118,14 +118,14 @@ class Axis extends Component {
 }
 
 class XAxis extends Axis {
-  constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
+  constructor(scale: Scale, orientation: string, formatter: any = null) {
     super(scale, orientation, formatter);
     super.rowMinimum(Axis.xHeight);
   }
 }
 
 class YAxis extends Axis {
-  constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
+  constructor(scale: Scale, orientation: string, formatter: any = null) {
     super(scale, orientation, formatter);
     super.colMinimum(Axis.yWidth);
   }
