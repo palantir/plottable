@@ -77,14 +77,14 @@ function makeSparklineMultichart() {
   rightAxesTable.colWeight(0);
   var data1 = makeRandomData(30, .0005);
   var renderer1 = new LineRenderer(data1, xScale1, yScale1);
-  var row1: IRenderable[] = [rightAxesTable, renderer1, leftAxesTable];
+  var row1: Renderable[] = [rightAxesTable, renderer1, leftAxesTable];
   var yScale2 = d3.scale.linear();
   var leftAxis = new YAxis(yScale2, "left");
   var data2 = makeRandomData(100, 100000);
   var renderer2 = new LineRenderer(data2, xScale1, yScale2);
-  var row2: IRenderable[] = [leftAxis, renderer2, null];
+  var row2: Renderable[] = [leftAxis, renderer2, null];
   var bottomAxis = new XAxis(xScale1, "bottom");
-  var row3: IRenderable[] = [null, bottomAxis, null];
+  var row3: Renderable[] = [null, bottomAxis, null];
   var yScaleSpark = d3.scale.linear();
   var sparkline = new LineRenderer(data2, xScale1, yScaleSpark);
   sparkline.rowWeight(0.25);
