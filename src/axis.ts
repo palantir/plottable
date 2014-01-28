@@ -1,10 +1,10 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
+///<reference path="renderable.ts" />
 
-class Axis implements IRenderable {
+class Axis extends Renderable {
   public static yWidth = 50;
   public static xHeight = 30;
-  public className: string;
   public element: D3.Selection;
   public d3axis: D3.Svg.Axis;
   private cachedScale: number;
@@ -30,6 +30,7 @@ class Axis implements IRenderable {
     private rowMinimumVal: number,
     private colMinimumVal: number
   ) {
+    super();
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     var rowMinimum = this.isXAligned ? Axis.xHeight : 0;
     var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
@@ -41,7 +42,6 @@ class Axis implements IRenderable {
     this.d3axis.tickFormat(this.formatter);
     this.cachedScale = 1;
     this.cachedTranslate = 0;
-    this.className = "axis";
   }
 
   private transformString(translate: number, scale: number) {
