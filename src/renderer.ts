@@ -1,7 +1,7 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
 
-class Renderer implements IRenderable {
+class Renderer extends Renderable {
   public renderArea: D3.Selection;
   public element: D3.Selection;
   public className: string;
@@ -9,38 +9,11 @@ class Renderer implements IRenderable {
   public height: number;
   public scales: any;
 
-  private rowWeightVal: number;
-  private colWeightVal: number;
-  private rowMinimumVal: number;
-  private colMinimumVal: number;
-
   constructor(
     public dataset: IDataset
   ) {
-    this.rowWeightVal = 1;
-    this.colWeightVal = 1;
-  }
-
-  public rowWeight(newVal: number = null) {
-    if (newVal != null) {
-      this.rowWeightVal = newVal;
-    }
-    return this.rowWeightVal;
-  }
-
-  public colWeight(newVal: number = null) {
-    if (newVal != null) {
-      this.colWeightVal = newVal;
-    }
-    return this.colWeightVal;
-  }
-
-  public rowMinimum(): number {
-    return this.rowMinimumVal;
-  }
-
-  public colMinimum(): number {
-    return this.colMinimumVal;
+    super();
+    super.rowWeight(1).colWeight(1);
   }
 
   public transform(translate: number[], scale: number) {

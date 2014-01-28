@@ -12,11 +12,11 @@ class Table extends Renderable {
   public xMargin = 5;
   public yMargin = 5;
 
-  private renderables: IRenderable[];
+  private renderables: Renderable[];
   private tables: Table[];
 
-  private rows: IRenderable[][];
-  private cols: IRenderable[][];
+  private rows: Renderable[][];
+  private cols: Renderable[][];
   private nRows: number;
   private nCols: number;
   private rowMinimums: number[];
@@ -28,48 +28,53 @@ class Table extends Renderable {
   private rowWeights: number[];
   private colWeights: number[];
 
-  private rowWeightVal: number;
-  private colWeightVal: number;
-
   private rowWeightSum: number;
   private colWeightSum: number;
 
   /* Getters */
-  public rowMinimum() {return this.minHeight;}
-  public colMinimum() {return this.minWidth;}
-
-  /* GetterSetters */
-  public rowWeight(newVal: number=null): number {
-    if (newVal != null) {this.rowWeightVal = newVal;}
-    return this.rowWeightVal;
+  public rowMinimum(): number;
+  public rowMinimum(newVal: number): Renderable;
+  public rowMinimum(newVal?: number): any {
+    if (newVal != null) {
+      throw new Error("Row minimum cannot be directly set on Table.");
+      return this;
+    } else {
+      return this.minHeight;
+    }
   }
 
-  public colWeight(newVal: number=null): number {
-    if (newVal != null) {this.colWeightVal = newVal;}
-    return this.colWeightVal;
+  public colMinimum(): number;
+  public colMinimum(newVal: number): Renderable;
+  public colMinimum(newVal?: number): any {
+    if (newVal != null) {
+      throw new Error("Col minimum cannot be directly set on Table.");
+      return this;
+    } else {
+      return this.minWidth;
+    }
   }
 
-  constructor(rows: IRenderable[][], rowWeightVal=1, colWeightVal=1) {
+  constructor(rows: Renderable[][], rowWeightVal=1, colWeightVal=1) {
     super();
     this.rows = rows;
     this.cols = d3.transpose(rows);
     this.nRows = this.rows.length;
     this.nCols = this.cols.length;
-    this.renderables = <IRenderable[]> _.flatten(this.rows);
+    this.renderables = <Renderable[]> _.flatten(this.rows);
     this.tables = <Table[]> this.renderables.filter((x) => x != null && x.computeLayout != null)
-    this.rowWeightVal = rowWeightVal;
-    this.colWeightVal = colWeightVal;
+    super.rowWeight(rowWeightVal);
+    super.colWeight(colWeightVal);
   }
 
   public computeLayout() {
     this.tables.forEach((t) => t.computeLayout());
-    this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowMinimum() : 0));
-    this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colMinimum() : 0));
+    this.rowMinimums = this.rows.map((row: Renderable[]) => d3.max(row, (r: Renderable) => (r != null) ? r.rowMinimum() : 0));
+    this.colMinimums = this.cols.map((col: Renderable[]) => d3.max(col, (r: Renderable) => (r != null) ? r.colMinimum() : 0));
     this.minWidth  = d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1) + 2 * this.xMargin;
     this.minHeight = d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1) + 2 * this.yMargin;
 
-    this.rowWeights = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowWeight() : 0));
-    this.colWeights = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colWeight() : 0));
+    this.rowWeights = this.rows.map((row: Renderable[]) => d3.max(row, (r: Renderable) => (r != null) ? r.rowWeight() : 0));
+    this.colWeights = this.cols.map((col: Renderable[]) => d3.max(col, (r: Renderable) => (r != null) ? r.colWeight() : 0));
     this.rowWeightSum = d3.sum(this.rowWeights);
     this.colWeightSum = d3.sum(this.colWeights);
   }
@@ -103,7 +108,7 @@ class Table extends Renderable {
     chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding + 2 * this.yMargin, availableHeight, 1, "row heights sum to available height");
     chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, availableWidth, 1, "col widths sum to available width");
     var yOffset = this.yMargin;
-    this.rows.forEach((row: IRenderable[], i) => {
+    this.rows.forEach((row: Renderable[], i) => {
       var xOffset = this.xMargin;
       row.forEach((renderable, j) => {
         if (renderable == null) {
@@ -121,7 +126,7 @@ class Table extends Renderable {
 
   private static renderChild(
     parentElement: D3.Selection,
-    renderable: IRenderable,
+    renderable: Renderable,
     xOffset: number,
     yOffset: number,
     width: number,

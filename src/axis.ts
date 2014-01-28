@@ -26,15 +26,10 @@ class Axis extends Renderable {
   constructor(
     public scale: D3.Scale.Scale,
     public orientation: string,
-    public formatter: any,
-    private rowMinimumVal: number,
-    private colMinimumVal: number
+    public formatter: any
   ) {
     super();
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
-    var rowMinimum = this.isXAligned ? Axis.xHeight : 0;
-    var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
-    // this.orientation = attachmentTypeToString(this.attachmentTypeToStringt);
     this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
     if (this.formatter == null) {
       this.formatter = d3.format("s3");
@@ -49,18 +44,26 @@ class Axis extends Renderable {
     return "translate(" + translateS + ")";
   }
 
-  public rowWeight(newVal: number = null) {
-    return 0;
-  }
-  public colWeight(newVal: number = null) {
-    return 0;
+  public rowWeight(): number;
+  public rowWeight(newVal: number): Renderable;
+  public rowWeight(newVal?: number): any {
+    if (newVal != null) {
+      throw new Error("Axis row weight is not settable.");
+      return this;
+    } else {
+      return 0;
+    }
   }
 
-  public rowMinimum(): number {
-    return this.rowMinimumVal;
-  }
-  public colMinimum(): number {
-    return this.colMinimumVal;
+  public colWeight(): number;
+  public colWeight(newVal: number): Renderable;
+  public colWeight(newVal?: number): any {
+    if (newVal != null) {
+      throw new Error("Axis col weight is not settable.");
+      return this;
+    } else {
+      return 0;
+    }
   }
 
   public render(element: D3.Selection, width: number, height: number) {
@@ -116,12 +119,14 @@ class Axis extends Renderable {
 
 class XAxis extends Axis {
   constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
-    super(scale, orientation, formatter, Axis.xHeight, 0);
+    super(scale, orientation, formatter);
+    super.rowMinimum(Axis.xHeight);
   }
 }
 
 class YAxis extends Axis {
   constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
-    super(scale, orientation, formatter, 0, Axis.yWidth);
+    super(scale, orientation, formatter);
+    super.colMinimum(Axis.yWidth);
   }
 }
