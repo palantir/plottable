@@ -3,10 +3,10 @@
 ///<reference path="../lib/chai/chai.d.ts" />
 ///<reference path="../lib/chai/chai-assert.d.ts" />
 ///<reference path="utils.ts" />
+///<reference path="renderable.ts" />
 
 
-class Table implements IRenderable {
-  public className: string;
+class Table extends Renderable {
   public rowPadding = 5;
   public colPadding = 5;
   public xMargin = 5;
@@ -50,6 +50,7 @@ class Table implements IRenderable {
   }
 
   constructor(rows: IRenderable[][], rowWeightVal=1, colWeightVal=1) {
+    super();
     this.rows = rows;
     this.cols = d3.transpose(rows);
     this.nRows = this.rows.length;
@@ -58,7 +59,6 @@ class Table implements IRenderable {
     this.tables = <Table[]> this.renderables.filter((x) => x != null && x.computeLayout != null)
     this.rowWeightVal = rowWeightVal;
     this.colWeightVal = colWeightVal;
-    this.className = "table";
   }
 
   public computeLayout() {
@@ -127,7 +127,7 @@ class Table implements IRenderable {
     width: number,
     height: number
   ) {
-    var childElement = parentElement.append("g").classed(renderable.className, true);
+    var childElement = parentElement.append("g");
     Utils.translate(childElement, [xOffset, yOffset]);
     renderable.render(childElement, width, height);
   }
