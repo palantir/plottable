@@ -16,9 +16,10 @@ var Axis = (function () {
         var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
 
         this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
-        if (this.formatter != null) {
-            this.d3axis.tickFormat(formatter);
+        if (this.formatter == null) {
+            this.formatter = d3.format("s3");
         }
+        this.d3axis.tickFormat(this.formatter);
         this.cachedScale = 1;
         this.cachedTranslate = 0;
         this.className = "axis";
@@ -97,7 +98,7 @@ var Axis = (function () {
             this.element.attr("transform", transform);
         }
     };
-    Axis.yWidth = 30;
+    Axis.yWidth = 50;
     Axis.xHeight = 30;
     return Axis;
 })();
@@ -106,7 +107,7 @@ var XAxis = (function (_super) {
     __extends(XAxis, _super);
     function XAxis(scale, orientation, formatter) {
         if (typeof formatter === "undefined") { formatter = null; }
-        _super.call(this, scale, orientation, formatter, 30, 0);
+        _super.call(this, scale, orientation, formatter, Axis.xHeight, 0);
     }
     return XAxis;
 })(Axis);
@@ -115,7 +116,7 @@ var YAxis = (function (_super) {
     __extends(YAxis, _super);
     function YAxis(scale, orientation, formatter) {
         if (typeof formatter === "undefined") { formatter = null; }
-        _super.call(this, scale, orientation, formatter, 0, 30);
+        _super.call(this, scale, orientation, formatter, 0, Axis.yWidth);
     }
     return YAxis;
 })(Axis);
@@ -141,8 +142,12 @@ var Table = (function () {
     function Table(rows, rowWeightVal, colWeightVal) {
         if (typeof rowWeightVal === "undefined") { rowWeightVal = 1; }
         if (typeof colWeightVal === "undefined") { colWeightVal = 1; }
+        this.rowPadding = 5;
+        this.colPadding = 5;
         this.rows = rows;
         this.cols = d3.transpose(rows);
+        this.nRows = this.rows.length;
+        this.nCols = this.cols.length;
         this.renderables = _.flatten(this.rows);
         this.tables = this.renderables.filter(function (x) {
             return x != null && x.computeLayout != null;
@@ -188,8 +193,8 @@ var Table = (function () {
                 return (r != null) ? r.colMinimum() : 0;
             });
         });
-        this.minWidth = d3.sum(this.colMinimums);
-        this.minHeight = d3.sum(this.rowMinimums);
+        this.minWidth = d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);
+        this.minHeight = d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
 
         this.rowWeights = this.rows.map(function (row) {
             return d3.max(row, function (r) {
@@ -244,8 +249,8 @@ var Table = (function () {
         var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
         var colWidths = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
 
-        chai.assert.closeTo(d3.sum(rowHeights), availableHeight, 1, "row heights sum to available height");
-        chai.assert.closeTo(d3.sum(colWidths), availableWidth, 1, "col widths sum to available width");
+        chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding, availableHeight, 1, "row heights sum to available height");
+        chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding, availableWidth, 1, "col widths sum to available width");
         var yOffset = 0;
         this.rows.forEach(function (row, i) {
             var xOffset = 0;
@@ -255,12 +260,12 @@ var Table = (function () {
                     return;
                 }
                 Table.renderChild(element, renderable, xOffset, yOffset, colWidths[j], rowHeights[i]);
-                xOffset += colWidths[j];
+                xOffset += colWidths[j] + _this.colPadding;
             });
-            chai.assert.operator(xOffset, "<=", availableWidth, "final xOffset was <= availableWidth");
-            yOffset += rowHeights[i];
+            chai.assert.operator(xOffset - _this.colPadding, "<=", availableWidth, "final xOffset was <= availableWidth");
+            yOffset += rowHeights[i] + _this.rowPadding;
         });
-        chai.assert.operator(yOffset, "<=", availableHeight, "final xOffset was <= availableHeight");
+        chai.assert.operator(yOffset - this.rowPadding, "<=", availableHeight, "final xOffset was <= availableHeight");
     };
 
     Table.renderChild = function (parentElement, renderable, xOffset, yOffset, width, height) {
@@ -371,10 +376,11 @@ var LineRenderer = (function (_super) {
     };
     return LineRenderer;
 })(XYRenderer);
-function makeRandomData(numPoints) {
+function makeRandomData(numPoints, scaleFactor) {
+    if (typeof scaleFactor === "undefined") { scaleFactor = 1; }
     var data = [];
     for (var i = 0; i < numPoints; i++) {
-        var r = { x: Math.random(), y: Math.random() * Math.random() };
+        var r = { x: Math.random(), y: Math.random() * Math.random() * scaleFactor };
         data.push(r);
     }
     data = _.sortBy(data, function (d) {
@@ -431,18 +437,18 @@ multiaxischart.render(svg3, 400, 400);
 function makeSparklineMultichart() {
     var xScale1 = d3.scale.linear();
     var yScale1 = d3.scale.linear();
-    var leftAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
+    var leftAxes = [new YAxis(yScale1, "left"), new YAxis(yScale1, "left")];
     var leftAxesTable = new Table([leftAxes]);
     leftAxesTable.colWeight(0);
     var rightAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
     var rightAxesTable = new Table([rightAxes]);
     rightAxesTable.colWeight(0);
-    var data1 = makeRandomData(3);
+    var data1 = makeRandomData(30, .0005);
     var renderer1 = new LineRenderer(data1, xScale1, yScale1);
     var row1 = [rightAxesTable, renderer1, leftAxesTable];
     var yScale2 = d3.scale.linear();
-    var leftAxis = new YAxis(yScale2, "right");
-    var data2 = makeRandomData(100);
+    var leftAxis = new YAxis(yScale2, "left");
+    var data2 = makeRandomData(100, 100000);
     var renderer2 = new LineRenderer(data2, xScale1, yScale2);
     var row2 = [leftAxis, renderer2, null];
     var bottomAxis = new XAxis(xScale1, "bottom");
