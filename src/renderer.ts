@@ -13,7 +13,6 @@ class Renderer extends Renderable {
     public dataset: IDataset
   ) {
     super();
-    super.rowWeight(1).colWeight(1);
   }
 
   public transform(translate: number[], scale: number) {
