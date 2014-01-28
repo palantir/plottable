@@ -16,7 +16,7 @@ function generateSVG(width, height) {
 
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
-  // child being a basic Renderer (todo: maybe change to basic renderable)
+  // child being a basic Renderer (todo: maybe change to basic component)
   var emptyDataset: IDataset = {data: [], seriesName: "blah"};
   var rows: Renderer[][] = [];
   var renderers: Renderer[] = [];
