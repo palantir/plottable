@@ -54,3 +54,8 @@ svg {
 .lol {
   stroke: royalblue;
 }
+
+.table-rect {
+  fill: none;
+  stroke: royalblue;
+}

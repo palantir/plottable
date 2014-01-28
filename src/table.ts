@@ -57,8 +57,8 @@ class Table implements IRenderable {
     this.tables.forEach((t) => t.computeLayout());
     this.rowMinimums = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowMinimum() : 0));
     this.colMinimums = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colMinimum() : 0));
-    this.minWidth  = d3.sum(this.rowMinimums);
-    this.minHeight = d3.sum(this.colMinimums);
+    this.minWidth  = d3.sum(this.colMinimums);
+    this.minHeight = d3.sum(this.rowMinimums);
 
     this.rowWeights = this.rows.map((row: IRenderable[]) => d3.max(row, (r: IRenderable) => (r != null) ? r.rowWeight() : 0));
     this.colWeights = this.cols.map((col: IRenderable[]) => d3.max(col, (r: IRenderable) => (r != null) ? r.colWeight() : 0));
@@ -67,6 +67,8 @@ class Table implements IRenderable {
   }
 
   public render(element: D3.Selection, availableWidth: number, availableHeight: number) {
+    var rect = element.append("rect");
+    rect.attr("width", availableWidth).attr("height", availableHeight).classed("table-rect", true);
     chai.assert.operator(availableWidth, '>=', 0, "availableWidth is >= 0");
     chai.assert.operator(availableHeight, '>=', 0, "availableHeight is >= 0");
     this.computeLayout();
@@ -74,12 +76,24 @@ class Table implements IRenderable {
     var freeHeight = availableHeight - this.minHeight;
 
     if (freeWidth < 0 || freeHeight < 0) {throw "InsufficientSpaceError";}
-    var rowProportionalSpace = this.rowWeights.map((w: number) => w / this.rowWeightSum * availableHeight);
-    var colProportionalSpace = this.colWeights.map((w: number) => w / this.colWeightSum * availableWidth);
+    if (this.rowWeightSum === 0) {
+      var nRows = this.rowWeights.length;
+      var rowProportionalSpace = this.rowWeights.map((w) => freeHeight / nRows);
+    } else {
+      var rowProportionalSpace = this.rowWeights.map((w: number) => w / this.rowWeightSum * freeHeight);
+    }
+    if (this.colWeightSum === 0) {
+      var nCols = this.colWeights.length;
+      var colProportionalSpace = this.colWeights.map((w) => freeWidth / nCols);
+    } else {
+      var colProportionalSpace = this.colWeights.map((w: number) => w / this.colWeightSum * freeWidth);
+    }
     var sumPair = (p: number[]) => p[0] + p[1];
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
 
+    chai.assert.closeTo(d3.sum(rowHeights), availableHeight, 1, "row heights sum to available height");
+    chai.assert.closeTo(d3.sum(colWidths), availableWidth, 1, "col widths sum to available width");
     var yOffset = 0;
     this.rows.forEach((row: IRenderable[], i) => {
       var xOffset = 0;
@@ -87,11 +101,13 @@ class Table implements IRenderable {
         if (renderable == null) {
           return;
         }
-        Table.renderChild(element, renderable, xOffset, yOffset, rowHeights[i], colWidths[j]);
+        Table.renderChild(element, renderable, xOffset, yOffset, colWidths[j], rowHeights[i]);
         xOffset += colWidths[j];
       });
+      chai.assert.operator(xOffset, "<=", availableWidth, "final xOffset was <= availableWidth");
       yOffset += rowHeights[i];
     });
+    chai.assert.operator(yOffset, "<=", availableHeight, "final xOffset was <= availableHeight");
   }
 
   private static renderChild(

@@ -187,8 +187,8 @@ var Table = (function () {
                 return (r != null) ? r.colMinimum() : 0;
             });
         });
-        this.minWidth = d3.sum(this.rowMinimums);
-        this.minHeight = d3.sum(this.colMinimums);
+        this.minWidth = d3.sum(this.colMinimums);
+        this.minHeight = d3.sum(this.rowMinimums);
 
         this.rowWeights = this.rows.map(function (row) {
             return d3.max(row, function (r) {
@@ -206,6 +206,8 @@ var Table = (function () {
 
     Table.prototype.render = function (element, availableWidth, availableHeight) {
         var _this = this;
+        var rect = element.append("rect");
+        rect.attr("width", availableWidth).attr("height", availableHeight).classed("table-rect", true);
         chai.assert.operator(availableWidth, '>=', 0, "availableWidth is >= 0");
         chai.assert.operator(availableHeight, '>=', 0, "availableHeight is >= 0");
         this.computeLayout();
@@ -215,18 +217,34 @@ var Table = (function () {
         if (freeWidth < 0 || freeHeight < 0) {
             throw "InsufficientSpaceError";
         }
-        var rowProportionalSpace = this.rowWeights.map(function (w) {
-            return w / _this.rowWeightSum * availableHeight;
-        });
-        var colProportionalSpace = this.colWeights.map(function (w) {
-            return w / _this.colWeightSum * availableWidth;
-        });
+        if (this.rowWeightSum === 0) {
+            var nRows = this.rowWeights.length;
+            var rowProportionalSpace = this.rowWeights.map(function (w) {
+                return freeHeight / nRows;
+            });
+        } else {
+            var rowProportionalSpace = this.rowWeights.map(function (w) {
+                return w / _this.rowWeightSum * freeHeight;
+            });
+        }
+        if (this.colWeightSum === 0) {
+            var nCols = this.colWeights.length;
+            var colProportionalSpace = this.colWeights.map(function (w) {
+                return freeWidth / nCols;
+            });
+        } else {
+            var colProportionalSpace = this.colWeights.map(function (w) {
+                return w / _this.colWeightSum * freeWidth;
+            });
+        }
         var sumPair = function (p) {
             return p[0] + p[1];
         };
         var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
         var colWidths = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
 
+        chai.assert.closeTo(d3.sum(rowHeights), availableHeight, 1, "row heights sum to available height");
+        chai.assert.closeTo(d3.sum(colWidths), availableWidth, 1, "col widths sum to available width");
         var yOffset = 0;
         this.rows.forEach(function (row, i) {
             var xOffset = 0;
@@ -234,11 +252,13 @@ var Table = (function () {
                 if (renderable == null) {
                     return;
                 }
-                Table.renderChild(element, renderable, xOffset, yOffset, rowHeights[i], colWidths[j]);
+                Table.renderChild(element, renderable, xOffset, yOffset, colWidths[j], rowHeights[i]);
                 xOffset += colWidths[j];
             });
+            chai.assert.operator(xOffset, "<=", availableWidth, "final xOffset was <= availableWidth");
             yOffset += rowHeights[i];
         });
+        chai.assert.operator(yOffset, "<=", availableHeight, "final xOffset was <= availableHeight");
     };
 
     Table.renderChild = function (parentElement, renderable, xOffset, yOffset, width, height) {
@@ -354,6 +374,9 @@ function makeRandomData(numPoints) {
         var r = { x: Math.random(), y: Math.random() * Math.random() };
         data.push(r);
     }
+    data = _.sortBy(data, function (d) {
+        return d.x;
+    });
     return { "data": data, "seriesName": "random-data" };
 }
 
@@ -369,7 +392,7 @@ function makeBasicChartTable() {
 }
 
 var svg1 = d3.select("#svg1");
-makeBasicChartTable().render(svg1, 500, 500);
+svg1.attr("width", 500).attr("height", 500);
 
 var svg2 = d3.select("#svg2");
 
@@ -379,7 +402,64 @@ var t3 = makeBasicChartTable();
 var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
-metaTable.render(svg2, 800, 800);
+svg2.attr("width", 800).attr("height", 800);
+
+function makeMultiAxisChart() {
+    var xScale = d3.scale.linear();
+    var yScale = d3.scale.linear();
+    var rightAxes = [new YAxis(yScale, "right"), new YAxis(yScale, "right")];
+    var rightAxesTable = new Table([rightAxes]);
+    rightAxesTable.colWeight(0);
+    var xAxis = new XAxis(xScale, "bottom");
+    var data = makeRandomData(30);
+    var renderArea = new LineRenderer(data, xScale, yScale);
+    var rootTable = new Table([[renderArea, rightAxesTable], [xAxis, null]]);
+    console.log(rootTable);
+    return rootTable;
+}
+
+var svg3 = d3.select("#svg3");
+svg3.attr("width", 400).attr("height", 400);
+var multiaxischart = makeMultiAxisChart();
+multiaxischart.render(svg3, 400, 400);
+
+function makeSparklineMultichart() {
+    var xScale1 = d3.scale.linear();
+    var yScale1 = d3.scale.linear();
+    var leftAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
+    var leftAxesTable = new Table([leftAxes]);
+    leftAxesTable.colWeight(0);
+    var rightAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
+    var rightAxesTable = new Table([rightAxes]);
+    rightAxesTable.colWeight(0);
+    var data1 = makeRandomData(3);
+    var renderer1 = new LineRenderer(data1, xScale1, yScale1);
+    var row1 = [rightAxesTable, renderer1, leftAxesTable];
+    var yScale2 = d3.scale.linear();
+    var leftAxis = new YAxis(yScale2, "right");
+    var data2 = makeRandomData(100);
+    var renderer2 = new LineRenderer(data2, xScale1, yScale2);
+    var row2 = [leftAxis, renderer2, null];
+    var bottomAxis = new XAxis(xScale1, "bottom");
+    var row3 = [null, bottomAxis, null];
+    var multiChart = new Table([row1, row2, row3]);
+    return multiChart;
+}
+
+var svg4 = d3.select("#svg4");
+svg4.attr("width", 800).attr("height", 800);
+var multichart = makeSparklineMultichart();
+multichart.render(svg4, 800, 800);
+svg4.selectAll("g").remove();
+multichart.render(svg4, 800, 800);
+
+function iterate(n, fn) {
+    var out = [];
+    for (var i = 0; i < n; i++) {
+        out.push(fn());
+    }
+    return out;
+}
 var PerfDiagnostics;
 (function (_PerfDiagnostics) {
     var PerfDiagnostics = (function () {
