@@ -77,7 +77,7 @@ function makeSparklineMultichart() {
   rightAxesTable.colWeight(0);
   var data1 = makeRandomData(30, .0005);
   var renderer1 = new LineRenderer(data1, xScale1, yScale1);
-  var row1: Component[] = [rightAxesTable, renderer1, leftAxesTable];
+  var row1: Component[] = [leftAxesTable, renderer1, rightAxesTable];
   var yScale2 = d3.scale.linear();
   var leftAxis = new YAxis(yScale2, "left");
   var data2 = makeRandomData(100, 100000);
