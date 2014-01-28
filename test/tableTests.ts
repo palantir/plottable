@@ -33,6 +33,13 @@ function generateBasicTable(nRows, nCols) {
   return {"table": table, "renderers": renderers};
 }
 
+function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
+  var width = widthAndHeightPair[0];
+  var height = widthAndHeightPair[1];
+  assert.equal(bbox.width, width, "width: " + message);
+  assert.equal(bbox.height, height, "height: " + message);
+}
+
 describe("Table layout", () => {
 
   it("basic table with 2 rows 2 cols lays out properly", () => {
@@ -51,14 +58,14 @@ describe("Table layout", () => {
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));
-    chai.assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
-    chai.assert.deepEqual(translates[1], [200, 0], "second element is located properly");
-    chai.assert.deepEqual(translates[2], [0, 200], "third element is located properly");
-    chai.assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
+    assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
+    assert.deepEqual(translates[1], [200, 0], "second element is located properly");
+    assert.deepEqual(translates[2], [0, 200], "third element is located properly");
+    assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
     var bboxes = elements.map((e) => Utils.getBBox(e));
     bboxes.forEach((b) => {
-      chai.assert.equal(b.width, 200, "bbox is 200 pixels wide");
-      chai.assert.equal(b.height, 200, "bbox is 200 pixels tall");
+      assert.equal(b.width, 200, "bbox is 200 pixels wide");
+      assert.equal(b.height, 200, "bbox is 200 pixels tall");
       });
     svg.remove();
   });
@@ -79,16 +86,57 @@ describe("Table layout", () => {
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));
-    chai.assert.deepEqual(translates[0], [10, 10], "first element is centered properly");
-    chai.assert.deepEqual(translates[1], [215, 10], "second element is located properly");
-    chai.assert.deepEqual(translates[2], [10, 215], "third element is located properly");
-    chai.assert.deepEqual(translates[3], [215, 215], "fourth element is located properly");
     var bboxes = elements.map((e) => Utils.getBBox(e));
+    assert.deepEqual(translates[0], [10, 10], "first element is centered properly");
+    assert.deepEqual(translates[1], [215, 10], "second element is located properly");
+    assert.deepEqual(translates[2], [10, 215], "third element is located properly");
+    assert.deepEqual(translates[3], [215, 215], "fourth element is located properly");
     bboxes.forEach((b) => {
-      chai.assert.equal(b.width, 200, "bbox is 200 pixels wide");
-      chai.assert.equal(b.height, 200, "bbox is 200 pixels tall");
+      assert.equal(b.width, 200, "bbox is 200 pixels wide");
+      assert.equal(b.height, 200, "bbox is 200 pixels tall");
       });
     svg.remove();
   });
+
+  it("table with fixed-size objects on every side lays out properly", () => {
+    var svg = generateSVG(400, 400);
+    var tableAndRenderers = generateBasicTable(3,3);
+    var table = tableAndRenderers.table;
+    var renderers = tableAndRenderers.renderers;
+    // [0 1 2] \\
+    // [3 4 5] \\
+    // [6 7 8] \\
+    // First, set everything to have no weight
+    renderers.forEach((r) => r.colWeight(0).rowWeight(0).colMinimum(0).rowMinimum(0));
+    // give the axis-like objects a minimum
+    renderers[1].rowMinimum(30);
+    renderers[7].rowMinimum(30);
+    renderers[3].colMinimum(50);
+    renderers[5].colMinimum(50);
+    // finally the center 'plot' object has a weight
+    renderers[4].rowWeight(1).colWeight(1);
+    table.xMargin = 0;
+    table.yMargin = 0;
+    table.rowPadding = 0;
+    table.colPadding = 0;
+    table.computeLayout();
+    table.render(svg, 400, 400);
+    var elements = renderers.map((r) => r.element);
+    var translates = elements.map((e) => Utils.getTranslate(e));
+    var bboxes = elements.map((e) => Utils.getBBox(e));
+    // test the translates
+    assert.deepEqual(translates[1], [50, 0]  , "top axis translate");
+    assert.deepEqual(translates[7], [50, 370], "bottom axis translate");
+    assert.deepEqual(translates[3], [0, 30]  , "left axis translate");
+    assert.deepEqual(translates[5], [350, 30], "right axis translate");
+    assert.deepEqual(translates[4], [50, 30] , "plot translate");
+    // test the bboxes
+    assertBBoxEquivalence(bboxes[1], [300, 30], "top axis bbox");
+    assertBBoxEquivalence(bboxes[7], [300, 30], "bottom axis bbox");
+    assertBBoxEquivalence(bboxes[3], [50, 340], "left axis bbox");
+    assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
+    assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
+    svg.remove();
+    })
 
 })
