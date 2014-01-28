@@ -142,8 +142,12 @@ var Table = (function () {
     function Table(rows, rowWeightVal, colWeightVal) {
         if (typeof rowWeightVal === "undefined") { rowWeightVal = 1; }
         if (typeof colWeightVal === "undefined") { colWeightVal = 1; }
+        this.rowPadding = 5;
+        this.colPadding = 5;
         this.rows = rows;
         this.cols = d3.transpose(rows);
+        this.nRows = this.rows.length;
+        this.nCols = this.cols.length;
         this.renderables = _.flatten(this.rows);
         this.tables = this.renderables.filter(function (x) {
             return x != null && x.computeLayout != null;
@@ -189,8 +193,8 @@ var Table = (function () {
                 return (r != null) ? r.colMinimum() : 0;
             });
         });
-        this.minWidth = d3.sum(this.colMinimums);
-        this.minHeight = d3.sum(this.rowMinimums);
+        this.minWidth = d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);
+        this.minHeight = d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
 
         this.rowWeights = this.rows.map(function (row) {
             return d3.max(row, function (r) {
@@ -245,8 +249,8 @@ var Table = (function () {
         var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
         var colWidths = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
 
-        chai.assert.closeTo(d3.sum(rowHeights), availableHeight, 1, "row heights sum to available height");
-        chai.assert.closeTo(d3.sum(colWidths), availableWidth, 1, "col widths sum to available width");
+        chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding, availableHeight, 1, "row heights sum to available height");
+        chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding, availableWidth, 1, "col widths sum to available width");
         var yOffset = 0;
         this.rows.forEach(function (row, i) {
             var xOffset = 0;
@@ -256,12 +260,12 @@ var Table = (function () {
                     return;
                 }
                 Table.renderChild(element, renderable, xOffset, yOffset, colWidths[j], rowHeights[i]);
-                xOffset += colWidths[j];
+                xOffset += colWidths[j] + _this.colPadding;
             });
-            chai.assert.operator(xOffset, "<=", availableWidth, "final xOffset was <= availableWidth");
-            yOffset += rowHeights[i];
+            chai.assert.operator(xOffset - _this.colPadding, "<=", availableWidth, "final xOffset was <= availableWidth");
+            yOffset += rowHeights[i] + _this.rowPadding;
         });
-        chai.assert.operator(yOffset, "<=", availableHeight, "final xOffset was <= availableHeight");
+        chai.assert.operator(yOffset - this.rowPadding, "<=", availableHeight, "final xOffset was <= availableHeight");
     };
 
     Table.renderChild = function (parentElement, renderable, xOffset, yOffset, width, height) {
