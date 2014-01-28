@@ -1,6 +1,6 @@
 class Renderable {
-  private rowWeightVal = 0;
-  private colWeightVal = 0;
+  private rowWeightVal = 1;
+  private colWeightVal = 1;
   private rowMinimumVal = 0;
   private colMinimumVal = 0;
 
