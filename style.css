@@ -27,7 +27,7 @@ svg {
   stroke-width: 1.5px;
   vector-effect: non-scaling-stroke;
 }
-.avg {
+.random-data {
   stroke: black;
 }
 .avgh {
@@ -53,4 +53,19 @@ svg {
 }
 .lol {
   stroke: royalblue;
+}
+
+.table-rect {
+  fill: none;
+  stroke: royalblue;
+}
+
+.renderer-box {
+  fill: none;
+  stroke: red;
+}
+
+.axis-box {
+  fill: none;
+  stroke: green;
 }

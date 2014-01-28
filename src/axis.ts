@@ -1,8 +1,10 @@
 ///<reference path="../lib/d3.d.ts" />
+///<reference path="../lib/chai/chai.d.ts" />
 
 class Axis implements IRenderable {
   public static yWidth = 30;
   public static xHeight = 30;
+  public className: string;
   public element: D3.Selection;
   public d3axis: D3.Svg.Axis;
   private cachedScale: number;
@@ -24,8 +26,13 @@ class Axis implements IRenderable {
   constructor(
     public scale: D3.Scale.Scale,
     public orientation: string,
-    public formatter: any
+    public formatter: any,
+    private rowMinimumVal: number,
+    private colMinimumVal: number
   ) {
+    this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
+    var rowMinimum = this.isXAligned ? Axis.xHeight : 0;
+    var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
     // this.orientation = attachmentTypeToString(this.attachmentPoint);
     this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
     if (this.formatter != null) {
@@ -33,7 +40,7 @@ class Axis implements IRenderable {
     }
     this.cachedScale = 1;
     this.cachedTranslate = 0;
-    this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
+    this.className = "axis";
   }
 
   private transformString(translate: number, scale: number) {
@@ -41,8 +48,23 @@ class Axis implements IRenderable {
     return "translate(" + translateS + ")";
   }
 
+  public rowWeight(newVal: number = null) {
+    return 0;
+  }
+  public colWeight(newVal: number = null) {
+    return 0;
+  }
+
+  public rowMinimum(): number {
+    return this.rowMinimumVal;
+  }
+  public colMinimum(): number {
+    return this.colMinimumVal;
+  }
+
   public render(element: D3.Selection, width: number, height: number) {
     this.element = element.append("g").classed("axis", true);
+    this.element.append("rect").attr("width", width).attr("height", height).classed("axis-box", true);
     if (this.orientation === "left") this.element.attr("transform", "translate(" + Axis.yWidth + ")");
     if (this.orientation === "top")  this.element.attr("transform", "translate(0," + Axis.xHeight + ")");
     var domain = this.scale.domain();
@@ -62,14 +84,6 @@ class Axis implements IRenderable {
     // a = [100,0]; extent = -100; 100 - (-100) = 200, 0 - (-100) = 100
     // a = [0,100]; extent = 100; 0 - 100 = -100, 100 - 100
     this.element.call(this.d3axis);
-  }
-
-  public getRequestedWidth(availableWidth: number, availableHeight: number) {
-    return this.isXAligned ? availableWidth : Axis.yWidth;
-  }
-
-  public getRequestedHeight(availableWidth: number, availableHeight: number) {
-    return this.isXAligned ? Axis.xHeight : availableHeight;
   }
 
   public rescale() {
@@ -93,3 +107,14 @@ class Axis implements IRenderable {
   }
 }
 
+class XAxis extends Axis {
+  constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
+    super(scale, orientation, formatter, 30, 0);
+  }
+}
+
+class YAxis extends Axis {
+  constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
+    super(scale, orientation, formatter, 0, 30);
+  }
+}

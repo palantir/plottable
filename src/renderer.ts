@@ -1,15 +1,46 @@
 ///<reference path="../lib/d3.d.ts" />
+///<reference path="../lib/chai/chai.d.ts" />
 
 class Renderer implements IRenderable {
   public renderArea: D3.Selection;
   public element: D3.Selection;
+  public className: string;
   public width: number;
   public height: number;
   public scales: any;
 
+  private rowWeightVal: number;
+  private colWeightVal: number;
+  private rowMinimumVal: number;
+  private colMinimumVal: number;
+
   constructor(
     public dataset: IDataset
   ) {
+    this.rowWeightVal = 1;
+    this.colWeightVal = 1;
+  }
+
+  public rowWeight(newVal: number = null) {
+    if (newVal != null) {
+      this.rowWeightVal = newVal;
+    }
+    return this.rowWeightVal;
+  }
+
+  public colWeight(newVal: number = null) {
+    if (newVal != null) {
+      this.colWeightVal = newVal;
+    }
+    return this.colWeightVal;
+  }
+
+  public rowMinimum(): number {
+    return this.rowMinimumVal;
+  }
+
+  public colMinimum(): number {
+    return this.colMinimumVal;
   }
 
   public transform(translate: number[], scale: number) {
@@ -18,6 +49,9 @@ class Renderer implements IRenderable {
 
   public render(element: D3.Selection, width: number, height: number) {
     this.element = element;
+    var bb = this.element.append("rect").attr("width", width).attr("height", height).classed("renderer-box", true);
+    chai.assert.operator(width, '>=', 0, "width is >= 0");
+    chai.assert.operator(height, '>=', 0, "height is >= 0");
     return; // no-op
   }
 
@@ -29,14 +63,6 @@ class Renderer implements IRenderable {
   public generateElement(container: D3.Selection) {
     this.element = container.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
   }
-
-  public getRequestedWidth(availableWidth: number, availableHeight: number) {
-    return availableWidth;
-  }
-
-  public getRequestedHeight(availableWidth: number, availableHeight: number) {
-    return availableHeight;
-  }
 }
 
 class XYRenderer extends Renderer {
@@ -44,13 +70,14 @@ class XYRenderer extends Renderer {
   public yScale: D3.Scale.Scale;
   constructor(dataset: IDataset, xScale: D3.Scale.Scale, yScale: D3.Scale.Scale) {
     super(dataset);
+    this.className = "XYRenderer";
     this.xScale = xScale;
     this.yScale = yScale;
     var data = dataset.data;
-    var dateDomain = d3.extent(data, (d) => d.x);
-    var rangeDomain = [100, 0];
-    this.xScale.domain(dateDomain);
-    this.yScale.domain(rangeDomain);
+    var xDomain = d3.extent(data, (d) => d.x);
+    var yDomain = d3.extent(data, (d) => d.y);
+    this.xScale.domain(xDomain);
+    this.yScale.domain(yDomain);
   }
 
   public render(element: D3.Selection, width: number, height: number) {
@@ -59,7 +86,6 @@ class XYRenderer extends Renderer {
   }
 
   public setDimensions(width: number, height: number) {
-    console.log("setDimensions", width, height)
     super.setDimensions(width, height);
     this.xScale.range([0, width]);
     this.yScale.range([height, 0]);
