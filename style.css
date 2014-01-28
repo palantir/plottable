@@ -69,3 +69,7 @@ svg {
   fill: none;
   stroke: green;
 }
+
+.error {
+  fill: pink;
+}

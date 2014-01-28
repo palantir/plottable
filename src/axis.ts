@@ -85,6 +85,12 @@ class Axis implements IRenderable {
     // a = [100,0]; extent = -100; 100 - (-100) = 200, 0 - (-100) = 100
     // a = [0,100]; extent = 100; 0 - 100 = -100, 100 - 100
     this.element.call(this.d3axis);
+    var bbox = (<any> this.element.node()).getBBox();
+    if (bbox.height > height || bbox.width > width) {
+      this.element.classed("error", true);
+    }
+    // chai.assert.operator(this.element.node().getBBox().height, '<=', height, "axis height is appropriate");
+    // chai.assert.operator(this.element.node().getBBox().width,  '<=', width, "axis width is appropriate");
   }
 
   public rescale() {

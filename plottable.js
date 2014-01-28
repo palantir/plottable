@@ -77,6 +77,10 @@ var Axis = (function () {
         }
 
         this.element.call(this.d3axis);
+        var bbox = this.element.node().getBBox();
+        if (bbox.height > height || bbox.width > width) {
+            this.element.classed("error", true);
+        }
     };
 
     Axis.prototype.rescale = function () {
