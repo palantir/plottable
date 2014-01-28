@@ -29,7 +29,7 @@ function makeBasicChartTable() {
 
 var svg1 = d3.select("#svg1");
 svg1.attr("width", 500).attr("height", 500);
-// makeBasicChartTable().render(svg1, 500, 500);
+makeBasicChartTable().render(svg1, 500, 500);
 
 var svg2 = d3.select("#svg2");
 
@@ -40,7 +40,7 @@ var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
 svg2.attr("width", 800).attr("height", 800);
-// metaTable.render(svg2, 800, 800);
+metaTable.render(svg2, 800, 800);
 // make a table with four nested tables
 
 

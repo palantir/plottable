@@ -99,6 +99,7 @@ class Table implements IRenderable {
       var xOffset = 0;
       row.forEach((renderable, j) => {
         if (renderable == null) {
+          xOffset += colWidths[j];
           return;
         }
         Table.renderChild(element, renderable, xOffset, yOffset, colWidths[j], rowHeights[i]);
