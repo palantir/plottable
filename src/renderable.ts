@@ -13,6 +13,7 @@ class Renderable {
   public rowWeight(newVal?: number): any {
     if (newVal != null) {
       this.rowWeightVal = newVal;
+      chai.assert.operator(this.rowWeightVal, '>=', 0, "rowWeight is a reasonable number");
       return this;
     } else {
       return this.rowWeightVal;
@@ -24,6 +25,7 @@ class Renderable {
   public colWeight(newVal?: number): any {
     if (newVal != null) {
       this.colWeightVal = newVal;
+      chai.assert.operator(this.colWeightVal, '>=', 0, "colWeight is a reasonable number");
       return this;
     } else {
       return this.colWeightVal
@@ -35,6 +37,7 @@ class Renderable {
   public rowMinimum(newVal?: number): any {
     if (newVal != null) {
       this.rowMinimumVal = newVal;
+      chai.assert.operator(this.rowMinimumVal, '>=', 0, "rowMinimum is a reasonable number");
       return this;
     } else {
       return this.rowMinimumVal;
@@ -46,6 +49,7 @@ class Renderable {
   public colMinimum(newVal?: number): any {
     if (newVal != null) {
       this.colMinimumVal = newVal;
+      chai.assert.operator(this.colMinimumVal, '>=', 0, "colMinimum is a reasonable number");
       return this;
     } else {
       return this.colMinimumVal;
