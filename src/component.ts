@@ -1,4 +1,4 @@
-class Renderable {
+class Component {
   private rowWeightVal = 1;
   private colWeightVal = 1;
   private rowMinimumVal = 0;
@@ -9,7 +9,7 @@ class Renderable {
   }
 
   public rowWeight(): number;
-  public rowWeight(newVal: number): Renderable;
+  public rowWeight(newVal: number): Component;
   public rowWeight(newVal?: number): any {
     if (newVal != null) {
       this.rowWeightVal = newVal;
@@ -21,7 +21,7 @@ class Renderable {
   }
 
   public colWeight(): number;
-  public colWeight(newVal: number): Renderable;
+  public colWeight(newVal: number): Component;
   public colWeight(newVal?: number): any {
     if (newVal != null) {
       this.colWeightVal = newVal;
@@ -33,7 +33,7 @@ class Renderable {
   }
 
   public rowMinimum(): number;
-  public rowMinimum(newVal: number): Renderable;
+  public rowMinimum(newVal: number): Component;
   public rowMinimum(newVal?: number): any {
     if (newVal != null) {
       this.rowMinimumVal = newVal;
@@ -45,7 +45,7 @@ class Renderable {
   }
 
   public colMinimum(): number;
-  public colMinimum(newVal: number): Renderable;
+  public colMinimum(newVal: number): Component;
   public colMinimum(newVal?: number): any {
     if (newVal != null) {
       this.colMinimumVal = newVal;

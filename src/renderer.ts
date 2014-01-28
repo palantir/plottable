@@ -1,7 +1,7 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
 
-class Renderer extends Renderable {
+class Renderer extends Component {
   public renderArea: D3.Selection;
   public element: D3.Selection;
   public className: string;

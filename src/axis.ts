@@ -1,8 +1,8 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="renderable.ts" />
+///<reference path="component.ts" />
 
-class Axis extends Renderable {
+class Axis extends Component {
   public static yWidth = 50;
   public static xHeight = 30;
   public element: D3.Selection;
@@ -45,7 +45,7 @@ class Axis extends Renderable {
   }
 
   public rowWeight(): number;
-  public rowWeight(newVal: number): Renderable;
+  public rowWeight(newVal: number): Component;
   public rowWeight(newVal?: number): any {
     if (newVal != null) {
       throw new Error("Axis row weight is not settable.");
@@ -56,7 +56,7 @@ class Axis extends Renderable {
   }
 
   public colWeight(): number;
-  public colWeight(newVal: number): Renderable;
+  public colWeight(newVal: number): Component;
   public colWeight(newVal?: number): any {
     if (newVal != null) {
       throw new Error("Axis col weight is not settable.");
