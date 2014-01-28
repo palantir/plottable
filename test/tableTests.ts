@@ -60,6 +60,7 @@ describe("Table layout", () => {
       chai.assert.equal(b.width, 200, "bbox is 200 pixels wide");
       chai.assert.equal(b.height, 200, "bbox is 200 pixels tall");
       });
+    svg.remove();
   });
 
   it("table with 2 rows 2 cols and margin/padding lays out properly", () => {
@@ -87,6 +88,7 @@ describe("Table layout", () => {
       chai.assert.equal(b.width, 200, "bbox is 200 pixels wide");
       chai.assert.equal(b.height, 200, "bbox is 200 pixels tall");
       });
+    svg.remove();
   });
 
 })
