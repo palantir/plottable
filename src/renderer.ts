@@ -47,14 +47,18 @@ class XYRenderer extends Renderer {
   private static defaultYAccessor = (d: any) => d.y;
   public xScale: Scale;
   public yScale: Scale;
-  public xAccessor: IAccessor;
-  public yAccessor: IAccessor;
+  private xAccessor: IAccessor;
+  private yAccessor: IAccessor;
+  public xScaledAccessor: (datum: any) => number;
+  public yScaledAccessor: (datum: any) => number;
   constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset);
     this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
     this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
     this.xScale = xScale;
     this.yScale = yScale;
+    this.xScaledAccessor = (datum: any) => this.xScale.scale(this.xAccessor(datum));
+    this.yScaledAccessor = (datum: any) => this.yScale.scale(this.yAccessor(datum));
     this.className = "XYRenderer";
     var data = dataset.data;
     var xDomain = d3.extent(data, this.xAccessor);
@@ -86,9 +90,7 @@ class LineRenderer extends XYRenderer {
   public render(element: D3.Selection, width: number, height: number) {
     super.render(element, width, height);
 
-    var scaledXValue = (datum: any) => this.xScale.scale(this.xAccessor(datum));
-    var scaledYValue = (datum: any) => this.yScale.scale(this.yAccessor(datum));
-    this.line = d3.svg.line().x(scaledXValue).y(scaledYValue);
+    this.line = d3.svg.line().x(this.xScaledAccessor).y(this.yScaledAccessor);
     this.renderArea = this.element.append("path")
       .classed("line", true)
       .classed(this.dataset.seriesName, true)
@@ -97,21 +99,23 @@ class LineRenderer extends XYRenderer {
   }
 }
 
-// class CircleRenderer extends Renderer {
-//   private circles: D3.Selection;
+class CircleRenderer extends XYRenderer {
+  private circles: D3.Selection;
 
-//   constructor(c,d,x,y,t) {
-//     super(c,d,x,y,t);
-//     this.circles = this.renderArea.selectAll("circle");
-//   }
+  constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+    super(dataset, xScale, yScale, xAccessor, yAccessor);
+  }
 
-//   public render() {
-//     this.circles.data(this.data).enter().append("circle")
-//       .attr("cx", (d) => {return this.xScale(d.date);})
-//       .attr("cy", (d) => {return this.yScale(d.y) + Math.random() * 10 - 5;})
-//       .attr("r", 0.5);
-//   }
-// }
+  public render(element: D3.Selection, width: number, height: number) {
+    super.render(element, width, height);
+
+    this.circles = this.element.selectAll("circle");
+    this.circles.data(this.dataset.data).enter().append("circle")
+      .attr("cx", this.xScaledAccessor)
+      .attr("cy", this.yScaledAccessor)
+      .attr("r", 3);
+  }
+}
 
 // class ResizingCircleRenderer extends CircleRenderer {
 //   public transform(translate: number[], scale: number) {

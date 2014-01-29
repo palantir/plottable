@@ -81,7 +81,7 @@ function makeSparklineMultichart() {
   var yScale2 = new LinearScale();
   var leftAxis = new YAxis(yScale2, "left");
   var data2 = makeRandomData(100, 100000);
-  var renderer2 = new LineRenderer(data2, xScale1, yScale2);
+  var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
   var row2: Component[] = [leftAxis, renderer2, null];
   var bottomAxis = new XAxis(xScale1, "bottom");
   var row3: Component[] = [null, bottomAxis, null];
