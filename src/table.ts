@@ -62,8 +62,7 @@ class Table extends Component {
     this.nCols = this.cols.length;
     this.components = <Component[]> _.flatten(this.rows);
     this.tables = <Table[]> this.components.filter((x) => x != null && x.computeLayout != null)
-    super.rowWeight(rowWeightVal);
-    super.colWeight(colWeightVal);
+    super.rowWeight(rowWeightVal).colWeight(colWeightVal);
   }
 
   public computeLayout() {
