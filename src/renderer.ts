@@ -38,18 +38,28 @@ class Renderer extends Component {
   }
 }
 
+interface IAccessor {
+  (d: any): number;
+};
+
 class XYRenderer extends Renderer {
+  private static defaultXAccessor = (d: any) => d.x;
+  private static defaultYAccessor = (d: any) => d.y;
   public xScale: Scale;
   public yScale: Scale;
-  constructor(dataset: IDataset, xScale: Scale, yScale: Scale) {
+  public xAccessor: IAccessor;
+  public yAccessor: IAccessor;
+  constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset);
-    this.className = "XYRenderer";
+    this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
+    this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
     this.xScale = xScale;
     this.yScale = yScale;
+    this.className = "XYRenderer";
     var data = dataset.data;
-    var xDomain = d3.extent(data, (d) => d.x);
+    var xDomain = d3.extent(data, this.xAccessor);
     this.xScale.widenDomain(xDomain);
-    var yDomain = d3.extent(data, (d) => d.y);
+    var yDomain = d3.extent(data, this.yAccessor);
     this.yScale.widenDomain(yDomain);
   }
 
@@ -66,19 +76,19 @@ class XYRenderer extends Renderer {
 }
 
 
-
 class LineRenderer extends XYRenderer {
   private line: D3.Svg.Line;
 
-  constructor(dataset: IDataset, xScale: Scale, yScale: Scale) {
-    super(dataset, xScale, yScale);
+  constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+    super(dataset, xScale, yScale, xAccessor, yAccessor);
   }
 
   public render(element: D3.Selection, width: number, height: number) {
     super.render(element, width, height);
-    this.line = d3.svg.line()
-      .x((d) => this.xScale.scale(d.x))
-      .y((d) => this.yScale.scale(d.y));
+
+    var scaledXValue = (datum: any) => this.xScale.scale(this.xAccessor(datum));
+    var scaledYValue = (datum: any) => this.yScale.scale(this.yAccessor(datum));
+    this.line = d3.svg.line().x(scaledXValue).y(scaledYValue);
     this.renderArea = this.element.append("path")
       .classed("line", true)
       .classed(this.dataset.seriesName, true)
