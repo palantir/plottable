@@ -90,7 +90,7 @@ class LineRenderer extends XYRenderer {
   public render(element: D3.Selection, width: number, height: number) {
     super.render(element, width, height);
 
-    this.line = d3.svg.line().x(this.xScaledAccessor).y(this.yScaledAccessor);
+    this.line = d3.svg.line().interpolate("basis").x(this.xScaledAccessor).y(this.yScaledAccessor);
     this.renderArea = this.element.append("path")
       .classed("line", true)
       .classed(this.dataset.seriesName, true)
