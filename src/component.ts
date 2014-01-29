@@ -1,4 +1,5 @@
 class Component {
+  public element: D3.Selection;
   private rowWeightVal = 1;
   private colWeightVal = 1;
   private rowMinimumVal = 0;
