@@ -3,6 +3,7 @@
 
 ///<reference path="table.ts" />
 ///<reference path="renderer.ts" />
+///<reference path="interaction.ts" />
 
 function makeRandomData(numPoints, scaleFactor=1): IDataset {
   var data = [];
@@ -30,7 +31,9 @@ function makeBasicChartTable() {
 
 var svg1 = d3.select("#svg1");
 svg1.attr("width", 500).attr("height", 500);
-makeBasicChartTable().render(svg1, 500, 500);
+var table1 = makeBasicChartTable();
+table1.render(svg1, 500, 500);
+new DragZoomInteraction(table1.components[0].element, []);
 
 var svg2 = d3.select("#svg2");
 
@@ -91,6 +94,10 @@ function makeSparklineMultichart() {
   sparkline.rowWeight(0.25);
   var row4 = [null, sparkline, null];
   var multiChart = new Table([row1, row2, row3, row4]);
+  // multiChart.xMargin = 0;
+  // multiChart.yMargin = 0;
+  // multiChart.xPadding = 0;
+  // multiChart.yPadding = 0;
   return multiChart;
 }
 

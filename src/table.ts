@@ -12,7 +12,7 @@ class Table extends Component {
   public xMargin = 5;
   public yMargin = 5;
 
-  private components: Component[];
+  public components: Component[];
   private tables: Table[];
 
   private rows: Component[][];

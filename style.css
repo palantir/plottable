@@ -7,9 +7,6 @@ div {
   display: inline;
 }
 
-svg {
-  display: block;
-}
 .axis path,
 .axis line {
   fill: none;
@@ -48,7 +45,8 @@ circle {
   fill: none;
   stroke: green;
 }
-
+/*
 .error {
   fill: pink;
 }
+*/
