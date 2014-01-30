@@ -36,10 +36,10 @@ circle {
   stroke: royalblue;
 }
 
-/*.renderer-box {
+.renderer-box {
   fill: none;
   stroke: red;
-}*/
+}
 
 .axis-box {
   fill: none;
@@ -48,7 +48,7 @@ circle {
 
 .hit-box {
   fill: red;
-  opacity: 0.1;
+  opacity: 0;
 }
 
 /*

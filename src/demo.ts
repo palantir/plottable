@@ -16,6 +16,28 @@ function makeRandomData(numPoints, scaleFactor=1): IDataset {
   return {"data": data, "seriesName": "random-data"};
 }
 
+
+// make a regular table with 1 axis on bottom, 1 axis on left, renderer in center
+
+var svg1 = d3.select("#svg1");
+svg1.attr("width", 500).attr("height", 500);
+var xScale = new LinearScale();
+var yScale = new LinearScale();
+var xAxis = new XAxis(xScale, "bottom");
+var yAxis = new YAxis(yScale, "right");
+var data = makeRandomData(30);
+var renderArea = new LineRenderer(data, xScale, yScale);
+var basicTable = new Table([[renderArea, yAxis], [xAxis, null]])
+basicTable.anchor(svg1);
+basicTable.computeLayout(0, 0, 500, 500);
+basicTable.render();
+new DragZoomInteraction(renderArea.hitBox, [xAxis, yAxis, renderArea]);
+
+
+
+// make a table with four nested tables
+var svg2 = d3.select("#svg2");
+
 function makeBasicChartTable() {
   var xScale = new LinearScale();
   var yScale = new LinearScale();
@@ -24,38 +46,22 @@ function makeBasicChartTable() {
   var data = makeRandomData(30);
   var renderArea = new LineRenderer(data, xScale, yScale);
   var rootTable = new Table([[renderArea, yAxis], [xAxis, null]])
+
   return rootTable;
 }
-
-// make a regular table with 1 axis on bottom, 1 axis on left, renderer in center
-
-var xScale = new LinearScale();
-var yScale = new LinearScale();
-var xAxis = new XAxis(xScale, "bottom");
-var yAxis = new YAxis(yScale, "right");
-var data = makeRandomData(30);
-var renderArea = new LineRenderer(data, xScale, yScale);
-var table1 = new Table([[renderArea, yAxis], [xAxis, null]])
-var svg1 = d3.select("#svg1");
-svg1.attr("width", 500).attr("height", 500);
-table1.render(svg1, 500, 500);
-new DragZoomInteraction(renderArea.hitBox, [xAxis, yAxis, renderArea]);
-
-var svg2 = d3.select("#svg2");
-
 var t1 = makeBasicChartTable();
 var t2 = makeBasicChartTable();
 var t3 = makeBasicChartTable();
 var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
+metaTable.anchor(svg2);
 svg2.attr("width", 800).attr("height", 600);
-metaTable.render(svg2, 800, 600);
-// make a table with four nested tables
+metaTable.computeLayout(0, 0, 800, 600);
+metaTable.render();
 
 
-// make a table with 2 charts and sparkline
-
+// make a chart with two axes
 function makeMultiAxisChart() {
   var xScale = new LinearScale();
   var yScale = new LinearScale();
@@ -72,10 +78,13 @@ function makeMultiAxisChart() {
 }
 
 var svg3 = d3.select("#svg3");
-svg3.attr("width", 400).attr("height", 400);
 var multiaxischart = makeMultiAxisChart();
-multiaxischart.render(svg3, 400, 400);
+multiaxischart.anchor(svg3);
+svg3.attr("width", 400).attr("height",400);
+multiaxischart.computeLayout(0, 0, 400, 400);
+multiaxischart.render();
 
+// make a table with 2 charts and sparkline
 function makeSparklineMultichart() {
   var xScale1 = new LinearScale();
   var yScale1 = new LinearScale();
@@ -108,11 +117,13 @@ function makeSparklineMultichart() {
 }
 
 var svg4 = d3.select("#svg4");
-svg4.attr("width", 800).attr("height", 600);
 var multichart = makeSparklineMultichart();
-multichart.render(svg4, 800, 600);
-svg4.selectAll("g").remove()
-multichart.render(svg4, 800, 600);
+multichart.anchor(svg4);
+svg4.attr("width",800).attr("height",600);
+multichart.computeLayout(0, 0, 800, 600);
+multichart.render();
+// svg4.selectAll("g").remove()
+// multichart.render(svg4, 800, 600);
 
 // function makeChartWithGivenNumAxes(left=1, right=0, top=0, bottom=1){
 //   var xScale = new LinearScale();
