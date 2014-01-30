@@ -36,7 +36,7 @@ class Table extends Component {
       throw new Error("Row minimum cannot be directly set on Table.");
       return this;
     } else {
-      this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => (r != null) ? r.rowMinimum() : 0));
+      this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => r.rowMinimum()));
       this.minHeight = d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1) + 2 * this.yMargin;
       return this.minHeight;
     }
@@ -49,7 +49,7 @@ class Table extends Component {
       throw new Error("Col minimum cannot be directly set on Table.");
       return this;
     } else {
-      this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => (r != null) ? r.colMinimum() : 0));
+      this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
       this.minWidth  = d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1) + 2 * this.xMargin;
       return this.minWidth;
     }
@@ -57,6 +57,9 @@ class Table extends Component {
 
   constructor(rows: Component[][], rowWeightVal=1, colWeightVal=1) {
     super();
+    // Clean out any null components and replace them with base Components
+    var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
+    rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
     this.rows = rows;
     this.cols = d3.transpose(rows);
     this.nRows = this.rows.length;
@@ -69,9 +72,7 @@ class Table extends Component {
     // recursively anchor children
     this.rows.forEach((row: Component[], rowIndex: number) => {
       row.forEach((component: Component, colIndex: number) => {
-        if (component != null) {
-          component.anchor(this.element.append("g"));
-        }
+        component.anchor(this.element.append("g"));
       });
     });
   }
@@ -88,7 +89,7 @@ class Table extends Component {
     }
 
     // distribute remaining height to rows
-    this.rowWeights = this.rows.map((row: Component[]) => d3.max(row, (c: Component) => (c != null) ? c.rowWeight() : 0));
+    this.rowWeights = this.rows.map((row: Component[]) => d3.max(row, (c: Component) => c.rowWeight()));
     this.rowWeightSum = d3.sum(this.rowWeights);
     if (this.rowWeightSum === 0) {
       var rowProportionalSpace = this.rowWeights.map((w) => freeHeight / this.nRows);
@@ -97,7 +98,7 @@ class Table extends Component {
     }
 
     // distribute remaining width to columns
-    this.colWeights = this.cols.map((col: Component[]) => d3.max(col, (c: Component) => (c != null) ? c.colWeight() : 0));
+    this.colWeights = this.cols.map((col: Component[]) => d3.max(col, (c: Component) => c.colWeight()));
     this.colWeightSum = d3.sum(this.colWeights);
     if (this.colWeightSum === 0) {
       var colProportionalSpace = this.colWeights.map((w) => freeWidth / this.nCols);
@@ -112,10 +113,6 @@ class Table extends Component {
     this.rows.forEach((row: Component[], rowIndex: number) => {
       var childXOffset = this.xMargin;
       row.forEach((component: Component, colIndex: number) => {
-        if (component == null) {
-          childXOffset += colWidths[colIndex] + this.colPadding;
-          return;
-        }
         // recursively compute layout
         component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
         childXOffset += colWidths[colIndex] + this.colPadding;
@@ -131,9 +128,7 @@ class Table extends Component {
     // recursively render children
     this.rows.forEach((row: Component[], rowIndex: number) => {
       row.forEach((component: Component, colIndex: number) => {
-        if (component != null) {
-          component.render();
-        }
+        component.render();
       });
     });
 
