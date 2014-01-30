@@ -59,5 +59,16 @@ circle {
 
 .bounding-box {
   fill: none;
+}
+
+.renderer-bounding-box {
+  stroke: red;
+}
+
+.axis-bounding-box {
+  stroke: green;
+}
+
+.table-bounding-box {
   stroke: blue;
 }
