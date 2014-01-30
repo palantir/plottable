@@ -119,10 +119,10 @@ class Table extends Component {
         component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
         childXOffset += colWidths[colIndex] + this.colPadding;
       });
-      // chai.assert.operator(xOffset - this.colPadding - this.xMargin, "<=", this.availableWidth, "final xOffset was <= availableWidth");
+      chai.assert.operator(childXOffset - this.colPadding - this.xMargin, "<=", this.availableWidth, "final xOffset was <= availableWidth");
       childYOffset += rowHeights[rowIndex] + this.rowPadding;
     });
-    // chai.assert.operator(yOffset - this.rowPadding - this.yMargin, "<=", this.availableHeight, "final yOffset was <= availableHeight");
+    chai.assert.operator(childYOffset - this.rowPadding - this.yMargin, "<=", this.availableHeight, "final yOffset was <= availableHeight");
   }
 
   public render() {
