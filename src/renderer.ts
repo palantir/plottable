@@ -6,8 +6,6 @@ class Renderer extends Component {
   public renderArea: D3.Selection;
   public element: D3.Selection;
   public className: string;
-  public width: number;
-  public height: number;
   public scales: Scale[];
 
   constructor(
@@ -20,17 +18,11 @@ class Renderer extends Component {
     return; // no-op
   }
 
-  public render(element: D3.Selection, width: number, height: number) {
-    this.element = element;
-    var bb = this.element.append("rect").attr("width", width).attr("height", height).classed("renderer-box", true);
-    chai.assert.operator(width, '>=', 0, "width is >= 0");
-    chai.assert.operator(height, '>=', 0, "height is >= 0");
+  public render() {
+    var bb = this.element.append("rect").attr("width", this.availableWidth).attr("height", this.availableHeight).classed("renderer-box", true);
+    //chai.assert.operator(width, '>=', 0, "width is >= 0");
+    //chai.assert.operator(height, '>=', 0, "height is >= 0");
     return; // no-op
-  }
-
-  public setDimensions(width: number, height: number) {
-    this.width = width;
-    this.height = height;
   }
 
   public generateElement(container: D3.Selection) {
@@ -53,15 +45,15 @@ class XYRenderer extends Renderer {
     this.yScale.widenDomain(yDomain);
   }
 
-  public render(element: D3.Selection, width: number, height: number) {
-    super.render(element, width, height);
-    this.setDimensions(width, height);
-  }
+  // public render() {
+  //   super.render();
+  //   this.setDimensions(width, height);
+  // }
 
-  public setDimensions(width: number, height: number) {
-    super.setDimensions(width, height);
-    this.xScale.range([0, width]);
-    this.yScale.range([height, 0]);
+  public computeLayout(xOffset: number, yOffset: number, availableWidth: number, availableHeight:number) {
+    super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    this.xScale.range([0, availableWidth]);
+    this.yScale.range([availableHeight, 0]);
   }
 }
 
@@ -74,8 +66,8 @@ class LineRenderer extends XYRenderer {
     super(dataset, xScale, yScale);
   }
 
-  public render(element: D3.Selection, width: number, height: number) {
-    super.render(element, width, height);
+  public render() {
+    super.render();
     this.line = d3.svg.line()
       .x((d) => this.xScale.scale(d.x))
       .y((d) => this.yScale.scale(d.y));

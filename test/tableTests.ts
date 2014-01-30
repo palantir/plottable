@@ -52,9 +52,10 @@ describe("Table layout", () => {
     table.rowPadding = 0;
     table.colPadding = 0;
 
-    var svg = generateSVG(400,400);
-    table.computeLayout();
-    table.render(svg, 400, 400);
+    var svg = d3.select("body").append("svg:svg")
+    table.anchor(svg);
+    table.computeLayout(0, 0, 400, 400);
+    table.render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));
@@ -80,9 +81,10 @@ describe("Table layout", () => {
     table.rowPadding = 5;
     table.colPadding = 5;
 
-    var svg = generateSVG(425,425);
-    table.computeLayout();
-    table.render(svg, 425, 425);
+    var svg = d3.select("body").append("svg:svg");
+    table.anchor(svg);
+    table.computeLayout(0, 0, 425, 425);
+    table.render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));
@@ -99,7 +101,7 @@ describe("Table layout", () => {
   });
 
   it("table with fixed-size objects on every side lays out properly", () => {
-    var svg = generateSVG(400, 400);
+    var svg = d3.select("body").append("svg:svg");
     var tableAndRenderers = generateBasicTable(3,3);
     var table = tableAndRenderers.table;
     var renderers = tableAndRenderers.renderers;
@@ -119,8 +121,11 @@ describe("Table layout", () => {
     table.yMargin = 0;
     table.rowPadding = 0;
     table.colPadding = 0;
-    table.computeLayout();
-    table.render(svg, 400, 400);
+
+    table.anchor(svg);
+    table.computeLayout(0, 0, 400, 400);
+    table.render();
+
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));
     var bboxes = elements.map((e) => Utils.getBBox(e));

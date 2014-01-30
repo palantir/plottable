@@ -27,8 +27,11 @@ function makeBasicChartTable() {
 
 // make a regular table with 1 axis on bottom, 1 axis on left, renderer in center
 var svg1 = d3.select("#svg1");
-svg1.attr("width", 500).attr("height", 500);
-makeBasicChartTable().render(svg1, 500, 500);
+//svg1.attr("width", 500).attr("height", 500);
+var basicChartTable = makeBasicChartTable();
+basicChartTable.anchor(svg1);
+basicChartTable.computeLayout(0, 0, 500, 500);
+basicChartTable.render();
 
 
 // make a table with four nested tables
@@ -40,8 +43,9 @@ var t3 = makeBasicChartTable();
 var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
-svg2.attr("width", 800).attr("height", 600);
-metaTable.render(svg2, 800, 600);
+metaTable.anchor(svg2);
+metaTable.computeLayout(0, 0, 800, 600);
+metaTable.render();
 
 
 // make a chart with two axes
@@ -61,9 +65,10 @@ function makeMultiAxisChart() {
 }
 
 var svg3 = d3.select("#svg3");
-svg3.attr("width", 400).attr("height", 400);
 var multiaxischart = makeMultiAxisChart();
-multiaxischart.render(svg3, 400, 400);
+multiaxischart.anchor(svg3);
+multiaxischart.computeLayout(0, 0, 400, 400);
+multiaxischart.render();
 
 // make a table with 2 charts and sparkline
 function makeSparklineMultichart() {
@@ -94,11 +99,12 @@ function makeSparklineMultichart() {
 }
 
 var svg4 = d3.select("#svg4");
-svg4.attr("width", 800).attr("height", 600);
 var multichart = makeSparklineMultichart();
-multichart.render(svg4, 800, 600);
-svg4.selectAll("g").remove()
-multichart.render(svg4, 800, 600);
+multichart.anchor(svg4);
+multichart.computeLayout(0, 0, 800, 600);
+multichart.render();
+// svg4.selectAll("g").remove()
+// multichart.render(svg4, 800, 600);
 
 // function makeChartWithGivenNumAxes(left=1, right=0, top=0, bottom=1){
 //   var xScale = new LinearScale();
