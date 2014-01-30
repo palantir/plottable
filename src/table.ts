@@ -79,7 +79,6 @@ class Table extends Component {
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-    // TODO: nullcheck on availableWidth and availableHeight, infer from element if necessary
 
     // calculate the amount of free space by recursive col-/row- Minimum() calls
     var freeWidth = this.availableWidth - this.colMinimum();
@@ -94,7 +93,7 @@ class Table extends Component {
     if (this.rowWeightSum === 0) {
       var rowProportionalSpace = this.rowWeights.map((w) => freeHeight / this.nRows);
     } else {
-      var rowProportionalSpace = this.rowWeights.map((w: number) => w / this.rowWeightSum * freeHeight);
+      var rowProportionalSpace = this.rowWeights.map((w) => freeHeight * w / this.rowWeightSum);
     }
 
     // distribute remaining width to columns
@@ -108,6 +107,8 @@ class Table extends Component {
     var sumPair = (p: number[]) => p[0] + p[1];
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
+    chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding + 2 * this.yMargin, availableHeight, 1, "row heights sum to available height");
+    chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, availableWidth, 1, "col widths sum to available width");
 
     var childYOffset = this.yMargin;
     this.rows.forEach((row: Component[], rowIndex: number) => {
@@ -117,8 +118,10 @@ class Table extends Component {
         component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
         childXOffset += colWidths[colIndex] + this.colPadding;
       });
+      chai.assert.operator(xOffset - this.colPadding - this.xMargin, "<=", availableWidth, "final xOffset was <= availableWidth");
       childYOffset += rowHeights[rowIndex] + this.rowPadding;
     });
+    chai.assert.operator(yOffset - this.rowPadding - this.yMargin, "<=", availableHeight, "final yOffset was <= availableHeight");
   }
 
   public render() {
@@ -131,64 +134,5 @@ class Table extends Component {
         component.render();
       });
     });
-
-    //chai.assert.operator(availableWidth, '>=', 0, "availableWidth is >= 0");
-    //chai.assert.operator(availableHeight, '>=', 0, "availableHeight is >= 0");
-
-    // //this.computeLayout();
-    // var freeWidth = availableWidth - this.minWidth;
-    // var freeHeight = availableHeight - this.minHeight;
-
-    // if (freeWidth < 0 || freeHeight < 0) {
-    //   throw "InsufficientSpaceError";
-    // }
-
-    // if (this.rowWeightSum === 0) {
-    //   var rowProportionalSpace = this.rowWeights.map((w) => freeHeight / this.nRows);
-    // } else {
-    //   var rowProportionalSpace = this.rowWeights.map((w: number) => w / this.rowWeightSum * freeHeight);
-    // }
-    // if (this.colWeightSum === 0) {
-    //   var colProportionalSpace = this.colWeights.map((w) => freeWidth / this.nCols);
-    // } else {
-    //   var colProportionalSpace = this.colWeights.map((w: number) => w / this.colWeightSum * freeWidth);
-    // }
-    // var sumPair = (p: number[]) => p[0] + p[1];
-    // var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
-    // var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
-
-    // chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding + 2 * this.yMargin, availableHeight, 1, "row heights sum to available height");
-    // chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, availableWidth, 1, "col widths sum to available width");
-    // var yOffset = this.yMargin;
-    // this.rows.forEach((row: Component[], i) => {
-    //   var xOffset = this.xMargin;
-    //   row.forEach((component, j) => {
-    //     if (component == null) {
-    //       xOffset += colWidths[j] + this.colPadding;
-    //       return;
-    //     }
-    //     Table.renderChild(element, component, xOffset, yOffset, colWidths[j], rowHeights[i]);
-    //     xOffset += colWidths[j] + this.colPadding;
-    //   });
-    //   chai.assert.operator(xOffset - this.colPadding - this.xMargin, "<=", availableWidth, "final xOffset was <= availableWidth");
-    //   yOffset += rowHeights[i] + this.rowPadding;
-    // });
-    // chai.assert.operator(yOffset - this.rowPadding - this.yMargin, "<=", availableHeight, "final xOffset was <= availableHeight");
   }
-
-  // private static renderChild(
-  //   parentElement: D3.Selection,
-  //   component: Component,
-  //   xOffset: number,
-  //   yOffset: number,
-  //   width: number,
-  //   height: number
-  // ) {
-  //   var childElement = parentElement.append("g");
-  //   Utils.translate(childElement, [xOffset, yOffset]);
-  //   component.render(childElement, width, height);
-  // }
-
-
-
 }
