@@ -39,4 +39,13 @@ describe("Component behavior", () => {
     assertComponentXY(component, 200, 200, "bottom-right component aligns correctly");
     svg.remove();
     })
+  it("component defaults are as expected", () => {
+    var c = new Component();
+    assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
+    assert.equal(c.rowWeight() , 0, "rowWeight defaults to 0");
+    assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
+    assert.equal(c.colWeight() , 0, "colWeight defaults to 0");
+    assert.equal(c.xAlignment, "LEFT", "xAlignment defaults to LEFT");
+    assert.equal(c.yAlignment, "TOP" , "yAlignment defaults to TOP");
+    })
 })
