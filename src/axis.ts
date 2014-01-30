@@ -68,7 +68,7 @@ class Axis extends Component {
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.element.append("rect").attr("width", this.availableWidth).attr("height", this.availableHeight).classed("axis-box", true);
+    this.boundingBox.classed("axis-bounding-box", true);
     this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
   }
 
