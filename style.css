@@ -59,6 +59,7 @@ circle {
 
 .bounding-box {
   fill: none;
+  stroke: black;
 }
 
 .renderer-bounding-box {
