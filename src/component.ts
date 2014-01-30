@@ -13,6 +13,9 @@ class Component {
   private xOffset       : number;
   private yOffset       : number;
 
+  public xAlignment = "LEFT"; // LEFT, CENTER, RIGHT
+  public yAlignment = "TOP"; // TOP, CENTER, BOTTOM
+
   public anchor(element: D3.Selection) {
     this.element = element;
     this.hitBox = element.append("rect").classed("hit-box", true);
@@ -32,6 +35,36 @@ class Component {
       } else {
         throw new Error("You need to pass non-null arguments when calling computeLayout on a non-root node");
       }
+    }
+    if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
+      switch (this.yAlignment) {
+        case "TOP":
+          break;
+        case "CENTER":
+          yOffset += (availableHeight - this.rowMinimum()) / 2;
+          break;
+        case "BOTTOM":
+          yOffset += availableHeight - this.rowMinimum();
+          break;
+        default:
+          throw new Error("unsupported alignment");
+      }
+      availableHeight = this.rowMinimum();
+    }
+    if (this.colWeight() === 0 && this.colMinimum() !== 0) {
+      switch (this.xAlignment) {
+        case "LEFT":
+          break;
+        case "CENTER":
+          xOffset += (availableWidth - this.colMinimum()) / 2;
+          break;
+        case "RIGHT":
+          xOffset += availableWidth - this.colMinimum();
+          break;
+        default:
+          throw new Error("unsupported alignment");
+      }
+      availableWidth = this.colMinimum();
     }
     this.xOffset = xOffset;
     this.yOffset = yOffset;
