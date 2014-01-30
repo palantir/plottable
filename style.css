@@ -28,31 +28,10 @@ svg {
   vector-effect: non-scaling-stroke;
 }
 .random-data {
-  stroke: black;
-}
-.avgh {
-  stroke:pink;
-}
-.avgl {
-  stroke: powderblue;
-}
-.hi {
-  stroke: orange;
-}
-.hih {
-  stroke: orangered;
-}
-.hil {
-  stroke: coral;
-}
-.lo {
   stroke: steelblue;
 }
-.loh {
-  stroke: plum;
-}
-.lol {
-  stroke: royalblue;
+circle {
+  fill: steelblue;
 }
 
 .table-rect {
@@ -68,4 +47,8 @@ svg {
 .axis-box {
   fill: none;
   stroke: green;
+}
+
+.error {
+  fill: pink;
 }

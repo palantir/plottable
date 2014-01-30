@@ -1,21 +1,6 @@
-interface IRenderable {
-  render: (element: D3.Selection, width: number, height: number) => void;
-
-  rowWeight: (newVal?: number) => number;
-  colWeight: (newVal?: number) => number;
-  rowMinimum: () => number;
-  colMinimum: () => number;
-  className: string;
-  computeLayout?: () => void;
-}
-
-interface IDatum {
-  x: number;
-  y: number;
-}
 
 interface IDataset {
-  data: IDatum[];
+  data: any[];
   seriesName: string;
 }
 
