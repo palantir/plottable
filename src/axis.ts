@@ -1,10 +1,10 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
+///<reference path="component.ts" />
 
-class Axis implements IRenderable {
+class Axis extends Component {
   public static yWidth = 50;
   public static xHeight = 30;
-  public className: string;
   public element: D3.Selection;
   public d3axis: D3.Svg.Axis;
   private cachedScale: number;
@@ -24,24 +24,19 @@ class Axis implements IRenderable {
   }
 
   constructor(
-    public scale: D3.Scale.Scale,
+    public scale: Scale,
     public orientation: string,
-    public formatter: any,
-    private rowMinimumVal: number,
-    private colMinimumVal: number
+    public formatter: any
   ) {
+    super();
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
-    var rowMinimum = this.isXAligned ? Axis.xHeight : 0;
-    var colMinimum = this.isXAligned ? 0 : Axis.yWidth;
-    // this.orientation = attachmentTypeToString(this.attachmentTypeToStringt);
-    this.d3axis = d3.svg.axis().scale(this.scale).orient(this.orientation);
+    this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
     if (this.formatter == null) {
       this.formatter = d3.format("s3");
     }
     this.d3axis.tickFormat(this.formatter);
     this.cachedScale = 1;
     this.cachedTranslate = 0;
-    this.className = "axis";
   }
 
   private transformString(translate: number, scale: number) {
@@ -49,23 +44,31 @@ class Axis implements IRenderable {
     return "translate(" + translateS + ")";
   }
 
-  public rowWeight(newVal: number = null) {
-    return 0;
-  }
-  public colWeight(newVal: number = null) {
-    return 0;
+  public rowWeight(): number;
+  public rowWeight(newVal: number): Component;
+  public rowWeight(newVal?: number): any {
+    if (newVal != null) {
+      throw new Error("Axis row weight is not settable.");
+      return this;
+    } else {
+      return 0;
+    }
   }
 
-  public rowMinimum(): number {
-    return this.rowMinimumVal;
-  }
-  public colMinimum(): number {
-    return this.colMinimumVal;
+  public colWeight(): number;
+  public colWeight(newVal: number): Component;
+  public colWeight(newVal?: number): any {
+    if (newVal != null) {
+      throw new Error("Axis col weight is not settable.");
+      return this;
+    } else {
+      return 0;
+    }
   }
 
   public render(element: D3.Selection, width: number, height: number) {
+    element.append("rect").attr("width", width).attr("height", height).classed("axis-box", true);
     this.element = element.append("g").classed("axis", true);
-    this.element.append("rect").attr("width", width).attr("height", height).classed("axis-box", true);
     if (this.orientation === "left") this.element.attr("transform", "translate(" + Axis.yWidth + ")");
     if (this.orientation === "top")  this.element.attr("transform", "translate(0," + Axis.xHeight + ")");
     var domain = this.scale.domain();
@@ -85,12 +88,18 @@ class Axis implements IRenderable {
     // a = [100,0]; extent = -100; 100 - (-100) = 200, 0 - (-100) = 100
     // a = [0,100]; extent = 100; 0 - 100 = -100, 100 - 100
     this.element.call(this.d3axis);
+    var bbox = (<any> this.element.node()).getBBox();
+    if (bbox.height > height || bbox.width > width) {
+      this.element.classed("error", true);
+    }
+    // chai.assert.operator(this.element.node().getBBox().height, '<=', height, "axis height is appropriate");
+    // chai.assert.operator(this.element.node().getBBox().width,  '<=', width, "axis width is appropriate");
   }
 
   public rescale() {
     var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
     var tickSelection = this.element.selectAll(".tick");
-    (<any> tickSelection).call(tickTransform, this.scale);
+    (<any> tickSelection).call(tickTransform, this.scale.scale);
     this.element.attr("transform","");
   }
 
@@ -109,13 +118,15 @@ class Axis implements IRenderable {
 }
 
 class XAxis extends Axis {
-  constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
-    super(scale, orientation, formatter, Axis.xHeight, 0);
+  constructor(scale: Scale, orientation: string, formatter: any = null) {
+    super(scale, orientation, formatter);
+    super.rowMinimum(Axis.xHeight);
   }
 }
 
 class YAxis extends Axis {
-  constructor(scale: D3.Scale.Scale, orientation: string, formatter: any = null) {
-    super(scale, orientation, formatter, 0, Axis.yWidth);
+  constructor(scale: Scale, orientation: string, formatter: any = null) {
+    super(scale, orientation, formatter);
+    super.colMinimum(Axis.yWidth);
   }
 }

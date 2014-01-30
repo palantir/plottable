@@ -23,7 +23,7 @@ module.exports = function(grunt) {
         },
         files: [
           { src: ["src/*.ts"], dest: "plottable.js" },
-          { src: ["test/*.ts"], dest: "." }
+          { src: ["test/*.ts"], dest: "test/tests.js" }
         ]
       }
     },
