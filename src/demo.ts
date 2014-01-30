@@ -18,8 +18,8 @@ function makeRandomData(numPoints, scaleFactor=1): IDataset {
 
 function makeBasicChartTable() {
   var xScale = new LinearScale();
-  var xAxis = new XAxis(xScale, "bottom");
   var yScale = new LinearScale();
+  var xAxis = new XAxis(xScale, "bottom");
   var yAxis = new YAxis(yScale, "right");
   var data = makeRandomData(30);
   var renderArea = new LineRenderer(data, xScale, yScale);
@@ -29,11 +29,17 @@ function makeBasicChartTable() {
 
 // make a regular table with 1 axis on bottom, 1 axis on left, renderer in center
 
+var xScale = new LinearScale();
+var yScale = new LinearScale();
+var xAxis = new XAxis(xScale, "bottom");
+var yAxis = new YAxis(yScale, "right");
+var data = makeRandomData(30);
+var renderArea = new LineRenderer(data, xScale, yScale);
+var table1 = new Table([[renderArea, yAxis], [xAxis, null]])
 var svg1 = d3.select("#svg1");
 svg1.attr("width", 500).attr("height", 500);
-var table1 = makeBasicChartTable();
 table1.render(svg1, 500, 500);
-new DragZoomInteraction(table1.components[0].element, []);
+new DragZoomInteraction(renderArea.hitBox, [xAxis, yAxis, renderArea]);
 
 var svg2 = d3.select("#svg2");
 

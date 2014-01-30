@@ -1,5 +1,8 @@
 class Component {
   public element: D3.Selection;
+  public zoom(translate, scale) {
+    //noop - hackhack to appease TSC
+  }
   private rowWeightVal = 1;
   private colWeightVal = 1;
   private rowMinimumVal = 0;
