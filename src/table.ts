@@ -108,7 +108,7 @@ class Table extends Component {
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
     chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding + 2 * this.yMargin, availableHeight, 1, "row heights sum to available height");
-    chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, availableWidth, 1, "col widths sum to available width");
+    chai.assert.closeTo(d3.sum(colWidths ) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, availableWidth , 1, "col widths sum to available width");
 
     var childYOffset = this.yMargin;
     this.rows.forEach((row: Component[], rowIndex: number) => {
