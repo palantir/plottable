@@ -1,9 +1,10 @@
 class Component {
   public element: D3.Selection;
   public hitBox: D3.Selection;
+  public boundingBox: D3.Selection;
 
   private anchored = false;
-  private layedOut = false;
+  private laidOut = false;
 
   private rowWeightVal  = 0;
   private colWeightVal  = 0;
@@ -18,12 +19,13 @@ class Component {
   public anchor(element: D3.Selection) {
     this.element = element;
     this.hitBox = element.append("rect").classed("hit-box", true);
+    this.boundingBox = element.append("rect").classed("bounding-box", true);
     this.anchored = true;
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
-      if (this.layedOut) {
+      if (this.laidOut) {
         return; // idempotent if called after initial layout
       } else if (this.anchored && this.element.node().nodeName === "svg") {
         // we are the root node, let's guess width and height for convenience
@@ -43,11 +45,12 @@ class Component {
     this.availableHeight = availableHeight;
     this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
     this.hitBox.attr("width", this.availableWidth).attr("height", this.availableHeight);
-    this.layedOut = true;
+    this.boundingBox.attr("width", this.availableWidth).attr("height", this.availableHeight);
+    this.laidOut = true;
   }
 
   public render() {
-    if (!this.layedOut) {
+    if (!this.laidOut) {
       this.computeLayout()
     }
   }
@@ -62,7 +65,7 @@ class Component {
     if (newVal != null) {
       this.rowWeightVal = newVal;
       chai.assert.operator(this.rowWeightVal, '>=', 0, "rowWeight is a reasonable number");
-      this.layedOut = false;
+      this.laidOut = false;
       return this;
     } else {
       return this.rowWeightVal;
@@ -75,7 +78,7 @@ class Component {
     if (newVal != null) {
       this.colWeightVal = newVal;
       chai.assert.operator(this.colWeightVal, '>=', 0, "colWeight is a reasonable number");
-      this.layedOut = false;
+      this.laidOut = false;
       return this;
     } else {
       return this.colWeightVal
@@ -88,7 +91,7 @@ class Component {
     if (newVal != null) {
       this.rowMinimumVal = newVal;
       chai.assert.operator(this.rowMinimumVal, '>=', 0, "rowMinimum is a reasonable number");
-      this.layedOut = false;
+      this.laidOut = false;
       return this;
     } else {
       return this.rowMinimumVal;
@@ -101,7 +104,7 @@ class Component {
     if (newVal != null) {
       this.colMinimumVal = newVal;
       chai.assert.operator(this.colMinimumVal, '>=', 0, "colMinimum is a reasonable number");
-      this.layedOut = false;
+      this.laidOut = false;
       return this;
     } else {
       return this.colMinimumVal;

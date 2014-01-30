@@ -22,6 +22,7 @@ class Renderer extends Component {
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.element.classed("renderer-container", true);
+    this.boundingBox.classed("renderer-bounding-box", true);
     this.renderArea = element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
   }
 }

@@ -56,3 +56,8 @@ circle {
   fill: pink;
 }
 */
+
+.bounding-box {
+  fill: none;
+  stroke: blue;
+}

@@ -69,6 +69,7 @@ class Table extends Component {
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
+    this.boundingBox.classed("table-bounding-box", true);
     // recursively anchor children
     this.rows.forEach((row: Component[], rowIndex: number) => {
       row.forEach((component: Component, colIndex: number) => {
@@ -107,8 +108,8 @@ class Table extends Component {
     var sumPair = (p: number[]) => p[0] + p[1];
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
-    chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding + 2 * this.yMargin, availableHeight, 1, "row heights sum to available height");
-    chai.assert.closeTo(d3.sum(colWidths ) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, availableWidth , 1, "col widths sum to available width");
+    chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding + 2 * this.yMargin, this.availableHeight, 1, "row heights sum to available height");
+    chai.assert.closeTo(d3.sum(colWidths ) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, this.availableWidth , 1, "col widths sum to available width");
 
     var childYOffset = this.yMargin;
     this.rows.forEach((row: Component[], rowIndex: number) => {
@@ -118,16 +119,13 @@ class Table extends Component {
         component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
         childXOffset += colWidths[colIndex] + this.colPadding;
       });
-      chai.assert.operator(xOffset - this.colPadding - this.xMargin, "<=", availableWidth, "final xOffset was <= availableWidth");
+      // chai.assert.operator(xOffset - this.colPadding - this.xMargin, "<=", this.availableWidth, "final xOffset was <= availableWidth");
       childYOffset += rowHeights[rowIndex] + this.rowPadding;
     });
-    chai.assert.operator(yOffset - this.rowPadding - this.yMargin, "<=", availableHeight, "final yOffset was <= availableHeight");
+    // chai.assert.operator(yOffset - this.rowPadding - this.yMargin, "<=", this.availableHeight, "final yOffset was <= availableHeight");
   }
 
   public render() {
-    var rect = this.element.append("rect");
-    rect.attr("width", this.availableWidth).attr("height", this.availableHeight).classed("table-rect", true);
-
     // recursively render children
     this.rows.forEach((row: Component[], rowIndex: number) => {
       row.forEach((component: Component, colIndex: number) => {
