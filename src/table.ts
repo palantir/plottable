@@ -89,22 +89,9 @@ class Table extends Component {
     }
 
     // distribute remaining height to rows
-    this.rowWeights = this.rows.map((row: Component[]) => d3.max(row, (c: Component) => c.rowWeight()));
-    this.rowWeightSum = d3.sum(this.rowWeights);
-    if (this.rowWeightSum === 0) {
-      var rowProportionalSpace = this.rowWeights.map((w) => freeHeight / this.nRows);
-    } else {
-      var rowProportionalSpace = this.rowWeights.map((w) => freeHeight * w / this.rowWeightSum);
-    }
+    var rowProportionalSpace = Table.rowProportionalSpace(this.rows, freeHeight);
+    var colProportionalSpace = Table.colProportionalSpace(this.cols, freeWidth);
 
-    // distribute remaining width to columns
-    this.colWeights = this.cols.map((col: Component[]) => d3.max(col, (c: Component) => c.colWeight()));
-    this.colWeightSum = d3.sum(this.colWeights);
-    if (this.colWeightSum === 0) {
-      var colProportionalSpace = this.colWeights.map((w) => freeWidth / this.nCols);
-    } else {
-      var colProportionalSpace = this.colWeights.map((w: number) => w / this.colWeightSum * freeWidth);
-    }
     var sumPair = (p: number[]) => p[0] + p[1];
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
@@ -123,6 +110,23 @@ class Table extends Component {
       childYOffset += rowHeights[rowIndex] + this.rowPadding;
     });
     chai.assert.operator(childYOffset - this.rowPadding - this.yMargin, "<=", this.availableHeight, "final yOffset was <= availableHeight");
+  }
+
+  private static rowProportionalSpace(rows: Component[][], freeHeight: number) {
+    return Table.calculateProportionalSpace(rows, freeHeight, (c: Component) => c.rowWeight());
+  }
+  private static colProportionalSpace(cols: Component[][], freeWidth: number) {
+    return Table.calculateProportionalSpace(cols, freeWidth, (c: Component) => c.colWeight());
+  }
+  private static calculateProportionalSpace(componentGroups: Component[][], freeSpace: number, spaceAccessor: (c: Component) => number) {
+    var weights = componentGroups.map((group) => d3.max(group, spaceAccessor));
+    var weightSum = d3.sum(weights);
+    if (weightSum == 0) {
+      var numGroups = componentGroups.length;
+      return weights.map((w) => freeSpace / numGroups);
+    } else {
+      return weights.map((w) => freeSpace * w / weightSum);
+    }
   }
 
   public render() {
