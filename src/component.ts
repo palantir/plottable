@@ -5,9 +5,6 @@ class Component {
   private anchored = false;
   private layedOut = false;
 
-  public zoom(translate, scale) {
-    //noop - hackhack to appease TSC
-  }
   private rowWeightVal  = 0;
   private colWeightVal  = 0;
   private rowMinimumVal = 0;
@@ -53,6 +50,10 @@ class Component {
     if (!this.layedOut) {
       this.computeLayout()
     }
+  }
+
+  public zoom(translate, scale) {
+    this.render(); // if not overwritten, a zoom event just causes the component to rerender
   }
 
   public rowWeight(): number;
