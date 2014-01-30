@@ -1,10 +1,6 @@
-interface IDatum {
-  x: number;
-  y: number;
-}
 
 interface IDataset {
-  data: IDatum[];
+  data: any[];
   seriesName: string;
 }
 

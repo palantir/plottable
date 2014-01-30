@@ -7,7 +7,8 @@
 function makeRandomData(numPoints, scaleFactor=1): IDataset {
   var data = [];
   for (var i = 0; i < numPoints; i++) {
-    var r = {x: Math.random(), y: Math.random() * Math.random() * scaleFactor}
+    var x = Math.random();
+    var r = {x: x, y: (x + x * Math.random()) * scaleFactor}
     data.push(r);
   }
   data = _.sortBy(data, (d) => d.x);
@@ -86,7 +87,7 @@ function makeSparklineMultichart() {
   var yScale2 = new LinearScale();
   var leftAxis = new YAxis(yScale2, "left");
   var data2 = makeRandomData(100, 100000);
-  var renderer2 = new LineRenderer(data2, xScale1, yScale2);
+  var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
   var row2: Component[] = [leftAxis, renderer2, null];
   var bottomAxis = new XAxis(xScale1, "bottom");
   var row3: Component[] = [null, bottomAxis, null];
