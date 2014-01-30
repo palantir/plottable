@@ -17,7 +17,11 @@ class Component {
     this.hitBox = element.append("rect").classed("hit-box", true);
   }
 
-  public computeLayout(xOffset: number, yOffset: number, availableWidth: number, availableHeight:number) {
+  public computeLayout(xOffset = 0, yOffset = 0, availableWidth: number = null, availableHeight: number = null) {
+    if (availableWidth == null || availableHeight == null) {
+      availableWidth  = parseFloat(this.element.attr("width" ));
+      availableHeight = parseFloat(this.element.attr("height"));
+    }
     this.element.attr("transform", "translate(" + xOffset + "," + yOffset + ")");
     this.hitBox.attr("width", availableWidth).attr("height", availableHeight);
     this.availableWidth = availableWidth;

@@ -54,10 +54,10 @@ class XYRenderer extends Renderer {
     this.yScale.widenDomain(yDomain);
   }
 
-  public computeLayout(xOffset: number, yOffset: number, availableWidth: number, availableHeight:number) {
+  public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight? :number) {
     super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-    this.xScale.range([0, availableWidth]);
-    this.yScale.range([availableHeight, 0]);
+    this.xScale.range([0, this.availableWidth]);
+    this.yScale.range([this.availableHeight, 0]);
   }
 }
 

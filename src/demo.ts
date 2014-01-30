@@ -29,7 +29,7 @@ var data = makeRandomData(30);
 var renderArea = new LineRenderer(data, xScale, yScale);
 var basicTable = new Table([[renderArea, yAxis], [xAxis, null]])
 basicTable.anchor(svg1);
-basicTable.computeLayout(0, 0, 500, 500);
+basicTable.computeLayout();
 basicTable.render();
 new DragZoomInteraction(renderArea.hitBox, [xAxis, yAxis, renderArea]);
 
@@ -57,7 +57,7 @@ var t4 = makeBasicChartTable();
 var metaTable = new Table([[t1, t2], [t3, t4]]);
 metaTable.anchor(svg2);
 svg2.attr("width", 800).attr("height", 600);
-metaTable.computeLayout(0, 0, 800, 600);
+metaTable.computeLayout();
 metaTable.render();
 
 
@@ -81,7 +81,7 @@ var svg3 = d3.select("#svg3");
 var multiaxischart = makeMultiAxisChart();
 multiaxischart.anchor(svg3);
 svg3.attr("width", 400).attr("height",400);
-multiaxischart.computeLayout(0, 0, 400, 400);
+multiaxischart.computeLayout();
 multiaxischart.render();
 
 // make a table with 2 charts and sparkline
@@ -120,7 +120,7 @@ var svg4 = d3.select("#svg4");
 var multichart = makeSparklineMultichart();
 multichart.anchor(svg4);
 svg4.attr("width",800).attr("height",600);
-multichart.computeLayout(0, 0, 800, 600);
+multichart.computeLayout();
 multichart.render();
 // svg4.selectAll("g").remove()
 // multichart.render(svg4, 800, 600);
