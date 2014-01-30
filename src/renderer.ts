@@ -4,30 +4,24 @@
 
 class Renderer extends Component {
   public renderArea: D3.Selection;
-  public hitBox: D3.Selection;
   public element: D3.Selection;
-  public className: string;
   public scales: Scale[];
 
   constructor(
     public dataset: IDataset
   ) {
     super();
+    super.rowWeight(1);
+    super.colWeight(1);
   }
 
   public zoom(translate, scale) {
     this.renderArea.attr("transform", "translate("+translate+") scale("+scale+")");
   }
 
-  public render() {
-    var bb = this.element.append("rect").attr("width", this.availableWidth).attr("height", this.availableHeight).classed("renderer-box", true);
-    //chai.assert.operator(width, '>=', 0, "width is >= 0");
-    //chai.assert.operator(height, '>=', 0, "height is >= 0");
-    return; // no-op
-  }
-
   public anchor(element: D3.Selection) {
     super.anchor(element);
+    this.element.classed("renderer-container", true);
     this.renderArea = element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
   }
 }
@@ -53,7 +47,6 @@ class XYRenderer extends Renderer {
     this.yScale = yScale;
     this.xScaledAccessor = (datum: any) => this.xScale.scale(this.xAccessor(datum));
     this.yScaledAccessor = (datum: any) => this.yScale.scale(this.yAccessor(datum));
-    this.className = "XYRenderer";
     var data = dataset.data;
     var xDomain = d3.extent(data, this.xAccessor);
     this.xScale.widenDomain(xDomain);
