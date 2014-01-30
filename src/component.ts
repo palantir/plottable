@@ -4,7 +4,22 @@ class Component {
   private rowMinimumVal = 0;
   private colMinimumVal = 0;
 
-  public render(element: D3.Selection, width: number, height: number) {
+  public availableWidth = 0;
+  public availableHeight = 0;
+
+  public element: D3.Selection;
+
+  public anchor(element: D3.Selection) {
+    this.element = element;
+  }
+
+  public computeLayout(xOffset: number, yOffset: number, availableWidth: number, availableHeight:number) {
+    this.element.attr("transform", "translate(" + xOffset + "," + yOffset + ")");
+    this.availableWidth = availableWidth;
+    this.availableHeight = availableHeight;
+  }
+
+  public render() {
     // no-op
   }
 
@@ -54,9 +69,5 @@ class Component {
     } else {
       return this.colMinimumVal;
     }
-  }
-
-  public computeLayout() {
-    // no-op
   }
 }
