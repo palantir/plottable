@@ -77,13 +77,13 @@ class Table extends Component {
     });
   }
 
-  public computeLayout(xOffset: number, yOffset: number, availableWidth: number, availableHeight:number) {
+  public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
     // TODO: nullcheck on availableWidth and availableHeight, infer from element if necessary
 
     // calculate the amount of free space by recursive col-/row- Minimum() calls
-    var freeWidth = availableWidth - this.colMinimum();
-    var freeHeight = availableHeight - this.rowMinimum();
+    var freeWidth = this.availableWidth - this.colMinimum();
+    var freeHeight = this.availableHeight - this.rowMinimum();
     if (freeWidth < 0 || freeHeight < 0) {
       throw "InsufficientSpaceError";
     }
