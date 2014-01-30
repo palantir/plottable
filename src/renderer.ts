@@ -4,6 +4,7 @@
 
 class Renderer extends Component {
   public renderArea: D3.Selection;
+  public hitBox: D3.Selection;
   public element: D3.Selection;
   public className: string;
   public width: number;
@@ -21,11 +22,16 @@ class Renderer extends Component {
   }
 
   public render(element: D3.Selection, width: number, height: number) {
-    this.element = element;
-    var bb = this.element.append("rect").attr("width", width).attr("height", height).classed("renderer-box", true);
+    var bb = element.append("rect").attr("width", width).attr("height", height).classed("renderer-box", true);
+    this.element = element.append("g");
+    this.hitBox = bb.classed("hit-box", true);
     chai.assert.operator(width, '>=', 0, "width is >= 0");
     chai.assert.operator(height, '>=', 0, "height is >= 0");
     return; // no-op
+  }
+
+  public zoom(translate, scale) {
+    this.element.attr("transform", "translate("+translate+") scale("+scale+")");
   }
 
   public setDimensions(width: number, height: number) {

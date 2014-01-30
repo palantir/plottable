@@ -36,15 +36,21 @@ circle {
   stroke: royalblue;
 }
 
-.renderer-box {
+/*.renderer-box {
   fill: none;
   stroke: red;
-}
+}*/
 
 .axis-box {
   fill: none;
   stroke: green;
 }
+
+.hit-box {
+  fill: red;
+  opacity: 0.1;
+}
+
 /*
 .error {
   fill: pink;

@@ -103,7 +103,7 @@ class Axis extends Component {
     this.element.attr("transform","");
   }
 
-  public transform(translatePair: number[], scale: number) {
+  public zoom(translatePair: number[], scale: number) {
     var translate = this.isXAligned ? translatePair[0] : translatePair[1];
     if (scale != null && scale != this.cachedScale) {
       this.cachedTranslate = translate;
