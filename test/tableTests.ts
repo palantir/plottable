@@ -7,12 +7,9 @@
 ///<reference path="../src/table.ts" />
 ///<reference path="../src/renderer.ts" />
 ///<reference path="../src/utils.ts" />
+///<reference path="testUtils.ts" />
 
 var assert = chai.assert;
-
-function generateSVG(width, height) {
-  return d3.select("body").append("svg:svg").attr("width", width).attr("height", height);
-}
 
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
@@ -142,6 +139,5 @@ describe("Table layout", () => {
     assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
     assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
     svg.remove();
-    })
-
+  })
 })
