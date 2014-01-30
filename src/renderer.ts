@@ -7,8 +7,6 @@ class Renderer extends Component {
   public hitBox: D3.Selection;
   public element: D3.Selection;
   public className: string;
-  public width: number;
-  public height: number;
   public scales: Scale[];
 
   constructor(
@@ -17,30 +15,20 @@ class Renderer extends Component {
     super();
   }
 
-  public transform(translate: number[], scale: number) {
-    return; // no-op
-  }
-
-  public render(element: D3.Selection, width: number, height: number) {
-    var bb = element.append("rect").attr("width", width).attr("height", height).classed("renderer-box", true);
-    this.element = element.append("g");
-    this.hitBox = bb.classed("hit-box", true);
-    chai.assert.operator(width, '>=', 0, "width is >= 0");
-    chai.assert.operator(height, '>=', 0, "height is >= 0");
-    return; // no-op
-  }
-
   public zoom(translate, scale) {
-    this.element.attr("transform", "translate("+translate+") scale("+scale+")");
+    this.renderArea.attr("transform", "translate("+translate+") scale("+scale+")");
   }
 
-  public setDimensions(width: number, height: number) {
-    this.width = width;
-    this.height = height;
+  public render() {
+    var bb = this.element.append("rect").attr("width", this.availableWidth).attr("height", this.availableHeight).classed("renderer-box", true);
+    //chai.assert.operator(width, '>=', 0, "width is >= 0");
+    //chai.assert.operator(height, '>=', 0, "height is >= 0");
+    return; // no-op
   }
 
-  public generateElement(container: D3.Selection) {
-    this.element = container.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
+  public anchor(element: D3.Selection) {
+    super.anchor(element);
+    this.renderArea = element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
   }
 }
 
@@ -73,15 +61,10 @@ class XYRenderer extends Renderer {
     this.yScale.widenDomain(yDomain);
   }
 
-  public render(element: D3.Selection, width: number, height: number) {
-    super.render(element, width, height);
-    this.setDimensions(width, height);
-  }
-
-  public setDimensions(width: number, height: number) {
-    super.setDimensions(width, height);
-    this.xScale.range([0, width]);
-    this.yScale.range([height, 0]);
+  public computeLayout(xOffset: number, yOffset: number, availableWidth: number, availableHeight:number) {
+    super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    this.xScale.range([0, availableWidth]);
+    this.yScale.range([availableHeight, 0]);
   }
 }
 
@@ -93,12 +76,15 @@ class LineRenderer extends XYRenderer {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
   }
 
-  public render(element: D3.Selection, width: number, height: number) {
-    super.render(element, width, height);
+  public anchor(element: D3.Selection) {
+    super.anchor(element);
+    this.renderArea = this.renderArea.append("path");
+  }
 
+  public render() {
+    super.render();
     this.line = d3.svg.line().interpolate("basis").x(this.xScaledAccessor).y(this.yScaledAccessor);
-    this.renderArea = this.element.append("path")
-      .classed("line", true)
+    this.renderArea.classed("line", true)
       .classed(this.dataset.seriesName, true)
       .datum(this.dataset.data);
     this.renderArea.attr("d", this.line);
@@ -112,10 +98,10 @@ class CircleRenderer extends XYRenderer {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
   }
 
-  public render(element: D3.Selection, width: number, height: number) {
-    super.render(element, width, height);
+  public render() {
+    super.render();
 
-    this.circles = this.element.selectAll("circle");
+    this.circles = this.renderArea.selectAll("circle");
     this.circles.data(this.dataset.data).enter().append("circle")
       .attr("cx", this.xScaledAccessor)
       .attr("cy", this.yScaledAccessor)
