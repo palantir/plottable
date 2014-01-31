@@ -31,7 +31,7 @@ var basicTable = new Table([[renderArea, yAxis], [xAxis, null]])
 basicTable.anchor(svg1);
 basicTable.computeLayout();
 basicTable.render();
-new DragZoomInteraction(renderArea.hitBox, [xAxis, yAxis, renderArea], xScale, yScale);
+new DragZoomInteraction(renderArea, [xAxis, yAxis, renderArea], xScale, yScale);
 
 
 

@@ -1,7 +1,11 @@
+///<reference path="../lib/d3.d.ts" />
+///<reference path="interaction.ts" />
+
 class Component {
   public element: D3.Selection;
   public hitBox: D3.Selection;
   public boundingBox: D3.Selection;
+  private registeredInteractions: Interaction[] = [];
 
   private rowWeightVal  = 0;
   private colWeightVal  = 0;
@@ -20,6 +24,7 @@ class Component {
     this.element = element;
     this.hitBox = element.append("rect").classed("hit-box", true);
     this.boundingBox = element.append("rect").classed("bounding-box", true);
+    this.registeredInteractions.forEach((r) => this.registerInteraction(r));
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -73,6 +78,16 @@ class Component {
     this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
     this.hitBox.attr("width", this.availableWidth).attr("height", this.availableHeight);
     this.boundingBox.attr("width", this.availableWidth).attr("height", this.availableHeight);
+  }
+
+  public registerInteraction(interaction: Interaction) {
+    // Interactions can be registered before or after anchoring. If registered before, they are
+    // pushed to this.registeredInteractions and registered during anchoring. If after, they are
+    // registered immediately
+    this.registeredInteractions.push(interaction);
+    if (this.element != null) {
+      interaction.listenToHitBox(this.hitBox);
+    }
   }
 
   public render() {
