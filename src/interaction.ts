@@ -1,10 +1,13 @@
 ///<reference path="../lib/lodash.d.ts" />
 
 class Interaction {
+  public hitBox: D3.Selection;
+
   constructor(public componentToListenTo: Component) {
   }
 
   public listenToHitBox(hitBox: D3.Selection) {
+    this.hitBox = hitBox;
     // no-op; should be overwritten
   }
 
@@ -29,6 +32,7 @@ class DragZoomInteraction extends Interaction {
   }
 
   public listenToHitBox(hitBox: D3.Selection) {
+    super.listenToHitBox(hitBox);
     this.zoom(hitBox);
   }
 
@@ -53,6 +57,8 @@ class AreaInteraction extends Interaction {
   private dragInitialized = false;
   private dragBehavior;
   private origin = [0,0];
+  private constrainX: (n: number) => number;
+  private constrainY: (n: number) => number;
   private dragBox: D3.Selection;
 
   constructor(
@@ -67,12 +73,14 @@ class AreaInteraction extends Interaction {
     this.registerWithComponent();
   }
 
-
-
   private dragstart(){
-    var x = d3.event.x;
-    var y = d3.event.y;
     this.dragBox.attr("height", 0).attr("width", 0);
+    var availableWidth  = parseFloat(this.hitBox.attr("width"));
+    var availableHeight = parseFloat(this.hitBox.attr("height"));
+    // the constraint functions ensure that the selection rectangle will not exceed the hit box
+    var constraintFunction = (min, max) => (x) => Math.min(Math.max(x, min), max);
+    this.constrainX = constraintFunction(0, availableWidth);
+    this.constrainY = constraintFunction(0, availableHeight);
   }
 
   private drag(){
@@ -80,7 +88,8 @@ class AreaInteraction extends Interaction {
       this.origin = [d3.event.x, d3.event.y];
       this.dragInitialized = true;
     }
-    var location = [d3.event.x, d3.event.y];
+
+    var location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
     var width  = Math.abs(this.origin[0] - location[0]);
     var height = Math.abs(this.origin[1] - location[1]);
     var x = Math.min(this.origin[0], location[0]);
@@ -90,10 +99,10 @@ class AreaInteraction extends Interaction {
 
   private dragend(){
     this.dragInitialized = false;
-    // this.dragBox.attr("height", 0).attr("width", 0);
   }
 
   public listenToHitBox(hitBox: D3.Selection) {
+    super.listenToHitBox(hitBox);
     var cname = AreaInteraction.CLASS_DRAG_BOX;
     var element = this.componentToListenTo.element;
     this.dragBox = element.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
