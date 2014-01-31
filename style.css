@@ -73,3 +73,8 @@ circle {
 .table-bounding-box {
   stroke: blue;
 }
+
+.drag-box {
+  fill: blue;
+  opacity: 0.5;
+}
