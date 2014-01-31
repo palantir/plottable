@@ -55,6 +55,8 @@ var t3 = makeBasicChartTable();
 var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
+metaTable.rowPadding = 5;
+metaTable.colPadding = 5;
 metaTable.anchor(svg2);
 svg2.attr("width", 800).attr("height", 600);
 metaTable.computeLayout();
@@ -72,7 +74,6 @@ function makeMultiAxisChart() {
   var data = makeRandomData(30);
   var renderArea = new LineRenderer(data, xScale, yScale);
   var rootTable = new Table([[renderArea, rightAxesTable], [xAxis, null]])
-  console.log(rootTable);
   return rootTable;
 
 }
@@ -100,7 +101,7 @@ function makeSparklineMultichart() {
   var yScale2 = new LinearScale();
   var leftAxis = new YAxis(yScale2, "left");
   leftAxis.xAlignment = "RIGHT";
-  var data2 = makeRandomData(100, 100000);
+  var data2 = makeRandomData(1000, 100000);
   var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
   var areaInteraction = new AreaInteraction(renderer2, null);
   var row2: Component[] = [leftAxis, renderer2, null];
@@ -111,10 +112,6 @@ function makeSparklineMultichart() {
   sparkline.rowWeight(0.25);
   var row4 = [null, sparkline, null];
   var multiChart = new Table([row1, row2, row3, row4]);
-  // multiChart.xMargin = 0;
-  // multiChart.yMargin = 0;
-  // multiChart.xPadding = 0;
-  // multiChart.yPadding = 0;
   return multiChart;
 }
 

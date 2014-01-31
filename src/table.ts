@@ -7,10 +7,10 @@
 
 
 class Table extends Component {
-  public rowPadding = 5;
-  public colPadding = 5;
-  public xMargin = 5;
-  public yMargin = 5;
+  public rowPadding = 0;
+  public colPadding = 0;
+  public xMargin = 0;
+  public yMargin = 0;
 
   private rows: Component[][];
   private cols: Component[][];
@@ -106,10 +106,10 @@ class Table extends Component {
         component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
         childXOffset += colWidths[colIndex] + this.colPadding;
       });
-      chai.assert.operator(childXOffset - this.colPadding - this.xMargin, "<=", this.availableWidth, "final xOffset was <= availableWidth");
+      chai.assert.operator(childXOffset - this.colPadding - this.xMargin, "<=", this.availableWidth + 0.1, "final xOffset was <= availableWidth");
       childYOffset += rowHeights[rowIndex] + this.rowPadding;
     });
-    chai.assert.operator(childYOffset - this.rowPadding - this.yMargin, "<=", this.availableHeight, "final yOffset was <= availableHeight");
+    chai.assert.operator(childYOffset - this.rowPadding - this.yMargin, "<=", this.availableHeight + 0.1, "final yOffset was <= availableHeight");
   }
 
   private static rowProportionalSpace(rows: Component[][], freeHeight: number) {
