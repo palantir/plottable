@@ -24,7 +24,7 @@ class Component {
     this.element = element;
     this.hitBox = element.append("rect").classed("hit-box", true);
     this.boundingBox = element.append("rect").classed("bounding-box", true);
-    this.registeredInteractions.forEach((r) => this.registerInteraction(r));
+    this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -86,7 +86,7 @@ class Component {
     // registered immediately
     this.registeredInteractions.push(interaction);
     if (this.element != null) {
-      interaction.listenToHitBox(this.hitBox);
+      interaction.anchor(this.hitBox);
     }
   }
 
