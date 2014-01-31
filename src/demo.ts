@@ -4,6 +4,7 @@
 ///<reference path="table.ts" />
 ///<reference path="renderer.ts" />
 ///<reference path="interaction.ts" />
+///<reference path="labelComponent.ts" />
 
 function makeRandomData(numPoints, scaleFactor=1): IDataset {
   var data = [];
@@ -141,3 +142,23 @@ function iterate(n: number, fn: () => any) {
   }
   return out;
 }
+
+
+
+var svg1 = d3.select("#svg5");
+svg1.attr("width", 500).attr("height", 500);
+var xScale = new LinearScale();
+var yScale = new LinearScale();
+var xAxis = new XAxis(xScale, "bottom");
+var yAxis = new YAxis(yScale, "right");
+var yAxisLabel = new LabelComponent("bp y-axis qd", 90);
+var yAxisTable = new Table([[yAxis, yAxisLabel]]);
+yAxisTable.colWeight(0);
+var data = makeRandomData(30);
+var renderArea = new LineRenderer(data, xScale, yScale);
+var basicTable = new Table([[renderArea, yAxisTable], [xAxis, null]]);
+var title = new LabelComponent("bpqd");
+var outerTable = new Table([[title], [basicTable]]);
+outerTable.anchor(svg1);
+outerTable.computeLayout();
+outerTable.render();
