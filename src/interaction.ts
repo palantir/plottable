@@ -45,25 +45,20 @@ class DragZoomInteraction extends Interaction {
   }
 }
 
-interface XYSelectionArea {
-  xMin: number;
-  xMax: number;
-  yMin: number;
-  yMax: number;
-}
-
 class AreaInteraction extends Interaction {
   private static CLASS_DRAG_BOX = "drag-box";
   private dragInitialized = false;
   private dragBehavior;
   private origin = [0,0];
+  private location = [0,0];
   private constrainX: (n: number) => number;
   private constrainY: (n: number) => number;
   private dragBox: D3.Selection;
 
   constructor(
     private rendererComponent: XYRenderer,
-    private areaCallback: (a: XYSelectionArea) => any
+    private areaCallback?: (a: XYSelectionArea) => any,
+    private selectionCallback?: (a: D3.Selection) => any
   ) {
     super(rendererComponent);
     this.dragBehavior = d3.behavior.drag();
@@ -89,16 +84,28 @@ class AreaInteraction extends Interaction {
       this.dragInitialized = true;
     }
 
-    var location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
-    var width  = Math.abs(this.origin[0] - location[0]);
-    var height = Math.abs(this.origin[1] - location[1]);
-    var x = Math.min(this.origin[0], location[0]);
-    var y = Math.min(this.origin[1], location[1]);
+    this.location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+    var width  = Math.abs(this.origin[0] - this.location[0]);
+    var height = Math.abs(this.origin[1] - this.location[1]);
+    var x = Math.min(this.origin[0], this.location[0]);
+    var y = Math.min(this.origin[1], this.location[1]);
     this.dragBox.attr("x", x).attr("y", y).attr("height", height).attr("width", width);
   }
 
   private dragend(){
     this.dragInitialized = false;
+    var xMin = Math.min(this.origin[0], this.location[0]);
+    var xMax = Math.max(this.origin[0], this.location[0]);
+    var yMin = Math.min(this.origin[1], this.location[1]);
+    var yMax = Math.max(this.origin[1], this.location[1]);
+    var selectionArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
+    if (this.areaCallback != null) {
+      this.areaCallback(selectionArea);
+    }
+    if (this.selectionCallback != null) {
+      var selection = this.rendererComponent.getSelectionFromArea(selectionArea);
+      this.selectionCallback(selection);
+    }
   }
 
   public anchor(hitBox: D3.Selection) {
