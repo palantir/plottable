@@ -48,7 +48,7 @@ class Axis extends Component {
   public rowWeight(newVal: number): Component;
   public rowWeight(newVal?: number): any {
     if (newVal != null) {
-      throw new Error("Axis row weight is not settable.");
+      throw new Error("Row weight cannot be set on Axis.");
       return this;
     } else {
       return 0;
@@ -59,7 +59,7 @@ class Axis extends Component {
   public colWeight(newVal: number): Component;
   public colWeight(newVal?: number): any {
     if (newVal != null) {
-      throw new Error("Axis col weight is not settable.");
+      throw new Error("Col weight cannot be set on Axis.");
       return this;
     } else {
       return 0;

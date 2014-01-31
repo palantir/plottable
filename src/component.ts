@@ -118,7 +118,7 @@ class Component {
       chai.assert.operator(this.colWeightVal, '>=', 0, "colWeight is a reasonable number");
       return this;
     } else {
-      return this.colWeightVal
+      return this.colWeightVal;
     }
   }
 

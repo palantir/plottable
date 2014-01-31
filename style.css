@@ -7,6 +7,14 @@ div {
   display: inline;
 }
 
+.text-label {
+  font-size: 24pt;
+}
+
+.text-label-vertical {
+  writing-mode: tb;
+}
+
 .axis path,
 .axis line {
   fill: none;
