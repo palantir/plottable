@@ -6,13 +6,15 @@ class Interaction {
   constructor(public componentToListenTo: Component) {
   }
 
-  public listenToHitBox(hitBox: D3.Selection) {
+  public anchor(hitBox: D3.Selection) {
     this.hitBox = hitBox;
-    // no-op; should be overwritten
   }
 
   public registerWithComponent() {
     this.componentToListenTo.registerInteraction(this);
+    // It would be nice to have a call to this in the Interaction constructor, but
+    // can't do this right now because that depends on listenToHitBox being callable, which depends on the subclass
+    // constructor finishing first.
   }
 }
 
@@ -26,13 +28,11 @@ class DragZoomInteraction extends Interaction {
     var throttledZoom = _.throttle(() => this.rerenderZoomed(), 16);
     this.zoom.on("zoom", throttledZoom);
 
-    this.registerWithComponent(); // It would be nice to have a call to this in the Interaction constructor, but
-    // can't do this right now because that depends on listenToHitBox being callable, which depends on the DragZoomInteractor
-    // constructor finishing first.
+    this.registerWithComponent();
   }
 
-  public listenToHitBox(hitBox: D3.Selection) {
-    super.listenToHitBox(hitBox);
+  public anchor(hitBox: D3.Selection) {
+    super.anchor(hitBox);
     this.zoom(hitBox);
   }
 
@@ -101,8 +101,8 @@ class AreaInteraction extends Interaction {
     this.dragInitialized = false;
   }
 
-  public listenToHitBox(hitBox: D3.Selection) {
-    super.listenToHitBox(hitBox);
+  public anchor(hitBox: D3.Selection) {
+    super.anchor(hitBox);
     var cname = AreaInteraction.CLASS_DRAG_BOX;
     var element = this.componentToListenTo.element;
     this.dragBox = element.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
