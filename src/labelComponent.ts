@@ -13,11 +13,17 @@ class LabelComponent extends Component {
   private textWidth = 0;
   private isVertical = false;
   private rotationAngle = 0;
+  private orientation = "horizontal";
 
-  constructor(text: string, rotationAngle=0) {
+  constructor(text: string, orientation?: string) {
     super();
     this.text = text;
-    this.rotationAngle = rotationAngle;
+    //this.rotationAngle = rotationAngle;
+    if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
+      this.orientation = orientation;
+    } else if (orientation != null) {
+      throw new Error(orientation + " is not a valid orientation for LabelComponent");
+    }
   }
 
   public rowWeight(): number;
@@ -70,22 +76,22 @@ class LabelComponent extends Component {
                         .classed(this.CLASS_TEXT_LABEL, true)
                         .attr("alignment-baseline", "middle")
                         .text(this.text);
-    this.textElement.attr("transform", "rotate(" + this.rotationAngle + ")");
-    var sinVal = Math.sin(this.rotationAngle * Math.PI / 180);
-    var cosVal = Math.cos(this.rotationAngle * Math.PI / 180);
-
-    // TODO: Clean up this shifty code
-    var cosRotatedVal = Math.cos((this.rotationAngle + 45) * Math.PI / 180);
-    var sinRotatedVal = Math.sin(2 * this.rotationAngle * Math.PI / 180);
-    var yShift = cosRotatedVal;
-    var xShift = sinRotatedVal/2;
-    this.textElement.attr("y", yShift + "em");
-    this.textElement.attr("x", xShift + "em");
 
     var clientHeight = this.textElement.node().clientHeight;
     var clientWidth = this.textElement.node().clientWidth;
 
-    this.textHeight = Math.abs(cosVal * clientHeight) + Math.abs(sinVal * clientWidth);
-    this.textWidth = Math.abs(sinVal * clientHeight) + Math.abs(cosVal * clientWidth);
+    if (this.orientation === "horizontal") {
+      this.textElement.attr("transform", "translate(0 " + clientHeight/2 + ")");
+      this.textHeight = clientHeight;
+      this.textWidth = clientWidth;
+    } else {
+      this.textWidth = clientHeight;
+      this.textHeight = clientWidth;
+      if (this.orientation === "vertical-right") {
+        this.textElement.attr("transform", "rotate(90) translate(0 " + (-clientHeight/2) + ")");
+      } else if (this.orientation === "vertical-left") {
+        this.textElement.attr("transform", "rotate(-90) translate(" + (-clientWidth) + " " + clientHeight/2 + ")");
+      }
+    }
   }
 }
