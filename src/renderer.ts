@@ -32,15 +32,16 @@ interface IAccessor {
 };
 
 class XYRenderer extends Renderer {
+  public dataSelection: D3.Selection;
   private static defaultXAccessor = (d: any) => d.x;
   private static defaultYAccessor = (d: any) => d.y;
-  public xScale: Scale;
-  public yScale: Scale;
+  public xScale: QuantitiveScale;
+  public yScale: QuantitiveScale;
   private xAccessor: IAccessor;
   private yAccessor: IAccessor;
   public xScaledAccessor: (datum: any) => number;
   public yScaledAccessor: (datum: any) => number;
-  constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+  constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset);
     this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
     this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
@@ -60,13 +61,32 @@ class XYRenderer extends Renderer {
     this.xScale.range([0, this.availableWidth]);
     this.yScale.range([this.availableHeight, 0]);
   }
+
+  public getSelectionFromArea(area: XYSelectionArea) {
+    var xMin = this.xScale.invert(area.xMin);
+    var xMax = this.xScale.invert(area.xMax);
+    var yMin = this.yScale.invert(area.yMin);
+    var yMax = this.yScale.invert(area.yMax);
+    var inRange = (x: number, a: number, b: number) => {
+      return (Math.min(a,b) <= x && x <= Math.max(a,b));
+    }
+    var filterFunction = (d: any) => {
+      var x = this.xAccessor(d);
+      var y = this.yAccessor(d);
+      // use inRange rather than inline comparison to avoid thinking about scale inversion
+      return inRange(x, xMin, xMax) && inRange(y, yMin, yMax);;
+    }
+    var selection = this.dataSelection.filter(filterFunction);
+    return selection;
+
+  }
 }
 
 
 class LineRenderer extends XYRenderer {
   private line: D3.Svg.Line;
 
-  constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+  constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
   }
 
@@ -78,7 +98,7 @@ class LineRenderer extends XYRenderer {
   public render() {
     super.render();
     this.line = d3.svg.line().interpolate("basis").x(this.xScaledAccessor).y(this.yScaledAccessor);
-    this.renderArea.classed("line", true)
+    this.dataSelection = this.renderArea.classed("line", true)
       .classed(this.dataset.seriesName, true)
       .datum(this.dataset.data);
     this.renderArea.attr("d", this.line);
@@ -86,17 +106,16 @@ class LineRenderer extends XYRenderer {
 }
 
 class CircleRenderer extends XYRenderer {
-  private circles: D3.Selection;
-
-  constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+  constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
   }
 
   public render() {
     super.render();
 
-    this.circles = this.renderArea.selectAll("circle");
-    this.circles.data(this.dataset.data).enter().append("circle")
+    this.dataSelection = this.renderArea.selectAll("circle");
+    this.dataSelection = this.dataSelection.data(this.dataset.data).enter()
+      .append("circle")
       .attr("cx", this.xScaledAccessor)
       .attr("cy", this.yScaledAccessor)
       .attr("r", 3);

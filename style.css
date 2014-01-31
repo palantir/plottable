@@ -75,6 +75,12 @@ circle {
 }
 
 .drag-box {
-  fill: blue;
-  opacity: 0.5;
+  fill: aliceblue;
+  opacity: 1;
+
+}
+
+.selected-point {
+  fill: orange;
+  stroke: none;
 }
