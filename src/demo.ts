@@ -150,14 +150,21 @@ svg1.attr("width", 500).attr("height", 500);
 var xScale = new LinearScale();
 var yScale = new LinearScale();
 var xAxis = new XAxis(xScale, "bottom");
-var yAxis = new YAxis(yScale, "right");
-var yAxisLabel = new LabelComponent("bp y-axis qd", 90);
-var yAxisTable = new Table([[yAxis, yAxisLabel]]);
-yAxisTable.colWeight(0);
+
+var yAxisRight = new YAxis(yScale, "right");
+var yAxisRightLabel = new LabelComponent("bp y right qd", "vertical-right");
+var yAxisRightTable = new Table([[yAxisRight, yAxisRightLabel]]);
+yAxisRightTable.colWeight(0);
+
+var yAxisLeft = new YAxis(yScale, "left");
+var yAxisLeftLabel = new LabelComponent("bp y left qd", "vertical-left");
+var yAxisLeftTable = new Table([[yAxisLeftLabel, yAxisLeft]]);
+yAxisLeftTable.colWeight(0);
+
 var data = makeRandomData(30);
 var renderArea = new LineRenderer(data, xScale, yScale);
-var basicTable = new Table([[renderArea, yAxisTable], [xAxis, null]]);
-var title = new LabelComponent("bpqd");
+var basicTable = new Table([[yAxisLeftTable, renderArea, yAxisRightTable], [null, xAxis, null]]);
+var title = new LabelComponent("bpIqd");
 var outerTable = new Table([[title], [basicTable]]);
 outerTable.anchor(svg1);
 outerTable.computeLayout();
