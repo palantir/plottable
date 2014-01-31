@@ -40,3 +40,33 @@ class DragZoomInteraction extends Interaction {
       })
   }
 }
+
+interface XYSelectionArea {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+}
+
+class AreaInteraction extends Interaction {
+  private drag;
+  private dragBox: D3.Selection;
+
+  constructor(
+    private rendererComponent: XYRenderer,
+    private areaCallback: (a: XYSelectionArea) => any
+  ) {
+    super(rendererComponent);
+    this.drag = d3.behavior.drag();
+    this.drag.on("dragstart", () => console.log("dragstart"));
+    this.drag.on("drag", () => console.log("drag"));
+    this.drag.on("dragend", () => console.log("dragend"));
+    this.registerWithComponent();
+  }
+
+
+
+  public listenToHitBox(hitBox: D3.Selection) {
+    hitBox.call(this.drag);
+  }
+}
