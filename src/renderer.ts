@@ -3,6 +3,8 @@
 ///<reference path="scale.ts" />
 
 class Renderer extends Component {
+  public CLASS_RENDERER_CONTAINER = "renderer-container";
+
   public renderArea: D3.Selection;
   public element: D3.Selection;
   public scales: Scale[];
@@ -13,6 +15,8 @@ class Renderer extends Component {
     super();
     super.rowWeight(1);
     super.colWeight(1);
+
+    this.classed(this.CLASS_RENDERER_CONTAINER, true);
   }
 
   public zoom(translate, scale) {
@@ -21,7 +25,6 @@ class Renderer extends Component {
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.element.classed("renderer-container", true);
     this.boundingBox.classed("renderer-bounding-box", true);
     this.renderArea = element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
   }
