@@ -138,11 +138,11 @@ class BrushZoomInteraction extends AreaInteraction {
   public zoom(area: FullSelectionArea) {
     var originalXDomain = this.xScale.domain();
     var originalYDomain = this.yScale.domain();
-    var xOrigDirection = originalXDomain[0] > originalXDomain[1];
-    var yOrigDirection = originalYDomain[0] > originalYDomain[1];
     var xDomain = [area.data.xMin, area.data.xMax];
     var yDomain = [area.data.yMin, area.data.yMax];
 
+    var xOrigDirection = originalXDomain[0] > originalXDomain[1];
+    var yOrigDirection = originalYDomain[0] > originalYDomain[1];
     var xDirection = xDomain[0] > xDomain[1];
     var yDirection = yDomain[0] > yDomain[1]
     // make sure we don't change inversion of the scale by zooming
