@@ -130,6 +130,8 @@ class AreaInteraction extends Interaction {
 }
 
 class BrushZoomInteraction extends AreaInteraction {
+  public componentsToZoom: Component[]; //Typically axes and renderers.
+  public xScaleOriginal: QuantitiveScale;
   private xDomainRange: number;
   private yDomainRange: number;
   private xRangeRange: number;
@@ -137,18 +139,18 @@ class BrushZoomInteraction extends AreaInteraction {
   private xMin: number;
   private yMin: number;
 
-  constructor(eventComponent: XYRenderer, public componentsToZoom: Component[], public xScale: QuantitiveScale, public yScale: QuantitiveScale) {
+  constructor(eventComponent: XYRenderer, public xScale: QuantitiveScale, public yScale: QuantitiveScale) {
     super(eventComponent);
-    var xRange = this.xScale.range()
-    var yRange = this.yScale.range()
-    var xDomain = xScale.domain();
-    var yDomain = yScale.domain();
-    this.xDomainRange = xDomain[1] - xDomain[0];
-    this.yDomainRange = yDomain[1] - yDomain[0];
-    this.xMin = xRange[0];
-    this.yMin = yRange[0];
-    chai.assert.operator(this.xDomainRange, '>=', 0, "xDomainRange >= 0; failure may indicate scale wasn't initialized by renderers");
-    chai.assert.operator(this.yDomainRange, '>=', 0, "yDomainRange >= 0; failure may indicate scale wasn't initialized by renderers");
+    // var xRange = this.xScale.range()
+    // var yRange = this.yScale.range()
+    // var xDomain = this.xScale.domain();
+    // var yDomain = this.yScale.domain();
+    // this.xDomainRange = xDomain[1] - xDomain[0];
+    // this.yDomainRange = yDomain[1] - yDomain[0];
+    // this.xMin = xRange[0];
+    // this.yMin = yRange[0];
+    // chai.assert.operator(this.xDomainRange, '>=', 0, "xDomainRange >= 0; failure may indicate scale wasn't initialized by renderers");
+    // chai.assert.operator(this.yDomainRange, '>=', 0, "yDomainRange >= 0; failure may indicate scale wasn't initialized by renderers");
     this.areaCallback = this.zoom;
   }
 
@@ -170,15 +172,16 @@ class BrushZoomInteraction extends AreaInteraction {
   }
 
   public zoom(area: FullSelectionArea) {
-    var zoomInfo = this.getZoomInfo(area);
-    var translate = zoomInfo.translate;
-    var scale = zoomInfo.scale;
+    // var zoomInfo = this.getZoomInfo(area);
+    // var translate = zoomInfo.translate;
+    // var scale = zoomInfo.scale;
+    console.log("zoomin baby");
     var xDomain = [area.data.xMin, area.data.xMax];
     var yDomain = [area.data.yMin, area.data.yMax];
     this.xScale.domain(xDomain);
     this.yScale.domain(yDomain);
-    this.componentsToZoom.forEach((c) => {
-      c.zoom(translate, scale);
-    });
+    // this.componentsToZoom.forEach((c) => {
+    //   c.zoom(translate, scale);
+    // });
   }
 }

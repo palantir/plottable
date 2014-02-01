@@ -16,6 +16,15 @@ interface FullSelectionArea {
   data: SelectionArea;
 }
 
+
+interface IBroadcasterCallback {
+  (broadcaster: IBroadcaster, ...args: any[]): any;
+}
+
+interface IBroadcaster {
+  registerListener: (cb: IBroadcasterCallback) => IBroadcaster;
+}
+
 // interface IRenderer<T extends IDatum> extends IRendererable {
 
 // }
