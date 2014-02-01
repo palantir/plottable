@@ -23,7 +23,8 @@ module.exports = function(grunt) {
         },
         files: [
           { src: ["src/*.ts"], dest: "plottable.js" },
-          { src: ["test/*.ts"], dest: "test/tests.js" }
+          { src: ["test/*.ts"], dest: "test/tests.js" },
+          { src: ["examples/*.ts"], dest: "examples/examples.js"}
         ]
       }
     },
@@ -35,7 +36,8 @@ module.exports = function(grunt) {
         "files": [
           "Gruntfile.js",
           "src/*.ts",
-          "test/*.ts"
+          "test/*.ts",
+          "examples/*.ts"
         ]
       }
     }
