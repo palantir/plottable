@@ -4,6 +4,7 @@
 ///<reference path="table.ts" />
 ///<reference path="renderer.ts" />
 ///<reference path="interaction.ts" />
+///<reference path="labelComponent.ts" />
 
 function makeRandomData(numPoints, scaleFactor=1): IDataset {
   var data = [];
@@ -31,7 +32,7 @@ var basicTable = new Table([[renderArea, yAxis], [xAxis, null]])
 basicTable.anchor(svg1);
 basicTable.computeLayout();
 basicTable.render();
-new DragZoomInteraction(renderArea.hitBox, [xAxis, yAxis, renderArea], xScale, yScale);
+new DragZoomInteraction(renderArea, [xAxis, yAxis, renderArea], xScale, yScale);
 
 
 
@@ -55,6 +56,8 @@ var t3 = makeBasicChartTable();
 var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
+metaTable.rowPadding = 5;
+metaTable.colPadding = 5;
 metaTable.anchor(svg2);
 svg2.attr("width", 800).attr("height", 600);
 metaTable.computeLayout();
@@ -72,7 +75,6 @@ function makeMultiAxisChart() {
   var data = makeRandomData(30);
   var renderArea = new LineRenderer(data, xScale, yScale);
   var rootTable = new Table([[renderArea, rightAxesTable], [xAxis, null]])
-  console.log(rootTable);
   return rootTable;
 
 }
@@ -99,8 +101,12 @@ function makeSparklineMultichart() {
   var row1: Component[] = [leftAxesTable, renderer1, rightAxesTable];
   var yScale2 = new LinearScale();
   var leftAxis = new YAxis(yScale2, "left");
-  var data2 = makeRandomData(100, 100000);
+  leftAxis.xAlignment = "RIGHT";
+  var data2 = makeRandomData(1000, 100000);
   var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
+  var toggleClass = function() {return !d3.select(this).classed("selected-point")};
+  var cb = (s) => s.classed("selected-point", toggleClass);
+  var areaInteraction = new AreaInteraction(renderer2, null, cb);
   var row2: Component[] = [leftAxis, renderer2, null];
   var bottomAxis = new XAxis(xScale1, "bottom");
   var row3: Component[] = [null, bottomAxis, null];
@@ -109,10 +115,6 @@ function makeSparklineMultichart() {
   sparkline.rowWeight(0.25);
   var row4 = [null, sparkline, null];
   var multiChart = new Table([row1, row2, row3, row4]);
-  // multiChart.xMargin = 0;
-  // multiChart.yMargin = 0;
-  // multiChart.xPadding = 0;
-  // multiChart.yPadding = 0;
   return multiChart;
 }
 
@@ -141,3 +143,30 @@ function iterate(n: number, fn: () => any) {
   }
   return out;
 }
+
+
+
+var svg1 = d3.select("#svg5");
+svg1.attr("width", 500).attr("height", 500);
+var xScale = new LinearScale();
+var yScale = new LinearScale();
+var xAxis = new XAxis(xScale, "bottom");
+
+var yAxisRight = new YAxis(yScale, "right");
+var yAxisRightLabel = new AxisLabel("bp y right qd", "vertical-right");
+var yAxisRightTable = new Table([[yAxisRight, yAxisRightLabel]]);
+yAxisRightTable.colWeight(0);
+
+var yAxisLeft = new YAxis(yScale, "left");
+var yAxisLeftLabel = new AxisLabel("bp y left qd", "vertical-left");
+var yAxisLeftTable = new Table([[yAxisLeftLabel, yAxisLeft]]);
+yAxisLeftTable.colWeight(0);
+
+var data = makeRandomData(30);
+var renderArea = new LineRenderer(data, xScale, yScale);
+var basicTable = new Table([[yAxisLeftTable, renderArea, yAxisRightTable], [null, xAxis, null]]);
+var title = new TitleLabel("bpIqd");
+var outerTable = new Table([[title], [basicTable]]);
+outerTable.anchor(svg1);
+outerTable.computeLayout();
+outerTable.render();

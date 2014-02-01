@@ -7,6 +7,23 @@ div {
   display: inline;
 }
 
+.text-label text {
+  font-family: TrebuchetMS;
+}
+
+.axis-label text {
+  font-size: 18pt;
+  font-style: italic;
+}
+
+.title-label text {
+  font-size: 36pt;
+}
+
+.text-label-vertical {
+  writing-mode: tb;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -59,6 +76,7 @@ circle {
 
 .bounding-box {
   fill: none;
+  stroke: black;
 }
 
 .renderer-bounding-box {
@@ -71,4 +89,15 @@ circle {
 
 .table-bounding-box {
   stroke: blue;
+}
+
+.drag-box {
+  fill: aliceblue;
+  opacity: 1;
+
+}
+
+.selected-point {
+  fill: orange;
+  stroke: none;
 }

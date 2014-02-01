@@ -43,7 +43,19 @@ class Scale {
 
 }
 
-class LinearScale extends Scale {
+class QuantitiveScale extends Scale {
+  public scale: D3.Scale.QuantitiveScale;
+  constructor(scale: D3.Scale.QuantitiveScale) {
+    super(scale);
+  }
+
+  public invert(value: number) {
+    return this.scale.invert(value);
+  }
+
+}
+
+class LinearScale extends QuantitiveScale {
   constructor() {
     super(d3.scale.linear());
     this.domain([Infinity, -Infinity]);
