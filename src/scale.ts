@@ -1,10 +1,5 @@
 ///<reference path="../lib/d3.d.ts" />
 
-interface Rescaleable {
-  // We could do without this interface if we just have registerDependent take an arbitrary
-  rescale: (domain: number[]) => void;
-}
-
 class Scale implements IBroadcaster {
   public scale: D3.Scale.Scale;
   private broadcasterCallbacks: IBroadcasterCallback[] = [];
@@ -68,8 +63,6 @@ class QuantitiveScale extends Scale {
   public invert(value: number) {
     return this.scale.invert(value);
   }
-
-
 }
 
 class LinearScale extends QuantitiveScale {
