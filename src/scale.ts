@@ -55,7 +55,6 @@ class Scale implements IBroadcaster {
 
   public registerListener(callback: IBroadcasterCallback) {
     this.broadcasterCallbacks.push(callback);
-    console.log("got listenas");
     return this;
   }
 }

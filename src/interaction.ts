@@ -158,8 +158,6 @@ class BrushZoomInteraction extends AreaInteraction {
     var xRange = this.xScale.range()
     var yRange = this.yScale.range()
     var pixelArea = area.pixel;
-    console.log("yRange: ", yRange);
-    console.log("pixelArea: ", pixelArea);
     this.xRangeRange = xRange[1] - xRange[0];
     this.yRangeRange = yRange[1] - yRange[0];
     var xTranslate = pixelArea.xMin - this.xMin;
@@ -172,16 +170,22 @@ class BrushZoomInteraction extends AreaInteraction {
   }
 
   public zoom(area: FullSelectionArea) {
-    // var zoomInfo = this.getZoomInfo(area);
-    // var translate = zoomInfo.translate;
-    // var scale = zoomInfo.scale;
-    console.log("zoomin baby");
+    var originalXDomain = this.xScale.domain();
+    var originalYDomain = this.yScale.domain();
+    var xOrigDirection = originalXDomain[0] > originalXDomain[1];
+    var yOrigDirection = originalYDomain[0] > originalYDomain[1];
     var xDomain = [area.data.xMin, area.data.xMax];
     var yDomain = [area.data.yMin, area.data.yMax];
+
+    var xDirection = xDomain[0] > xDomain[1];
+    var yDirection = yDomain[0] > yDomain[1]
+    // make sure we don't change inversion of the scale by zooming
+
+    if (xDirection != xOrigDirection) {xDomain.reverse();};
+    if (yDirection != yOrigDirection) {yDomain.reverse();};
+
+
     this.xScale.domain(xDomain);
     this.yScale.domain(yDomain);
-    // this.componentsToZoom.forEach((c) => {
-    //   c.zoom(translate, scale);
-    // });
   }
 }

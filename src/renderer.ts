@@ -74,7 +74,7 @@ class XYRenderer extends Renderer {
     var xMax = this.xScale.invert(area.xMax);
     var yMin = this.yScale.invert(area.yMin);
     var yMax = this.yScale.invert(area.yMax);
-    return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, isDataAreaNotPixelArea: true}
+    return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax}
   }
 
   public getSelectionFromArea(area: FullSelectionArea) {
@@ -130,7 +130,7 @@ class CircleRenderer extends XYRenderer {
 
   public render() {
     super.render();
-
+    console.log("circleRenderer y domain:", this.yScale.domain());
     this.dataSelection = this.renderArea.selectAll("circle");
     this.dataSelection = this.dataSelection.data(this.dataset.data).enter()
       .append("circle")
