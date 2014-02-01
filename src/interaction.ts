@@ -18,9 +18,14 @@ class Interaction {
   }
 }
 
+interface ZoomInfo {
+  translate: number[];
+  scale: number[];
+}
+
 class PanZoomInteraction extends Interaction {
   private zoom;
-  constructor(componentToListenTo: Component, public renderers: Component[], public xScale: Scale, public yScale: Scale) {
+  constructor(componentToListenTo: Component, public renderers: Component[], public xScale: QuantitiveScale, public yScale: QuantitiveScale) {
     super(componentToListenTo);
     this.zoom = d3.behavior.zoom();
     this.zoom.x(this.xScale.scale);
@@ -57,8 +62,8 @@ class AreaInteraction extends Interaction {
 
   constructor(
     private rendererComponent: XYRenderer,
-    private areaCallback?: (a: XYSelectionArea) => any,
-    private selectionCallback?: (a: D3.Selection) => any
+    public areaCallback?: (a: FullSelectionArea) => any,
+    public selectionCallback?: (a: D3.Selection) => any
   ) {
     super(rendererComponent);
     this.dragBehavior = d3.behavior.drag();
@@ -103,13 +108,14 @@ class AreaInteraction extends Interaction {
     var xMax = Math.max(this.origin[0], this.location[0]);
     var yMin = Math.min(this.origin[1], this.location[1]);
     var yMax = Math.max(this.origin[1], this.location[1]);
-    var pixelArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, isDataAreaNotPixelArea: false};
+    var pixelArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
     var dataArea = this.rendererComponent.invertXYSelectionArea(pixelArea);
+    var fullArea = {pixel: pixelArea, data: dataArea};
     if (this.areaCallback != null) {
-      this.areaCallback(dataArea);
+      this.areaCallback(fullArea);
     }
     if (this.selectionCallback != null) {
-      var selection = this.rendererComponent.getSelectionFromArea(dataArea);
+      var selection = this.rendererComponent.getSelectionFromArea(fullArea);
       this.selectionCallback(selection);
     }
   }
@@ -120,5 +126,59 @@ class AreaInteraction extends Interaction {
     var element = this.componentToListenTo.element;
     this.dragBox = element.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
     hitBox.call(this.dragBehavior);
+  }
+}
+
+class BrushZoomInteraction extends AreaInteraction {
+  private xDomainRange: number;
+  private yDomainRange: number;
+  private xRangeRange: number;
+  private yRangeRange: number;
+  private xMin: number;
+  private yMin: number;
+
+  constructor(eventComponent: XYRenderer, public componentsToZoom: Component[], public xScale: QuantitiveScale, public yScale: QuantitiveScale) {
+    super(eventComponent);
+    var xRange = this.xScale.range()
+    var yRange = this.yScale.range()
+    var xDomain = xScale.domain();
+    var yDomain = yScale.domain();
+    this.xDomainRange = xDomain[1] - xDomain[0];
+    this.yDomainRange = yDomain[1] - yDomain[0];
+    this.xMin = xRange[0];
+    this.yMin = yRange[0];
+    chai.assert.operator(this.xDomainRange, '>=', 0, "xDomainRange >= 0; failure may indicate scale wasn't initialized by renderers");
+    chai.assert.operator(this.yDomainRange, '>=', 0, "yDomainRange >= 0; failure may indicate scale wasn't initialized by renderers");
+    this.areaCallback = this.zoom;
+  }
+
+  public getZoomInfo(area: FullSelectionArea) {
+    var xRange = this.xScale.range()
+    var yRange = this.yScale.range()
+    var pixelArea = area.pixel;
+    console.log("yRange: ", yRange);
+    console.log("pixelArea: ", pixelArea);
+    this.xRangeRange = xRange[1] - xRange[0];
+    this.yRangeRange = yRange[1] - yRange[0];
+    var xTranslate = pixelArea.xMin - this.xMin;
+    var yTranslate = pixelArea.yMin - this.yMin;
+    var xScale = Math.abs(this.xRangeRange / (pixelArea.xMax - pixelArea.xMin));
+    var yScale = Math.abs(this.yRangeRange / (pixelArea.yMax - pixelArea.yMin));
+    var translate = [xTranslate, yTranslate];
+    var scale = [xScale, yScale];
+    return {translate: translate, scale: scale};
+  }
+
+  public zoom(area: FullSelectionArea) {
+    var zoomInfo = this.getZoomInfo(area);
+    var translate = zoomInfo.translate;
+    var scale = zoomInfo.scale;
+    var xDomain = [area.data.xMin, area.data.xMax];
+    var yDomain = [area.data.yMin, area.data.yMax];
+    this.xScale.domain(xDomain);
+    this.yScale.domain(yDomain);
+    this.componentsToZoom.forEach((c) => {
+      c.zoom(translate, scale);
+    });
   }
 }

@@ -16,6 +16,7 @@ class Renderer extends Component {
   }
 
   public zoom(translate, scale) {
+    console.log("zoom in renderer:", translate, scale)
     this.renderArea.attr("transform", "translate("+translate+") scale("+scale+")");
   }
 
@@ -62,10 +63,7 @@ class XYRenderer extends Renderer {
     this.yScale.range([this.availableHeight, 0]);
   }
 
-  public invertXYSelectionArea(area: XYSelectionArea) {
-    if (area.isDataAreaNotPixelArea) {
-      throw new Error("inverting from data range to pixel range not yet supported (but easy to implement)");
-    }
+  public invertXYSelectionArea(area: SelectionArea) {
     var xMin = this.xScale.invert(area.xMin);
     var xMax = this.xScale.invert(area.xMax);
     var yMin = this.yScale.invert(area.yMin);
@@ -73,10 +71,9 @@ class XYRenderer extends Renderer {
     return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, isDataAreaNotPixelArea: true}
   }
 
-  public getSelectionFromArea(area: XYSelectionArea) {
-    if (!area.isDataAreaNotPixelArea) {
-      throw new Error("This function was called improperly, it should have a data range not pixel range");
-    }
+  public getSelectionFromArea(area: FullSelectionArea) {
+
+    var dataArea = area.data;
     var inRange = (x: number, a: number, b: number) => {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
     }
@@ -84,7 +81,7 @@ class XYRenderer extends Renderer {
       var x = this.xAccessor(d);
       var y = this.yAccessor(d);
       // use inRange rather than direct comparison to avoid thinking about scale inversion
-      return inRange(x, area.xMin, area.xMax) && inRange(y, area.yMin, area.yMax);;
+      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);;
     }
     var selection = this.dataSelection.filter(filterFunction);
     return selection;
