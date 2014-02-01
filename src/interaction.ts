@@ -18,7 +18,7 @@ class Interaction {
   }
 }
 
-class DragZoomInteraction extends Interaction {
+class PanZoomInteraction extends Interaction {
   private zoom;
   constructor(componentToListenTo: Component, public renderers: Component[], public xScale: Scale, public yScale: Scale) {
     super(componentToListenTo);
