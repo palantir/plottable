@@ -101,6 +101,8 @@ class Axis extends Component {
   }
 
   public rescale() {
+    return this.render();
+    // short circuit, we don't care about perf.
     var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
     var tickSelection = this.element.selectAll(".tick");
     (<any> tickSelection).call(tickTransform, this.scale.scale);

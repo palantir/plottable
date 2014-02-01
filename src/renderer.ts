@@ -88,6 +88,10 @@ class XYRenderer extends Renderer {
     }
     var selection = this.dataSelection.filter(filterFunction);
     return selection;
+  }
+
+  public rescale() {
+    this.render();
 
   }
 }

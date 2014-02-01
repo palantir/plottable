@@ -114,7 +114,7 @@ function makeSparklineMultichart() {
   var sparkline = new LineRenderer(data2, xScale1, yScaleSpark);
   sparkline.rowWeight(0.25);
   var row4 = [null, sparkline, null];
-  var zoomInteraction = new BrushZoomInteraction(sparkline, [renderer2, leftAxis, bottomAxis], xScale1, yScaleSpark);
+  var zoomInteraction = new BrushZoomInteraction(sparkline, xScale1, yScaleSpark);
   var multiChart = new Table([row1, row2, row3, row4]);
   return multiChart;
 }
