@@ -108,6 +108,7 @@ class Axis extends Component {
   }
 
   public zoom(translatePair: number[], scale: number) {
+    return this.render(); //short-circuit, we dont need the performant cleverness for present demo
     var translate = this.isXAligned ? translatePair[0] : translatePair[1];
     if (scale != null && scale != this.cachedScale) {
       this.cachedTranslate = translate;

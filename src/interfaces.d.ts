@@ -4,12 +4,16 @@ interface IDataset {
   seriesName: string;
 }
 
-interface XYSelectionArea {
+interface SelectionArea {
   xMin: number;
   xMax: number;
   yMin: number;
   yMax: number;
-  isDataAreaNotPixelArea: boolean;
+}
+
+interface FullSelectionArea {
+  pixel: SelectionArea;
+  data: SelectionArea;
 }
 
 // interface IRenderer<T extends IDatum> extends IRendererable {
