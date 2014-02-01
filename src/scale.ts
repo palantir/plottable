@@ -55,6 +55,7 @@ class Scale implements IBroadcaster {
 
   public registerListener(callback: IBroadcasterCallback) {
     this.broadcasterCallbacks.push(callback);
+    console.log("got listenas");
     return this;
   }
 }
@@ -79,10 +80,10 @@ class LinearScale extends QuantitiveScale {
   }
 }
 
-class ScaleDomainCoordinatior {
+class ScaleDomainCoordinator {
   private currentDomain: any[] = [];
   constructor(private scales: Scale[]) {
-    this.scales.forEach((s) => s.registerListener(this.rescale));
+    this.scales.forEach((s) => s.registerListener((sx: Scale) => this.rescale(sx)));
   }
 
   public rescale(scale: Scale) {

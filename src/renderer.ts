@@ -58,6 +58,9 @@ class XYRenderer extends Renderer {
     this.xScale.widenDomain(xDomain);
     var yDomain = d3.extent(data, this.yAccessor);
     this.yScale.widenDomain(yDomain);
+
+    this.xScale.registerListener(() => this.rescale());
+    this.yScale.registerListener(() => this.rescale());
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight? :number) {
@@ -91,6 +94,7 @@ class XYRenderer extends Renderer {
   }
 
   public rescale() {
+    this.renderArea.html("");
     this.render();
 
   }
