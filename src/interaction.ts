@@ -93,6 +93,11 @@ class AreaInteraction extends Interaction {
   }
 
   private dragend(){
+    if (!this.dragInitialized) {
+      return;
+      // It records a tap as a dragstart+dragend, but this can have unintended consequences.
+      // only trigger logic if we actually did some dragging.
+    }
     this.dragInitialized = false;
     var xMin = Math.min(this.origin[0], this.location[0]);
     var xMax = Math.max(this.origin[0], this.location[0]);
