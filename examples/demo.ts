@@ -1,23 +1,17 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
+///<reference path="../src/interfaces.d.ts" />
 
-///<reference path="table.ts" />
-///<reference path="renderer.ts" />
-///<reference path="interaction.ts" />
-///<reference path="labelComponent.ts" />
-
-function makeRandomData(numPoints, scaleFactor=1): IDataset {
-  var data = [];
-  for (var i = 0; i < numPoints; i++) {
-    var x = Math.random();
-    var r = {x: x, y: (x + x * Math.random()) * scaleFactor}
-    data.push(r);
-  }
-  data = _.sortBy(data, (d) => d.x);
-  return {"data": data, "seriesName": "random-data"};
-}
+///<reference path="../src/table.ts" />
+///<reference path="../src/renderer.ts" />
+///<reference path="../src/interaction.ts" />
+///<reference path="../src/labelComponent.ts" />
+///<reference path="../src/axis.ts" />
+///<reference path="exampleUtil.ts" />
 
 
+
+if ((<any> window).demoName == "demo1") {
 // make a regular table with 1 axis on bottom, 1 axis on left, renderer in center
 
 var svg1 = d3.select("#svg1");
@@ -136,16 +130,6 @@ multichart.render();
 //   var bottomAxes = iterate(bottom, () => new xAxis(yScale, "bottom"))
 // }
 
-function iterate(n: number, fn: () => any) {
-  var out = [];
-  for (var i=0; i<n; i++) {
-    out.push(fn())
-  }
-  return out;
-}
-
-
-
 var svg1 = d3.select("#svg5");
 svg1.attr("width", 500).attr("height", 500);
 var xScale = new LinearScale();
@@ -170,3 +154,8 @@ var outerTable = new Table([[title], [basicTable]]);
 outerTable.anchor(svg1);
 outerTable.computeLayout();
 outerTable.render();
+
+
+
+
+} // hackhack
