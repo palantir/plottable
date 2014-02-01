@@ -104,7 +104,8 @@ function makeSparklineMultichart() {
   leftAxis.xAlignment = "RIGHT";
   var data2 = makeRandomData(1000, 100000);
   var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
-  var cb = (s) => s.classed("selected-point", true);
+  var toggleClass = function() {return !d3.select(this).classed("selected-point")};
+  var cb = (s) => s.classed("selected-point", toggleClass);
   var areaInteraction = new AreaInteraction(renderer2, null, cb);
   var row2: Component[] = [leftAxis, renderer2, null];
   var bottomAxis = new XAxis(xScale1, "bottom");
