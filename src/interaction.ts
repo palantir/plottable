@@ -103,12 +103,13 @@ class AreaInteraction extends Interaction {
     var xMax = Math.max(this.origin[0], this.location[0]);
     var yMin = Math.min(this.origin[1], this.location[1]);
     var yMax = Math.max(this.origin[1], this.location[1]);
-    var selectionArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
+    var pixelArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, isDataAreaNotPixelArea: false};
+    var dataArea = this.rendererComponent.invertXYSelectionArea(pixelArea);
     if (this.areaCallback != null) {
-      this.areaCallback(selectionArea);
+      this.areaCallback(dataArea);
     }
     if (this.selectionCallback != null) {
-      var selection = this.rendererComponent.getSelectionFromArea(selectionArea);
+      var selection = this.rendererComponent.getSelectionFromArea(dataArea);
       this.selectionCallback(selection);
     }
   }

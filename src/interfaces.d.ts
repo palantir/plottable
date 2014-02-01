@@ -9,6 +9,7 @@ interface XYSelectionArea {
   xMax: number;
   yMin: number;
   yMax: number;
+  isDataAreaNotPixelArea: boolean;
 }
 
 // interface IRenderer<T extends IDatum> extends IRendererable {
