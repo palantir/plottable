@@ -154,19 +154,19 @@ var yScale = new LinearScale();
 var xAxis = new XAxis(xScale, "bottom");
 
 var yAxisRight = new YAxis(yScale, "right");
-var yAxisRightLabel = new LabelComponent("bp y right qd", "vertical-right");
+var yAxisRightLabel = new AxisLabel("bp y right qd", "vertical-right");
 var yAxisRightTable = new Table([[yAxisRight, yAxisRightLabel]]);
 yAxisRightTable.colWeight(0);
 
 var yAxisLeft = new YAxis(yScale, "left");
-var yAxisLeftLabel = new LabelComponent("bp y left qd", "vertical-left");
+var yAxisLeftLabel = new AxisLabel("bp y left qd", "vertical-left");
 var yAxisLeftTable = new Table([[yAxisLeftLabel, yAxisLeft]]);
 yAxisLeftTable.colWeight(0);
 
 var data = makeRandomData(30);
 var renderArea = new LineRenderer(data, xScale, yScale);
 var basicTable = new Table([[yAxisLeftTable, renderArea, yAxisRightTable], [null, xAxis, null]]);
-var title = new LabelComponent("bpIqd");
+var title = new TitleLabel("bpIqd");
 var outerTable = new Table([[title], [basicTable]]);
 outerTable.anchor(svg1);
 outerTable.computeLayout();
