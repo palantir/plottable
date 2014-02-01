@@ -17,11 +17,39 @@ class Component {
   private xOffset       : number;
   private yOffset       : number;
 
+  private cssClasses: string[] = [];
+
   public xAlignment = "LEFT"; // LEFT, CENTER, RIGHT
   public yAlignment = "TOP"; // TOP, CENTER, BOTTOM
 
+  public classed(cssClass: string): boolean;
+  public classed(cssClass: string, addClass: boolean): Component;
+  public classed(cssClass: string, addClass?:boolean): any {
+    if (this.element == null) { // not yet anchored
+      if (addClass != null) {
+        if (this.cssClasses.indexOf(cssClass) == -1) {
+          this.cssClasses.push(cssClass);
+        }
+        return this;
+      } else {
+        return (this.cssClasses.indexOf(cssClass) != -1);
+      }
+    } else {
+      if (addClass != null) {
+        this.element.classed(cssClass, addClass);
+        return this;
+      } else {
+        return this.element.classed(cssClass);
+      }
+    }
+  }
+
   public anchor(element: D3.Selection) {
     this.element = element;
+    this.cssClasses.forEach((cssClass: string) => {
+      this.element.classed(cssClass, true);
+    });
+    this.cssClasses = null; // I don't need ... This one!!
     this.hitBox = element.append("rect").classed("hit-box", true);
     this.boundingBox = element.append("rect").classed("bounding-box", true);
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
