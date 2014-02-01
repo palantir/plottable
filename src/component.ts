@@ -25,22 +25,24 @@ class Component {
   public classed(cssClass: string): boolean;
   public classed(cssClass: string, addClass: boolean): Component;
   public classed(cssClass: string, addClass?:boolean): any {
-    if (this.element == null) { // not yet anchored
-      if (addClass != null) {
-        if (this.cssClasses.indexOf(cssClass) == -1) {
-          this.cssClasses.push(cssClass);
-        }
-        return this;
-      } else {
+    if (addClass == null) {
+      if (this.element == null) {
         return (this.cssClasses.indexOf(cssClass) != -1);
-      }
-    } else {
-      if (addClass != null) {
-        this.element.classed(cssClass, addClass);
-        return this;
       } else {
         return this.element.classed(cssClass);
       }
+    } else {
+      if (this.element == null) {
+        var classIndex = this.cssClasses.indexOf(cssClass);
+        if (addClass && classIndex == -1) {
+          this.cssClasses.push(cssClass);
+        } else if (!addClass && classIndex != -1) {
+          this.cssClasses.splice(classIndex, 1);
+        }
+      } else {
+        this.element.classed(cssClass, addClass);
+      }
+      return this;
     }
   }
 
@@ -49,7 +51,7 @@ class Component {
     this.cssClasses.forEach((cssClass: string) => {
       this.element.classed(cssClass, true);
     });
-    this.cssClasses = null; // I don't need ... This one!!
+    this.cssClasses = null;
     this.hitBox = element.append("rect").classed("hit-box", true);
     this.boundingBox = element.append("rect").classed("bounding-box", true);
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
