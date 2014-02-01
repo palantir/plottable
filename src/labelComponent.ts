@@ -2,7 +2,6 @@
 
 class LabelComponent extends Component {
   public CLASS_TEXT_LABEL = "text-label";
-  public CLASS_TEXT_LABEL_VERTICAL = "text-label-vertical";
 
   public xAlignment = "CENTER";
   public yAlignment = "CENTER";
@@ -17,8 +16,8 @@ class LabelComponent extends Component {
 
   constructor(text: string, orientation?: string) {
     super();
+    this.classed(this.CLASS_TEXT_LABEL, true);
     this.text = text;
-    //this.rotationAngle = rotationAngle;
     if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
       this.orientation = orientation;
     } else if (orientation != null) {
@@ -73,7 +72,6 @@ class LabelComponent extends Component {
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.textElement = this.element.append("text")
-                        .classed(this.CLASS_TEXT_LABEL, true)
                         .attr("alignment-baseline", "middle")
                         .text(this.text);
 
@@ -93,5 +91,21 @@ class LabelComponent extends Component {
         this.textElement.attr("transform", "rotate(-90) translate(" + (-clientWidth) + " " + clientHeight/2 + ")");
       }
     }
+  }
+}
+
+class TitleLabel extends LabelComponent {
+  public CLASS_TITLE_LABEL = "title-label";
+  constructor(text: string, orientation?: string) {
+    super(text, orientation);
+    this.classed(this.CLASS_TITLE_LABEL, true);
+  }
+}
+
+class AxisLabel extends LabelComponent {
+  public CLASS_AXIS_LABEL = "axis-label";
+  constructor(text: string, orientation?: string) {
+    super(text, orientation);
+    this.classed(this.CLASS_AXIS_LABEL, true);
   }
 }
