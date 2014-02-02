@@ -94,8 +94,10 @@ class XYRenderer extends Renderer {
   }
 
   public rescale() {
-    this.renderArea.html("");
-    this.render();
+    if (this.element != null) {
+      this.renderArea.html("");
+      this.render();
+    }
 
   }
 }
