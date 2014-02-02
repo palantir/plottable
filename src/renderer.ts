@@ -20,7 +20,6 @@ class Renderer extends Component {
   }
 
   public zoom(translate, scale) {
-    console.log("zoom in renderer:", translate, scale)
     this.renderArea.attr("transform", "translate("+translate+") scale("+scale+")");
   }
 
@@ -98,7 +97,6 @@ class XYRenderer extends Renderer {
       this.renderArea.html("");
       this.render();
     }
-
   }
 }
 
@@ -132,7 +130,6 @@ class CircleRenderer extends XYRenderer {
 
   public render() {
     super.render();
-    console.log("circleRenderer y domain:", this.yScale.domain());
     this.dataSelection = this.renderArea.selectAll("circle");
     this.dataSelection = this.dataSelection.data(this.dataset.data).enter()
       .append("circle")
@@ -144,7 +141,6 @@ class CircleRenderer extends XYRenderer {
 
 // class ResizingCircleRenderer extends CircleRenderer {
 //   public transform(translate: number[], scale: number) {
-//     console.log("xform");
 //     this.renderArea.selectAll("circle").attr("r", 0.5/scale);
 //   }
 // }
