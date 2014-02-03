@@ -2,9 +2,11 @@
 ///<reference path="interaction.ts" />
 
 class Component {
+  private static clipPathId = 0; // Used for unique namespacing for the clipPaths
   public element: D3.Selection;
   public hitBox: D3.Selection;
   public boundingBox: D3.Selection;
+  private clipPathRect: D3.Selection;
   private registeredInteractions: Interaction[] = [];
 
   private rowWeightVal  = 0;
@@ -48,6 +50,7 @@ class Component {
 
   public anchor(element: D3.Selection) {
     this.element = element;
+    this.generateClipPath();
     this.cssClasses.forEach((cssClass: string) => {
       this.element.classed(cssClass, true);
     });
@@ -55,6 +58,15 @@ class Component {
     this.hitBox = element.append("rect").classed("hit-box", true);
     this.boundingBox = element.append("rect").classed("bounding-box", true);
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
+  }
+
+  public generateClipPath() {
+    // The clip path will prevent content from overflowing its component space.
+    var clipPathId = Component.clipPathId++;
+    this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
+    this.clipPathRect = this.element.append("clipPath")
+                                    .attr("id", "clipPath" + clipPathId)
+                                    .append("rect");
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -106,8 +118,8 @@ class Component {
     this.availableWidth = availableWidth;
     this.availableHeight = availableHeight;
     this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
-    this.hitBox.attr("width", this.availableWidth).attr("height", this.availableHeight);
-    this.boundingBox.attr("width", this.availableWidth).attr("height", this.availableHeight);
+    var boxes = [this.clipPathRect, this.hitBox, this.boundingBox];
+    Utils.setWidthHeight(boxes, this.availableWidth, this.availableHeight);
   }
 
   public registerInteraction(interaction: Interaction) {
