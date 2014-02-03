@@ -1,6 +1,12 @@
 ///<reference path="../lib/lodash.d.ts" />
 
 class Interaction {
+  /* A general base class for interactions.
+  It maintains a 'hitBox' which is where all event listeners are attached. Due to cross-
+  browser weirdness, the hitbox needs to be an opaque but invisible rectangle.
+  TODO: We should give the interaction "foreground" and "background" elements where it can
+  draw things, e.g. crosshairs.
+  */
   public hitBox: D3.Selection;
 
   constructor(public componentToListenTo: Component) {
@@ -51,6 +57,19 @@ class PanZoomInteraction extends Interaction {
 }
 
 class AreaInteraction extends Interaction {
+  /*
+  This class is responsible for any kind of interaction in which you brush over an area
+  of a renderer and plan to execute some logic based on the selected area.
+  Right now it only works for XYRenderers, but we can make the interface more general in
+  the future.
+  You pass it a rendererComponent (:XYRenderer) and it sets up events so that you can draw
+  a rectangle over it. Then, you pass it callbacks that the AreaInteraction will execute on
+  the selected region. The first callback (areaCallback) will be passed a FullSelectionArea
+  object which contains info on both the pixel and data range of the selected region.
+  The selectionCallback will be passed a D3.Selection object that contains the elements bound
+  to the data in the selection region. You can use this, for example, to change their class
+  and display properties.
+  */
   private static CLASS_DRAG_BOX = "drag-box";
   private dragInitialized = false;
   private dragBehavior;
@@ -130,6 +149,14 @@ class AreaInteraction extends Interaction {
 }
 
 class BrushZoomInteraction extends AreaInteraction {
+  /*
+  This is an extension of the AreaInteraction which is used for zooming into a selected region.
+  It takes the XYRenderer to initialize the AreaInteraction on, and the xScale and yScale to be
+  scaled according to the domain of the data selected. Note that the xScale and yScale given to
+  the BrushZoomInteraction can be distinct from those that the renderer depends on, e.g. if you
+  make a sparkline, you do not want to update the sparkline's scales, but rather the scales of a
+  linked chart.
+  */
   constructor(eventComponent: XYRenderer, public xScale: QuantitiveScale, public yScale: QuantitiveScale) {
     super(eventComponent);
     this.areaCallback = this.zoom;
