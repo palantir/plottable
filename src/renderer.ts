@@ -94,7 +94,8 @@ class XYRenderer extends Renderer {
 
   public rescale() {
     if (this.element != null) {
-      this.renderArea.html("");
+      this.renderArea.remove();
+      this.renderArea = this.element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
       this.render();
     }
   }
