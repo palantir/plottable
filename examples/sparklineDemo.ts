@@ -30,8 +30,9 @@ chart.xMargin = 10;
 chart.yMargin = 10;
 
 var brushZoom = new BrushZoomInteraction(sparkline, xScale, yScale);
-// var zoomCoordinator = new ScaleDomainCoordinator([yScale, ySpark]);
-
+var toggleClass = function() {return !d3.select(this).classed("selected-point")};
+var cb = (s) => s.classed("selected-point", toggleClass);
+var areaInteraction = new AreaInteraction(renderer, null, cb);
 
 var svg = d3.select("#table");
 chart.anchor(svg);
