@@ -2,7 +2,7 @@
 ///<reference path="interaction.ts" />
 
 class Component {
-  private static componentID = 0; // Used for unique namespacing for the clipPaths
+  private static clipPathId = 0; // Used for unique namespacing for the clipPaths
   public element: D3.Selection;
   public hitBox: D3.Selection;
   public boundingBox: D3.Selection;
@@ -50,9 +50,7 @@ class Component {
 
   public anchor(element: D3.Selection) {
     this.element = element;
-    // The clip path will prevent content from overflowing its component space.
-    this.element.attr("clipPath", "url(#clipPath" + Component.componentID + ")");
-    Component.componentID++;
+    this.generateClipPath();
     this.cssClasses.forEach((cssClass: string) => {
       this.element.classed(cssClass, true);
     });
@@ -60,8 +58,14 @@ class Component {
     this.hitBox = element.append("rect").classed("hit-box", true);
     this.boundingBox = element.append("rect").classed("bounding-box", true);
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
+  }
+
+  public generateClipPath() {
+    // The clip path will prevent content from overflowing its component space.
+    var clipPathId = Component.clipPathId++;
+    this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
     this.clipPathRect = this.element.append("clipPath")
-                                    .attr("id", "clipPath" + Component.componentID)
+                                    .attr("id", "clipPath" + clipPathId)
                                     .append("rect");
   }
 
