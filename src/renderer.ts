@@ -57,6 +57,9 @@ class XYRenderer extends Renderer {
     this.xScale.widenDomain(xDomain);
     var yDomain = d3.extent(data, this.yAccessor);
     this.yScale.widenDomain(yDomain);
+
+    this.xScale.registerListener(() => this.rescale());
+    this.yScale.registerListener(() => this.rescale());
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight? :number) {
@@ -65,21 +68,17 @@ class XYRenderer extends Renderer {
     this.yScale.range([this.availableHeight, 0]);
   }
 
-  public invertXYSelectionArea(area: XYSelectionArea) {
-    if (area.isDataAreaNotPixelArea) {
-      throw new Error("inverting from data range to pixel range not yet supported (but easy to implement)");
-    }
+  public invertXYSelectionArea(area: SelectionArea) {
     var xMin = this.xScale.invert(area.xMin);
     var xMax = this.xScale.invert(area.xMax);
     var yMin = this.yScale.invert(area.yMin);
     var yMax = this.yScale.invert(area.yMax);
-    return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, isDataAreaNotPixelArea: true}
+    return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax}
   }
 
-  public getSelectionFromArea(area: XYSelectionArea) {
-    if (!area.isDataAreaNotPixelArea) {
-      throw new Error("This function was called improperly, it should have a data range not pixel range");
-    }
+  public getSelectionFromArea(area: FullSelectionArea) {
+
+    var dataArea = area.data;
     var inRange = (x: number, a: number, b: number) => {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
     }
@@ -87,11 +86,18 @@ class XYRenderer extends Renderer {
       var x = this.xAccessor(d);
       var y = this.yAccessor(d);
       // use inRange rather than direct comparison to avoid thinking about scale inversion
-      return inRange(x, area.xMin, area.xMax) && inRange(y, area.yMin, area.yMax);;
+      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);;
     }
     var selection = this.dataSelection.filter(filterFunction);
     return selection;
+  }
 
+  public rescale() {
+    if (this.element != null) {
+      this.renderArea.remove();
+      this.renderArea = this.element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
+      this.render();
+    }
   }
 }
 
@@ -125,7 +131,6 @@ class CircleRenderer extends XYRenderer {
 
   public render() {
     super.render();
-
     this.dataSelection = this.renderArea.selectAll("circle");
     this.dataSelection = this.dataSelection.data(this.dataset.data).enter()
       .append("circle")
@@ -137,7 +142,6 @@ class CircleRenderer extends XYRenderer {
 
 // class ResizingCircleRenderer extends CircleRenderer {
 //   public transform(translate: number[], scale: number) {
-//     console.log("xform");
 //     this.renderArea.selectAll("circle").attr("r", 0.5/scale);
 //   }
 // }
