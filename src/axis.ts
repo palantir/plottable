@@ -37,6 +37,7 @@ class Axis extends Component {
     this.d3axis.tickFormat(this.formatter);
     this.cachedScale = 1;
     this.cachedTranslate = 0;
+    this.scale.registerListener(() => this.rescale());
   }
 
   private transformString(translate: number, scale: number) {
@@ -101,6 +102,8 @@ class Axis extends Component {
   }
 
   public rescale() {
+    return (this.element != null) ? this.render() : null;
+    // short circuit, we don't care about perf.
     var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
     var tickSelection = this.element.selectAll(".tick");
     (<any> tickSelection).call(tickTransform, this.scale.scale);
@@ -108,6 +111,7 @@ class Axis extends Component {
   }
 
   public zoom(translatePair: number[], scale: number) {
+    return this.render(); //short-circuit, we dont need the performant cleverness for present demo
     var translate = this.isXAligned ? translatePair[0] : translatePair[1];
     if (scale != null && scale != this.cachedScale) {
       this.cachedTranslate = translate;
