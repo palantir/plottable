@@ -73,6 +73,10 @@ class LinearScale extends QuantitiveScale {
 }
 
 class ScaleDomainCoordinator {
+  /* This class is responsible for maintaining coordination between linked scales.
+  It registers event listeners for when one of its scales changes its domain. When the scale
+  does change its domain, it re-propogates the change to every linked scale.
+  */
   private currentDomain: any[] = [];
   constructor(private scales: Scale[]) {
     this.scales.forEach((s) => s.registerListener((sx: Scale) => this.rescale(sx)));
