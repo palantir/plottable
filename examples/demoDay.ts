@@ -35,10 +35,12 @@ function makeHistograms(data) {
   h.xScale1 = new LinearScale();
   h.xScale2 = new LinearScale();
   h.yScale = new LinearScale();
-  var data1 = data;
-  var data2 = data;
-  h.renderer1 = new BarRenderer(data1, h.xScale1, h.yScale);
-  h.renderer2 = new BarRenderer(data2, h.xScale2, h.yScale);
+  var data1 = binByVal(data.data, (d) => d.x, [0,1], 10);
+  var data2 = binByVal(data.data, (d) => d.y, [0,1], 10);
+  var ds1 = {data: data1, seriesName: "xVals"}
+  var ds2 = {data: data2, seriesName: "yVals"}
+  h.renderer1 = new BarRenderer(ds1, h.xScale1, h.yScale);
+  h.renderer2 = new BarRenderer(ds2, h.xScale2, h.yScale);
   h.yAxis = new YAxis(h.yScale, "right");
   h.xAxis1 = new XAxis(h.xScale1, "bottom");
   h.xAxis2 = new XAxis(h.xScale2, "bottom");
@@ -50,16 +52,54 @@ function makeHistograms(data) {
 
 function makeScatterHisto(data) {
   var s = makeScatterPlotWithSparkline(data);
-  var h = makeHistograms(makeRandomBucketData(5, 5, 20));
+  var h = makeHistograms(data);
   var r = [s.table, h.table];
   var table = new Table([r]);
   table.colPadding = 10;
   return table;
 }
 
-var data1 = makeRandomData(1000, 1).data;
-var data2 = makeRandomData(1000, 3).data;
+function filterSelectedData(data) {
+  var p = (d) => d.selected;
+  return data.filter(p);
+}
+
+function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
+  if (accessor == null) {accessor = (d) => d.x};
+  var min = range[0];
+  var max = range[1];
+  var binBeginnings = _.range(nBins).map((n) => n * max / nBins);
+  var binEndings = _.range(nBins).map((n) => (n+1) * max / nBins);
+  var counts = new Array(nBins);
+  _.range(nBins).forEach((b, i) => counts[i] = 0);
+  data.forEach((d) => {
+    var v = accessor(d);
+    var found = false;
+    for (var i=0; i<nBins; i++) {
+      if (v <= binEndings[i]) {
+        counts[i]++;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {counts[i]++};
+  });
+  var bins = counts.map((count, i) => {
+    var bin: any = {};
+    bin.x = binBeginnings[i];
+    bin.x2 = binEndings[i];
+    bin.y = count;
+    return bin;
+  })
+  return bins;
+}
+
+var data1 = makeRandomData(5, 1).data;
+var data2 = makeRandomData(5, 3).data;
 var data = {seriesName: "randomData", data: data1.concat(data2)}
+
+var smallData = makeRandomData(10).data;
+var smallBins = binByVal(smallData, null, [0,1], 4);
 
 var chart = makeScatterHisto(data);
 
