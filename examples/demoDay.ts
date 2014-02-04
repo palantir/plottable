@@ -17,16 +17,22 @@ function makeScatterPlotWithSparkline(data) {
   s.xScale = new LinearScale();
   s.yScale = new LinearScale();
   s.leftAxis = new YAxis(s.yScale, "left");
+  var leftAxisTable = new Table([[new AxisLabel("Y", "vertical-left"), s.leftAxis]]);
+  leftAxisTable.colWeight(0);
   s.xAxis = new XAxis(s.xScale, "bottom");
+  var xAxisTable = new Table([[s.xAxis], [new AxisLabel("X")]]);
+  xAxisTable.rowWeight(0);
+
   s.renderer = new CircleRenderer(data, s.xScale, s.yScale);
   s.xSpark = new LinearScale();
   s.ySpark = new LinearScale();
   s.sparkline = new CircleRenderer(data, s.xSpark, s.ySpark);
   s.sparkline.rowWeight(0.25);
-  var r1 = [s.leftAxis, s.renderer];
-  var r2 = [null, s.xAxis];
+  var r1 = [leftAxisTable, s.renderer];
+  var r2 = [null, xAxisTable];
   var r3 = [null, s.sparkline];
-  s.table = new Table([r1,r2,r3]);
+  var chartTable = new Table([r1,r2,r3]);
+  s.table = new Table([[new TitleLabel("Random Data").classed("scatterplot-title", true)], [chartTable]]);
   return s;
 }
 
@@ -39,7 +45,11 @@ function makeHistograms(data: any[]) {
   h.renderer1 = new BarRenderer(ds1, h.xScale1, h.yScale1);
   h.xAxis1 = new XAxis(h.xScale1, "bottom");
   h.yAxis1 = new YAxis(h.yScale1, "right");
-  var table1 = new Table([[h.renderer1, h.yAxis1], [h.xAxis1, null]]);
+  var labelX1Table = new Table([[h.xAxis1], [new AxisLabel("X values")]]);
+  labelX1Table.rowWeight(0);
+  var labelY1Table = new Table([[h.yAxis1, new AxisLabel("Counts", "vertical-right")]]);
+  labelY1Table.colWeight(0);
+  var table1 = new Table([[h.renderer1, labelY1Table], [labelX1Table, null]]);
 
   h.xScale2 = new LinearScale();
   h.yScale2 = new LinearScale();
@@ -48,9 +58,15 @@ function makeHistograms(data: any[]) {
   h.renderer2 = new BarRenderer(ds2, h.xScale2, h.yScale2);
   h.xAxis2 = new XAxis(h.xScale2, "bottom");
   h.yAxis2 = new YAxis(h.yScale2, "right");
-  var table2 = new Table([[h.renderer2, h.yAxis2], [h.xAxis2, null]]);
+  var labelX2Table = new Table([[h.xAxis2], [new AxisLabel("Y values")]]);
+  labelX2Table.rowWeight(0);
+  var labelY2Table = new Table([[h.yAxis2, new AxisLabel("Counts", "vertical-right")]]);
+  labelY2Table.colWeight(0);
+  var table2 = new Table([[h.renderer2, labelY2Table], [labelX2Table, null]]);
 
   h.table = new Table([[table1], [table2]]);
+  h.table.rowPadding = 5;
+  h.table.colPadding = 5;
   return h;
 }
 
@@ -58,8 +74,10 @@ function makeScatterHisto(data) {
   var s = makeScatterPlotWithSparkline(data);
   var h = makeHistograms(data.data);
   var r = [s.table, h.table];
-  var table = new Table([r]);
-  table.colPadding = 10;
+  var chartTable = new Table([r]);
+  chartTable.colPadding = 10;
+
+  var table = new Table([[new TitleLabel("Glorious Demo Day Demo of Glory").classed("demo-table-title", true)], [chartTable]]);
 
   return {table: table, s: s, h: h};
 }
