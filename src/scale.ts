@@ -41,6 +41,7 @@ class Scale implements IBroadcaster {
     return new Scale(this.scale.copy());
   }
 
+
   public widenDomain(newDomain: number[]) {
     var currentDomain = this.domain();
     var wideDomain = [Math.min(newDomain[0], currentDomain[0]), Math.max(newDomain[1], currentDomain[1])];
@@ -62,6 +63,10 @@ class QuantitiveScale extends Scale {
 
   public invert(value: number) {
     return this.scale.invert(value);
+  }
+
+  public ticks(count: number) {
+    return this.scale.ticks(count);
   }
 }
 

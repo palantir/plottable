@@ -32,9 +32,10 @@ class Axis extends Component {
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
     if (this.formatter == null) {
-      this.formatter = d3.format("s3");
+      this.formatter = d3.format(".3s");
     }
     this.d3axis.tickFormat(this.formatter);
+
     this.cachedScale = 1;
     this.cachedTranslate = 0;
     this.scale.registerListener(() => this.rescale());
@@ -87,11 +88,19 @@ class Axis extends Component {
     } else {
       newDomain = standardOrder ? [new Date(min - extent), new Date(max + extent)] : [new Date(max + extent), new Date(min - extent)];
     }
-    // var copyScale = this.scale.copy().domain(newDomain)
-    // var ticks = (<any> copyScale).ticks(30);
-    // this.d3axis.tickValues(ticks);
-    // a = [100,0]; extent = -100; 100 - (-100) = 200, 0 - (-100) = 100
-    // a = [0,100]; extent = 100; 0 - 100 = -100, 100 - 100
+
+    // Make tiny-zero representations not look like crap, by rounding them to 0
+    if ((<QuantitiveScale> this.scale).ticks != null) {
+      var scale = <QuantitiveScale> this.scale;
+      var nTicks = 10;
+      var ticks = scale.ticks(nTicks);
+      var domain = scale.domain();
+      var interval = domain[1] - domain[0];
+      var cleanTick = (n) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
+      ticks = ticks.map(cleanTick);
+      this.d3axis.tickValues(ticks);
+    }
+
     this.axisElement.call(this.d3axis);
     var bbox = (<any> this.axisElement.node()).getBBox();
     if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
