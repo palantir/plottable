@@ -82,7 +82,8 @@ class AreaInteraction extends Interaction {
   constructor(
     private rendererComponent: XYRenderer,
     public areaCallback?: (a: FullSelectionArea) => any,
-    public selectionCallback?: (a: D3.Selection) => any
+    public selectionCallback?: (a: D3.Selection) => any,
+    public indicesCallback?: (a: number[]) => any
   ) {
     super(rendererComponent);
     this.dragBehavior = d3.behavior.drag();
@@ -136,6 +137,10 @@ class AreaInteraction extends Interaction {
     if (this.selectionCallback != null) {
       var selection = this.rendererComponent.getSelectionFromArea(fullArea);
       this.selectionCallback(selection);
+    }
+    if (this.indicesCallback != null) {
+      var indices = this.rendererComponent.getDataIndicesFromArea(fullArea);
+      this.indicesCallback(indices);
     }
   }
 
