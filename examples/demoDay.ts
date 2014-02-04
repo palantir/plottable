@@ -19,10 +19,10 @@ function makeScatterPlotWithSparkline(data) {
   s.xScale = new LinearScale();
   s.yScale = new LinearScale();
   s.leftAxis = new YAxis(s.yScale, "left");
-  var leftAxisTable = new Table([[new AxisLabel("Y", "vertical-left"), s.leftAxis]]);
+  var leftAxisTable = new Table([[new AxisLabel("y", "vertical-left"), s.leftAxis]]);
   leftAxisTable.colWeight(0);
   s.xAxis = new XAxis(s.xScale, "bottom");
-  var xAxisTable = new Table([[s.xAxis], [new AxisLabel("X")]]);
+  var xAxisTable = new Table([[s.xAxis], [new AxisLabel("x")]]);
   xAxisTable.rowWeight(0);
 
   s.renderer = new CircleRenderer(data, s.xScale, s.yScale, null, null, 1.5);
