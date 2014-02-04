@@ -50,13 +50,18 @@ function makeHistograms(data) {
 
 function makeScatterHisto(data) {
   var s = makeScatterPlotWithSparkline(data);
-  var h = makeHistograms(data);
+  var h = makeHistograms(makeRandomBucketData(5, 5, 20));
   var r = [s.table, h.table];
   var table = new Table([r]);
+  table.colPadding = 10;
   return table;
 }
 
-var chart = makeScatterHisto({seriesName: "foo", data: []});
+var data1 = makeRandomData(1000, 1).data;
+var data2 = makeRandomData(1000, 3).data;
+var data = {seriesName: "randomData", data: data1.concat(data2)}
+
+var chart = makeScatterHisto(data);
 
 var svg = d3.select("#table");
 chart.anchor(svg);
