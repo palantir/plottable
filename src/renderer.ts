@@ -92,6 +92,26 @@ class XYRenderer extends Renderer {
     return selection;
   }
 
+  public getDataIndicesFromArea(area: FullSelectionArea) {
+    var dataArea = area.data;
+    var inRange = (x: number, a: number, b: number) => {
+      return (Math.min(a,b) <= x && x <= Math.max(a,b));
+    }
+    var filterFunction = (d: any) => {
+      var x = this.xAccessor(d);
+      var y = this.yAccessor(d);
+      // use inRange rather than direct comparison to avoid thinking about scale inversion
+      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);;
+    }
+    var results = [];
+    this.dataset.data.forEach((d, i) => {
+      if (filterFunction(d)) {
+        results.push(i);
+      }
+    });
+    return results;
+  }
+
   public rescale() {
     if (this.element != null) {
       this.renderArea.remove();
