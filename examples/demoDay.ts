@@ -12,6 +12,8 @@ if ((<any> window).demoName === "demo-day") {
 
 // First we make the scatterplot that shows the full dataset
 
+
+var N_BINS = 3;
 function makeScatterPlotWithSparkline(data) {
   var s: any = {};
   s.xScale = new LinearScale();
@@ -32,18 +34,22 @@ function makeScatterPlotWithSparkline(data) {
 
 function makeHistograms(data: any[]) {
   var h: any = {};
-  h.xScale1 = new LinearScale();
+  var xExtent = d3.extent(data, (d) => d.x);
+  h.xScale1 = new LinearScale().domain(xExtent);
   h.yScale1 = new LinearScale();
-  var data1 = binByVal(data, (d) => d.x, [0,1], 10);
+  h.bin1 = makeBinFunction((d) => d.x, xExtent, N_BINS);
+  var data1 = h.bin1(data);
   var ds1 = {data: data1, seriesName: "xVals"}
   h.renderer1 = new BarRenderer(ds1, h.xScale1, h.yScale1);
   h.xAxis1 = new XAxis(h.xScale1, "bottom");
   h.yAxis1 = new YAxis(h.yScale1, "right");
   var table1 = new Table([[h.renderer1, h.yAxis1], [h.xAxis1, null]]);
 
-  h.xScale2 = new LinearScale();
+  var yExtent = d3.extent(data, (d) => d.y);
+  h.xScale2 = new LinearScale().domain(yExtent);
   h.yScale2 = new LinearScale();
-  var data2 = binByVal(data, (d) => d.y, [0,1], 10);
+  h.bin2 = makeBinFunction((d) => d.y, yExtent, N_BINS);
+  var data2 = h.bin2(data);
   var ds2 = {data: data2, seriesName: "yVals"}
   h.renderer2 = new BarRenderer(ds2, h.xScale2, h.yScale2);
   h.xAxis2 = new XAxis(h.xScale2, "bottom");
@@ -69,12 +75,17 @@ function filterSelectedData(data) {
   return data.filter(p);
 }
 
+function makeBinFunction(accessor, range, nBins) {
+  return (d) => binByVal(d, accessor, range, nBins);
+}
+
 function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
   if (accessor == null) {accessor = (d) => d.x};
   var min = range[0];
   var max = range[1];
-  var binBeginnings = _.range(nBins).map((n) => n * max / nBins);
-  var binEndings = _.range(nBins).map((n) => (n+1) * max / nBins);
+  var spread = max-min;
+  var binBeginnings = _.range(nBins).map((n) => min + n * spread / nBins);
+  var binEndings = _.range(nBins)   .map((n) => min + (n+1) * spread / nBins);
   var counts = new Array(nBins);
   _.range(nBins).forEach((b, i) => counts[i] = 0);
   data.forEach((d) => {
@@ -99,12 +110,18 @@ function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
   return bins;
 }
 
-function coordinator(scatterplot: any, histogram: any, dataset: IDataset) {
+function coordinator(chart: any, dataset: IDataset) {
+  var scatterplot = chart.s;
+  var histogram = chart.h;
+  chart.c = {};
+
   var data = dataset.data;
   var dataCallback = (selectedIndices: number[]) => {
     var selectedData = grabIndices(data, selectedIndices);
-    var xBins = binByVal(selectedData, (d) => d.x, [0,1], 5);
-    var yBins = binByVal(selectedData, (d) => d.y, [0,3], 5);
+    var xBins = histogram.bin1(selectedData);
+    var yBins = histogram.bin2(selectedData);
+    chart.c.xBins = xBins;
+    chart.c.yBins = yBins;
     histogram.renderer1.data({seriesName: "xBins", data: xBins})
     histogram.renderer2.data({seriesName: "yBins", data: yBins})
     histogram.renderer1.render();
@@ -117,17 +134,17 @@ function grabIndices(itemsToGrab: any[], indices: number[]) {
   return indices.map((i) => itemsToGrab[i]);
 }
 
-var clump1 = makeNormallyDistributedData(300, -10, 5, 7, 1);
-var clump2 = makeNormallyDistributedData(300, 2, 0.5, 3, 3);
-var clump3 = makeNormallyDistributedData(400, 5, 10, -3, 9);
-var clump4 = makeNormallyDistributedData(200, -25, 1, 20, 5);
+var clump1 = makeNormallyDistributedData(3, -10, 5, 7, 1);
+var clump2 = makeNormallyDistributedData(3, 2, 0.5, 3, 3);
+var clump3 = makeNormallyDistributedData(4, 5, 10, -3, 9);
+var clump4 = makeNormallyDistributedData(2, -25, 1, 20, 5);
 
 var clumpData = clump1.concat(clump2, clump3, clump4);
 var dataset = {seriesName: "clumpedData", data: clumpData};
 
 var chartSH = makeScatterHisto(dataset);
 
-coordinator(chartSH.s, chartSH.h, dataset);
+coordinator(chartSH, dataset);
 
 var svg = d3.select("#table");
 chartSH.table.anchor(svg);
