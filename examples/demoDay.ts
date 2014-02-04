@@ -33,8 +33,7 @@ function makeScatterPlotWithSparkline(data) {
   var r1 = [leftAxisTable, s.renderer];
   var r2 = [null, xAxisTable];
   var r3 = [null, s.sparkline];
-  var chartTable = new Table([r1,r2,r3]);
-  s.table = new Table([[new TitleLabel("Random Data").classed("scatterplot-title", true)], [chartTable]]);
+  s.table = new Table([r1,r2,r3]);
   return s;
 }
 
@@ -80,9 +79,10 @@ function makeScatterHisto(data) {
   var s = makeScatterPlotWithSparkline(data);
   var h = makeHistograms(data.data);
   var r = [s.table, h.table];
-  var chartTable = new Table([r]);
+  var titleRow = [ new TitleLabel("Random Data").classed("scatterplot-title", true),
+                    new TitleLabel("Histograms").classed("histogram-title", true) ];
+  var chartTable = new Table([titleRow, r]);
   chartTable.colPadding = 10;
-
   var table = new Table([[new TitleLabel("Glorious Demo Day Demo of Glory").classed("demo-table-title", true)], [chartTable]]);
 
   return {table: table, s: s, h: h};
