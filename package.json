@@ -1,13 +1,10 @@
 {
-  "name": "linkedaxisprototype",
-  "version": "0.0.0",
-  "description": "Prototype linked axis timeseriescharts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "name": "plottable",
+  "version": "0.1.0",
+  "description": "A library for easily creating charts within a grid layout.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/danmane/LinkedChartPrototype.git"
+    "url": "https://github.com/palantir/plottable.git"
   },
   "author": "daniel mane",
   "devDependencies": {
