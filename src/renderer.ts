@@ -152,8 +152,10 @@ class LineRenderer extends XYRenderer {
 }
 
 class CircleRenderer extends XYRenderer {
-  constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+  public size: number;
+  constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size=3) {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
+    this.size = size;
   }
 
   public render() {
@@ -163,7 +165,8 @@ class CircleRenderer extends XYRenderer {
       .append("circle")
       .attr("cx", this.xScaledAccessor)
       .attr("cy", this.yScaledAccessor)
-      .attr("r", 1);
+      .attr("r", this.size)
+      .classed("selected-point", (d) => d.selected);
   }
 }
 
