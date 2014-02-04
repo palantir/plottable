@@ -168,10 +168,16 @@ var yAxis = new YAxis(yScale, "left");
 
 var bucketData = makeRandomBucketData(10, 10, 80);
 
+var replacementData = makeRandomBucketData(5, 20, 80);
+
 var BarRenderArea = new BarRenderer(bucketData, xScale, yScale);
 var basicTable = new Table([[yAxis, BarRenderArea], [null, xAxis]])
 basicTable.anchor(svg6);
 basicTable.computeLayout();
 basicTable.render();
+
+window.BarRenderArea = BarRenderArea;
+window.replacementData = replacementData;
+console.log("type 'window.BarRenderArea.data(replacementData).render()'' to see new data");
 
 } // hackhack

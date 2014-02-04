@@ -5,18 +5,25 @@
 class Renderer extends Component {
   public CLASS_RENDERER_CONTAINER = "renderer-container";
 
+  public dataset: IDataset;
   public renderArea: D3.Selection;
   public element: D3.Selection;
   public scales: Scale[];
 
   constructor(
-    public dataset: IDataset
+    dataset: IDataset
   ) {
     super();
     super.rowWeight(1);
     super.colWeight(1);
 
+    this.dataset = dataset;
     this.classed(this.CLASS_RENDERER_CONTAINER, true);
+  }
+
+  public data(dataset: IDataset): Renderer {
+    this.dataset = dataset;
+    return this;
   }
 
   public zoom(translate, scale) {
@@ -178,15 +185,16 @@ class BarRenderer extends XYRenderer {
     var yRange = this.yScale.range();
     var maxScaledY = Math.max(yRange[0], yRange[1]);
 
-    this.dataSelection = this.renderArea.selectAll("rect");
-    this.dataSelection.data(this.dataset.data).enter()
-      .append("rect")
-      .attr("x", (d: any) => this.xScaledAccessor(d) + this.BAR_START_PADDING_PX)
+    var dataSelection = this.renderArea.selectAll("rect").data(this.dataset.data);
+    dataSelection.enter().append("rect");
+    dataSelection.transition().attr("x", (d: any) => this.xScaledAccessor(d) + this.BAR_START_PADDING_PX)
       .attr("y", this.yScaledAccessor)
       .attr("width", (d: any) => (this.x2ScaledAccessor(d) - this.xScaledAccessor(d)
                                       - this.BAR_START_PADDING_PX - this.BAR_END_PADDING_PX))
-      .attr("height", (d: any) => maxScaledY - this.yScaledAccessor(d));
-
+      .attr("height", (d: any) => {
+        return (maxScaledY - this.yScaledAccessor(d));
+      });
+    dataSelection.exit().remove();
   }
 }
 
