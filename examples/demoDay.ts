@@ -182,5 +182,4 @@ chartSH.table.anchor(svg);
 chartSH.table.computeLayout();
 chartSH.table.render();
 
-
 }
