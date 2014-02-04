@@ -9,7 +9,7 @@ function makeRandomData(numPoints, scaleFactor=1): IDataset {
   return {"data": data, "seriesName": "random-data"};
 }
 
-function makeNormallyDistributedData(n=100, xMean?, yMean?, xStdDev?, yStdDev?) {
+function makeNormallyDistributedData(n=100, xMean?, xStdDev?, yMean?, yStdDev?) {
   var results = [];
   var x = d3.random.normal(xMean, xStdDev);
   var y = d3.random.normal(yMean, yStdDev);
