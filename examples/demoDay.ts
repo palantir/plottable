@@ -60,7 +60,8 @@ function makeScatterHisto(data) {
   var r = [s.table, h.table];
   var table = new Table([r]);
   table.colPadding = 10;
-  return table;
+
+  return {table: table, s: s, h: h};
 }
 
 function filterSelectedData(data) {
@@ -125,10 +126,12 @@ var smallBins = binByVal(smallData, null, [0,1], 4);
 
 var chart = makeScatterHisto(data);
 
+coordinator(chart.s, chart.h, data);
+
 var svg = d3.select("#table");
-chart.anchor(svg);
-chart.computeLayout();
-chart.render();
+chart.table.anchor(svg);
+chart.table.computeLayout();
+chart.table.render();
 
 
 }
