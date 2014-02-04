@@ -5,3 +5,7 @@
 .scatterplot-title text {
   font-size: 24pt;
 }
+
+.axis-label text {
+  font-size: 12pt;
+}
