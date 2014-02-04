@@ -42,8 +42,8 @@ class XYRenderer extends Renderer {
   public yScale: QuantitiveScale;
   private xAccessor: IAccessor;
   private yAccessor: IAccessor;
-  public xScaledAccessor: (datum: any) => number;
-  public yScaledAccessor: (datum: any) => number;
+  public xScaledAccessor: IAccessor;
+  public yScaledAccessor: IAccessor;
   constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset);
     this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
@@ -137,6 +137,56 @@ class CircleRenderer extends XYRenderer {
       .attr("cx", this.xScaledAccessor)
       .attr("cy", this.yScaledAccessor)
       .attr("r", 3);
+  }
+}
+
+class BarRenderer extends XYRenderer {
+  private BAR_START_PADDING_PX = 1;
+  private BAR_END_PADDING_PX = 1;
+
+  private x2Accessor: IAccessor;
+  public x2ScaledAccessor: IAccessor;
+
+  constructor(dataset: IDataset,
+              xScale: QuantitiveScale,
+              yScale: QuantitiveScale,
+              xAccessor?: IAccessor,
+              x2Accessor?: IAccessor,
+              yAccessor?: IAccessor) {
+    super(dataset, xScale, yScale, xAccessor, yAccessor);
+
+    var inRange = (x: number, a: number, b: number) => {
+      return (Math.min(a,b) <= x && x <= Math.max(a,b));
+    }
+
+    var yDomain = this.yScale.domain();
+    if (!inRange(0, yDomain[0], yDomain[1])) {
+      var newMin = 0;
+      var newMax = 1.1 * yDomain[1];
+      this.yScale.widenDomain([newMin, newMax]); // TODO: make this handle reversed scales
+    }
+
+    this.x2Accessor = (x2Accessor != null) ? x2Accessor : (d: any) => d.x2;
+    this.x2ScaledAccessor = (datum: any) => xScale.scale(this.x2Accessor(datum));
+
+    var x2Extent = d3.extent(dataset.data, this.x2Accessor);
+    this.xScale.widenDomain(x2Extent);
+  }
+
+  public render() {
+    super.render();
+    var yRange = this.yScale.range();
+    var maxScaledY = Math.max(yRange[0], yRange[1]);
+
+    this.dataSelection = this.renderArea.selectAll("rect");
+    this.dataSelection.data(this.dataset.data).enter()
+      .append("rect")
+      .attr("x", (d: any) => this.xScaledAccessor(d) + this.BAR_START_PADDING_PX)
+      .attr("y", this.yScaledAccessor)
+      .attr("width", (d: any) => (this.x2ScaledAccessor(d) - this.xScaledAccessor(d)
+                                      - this.BAR_START_PADDING_PX - this.BAR_END_PADDING_PX))
+      .attr("height", (d: any) => maxScaledY - this.yScaledAccessor(d));
+
   }
 }
 
