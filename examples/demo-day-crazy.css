@@ -27,3 +27,8 @@ circle {
 .selected-point {
   fill: black;
 }
+
+.drag-box {
+  fill: red;
+  opacity: 0.5;
+}

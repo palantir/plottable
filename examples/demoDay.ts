@@ -9,10 +9,6 @@
 ///<reference path="exampleUtil.ts" />
 
 if ((<any> window).demoName === "demo-day") {
-
-// First we make the scatterplot that shows the full dataset
-
-
 var N_BINS = 25;
 function makeScatterPlotWithSparkline(data) {
   var s: any = {};
@@ -88,46 +84,6 @@ function makeScatterHisto(data) {
   return {table: table, s: s, h: h};
 }
 
-function filterSelectedData(data) {
-  var p = (d) => d.selected;
-  return data.filter(p);
-}
-
-function makeBinFunction(accessor, range, nBins) {
-  return (d) => binByVal(d, accessor, range, nBins);
-}
-
-function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
-  if (accessor == null) {accessor = (d) => d.x};
-  var min = range[0];
-  var max = range[1];
-  var spread = max-min;
-  var binBeginnings = _.range(nBins).map((n) => min + n * spread / nBins);
-  var binEndings = _.range(nBins)   .map((n) => min + (n+1) * spread / nBins);
-  var counts = new Array(nBins);
-  _.range(nBins).forEach((b, i) => counts[i] = 0);
-  data.forEach((d) => {
-    var v = accessor(d);
-    var found = false;
-    for (var i=0; i<nBins; i++) {
-      if (v <= binEndings[i]) {
-        counts[i]++;
-        found = true;
-        break;
-      }
-    }
-    if (!found) {counts[counts.length-1]++};
-  });
-  var bins = counts.map((count, i) => {
-    var bin: any = {};
-    bin.x = binBeginnings[i];
-    bin.x2 = binEndings[i];
-    bin.y = count;
-    return bin;
-  })
-  return bins;
-}
-
 function coordinator(chart: any, dataset: IDataset) {
   var scatterplot = chart.s;
   var histogram = chart.h;
@@ -164,7 +120,6 @@ function coordinator(chart: any, dataset: IDataset) {
 function grabIndices(itemsToGrab: any[], indices: number[]) {
   return indices.map((i) => itemsToGrab[i]);
 }
-
 var clump1 = makeNormallyDistributedData(300, -10, 5, 7, 1);
 var clump2 = makeNormallyDistributedData(300, 2, 0.5, 3, 3);
 var clump3 = makeNormallyDistributedData(30, 5, 10, -3, 9);
