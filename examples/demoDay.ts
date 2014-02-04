@@ -19,10 +19,10 @@ function makeScatterPlotWithSparkline(data) {
   s.xScale = new LinearScale();
   s.yScale = new LinearScale();
   s.leftAxis = new YAxis(s.yScale, "left");
-  var leftAxisTable = new Table([[new AxisLabel("Y", "vertical-left"), s.leftAxis]]);
+  var leftAxisTable = new Table([[new AxisLabel("y", "vertical-left"), s.leftAxis]]);
   leftAxisTable.colWeight(0);
   s.xAxis = new XAxis(s.xScale, "bottom");
-  var xAxisTable = new Table([[s.xAxis], [new AxisLabel("X")]]);
+  var xAxisTable = new Table([[s.xAxis], [new AxisLabel("x")]]);
   xAxisTable.rowWeight(0);
 
   s.renderer = new CircleRenderer(data, s.xScale, s.yScale, null, null, 1.5);
@@ -167,7 +167,7 @@ function grabIndices(itemsToGrab: any[], indices: number[]) {
 
 var clump1 = makeNormallyDistributedData(300, -10, 5, 7, 1);
 var clump2 = makeNormallyDistributedData(300, 2, 0.5, 3, 3);
-var clump3 = makeNormallyDistributedData(400, 5, 10, -3, 9);
+var clump3 = makeNormallyDistributedData(30, 5, 10, -3, 9);
 var clump4 = makeNormallyDistributedData(200, -25, 1, 20, 5);
 
 var clumpData = clump1.concat(clump2, clump3, clump4);
@@ -181,6 +181,5 @@ var svg = d3.select("#table");
 chartSH.table.anchor(svg);
 chartSH.table.computeLayout();
 chartSH.table.render();
-
 
 }
