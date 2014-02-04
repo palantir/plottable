@@ -116,13 +116,20 @@ function coordinator(chart: any, dataset: IDataset) {
   var histogram = chart.h;
   chart.c = {};
 
+  var lastSelection = null;
   var selectionCallback = (selection: D3.Selection) => {
+    if (lastSelection != null) lastSelection.classed("selected-point", false);
     selection.classed("selected-point", true);
+    lastSelection = selection;
   }
 
   var data = dataset.data;
+  var lastSelectedData = null;
   var dataCallback = (selectedIndices: number[]) => {
     var selectedData = grabIndices(data, selectedIndices);
+    selectedData.forEach((d) => d.selected = true);
+    if (lastSelectedData != null) lastSelectedData.forEach((d) => d.selected = false);
+    lastSelectedData = selectedData;
     var xBins = histogram.bin1(selectedData);
     var yBins = histogram.bin2(selectedData);
     chart.c.xBins = xBins;
