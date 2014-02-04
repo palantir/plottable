@@ -82,7 +82,7 @@ function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
         break;
       }
     }
-    if (!found) {counts[i]++};
+    if (!found) {counts[counts.length-1]++};
   });
   var bins = counts.map((count, i) => {
     var bin: any = {};

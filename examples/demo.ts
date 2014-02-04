@@ -175,9 +175,4 @@ var basicTable = new Table([[yAxis, BarRenderArea], [null, xAxis]])
 basicTable.anchor(svg6);
 basicTable.computeLayout();
 basicTable.render();
-
-window.BarRenderArea = BarRenderArea;
-window.replacementData = replacementData;
-console.log("type 'window.BarRenderArea.data(replacementData).render()'' to see new data");
-
 } // hackhack
