@@ -21,4 +21,9 @@ module Utils {
 	export function getBBox(element: D3.Selection): SVGRect {
 		return (<any> element.node()).getBBox();
 	}
+	export function setWidthHeight(elements: D3.Selection[], width: number, height: number) {
+		elements.forEach((e) => {
+			e.attr("width", width).attr("height", height);
+			})
+	}
 }

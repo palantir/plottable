@@ -1,7 +1,13 @@
+///<reference path="../lib/d3.d.ts" />
+///<reference path="interaction.ts" />
+
 class Component {
+  private static clipPathId = 0; // Used for unique namespacing for the clipPaths
   public element: D3.Selection;
   public hitBox: D3.Selection;
   public boundingBox: D3.Selection;
+  private clipPathRect: D3.Selection;
+  private registeredInteractions: Interaction[] = [];
 
   private rowWeightVal  = 0;
   private colWeightVal  = 0;
@@ -13,10 +19,54 @@ class Component {
   private xOffset       : number;
   private yOffset       : number;
 
+  private cssClasses: string[] = [];
+
+  public xAlignment = "LEFT"; // LEFT, CENTER, RIGHT
+  public yAlignment = "TOP"; // TOP, CENTER, BOTTOM
+
+  public classed(cssClass: string): boolean;
+  public classed(cssClass: string, addClass: boolean): Component;
+  public classed(cssClass: string, addClass?:boolean): any {
+    if (addClass == null) {
+      if (this.element == null) {
+        return (this.cssClasses.indexOf(cssClass) != -1);
+      } else {
+        return this.element.classed(cssClass);
+      }
+    } else {
+      if (this.element == null) {
+        var classIndex = this.cssClasses.indexOf(cssClass);
+        if (addClass && classIndex == -1) {
+          this.cssClasses.push(cssClass);
+        } else if (!addClass && classIndex != -1) {
+          this.cssClasses.splice(classIndex, 1);
+        }
+      } else {
+        this.element.classed(cssClass, addClass);
+      }
+      return this;
+    }
+  }
+
   public anchor(element: D3.Selection) {
     this.element = element;
+    this.generateClipPath();
+    this.cssClasses.forEach((cssClass: string) => {
+      this.element.classed(cssClass, true);
+    });
+    this.cssClasses = null;
     this.hitBox = element.append("rect").classed("hit-box", true);
     this.boundingBox = element.append("rect").classed("bounding-box", true);
+    this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
+  }
+
+  public generateClipPath() {
+    // The clip path will prevent content from overflowing its component space.
+    var clipPathId = Component.clipPathId++;
+    this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
+    this.clipPathRect = this.element.append("clipPath")
+                                    .attr("id", "clipPath" + clipPathId)
+                                    .append("rect");
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -33,13 +83,53 @@ class Component {
         throw new Error("You need to pass non-null arguments when calling computeLayout on a non-root node");
       }
     }
+    if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
+      switch (this.yAlignment) {
+        case "TOP":
+          break;
+        case "CENTER":
+          yOffset += (availableHeight - this.rowMinimum()) / 2;
+          break;
+        case "BOTTOM":
+          yOffset += availableHeight - this.rowMinimum();
+          break;
+        default:
+          throw new Error("unsupported alignment");
+      }
+      availableHeight = this.rowMinimum();
+    }
+    if (this.colWeight() === 0 && this.colMinimum() !== 0) {
+      switch (this.xAlignment) {
+        case "LEFT":
+          break;
+        case "CENTER":
+          xOffset += (availableWidth - this.colMinimum()) / 2;
+          break;
+        case "RIGHT":
+          xOffset += availableWidth - this.colMinimum();
+          break;
+        default:
+          throw new Error("unsupported alignment");
+      }
+      availableWidth = this.colMinimum();
+    }
     this.xOffset = xOffset;
     this.yOffset = yOffset;
     this.availableWidth = availableWidth;
     this.availableHeight = availableHeight;
     this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
-    this.hitBox.attr("width", this.availableWidth).attr("height", this.availableHeight);
-    this.boundingBox.attr("width", this.availableWidth).attr("height", this.availableHeight);
+    var boxes = [this.clipPathRect, this.hitBox, this.boundingBox];
+    Utils.setWidthHeight(boxes, this.availableWidth, this.availableHeight);
+  }
+
+  public registerInteraction(interaction: Interaction) {
+    // Interactions can be registered before or after anchoring. If registered before, they are
+    // pushed to this.registeredInteractions and registered during anchoring. If after, they are
+    // registered immediately
+    this.registeredInteractions.push(interaction);
+    if (this.element != null) {
+      interaction.anchor(this.hitBox);
+    }
   }
 
   public render() {
@@ -70,7 +160,7 @@ class Component {
       chai.assert.operator(this.colWeightVal, '>=', 0, "colWeight is a reasonable number");
       return this;
     } else {
-      return this.colWeightVal
+      return this.colWeightVal;
     }
   }
 

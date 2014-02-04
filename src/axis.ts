@@ -32,11 +32,13 @@ class Axis extends Component {
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
     if (this.formatter == null) {
-      this.formatter = d3.format("s3");
+      this.formatter = d3.format(".3s");
     }
     this.d3axis.tickFormat(this.formatter);
+
     this.cachedScale = 1;
     this.cachedTranslate = 0;
+    this.scale.registerListener(() => this.rescale());
   }
 
   private transformString(translate: number, scale: number) {
@@ -48,7 +50,7 @@ class Axis extends Component {
   public rowWeight(newVal: number): Component;
   public rowWeight(newVal?: number): any {
     if (newVal != null) {
-      throw new Error("Axis row weight is not settable.");
+      throw new Error("Row weight cannot be set on Axis.");
       return this;
     } else {
       return 0;
@@ -59,7 +61,7 @@ class Axis extends Component {
   public colWeight(newVal: number): Component;
   public colWeight(newVal?: number): any {
     if (newVal != null) {
-      throw new Error("Axis col weight is not settable.");
+      throw new Error("Col weight cannot be set on Axis.");
       return this;
     } else {
       return 0;
@@ -86,11 +88,19 @@ class Axis extends Component {
     } else {
       newDomain = standardOrder ? [new Date(min - extent), new Date(max + extent)] : [new Date(max + extent), new Date(min - extent)];
     }
-    // var copyScale = this.scale.copy().domain(newDomain)
-    // var ticks = (<any> copyScale).ticks(30);
-    // this.d3axis.tickValues(ticks);
-    // a = [100,0]; extent = -100; 100 - (-100) = 200, 0 - (-100) = 100
-    // a = [0,100]; extent = 100; 0 - 100 = -100, 100 - 100
+
+    // Make tiny-zero representations not look like crap, by rounding them to 0
+    if ((<QuantitiveScale> this.scale).ticks != null) {
+      var scale = <QuantitiveScale> this.scale;
+      var nTicks = 10;
+      var ticks = scale.ticks(nTicks);
+      var domain = scale.domain();
+      var interval = domain[1] - domain[0];
+      var cleanTick = (n) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
+      ticks = ticks.map(cleanTick);
+      this.d3axis.tickValues(ticks);
+    }
+
     this.axisElement.call(this.d3axis);
     var bbox = (<any> this.axisElement.node()).getBBox();
     if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
@@ -101,6 +111,8 @@ class Axis extends Component {
   }
 
   public rescale() {
+    return (this.element != null) ? this.render() : null;
+    // short circuit, we don't care about perf.
     var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
     var tickSelection = this.element.selectAll(".tick");
     (<any> tickSelection).call(tickTransform, this.scale.scale);
@@ -108,6 +120,7 @@ class Axis extends Component {
   }
 
   public zoom(translatePair: number[], scale: number) {
+    return this.render(); //short-circuit, we dont need the performant cleverness for present demo
     var translate = this.isXAligned ? translatePair[0] : translatePair[1];
     if (scale != null && scale != this.cachedScale) {
       this.cachedTranslate = translate;

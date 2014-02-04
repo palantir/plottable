@@ -1,22 +1,17 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/chai/chai.d.ts" />
+///<reference path="../src/interfaces.d.ts" />
 
-///<reference path="table.ts" />
-///<reference path="renderer.ts" />
-///<reference path="interaction.ts" />
-
-function makeRandomData(numPoints, scaleFactor=1): IDataset {
-  var data = [];
-  for (var i = 0; i < numPoints; i++) {
-    var x = Math.random();
-    var r = {x: x, y: (x + x * Math.random()) * scaleFactor}
-    data.push(r);
-  }
-  data = _.sortBy(data, (d) => d.x);
-  return {"data": data, "seriesName": "random-data"};
-}
+///<reference path="../src/table.ts" />
+///<reference path="../src/renderer.ts" />
+///<reference path="../src/interaction.ts" />
+///<reference path="../src/labelComponent.ts" />
+///<reference path="../src/axis.ts" />
+///<reference path="exampleUtil.ts" />
 
 
+
+if ((<any> window).demoName == "demo1") {
 // make a regular table with 1 axis on bottom, 1 axis on left, renderer in center
 
 var svg1 = d3.select("#svg1");
@@ -31,7 +26,7 @@ var basicTable = new Table([[renderArea, yAxis], [xAxis, null]])
 basicTable.anchor(svg1);
 basicTable.computeLayout();
 basicTable.render();
-new DragZoomInteraction(renderArea.hitBox, [xAxis, yAxis, renderArea], xScale, yScale);
+new PanZoomInteraction(renderArea, [xAxis, yAxis, renderArea], xScale, yScale);
 
 
 
@@ -55,6 +50,8 @@ var t3 = makeBasicChartTable();
 var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
+metaTable.rowPadding = 5;
+metaTable.colPadding = 5;
 metaTable.anchor(svg2);
 svg2.attr("width", 800).attr("height", 600);
 metaTable.computeLayout();
@@ -72,7 +69,6 @@ function makeMultiAxisChart() {
   var data = makeRandomData(30);
   var renderArea = new LineRenderer(data, xScale, yScale);
   var rootTable = new Table([[renderArea, rightAxesTable], [xAxis, null]])
-  console.log(rootTable);
   return rootTable;
 
 }
@@ -99,20 +95,22 @@ function makeSparklineMultichart() {
   var row1: Component[] = [leftAxesTable, renderer1, rightAxesTable];
   var yScale2 = new LinearScale();
   var leftAxis = new YAxis(yScale2, "left");
-  var data2 = makeRandomData(100, 100000);
+  leftAxis.xAlignment = "RIGHT";
+  var data2 = makeRandomData(1000, 100000);
   var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
+  var toggleClass = function() {return !d3.select(this).classed("selected-point")};
+  var cb = (s) => s.classed("selected-point", toggleClass);
+  var areaInteraction = new AreaInteraction(renderer2, null, cb);
   var row2: Component[] = [leftAxis, renderer2, null];
   var bottomAxis = new XAxis(xScale1, "bottom");
   var row3: Component[] = [null, bottomAxis, null];
+  var xScaleSpark = new LinearScale();
   var yScaleSpark = new LinearScale();
-  var sparkline = new LineRenderer(data2, xScale1, yScaleSpark);
+  var sparkline = new LineRenderer(data2, xScaleSpark, yScaleSpark);
   sparkline.rowWeight(0.25);
   var row4 = [null, sparkline, null];
+  var zoomInteraction = new BrushZoomInteraction(sparkline, xScale1, yScale2);
   var multiChart = new Table([row1, row2, row3, row4]);
-  // multiChart.xMargin = 0;
-  // multiChart.yMargin = 0;
-  // multiChart.xPadding = 0;
-  // multiChart.yPadding = 0;
   return multiChart;
 }
 
@@ -134,10 +132,47 @@ multichart.render();
 //   var bottomAxes = iterate(bottom, () => new xAxis(yScale, "bottom"))
 // }
 
-function iterate(n: number, fn: () => any) {
-  var out = [];
-  for (var i=0; i<n; i++) {
-    out.push(fn())
-  }
-  return out;
-}
+var svg5 = d3.select("#svg5");
+svg5.attr("width", 500).attr("height", 500);
+var xScale = new LinearScale();
+var yScale = new LinearScale();
+var xAxis = new XAxis(xScale, "bottom");
+
+var yAxisRight = new YAxis(yScale, "right");
+var yAxisRightLabel = new AxisLabel("bp y right qd", "vertical-right");
+var yAxisRightTable = new Table([[yAxisRight, yAxisRightLabel]]);
+yAxisRightTable.colWeight(0);
+
+var yAxisLeft = new YAxis(yScale, "left");
+var yAxisLeftLabel = new AxisLabel("bp y left qd", "vertical-left");
+var yAxisLeftTable = new Table([[yAxisLeftLabel, yAxisLeft]]);
+yAxisLeftTable.colWeight(0);
+
+var data = makeRandomData(30);
+var renderArea = new LineRenderer(data, xScale, yScale);
+var basicTable = new Table([[yAxisLeftTable, renderArea, yAxisRightTable], [null, xAxis, null]]);
+var title = new TitleLabel("bpIqd");
+var outerTable = new Table([[title], [basicTable]]);
+outerTable.anchor(svg5);
+outerTable.computeLayout();
+outerTable.render();
+
+
+// bar renderer test
+var svg6 = d3.select("#svg6");
+svg6.attr("width", 500).attr("height", 500);
+var xScale = new LinearScale();
+var yScale = new LinearScale();
+var xAxis = new XAxis(xScale, "bottom");
+var yAxis = new YAxis(yScale, "left");
+
+var bucketData = makeRandomBucketData(10, 10, 80);
+
+var replacementData = makeRandomBucketData(5, 20, 80);
+
+var BarRenderArea = new BarRenderer(bucketData, xScale, yScale);
+var basicTable = new Table([[yAxis, BarRenderArea], [null, xAxis]])
+basicTable.anchor(svg6);
+basicTable.computeLayout();
+basicTable.render();
+} // hackhack
