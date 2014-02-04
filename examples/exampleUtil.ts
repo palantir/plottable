@@ -9,6 +9,17 @@ function makeRandomData(numPoints, scaleFactor=1): IDataset {
   return {"data": data, "seriesName": "random-data"};
 }
 
+function makeNormallyDistributedData(n=100, xMean?, yMean?, xStdDev?, yStdDev?) {
+  var results = [];
+  var x = d3.random.normal(xMean, xStdDev);
+  var y = d3.random.normal(yMean, yStdDev);
+  for (var i=0; i<n; i++) {
+    var r = {x: x(), y: y()};
+    results.push(r);
+  }
+  return results;
+}
+
 function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue = 10): IDataset {
   var data = [];
   for (var i=0; i < numBuckets; i++) {

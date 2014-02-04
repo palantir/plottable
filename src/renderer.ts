@@ -163,7 +163,7 @@ class CircleRenderer extends XYRenderer {
       .append("circle")
       .attr("cx", this.xScaledAccessor)
       .attr("cy", this.yScaledAccessor)
-      .attr("r", 3);
+      .attr("r", 1);
   }
 }
 

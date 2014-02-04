@@ -117,21 +117,21 @@ function grabIndices(itemsToGrab: any[], indices: number[]) {
   return indices.map((i) => itemsToGrab[i]);
 }
 
-var data1 = makeRandomData(5, 1).data;
-var data2 = makeRandomData(5, 3).data;
-var data = {seriesName: "randomData", data: data1.concat(data2)}
+var clump1 = makeNormallyDistributedData(300, -10, 5, 7, 1);
+var clump2 = makeNormallyDistributedData(300, 2, 0.5, 3, 3);
+var clump3 = makeNormallyDistributedData(400, 5, 10, -3, 9);
 
-var smallData = makeRandomData(10).data;
-var smallBins = binByVal(smallData, null, [0,1], 4);
+var clumpData = clump1.concat(clump2, clump3);
+var dataset = {seriesName: "clumpedData", data: clumpData};
 
-var chart = makeScatterHisto(data);
+var chartSH = makeScatterHisto(dataset);
 
-coordinator(chart.s, chart.h, data);
+coordinator(chartSH.s, chartSH.h, dataset);
 
 var svg = d3.select("#table");
-chart.table.anchor(svg);
-chart.table.computeLayout();
-chart.table.render();
+chartSH.table.anchor(svg);
+chartSH.table.computeLayout();
+chartSH.table.render();
 
 
 }
