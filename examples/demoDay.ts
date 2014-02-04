@@ -33,20 +33,24 @@ function makeScatterPlotWithSparkline(data) {
 function makeHistograms(data: any[]) {
   var h: any = {};
   h.xScale1 = new LinearScale();
-  h.xScale2 = new LinearScale();
-  h.yScale = new LinearScale();
+  h.yScale1 = new LinearScale();
   var data1 = binByVal(data, (d) => d.x, [0,1], 10);
-  var data2 = binByVal(data, (d) => d.y, [0,1], 10);
   var ds1 = {data: data1, seriesName: "xVals"}
-  var ds2 = {data: data2, seriesName: "yVals"}
-  h.renderer1 = new BarRenderer(ds1, h.xScale1, h.yScale);
-  h.renderer2 = new BarRenderer(ds2, h.xScale2, h.yScale);
-  h.yAxis = new YAxis(h.yScale, "right");
+  h.renderer1 = new BarRenderer(ds1, h.xScale1, h.yScale1);
   h.xAxis1 = new XAxis(h.xScale1, "bottom");
+  h.yAxis1 = new YAxis(h.yScale1, "right");
+  var table1 = new Table([[h.renderer1, h.yAxis1], [h.xAxis1, null]]);
+
+  h.xScale2 = new LinearScale();
+  h.yScale2 = new LinearScale();
+  var data2 = binByVal(data, (d) => d.y, [0,1], 10);
+  var ds2 = {data: data2, seriesName: "yVals"}
+  h.renderer2 = new BarRenderer(ds2, h.xScale2, h.yScale2);
   h.xAxis2 = new XAxis(h.xScale2, "bottom");
-  var r1 = [h.renderer1, h.renderer2, h.yAxis];
-  var r2 = [h.xAxis1, h.xAxis2, null];
-  h.table = new Table([r1, r2]);
+  h.yAxis2 = new YAxis(h.yScale2, "right");
+  var table2 = new Table([[h.renderer2, h.yAxis2], [h.xAxis2, null]]);
+
+  h.table = new Table([[table1], [table2]]);
   return h;
 }
 
