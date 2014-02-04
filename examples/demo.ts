@@ -132,8 +132,8 @@ multichart.render();
 //   var bottomAxes = iterate(bottom, () => new xAxis(yScale, "bottom"))
 // }
 
-var svg1 = d3.select("#svg5");
-svg1.attr("width", 500).attr("height", 500);
+var svg5 = d3.select("#svg5");
+svg5.attr("width", 500).attr("height", 500);
 var xScale = new LinearScale();
 var yScale = new LinearScale();
 var xAxis = new XAxis(xScale, "bottom");
@@ -153,11 +153,25 @@ var renderArea = new LineRenderer(data, xScale, yScale);
 var basicTable = new Table([[yAxisLeftTable, renderArea, yAxisRightTable], [null, xAxis, null]]);
 var title = new TitleLabel("bpIqd");
 var outerTable = new Table([[title], [basicTable]]);
-outerTable.anchor(svg1);
+outerTable.anchor(svg5);
 outerTable.computeLayout();
 outerTable.render();
 
 
+// bar renderer test
+var svg6 = d3.select("#svg6");
+svg6.attr("width", 500).attr("height", 500);
+var xScale = new LinearScale();
+var yScale = new LinearScale();
+var xAxis = new XAxis(xScale, "bottom");
+var yAxis = new YAxis(yScale, "left");
 
+var bucketData = makeRandomBucketData(10, 10, 80);
+
+var BarRenderArea = new BarRenderer(bucketData, xScale, yScale);
+var basicTable = new Table([[yAxis, BarRenderArea], [null, xAxis]])
+basicTable.anchor(svg6);
+basicTable.computeLayout();
+basicTable.render();
 
 } // hackhack
