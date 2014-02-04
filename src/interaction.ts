@@ -82,7 +82,8 @@ class AreaInteraction extends Interaction {
   constructor(
     private rendererComponent: XYRenderer,
     public areaCallback?: (a: FullSelectionArea) => any,
-    public selectionCallback?: (a: D3.Selection) => any
+    public selectionCallback?: (a: D3.Selection) => any,
+    public indicesCallback?: (a: number[]) => any
   ) {
     super(rendererComponent);
     this.dragBehavior = d3.behavior.drag();
@@ -137,6 +138,14 @@ class AreaInteraction extends Interaction {
       var selection = this.rendererComponent.getSelectionFromArea(fullArea);
       this.selectionCallback(selection);
     }
+    if (this.indicesCallback != null) {
+      var indices = this.rendererComponent.getDataIndicesFromArea(fullArea);
+      this.indicesCallback(indices);
+    }
+  }
+
+  public clearBox() {
+    this.dragBox.attr("height", 0).attr("width", 0);
   }
 
   public anchor(hitBox: D3.Selection) {
@@ -157,9 +166,10 @@ class BrushZoomInteraction extends AreaInteraction {
   make a sparkline, you do not want to update the sparkline's scales, but rather the scales of a
   linked chart.
   */
-  constructor(eventComponent: XYRenderer, public xScale: QuantitiveScale, public yScale: QuantitiveScale) {
+  constructor(eventComponent: XYRenderer, public xScale: QuantitiveScale, public yScale: QuantitiveScale, public indicesCallback?: (a: number[]) => any) {
     super(eventComponent);
     this.areaCallback = this.zoom;
+    this.indicesCallback = indicesCallback;
   }
 
   public zoom(area: FullSelectionArea) {
