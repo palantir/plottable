@@ -13,22 +13,23 @@ if ((<any> window).demoName === "demo-day") {
 // First we make the scatterplot that shows the full dataset
 
 
-var N_BINS = 3;
+var N_BINS = 25;
 function makeScatterPlotWithSparkline(data) {
   var s: any = {};
   s.xScale = new LinearScale();
   s.yScale = new LinearScale();
   s.leftAxis = new YAxis(s.yScale, "left");
   s.xAxis = new XAxis(s.xScale, "bottom");
-  s.renderer = new CircleRenderer(data, s.xScale, s.yScale);
+  s.renderer = new CircleRenderer(data, s.xScale, s.yScale, null, null, 1.5);
   s.xSpark = new LinearScale();
   s.ySpark = new LinearScale();
-  s.sparkline = new CircleRenderer(data, s.xSpark, s.ySpark);
+  s.sparkline = new CircleRenderer(data, s.xSpark, s.ySpark, null, null, 0.5);
   s.sparkline.rowWeight(0.25);
   var r1 = [s.leftAxis, s.renderer];
   var r2 = [null, s.xAxis];
   var r3 = [null, s.sparkline];
   s.table = new Table([r1,r2,r3]);
+  s.zoom = new BrushZoomInteraction(s.sparkline, s.xScale, s.yScale);
   return s;
 }
 
@@ -115,6 +116,10 @@ function coordinator(chart: any, dataset: IDataset) {
   var histogram = chart.h;
   chart.c = {};
 
+  var selectionCallback = (selection: D3.Selection) => {
+    selection.classed("selected-point", true);
+  }
+
   var data = dataset.data;
   var dataCallback = (selectedIndices: number[]) => {
     var selectedData = grabIndices(data, selectedIndices);
@@ -127,17 +132,17 @@ function coordinator(chart: any, dataset: IDataset) {
     histogram.renderer1.render();
     histogram.renderer2.render();
   };
-  var areaInteraction = new AreaInteraction(scatterplot.renderer, null, null, dataCallback);
+  var areaInteraction = new AreaInteraction(scatterplot.renderer, null, selectionCallback, dataCallback);
 }
 
 function grabIndices(itemsToGrab: any[], indices: number[]) {
   return indices.map((i) => itemsToGrab[i]);
 }
 
-var clump1 = makeNormallyDistributedData(3, -10, 5, 7, 1);
-var clump2 = makeNormallyDistributedData(3, 2, 0.5, 3, 3);
-var clump3 = makeNormallyDistributedData(4, 5, 10, -3, 9);
-var clump4 = makeNormallyDistributedData(2, -25, 1, 20, 5);
+var clump1 = makeNormallyDistributedData(300, -10, 5, 7, 1);
+var clump2 = makeNormallyDistributedData(300, 2, 0.5, 3, 3);
+var clump3 = makeNormallyDistributedData(400, 5, 10, -3, 9);
+var clump4 = makeNormallyDistributedData(200, -25, 1, 20, 5);
 
 var clumpData = clump1.concat(clump2, clump3, clump4);
 var dataset = {seriesName: "clumpedData", data: clumpData};
