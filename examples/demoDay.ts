@@ -29,7 +29,6 @@ function makeScatterPlotWithSparkline(data) {
   var r2 = [null, s.xAxis];
   var r3 = [null, s.sparkline];
   s.table = new Table([r1,r2,r3]);
-  s.zoom = new BrushZoomInteraction(s.sparkline, s.xScale, s.yScale);
   return s;
 }
 
@@ -124,12 +123,12 @@ function coordinator(chart: any, dataset: IDataset) {
   }
 
   var data = dataset.data;
-  var lastSelectedData = null;
+  // var lastSelectedData = null;
   var dataCallback = (selectedIndices: number[]) => {
     var selectedData = grabIndices(data, selectedIndices);
-    selectedData.forEach((d) => d.selected = true);
-    if (lastSelectedData != null) lastSelectedData.forEach((d) => d.selected = false);
-    lastSelectedData = selectedData;
+    // selectedData.forEach((d) => d.selected = true);
+    // if (lastSelectedData != null) lastSelectedData.forEach((d) => d.selected = false);
+    // lastSelectedData = selectedData;
     var xBins = histogram.bin1(selectedData);
     var yBins = histogram.bin2(selectedData);
     chart.c.xBins = xBins;
@@ -140,6 +139,8 @@ function coordinator(chart: any, dataset: IDataset) {
     histogram.renderer2.render();
   };
   var areaInteraction = new AreaInteraction(scatterplot.renderer, null, selectionCallback, dataCallback);
+  var zoomCallback = (indices) => {areaInteraction.clearBox(); dataCallback(indices)};
+  chart.c.zoom = new BrushZoomInteraction(scatterplot.sparkline, scatterplot.xScale, scatterplot.yScale, zoomCallback);
 }
 
 function grabIndices(itemsToGrab: any[], indices: number[]) {
