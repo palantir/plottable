@@ -12,6 +12,8 @@ if ((<any> window).demoName === "demo-day") {
 
 // First we make the scatterplot that shows the full dataset
 
+
+var N_BINS = 25;
 function makeScatterPlotWithSparkline(data) {
   var s: any = {};
   s.xScale = new LinearScale();
@@ -23,10 +25,10 @@ function makeScatterPlotWithSparkline(data) {
   var xAxisTable = new Table([[s.xAxis], [new AxisLabel("X")]]);
   xAxisTable.rowWeight(0);
 
-  s.renderer = new CircleRenderer(data, s.xScale, s.yScale);
+  s.renderer = new CircleRenderer(data, s.xScale, s.yScale, null, null, 1.5);
   s.xSpark = new LinearScale();
   s.ySpark = new LinearScale();
-  s.sparkline = new CircleRenderer(data, s.xSpark, s.ySpark);
+  s.sparkline = new CircleRenderer(data, s.xSpark, s.ySpark, null, null, 0.5);
   s.sparkline.rowWeight(0.25);
   var r1 = [leftAxisTable, s.renderer];
   var r2 = [null, xAxisTable];
@@ -38,9 +40,11 @@ function makeScatterPlotWithSparkline(data) {
 
 function makeHistograms(data: any[]) {
   var h: any = {};
-  h.xScale1 = new LinearScale();
+  var xExtent = d3.extent(data, (d) => d.x);
+  h.xScale1 = new LinearScale().domain(xExtent);
   h.yScale1 = new LinearScale();
-  var data1 = binByVal(data, (d) => d.x, [0,1], 10);
+  h.bin1 = makeBinFunction((d) => d.x, xExtent, N_BINS);
+  var data1 = h.bin1(data);
   var ds1 = {data: data1, seriesName: "xVals"}
   h.renderer1 = new BarRenderer(ds1, h.xScale1, h.yScale1);
   h.xAxis1 = new XAxis(h.xScale1, "bottom");
@@ -51,9 +55,11 @@ function makeHistograms(data: any[]) {
   labelY1Table.colWeight(0);
   var table1 = new Table([[h.renderer1, labelY1Table], [labelX1Table, null]]);
 
-  h.xScale2 = new LinearScale();
+  var yExtent = d3.extent(data, (d) => d.y);
+  h.xScale2 = new LinearScale().domain(yExtent);
   h.yScale2 = new LinearScale();
-  var data2 = binByVal(data, (d) => d.y, [0,1], 10);
+  h.bin2 = makeBinFunction((d) => d.y, yExtent, N_BINS);
+  var data2 = h.bin2(data);
   var ds2 = {data: data2, seriesName: "yVals"}
   h.renderer2 = new BarRenderer(ds2, h.xScale2, h.yScale2);
   h.xAxis2 = new XAxis(h.xScale2, "bottom");
@@ -87,12 +93,17 @@ function filterSelectedData(data) {
   return data.filter(p);
 }
 
+function makeBinFunction(accessor, range, nBins) {
+  return (d) => binByVal(d, accessor, range, nBins);
+}
+
 function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
   if (accessor == null) {accessor = (d) => d.x};
   var min = range[0];
   var max = range[1];
-  var binBeginnings = _.range(nBins).map((n) => n * max / nBins);
-  var binEndings = _.range(nBins).map((n) => (n+1) * max / nBins);
+  var spread = max-min;
+  var binBeginnings = _.range(nBins).map((n) => min + n * spread / nBins);
+  var binEndings = _.range(nBins)   .map((n) => min + (n+1) * spread / nBins);
   var counts = new Array(nBins);
   _.range(nBins).forEach((b, i) => counts[i] = 0);
   data.forEach((d) => {
@@ -117,18 +128,37 @@ function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
   return bins;
 }
 
-function coordinator(scatterplot: any, histogram: any, dataset: IDataset) {
+function coordinator(chart: any, dataset: IDataset) {
+  var scatterplot = chart.s;
+  var histogram = chart.h;
+  chart.c = {};
+
+  var lastSelection = null;
+  var selectionCallback = (selection: D3.Selection) => {
+    if (lastSelection != null) lastSelection.classed("selected-point", false);
+    selection.classed("selected-point", true);
+    lastSelection = selection;
+  }
+
   var data = dataset.data;
+  // var lastSelectedData = null;
   var dataCallback = (selectedIndices: number[]) => {
     var selectedData = grabIndices(data, selectedIndices);
-    var xBins = binByVal(selectedData, (d) => d.x, [0,1], 5);
-    var yBins = binByVal(selectedData, (d) => d.y, [0,3], 5);
+    // selectedData.forEach((d) => d.selected = true);
+    // if (lastSelectedData != null) lastSelectedData.forEach((d) => d.selected = false);
+    // lastSelectedData = selectedData;
+    var xBins = histogram.bin1(selectedData);
+    var yBins = histogram.bin2(selectedData);
+    chart.c.xBins = xBins;
+    chart.c.yBins = yBins;
     histogram.renderer1.data({seriesName: "xBins", data: xBins})
     histogram.renderer2.data({seriesName: "yBins", data: yBins})
     histogram.renderer1.render();
     histogram.renderer2.render();
   };
-  var areaInteraction = new AreaInteraction(scatterplot.renderer, null, null, dataCallback);
+  var areaInteraction = new AreaInteraction(scatterplot.renderer, null, selectionCallback, dataCallback);
+  var zoomCallback = (indices) => {areaInteraction.clearBox(); dataCallback(indices)};
+  chart.c.zoom = new BrushZoomInteraction(scatterplot.sparkline, scatterplot.xScale, scatterplot.yScale, zoomCallback);
 }
 
 function grabIndices(itemsToGrab: any[], indices: number[]) {
@@ -145,7 +175,7 @@ var dataset = {seriesName: "clumpedData", data: clumpData};
 
 var chartSH = makeScatterHisto(dataset);
 
-coordinator(chartSH.s, chartSH.h, dataset);
+coordinator(chartSH, dataset);
 
 var svg = d3.select("#table");
 chartSH.table.anchor(svg);
