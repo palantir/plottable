@@ -144,6 +144,10 @@ class AreaInteraction extends Interaction {
     }
   }
 
+  public clearBox() {
+    this.dragBox.attr("height", 0).attr("width", 0);
+  }
+
   public anchor(hitBox: D3.Selection) {
     super.anchor(hitBox);
     var cname = AreaInteraction.CLASS_DRAG_BOX;
@@ -162,9 +166,10 @@ class BrushZoomInteraction extends AreaInteraction {
   make a sparkline, you do not want to update the sparkline's scales, but rather the scales of a
   linked chart.
   */
-  constructor(eventComponent: XYRenderer, public xScale: QuantitiveScale, public yScale: QuantitiveScale) {
+  constructor(eventComponent: XYRenderer, public xScale: QuantitiveScale, public yScale: QuantitiveScale, public indicesCallback?: (a: number[]) => any) {
     super(eventComponent);
     this.areaCallback = this.zoom;
+    this.indicesCallback = indicesCallback;
   }
 
   public zoom(area: FullSelectionArea) {
