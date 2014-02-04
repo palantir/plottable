@@ -30,13 +30,13 @@ function makeScatterPlotWithSparkline(data) {
   return s;
 }
 
-function makeHistograms(data) {
+function makeHistograms(data: any[]) {
   var h: any = {};
   h.xScale1 = new LinearScale();
   h.xScale2 = new LinearScale();
   h.yScale = new LinearScale();
-  var data1 = binByVal(data.data, (d) => d.x, [0,1], 10);
-  var data2 = binByVal(data.data, (d) => d.y, [0,1], 10);
+  var data1 = binByVal(data, (d) => d.x, [0,1], 10);
+  var data2 = binByVal(data, (d) => d.y, [0,1], 10);
   var ds1 = {data: data1, seriesName: "xVals"}
   var ds2 = {data: data2, seriesName: "yVals"}
   h.renderer1 = new BarRenderer(ds1, h.xScale1, h.yScale);
@@ -52,7 +52,7 @@ function makeHistograms(data) {
 
 function makeScatterHisto(data) {
   var s = makeScatterPlotWithSparkline(data);
-  var h = makeHistograms(data);
+  var h = makeHistograms(data.data);
   var r = [s.table, h.table];
   var table = new Table([r]);
   table.colPadding = 10;
@@ -92,6 +92,24 @@ function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
     return bin;
   })
   return bins;
+}
+
+function coordinator(scatterplot: any, histogram: any, dataset: IDataset) {
+  var data = dataset.data;
+  var dataCallback = (selectedIndices: number[]) => {
+    var selectedData = grabIndices(data, selectedIndices);
+    var xBins = binByVal(selectedData, (d) => d.x, [0,1], 5);
+    var yBins = binByVal(selectedData, (d) => d.y, [0,3], 5);
+    histogram.renderer1.data({seriesName: "xBins", data: xBins})
+    histogram.renderer2.data({seriesName: "yBins", data: yBins})
+    histogram.renderer1.render();
+    histogram.renderer2.render();
+  };
+  var areaInteraction = new AreaInteraction(scatterplot.renderer, null, null, dataCallback);
+}
+
+function grabIndices(itemsToGrab: any[], indices: number[]) {
+  return indices.map((i) => itemsToGrab[i]);
 }
 
 var data1 = makeRandomData(5, 1).data;
