@@ -165,7 +165,8 @@ class CircleRenderer extends XYRenderer {
       .append("circle")
       .attr("cx", this.xScaledAccessor)
       .attr("cy", this.yScaledAccessor)
-      .attr("r", this.size);
+      .attr("r", this.size)
+      .classed("selected-point", (d) => d.selected);
   }
 }
 
