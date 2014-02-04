@@ -120,8 +120,9 @@ function grabIndices(itemsToGrab: any[], indices: number[]) {
 var clump1 = makeNormallyDistributedData(300, -10, 5, 7, 1);
 var clump2 = makeNormallyDistributedData(300, 2, 0.5, 3, 3);
 var clump3 = makeNormallyDistributedData(400, 5, 10, -3, 9);
+var clump4 = makeNormallyDistributedData(200, -25, 1, 20, 5);
 
-var clumpData = clump1.concat(clump2, clump3);
+var clumpData = clump1.concat(clump2, clump3, clump4);
 var dataset = {seriesName: "clumpedData", data: clumpData};
 
 var chartSH = makeScatterHisto(dataset);
