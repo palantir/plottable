@@ -47,6 +47,9 @@ div {
 circle {
   fill: steelblue;
 }
+rect {
+  fill: steelblue;
+}
 
 .table-rect {
   fill: none;
