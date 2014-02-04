@@ -8,3 +8,18 @@ function makeRandomData(numPoints, scaleFactor=1): IDataset {
   data = _.sortBy(data, (d) => d.x);
   return {"data": data, "seriesName": "random-data"};
 }
+
+function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue = 10): IDataset {
+  var data = [];
+  for (var i=0; i < numBuckets; i++) {
+    data.push({
+      x: i * bucketWidth,
+      x2: (i+1) * bucketWidth,
+      y: Math.round(Math.random() * maxValue)
+    });
+  }
+  return {
+    "data": data,
+    "seriesName": "random-buckets"
+  };
+}
