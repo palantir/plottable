@@ -13,14 +13,6 @@ module.exports = function(grunt) {
   // project configuration
   grunt.initConfig({
 
-    copy: {
-      main: {
-        expand: true,
-        cwd: 'web',
-        src: '**',
-        dest: 'build'
-      }
-    },
     typescript: {
       compile: {
         options: {
@@ -30,9 +22,9 @@ module.exports = function(grunt) {
           target: "ES5"
         },
         files: [
-          { src: ["build/src/*.ts"], dest: "build/plottable.js" },
-          { src: ["build/test/*.ts"], dest: "build/test/tests.js" },
-          { src: ["build/examples/*.ts"], dest: "build/examples/examples.js"}
+          { src: ["src/*.ts"], dest: "plottable.js" },
+          { src: ["test/*.ts"], dest: "test/tests.js" },
+          { src: ["examples/*.ts"], dest: "examples/examples.js"}
         ]
       }
     },
@@ -43,7 +35,9 @@ module.exports = function(grunt) {
         ],
         "files": [
           "Gruntfile.js",
-          "web/**.ts",
+          "src/*.ts",
+          "test/*.ts",
+          "examples/*.ts"
         ]
       }
     }
@@ -55,7 +49,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask("build",
     [
-      "copy",
       "typescript",
       "watch"
     ]
