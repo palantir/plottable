@@ -13,7 +13,6 @@
     "grunt-cli": "0.1.6",
     "grunt-contrib-watch": "~0.5.3",
     "load-grunt-tasks": "~0.2.0",
-    "grunt-contrib-copy": "~0.5.0",
-    "grunt-ts": "~1.6.4"
+    "grunt-contrib-copy": "~0.5.0"
   }
 }
