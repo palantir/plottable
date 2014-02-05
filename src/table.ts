@@ -1,10 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
-///<reference path="../lib/lodash.d.ts" />
-///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="../lib/chai/chai-assert.d.ts" />
-///<reference path="utils.ts" />
-///<reference path="component.ts" />
-
+///<reference path="reference.ts" />
 
 class Table extends Component {
   public rowPadding = 0;

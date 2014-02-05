@@ -1,4 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
+///<reference path="reference.ts" />
 
 class LabelComponent extends Component {
   public CLASS_TEXT_LABEL = "text-label";

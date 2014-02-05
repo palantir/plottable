@@ -1,6 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
-///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="scale.ts" />
+///<reference path="reference.ts" />
 
 class Renderer extends Component {
   public CLASS_RENDERER_CONTAINER = "renderer-container";

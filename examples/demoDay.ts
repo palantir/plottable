@@ -1,12 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
-
-///<reference path="../src/table.ts" />
-///<reference path="../src/renderer.ts" />
-///<reference path="../src/interaction.ts" />
-///<reference path="../src/labelComponent.ts" />
-///<reference path="../src/axis.ts" />
-///<reference path="../src/scale.ts" />
-///<reference path="exampleUtil.ts" />
+///<reference path="exampleReference.ts" />
 
 if ((<any> window).demoName === "demo-day") {
 var N_BINS = 25;

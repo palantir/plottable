@@ -1,5 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
-///<reference path="interaction.ts" />
+///<reference path="reference.ts" />
 
 class Component {
   private static clipPathId = 0; // Used for unique namespacing for the clipPaths

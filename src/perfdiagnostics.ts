@@ -1,3 +1,5 @@
+///<reference path="reference.ts" />
+
 module PerfDiagnostics {
   class PerfDiagnostics {
     private static diagnostics: { [measurementName: string]: PerfDiagnostics; } = {};

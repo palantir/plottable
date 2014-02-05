@@ -1,13 +1,5 @@
-///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="../lib/chai/chai-assert.d.ts" />
-///<reference path="../lib/mocha/mocha.d.ts" />
-///<reference path="../lib/d3.d.ts" />
+///<reference path="testReference.ts" />
 
-///<reference path="../src/axis.ts" />
-///<reference path="../src/table.ts" />
-///<reference path="../src/renderer.ts" />
-///<reference path="../src/utils.ts" />
-///<reference path="testUtils.ts" />
 
 var assert = chai.assert;
 

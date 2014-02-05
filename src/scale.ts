@@ -1,4 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
+///<reference path="reference.ts" />
 
 class Scale implements IBroadcaster {
   public scale: D3.Scale.Scale;

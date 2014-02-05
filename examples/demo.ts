@@ -1,15 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
-///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="../src/interfaces.d.ts" />
-
-///<reference path="../src/table.ts" />
-///<reference path="../src/renderer.ts" />
-///<reference path="../src/interaction.ts" />
-///<reference path="../src/labelComponent.ts" />
-///<reference path="../src/axis.ts" />
-///<reference path="exampleUtil.ts" />
-
-
+///<reference path="exampleReference.ts" />
 
 if ((<any> window).demoName == "demo1") {
 // make a regular table with 1 axis on bottom, 1 axis on left, renderer in center

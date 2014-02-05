@@ -1,4 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
+///<reference path="reference.ts" />
 
 module Utils {
 	export function readyCallback(numToTrigger: number, callbackWhenReady: () => any) {

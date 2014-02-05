@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     ts: {
       dev: {
         src: ["src/*.ts"],
-        out: "src/plottable.js",
+        out: "plottable.js",
         // watch: "src",
         options: {
           target: 'es5',

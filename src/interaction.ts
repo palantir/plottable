@@ -1,4 +1,4 @@
-///<reference path="../lib/lodash.d.ts" />
+///<reference path="reference.ts" />
 
 class Interaction {
   /* A general base class for interactions.
