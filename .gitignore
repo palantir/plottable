@@ -1,7 +1,9 @@
 .DS_Store
 plottable.js
 plottable.js.map
-tests.js
-tests.js.map
+plottable.d.ts
 examples/*.js
 examples/*.js.map
+test/*.js
+test/*.js.map
+*.tmp.txt

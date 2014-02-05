@@ -12,33 +12,56 @@ module.exports = function(grunt) {
 
   // project configuration
   grunt.initConfig({
-
-    typescript: {
-      compile: {
+    ts: {
+      dev: {
+        src: ["src/*.ts"],
+        out: "plottable.js",
+        // watch: "src",
         options: {
-          module: "amd",
-          // nolib: true,
-          sourcemap: true,
-          target: "ES5"
-        },
-        files: [
-          { src: ["src/*.ts"], dest: "plottable.js" },
-          { src: ["test/*.ts"], dest: "test/tests.js" },
-          { src: ["examples/*.ts"], dest: "examples/examples.js"}
-        ]
+          target: 'es5',
+          sourceMap: true,
+          declaration: true,
+          removeComments: true
+        }
+      },
+      test: {
+        src: ["test/*.ts"],
+        out: "test/tests.js",
+        // watch: "test",
+        options: {
+          target: 'es5',
+          sourceMap: true,
+          declaration: false,
+          removeComments: false
+        }
+      },
+      examples: {
+        src: ["examples/*.ts"],
+        out: "examples/examples.js",
+        // watch: "examples",
+        options: {
+          target: 'es5',
+          sourceMap: true,
+          declaration: false,
+          removeComments: false
+        }
       }
     },
     watch: {
       "rebuild": {
-        "tasks": [
-          "build:rebuild"
-        ],
+        "tasks": ["build:rebuild"],
         "files": [
           "Gruntfile.js",
           "src/*.ts",
-          "test/*.ts",
-          "examples/*.ts"
         ]
+      },
+      "tests": {
+        "tasks": ["ts:test"],
+        "files": ["test/**.ts"]
+      },
+      "examples": {
+        "tasks": ["ts:examples"],
+        "files": ["examples/**.ts"]
       }
     }
   });
@@ -49,8 +72,11 @@ module.exports = function(grunt) {
 
   grunt.registerTask("build",
     [
-      "typescript",
+      "compile",
       "watch"
     ]
   );
+  grunt.registerTask("compile",
+    ["ts:dev", "ts:test", "ts:examples"]
+    );
 };

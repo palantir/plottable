@@ -1,6 +1,4 @@
-///<reference path="../lib/d3.d.ts" />
-///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="component.ts" />
+///<reference path="reference.ts" />
 
 class Axis extends Component {
   public static yWidth = 50;
