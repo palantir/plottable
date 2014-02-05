@@ -14,10 +14,10 @@ var yScale = new LinearScale();
 var xScale = new LinearScale();
 var left = new YAxis(yScale, "left");
 var data = makeRandomData(1000, 200);
-var renderer = new LineRenderer(data, xScale, yScale);
+var lineRenderer = new LineRenderer(data, xScale, yScale);
 var bottomAxis = new XAxis(xScale, "bottom");
 
-var chart = new Table([[left, renderer]
+var chart = new Table([[left, lineRenderer]
                       ,[null, bottomAxis]]);
 
 var outerTable = new Table([ [new TitleLabel("A Chart")],
