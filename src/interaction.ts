@@ -36,8 +36,7 @@ class PanZoomInteraction extends Interaction {
     this.zoom = d3.behavior.zoom();
     this.zoom.x(this.xScale.scale);
     this.zoom.y(this.yScale.scale);
-    var throttledZoom = _.throttle(() => this.rerenderZoomed(), 16);
-    this.zoom.on("zoom", throttledZoom);
+    this.zoom.on("zoom", () => this.rerenderZoomed());
 
     this.registerWithComponent();
   }
