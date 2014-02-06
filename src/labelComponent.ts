@@ -72,23 +72,24 @@ class LabelComponent extends Component {
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.textElement = this.element.append("text")
-                        .attr("alignment-baseline", "middle")
+                        .attr("dominant-baseline", "hanging")
+                        .attr("alignment-baseline", "hanging")
                         .text(this.text);
 
-    var clientHeight = this.textElement.node().clientHeight;
-    var clientWidth = this.textElement.node().clientWidth;
+    var bbox = (<SVGGElement> this.textElement.node()).getBBox();
+    var clientHeight = bbox.height;
+    var clientWidth = bbox.width;
 
     if (this.orientation === "horizontal") {
-      this.textElement.attr("transform", "translate(0 " + clientHeight/2 + ")");
       this.textHeight = clientHeight;
       this.textWidth = clientWidth;
     } else {
       this.textWidth = clientHeight;
       this.textHeight = clientWidth;
       if (this.orientation === "vertical-right") {
-        this.textElement.attr("transform", "rotate(90) translate(0 " + (-clientHeight/2) + ")");
+        this.textElement.attr("transform", "rotate(90) translate(0 " + (-clientHeight) + ")");
       } else if (this.orientation === "vertical-left") {
-        this.textElement.attr("transform", "rotate(-90) translate(" + (-clientWidth) + " " + clientHeight/2 + ")");
+        this.textElement.attr("transform", "rotate(-90) translate(" + (-clientWidth) + " 0)");
       }
     }
   }
