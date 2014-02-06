@@ -6,3 +6,11 @@ Plottable.js is a library for easily creating beautiful, flexible, interactive, 
 Plottable is currently in early alpha and does not yet have a stable API.
 
 Plottable is copyright (c) 2014 Palantir Technologies.
+
+
+=========
+Setup Instructions:
+
+    sudo npm install
+    bower install
+    tsd reinstall
