@@ -6,12 +6,14 @@
     "type": "git",
     "url": "https://github.com/palantir/plottable.git"
   },
-  "author": "Daniel Mané, Justin Lan at Palantir",
+  "author": "Palantir Technologies",
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-cli": "0.1.6",
     "grunt-contrib-watch": "~0.5.3",
     "load-grunt-tasks": "~0.2.0",
-    "grunt-ts": "~1.6.4"
+    "grunt-ts": "~1.6.4",
+    "tsd": "~0.5.5",
+    "bower": "~1.2.8"
   }
 }
