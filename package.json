@@ -14,6 +14,8 @@
     "load-grunt-tasks": "~0.2.0",
     "grunt-ts": "~1.6.4",
     "tsd": "~0.5.5",
-    "bower": "~1.2.8"
+    "bower": "~1.2.8",
+    "grunt-bower-task": "~0.3.4",
+    "grunt-tsd": "0.0.1"
   }
 }
