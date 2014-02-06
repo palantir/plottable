@@ -11,6 +11,6 @@ Plottable is copyright (c) 2014 Palantir Technologies.
 =========
 Setup Instructions:
 
-    sudo npm install
+    npm install
     bower install
     tsd reinstall
