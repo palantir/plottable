@@ -71,12 +71,10 @@ class LabelComponent extends Component {
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.textElement = this.element.append("text")
-                        .attr("dominant-baseline", "hanging")
-                        .attr("alignment-baseline", "hanging")
-                        .text(this.text);
+    this.textElement = this.element.append("text").text(this.text);
 
     var bbox = (<SVGGElement> this.textElement.node()).getBBox();
+    this.textElement.attr("dy", -bbox.y);
     var clientHeight = bbox.height;
     var clientWidth = bbox.width;
 
