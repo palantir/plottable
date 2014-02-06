@@ -1,6 +1,5 @@
 ///<reference path="exampleReference.ts" />
 
-if ((<any> window).demoName == "demo1") {
 // make a regular table with 1 axis on bottom, 1 axis on left, renderer in center
 
 var svg1 = d3.select("#svg1");
@@ -164,4 +163,3 @@ var basicTable = new Table([[yAxis, BarRenderArea], [null, xAxis]])
 basicTable.anchor(svg6);
 basicTable.computeLayout();
 basicTable.render();
-} // hackhack

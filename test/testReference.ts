@@ -4,4 +4,4 @@
 ///<reference path="../lib/d3.d.ts" />
 ///<reference path="../lib/lodash.d.ts" />
 ///<reference path="testUtils.ts" />
-///<reference path="../plottable.d.ts" />
+///<reference path="../build/plottable.d.ts" />

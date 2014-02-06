@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     ts: {
       dev: {
         src: ["src/*.ts"],
-        out: "plottable.js",
+        out: "build/plottable.js",
         // watch: "src",
         options: {
           target: 'es5',
@@ -26,7 +26,7 @@ module.exports = function(grunt) {
       },
       test: {
         src: ["test/*.ts"],
-        out: "test/tests.js",
+        out: "build/tests.js",
         // watch: "test",
         options: {
           target: 'es5',
@@ -37,7 +37,7 @@ module.exports = function(grunt) {
       },
       examples: {
         src: ["examples/*.ts"],
-        out: "examples/examples.js",
+        outDir: "build",
         // watch: "examples",
         options: {
           target: 'es5',

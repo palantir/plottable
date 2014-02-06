@@ -1,8 +1,5 @@
 ///<reference path="exampleReference.ts" />
 
-
-if ((<any> window).demoName === "tsc-demo") {
-
 var yScale = new LinearScale();
 var xScale = new LinearScale();
 var left = new YAxis(yScale, "left");
@@ -22,4 +19,3 @@ var svg = d3.select("#table");
 outerTable.anchor(svg);
 outerTable.computeLayout();
 outerTable.render();
-}

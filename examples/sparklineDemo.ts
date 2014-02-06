@@ -1,7 +1,5 @@
 ///<reference path="exampleReference.ts" />
 
-if ((<any> window).demoName === "sparkline-demo") {
-
 var yScale = new LinearScale();
 var xScale = new LinearScale();
 var left = new YAxis(yScale, "left");
@@ -30,6 +28,3 @@ var svg = d3.select("#table");
 chart.anchor(svg);
 chart.computeLayout();
 chart.render();
-
-
-}

@@ -1,6 +1,5 @@
 ///<reference path="exampleReference.ts" />
 
-if ((<any> window).demoName === "demo-day") {
 var N_BINS = 25;
 function makeScatterPlotWithSparkline(data) {
   var s: any = {};
@@ -129,4 +128,3 @@ chartSH.table.anchor(svg);
 chartSH.table.computeLayout();
 chartSH.table.render();
 
-}
