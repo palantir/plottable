@@ -85,9 +85,9 @@ class LabelComponent extends Component {
       this.textWidth = clientHeight;
       this.textHeight = clientWidth;
       if (this.orientation === "vertical-right") {
-        this.textElement.attr("transform", "rotate(90) translate(0 " + (-clientHeight) + ")");
+        this.textElement.attr("transform", "rotate(90)").attr("y", -clientHeight);
       } else if (this.orientation === "vertical-left") {
-        this.textElement.attr("transform", "rotate(-90) translate(" + (-clientWidth) + " 0)");
+        this.textElement.attr("transform", "rotate(-90)").attr("x", -clientWidth);
       }
     }
   }
