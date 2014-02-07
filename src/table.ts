@@ -2,10 +2,8 @@
 
 class Table extends Component {
   private static CSS_CLASS = "table";
-  public rowPadding = 0;
-  public colPadding = 0;
-  public xMargin = 0;
-  public yMargin = 0;
+  private rowPadding = 0;
+  private colPadding = 0;
 
   private rows: Component[][];
   private cols: Component[][];
@@ -28,7 +26,7 @@ class Table extends Component {
       throw new Error("Row minimum cannot be directly set on Table.");
     } else {
       this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => r.rowMinimum()));
-      return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1) + 2 * this.yMargin;
+      return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
     }
   }
 
@@ -39,8 +37,14 @@ class Table extends Component {
       throw new Error("Col minimum cannot be directly set on Table.");
     } else {
       this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
-      return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1) + 2 * this.xMargin;
+      return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);
     }
+  }
+
+  public padding(rowPadding: number, colPadding: number) {
+    this.rowPadding = rowPadding;
+    this.colPadding = colPadding;
+    return this;
   }
 
   constructor(rows: Component[][], rowWeightVal=1, colWeightVal=1) {
@@ -83,21 +87,21 @@ class Table extends Component {
     var sumPair = (p: number[]) => p[0] + p[1];
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
-    chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding + 2 * this.yMargin, this.availableHeight, 1, "row heights sum to available height");
-    chai.assert.closeTo(d3.sum(colWidths ) + (this.nCols - 1) * this.colPadding + 2 * this.xMargin, this.availableWidth , 1, "col widths sum to available width");
+    chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding, this.availableHeight, 1, "row heights sum to available height");
+    chai.assert.closeTo(d3.sum(colWidths ) + (this.nCols - 1) * this.colPadding, this.availableWidth , 1, "col widths sum to available width");
 
-    var childYOffset = this.yMargin;
+    var childYOffset = 0;
     this.rows.forEach((row: Component[], rowIndex: number) => {
-      var childXOffset = this.xMargin;
+      var childXOffset = 0;
       row.forEach((component: Component, colIndex: number) => {
         // recursively compute layout
         component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
         childXOffset += colWidths[colIndex] + this.colPadding;
       });
-      chai.assert.operator(childXOffset - this.colPadding - this.xMargin, "<=", this.availableWidth + 0.1, "final xOffset was <= availableWidth");
+      chai.assert.operator(childXOffset - this.colPadding, "<=", this.availableWidth + 0.1, "final xOffset was <= availableWidth");
       childYOffset += rowHeights[rowIndex] + this.rowPadding;
     });
-    chai.assert.operator(childYOffset - this.rowPadding - this.yMargin, "<=", this.availableHeight + 0.1, "final yOffset was <= availableHeight");
+    chai.assert.operator(childYOffset - this.rowPadding, "<=", this.availableHeight + 0.1, "final yOffset was <= availableHeight");
   }
 
   private static rowProportionalSpace(rows: Component[][], freeHeight: number) {
