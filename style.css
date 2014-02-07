@@ -82,17 +82,18 @@ rect {
   stroke: black;
 }
 
-.renderer-bounding-box {
+.table-container .bounding-box {
+  stroke: blue;
+}
+
+.renderer-container .bounding-box {
   stroke: red;
 }
 
-.axis-bounding-box {
+.axis-container .bounding-box {
   stroke: green;
 }
 
-.table-bounding-box {
-  stroke: blue;
-}
 
 .drag-box {
   fill: aliceblue;

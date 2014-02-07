@@ -4,9 +4,8 @@ class Component {
   private static clipPathId = 0; // Used for unique namespacing for the clipPaths
   public element: D3.Selection;
   public hitBox: D3.Selection;
-  public boundingBox: D3.Selection;
-  private clipPathRect: D3.Selection;
   private registeredInteractions: Interaction[] = [];
+  private boxes: D3.Selection[] = [];
 
   private rowWeightVal  = 0;
   private colWeightVal  = 0;
@@ -47,6 +46,14 @@ class Component {
     }
   }
 
+  private addBox(className?: string, parentElement?: D3.Selection) {
+    var parentElement = parentElement == null ? this.element : parentElement;
+    var box = parentElement.append("rect");
+    if (className != null) {box.classed(className, true)};
+    this.boxes.push(box);
+    return box;
+  }
+
   public anchor(element: D3.Selection) {
     this.element = element;
     this.generateClipPath();
@@ -54,8 +61,10 @@ class Component {
       this.element.classed(cssClass, true);
     });
     this.cssClasses = null;
-    this.hitBox = element.append("rect").classed("hit-box", true);
-    this.boundingBox = element.append("rect").classed("bounding-box", true);
+
+    this.hitBox = this.addBox("hit-box");
+    this.addBox("bounding-box");
+
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
   }
 
@@ -63,9 +72,9 @@ class Component {
     // The clip path will prevent content from overflowing its component space.
     var clipPathId = Component.clipPathId++;
     this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
-    this.clipPathRect = this.element.append("clipPath")
-                                    .attr("id", "clipPath" + clipPathId)
-                                    .append("rect");
+    var clipPathParent = this.element.append("clipPath")
+                                    .attr("id", "clipPath" + clipPathId);
+    this.addBox("clip-rect", clipPathParent);
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -117,8 +126,7 @@ class Component {
     this.availableWidth = availableWidth;
     this.availableHeight = availableHeight;
     this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
-    var boxes = [this.clipPathRect, this.hitBox, this.boundingBox];
-    Utils.setWidthHeight(boxes, this.availableWidth, this.availableHeight);
+    this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
   }
 
   public registerInteraction(interaction: Interaction) {

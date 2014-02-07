@@ -8,6 +8,7 @@ class Axis extends Component {
   private cachedScale: number;
   private cachedTranslate: number;
   private isXAligned: boolean;
+  private CLASS_AXIS_CONTAINER = "axis-container";
 
   private static axisXTransform(selection, x) {
     selection.attr("transform", function(d) {
@@ -27,6 +28,7 @@ class Axis extends Component {
     public formatter: any
   ) {
     super();
+    this.classed(this.CLASS_AXIS_CONTAINER, true);
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
     if (this.formatter == null) {
@@ -68,7 +70,6 @@ class Axis extends Component {
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.boundingBox.classed("axis-bounding-box", true);
     this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
   }
 

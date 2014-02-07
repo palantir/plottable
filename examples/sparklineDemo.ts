@@ -3,7 +3,7 @@
 var yScale = new LinearScale();
 var xScale = new LinearScale();
 var left = new YAxis(yScale, "left");
-var data = makeRandomData(1000, 200);
+var data = makeRandomData(100, 200);
 var renderer = new CircleRenderer(data, xScale, yScale);
 var bottomAxis = new XAxis(xScale, "bottom");
 var xSpark = new LinearScale();

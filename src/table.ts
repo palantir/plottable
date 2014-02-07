@@ -5,6 +5,7 @@ class Table extends Component {
   public colPadding = 0;
   public xMargin = 0;
   public yMargin = 0;
+  private CLASS_TABLE_CONTAINER = "table-container";
 
   private rows: Component[][];
   private cols: Component[][];
@@ -58,12 +59,12 @@ class Table extends Component {
     this.cols = d3.transpose(rows);
     this.nRows = this.rows.length;
     this.nCols = this.cols.length;
+    this.classed(this.CLASS_TABLE_CONTAINER, true);
     super.rowWeight(rowWeightVal).colWeight(colWeightVal);
   }
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.boundingBox.classed("table-bounding-box", true);
     // recursively anchor children
     this.rows.forEach((row: Component[], rowIndex: number) => {
       row.forEach((component: Component, colIndex: number) => {
