@@ -9,12 +9,12 @@ var yScale = new LinearScale();
 var xAxis = new XAxis(xScale, "bottom");
 var yAxis = new YAxis(yScale, "right");
 var data = makeRandomData(30);
-var renderArea = new LineRenderer(data, xScale, yScale);
-var basicTable = new Table([[renderArea, yAxis], [xAxis, null]])
+var renderAreaD1 = new CircleRenderer(data, xScale, yScale);
+var basicTable = new Table([[renderAreaD1, yAxis], [xAxis, null]])
 basicTable.anchor(svg1);
 basicTable.computeLayout();
 basicTable.render();
-new PanZoomInteraction(renderArea, [xAxis, yAxis, renderArea], xScale, yScale);
+new PanZoomInteraction(renderAreaD1, [xAxis, yAxis, renderAreaD1], xScale, yScale);
 
 
 
