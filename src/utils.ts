@@ -1,6 +1,10 @@
 ///<reference path="reference.ts" />
 
 module Utils {
+  export function inRange(x: number, a: number, b: number) {
+    return (Math.min(a,b) <= x && x <= Math.max(a,b));
+  }
+
   export function translate(element: D3.Selection, translatePair: number[]) {
     return element.attr("transform", "translate(" + translatePair + ")");
   }

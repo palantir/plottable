@@ -38,8 +38,7 @@ var t3 = makeBasicChartTable();
 var t4 = makeBasicChartTable();
 
 var metaTable = new Table([[t1, t2], [t3, t4]]);
-metaTable.rowPadding = 5;
-metaTable.colPadding = 5;
+metaTable.padding(5, 5);
 metaTable.anchor(svg2);
 svg2.attr("width", 800).attr("height", 600);
 metaTable.computeLayout();

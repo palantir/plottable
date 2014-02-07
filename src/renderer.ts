@@ -41,25 +41,25 @@ interface IAccessor {
 
 class XYRenderer extends Renderer {
   private static CSS_CLASS = "x-y-renderer";
-  public dataSelection: D3.Selection;
+  public dataSelection: D3.UpdateSelection;
   private static defaultXAccessor = (d: any) => d.x;
   private static defaultYAccessor = (d: any) => d.y;
   public xScale: QuantitiveScale;
   public yScale: QuantitiveScale;
-  private xAccessor: IAccessor;
-  private yAccessor: IAccessor;
-  public xScaledAccessor: IAccessor;
-  public yScaledAccessor: IAccessor;
+  public xAccessor: IAccessor;
+  public yAccessor: IAccessor;
   constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset);
     this.classed(XYRenderer.CSS_CLASS);
+
     this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
     this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
+
     this.xScale = xScale;
     this.yScale = yScale;
-    this.xScaledAccessor = (datum: any) => this.xScale.scale(this.xAccessor(datum));
-    this.yScaledAccessor = (datum: any) => this.yScale.scale(this.yAccessor(datum));
+
     var data = dataset.data;
+
     var xDomain = d3.extent(data, this.xAccessor);
     this.xScale.widenDomain(xDomain);
     var yDomain = d3.extent(data, this.yAccessor);
@@ -84,31 +84,21 @@ class XYRenderer extends Renderer {
   }
 
   public getSelectionFromArea(area: FullSelectionArea) {
-
     var dataArea = area.data;
-    var inRange = (x: number, a: number, b: number) => {
-      return (Math.min(a,b) <= x && x <= Math.max(a,b));
-    };
     var filterFunction = (d: any) => {
       var x = this.xAccessor(d);
       var y = this.yAccessor(d);
-      // use inRange rather than direct comparison to avoid thinking about scale inversion
-      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);
+      return Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Utils.inRange(y, dataArea.yMin, dataArea.yMax);
     };
-    var selection = this.dataSelection.filter(filterFunction);
-    return selection;
+    return this.dataSelection.filter(filterFunction);
   }
 
   public getDataIndicesFromArea(area: FullSelectionArea) {
     var dataArea = area.data;
-    var inRange = (x: number, a: number, b: number) => {
-      return (Math.min(a,b) <= x && x <= Math.max(a,b));
-    };
     var filterFunction = (d: any) => {
       var x = this.xAccessor(d);
       var y = this.yAccessor(d);
-      // use inRange rather than direct comparison to avoid thinking about scale inversion
-      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);
+      return Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Utils.inRange(y, dataArea.yMin, dataArea.yMax);
     };
     var results = [];
     this.dataset.data.forEach((d, i) => {
@@ -121,8 +111,6 @@ class XYRenderer extends Renderer {
 
   public rescale() {
     if (this.element != null) {
-      this.renderArea.remove();
-      this.renderArea = this.element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
       this.render();
     }
   }
@@ -145,7 +133,9 @@ class LineRenderer extends XYRenderer {
 
   public render() {
     super.render();
-    this.line = d3.svg.line().x(this.xScaledAccessor).y(this.yScaledAccessor);
+    this.line = d3.svg.line()
+                      .x((datum: any) => this.xScale.scale(this.xAccessor(datum)))
+                      .y((datum: any) => this.yScale.scale(this.yAccessor(datum)));
     this.dataSelection = this.renderArea.classed("line", true)
       .classed(this.dataset.seriesName, true)
       .datum(this.dataset.data);
@@ -164,23 +154,22 @@ class CircleRenderer extends XYRenderer {
 
   public render() {
     super.render();
-    var dataSelection = this.renderArea.selectAll("circle").data(this.dataset.data);
-    this.dataSelection = dataSelection;
-    dataSelection.enter().append("circle");
-    dataSelection.attr("cx", this.xScaledAccessor);
-    dataSelection.attr("cy", this.yScaledAccessor);
-    dataSelection.attr("r", this.size);
-    dataSelection.exit().remove();
+    this.dataSelection = this.renderArea.selectAll("circle").data(this.dataset.data);
+    this.dataSelection.enter().append("circle");
+    this.dataSelection.attr("cx", (datum: any) => this.xScale.scale(this.xAccessor(datum)))
+                      .attr("cy", (datum: any) => this.yScale.scale(this.yAccessor(datum)))
+                      .attr("r", this.size);
+    this.dataSelection.exit().remove();
   }
 }
 
 class BarRenderer extends XYRenderer {
   private static CSS_CLASS = "bar-renderer";
+  private static defaultX2Accessor = (d: any) => d.x2;
   private BAR_START_PADDING_PX = 1;
   private BAR_END_PADDING_PX = 1;
 
-  private x2Accessor: IAccessor;
-  public x2ScaledAccessor: IAccessor;
+  public x2Accessor: IAccessor;
 
   constructor(dataset: IDataset,
               xScale: QuantitiveScale,
@@ -191,19 +180,14 @@ class BarRenderer extends XYRenderer {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
     this.classed(BarRenderer.CSS_CLASS, true);
 
-    var inRange = (x: number, a: number, b: number) => {
-      return (Math.min(a,b) <= x && x <= Math.max(a,b));
-    };
-
     var yDomain = this.yScale.domain();
-    if (!inRange(0, yDomain[0], yDomain[1])) {
+    if (!Utils.inRange(0, yDomain[0], yDomain[1])) {
       var newMin = 0;
       var newMax = 1.1 * yDomain[1];
       this.yScale.widenDomain([newMin, newMax]); // TODO: make this handle reversed scales
     }
 
-    this.x2Accessor = (x2Accessor != null) ? x2Accessor : (d: any) => d.x2;
-    this.x2ScaledAccessor = (datum: any) => xScale.scale(this.x2Accessor(datum));
+    this.x2Accessor = (x2Accessor != null) ? x2Accessor : BarRenderer.defaultX2Accessor;
 
     var x2Extent = d3.extent(dataset.data, this.x2Accessor);
     this.xScale.widenDomain(x2Extent);
@@ -214,34 +198,14 @@ class BarRenderer extends XYRenderer {
     var yRange = this.yScale.range();
     var maxScaledY = Math.max(yRange[0], yRange[1]);
 
-    var dataSelection = this.renderArea.selectAll("rect").data(this.dataset.data);
-    dataSelection.enter().append("rect");
-    dataSelection.transition().attr("x", (d: any) => this.xScaledAccessor(d) + this.BAR_START_PADDING_PX)
-      .attr("y", this.yScaledAccessor)
-      .attr("width", (d: any) => (this.x2ScaledAccessor(d) - this.xScaledAccessor(d)
-                                      - this.BAR_START_PADDING_PX - this.BAR_END_PADDING_PX))
-      .attr("height", (d: any) => {
-        return (maxScaledY - this.yScaledAccessor(d));
-      });
-    dataSelection.exit().remove();
+    this.dataSelection = this.renderArea.selectAll("rect").data(this.dataset.data);
+    this.dataSelection.enter().append("rect");
+    this.dataSelection.transition()
+          .attr("x", (d: any) => this.xScale.scale(this.xAccessor(d)) + this.BAR_START_PADDING_PX)
+          .attr("y", (d: any) => this.yScale.scale(this.yAccessor(d)))
+          .attr("width", (d: any) => (this.xScale.scale(this.x2Accessor(d)) - this.xScale.scale(this.xAccessor(d))
+                                          - this.BAR_START_PADDING_PX - this.BAR_END_PADDING_PX))
+          .attr("height", (d: any) => maxScaledY - this.yScale.scale(this.yAccessor(d)) );
+    this.dataSelection.exit().remove();
   }
 }
-
-// class ResizingCircleRenderer extends CircleRenderer {
-//   public transform(translate: number[], scale: number) {
-//     this.renderArea.selectAll("circle").attr("r", 0.5/scale);
-//   }
-// }
-
-// class RectRenderer extends Renderer {
-//   private rects: D3.Selection;
-
-//   public render() {
-//     this.rects = this.renderArea.selectAll("rect");
-//     this.rects.data(this.data).enter().append("rect")
-//       .attr("x", (d) => {return this.xScale(d.date);})
-//       .attr("y", (d) => {return this.yScale(d.y) + Math.random() * 10 - 5;})
-//       .attr("width", 1)
-//       .attr("height",1);
-//   }
-// }

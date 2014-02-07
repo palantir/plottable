@@ -16,8 +16,6 @@ var r2: Component[] = [null, bottomAxis];
 var r3: Component[] = [null, sparkline];
 
 var chart = new Table([r1, r2, r3]);
-chart.xMargin = 10;
-chart.yMargin = 10;
 
 var brushZoom = new BrushZoomInteraction(sparkline, xScale, yScale);
 var toggleClass = function() {return !d3.select(this).classed("selected-point")};

@@ -12,8 +12,6 @@ var chart = new Table([[left, lineRenderer]
 
 var outerTable = new Table([ [new TitleLabel("A Chart")],
                              [chart] ])
-outerTable.xMargin = 10;
-outerTable.yMargin = 10;
 
 var svg = d3.select("#table");
 outerTable.anchor(svg);

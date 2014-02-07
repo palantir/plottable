@@ -57,8 +57,7 @@ function makeHistograms(data: any[]) {
   var table2 = new Table([[h.renderer2, labelY2Table], [labelX2Table, null]]);
 
   h.table = new Table([[table1], [table2]]);
-  h.table.rowPadding = 5;
-  h.table.colPadding = 5;
+  h.table.padding(5, 5);
   return h;
 }
 
@@ -69,7 +68,7 @@ function makeScatterHisto(data) {
   var titleRow = [ new TitleLabel("Random Data").classed("scatterplot-title", true),
                     new TitleLabel("Histograms").classed("histogram-title", true) ];
   var chartTable = new Table([titleRow, r]);
-  chartTable.colPadding = 10;
+  chartTable.padding(0, 10);
   var table = new Table([[new TitleLabel("Glorious Demo Day Demo of Glory").classed("demo-table-title", true)], [chartTable]]);
 
   return {table: table, s: s, h: h};
@@ -83,8 +82,10 @@ function coordinator(chart: any, dataset: IDataset) {
   var lastSelection = null;
   var selectionCallback = (selection: D3.Selection) => {
     if (lastSelection != null) lastSelection.classed("selected-point", false);
-    selection.classed("selected-point", true);
-    lastSelection = selection;
+    if (selection != null) {
+      selection.classed("selected-point", true);
+      lastSelection = selection;
+    }
   }
 
   var data = dataset.data;
@@ -104,7 +105,11 @@ function coordinator(chart: any, dataset: IDataset) {
     histogram.renderer2.render();
   };
   var areaInteraction = new AreaInteraction(scatterplot.renderer, null, selectionCallback, dataCallback);
-  var zoomCallback = (indices) => {areaInteraction.clearBox(); dataCallback(indices)};
+  var zoomCallback = (indices) => {
+    areaInteraction.clearBox();
+    selectionCallback(null);
+    dataCallback(indices);
+  };
   chart.c.zoom = new BrushZoomInteraction(scatterplot.sparkline, scatterplot.xScale, scatterplot.yScale, zoomCallback);
 }
 
