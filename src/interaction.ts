@@ -10,7 +10,7 @@ class Interaction {
   public hitBox: D3.Selection;
   public componentToListenTo: Component;
 
-  constructor(public componentToListenTo: Component) {
+  constructor(componentToListenTo: Component) {
     this.componentToListenTo = componentToListenTo;
   }
 
@@ -38,6 +38,8 @@ class PanZoomInteraction extends Interaction {
   public yScale: QuantitiveScale;
   constructor(componentToListenTo: Component, renderers: Component[], xScale: QuantitiveScale, yScale: QuantitiveScale) {
     super(componentToListenTo);
+    this.xScale = xScale;
+    this.yScale = yScale;
     this.zoom = d3.behavior.zoom();
     this.zoom.x(this.xScale.scale);
     this.zoom.y(this.yScale.scale);
