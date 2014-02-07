@@ -18,7 +18,7 @@ class Component {
   private xOffset       : number;
   private yOffset       : number;
 
-  private cssClasses: string[] = [];
+  private cssClasses: string[] = ["component"];
 
   public xAlignment = "LEFT"; // LEFT, CENTER, RIGHT
   public yAlignment = "TOP"; // TOP, CENTER, BOTTOM

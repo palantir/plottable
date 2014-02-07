@@ -1,7 +1,7 @@
 ///<reference path="reference.ts" />
 
-class LabelComponent extends Component {
-  public CLASS_TEXT_LABEL = "text-label";
+class Label extends Component {
+  private static CSS_CLASS = "label";
 
   public xAlignment = "CENTER";
   public yAlignment = "CENTER";
@@ -12,7 +12,7 @@ class LabelComponent extends Component {
 
   constructor(text: string, orientation?: string) {
     super();
-    this.classed(this.CLASS_TEXT_LABEL, true);
+    this.classed(Label.CSS_CLASS, true);
     this.text = text;
     if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
       this.orientation = orientation;
@@ -45,18 +45,18 @@ class LabelComponent extends Component {
   }
 }
 
-class TitleLabel extends LabelComponent {
-  public CLASS_TITLE_LABEL = "title-label";
+class TitleLabel extends Label {
+  private static CSS_CLASS = "title-label";
   constructor(text: string, orientation?: string) {
     super(text, orientation);
-    this.classed(this.CLASS_TITLE_LABEL, true);
+    this.classed(TitleLabel.CSS_CLASS, true);
   }
 }
 
-class AxisLabel extends LabelComponent {
-  public CLASS_AXIS_LABEL = "axis-label";
+class AxisLabel extends Label {
+  private static CSS_CLASS = "axis-label";
   constructor(text: string, orientation?: string) {
     super(text, orientation);
-    this.classed(this.CLASS_AXIS_LABEL, true);
+    this.classed(AxisLabel.CSS_CLASS, true);
   }
 }

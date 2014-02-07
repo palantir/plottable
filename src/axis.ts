@@ -1,6 +1,7 @@
 ///<reference path="reference.ts" />
 
 class Axis extends Component {
+  private static CSS_CLASS = "axis";
   public static yWidth = 50;
   public static xHeight = 30;
   public axisElement: D3.Selection;
@@ -8,7 +9,6 @@ class Axis extends Component {
   private cachedScale: number;
   private cachedTranslate: number;
   private isXAligned: boolean;
-  private CLASS_AXIS_CONTAINER = "axis-container";
 
   private static axisXTransform(selection, x) {
     selection.attr("transform", function(d) {
@@ -28,8 +28,8 @@ class Axis extends Component {
     public formatter: any
   ) {
     super();
+    this.classed(Axis.CSS_CLASS, true);
     this.clipPathEnabled = true;
-    this.classed(this.CLASS_AXIS_CONTAINER, true);
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
     if (this.formatter == null) {

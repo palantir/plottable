@@ -1,11 +1,11 @@
 ///<reference path="reference.ts" />
 
 class Table extends Component {
+  private static CSS_CLASS = "table";
   public rowPadding = 0;
   public colPadding = 0;
   public xMargin = 0;
   public yMargin = 0;
-  private CLASS_TABLE_CONTAINER = "table-container";
 
   private rows: Component[][];
   private cols: Component[][];
@@ -47,6 +47,7 @@ class Table extends Component {
 
   constructor(rows: Component[][], rowWeightVal=1, colWeightVal=1) {
     super();
+    this.classed(Table.CSS_CLASS, true);
     // Clean out any null components and replace them with base Components
     var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
     rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
@@ -54,7 +55,6 @@ class Table extends Component {
     this.cols = d3.transpose(rows);
     this.nRows = this.rows.length;
     this.nCols = this.cols.length;
-    this.classed(this.CLASS_TABLE_CONTAINER, true);
     super.rowWeight(rowWeightVal).colWeight(colWeightVal);
   }
 

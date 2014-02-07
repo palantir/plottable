@@ -1,7 +1,7 @@
 ///<reference path="reference.ts" />
 
 class Renderer extends Component {
-  public CLASS_RENDERER_CONTAINER = "renderer-container";
+  private static CSS_CLASS = "renderer";
 
   public dataset: IDataset;
   public renderArea: D3.Selection;
@@ -17,7 +17,7 @@ class Renderer extends Component {
     this.clipPathEnabled = true;
 
     this.dataset = dataset;
-    this.classed(this.CLASS_RENDERER_CONTAINER, true);
+    this.classed(Renderer.CSS_CLASS, true);
   }
 
   public data(dataset: IDataset): Renderer {
@@ -40,6 +40,7 @@ interface IAccessor {
 };
 
 class XYRenderer extends Renderer {
+  private static CSS_CLASS = "x-y-renderer";
   public dataSelection: D3.Selection;
   private static defaultXAccessor = (d: any) => d.x;
   private static defaultYAccessor = (d: any) => d.y;
@@ -51,6 +52,7 @@ class XYRenderer extends Renderer {
   public yScaledAccessor: IAccessor;
   constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset);
+    this.classed(XYRenderer.CSS_CLASS);
     this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
     this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
     this.xScale = xScale;
@@ -128,10 +130,12 @@ class XYRenderer extends Renderer {
 
 
 class LineRenderer extends XYRenderer {
+  private static CSS_CLASS = "line-renderer";
   private line: D3.Svg.Line;
 
   constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
+    this.classed(LineRenderer.CSS_CLASS, true);
   }
 
   public anchor(element: D3.Selection) {
@@ -150,9 +154,11 @@ class LineRenderer extends XYRenderer {
 }
 
 class CircleRenderer extends XYRenderer {
+  private static CSS_CLASS = "circle-renderer";
   public size: number;
   constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size=3) {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
+    this.classed(CircleRenderer.CSS_CLASS, true);
     this.size = size;
   }
 
@@ -169,6 +175,7 @@ class CircleRenderer extends XYRenderer {
 }
 
 class BarRenderer extends XYRenderer {
+  private static CSS_CLASS = "bar-renderer";
   private BAR_START_PADDING_PX = 1;
   private BAR_END_PADDING_PX = 1;
 
@@ -182,6 +189,7 @@ class BarRenderer extends XYRenderer {
               x2Accessor?: IAccessor,
               yAccessor?: IAccessor) {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
+    this.classed(BarRenderer.CSS_CLASS, true);
 
     var inRange = (x: number, a: number, b: number) => {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
