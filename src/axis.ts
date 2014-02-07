@@ -53,27 +53,27 @@ class Axis extends Component {
   }
 
   public render() {
-    if (this.orientation === "left") this.axisElement.attr("transform", "translate(" + Axis.yWidth + ")");
-    if (this.orientation === "top")  this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");
+    if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ")");};
+    if (this.orientation === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
     var domain = this.scale.domain();
     var extent = Math.abs(domain[1] - domain[0]);
     var min = +d3.min(domain);
     var max = +d3.max(domain);
     var newDomain: any;
     var standardOrder = domain[0] < domain[1];
-    if (typeof(domain[0]) == "number") {
+    if (typeof(domain[0]) === "number") {
       newDomain = standardOrder ? [min - extent, max + extent] : [max + extent, min - extent];
     } else {
       newDomain = standardOrder ? [new Date(min - extent), new Date(max + extent)] : [new Date(max + extent), new Date(min - extent)];
     }
 
-    // Make tiny-zero representations not look like crap, by rounding them to 0
+    // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
     if ((<QuantitiveScale> this.scale).ticks != null) {
       var scale = <QuantitiveScale> this.scale;
       var nTicks = 10;
       var ticks = scale.ticks(nTicks);
-      var domain = scale.domain();
-      var interval = domain[1] - domain[0];
+      var numericDomain = scale.domain();
+      var interval = numericDomain[1] - numericDomain[0];
       var cleanTick = (n) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
       ticks = ticks.map(cleanTick);
       this.d3axis.tickValues(ticks);
@@ -91,24 +91,24 @@ class Axis extends Component {
   public rescale() {
     return (this.element != null) ? this.render() : null;
     // short circuit, we don't care about perf.
-    var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
-    var tickSelection = this.element.selectAll(".tick");
-    (<any> tickSelection).call(tickTransform, this.scale.scale);
-    this.axisElement.attr("transform","");
+    // var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
+    // var tickSelection = this.element.selectAll(".tick");
+    // (<any> tickSelection).call(tickTransform, this.scale.scale);
+    // this.axisElement.attr("transform","");
   }
 
   public zoom(translatePair: number[], scale: number) {
     return this.render(); //short-circuit, we dont need the performant cleverness for present demo
-    var translate = this.isXAligned ? translatePair[0] : translatePair[1];
-    if (scale != null && scale != this.cachedScale) {
-      this.cachedTranslate = translate;
-      this.cachedScale = scale;
-      this.rescale();
-    } else {
-      translate -= this.cachedTranslate;
-      var transform = this.transformString(translate, scale);
-      this.axisElement.attr("transform", transform);
-    }
+    // var translate = this.isXAligned ? translatePair[0] : translatePair[1];
+    // if (scale != null && scale !== this.cachedScale) {
+    //   this.cachedTranslate = translate;
+    //   this.cachedScale = scale;
+    //   this.rescale();
+    // } else {
+    //   translate -= this.cachedTranslate;
+    //   var transform = this.transformString(translate, scale);
+    //   this.axisElement.attr("transform", transform);
+    // }
   }
 }
 

@@ -28,16 +28,16 @@ class Component {
   public classed(cssClass: string, addClass?:boolean): any {
     if (addClass == null) {
       if (this.element == null) {
-        return (this.cssClasses.indexOf(cssClass) != -1);
+        return (this.cssClasses.indexOf(cssClass) !== -1);
       } else {
         return this.element.classed(cssClass);
       }
     } else {
       if (this.element == null) {
         var classIndex = this.cssClasses.indexOf(cssClass);
-        if (addClass && classIndex == -1) {
+        if (addClass && classIndex === -1) {
           this.cssClasses.push(cssClass);
-        } else if (!addClass && classIndex != -1) {
+        } else if (!addClass && classIndex !== -1) {
           this.cssClasses.splice(classIndex, 1);
         }
       } else {
@@ -50,14 +50,14 @@ class Component {
   private addBox(className?: string, parentElement?: D3.Selection) {
     var parentElement = parentElement == null ? this.element : parentElement;
     var box = parentElement.append("rect");
-    if (className != null) {box.classed(className, true)};
+    if (className != null) {box.classed(className, true);};
     this.boxes.push(box);
     return box;
   }
 
   public anchor(element: D3.Selection) {
     this.element = element;
-    if (this.clipPathEnabled) {this.generateClipPath()};
+    if (this.clipPathEnabled) {this.generateClipPath();};
     this.cssClasses.forEach((cssClass: string) => {
       this.element.classed(cssClass, true);
     });
@@ -153,7 +153,7 @@ class Component {
   public rowWeight(newVal?: number): any {
     if (newVal != null) {
       this.rowWeightVal = newVal;
-      chai.assert.operator(this.rowWeightVal, '>=', 0, "rowWeight is a reasonable number");
+      chai.assert.operator(this.rowWeightVal, ">=", 0, "rowWeight is a reasonable number");
       return this;
     } else {
       return this.rowWeightVal;
@@ -165,7 +165,7 @@ class Component {
   public colWeight(newVal?: number): any {
     if (newVal != null) {
       this.colWeightVal = newVal;
-      chai.assert.operator(this.colWeightVal, '>=', 0, "colWeight is a reasonable number");
+      chai.assert.operator(this.colWeightVal, ">=", 0, "colWeight is a reasonable number");
       return this;
     } else {
       return this.colWeightVal;
@@ -177,7 +177,7 @@ class Component {
   public rowMinimum(newVal?: number): any {
     if (newVal != null) {
       this.rowMinimumVal = newVal;
-      chai.assert.operator(this.rowMinimumVal, '>=', 0, "rowMinimum is a reasonable number");
+      chai.assert.operator(this.rowMinimumVal, ">=", 0, "rowMinimum is a reasonable number");
       return this;
     } else {
       return this.rowMinimumVal;
@@ -189,7 +189,7 @@ class Component {
   public colMinimum(newVal?: number): any {
     if (newVal != null) {
       this.colMinimumVal = newVal;
-      chai.assert.operator(this.colMinimumVal, '>=', 0, "colMinimum is a reasonable number");
+      chai.assert.operator(this.colMinimumVal, ">=", 0, "colMinimum is a reasonable number");
       return this;
     } else {
       return this.colMinimumVal;

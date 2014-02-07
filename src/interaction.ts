@@ -8,8 +8,10 @@ class Interaction {
   draw things, e.g. crosshairs.
   */
   public hitBox: D3.Selection;
+  public componentToListenTo: Component;
 
   constructor(public componentToListenTo: Component) {
+    this.componentToListenTo = componentToListenTo;
   }
 
   public anchor(hitBox: D3.Selection) {
@@ -31,7 +33,10 @@ interface ZoomInfo {
 
 class PanZoomInteraction extends Interaction {
   private zoom;
-  constructor(componentToListenTo: Component, public renderers: Component[], public xScale: QuantitiveScale, public yScale: QuantitiveScale) {
+  public renderers: Component[];
+  public xScale: QuantitiveScale;
+  public yScale: QuantitiveScale;
+  constructor(componentToListenTo: Component, renderers: Component[], xScale: QuantitiveScale, yScale: QuantitiveScale) {
     super(componentToListenTo);
     this.zoom = d3.behavior.zoom();
     this.zoom.x(this.xScale.scale);
@@ -51,7 +56,7 @@ class PanZoomInteraction extends Interaction {
     var scale = this.zoom.scale();
     this.renderers.forEach((r) => {
       r.zoom(translate, scale);
-      })
+    });
   }
 }
 
@@ -157,6 +162,8 @@ class AreaInteraction extends Interaction {
 }
 
 class BrushZoomInteraction extends AreaInteraction {
+  public xScale: QuantitiveScale;
+  public yScale: QuantitiveScale;
   /*
   This is an extension of the AreaInteraction which is used for zooming into a selected region.
   It takes the XYRenderer to initialize the AreaInteraction on, and the xScale and yScale to be
@@ -165,8 +172,14 @@ class BrushZoomInteraction extends AreaInteraction {
   make a sparkline, you do not want to update the sparkline's scales, but rather the scales of a
   linked chart.
   */
-  constructor(eventComponent: XYRenderer, public xScale: QuantitiveScale, public yScale: QuantitiveScale, public indicesCallback?: (a: number[]) => any) {
+  constructor(eventComponent: XYRenderer,
+    xScale: QuantitiveScale,
+    yScale: QuantitiveScale,
+    indicesCallback?: (a: number[]) => any
+  ) {
     super(eventComponent);
+    this.xScale = xScale;
+    this.yScale = yScale;
     this.areaCallback = this.zoom;
     this.indicesCallback = indicesCallback;
   }
@@ -180,11 +193,11 @@ class BrushZoomInteraction extends AreaInteraction {
     var xOrigDirection = originalXDomain[0] > originalXDomain[1];
     var yOrigDirection = originalYDomain[0] > originalYDomain[1];
     var xDirection = xDomain[0] > xDomain[1];
-    var yDirection = yDomain[0] > yDomain[1]
+    var yDirection = yDomain[0] > yDomain[1];
     // make sure we don't change inversion of the scale by zooming
 
-    if (xDirection != xOrigDirection) {xDomain.reverse();};
-    if (yDirection != yOrigDirection) {yDomain.reverse();};
+    if (xDirection !== xOrigDirection) {xDomain.reverse();};
+    if (yDirection !== yOrigDirection) {yDomain.reverse();};
 
 
     this.xScale.domain(xDomain);

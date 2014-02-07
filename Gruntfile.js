@@ -47,26 +47,33 @@ module.exports = function(grunt) {
         }
       }
     },
+    tslint: {
+      options: {
+        configuration: grunt.file.readJSON("tslint.json")
+      },
+      files: ["src/*.ts", "test/*.ts"]
+    },
     watch: {
       "rebuild": {
-        "tasks": ["build:rebuild"],
+        "tasks": ["build:rebuild", "tslint"],
         "files": [
           "Gruntfile.js",
           "src/*.ts",
         ]
       },
       "tests": {
-        "tasks": ["ts:test"],
+        "tasks": ["ts:test", "tslint"],
         "files": ["test/**.ts"]
       },
       "examples": {
-        "tasks": ["ts:examples"],
+        "tasks": ["ts:examples", "tslint"],
         "files": ["examples/**.ts"]
       }
     }
   });
 
   require('load-grunt-tasks')(grunt);
+
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("default", "build");
 
@@ -77,6 +84,6 @@ module.exports = function(grunt) {
     ]
   );
   grunt.registerTask("compile",
-    ["ts:dev", "ts:test", "ts:examples"]
+    ["ts:dev", "ts:test", "ts:examples", "tslint"]
     );
 };

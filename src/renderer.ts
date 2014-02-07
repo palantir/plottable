@@ -80,7 +80,7 @@ class XYRenderer extends Renderer {
     var xMax = this.xScale.invert(area.xMax);
     var yMin = this.yScale.invert(area.yMin);
     var yMax = this.yScale.invert(area.yMax);
-    return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax}
+    return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
   }
 
   public getSelectionFromArea(area: FullSelectionArea) {
@@ -88,13 +88,13 @@ class XYRenderer extends Renderer {
     var dataArea = area.data;
     var inRange = (x: number, a: number, b: number) => {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
-    }
+    };
     var filterFunction = (d: any) => {
       var x = this.xAccessor(d);
       var y = this.yAccessor(d);
       // use inRange rather than direct comparison to avoid thinking about scale inversion
-      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);;
-    }
+      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);
+    };
     var selection = this.dataSelection.filter(filterFunction);
     return selection;
   }
@@ -103,13 +103,13 @@ class XYRenderer extends Renderer {
     var dataArea = area.data;
     var inRange = (x: number, a: number, b: number) => {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
-    }
+    };
     var filterFunction = (d: any) => {
       var x = this.xAccessor(d);
       var y = this.yAccessor(d);
       // use inRange rather than direct comparison to avoid thinking about scale inversion
-      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);;
-    }
+      return inRange(x, dataArea.xMin, dataArea.xMax) && inRange(y, dataArea.yMin, dataArea.yMax);
+    };
     var results = [];
     this.dataset.data.forEach((d, i) => {
       if (filterFunction(d)) {
@@ -193,7 +193,7 @@ class BarRenderer extends XYRenderer {
 
     var inRange = (x: number, a: number, b: number) => {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
-    }
+    };
 
     var yDomain = this.yScale.domain();
     if (!inRange(0, yDomain[0], yDomain[1])) {

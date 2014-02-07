@@ -1,6 +1,5 @@
 ///<reference path="testReference.ts" />
 
-
 var assert = chai.assert;
 
 function generateBasicTable(nRows, nCols) {
@@ -41,7 +40,7 @@ describe("Table layout", () => {
     table.rowPadding = 0;
     table.colPadding = 0;
 
-    var svg = d3.select("body").append("svg:svg")
+    var svg = d3.select("body").append("svg:svg");
     table.anchor(svg);
     table.computeLayout(0, 0, 400, 400);
     table.render();
@@ -131,5 +130,5 @@ describe("Table layout", () => {
     assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
     assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
     svg.remove();
-  })
-})
+  });
+});

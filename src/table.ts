@@ -26,7 +26,6 @@ class Table extends Component {
   public rowMinimum(newVal?: number): any {
     if (newVal != null) {
       throw new Error("Row minimum cannot be directly set on Table.");
-      return this;
     } else {
       this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => r.rowMinimum()));
       return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1) + 2 * this.yMargin;
@@ -38,7 +37,6 @@ class Table extends Component {
   public colMinimum(newVal?: number): any {
     if (newVal != null) {
       throw new Error("Col minimum cannot be directly set on Table.");
-      return this;
     } else {
       this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
       return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1) + 2 * this.xMargin;
@@ -111,7 +109,7 @@ class Table extends Component {
   private static calculateProportionalSpace(componentGroups: Component[][], freeSpace: number, spaceAccessor: (c: Component) => number) {
     var weights = componentGroups.map((group) => d3.max(group, spaceAccessor));
     var weightSum = d3.sum(weights);
-    if (weightSum == 0) {
+    if (weightSum === 0) {
       var numGroups = componentGroups.length;
       return weights.map((w) => freeSpace / numGroups);
     } else {
