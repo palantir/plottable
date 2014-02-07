@@ -39,7 +39,7 @@ class Axis extends Component {
 
     this.cachedScale = 1;
     this.cachedTranslate = 0;
-    this.scale.registerListener(() => this.rescale());
+    this.scale.registerListener(this.rescale.bind(this));
   }
 
   private transformString(translate: number, scale: number) {

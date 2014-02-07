@@ -41,7 +41,7 @@ class PanZoomInteraction extends Interaction {
     this.zoom = d3.behavior.zoom();
     this.zoom.x(this.xScale.scale);
     this.zoom.y(this.yScale.scale);
-    this.zoom.on("zoom", () => this.rerenderZoomed());
+    this.zoom.on("zoom", this.rerenderZoomed.bind(this));
 
     this.registerWithComponent();
   }
@@ -91,9 +91,9 @@ class AreaInteraction extends Interaction {
   ) {
     super(rendererComponent);
     this.dragBehavior = d3.behavior.drag();
-    this.dragBehavior.on("dragstart", () => this.dragstart());
-    this.dragBehavior.on("drag", () => this.drag());
-    this.dragBehavior.on("dragend", () => this.dragend());
+    this.dragBehavior.on("dragstart", this.dragstart.bind(this));
+    this.dragBehavior.on("drag",      this.drag     .bind(this));
+    this.dragBehavior.on("dragend",   this.dragend  .bind(this));
     this.registerWithComponent();
   }
 

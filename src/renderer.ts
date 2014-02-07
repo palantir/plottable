@@ -65,8 +65,8 @@ class XYRenderer extends Renderer {
     var yDomain = d3.extent(data, this.yAccessor);
     this.yScale.widenDomain(yDomain);
 
-    this.xScale.registerListener(() => this.rescale());
-    this.yScale.registerListener(() => this.rescale());
+    this.xScale.registerListener(this.rescale.bind(this));
+    this.yScale.registerListener(this.rescale.bind(this));
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight? :number) {
