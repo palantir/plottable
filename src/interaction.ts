@@ -54,11 +54,12 @@ class PanZoomInteraction extends Interaction {
   }
 
   private rerenderZoomed() {
-    var translate = this.zoom.translate();
-    var scale = this.zoom.scale();
-    this.renderers.forEach((r) => {
-      r.zoom(translate, scale);
-    });
+    // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
+    // event listener machinery, let's grab the domain out of hte d3 scale and pipe it back into the TS scale
+    var xDomain = this.xScale.scale.domain();
+    var yDomain = this.yScale.scale.domain();
+    this.xScale.domain(xDomain);
+    this.yScale.domain(yDomain);
   }
 }
 
