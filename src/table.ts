@@ -14,9 +14,6 @@ class Table extends Component {
   private rowMinimums: number[];
   private colMinimums: number[];
 
-  private minHeight: number;
-  private minWidth : number;
-
   private rowWeights: number[];
   private colWeights: number[];
 
@@ -32,8 +29,7 @@ class Table extends Component {
       return this;
     } else {
       this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => r.rowMinimum()));
-      this.minHeight = d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1) + 2 * this.yMargin;
-      return this.minHeight;
+      return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1) + 2 * this.yMargin;
     }
   }
 
@@ -45,8 +41,7 @@ class Table extends Component {
       return this;
     } else {
       this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
-      this.minWidth  = d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1) + 2 * this.xMargin;
-      return this.minWidth;
+      return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1) + 2 * this.xMargin;
     }
   }
 

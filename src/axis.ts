@@ -46,28 +46,6 @@ class Axis extends Component {
     return "translate(" + translateS + ")";
   }
 
-  public rowWeight(): number;
-  public rowWeight(newVal: number): Component;
-  public rowWeight(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Row weight cannot be set on Axis.");
-      return this;
-    } else {
-      return 0;
-    }
-  }
-
-  public colWeight(): number;
-  public colWeight(newVal: number): Component;
-  public colWeight(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Col weight cannot be set on Axis.");
-      return this;
-    } else {
-      return 0;
-    }
-  }
-
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element

@@ -5,6 +5,7 @@ function makeRandomData(numPoints, scaleFactor=1): IDataset {
     var r = {x: x, y: (x + x * Math.random()) * scaleFactor}
     data.push(r);
   }
+  data.sort((a: any, b: any) => a.x - b.x);
   return {"data": data, "seriesName": "random-data"};
 }
 

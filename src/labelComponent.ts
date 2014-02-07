@@ -8,10 +8,6 @@ class LabelComponent extends Component {
 
   private textElement: D3.Selection;
   private text:string;
-  private textHeight = 0;
-  private textWidth = 0;
-  private isVertical = false;
-  private rotationAngle = 0;
   private orientation = "horizontal";
 
   constructor(text: string, orientation?: string) {
@@ -25,50 +21,6 @@ class LabelComponent extends Component {
     }
   }
 
-  public rowWeight(): number;
-  public rowWeight(newVal: number): Component;
-  public rowWeight(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Row weight cannot be set on Label.");
-      return this;
-    } else {
-      return 0;
-    }
-  }
-
-  public colWeight(): number;
-  public colWeight(newVal: number): Component;
-  public colWeight(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Col weight cannot be set on Label.");
-      return this;
-    } else {
-      return 0;
-    }
-  }
-
-  public rowMinimum(): number;
-  public rowMinimum(newVal: number): Component;
-  public rowMinimum(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Row minimum cannot be directly set on Label.");
-      return this;
-    } else {
-      return this.textHeight;
-    }
-  }
-
-  public colMinimum(): number;
-  public colMinimum(newVal: number): Component;
-  public colMinimum(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Col minimum cannot be directly set on Label.");
-      return this;
-    } else {
-      return this.textWidth;
-    }
-  }
-
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.textElement = this.element.append("text").text(this.text);
@@ -79,11 +31,11 @@ class LabelComponent extends Component {
     var clientWidth = bbox.width;
 
     if (this.orientation === "horizontal") {
-      this.textHeight = clientHeight;
-      this.textWidth = clientWidth;
+      this.rowMinimum(clientHeight);
+      this.colMinimum(clientWidth);
     } else {
-      this.textWidth = clientHeight;
-      this.textHeight = clientWidth;
+      this.colMinimum(clientHeight);
+      this.rowMinimum(clientWidth);
       if (this.orientation === "vertical-right") {
         this.textElement.attr("transform", "rotate(90)").attr("y", -clientHeight);
       } else if (this.orientation === "vertical-left") {

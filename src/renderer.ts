@@ -140,7 +140,7 @@ class LineRenderer extends XYRenderer {
 
   public render() {
     super.render();
-    this.line = d3.svg.line().interpolate("basis").x(this.xScaledAccessor).y(this.yScaledAccessor);
+    this.line = d3.svg.line().x(this.xScaledAccessor).y(this.yScaledAccessor);
     this.dataSelection = this.renderArea.classed("line", true)
       .classed(this.dataset.seriesName, true)
       .datum(this.dataset.data);
