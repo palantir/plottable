@@ -71,12 +71,22 @@ class QuantitiveScale extends Scale {
   public ticks(count: number) {
     return this.scale.ticks(count);
   }
+
+  public copy(): QuantitiveScale {
+    return new QuantitiveScale(this.scale.copy());
+  }
 }
 
 class LinearScale extends QuantitiveScale {
-  constructor() {
-    super(d3.scale.linear());
+  constructor();
+  constructor(scale: D3.Scale.LinearScale);
+  constructor(scale?: any) {
+    super(scale == null ? d3.scale.linear() : scale);
     this.domain([Infinity, -Infinity]);
+  }
+
+  public copy(): LinearScale {
+    return new LinearScale(this.scale.copy());
   }
 }
 
