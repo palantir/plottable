@@ -28,6 +28,7 @@ class Axis extends Component {
     public formatter: any
   ) {
     super();
+    this.clipPathEnabled = true;
     this.classed(this.CLASS_AXIS_CONTAINER, true);
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);

@@ -6,6 +6,7 @@ class Component {
   public hitBox: D3.Selection;
   private registeredInteractions: Interaction[] = [];
   private boxes: D3.Selection[] = [];
+  public clipPathEnabled = false;
 
   private rowWeightVal  = 0;
   private colWeightVal  = 0;
@@ -56,7 +57,7 @@ class Component {
 
   public anchor(element: D3.Selection) {
     this.element = element;
-    this.generateClipPath();
+    if (this.clipPathEnabled) {this.generateClipPath()};
     this.cssClasses.forEach((cssClass: string) => {
       this.element.classed(cssClass, true);
     });

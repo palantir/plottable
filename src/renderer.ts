@@ -14,6 +14,7 @@ class Renderer extends Component {
     super();
     super.rowWeight(1);
     super.colWeight(1);
+    this.clipPathEnabled = true;
 
     this.dataset = dataset;
     this.classed(this.CLASS_RENDERER_CONTAINER, true);
@@ -157,13 +158,13 @@ class CircleRenderer extends XYRenderer {
 
   public render() {
     super.render();
-    this.dataSelection = this.renderArea.selectAll("circle");
-    this.dataSelection = this.dataSelection.data(this.dataset.data).enter()
-      .append("circle")
-      .attr("cx", this.xScaledAccessor)
-      .attr("cy", this.yScaledAccessor)
-      .attr("r", this.size)
-      .classed("selected-point", (d) => d.selected);
+    var dataSelection = this.renderArea.selectAll("circle").data(this.dataset.data);
+    this.dataSelection = dataSelection;
+    dataSelection.enter().append("circle");
+    dataSelection.attr("cx", this.xScaledAccessor);
+    dataSelection.attr("cy", this.yScaledAccessor);
+    dataSelection.attr("r", this.size);
+    dataSelection.exit().remove();
   }
 }
 
