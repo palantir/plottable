@@ -12,45 +12,84 @@ module.exports = function(grunt) {
 
   // project configuration
   grunt.initConfig({
-
-    typescript: {
-      compile: {
+    concat: {
+      license: {
+        src: ["license_header.txt", "build/plottable.js"],
+        dest: "build/plottable.js",
+      },
+    },
+    ts: {
+      dev: {
+        src: ["src/*.ts"],
+        out: "build/plottable.js",
+        // watch: "src",
         options: {
-          module: "amd",
-          // nolib: true,
-          sourcemap: true,
-          target: "ES5"
-        },
-        files: [
-          { src: ["src/*.ts"], dest: "plottable.js" },
-          { src: ["test/*.ts"], dest: "test/tests.js" },
-          { src: ["examples/*.ts"], dest: "examples/examples.js"}
-        ]
+          target: 'es5',
+          sourceMap: true,
+          declaration: true,
+          removeComments: true
+        }
+      },
+      test: {
+        src: ["test/*.ts"],
+        out: "build/tests.js",
+        // watch: "test",
+        options: {
+          target: 'es5',
+          sourceMap: true,
+          declaration: false,
+          removeComments: false
+        }
+      },
+      examples: {
+        src: ["examples/*.ts"],
+        outDir: "build",
+        // watch: "examples",
+        options: {
+          target: 'es5',
+          sourceMap: true,
+          declaration: false,
+          removeComments: false
+        }
       }
+    },
+    tslint: {
+      options: {
+        configuration: grunt.file.readJSON("tslint.json")
+      },
+      files: ["src/*.ts", "test/*.ts"]
     },
     watch: {
       "rebuild": {
-        "tasks": [
-          "build:rebuild"
-        ],
+        "tasks": ["build:rebuild"],
         "files": [
           "Gruntfile.js",
           "src/*.ts",
-          "test/*.ts",
-          "examples/*.ts"
         ]
+      },
+      "tests": {
+        "tasks": ["ts:test", "tslint"],
+        "files": ["test/**.ts"]
+      },
+      "examples": {
+        "tasks": ["ts:examples", "tslint"],
+        "files": ["examples/**.ts"]
       }
     }
   });
 
   require('load-grunt-tasks')(grunt);
+
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("default", "build");
 
   grunt.registerTask("build",
     [
-      "typescript",
+      "compile",
       "watch"
     ]
   );
+  grunt.registerTask("compile",
+    ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]
+    );
 };

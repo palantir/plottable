@@ -5,7 +5,7 @@ function makeRandomData(numPoints, scaleFactor=1): IDataset {
     var r = {x: x, y: (x + x * Math.random()) * scaleFactor}
     data.push(r);
   }
-  data = _.sortBy(data, (d) => d.x);
+  data.sort((a: any, b: any) => a.x - b.x);
   return {"data": data, "seriesName": "random-data"};
 }
 
@@ -28,10 +28,10 @@ function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
   var min = range[0];
   var max = range[1];
   var spread = max-min;
-  var binBeginnings = _.range(nBins).map((n) => min + n * spread / nBins);
-  var binEndings = _.range(nBins)   .map((n) => min + (n+1) * spread / nBins);
+  var binBeginnings = d3.range(nBins).map((n) => min + n * spread / nBins);
+  var binEndings = d3.range(nBins)   .map((n) => min + (n+1) * spread / nBins);
   var counts = new Array(nBins);
-  _.range(nBins).forEach((b, i) => counts[i] = 0);
+  d3.range(nBins).forEach((b, i) => counts[i] = 0);
   data.forEach((d) => {
     var v = accessor(d);
     var found = false;

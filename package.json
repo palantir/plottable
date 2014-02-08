@@ -1,17 +1,24 @@
 {
-  "name": "plottable",
-  "version": "0.1.0",
+  "name": "plottable.js",
+  "version": "0.1.1",
   "description": "A library for easily creating charts within a grid layout.",
   "repository": {
     "type": "git",
     "url": "https://github.com/palantir/plottable.git"
   },
-  "author": "daniel mane",
+  "author": "Palantir Technologies",
   "devDependencies": {
     "grunt": "~0.4.2",
-    "grunt-typescript": "~0.2.0",
     "grunt-cli": "0.1.6",
     "grunt-contrib-watch": "~0.5.3",
-    "load-grunt-tasks": "~0.2.0"
+    "load-grunt-tasks": "~0.2.0",
+    "grunt-ts": "~1.6.4",
+    "tsd": "~0.5.5",
+    "bower": "~1.2.8",
+    "grunt-bower-task": "~0.3.4",
+    "grunt-tsd": "0.0.1",
+    "tslint": "~0.4.2",
+    "grunt-tslint": "~0.4.0",
+    "grunt-contrib-concat": "~0.3.0"
   }
 }

@@ -1,13 +1,12 @@
-///<reference path="../lib/d3.d.ts" />
-///<reference path="interaction.ts" />
+///<reference path="reference.ts" />
 
 class Component {
   private static clipPathId = 0; // Used for unique namespacing for the clipPaths
   public element: D3.Selection;
   public hitBox: D3.Selection;
-  public boundingBox: D3.Selection;
-  private clipPathRect: D3.Selection;
   private registeredInteractions: Interaction[] = [];
+  private boxes: D3.Selection[] = [];
+  public clipPathEnabled = false;
 
   private rowWeightVal  = 0;
   private colWeightVal  = 0;
@@ -19,54 +18,23 @@ class Component {
   private xOffset       : number;
   private yOffset       : number;
 
-  private cssClasses: string[] = [];
+  private cssClasses: string[] = ["component"];
 
   public xAlignment = "LEFT"; // LEFT, CENTER, RIGHT
   public yAlignment = "TOP"; // TOP, CENTER, BOTTOM
 
-  public classed(cssClass: string): boolean;
-  public classed(cssClass: string, addClass: boolean): Component;
-  public classed(cssClass: string, addClass?:boolean): any {
-    if (addClass == null) {
-      if (this.element == null) {
-        return (this.cssClasses.indexOf(cssClass) != -1);
-      } else {
-        return this.element.classed(cssClass);
-      }
-    } else {
-      if (this.element == null) {
-        var classIndex = this.cssClasses.indexOf(cssClass);
-        if (addClass && classIndex == -1) {
-          this.cssClasses.push(cssClass);
-        } else if (!addClass && classIndex != -1) {
-          this.cssClasses.splice(classIndex, 1);
-        }
-      } else {
-        this.element.classed(cssClass, addClass);
-      }
-      return this;
-    }
-  }
-
   public anchor(element: D3.Selection) {
     this.element = element;
-    this.generateClipPath();
+    if (this.clipPathEnabled) {this.generateClipPath();};
     this.cssClasses.forEach((cssClass: string) => {
       this.element.classed(cssClass, true);
     });
     this.cssClasses = null;
-    this.hitBox = element.append("rect").classed("hit-box", true);
-    this.boundingBox = element.append("rect").classed("bounding-box", true);
-    this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
-  }
 
-  public generateClipPath() {
-    // The clip path will prevent content from overflowing its component space.
-    var clipPathId = Component.clipPathId++;
-    this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
-    this.clipPathRect = this.element.append("clipPath")
-                                    .attr("id", "clipPath" + clipPathId)
-                                    .append("rect");
+    this.hitBox = this.addBox("hit-box");
+    this.addBox("bounding-box");
+
+    this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -118,8 +86,28 @@ class Component {
     this.availableWidth = availableWidth;
     this.availableHeight = availableHeight;
     this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
-    var boxes = [this.clipPathRect, this.hitBox, this.boundingBox];
-    Utils.setWidthHeight(boxes, this.availableWidth, this.availableHeight);
+    this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
+  }
+
+  public render() {
+    //no-op
+  }
+
+  private addBox(className?: string, parentElement?: D3.Selection) {
+    var parentElement = parentElement == null ? this.element : parentElement;
+    var box = parentElement.append("rect");
+    if (className != null) {box.classed(className, true);};
+    this.boxes.push(box);
+    return box;
+  }
+
+  public generateClipPath() {
+    // The clip path will prevent content from overflowing its component space.
+    var clipPathId = Component.clipPathId++;
+    this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
+    var clipPathParent = this.element.append("clipPath")
+                                    .attr("id", "clipPath" + clipPathId);
+    this.addBox("clip-rect", clipPathParent);
   }
 
   public registerInteraction(interaction: Interaction) {
@@ -132,12 +120,32 @@ class Component {
     }
   }
 
-  public render() {
-    //no-op
-  }
-
   public zoom(translate, scale) {
     this.render(); // if not overwritten, a zoom event just causes the component to rerender
+  }
+
+  public classed(cssClass: string): boolean;
+  public classed(cssClass: string, addClass: boolean): Component;
+  public classed(cssClass: string, addClass?:boolean): any {
+    if (addClass == null) {
+      if (this.element == null) {
+        return (this.cssClasses.indexOf(cssClass) !== -1);
+      } else {
+        return this.element.classed(cssClass);
+      }
+    } else {
+      if (this.element == null) {
+        var classIndex = this.cssClasses.indexOf(cssClass);
+        if (addClass && classIndex === -1) {
+          this.cssClasses.push(cssClass);
+        } else if (!addClass && classIndex !== -1) {
+          this.cssClasses.splice(classIndex, 1);
+        }
+      } else {
+        this.element.classed(cssClass, addClass);
+      }
+      return this;
+    }
   }
 
   public rowWeight(): number;
@@ -145,7 +153,7 @@ class Component {
   public rowWeight(newVal?: number): any {
     if (newVal != null) {
       this.rowWeightVal = newVal;
-      chai.assert.operator(this.rowWeightVal, '>=', 0, "rowWeight is a reasonable number");
+      chai.assert.operator(this.rowWeightVal, ">=", 0, "rowWeight is a reasonable number");
       return this;
     } else {
       return this.rowWeightVal;
@@ -157,7 +165,7 @@ class Component {
   public colWeight(newVal?: number): any {
     if (newVal != null) {
       this.colWeightVal = newVal;
-      chai.assert.operator(this.colWeightVal, '>=', 0, "colWeight is a reasonable number");
+      chai.assert.operator(this.colWeightVal, ">=", 0, "colWeight is a reasonable number");
       return this;
     } else {
       return this.colWeightVal;
@@ -169,7 +177,7 @@ class Component {
   public rowMinimum(newVal?: number): any {
     if (newVal != null) {
       this.rowMinimumVal = newVal;
-      chai.assert.operator(this.rowMinimumVal, '>=', 0, "rowMinimum is a reasonable number");
+      chai.assert.operator(this.rowMinimumVal, ">=", 0, "rowMinimum is a reasonable number");
       return this;
     } else {
       return this.rowMinimumVal;
@@ -181,7 +189,7 @@ class Component {
   public colMinimum(newVal?: number): any {
     if (newVal != null) {
       this.colMinimumVal = newVal;
-      chai.assert.operator(this.colMinimumVal, '>=', 0, "colMinimum is a reasonable number");
+      chai.assert.operator(this.colMinimumVal, ">=", 0, "colMinimum is a reasonable number");
       return this;
     } else {
       return this.colMinimumVal;

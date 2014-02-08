@@ -1,8 +1,9 @@
-///<reference path="../lib/d3.d.ts" />
+///<reference path="reference.ts" />
 
 class Scale implements IBroadcaster {
   public scale: D3.Scale.Scale;
   private broadcasterCallbacks: IBroadcasterCallback[] = [];
+  private cachedDomain: any[];
 
   constructor(scale: D3.Scale.Scale) {
     this.scale = scale;
@@ -15,9 +16,11 @@ class Scale implements IBroadcaster {
   public domain(): any[];
   public domain(values: any[]): Scale;
   public domain(values?: any[]): any {
-    if (values != null && !(_.isEqual(values, this.scale.domain()))) {
+    if (values != null && values !== this.cachedDomain) {
       // It is important that the scale does not update if the new domain is the same as
-      // the current domain, to prevent circular propogation of events
+      // the current domain, to prevent circular propogation of events. We can do a
+      // pointer check against this.cachedDomain, but not against this.scale.domain(), since
+      // d3 modifies the domain as it comes in
       this.scale.domain(values);
       this.broadcasterCallbacks.forEach((b) => b(this));
       return this;
@@ -68,12 +71,22 @@ class QuantitiveScale extends Scale {
   public ticks(count: number) {
     return this.scale.ticks(count);
   }
+
+  public copy(): QuantitiveScale {
+    return new QuantitiveScale(this.scale.copy());
+  }
 }
 
 class LinearScale extends QuantitiveScale {
-  constructor() {
-    super(d3.scale.linear());
+  constructor();
+  constructor(scale: D3.Scale.LinearScale);
+  constructor(scale?: any) {
+    super(scale == null ? d3.scale.linear() : scale);
     this.domain([Infinity, -Infinity]);
+  }
+
+  public copy(): LinearScale {
+    return new LinearScale(this.scale.copy());
   }
 }
 
@@ -89,8 +102,9 @@ class ScaleDomainCoordinator {
 
   public rescale(scale: Scale) {
     var newDomain = scale.domain();
-    if (_.isEqual(newDomain, this.currentDomain)) {
+    if (newDomain === this.currentDomain) {
       // Avoid forming a really funky call stack with depth proportional to number of scales
+      // pointer equality check is sufficient in this case
       return;
     }
     this.currentDomain = newDomain;

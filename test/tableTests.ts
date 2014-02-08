@@ -1,13 +1,4 @@
-///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="../lib/chai/chai-assert.d.ts" />
-///<reference path="../lib/mocha/mocha.d.ts" />
-///<reference path="../lib/d3.d.ts" />
-
-///<reference path="../src/axis.ts" />
-///<reference path="../src/table.ts" />
-///<reference path="../src/renderer.ts" />
-///<reference path="../src/utils.ts" />
-///<reference path="testUtils.ts" />
+///<reference path="testReference.ts" />
 
 var assert = chai.assert;
 
@@ -44,12 +35,7 @@ describe("Table layout", () => {
     var table = tableAndRenderers.table;
     var renderers = tableAndRenderers.renderers;
 
-    table.xMargin = 0;
-    table.yMargin = 0;
-    table.rowPadding = 0;
-    table.colPadding = 0;
-
-    var svg = d3.select("body").append("svg:svg")
+    var svg = d3.select("body").append("svg:svg");
     table.anchor(svg);
     table.computeLayout(0, 0, 400, 400);
     table.render();
@@ -73,26 +59,23 @@ describe("Table layout", () => {
     var table = tableAndRenderers.table;
     var renderers = tableAndRenderers.renderers;
 
-    table.xMargin = 10;
-    table.yMargin = 10;
-    table.rowPadding = 5;
-    table.colPadding = 5;
+    table.padding(5,5);
 
     var svg = d3.select("body").append("svg:svg");
     table.anchor(svg);
-    table.computeLayout(0, 0, 425, 425);
+    table.computeLayout(0, 0, 415, 415);
     table.render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));
     var bboxes = elements.map((e) => Utils.getBBox(e));
-    assert.deepEqual(translates[0], [10, 10], "first element is centered properly");
-    assert.deepEqual(translates[1], [215, 10], "second element is located properly");
-    assert.deepEqual(translates[2], [10, 215], "third element is located properly");
-    assert.deepEqual(translates[3], [215, 215], "fourth element is located properly");
+    assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
+    assert.deepEqual(translates[1], [210, 0], "second element is located properly");
+    assert.deepEqual(translates[2], [0, 210], "third element is located properly");
+    assert.deepEqual(translates[3], [210, 210], "fourth element is located properly");
     bboxes.forEach((b) => {
-      assert.equal(b.width, 200, "bbox is 200 pixels wide");
-      assert.equal(b.height, 200, "bbox is 200 pixels tall");
+      assert.equal(b.width, 205, "bbox is 205 pixels wide");
+      assert.equal(b.height, 205, "bbox is 205 pixels tall");
       });
     svg.remove();
   });
@@ -114,10 +97,6 @@ describe("Table layout", () => {
     renderers[5].colMinimum(50);
     // finally the center 'plot' object has a weight
     renderers[4].rowWeight(1).colWeight(1);
-    table.xMargin = 0;
-    table.yMargin = 0;
-    table.rowPadding = 0;
-    table.colPadding = 0;
 
     table.anchor(svg);
     table.computeLayout(0, 0, 400, 400);
@@ -139,5 +118,5 @@ describe("Table layout", () => {
     assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
     assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
     svg.remove();
-  })
-})
+  });
+});

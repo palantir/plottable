@@ -1,8 +1,7 @@
-///<reference path="../lib/d3.d.ts" />
-///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="component.ts" />
+///<reference path="reference.ts" />
 
 class Axis extends Component {
+  private static CSS_CLASS = "axis";
   public static yWidth = 50;
   public static xHeight = 30;
   public axisElement: D3.Selection;
@@ -29,6 +28,8 @@ class Axis extends Component {
     public formatter: any
   ) {
     super();
+    this.classed(Axis.CSS_CLASS, true);
+    this.clipPathEnabled = true;
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
     if (this.formatter == null) {
@@ -38,7 +39,13 @@ class Axis extends Component {
 
     this.cachedScale = 1;
     this.cachedTranslate = 0;
-    this.scale.registerListener(() => this.rescale());
+    this.scale.registerListener(this.rescale.bind(this));
+  }
+
+
+  public anchor(element: D3.Selection) {
+    super.anchor(element);
+    this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
   }
 
   private transformString(translate: number, scale: number) {
@@ -46,56 +53,28 @@ class Axis extends Component {
     return "translate(" + translateS + ")";
   }
 
-  public rowWeight(): number;
-  public rowWeight(newVal: number): Component;
-  public rowWeight(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Row weight cannot be set on Axis.");
-      return this;
-    } else {
-      return 0;
-    }
-  }
-
-  public colWeight(): number;
-  public colWeight(newVal: number): Component;
-  public colWeight(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Col weight cannot be set on Axis.");
-      return this;
-    } else {
-      return 0;
-    }
-  }
-
-  public anchor(element: D3.Selection) {
-    super.anchor(element);
-    this.boundingBox.classed("axis-bounding-box", true);
-    this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
-  }
-
   public render() {
-    if (this.orientation === "left") this.axisElement.attr("transform", "translate(" + Axis.yWidth + ")");
-    if (this.orientation === "top")  this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");
+    if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ")");};
+    if (this.orientation === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
     var domain = this.scale.domain();
     var extent = Math.abs(domain[1] - domain[0]);
     var min = +d3.min(domain);
     var max = +d3.max(domain);
     var newDomain: any;
     var standardOrder = domain[0] < domain[1];
-    if (typeof(domain[0]) == "number") {
+    if (typeof(domain[0]) === "number") {
       newDomain = standardOrder ? [min - extent, max + extent] : [max + extent, min - extent];
     } else {
       newDomain = standardOrder ? [new Date(min - extent), new Date(max + extent)] : [new Date(max + extent), new Date(min - extent)];
     }
 
-    // Make tiny-zero representations not look like crap, by rounding them to 0
+    // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
     if ((<QuantitiveScale> this.scale).ticks != null) {
       var scale = <QuantitiveScale> this.scale;
       var nTicks = 10;
       var ticks = scale.ticks(nTicks);
-      var domain = scale.domain();
-      var interval = domain[1] - domain[0];
+      var numericDomain = scale.domain();
+      var interval = numericDomain[1] - numericDomain[0];
       var cleanTick = (n) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
       ticks = ticks.map(cleanTick);
       this.d3axis.tickValues(ticks);
@@ -113,24 +92,24 @@ class Axis extends Component {
   public rescale() {
     return (this.element != null) ? this.render() : null;
     // short circuit, we don't care about perf.
-    var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
-    var tickSelection = this.element.selectAll(".tick");
-    (<any> tickSelection).call(tickTransform, this.scale.scale);
-    this.axisElement.attr("transform","");
+    // var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
+    // var tickSelection = this.element.selectAll(".tick");
+    // (<any> tickSelection).call(tickTransform, this.scale.scale);
+    // this.axisElement.attr("transform","");
   }
 
   public zoom(translatePair: number[], scale: number) {
     return this.render(); //short-circuit, we dont need the performant cleverness for present demo
-    var translate = this.isXAligned ? translatePair[0] : translatePair[1];
-    if (scale != null && scale != this.cachedScale) {
-      this.cachedTranslate = translate;
-      this.cachedScale = scale;
-      this.rescale();
-    } else {
-      translate -= this.cachedTranslate;
-      var transform = this.transformString(translate, scale);
-      this.axisElement.attr("transform", transform);
-    }
+    // var translate = this.isXAligned ? translatePair[0] : translatePair[1];
+    // if (scale != null && scale !== this.cachedScale) {
+    //   this.cachedTranslate = translate;
+    //   this.cachedScale = scale;
+    //   this.rescale();
+    // } else {
+    //   translate -= this.cachedTranslate;
+    //   var transform = this.transformString(translate, scale);
+    //   this.axisElement.attr("transform", transform);
+    // }
   }
 }
 

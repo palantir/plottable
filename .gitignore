@@ -1,7 +1,6 @@
 .DS_Store
-plottable.js
-plottable.js.map
-tests.js
-tests.js.map
-examples/*.js
-examples/*.js.map
+*.tmp.txt
+build/*
+node_modules
+bower_components
+typings

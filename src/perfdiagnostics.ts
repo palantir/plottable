@@ -1,3 +1,5 @@
+///<reference path="reference.ts" />
+
 module PerfDiagnostics {
   class PerfDiagnostics {
     private static diagnostics: { [measurementName: string]: PerfDiagnostics; } = {};
@@ -6,10 +8,11 @@ module PerfDiagnostics {
     private numCalls: number;
 
     public static toggle(measurementName: string) {
+      var diagnostic: PerfDiagnostics;;
       if (PerfDiagnostics.diagnostics[measurementName] != null) {
-        var diagnostic = PerfDiagnostics.diagnostics[measurementName];
+        diagnostic = PerfDiagnostics.diagnostics[measurementName];
       } else {
-        var diagnostic = new PerfDiagnostics();
+        diagnostic = new PerfDiagnostics();
         PerfDiagnostics.diagnostics[measurementName] = diagnostic;
       }
       diagnostic.toggle();

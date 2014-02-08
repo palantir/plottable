@@ -1,13 +1,4 @@
-///<reference path="../lib/chai/chai.d.ts" />
-///<reference path="../lib/chai/chai-assert.d.ts" />
-///<reference path="../lib/mocha/mocha.d.ts" />
-///<reference path="../lib/d3.d.ts" />
-
-///<reference path="../src/axis.ts" />
-///<reference path="../src/table.ts" />
-///<reference path="../src/renderer.ts" />
-///<reference path="../src/utils.ts" />
-///<reference path="testUtils.ts" />
+///<reference path="testReference.ts" />
 
 var assert = chai.assert;
 
@@ -38,7 +29,8 @@ describe("Component behavior", () => {
     component.computeLayout();
     assertComponentXY(component, 200, 200, "bottom-right component aligns correctly");
     svg.remove();
-    })
+  });
+
   it("component defaults are as expected", () => {
     var c = new Component();
     assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
@@ -47,5 +39,6 @@ describe("Component behavior", () => {
     assert.equal(c.colWeight() , 0, "colWeight defaults to 0");
     assert.equal(c.xAlignment, "LEFT", "xAlignment defaults to LEFT");
     assert.equal(c.yAlignment, "TOP" , "yAlignment defaults to TOP");
-    })
-})
+  });
+
+});
