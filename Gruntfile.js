@@ -12,6 +12,12 @@ module.exports = function(grunt) {
 
   // project configuration
   grunt.initConfig({
+    concat: {
+      license: {
+        src: ["license_header.txt", "build/plottable.js"],
+        dest: "build/plottable.js",
+      },
+    },
     ts: {
       dev: {
         src: ["src/*.ts"],
@@ -55,7 +61,7 @@ module.exports = function(grunt) {
     },
     watch: {
       "rebuild": {
-        "tasks": ["build:rebuild", "tslint"],
+        "tasks": ["build:rebuild"],
         "files": [
           "Gruntfile.js",
           "src/*.ts",
@@ -84,6 +90,6 @@ module.exports = function(grunt) {
     ]
   );
   grunt.registerTask("compile",
-    ["ts:dev", "ts:test", "ts:examples", "tslint"]
+    ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]
     );
 };
