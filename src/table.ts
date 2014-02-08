@@ -18,35 +18,6 @@ class Table extends Component {
   private rowWeightSum: number;
   private colWeightSum: number;
 
-  /* Getters */
-  public rowMinimum(): number;
-  public rowMinimum(newVal: number): Component;
-  public rowMinimum(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Row minimum cannot be directly set on Table.");
-    } else {
-      this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => r.rowMinimum()));
-      return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
-    }
-  }
-
-  public colMinimum(): number;
-  public colMinimum(newVal: number): Component;
-  public colMinimum(newVal?: number): any {
-    if (newVal != null) {
-      throw new Error("Col minimum cannot be directly set on Table.");
-    } else {
-      this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
-      return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);
-    }
-  }
-
-  public padding(rowPadding: number, colPadding: number) {
-    this.rowPadding = rowPadding;
-    this.colPadding = colPadding;
-    return this;
-  }
-
   constructor(rows: Component[][], rowWeightVal=1, colWeightVal=1) {
     super();
     this.classed(Table.CSS_CLASS, true);
@@ -128,5 +99,34 @@ class Table extends Component {
         component.render();
       });
     });
+  }
+
+  /* Getters */
+  public rowMinimum(): number;
+  public rowMinimum(newVal: number): Component;
+  public rowMinimum(newVal?: number): any {
+    if (newVal != null) {
+      throw new Error("Row minimum cannot be directly set on Table.");
+    } else {
+      this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => r.rowMinimum()));
+      return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
+    }
+  }
+
+  public colMinimum(): number;
+  public colMinimum(newVal: number): Component;
+  public colMinimum(newVal?: number): any {
+    if (newVal != null) {
+      throw new Error("Col minimum cannot be directly set on Table.");
+    } else {
+      this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
+      return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);
+    }
+  }
+
+  public padding(rowPadding: number, colPadding: number) {
+    this.rowPadding = rowPadding;
+    this.colPadding = colPadding;
+    return this;
   }
 }

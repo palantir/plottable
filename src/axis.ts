@@ -42,14 +42,15 @@ class Axis extends Component {
     this.scale.registerListener(this.rescale.bind(this));
   }
 
-  private transformString(translate: number, scale: number) {
-    var translateS = this.isXAligned ? "" + translate : "0," + translate;
-    return "translate(" + translateS + ")";
-  }
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+  }
+
+  private transformString(translate: number, scale: number) {
+    var translateS = this.isXAligned ? "" + translate : "0," + translate;
+    return "translate(" + translateS + ")";
   }
 
   public render() {

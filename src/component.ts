@@ -23,38 +23,6 @@ class Component {
   public xAlignment = "LEFT"; // LEFT, CENTER, RIGHT
   public yAlignment = "TOP"; // TOP, CENTER, BOTTOM
 
-  public classed(cssClass: string): boolean;
-  public classed(cssClass: string, addClass: boolean): Component;
-  public classed(cssClass: string, addClass?:boolean): any {
-    if (addClass == null) {
-      if (this.element == null) {
-        return (this.cssClasses.indexOf(cssClass) !== -1);
-      } else {
-        return this.element.classed(cssClass);
-      }
-    } else {
-      if (this.element == null) {
-        var classIndex = this.cssClasses.indexOf(cssClass);
-        if (addClass && classIndex === -1) {
-          this.cssClasses.push(cssClass);
-        } else if (!addClass && classIndex !== -1) {
-          this.cssClasses.splice(classIndex, 1);
-        }
-      } else {
-        this.element.classed(cssClass, addClass);
-      }
-      return this;
-    }
-  }
-
-  private addBox(className?: string, parentElement?: D3.Selection) {
-    var parentElement = parentElement == null ? this.element : parentElement;
-    var box = parentElement.append("rect");
-    if (className != null) {box.classed(className, true);};
-    this.boxes.push(box);
-    return box;
-  }
-
   public anchor(element: D3.Selection) {
     this.element = element;
     if (this.clipPathEnabled) {this.generateClipPath();};
@@ -67,15 +35,6 @@ class Component {
     this.addBox("bounding-box");
 
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
-  }
-
-  public generateClipPath() {
-    // The clip path will prevent content from overflowing its component space.
-    var clipPathId = Component.clipPathId++;
-    this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
-    var clipPathParent = this.element.append("clipPath")
-                                    .attr("id", "clipPath" + clipPathId);
-    this.addBox("clip-rect", clipPathParent);
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -130,6 +89,27 @@ class Component {
     this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
   }
 
+  public render() {
+    //no-op
+  }
+
+  private addBox(className?: string, parentElement?: D3.Selection) {
+    var parentElement = parentElement == null ? this.element : parentElement;
+    var box = parentElement.append("rect");
+    if (className != null) {box.classed(className, true);};
+    this.boxes.push(box);
+    return box;
+  }
+
+  public generateClipPath() {
+    // The clip path will prevent content from overflowing its component space.
+    var clipPathId = Component.clipPathId++;
+    this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
+    var clipPathParent = this.element.append("clipPath")
+                                    .attr("id", "clipPath" + clipPathId);
+    this.addBox("clip-rect", clipPathParent);
+  }
+
   public registerInteraction(interaction: Interaction) {
     // Interactions can be registered before or after anchoring. If registered before, they are
     // pushed to this.registeredInteractions and registered during anchoring. If after, they are
@@ -140,12 +120,32 @@ class Component {
     }
   }
 
-  public render() {
-    //no-op
-  }
-
   public zoom(translate, scale) {
     this.render(); // if not overwritten, a zoom event just causes the component to rerender
+  }
+
+  public classed(cssClass: string): boolean;
+  public classed(cssClass: string, addClass: boolean): Component;
+  public classed(cssClass: string, addClass?:boolean): any {
+    if (addClass == null) {
+      if (this.element == null) {
+        return (this.cssClasses.indexOf(cssClass) !== -1);
+      } else {
+        return this.element.classed(cssClass);
+      }
+    } else {
+      if (this.element == null) {
+        var classIndex = this.cssClasses.indexOf(cssClass);
+        if (addClass && classIndex === -1) {
+          this.cssClasses.push(cssClass);
+        } else if (!addClass && classIndex !== -1) {
+          this.cssClasses.splice(classIndex, 1);
+        }
+      } else {
+        this.element.classed(cssClass, addClass);
+      }
+      return this;
+    }
   }
 
   public rowWeight(): number;
