@@ -39,6 +39,7 @@ class Table extends Component {
         component.anchor(this.element.append("g"));
       });
     });
+    return this;
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -48,7 +49,7 @@ class Table extends Component {
     var freeWidth = this.availableWidth - this.colMinimum();
     var freeHeight = this.availableHeight - this.rowMinimum();
     if (freeWidth < 0 || freeHeight < 0) {
-      throw new Error("InsufficientSpaceError");
+      throw "InsufficientSpaceException";
     }
 
     // distribute remaining height to rows
@@ -73,6 +74,7 @@ class Table extends Component {
       childYOffset += rowHeights[rowIndex] + this.rowPadding;
     });
     chai.assert.operator(childYOffset - this.rowPadding, "<=", this.availableHeight + 0.1, "final yOffset was <= availableHeight");
+    return this;
   }
 
   private static rowProportionalSpace(rows: Component[][], freeHeight: number) {
@@ -99,6 +101,7 @@ class Table extends Component {
         component.render();
       });
     });
+    return this;
   }
 
   /* Getters */
@@ -106,7 +109,7 @@ class Table extends Component {
   public rowMinimum(newVal: number): Component;
   public rowMinimum(newVal?: number): any {
     if (newVal != null) {
-      throw new Error("Row minimum cannot be directly set on Table");
+      throw "Row minimum cannot be directly set on Table";
     } else {
       this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => r.rowMinimum()));
       return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
@@ -117,7 +120,7 @@ class Table extends Component {
   public colMinimum(newVal: number): Component;
   public colMinimum(newVal?: number): any {
     if (newVal != null) {
-      throw new Error("Col minimum cannot be directly set on Table");
+      throw "Col minimum cannot be directly set on Table";
     } else {
       this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
       return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);

@@ -36,9 +36,7 @@ describe("Table layout", () => {
     var renderers = tableAndRenderers.renderers;
 
     var svg = d3.select("body").append("svg:svg");
-    table.anchor(svg);
-    table.computeLayout(0, 0, 400, 400);
-    table.render();
+    table.anchor(svg).computeLayout(0, 0, 400, 400).render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));
@@ -62,9 +60,7 @@ describe("Table layout", () => {
     table.padding(5,5);
 
     var svg = d3.select("body").append("svg:svg");
-    table.anchor(svg);
-    table.computeLayout(0, 0, 415, 415);
-    table.render();
+    table.anchor(svg).computeLayout(0, 0, 415, 415).render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));
@@ -98,9 +94,7 @@ describe("Table layout", () => {
     // finally the center 'plot' object has a weight
     renderers[4].rowWeight(1).colWeight(1);
 
-    table.anchor(svg);
-    table.computeLayout(0, 0, 400, 400);
-    table.render();
+    table.anchor(svg).computeLayout(0, 0, 400, 400).render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => Utils.getTranslate(e));

@@ -46,6 +46,7 @@ class Axis extends Component {
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+    return this;
   }
 
   private transformString(translate: number, scale: number) {
@@ -87,6 +88,7 @@ class Axis extends Component {
     }
     // chai.assert.operator(this.element.node().getBBox().height, '<=', height, "axis height is appropriate");
     // chai.assert.operator(this.element.node().getBBox().width,  '<=', width, "axis width is appropriate");
+    return this;
   }
 
   public rescale() {

@@ -38,6 +38,7 @@ class Component {
     this.addBox("bounding-box");
 
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
+    return this;
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -90,10 +91,11 @@ class Component {
     this.availableHeight = availableHeight;
     this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
     this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
+    return this;
   }
 
   public render() {
-    //no-op
+    return this;
   }
 
   private addBox(className?: string, parentElement?: D3.Selection) {

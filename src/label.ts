@@ -25,6 +25,7 @@ class Label extends Component {
     super.anchor(element);
     this.textElement = this.element.append("text").text(this.text);
     this.setMinimumsByCalculatingTextSize();
+    return this;
   }
 
   public setText(text: string) {

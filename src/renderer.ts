@@ -32,6 +32,7 @@ class Renderer extends Component {
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.renderArea = element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
+    return this;
   }
 }
 
@@ -73,6 +74,7 @@ class XYRenderer extends Renderer {
     super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
     this.xScale.range([0, this.availableWidth]);
     this.yScale.range([this.availableHeight, 0]);
+    return this;
   }
 
   public invertXYSelectionArea(area: SelectionArea) {
@@ -129,6 +131,7 @@ class LineRenderer extends XYRenderer {
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.renderArea = this.renderArea.append("path");
+    return this;
   }
 
   public render() {
@@ -140,6 +143,7 @@ class LineRenderer extends XYRenderer {
       .classed(this.dataset.seriesName, true)
       .datum(this.dataset.data);
     this.renderArea.attr("d", this.line);
+    return this;
   }
 }
 
@@ -160,6 +164,7 @@ class CircleRenderer extends XYRenderer {
                       .attr("cy", (datum: any) => this.yScale.scale(this.yAccessor(datum)))
                       .attr("r", this.size);
     this.dataSelection.exit().remove();
+    return this;
   }
 }
 
@@ -207,5 +212,6 @@ class BarRenderer extends XYRenderer {
                                           - this.BAR_START_PADDING_PX - this.BAR_END_PADDING_PX))
           .attr("height", (d: any) => maxScaledY - this.yScale.scale(this.yAccessor(d)) );
     this.dataSelection.exit().remove();
+    return this;
   }
 }
