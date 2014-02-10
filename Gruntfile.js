@@ -82,6 +82,13 @@ module.exports = function(grunt) {
     },
     mocha_phantomjs: {
       all: ['tests.html']
+    },
+    connect: {
+      server: {
+        options: {
+          port: 7007
+        }
+      }
     }
   });
 
@@ -92,6 +99,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("build",
     [
+      "connect",
       "compile",
       "watch"
     ]
