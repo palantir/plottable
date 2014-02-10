@@ -7,16 +7,16 @@ class Label extends Component {
   public yAlignment = "CENTER";
 
   private textElement: D3.Selection;
-  private text:string;
-  private orientation = "horizontal";
+  private text: string;
+  private orientation: string;
 
-  constructor(text: string, orientation?: string) {
+  constructor(text: string, orientation = "horizontal") {
     super();
     this.classed(Label.CSS_CLASS, true);
     this.text = text;
     if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
       this.orientation = orientation;
-    } else if (orientation != null) {
+    } else {
       throw new Error(orientation + " is not a valid orientation for LabelComponent");
     }
   }
@@ -25,10 +25,10 @@ class Label extends Component {
     super.anchor(element);
     this.textElement = this.element.append("text").text(this.text);
 
-    var bbox = (<SVGGElement> this.textElement.node()).getBBox();
+    var bbox = Utils.getBBox(this.element);
     this.textElement.attr("dy", -bbox.y);
     var clientHeight = bbox.height;
-    var clientWidth = bbox.width;
+    var clientWidth  = bbox.width;
 
     if (this.orientation === "horizontal") {
       this.rowMinimum(clientHeight);
