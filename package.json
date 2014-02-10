@@ -19,6 +19,7 @@
     "grunt-tsd": "0.0.1",
     "tslint": "~0.4.2",
     "grunt-tslint": "~0.4.0",
-    "grunt-contrib-concat": "~0.3.0"
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-mocha-phantomjs": "~0.4.0"
   }
 }

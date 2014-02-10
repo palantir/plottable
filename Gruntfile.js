@@ -74,7 +74,14 @@ module.exports = function(grunt) {
       "examples": {
         "tasks": ["ts:examples", "tslint"],
         "files": ["examples/**.ts"]
+      },
+      "test": {
+        "tasks": ["test"],
+        "files": ["src/*.ts", "test/**.ts"]
       }
+    },
+    mocha_phantomjs: {
+      all: ['tests.html']
     }
   });
 
@@ -92,4 +99,8 @@ module.exports = function(grunt) {
   grunt.registerTask("compile",
     ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]
     );
+
+  grunt.registerTask("test", ["mocha_phantomjs"]);
+
+  grunt.registerTask("watch-test", ["mocha_phantomjs", "watch:test"]);
 };

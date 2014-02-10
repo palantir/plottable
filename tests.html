@@ -20,7 +20,12 @@
     <div id="mocha"></div>
     <script>
       mocha.checkLeaks();
-      mocha.run();
+      if (mochaPhantomJS) {
+        mochaPhantomJS.run();
+      }
+      else {
+        mocha.run();
+      }
     </script>
   </body>
 </html>
