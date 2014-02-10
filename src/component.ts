@@ -40,7 +40,7 @@ class Component {
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
       if (this.element == null) {
-        throw "anchor() must be called before computeLayout()";
+        throw new Error("anchor() must be called before computeLayout()");
       } else if (this.element.node().nodeName === "svg") {
         // we are the root node, let's guess width and height for convenience
         xOffset = 0;
@@ -48,7 +48,7 @@ class Component {
         availableWidth  = parseFloat(this.element.attr("width" ));
         availableHeight = parseFloat(this.element.attr("height"));
       } else {
-        throw "null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node";
+        throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
       }
     }
     if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
@@ -62,7 +62,7 @@ class Component {
           yOffset += availableHeight - this.rowMinimum();
           break;
         default:
-          throw this.yAlignment + " is not a supported alignment";
+          throw new Error(this.yAlignment + " is not a supported alignment");
       }
       availableHeight = this.rowMinimum();
     }
@@ -77,7 +77,7 @@ class Component {
           xOffset += availableWidth - this.colMinimum();
           break;
         default:
-          throw this.xAlignment + " is not a supported alignment";
+          throw new Error(this.xAlignment + " is not a supported alignment");
       }
       availableWidth = this.colMinimum();
     }

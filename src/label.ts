@@ -17,7 +17,7 @@ class Label extends Component {
     if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
       this.orientation = orientation;
     } else {
-      throw orientation + " is not a valid orientation for LabelComponent";
+      throw new Error(orientation + " is not a valid orientation for LabelComponent");
     }
   }
 
