@@ -10,7 +10,7 @@ class Label extends Component {
   private text: string;
   private orientation: string;
 
-  constructor(text: string, orientation = "horizontal") {
+  constructor(text = "", orientation = "horizontal") {
     super();
     this.classed(Label.CSS_CLASS, true);
     this.text = text;
@@ -24,7 +24,17 @@ class Label extends Component {
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.textElement = this.element.append("text").text(this.text);
+    this.setMinimumsByCalculatingTextSize();
+  }
 
+  public setText(text: string) {
+    this.text = text;
+    this.textElement.text(text);
+    this.setMinimumsByCalculatingTextSize();
+  }
+
+  private setMinimumsByCalculatingTextSize() {
+    this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
     var bbox = Utils.getBBox(this.element);
     this.textElement.attr("dy", -bbox.y);
     var clientHeight = bbox.height;
@@ -47,7 +57,7 @@ class Label extends Component {
 
 class TitleLabel extends Label {
   private static CSS_CLASS = "title-label";
-  constructor(text: string, orientation?: string) {
+  constructor(text?: string, orientation?: string) {
     super(text, orientation);
     this.classed(TitleLabel.CSS_CLASS, true);
   }
@@ -55,7 +65,7 @@ class TitleLabel extends Label {
 
 class AxisLabel extends Label {
   private static CSS_CLASS = "axis-label";
-  constructor(text: string, orientation?: string) {
+  constructor(text?: string, orientation?: string) {
     super(text, orientation);
     this.classed(AxisLabel.CSS_CLASS, true);
   }
