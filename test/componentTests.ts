@@ -139,7 +139,9 @@ describe("Component behavior", () => {
     });
 
     var hitBox = (<any> c).hitBox;
-    assert.equal(hitBox.style("fill"), "#ffffff", "the hitBox has a fill, ensuring that it will detect events");
+    var hitBoxFill = hitBox.style("fill");
+    var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
+    assert.isTrue(hitBoxFilled, hitBoxFill + "<- this should be filled, so the hitbox will detect events");
     assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
     svg.remove();
   });
