@@ -2,6 +2,7 @@
 ///<reference path="../typings/chai/chai-assert.d.ts" />
 /// <reference path="utils.ts" />
 /// <reference path="component.ts" />
+/// <reference path="coordinator.ts" />
 /// <reference path="scale.ts" />
 //grunt-start
 /// <reference path="axis.ts" />
