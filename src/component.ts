@@ -25,7 +25,7 @@ class Component {
 
   public anchor(element: D3.Selection) {
     if (element.node().childNodes.length > 0) {
-      throw new Error("Anchoring to a non-empty element is disallowed");
+      throw new Error("Can't anchor to a non-empty element");
     }
     this.element = element;
     if (this.clipPathEnabled) {this.generateClipPath();};
@@ -53,7 +53,7 @@ class Component {
         availableWidth  = parseFloat(this.element.attr("width" ));
         availableHeight = parseFloat(this.element.attr("height"));
       } else {
-        throw "null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node";
+        throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
       }
     }
     if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
@@ -67,7 +67,7 @@ class Component {
           yOffset += availableHeight - this.rowMinimum();
           break;
         default:
-          throw this.yAlignment + " is not a supported alignment";
+          throw new Error(this.yAlignment + " is not a supported alignment");
       }
       availableHeight = this.rowMinimum();
     }
@@ -82,7 +82,7 @@ class Component {
           xOffset += availableWidth - this.colMinimum();
           break;
         default:
-          throw this.xAlignment + " is not a supported alignment";
+          throw new Error(this.xAlignment + " is not a supported alignment");
       }
       availableWidth = this.colMinimum();
     }
