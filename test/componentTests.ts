@@ -20,8 +20,55 @@ describe("Component behavior", () => {
     c = new Component();
   });
 
-  it("components are sized properly when computeLayout is called with explicit arguments", () => {
-    svg.remove();
+  describe("anchor", () => {
+    it("anchoring works as expected", () => {
+      c.anchor(svg);
+      assert.equal(c.element, svg, "the component anchored to the svg");
+      svg.remove();
+    });
+
+    it("you cannot anchor to non-empty elements", () => {
+      svg.append("rect");
+      assert.throws(() => c.anchor(svg), Error);
+      svg.remove();
+    });
+  });
+
+  describe("computeLayout", () => {
+    it("computeLayout defaults intelligently", () => {
+      c.anchor(svg).computeLayout();
+      assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
+      assert.equal((<any> c).xOffset, 0 ,"xOffset defaulted to 0");
+      assert.equal((<any> c).yOffset, 0 ,"yOffset defaulted to 0");
+      svg.remove();
+    });
+
+    it("computeLayout will not default when attached to non-root node", () => {
+      var g = svg.append("g");
+      c.anchor(g);
+      assert.throws(() => c.computeLayout(), "null arguments");
+      svg.remove();
+    });
+
+    it("computeLayout throws an error when called on un-anchored component", () => {
+      assert.throws(() => c.computeLayout(), Error, "anchor must be called before computeLayout");
+      svg.remove();
+    });
+
+    it("computeLayout uses its arguments apropriately", () => {
+      var g = svg.append("g");
+      var xOff = 10;
+      var yOff = 20;
+      var width = 100;
+      var height = 200;
+      c.anchor(g).computeLayout(xOff, yOff, width, height);
+      var translate = getTranslate(c.element);
+      assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
+      assert.equal(c.availableWidth, width, "the width set properly");
+      assert.equal(c.availableHeight, height, "the height set propery");
+      svg.remove();
+    });
   });
 
   it("fixed-width component will align to the right spot", () => {
@@ -49,17 +96,6 @@ describe("Component behavior", () => {
     assert.equal(c.colWeight() , 0, "colWeight  defaults to 0");
     assert.equal(c.xAlignment, "LEFT", "xAlignment defaults to LEFT");
     assert.equal(c.yAlignment, "TOP" , "yAlignment defaults to TOP");
-    svg.remove();
-  });
-
-  it("you cannot anchor to non-empty elements", () => {
-    svg.append("rect");
-    assert.throws(() => c.anchor(svg), Error);
-    svg.remove();
-  });
-
-  it("you cannot computeLayout before anchoring", () => {
-    assert.throws(() => c.computeLayout(), Error);
     svg.remove();
   });
 
