@@ -29,7 +29,7 @@ describe("Tables", () => {
 
   it("tables transform null instances into base components", () => {
     var table = new Table([[null]]); // table with a single null component
-    var component = table.rows[0][0];
+    var component = (<any> table).rows[0][0];
     assert.isNotNull(component, "the component is not null");
     assert.equal(component.constructor.name, "Component", "the component is a base Component");
   });
