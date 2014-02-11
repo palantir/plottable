@@ -20,6 +20,7 @@ describe("Scales", () => {
     var scale = new Scale(d3.scale.linear());
     var callbackWasCalled = false;
     var testCallback: IBroadcasterCallback = (broadcaster: IBroadcaster) => {
+      assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
     scale.registerListener(testCallback);
