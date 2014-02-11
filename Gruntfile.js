@@ -60,6 +60,9 @@ module.exports = function(grunt) {
       files: ["src/*.ts", "test/*.ts"]
     },
     watch: {
+      "options": {
+        livereload: true
+      },
       "rebuild": {
         "tasks": ["build:rebuild"],
         "files": [
@@ -86,7 +89,8 @@ module.exports = function(grunt) {
     connect: {
       server: {
         options: {
-          port: 7007
+          port: 7007,
+          livereload: true
         }
       }
     }
@@ -99,8 +103,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask("build",
     [
-      "connect",
       "compile",
+      "connect",
       "watch"
     ]
   );
