@@ -45,7 +45,7 @@ class Component {
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
       if (this.element == null) {
-        throw new Error("anchor() must be called before computeLayout()");
+        throw new Error("anchor must be called before computeLayout");
       } else if (this.element.node().nodeName === "svg") {
         // we are the root node, let's guess width and height for convenience
         xOffset = 0;

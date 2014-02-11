@@ -21,17 +21,6 @@ function generateBasicTable(nRows, nCols) {
   return {"table": table, "renderers": renderers};
 }
 
-function getTranslate(element: D3.Selection) {
-  return d3.transform(element.attr("transform")).translate;
-}
-
-function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
-  var width = widthAndHeightPair[0];
-  var height = widthAndHeightPair[1];
-  assert.equal(bbox.width, width, "width: " + message);
-  assert.equal(bbox.height, height, "height: " + message);
-}
-
 describe("Table layout", () => {
 
   it("basic table with 2 rows 2 cols lays out properly", () => {

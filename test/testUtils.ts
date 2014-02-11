@@ -13,3 +13,14 @@ function generateSVG(width=400, height=400) {
   var svg = parent.append("svg").attr("width", width).attr("height", height);
   return svg;
 }
+
+function getTranslate(element: D3.Selection) {
+  return d3.transform(element.attr("transform")).translate;
+}
+
+function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
+  var width = widthAndHeightPair[0];
+  var height = widthAndHeightPair[1];
+  assert.equal(bbox.width, width, "width: " + message);
+  assert.equal(bbox.height, height, "height: " + message);
+}
