@@ -90,6 +90,11 @@ module.exports = function(grunt) {
           livereload: true
         }
       }
+    },
+    blanket_mocha: {
+      test: {
+        src: ['tests.html'],
+      }
     }
   });
 

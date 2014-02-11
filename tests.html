@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="bower_components/mocha/mocha.css">
     <link href="style.css" type="text/css" rel="stylesheet" />
     <script src="bower_components/chai/chai.js"></script>
-    <script src="build/plottable.js"></script>
+    <script src="build/plottable.js" data-cover></script>
     <script src="bower_components/mocha/mocha.js"></script>
+    <script src="bower_components/blanket/src/blanket.js"></script>
     <script>mocha.setup("bdd")</script>
 
     <!-- load chai and chai-as-promised-->
@@ -27,6 +28,11 @@
       else {
         mocha.run();
       }
+    </script>
+    <script>
+        if (window.PHANTOMJS) {
+            blanket.options("reporter", "/node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
+        }
     </script>
   </body>
 </html>
