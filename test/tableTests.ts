@@ -21,6 +21,10 @@ function generateBasicTable(nRows, nCols) {
   return {"table": table, "renderers": renderers};
 }
 
+function getTranslate(element: D3.Selection) {
+  return d3.transform(element.attr("transform")).translate;
+}
+
 function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
   var width = widthAndHeightPair[0];
   var height = widthAndHeightPair[1];
@@ -39,7 +43,7 @@ describe("Table layout", () => {
     table.anchor(svg).computeLayout(0, 0, 400, 400).render();
 
     var elements = renderers.map((r) => r.element);
-    var translates = elements.map((e) => Utils.getTranslate(e));
+    var translates = elements.map((e) => getTranslate(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 200], "third element is located properly");
@@ -63,7 +67,7 @@ describe("Table layout", () => {
     table.anchor(svg).computeLayout(0, 0, 415, 415).render();
 
     var elements = renderers.map((r) => r.element);
-    var translates = elements.map((e) => Utils.getTranslate(e));
+    var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Utils.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
     assert.deepEqual(translates[1], [210, 0], "second element is located properly");
@@ -97,7 +101,7 @@ describe("Table layout", () => {
     table.anchor(svg).computeLayout(0, 0, 400, 400).render();
 
     var elements = renderers.map((r) => r.element);
-    var translates = elements.map((e) => Utils.getTranslate(e));
+    var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Utils.getBBox(e));
     // test the translates
     assert.deepEqual(translates[1], [50, 0]  , "top axis translate");
