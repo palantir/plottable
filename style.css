@@ -66,10 +66,6 @@ rect {
   stroke: green;
 }
 
-.hit-box {
-  fill: red;
-  opacity: 0;
-}
 
 /*
 .error {

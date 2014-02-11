@@ -25,7 +25,7 @@ class Component {
 
   public anchor(element: D3.Selection) {
     if (element.node().childNodes.length > 0) {
-      throw new Error("Anchoring to a non-empty component is disallowed");
+      throw new Error("Anchoring to a non-empty element is disallowed");
     }
     this.element = element;
     if (this.clipPathEnabled) {this.generateClipPath();};
@@ -37,6 +37,7 @@ class Component {
     this.hitBox = this.addBox("hit-box");
     this.addBox("bounding-box");
 
+    this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
     return this;
   }
@@ -44,7 +45,7 @@ class Component {
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
       if (this.element == null) {
-        throw "anchor() must be called before computeLayout()";
+        throw new Error("anchor() must be called before computeLayout()");
       } else if (this.element.node().nodeName === "svg") {
         // we are the root node, let's guess width and height for convenience
         xOffset = 0;
@@ -99,10 +100,16 @@ class Component {
   }
 
   private addBox(className?: string, parentElement?: D3.Selection) {
+    if (this.element == null) {
+      throw new Error("Adding boxes before anchoring is currently disallowed");
+    }
     var parentElement = parentElement == null ? this.element : parentElement;
     var box = parentElement.append("rect");
     if (className != null) {box.classed(className, true);};
     this.boxes.push(box);
+    if (this.availableWidth != null && this.availableHeight != null) {
+      box.attr("width", this.availableWidth).attr("height", this.availableHeight);
+    }
     return box;
   }
 
@@ -123,10 +130,6 @@ class Component {
     if (this.element != null) {
       interaction.anchor(this.hitBox);
     }
-  }
-
-  public zoom(translate, scale) {
-    this.render(); // if not overwritten, a zoom event just causes the component to rerender
   }
 
   public classed(cssClass: string): boolean;
