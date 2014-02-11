@@ -19,8 +19,9 @@
     <!-- mocha results will be added to this div -->
     <div id="mocha"></div>
     <script>
+      mocha.setup({globals: ['LiveReload']});
       mocha.checkLeaks();
-      if (mochaPhantomJS) {
+      if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
       }
       else {
