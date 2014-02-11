@@ -74,10 +74,6 @@ module.exports = function(grunt) {
       "examples": {
         "tasks": ["ts:examples", "tslint"],
         "files": ["examples/**.ts"]
-      },
-      "test": {
-        "tasks": ["test"],
-        "files": ["src/*.ts", "test/**.ts"]
       }
     },
     mocha_phantomjs: {
@@ -98,7 +94,7 @@ module.exports = function(grunt) {
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("default", "launch");
 
-  grunt.registerTask("build" , ["compile", "watch:rebuild", "watch:tests", "watch:examples"]);
+  grunt.registerTask("build" , ["compile", "watch"]);
   grunt.registerTask("launch", ["connect", "build"]);
   grunt.registerTask("compile",
     ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]
