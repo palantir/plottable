@@ -10,10 +10,11 @@ describe("Utils", () => {
   });
 
   it("getBBox works properly", () => {
-    var svg = d3.select("body").append("svg");
+    var svg = generateSVG();
     var rect = svg.append("rect").attr("x", 0).attr("y", 0).attr("width", 5).attr("height", 5);
     var bb1 = Utils.getBBox(rect);
     var bb2 = (<any> rect.node()).getBBox();
     assert.deepEqual(bb1, bb2);
+    svg.remove();
   });
 });

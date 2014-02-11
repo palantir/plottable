@@ -5,10 +5,10 @@ var assert = chai.assert;
 describe("Labels", () => {
 
   it("Standard text title label generates properly", () => {
-    var svg = d3.select("body").append("svg:svg");
+    var svg = generateSVG(400, 80);
     var label = new TitleLabel("A CHART TITLE");
     label.anchor(svg);
-    label.computeLayout(0, 0, 400, 400);
+    label.computeLayout();
 
     var element = label.element;
     assert.isTrue(label.element.classed("label"), "title element has label css class");
@@ -27,14 +27,14 @@ describe("Labels", () => {
   });
 
   it("Italicized text is handled properly", () => {
-    var svg = d3.select("body").append("svg:svg");
+    var svg = generateSVG(400, 80);
     var label = new TitleLabel("A CHART TITLE");
     label.anchor(svg);
     var element = label.element;
     var text = element.select("text");
     text.style("font-style", "italic");
     (<any> label).setMinimumsByCalculatingTextSize(); // <any> to access private method
-    label.computeLayout(0, 0, 400, 400);
+    label.computeLayout();
     label.render();
     var bbox = Utils.getBBox(text);
     assert.operator(bbox.width, "<", label.colMinimum(), "text width is less than the col minimum (to account for italicized overhang)");
@@ -43,12 +43,12 @@ describe("Labels", () => {
     });
 
   it("Rotated text is handled properly", () => {
-    var svg = d3.select("body").append("svg:svg");
+    var svg = generateSVG(100, 400);
     var label = new AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
     label.anchor(svg);
     var element = label.element;
     var text = element.select("text");
-    label.computeLayout(0, 0, 400, 400);
+    label.computeLayout();
     label.render();
     var bbox = Utils.getBBox(text);
     assert.equal(bbox.width,  label.rowMinimum(), "text width === label.rowMinimum() (its rotated)");
@@ -59,12 +59,12 @@ describe("Labels", () => {
 
   it("Superlong text is handled in a sane fashion", () => {
     var svgWidth = 400;
-    var svg = d3.select("body").append("svg:svg");
+    var svg = generateSVG(svgWidth, 80);
     var label = new TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
     label.anchor(svg);
     var element = label.element;
     var text = element.select("text");
-    label.computeLayout(0, 0, svgWidth, 400);
+    label.computeLayout();
     label.render();
     var bbox = Utils.getBBox(text);
     assert.equal(bbox.width,  label.colMinimum(), "text width === label.colMinimum()");
@@ -75,7 +75,7 @@ describe("Labels", () => {
     });
 
   it("Labels with different font sizes have different space requirements", () => {
-    var svg = d3.select("body").append("svg:svg");
+    var svg = generateSVG(400, 80);
     var label = new TitleLabel("A CHART TITLE");
     label.anchor(svg);
     label.element.select("text").style("font-size", "18pt");
@@ -90,7 +90,7 @@ describe("Labels", () => {
     });
 
   it("Label text can be changed after label is created", () => {
-    var svg = d3.select("body").append("svg:svg");
+    var svg = generateSVG(400, 80);
     var label = new TitleLabel();
     label.anchor(svg);
     var textEl = label.element.select("text");

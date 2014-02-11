@@ -12,7 +12,7 @@ function assertComponentXY(component: Component, x: number, y: number, message: 
 
 describe("Component behavior", () => {
   it("fixed-width component will align to the right spot", () => {
-    var svg = generateSVG("300", "300");
+    var svg = generateSVG(300, 300);
     var component = new Component();
     component.rowMinimum(100).colMinimum(100);
     component.anchor(svg);

@@ -39,8 +39,8 @@ describe("Table layout", () => {
     var table = tableAndRenderers.table;
     var renderers = tableAndRenderers.renderers;
 
-    var svg = d3.select("body").append("svg:svg");
-    table.anchor(svg).computeLayout(0, 0, 400, 400).render();
+    var svg = generateSVG();
+    table.anchor(svg).computeLayout().render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
@@ -63,8 +63,8 @@ describe("Table layout", () => {
 
     table.padding(5,5);
 
-    var svg = d3.select("body").append("svg:svg");
-    table.anchor(svg).computeLayout(0, 0, 415, 415).render();
+    var svg = generateSVG(415, 415);
+    table.anchor(svg).computeLayout().render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
@@ -81,7 +81,7 @@ describe("Table layout", () => {
   });
 
   it("table with fixed-size objects on every side lays out properly", () => {
-    var svg = d3.select("body").append("svg:svg");
+    var svg = generateSVG();
     var tableAndRenderers = generateBasicTable(3,3);
     var table = tableAndRenderers.table;
     var renderers = tableAndRenderers.renderers;
@@ -98,7 +98,7 @@ describe("Table layout", () => {
     // finally the center 'plot' object has a weight
     renderers[4].rowWeight(1).colWeight(1);
 
-    table.anchor(svg).computeLayout(0, 0, 400, 400).render();
+    table.anchor(svg).computeLayout().render();
 
     var elements = renderers.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
