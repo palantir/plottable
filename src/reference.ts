@@ -11,4 +11,5 @@
 /// <reference path="perfdiagnostics.ts" />
 /// <reference path="renderer.ts" />
 /// <reference path="table.ts" />
+/// <reference path="coordinator.ts" />
 //grunt-end
