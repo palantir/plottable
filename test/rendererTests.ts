@@ -20,7 +20,6 @@ describe("Renderers", () => {
       assert.equal(r.colWeight(), 1, "colWeight defaults to 1");
       assert.equal(r.rowWeight(), 1, "rowWeight defaults to 1");
       assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
-      console.log("wee");
     });
 
     it("Base renderer functionality works", () => {
