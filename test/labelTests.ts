@@ -86,7 +86,6 @@ describe("Labels", () => {
     var label = new TitleLabel("A CHART TITLE");
     label.anchor(svg);
     var text = label.element.select("text");
-    (<any> label).setMinimumsByCalculatingTextSize(); // <any> to access private method
     svg.attr("width", (<any> label).textLength); // <any> to access private field
     label.computeLayout();
     label.render();
@@ -95,7 +94,6 @@ describe("Labels", () => {
     assert.operator((<any> label).textLength, "<=", svgWidth, "the non-italic text is not wider than the SVG width");
 
     text.style("font-style", "italic"); // the text should overflow now
-    (<any> label).setMinimumsByCalculatingTextSize(); // manually call this since Label can't detect a style change
     label.computeLayout();
     label.render();
     assert.equal((<any> label).textHeight, label.rowMinimum(), "text height === label.rowMinimum()");

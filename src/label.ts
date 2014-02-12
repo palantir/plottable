@@ -7,8 +7,7 @@ class Label extends Component {
   public yAlignment = "CENTER";
 
   private textElement: D3.Selection;
-  private text: string; // text assigned to the element; may not be the actual text displaed due to truncation
-  private displayText: string;
+  private text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
   private orientation: string;
   private textLength: number;
   private textHeight: number;
@@ -26,31 +25,15 @@ class Label extends Component {
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.textElement = this.element.append("text").text(this.text);
-    this.setMinimumsByCalculatingTextSize();
+    this.textElement = this.element.append("text");
+    this.setText(this.text);
     return this;
   }
 
   public setText(text: string) {
     this.text = text;
     this.textElement.text(text);
-    this.setMinimumsByCalculatingTextSize();
-  }
-
-  private setMinimumsByCalculatingTextSize() {
-    this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-    var bbox = Utils.getBBox(this.textElement);
-    this.textElement.attr("dy", -bbox.y);
-    this.textHeight = bbox.height;
-    this.textLength = bbox.width;
-
-    // italic text needs a slightly larger bounding box
-    if (this.textElement.style("font-style") === "italic") {
-      var textNode = <SVGTextElement> this.textElement.node();
-      // pad by half the width of the last character
-      this.textLength += 0.5 * textNode.getExtentOfChar(textNode.textContent.length-1).width;
-    }
-
+    this.calculateTextSize();
     if (this.orientation === "horizontal") {
       this.rowMinimum(this.textHeight);
     } else {
@@ -58,35 +41,53 @@ class Label extends Component {
     }
   }
 
+  private calculateTextSize() {
+    var bbox = Utils.getBBox(this.textElement);
+    this.textHeight = bbox.height;
+    this.textLength = bbox.width;
+    // italic text needs a slightly larger bounding box
+    if (this.textElement.style("font-style") === "italic") {
+      var textNode = <SVGTextElement> this.textElement.node();
+      // pad by half the height of the last character (equivalent to 30-degree tilt)
+      this.textLength += 0.5 * textNode.getExtentOfChar(textNode.textContent.length-1).height;
+    }
+  }
+
   private truncateTextToLength(availableLength: number) {
+    if (this.textLength < availableLength) {
+      return;
+    }
+
     this.textElement.text(this.text + "...");
     var textNode = <SVGTextElement> this.textElement.node();
-    var numChars = textNode.textContent.length;
-    var dotLength = textNode.getSubStringLength(numChars-3, 3);
-    for (var i=0; i<numChars; i++) {
+    var dotLength = textNode.getSubStringLength(textNode.textContent.length-3, 3);
+    if (dotLength > availableLength) {
+      this.textElement.text(""); // no room even for ellipsis
+    }
+
+    var numChars = this.text.length;
+    for (var i=1; i<numChars; i++) {
       var testLength = textNode.getSubStringLength(0, i);
       if ((testLength + dotLength) > availableLength) {
-        if (i > 0) {
-          this.textElement.text(this.text.substr(0, i-1).trim() + "...");
-        } else {
-          this.textElement.text(""); // no room even for ellipsis
-        }
-        this.setMinimumsByCalculatingTextSize();
-        return;
+        this.textElement.text(this.text.substr(0, i-1).trim() + "...");
+        break;
       }
     }
+    this.calculateTextSize();
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
 
+    this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
+    var bbox = Utils.getBBox(this.textElement);
+    this.textElement.attr("dy", -bbox.y);
+
     var xShift = 0;
     var yShift = 0;
 
     if (this.orientation === "horizontal") {
-      if (this.availableWidth < this.textLength) {
-        this.truncateTextToLength(this.availableWidth);
-      }
+      this.truncateTextToLength(this.availableWidth);
       switch (this.xAlignment) {
         case "LEFT":
           break;
@@ -97,12 +98,10 @@ class Label extends Component {
           xShift = this.availableWidth - this.textLength;
           break;
         default:
-          throw this.xAlignment + " is not a supported alignment";
+          throw new Error(this.xAlignment + " is not a supported alignment");
       }
     } else {
-      if (this.availableHeight < this.textLength) {
-        this.truncateTextToLength(this.availableHeight);
-      }
+      this.truncateTextToLength(this.availableHeight);
       switch (this.yAlignment) {
         case "TOP":
           break;
@@ -113,7 +112,7 @@ class Label extends Component {
           xShift = this.availableHeight - this.textLength;
           break;
         default:
-          throw this.yAlignment + " is not a supported alignment";
+          throw new Error(this.yAlignment + " is not a supported alignment");
       }
 
       if (this.orientation === "vertical-right") {
