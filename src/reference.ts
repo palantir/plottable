@@ -8,7 +8,6 @@
 /// <reference path="interaction.ts" />
 /// <reference path="interfaces.d.ts" />
 /// <reference path="label.ts" />
-/// <reference path="perfdiagnostics.ts" />
 /// <reference path="renderer.ts" />
 /// <reference path="table.ts" />
 /// <reference path="coordinator.ts" />
