@@ -80,26 +80,4 @@ describe("Labels", () => {
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
   });
-
-  it("Italicized text is handled properly", () => {
-    var svg = generateSVG(400, 80);
-    var label = new TitleLabel("A CHART TITLE");
-    label.anchor(svg);
-    var text = label.element.select("text");
-    svg.attr("width", (<any> label).textLength); // <any> to access private field
-    label.computeLayout();
-    label.render();
-    var svgWidth = Number(svg.attr("width"));
-    assert.equal((<any> label).textHeight, label.rowMinimum(), "text height === label.rowMinimum()");
-    assert.operator((<any> label).textLength, "<=", svgWidth, "the non-italic text is not wider than the SVG width");
-
-    text.style("font-style", "italic"); // the text should overflow now
-    label.computeLayout();
-    label.render();
-    assert.equal((<any> label).textHeight, label.rowMinimum(), "text height === label.rowMinimum()");
-    assert.operator((<any> label).textLength, "<=", svgWidth, "the italic text is not wider than the SVG width");
-    var textContent = text.node().textContent;
-    assert.equal(textContent.substr(textContent.length-3), "...", "Italicized text overflowed and was truncated");
-    svg.remove();
-  });
 });

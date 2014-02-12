@@ -45,16 +45,10 @@ class Label extends Component {
     var bbox = Utils.getBBox(this.textElement);
     this.textHeight = bbox.height;
     this.textLength = bbox.width;
-    // italic text needs a slightly larger bounding box
-    if (this.textElement.style("font-style") === "italic") {
-      var textNode = <SVGTextElement> this.textElement.node();
-      // pad by half the height of the last character (equivalent to 30-degree tilt)
-      this.textLength += 0.5 * textNode.getExtentOfChar(textNode.textContent.length-1).height;
-    }
   }
 
   private truncateTextToLength(availableLength: number) {
-    if (this.textLength < availableLength) {
+    if (this.textLength <= availableLength) {
       return;
     }
 
