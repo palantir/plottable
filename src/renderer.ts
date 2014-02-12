@@ -8,9 +8,7 @@ class Renderer extends Component {
   public element: D3.Selection;
   public scales: Scale[];
 
-  constructor(
-    dataset: IDataset
-  ) {
+  constructor(dataset: IDataset = {seriesName: "", data: []}) {
     super();
     super.rowWeight(1);
     super.colWeight(1);
@@ -21,12 +19,10 @@ class Renderer extends Component {
   }
 
   public data(dataset: IDataset): Renderer {
+    this.renderArea.classed(this.dataset.seriesName, false);
     this.dataset = dataset;
+    this.renderArea.classed(dataset.seriesName, true);
     return this;
-  }
-
-  public zoom(translate, scale) {
-    this.renderArea.attr("transform", "translate("+translate+") scale("+scale+")");
   }
 
   public anchor(element: D3.Selection) {
@@ -41,7 +37,7 @@ interface IAccessor {
 };
 
 class XYRenderer extends Renderer {
-  private static CSS_CLASS = "x-y-renderer";
+  private static CSS_CLASS = "xy-renderer";
   public dataSelection: D3.UpdateSelection;
   private static defaultXAccessor = (d: any) => d.x;
   private static defaultYAccessor = (d: any) => d.y;
