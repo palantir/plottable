@@ -159,4 +159,38 @@ describe("Component behavior", () => {
     assert.equal(hitBox2, hitNode, "hitBox2 was registerd");
     svg.remove();
   });
+
+  it("errors are thrown on bad alignments", () => {
+    c.rowWeight(0);
+    c.colWeight(0);
+    c.rowMinimum(10);
+    c.colMinimum(10);
+    c.xAlignment = "foo";
+    c.anchor(svg);
+    assert.throws(() => c.computeLayout(), Error, "not a supported alignment");
+    c.xAlignment = "CENTER";
+    c.yAlignment = "bar";
+    assert.throws(() => c.computeLayout(), Error, "not a supported alignment");
+    svg.remove();
+  });
+
+  it("css classing works as expected", () => {
+    assert.isFalse(c.classed("CSS-PREANCHOR-KEEP"));
+    c.classed("CSS-PREANCHOR-KEEP", true);
+    assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
+    c.classed("CSS-PREANCHOR-REMOVE", true);
+    assert.isTrue(c.classed("CSS-PREANCHOR-REMOVE"));
+    c.classed("CSS-PREANCHOR-REMOVE", false);
+    assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
+
+    c.anchor(svg);
+    assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
+    assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
+    assert.isFalse(c.classed("CSS-POSTANCHOR"));
+    c.classed("CSS-POSTANCHOR", true);
+    assert.isTrue(c.classed("CSS-POSTANCHOR"));
+    c.classed("CSS-POSTANCHOR", false);
+    assert.isFalse(c.classed("CSS-POSTANCHOR"));
+    svg.remove();
+  });
 });
