@@ -8,9 +8,7 @@ class Renderer extends Component {
   public element: D3.Selection;
   public scales: Scale[];
 
-  constructor(
-    dataset: IDataset
-  ) {
+  constructor(dataset: IDataset = {seriesName: "", data: []}) {
     super();
     super.rowWeight(1);
     super.colWeight(1);
@@ -21,12 +19,10 @@ class Renderer extends Component {
   }
 
   public data(dataset: IDataset): Renderer {
+    this.renderArea.classed(this.dataset.seriesName, false);
     this.dataset = dataset;
+    this.renderArea.classed(dataset.seriesName, true);
     return this;
-  }
-
-  public zoom(translate, scale) {
-    this.renderArea.attr("transform", "translate("+translate+") scale("+scale+")");
   }
 
   public anchor(element: D3.Selection) {
@@ -41,7 +37,7 @@ interface IAccessor {
 };
 
 class XYRenderer extends Renderer {
-  private static CSS_CLASS = "x-y-renderer";
+  private static CSS_CLASS = "xy-renderer";
   public dataSelection: D3.UpdateSelection;
   private static defaultXAccessor = (d: any) => d.x;
   private static defaultYAccessor = (d: any) => d.y;
@@ -77,12 +73,13 @@ class XYRenderer extends Renderer {
     return this;
   }
 
-  public invertXYSelectionArea(area: SelectionArea) {
-    var xMin = this.xScale.invert(area.xMin);
-    var xMax = this.xScale.invert(area.xMax);
-    var yMin = this.yScale.invert(area.yMin);
-    var yMax = this.yScale.invert(area.yMax);
-    return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
+  public invertXYSelectionArea(pixelArea: SelectionArea): FullSelectionArea {
+    var xMin = this.xScale.invert(pixelArea.xMin);
+    var xMax = this.xScale.invert(pixelArea.xMax);
+    var yMin = this.yScale.invert(pixelArea.yMin);
+    var yMax = this.yScale.invert(pixelArea.yMax);
+    var dataArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
+    return {pixel: pixelArea, data: dataArea};
   }
 
   public getSelectionFromArea(area: FullSelectionArea) {
