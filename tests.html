@@ -2,25 +2,28 @@
 <html>
   <head>
     <meta name="google" value="notranslate">
-    <title>plottable Tests</title>
-    <!-- load mocha -->
-    <script src="bower_components/d3/d3.min.js"></script>
+    <title>Plottable.js Tests</title>
     <link rel="stylesheet" href="bower_components/mocha/mocha.css">
     <link href="style.css" type="text/css" rel="stylesheet" />
-    <script src="bower_components/chai/chai.js"></script>
-    <script src="build/plottable.js"></script>
-    <script src="bower_components/mocha/mocha.js"></script>
-    <script>mocha.setup("bdd")</script>
-    <style> svg {border: 2px solid blue;} </style>
+    <style>
+      svg {
+        border: 2px solid blue;
+      }
+    </style>
 
-    <!-- load chai and chai-as-promised-->
-    <script src="build/tests.js"></script>
+    <script src="bower_components/d3/d3.min.js"></script>
+    <script src="bower_components/chai/chai.js"></script>
+    <script src="bower_components/mocha/mocha.js"></script>
+    <script src="blanket_mocha.js"></script>
+    <script src="build/plottable.js" data-cover></script>
   </head>
   <body>
-    <!-- mocha results will be added to this div -->
     <div id="mocha"></div>
     <script>
-      mocha.setup({globals: ['LiveReload']});
+      mocha.setup({
+        globals: ['LiveReload'],
+        ui: "bdd"
+      });
       mocha.checkLeaks();
       if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
@@ -29,5 +32,7 @@
         mocha.run();
       }
     </script>
+
+    <script src="build/tests.js"></script>
   </body>
 </html>
