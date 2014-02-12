@@ -33,7 +33,7 @@ class Label extends Component {
   public setText(text: string) {
     this.text = text;
     this.textElement.text(text);
-    this.calculateTextSize();
+    this.measureAndSetTextSize();
     if (this.orientation === "horizontal") {
       this.rowMinimum(this.textHeight);
     } else {
@@ -41,7 +41,7 @@ class Label extends Component {
     }
   }
 
-  private calculateTextSize() {
+  private measureAndSetTextSize() {
     var bbox = Utils.getBBox(this.textElement);
     this.textHeight = bbox.height;
     this.textLength = bbox.width;
@@ -63,6 +63,8 @@ class Label extends Component {
     var dotLength = textNode.getSubStringLength(textNode.textContent.length-3, 3);
     if (dotLength > availableLength) {
       this.textElement.text(""); // no room even for ellipsis
+      this.measureAndSetTextSize();
+      return;
     }
 
     var numChars = this.text.length;
@@ -70,10 +72,10 @@ class Label extends Component {
       var testLength = textNode.getSubStringLength(0, i);
       if ((testLength + dotLength) > availableLength) {
         this.textElement.text(this.text.substr(0, i-1).trim() + "...");
-        break;
+        this.measureAndSetTextSize();
+        return;
       }
     }
-    this.calculateTextSize();
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
