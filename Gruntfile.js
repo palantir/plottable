@@ -76,8 +76,11 @@ module.exports = function(grunt) {
         "files": ["examples/**.ts"]
       }
     },
-    mocha_phantomjs: {
-      all: ['tests.html']
+    blanket_mocha: {
+      all: ['tests.html'],
+      options: {
+        threshold: 60
+      }
     },
     connect: {
       server: {
@@ -100,7 +103,7 @@ module.exports = function(grunt) {
     ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]
     );
 
-  grunt.registerTask("test", ["mocha_phantomjs"]);
+  grunt.registerTask("test", ["blanket_mocha"]);
 
-  grunt.registerTask("watch-test", ["mocha_phantomjs", "watch:test"]);
+  grunt.registerTask("watch-test", ["blanket_mocha", "watch:test"]);
 };

@@ -34,5 +34,10 @@
     </script>
 
     <script src="build/tests.js"></script>
+    <script>
+        if (window.PHANTOMJS) {
+            blanket.options("reporter", "node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
+        }
+    </script>
   </body>
 </html>

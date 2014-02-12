@@ -15,12 +15,11 @@
     "grunt-ts": "~1.6.4",
     "tsd": "~0.5.5",
     "bower": "~1.2.8",
-    "grunt-bower-task": "~0.3.4",
-    "grunt-tsd": "0.0.1",
     "tslint": "~0.4.2",
     "grunt-tslint": "~0.4.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-mocha-phantomjs": "~0.4.0",
-    "grunt-contrib-connect": "~0.6.0"
+    "grunt-contrib-connect": "~0.6.0",
+    "grunt-blanket-mocha": "~0.4.0"
   }
 }
