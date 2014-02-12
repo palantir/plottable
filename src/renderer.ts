@@ -73,12 +73,13 @@ class XYRenderer extends Renderer {
     return this;
   }
 
-  public invertXYSelectionArea(area: SelectionArea) {
-    var xMin = this.xScale.invert(area.xMin);
-    var xMax = this.xScale.invert(area.xMax);
-    var yMin = this.yScale.invert(area.yMin);
-    var yMax = this.yScale.invert(area.yMax);
-    return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
+  public invertXYSelectionArea(pixelArea: SelectionArea): FullSelectionArea {
+    var xMin = this.xScale.invert(pixelArea.xMin);
+    var xMax = this.xScale.invert(pixelArea.xMax);
+    var yMin = this.yScale.invert(pixelArea.yMin);
+    var yMax = this.yScale.invert(pixelArea.yMax);
+    var dataArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
+    return {pixel: pixelArea, data: dataArea};
   }
 
   public getSelectionFromArea(area: FullSelectionArea) {
