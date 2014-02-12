@@ -7,8 +7,10 @@ class Label extends Component {
   public yAlignment = "CENTER";
 
   private textElement: D3.Selection;
-  private text: string;
+  private text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
   private orientation: string;
+  private textLength: number;
+  private textHeight: number;
 
   constructor(text = "", orientation = "horizontal") {
     super();
@@ -23,36 +25,104 @@ class Label extends Component {
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.textElement = this.element.append("text").text(this.text);
-    this.setMinimumsByCalculatingTextSize();
+    this.textElement = this.element.append("text");
+    this.setText(this.text);
     return this;
   }
 
   public setText(text: string) {
     this.text = text;
     this.textElement.text(text);
-    this.setMinimumsByCalculatingTextSize();
+    this.measureAndSetTextSize();
+    if (this.orientation === "horizontal") {
+      this.rowMinimum(this.textHeight);
+    } else {
+      this.colMinimum(this.textHeight);
+    }
   }
 
-  private setMinimumsByCalculatingTextSize() {
-    this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-    var bbox = Utils.getBBox(this.element);
-    this.textElement.attr("dy", -bbox.y);
-    var clientHeight = bbox.height;
-    var clientWidth  = bbox.width;
+  private measureAndSetTextSize() {
+    var bbox = Utils.getBBox(this.textElement);
+    this.textHeight = bbox.height;
+    this.textLength = bbox.width;
+  }
 
-    if (this.orientation === "horizontal") {
-      this.rowMinimum(clientHeight);
-      this.colMinimum(clientWidth);
-    } else {
-      this.colMinimum(clientHeight);
-      this.rowMinimum(clientWidth);
-      if (this.orientation === "vertical-right") {
-        this.textElement.attr("transform", "rotate(90)").attr("y", -clientHeight);
-      } else if (this.orientation === "vertical-left") {
-        this.textElement.attr("transform", "rotate(-90)").attr("x", -clientWidth);
+  private truncateTextToLength(availableLength: number) {
+    if (this.textLength <= availableLength) {
+      return;
+    }
+
+    this.textElement.text(this.text + "...");
+    var textNode = <SVGTextElement> this.textElement.node();
+    var dotLength = textNode.getSubStringLength(textNode.textContent.length-3, 3);
+    if (dotLength > availableLength) {
+      this.textElement.text(""); // no room even for ellipsis
+      this.measureAndSetTextSize();
+      return;
+    }
+
+    var numChars = this.text.length;
+    for (var i=1; i<numChars; i++) {
+      var testLength = textNode.getSubStringLength(0, i);
+      if ((testLength + dotLength) > availableLength) {
+        this.textElement.text(this.text.substr(0, i-1).trim() + "...");
+        this.measureAndSetTextSize();
+        return;
       }
     }
+  }
+
+  public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+    super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+
+    this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
+    var bbox = Utils.getBBox(this.textElement);
+    this.textElement.attr("dy", -bbox.y);
+
+    var xShift = 0;
+    var yShift = 0;
+
+    if (this.orientation === "horizontal") {
+      this.truncateTextToLength(this.availableWidth);
+      switch (this.xAlignment) {
+        case "LEFT":
+          break;
+        case "CENTER":
+          xShift = (this.availableWidth - this.textLength) / 2;
+          break;
+        case "RIGHT":
+          xShift = this.availableWidth - this.textLength;
+          break;
+        default:
+          throw new Error(this.xAlignment + " is not a supported alignment");
+      }
+    } else {
+      this.truncateTextToLength(this.availableHeight);
+      switch (this.yAlignment) {
+        case "TOP":
+          break;
+        case "CENTER":
+          xShift = (this.availableHeight - this.textLength) / 2;
+          break;
+        case "BOTTOM":
+          xShift = this.availableHeight - this.textLength;
+          break;
+        default:
+          throw new Error(this.yAlignment + " is not a supported alignment");
+      }
+
+      if (this.orientation === "vertical-right") {
+        this.textElement.attr("transform", "rotate(90)");
+        yShift = -this.textHeight;
+      } else { // vertical-left
+        this.textElement.attr("transform", "rotate(-90)");
+        xShift = -xShift - this.textLength; // flip xShift
+      }
+    }
+
+    this.textElement.attr("x", xShift);
+    this.textElement.attr("y", yShift);
+    return this;
   }
 }
 
