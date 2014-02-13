@@ -80,4 +80,26 @@ describe("Labels", () => {
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
   });
+
+  it("text in a tiny box is truncated to empty string", () => {
+    var svg = generateSVG(10, 10);
+    var label = new TitleLabel("Yeah, not gonna fit...");
+    label.anchor(svg).computeLayout().render();
+    var text = label.element.select("text");
+    assert.equal(text.text(), "", "text was truncated to empty string");
+    svg.remove();
+  });
+
+  it("unsupported alignments and orientations are unsupported", () => {
+    assert.throws(() => new Label("foo", "bar"), Error, "not a valid orientation");
+    var l1 = new Label("foo", "horizontal");
+    var svg = generateSVG(10, 10);
+    l1.anchor(svg);
+    l1.xAlignment = "bar";
+    l1.yAlignment = "bar";
+    assert.throws(() => l1.computeLayout(), Error, "supported alignment");
+    (<any> l1).orientation = "vertical-left";
+    assert.throws(() => l1.computeLayout(), Error, "supported alignment");
+    svg.remove();
+  });
 });
