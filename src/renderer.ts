@@ -169,8 +169,7 @@ class CircleRenderer extends XYRenderer {
 class BarRenderer extends XYRenderer {
   private static CSS_CLASS = "bar-renderer";
   private static defaultX2Accessor = (d: any) => d.x2;
-  private BAR_START_PADDING_PX = 1;
-  private BAR_END_PADDING_PX = 1;
+  public barPaddingPx = 1;
 
   public x2Accessor: IAccessor;
 
@@ -186,7 +185,7 @@ class BarRenderer extends XYRenderer {
     var yDomain = this.yScale.domain();
     if (!Utils.inRange(0, yDomain[0], yDomain[1])) {
       var newMin = 0;
-      var newMax = 1.1 * yDomain[1];
+      var newMax = yDomain[1];
       this.yScale.widenDomain([newMin, newMax]); // TODO: make this handle reversed scales
     }
 
@@ -203,11 +202,11 @@ class BarRenderer extends XYRenderer {
 
     this.dataSelection = this.renderArea.selectAll("rect").data(this.dataset.data);
     this.dataSelection.enter().append("rect");
-    this.dataSelection.transition()
-          .attr("x", (d: any) => this.xScale.scale(this.xAccessor(d)) + this.BAR_START_PADDING_PX)
+    this.dataSelection
+          .attr("x", (d: any) => this.xScale.scale(this.xAccessor(d)) + this.barPaddingPx)
           .attr("y", (d: any) => this.yScale.scale(this.yAccessor(d)))
           .attr("width", (d: any) => (this.xScale.scale(this.x2Accessor(d)) - this.xScale.scale(this.xAccessor(d))
-                                          - this.BAR_START_PADDING_PX - this.BAR_END_PADDING_PX))
+                                          - 2 * this.barPaddingPx))
           .attr("height", (d: any) => maxScaledY - this.yScale.scale(this.yAccessor(d)) );
     this.dataSelection.exit().remove();
     return this;
