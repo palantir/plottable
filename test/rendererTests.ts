@@ -63,18 +63,21 @@ describe("Renderers", () => {
       });
 
       it("the line renderer drew an appropriate line", () => {
-        assert.equal(renderArea.attr("d"), "M0,500L500,0");
+        var path = renderArea.select("path");
+        assert.equal(path.attr("d"), "M0,500L500,0");
       });
 
       it("rendering is idempotent", () => {
         lineRenderer.render();
-        assert.equal(renderArea.attr("d"), "M0,500L500,0");
+        var path = renderArea.select("path");
+        assert.equal(path.attr("d"), "M0,500L500,0");
       });
 
       it("rescaled rerender works properly", () => {
         xScale.domain([0, 5]);
         yScale.domain([0, 10]);
-        assert.equal(renderArea.attr("d"), "M0,500L100,450");
+        var path = renderArea.select("path");
+        assert.equal(path.attr("d"), "M0,500L100,450");
       });
 
       after(() => {

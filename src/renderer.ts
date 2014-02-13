@@ -118,6 +118,7 @@ class XYRenderer extends Renderer {
 
 class LineRenderer extends XYRenderer {
   private static CSS_CLASS = "line-renderer";
+  private path: D3.Selection;
   private line: D3.Svg.Line;
 
   constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
@@ -127,7 +128,7 @@ class LineRenderer extends XYRenderer {
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.renderArea = this.renderArea.append("path");
+    this.path = this.renderArea.append("path");
     return this;
   }
 
@@ -136,10 +137,10 @@ class LineRenderer extends XYRenderer {
     this.line = d3.svg.line()
                       .x((datum: any) => this.xScale.scale(this.xAccessor(datum)))
                       .y((datum: any) => this.yScale.scale(this.yAccessor(datum)));
-    this.dataSelection = this.renderArea.classed("line", true)
+    this.dataSelection = this.path.classed("line", true)
       .classed(this.dataset.seriesName, true)
       .datum(this.dataset.data);
-    this.renderArea.attr("d", this.line);
+    this.path.attr("d", this.line);
     return this;
   }
 }
