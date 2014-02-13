@@ -24,3 +24,17 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
   assert.equal(bbox.width, width, "width: " + message);
   assert.equal(bbox.height, height, "height: " + message);
 }
+
+class MultiTestVerifier {
+  public passed = true;
+  private temp: boolean;
+
+  public start() {
+    this.temp = this.passed;
+    this.passed = false;
+  }
+
+  public end() {
+    this.passed = this.temp;
+  }
+}
