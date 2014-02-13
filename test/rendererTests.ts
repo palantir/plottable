@@ -50,6 +50,17 @@ describe("Renderers", () => {
       var pixelAreaPartial: SelectionArea;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
+      var allTestsPassed = true;
+      var tempTestsPassed: boolean;
+      beforeEach(() => {
+        // We want to persist the effect where the svg hangs around if any of the tests passed.
+        // Set allTestsPassed to false at start of each test, and cache old allTestsPassed in temp var
+        // When test completes, swap the temp var back into allTestsPassed. Failure propogates thru to end.
+        tempTestsPassed = allTestsPassed;
+        allTestsPassed = false;
+      });
+
+
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new LinearScale();
@@ -66,6 +77,7 @@ describe("Renderers", () => {
         assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
         assert.lengthOf(circleRenderer.renderArea.selectAll("circle")[0], 10, "10 circles were drawn");
+        allTestsPassed = tempTestsPassed;
       });
 
       it("invertXYSelectionArea works", () => {
@@ -80,6 +92,7 @@ describe("Renderers", () => {
         assert.closeTo(actualDataAreaPartial.xMax, expectedDataAreaPartial.xMax, 1, "partial xMax is close");
         assert.closeTo(actualDataAreaPartial.yMin, expectedDataAreaPartial.yMin, 1, "partial yMin is close");
         assert.closeTo(actualDataAreaPartial.yMax, expectedDataAreaPartial.yMax, 1, "partial yMax is close");
+        allTestsPassed = tempTestsPassed;
       });
 
       it("getSelectionFromArea works", () => {
@@ -90,6 +103,7 @@ describe("Renderers", () => {
         var partialSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaPartial);
         var selectionPartial = circleRenderer.getSelectionFromArea(partialSelectionArea);
         assert.lengthOf(selectionPartial[0], 2, "2 circles were selected by the partial region");
+        allTestsPassed = tempTestsPassed;
       });
 
       it("getDataIndicesFromArea works", () => {
@@ -100,6 +114,7 @@ describe("Renderers", () => {
         var partialSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaPartial);
         var indicesPartial = circleRenderer.getDataIndicesFromArea(partialSelectionArea);
         assert.deepEqual(indicesPartial, [6, 7], "2 circles were selected by the partial region");
+        allTestsPassed = tempTestsPassed;
       });
 
       describe("after the scale has changed", () => {
@@ -119,6 +134,7 @@ describe("Renderers", () => {
           assert.closeTo(actualDataAreaPartial.xMax, expectedDataAreaPartial.xMax, 1, "partial xMax is close");
           assert.closeTo(actualDataAreaPartial.yMin, expectedDataAreaPartial.yMin, 1, "partial yMin is close");
           assert.closeTo(actualDataAreaPartial.yMax, expectedDataAreaPartial.yMax, 1, "partial yMax is close");
+          allTestsPassed = tempTestsPassed;
         });
 
         it("getSelectionFromArea works", () => {
@@ -129,6 +145,7 @@ describe("Renderers", () => {
           var partialSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaPartial);
           var selectionPartial = circleRenderer.getSelectionFromArea(partialSelectionArea);
           assert.lengthOf(selectionPartial[0], 0, "no circles were selected by the partial region");
+          allTestsPassed = tempTestsPassed;
         });
 
         it("getDataIndicesFromArea works", () => {
@@ -139,6 +156,7 @@ describe("Renderers", () => {
           var partialSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaPartial);
           var indicesPartial = circleRenderer.getDataIndicesFromArea(partialSelectionArea);
           assert.deepEqual(indicesPartial, [], "no circles were selected by the partial region");
+          allTestsPassed = tempTestsPassed;
         });
 
         it("the circles re-rendered properly", () => {
@@ -148,7 +166,6 @@ describe("Renderers", () => {
           var renderAreaTransform = d3.transform(renderArea.attr("transform"));
           var translate = renderAreaTransform.translate;
           var scale     = renderAreaTransform.scale;
-
           function elementFunction(datum, index) {
             // This function takes special care to compute the position of circles after taking svg transformation
             // into account.
@@ -166,11 +183,12 @@ describe("Renderers", () => {
           };
           circles.each(elementFunction);
           assert.equal(circlesInArea, 4, "four circles were found in the render area");
+          allTestsPassed = tempTestsPassed;
         });
       });
 
       after(() => {
-        svg.remove();
+        if (allTestsPassed) {svg.remove();};
       });
 
     });
