@@ -10,7 +10,8 @@ function makeQuadraticSeries(n: number): IDataset {
   return {data: data, seriesName: "quadratic-series"};
 }
 
-var dataset1 = makeQuadraticSeries(10);
+var quadraticDataset = makeQuadraticSeries(10);
+
 
 describe("Renderers", () => {
 
@@ -41,6 +42,46 @@ describe("Renderers", () => {
   });
 
   describe("XYRenderer functionality", () => {
+
+    describe("Basic LineRenderer functionality", () => {
+      // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
+      // draws properly for the LineRenderer
+      var svg: D3.Selection;
+      var xScale;
+      var yScale;
+      var lineRenderer;
+      var simpleDataset = {seriesName: "simpleDataset", data: [{x: 0, y:0}, {x:1, y:1}]};
+      var renderArea;
+
+      before(() => {
+        svg = generateSVG(500, 500);
+        xScale = new LinearScale();
+        yScale = new LinearScale();
+        lineRenderer = new LineRenderer(simpleDataset, xScale, yScale);
+        lineRenderer.anchor(svg).computeLayout().render();
+        renderArea = lineRenderer.renderArea;
+      });
+
+      it("the line renderer drew an appropriate line", () => {
+        assert.equal(renderArea.attr("d"), "M0,500L500,0");
+      });
+
+      it("rendering is idempotent", () => {
+        lineRenderer.render();
+        assert.equal(renderArea.attr("d"), "M0,500L500,0");
+      });
+
+      it("rescaled rerender works properly", () => {
+        xScale.domain([0, 5]);
+        yScale.domain([0, 10]);
+        assert.equal(renderArea.attr("d"), "M0,500L100,450");
+      });
+
+      after(() => {
+        svg.remove();
+      });
+    });
+
     describe("Example CircleRenderer with quadratic series", () => {
       var svg: D3.Selection;
       var xScale: LinearScale;
@@ -89,7 +130,7 @@ describe("Renderers", () => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new LinearScale();
         yScale = new LinearScale();
-        circleRenderer = new CircleRenderer(dataset1, xScale, yScale);
+        circleRenderer = new CircleRenderer(quadraticDataset, xScale, yScale);
         circleRenderer.anchor(svg).computeLayout().render();
         pixelAreaFull = {xMin: 0, xMax: SVG_WIDTH, yMin: 0, yMax: SVG_HEIGHT};
         pixelAreaPartial = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
