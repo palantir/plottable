@@ -127,4 +127,10 @@ describe("Tables", () => {
     assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
     svg.remove();
   });
+
+  it("you can't set colMinimum or rowMinimum on tables directly", () => {
+    var table = new Table([[]]);
+    assert.throws(() => table.rowMinimum(3), Error, "cannot be directly set");
+    assert.throws(() => table.colMinimum(3), Error, "cannot be directly set");
+  });
 });
