@@ -43,14 +43,14 @@ describe("Renderers", () => {
 
   describe("XYRenderer functionality", () => {
 
-    describe("Basic LineRenderer functionality", () => {
+    describe("Basic LineRenderer functionality, with custom accessors", () => {
       // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
       // draws properly for the LineRenderer
       var svg: D3.Selection;
       var xScale;
       var yScale;
       var lineRenderer;
-      var simpleDataset = {seriesName: "simpleDataset", data: [{x: 0, y:0}, {x:1, y:1}]};
+      var simpleDataset = {seriesName: "simpleDataset", data: [{foo: 0, bar:0}, {foo:1, bar:1}]};
       var renderArea;
       var verifier = new MultiTestVerifier();
 
@@ -58,7 +58,9 @@ describe("Renderers", () => {
         svg = generateSVG(500, 500);
         xScale = new LinearScale();
         yScale = new LinearScale();
-        lineRenderer = new LineRenderer(simpleDataset, xScale, yScale);
+        var xAccessor = (d) => d.foo;
+        var yAccessor = (d) => d.bar;
+        lineRenderer = new LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
         lineRenderer.anchor(svg).computeLayout().render();
         renderArea = lineRenderer.renderArea;
       });
@@ -252,7 +254,67 @@ describe("Renderers", () => {
       after(() => {
         if (verifier.passed) {svg.remove();};
       });
+    });
 
+    describe("Bar Renderer", () => {
+      var svg: D3.Selection;
+      var xScale: LinearScale;
+      var yScale: LinearScale;
+      var barRenderer: BarRenderer;
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
+      var verifier = new MultiTestVerifier();
+      var d0 = {x: 0, x2: 1, y: 1};
+      var d1 = {x: 2, x2: 6, y: 4};
+      var dataset = {seriesName: "sampleBarData", data: [d0, d1]};
+
+      before(() => {
+        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new LinearScale();
+        yScale = new LinearScale();
+        barRenderer = new BarRenderer(dataset, xScale, yScale);
+        barRenderer.anchor(svg).computeLayout();
+      });
+
+      beforeEach(() => {
+        verifier.start();
+      });
+
+      it("bars were rendered correctly with padding disabled", () => {
+        barRenderer.barPaddingPx = 0;
+        barRenderer.render();
+        var renderArea = barRenderer.renderArea;
+        var bars = renderArea.selectAll("rect");
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "400", "bar1 width is correct");
+        assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
+        assert.equal(bar1.attr("height"), "400", "bar1 height is correct");
+        assert.equal(bar0.attr("x"), "0", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "200", "bar1 x is correct");
+        verifier.end();
+      });
+
+      it("bars were rendered correctly with padding enabled", () => {
+        barRenderer.barPaddingPx = 1;
+        barRenderer.render();
+        var renderArea = barRenderer.renderArea;
+        var bars = renderArea.selectAll("rect");
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("width"), "98", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "398", "bar1 width is correct");
+        assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
+        assert.equal(bar1.attr("height"), "400", "bar1 height is correct");
+        assert.equal(bar0.attr("x"), "1", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "201", "bar1 x is correct");
+        verifier.end();
+      });
+
+      after(() => {
+        if (verifier.passed) {svg.remove();};
+      });
     });
   });
 });
