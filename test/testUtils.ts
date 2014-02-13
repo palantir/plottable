@@ -25,6 +25,22 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
   assert.equal(bbox.height, height, "height: " + message);
 }
 
+function makeLinearSeries(n: number): IDataset {
+  function makePoint(x: number) {
+    return {x: x, y: x};
+  }
+  var data = d3.range(n).map(makePoint);
+  return {data: data, seriesName: "linear-series"};
+}
+
+function makeQuadraticSeries(n: number): IDataset {
+  function makeQuadraticPoint(x: number) {
+    return {x: x, y: x*x};
+  }
+  var data = d3.range(n).map(makeQuadraticPoint);
+  return {data: data, seriesName: "quadratic-series"};
+}
+
 class MultiTestVerifier {
   public passed = true;
   private temp: boolean;

@@ -16,7 +16,7 @@ module Demo {
   basicTable.anchor(svg1);
   basicTable.computeLayout();
   basicTable.render();
-  new PanZoomInteraction(renderAreaD1, [xAxis, yAxis, renderAreaD1], xScale, yScale);
+  //new PanZoomInteraction(renderAreaD1, [xAxis, yAxis, renderAreaD1], xScale, yScale);
 
 
 

@@ -32,7 +32,7 @@ interface ZoomInfo {
 }
 
 class PanZoomInteraction extends Interaction {
-  private zoom;
+  private zoom: D3.Behavior.Zoom;
   public renderers: Component[];
   public xScale: QuantitiveScale;
   public yScale: QuantitiveScale;
@@ -55,7 +55,7 @@ class PanZoomInteraction extends Interaction {
 
   private rerenderZoomed() {
     // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
-    // event listener machinery, let's grab the domain out of hte d3 scale and pipe it back into the TS scale
+    // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
     var xDomain = this.xScale.scale.domain();
     var yDomain = this.yScale.scale.domain();
     this.xScale.domain(xDomain);
@@ -101,7 +101,7 @@ class AreaInteraction extends Interaction {
   }
 
   private dragstart(){
-    this.dragBox.attr("height", 0).attr("width", 0);
+    this.clearBox();
     var availableWidth  = parseFloat(this.hitBox.attr("width"));
     var availableHeight = parseFloat(this.hitBox.attr("height"));
     // the constraint functions ensure that the selection rectangle will not exceed the hit box
