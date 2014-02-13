@@ -29,6 +29,29 @@ function fakeDragSequence(anyedInteraction: any, startX: number, startY: number,
 }
 
 describe("Interactions", () => {
+  describe("PanZoomInteraction", () => {
+    it.skip("Properly updates scales on zoom", () => {
+      //
+      var xScale = new LinearScale();
+      var yScale = new LinearScale();
+      var xDomainBefore = xScale.domain();
+      var yDomainBefore = yScale.domain();
+
+      var svg = generateSVG();
+      var component = new Component();
+      component.anchor(svg).computeLayout().render();
+      var interaction = new PanZoomInteraction(component, [], xScale, yScale);
+
+      // var zoomEvent = document.createEvent("WheelEvent");
+      // zoomEvent.initEvent("mousewheel", true, true);
+      // var hb = component.element.select(".hit-box").node();
+
+      // hb.dispatchEvent(zoomEvent);
+
+      svg.remove();
+    });
+  });
+
   describe("AreaInteraction", () => {
     var svgWidth = 400;
     var svgHeight = 400;
