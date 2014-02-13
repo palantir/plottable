@@ -52,6 +52,31 @@ describe("Renderers", () => {
       var SVG_HEIGHT = 300;
       var allTestsPassed = true;
       var tempTestsPassed: boolean;
+      var circlesInArea;
+      function getCircleRendererVerifier() {
+        // creates a function that verifies that circles are drawn properly after accounting for svg transform
+        // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
+        circlesInArea = 0;
+        var renderArea = circleRenderer.renderArea;
+        var renderAreaTransform = d3.transform(renderArea.attr("transform"));
+        var translate = renderAreaTransform.translate;
+        var scale     = renderAreaTransform.scale;
+        return function (datum, index) {
+          // This function takes special care to compute the position of circles after taking svg transformation
+          // into account.
+          var selection = d3.select(this);
+          var elementTransform = d3.transform(selection.attr("transform"));
+          var elementTranslate = elementTransform.translate;
+          var x = +selection.attr("cx") * scale[0] + translate[0] + elementTranslate[0];
+          var y = +selection.attr("cy") * scale[1] + translate[1] + elementTranslate[1];
+          if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
+            circlesInArea++;
+            assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
+            assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+          };
+        };
+      };
+
       beforeEach(() => {
         // We want to persist the effect where the svg hangs around if any of the tests passed.
         // Set allTestsPassed to false at start of each test, and cache old allTestsPassed in temp var
@@ -59,7 +84,6 @@ describe("Renderers", () => {
         tempTestsPassed = allTestsPassed;
         allTestsPassed = false;
       });
-
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -76,7 +100,15 @@ describe("Renderers", () => {
         assert.deepEqual(yScale.domain(), [0, 81], "yScale domain was set by the renderer");
         assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
-        assert.lengthOf(circleRenderer.renderArea.selectAll("circle")[0], 10, "10 circles were drawn");
+        circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
+        assert.equal(circlesInArea, 10, "10 circles were drawn");
+        allTestsPassed = tempTestsPassed;
+      });
+
+      it("rendering is idempotent", () => {
+        circleRenderer.render().render();
+        circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
+        assert.equal(circlesInArea, 10, "10 circles were drawn");
         allTestsPassed = tempTestsPassed;
       });
 
@@ -162,26 +194,7 @@ describe("Renderers", () => {
         it("the circles re-rendered properly", () => {
           var renderArea = circleRenderer.renderArea;
           var circles = renderArea.selectAll("circle");
-          var circlesInArea = 0;
-          var renderAreaTransform = d3.transform(renderArea.attr("transform"));
-          var translate = renderAreaTransform.translate;
-          var scale     = renderAreaTransform.scale;
-          function elementFunction(datum, index) {
-            // This function takes special care to compute the position of circles after taking svg transformation
-            // into account.
-            var selection = d3.select(this);
-            var elementTransform = d3.transform(selection.attr("transform"));
-            var elementTranslate = elementTransform.translate;
-            var x = +selection.attr("cx") * scale[0] + translate[0] + elementTranslate[0];
-            var y = +selection.attr("cy") * scale[1] + translate[1] + elementTranslate[1];
-            console.log(x, +selection.attr("cx"), scale.x,  translate.x, elementTranslate.x);
-            if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
-              circlesInArea++;
-              assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
-              assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
-            };
-          };
-          circles.each(elementFunction);
+          circles.each(getCircleRendererVerifier());
           assert.equal(circlesInArea, 4, "four circles were found in the render area");
           allTestsPassed = tempTestsPassed;
         });
