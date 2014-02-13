@@ -3,7 +3,6 @@
 class Scale implements IBroadcaster {
   public scale: D3.Scale.Scale;
   private broadcasterCallbacks: IBroadcasterCallback[] = [];
-  private cachedDomain: any[];
 
   constructor(scale: D3.Scale.Scale) {
     this.scale = scale;
@@ -16,11 +15,7 @@ class Scale implements IBroadcaster {
   public domain(): any[];
   public domain(values: any[]): Scale;
   public domain(values?: any[]): any {
-    if (values != null && values !== this.cachedDomain) {
-      // It is important that the scale does not update if the new domain is the same as
-      // the current domain, to prevent circular propogation of events. We can do a
-      // pointer check against this.cachedDomain, but not against this.scale.domain(), since
-      // d3 modifies the domain as it comes in
+    if (values != null) {
       this.scale.domain(values);
       this.broadcasterCallbacks.forEach((b) => b(this));
       return this;
