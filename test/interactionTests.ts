@@ -30,23 +30,47 @@ function fakeDragSequence(anyedInteraction: any, startX: number, startY: number,
 
 describe("Interactions", () => {
   describe("PanZoomInteraction", () => {
-    it.skip("Properly updates scales on zoom", () => {
-      //
+    it("Pans properly", () => {
+      // The only difference between pan and zoom is internal to d3
+      // Simulating zoom events is painful, so panning will suffice here
       var xScale = new LinearScale();
       var yScale = new LinearScale();
+
+      var svg = generateSVG();
+      var dataset = makeLinearSeries(11);
+      var renderer = new CircleRenderer(dataset, xScale, yScale);
+      renderer.anchor(svg).computeLayout().render();
+
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
 
-      var svg = generateSVG();
-      var component = new Component();
-      component.anchor(svg).computeLayout().render();
-      var interaction = new PanZoomInteraction(component, [], xScale, yScale);
+      var interaction = new PanZoomInteraction(renderer, [], xScale, yScale);
 
-      // var zoomEvent = document.createEvent("WheelEvent");
-      // zoomEvent.initEvent("mousewheel", true, true);
-      // var hb = component.element.select(".hit-box").node();
+      var hb = renderer.element.select(".hit-box").node();
+      var dragDistancePixelX = 10;
+      var dragDistancePixelY = 20;
+      $(hb).simulate("drag", {
+        dx: dragDistancePixelX,
+        dy: dragDistancePixelY
+      });
 
-      // hb.dispatchEvent(zoomEvent);
+      var xDomainAfter = xScale.domain();
+      var yDomainAfter = yScale.domain();
+
+      assert.notDeepEqual(xDomainAfter, xDomainBefore, "x domain was changed by panning");
+      assert.notDeepEqual(yDomainAfter, yDomainBefore, "y domain was changed by panning");
+
+      function getSlope(scale: LinearScale) {
+        var range = scale.range();
+        var domain = scale.domain();
+        return (domain[1]-domain[0])/(range[1]-range[0]);
+      };
+
+      var expectedXDragChange = -dragDistancePixelX * getSlope(xScale);
+      var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
+
+      assert.equal(xDomainAfter[0]-xDomainBefore[0], expectedXDragChange, "x domain changed by the correct amount");
+      assert.equal(yDomainAfter[0]-yDomainBefore[0], expectedYDragChange, "y domain changed by the correct amount");
 
       svg.remove();
     });
@@ -127,14 +151,52 @@ describe("Interactions", () => {
       assert.equal(parseFloat(dragBox.attr("width")), Math.abs(dragstartX-dragendX), "highlighted box has correct width");
       assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY-dragendY), "highlighted box has correct height");
 
-      (<any> interaction).dragstart();
-      dragBox = renderer.element.select(dragBoxClass);
-      assert.equal(dragBox.attr("width"), "0", "highlighted box disappears when a new drag begins");
-      assert.equal(dragBox.attr("height"), "0", "highlighted box disappears when a new drag begins");
-      (<any> interaction).dragend();
+      interaction.clearBox();
+      var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
+      assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
     });
 
     after(() => {
+      svg.remove();
+    });
+  });
+
+  describe("BrushZoomInteraction", () => {
+    it("Zooms in correctly on drag", () =>{
+      var xScale = new LinearScale();
+      var yScale = new LinearScale();
+
+      var svgWidth = 400;
+      var svgHeight = 400;
+      var svg = generateSVG(svgWidth, svgHeight);
+      var dataset = makeLinearSeries(11);
+      var renderer = new CircleRenderer(dataset, xScale, yScale);
+      renderer.anchor(svg).computeLayout().render();
+
+      var xDomainBefore = xScale.domain();
+      var yDomainBefore = yScale.domain();
+
+      var dragstartX = 10;
+      var dragstartY = 210;
+      var dragendX = 190;
+      var dragendY = 390;
+
+      var expectedXDomain = [xScale.invert(dragstartX), xScale.invert(dragendX)];
+      var expectedYDomain = [yScale.invert(dragendY), yScale.invert(dragstartY)]; // reversed because Y scale is
+
+      var indicesCallbackCalled = false;
+      var indicesCallback = (a: number[]) => {
+        indicesCallbackCalled = true;
+        interaction.clearBox();
+        assert.deepEqual(a, [1, 2, 3, 4], "the correct points were selected");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "X scale domain was updated correctly");
+        assert.deepEqual(yScale.domain(), expectedYDomain, "Y scale domain was updated correclty");
+      };
+      var interaction = new BrushZoomInteraction(renderer, xScale, yScale, indicesCallback);
+
+      fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
+      assert.isTrue(indicesCallbackCalled, "indicesCallback was called");
+
       svg.remove();
     });
   });
