@@ -24,6 +24,9 @@ class Component {
   public yAlignment = "TOP"; // TOP, CENTER, BOTTOM
 
   public anchor(element: D3.Selection) {
+    if (element.node().childNodes.length > 0) {
+      throw new Error("Can't anchor to a non-empty element");
+    }
     this.element = element;
     if (this.clipPathEnabled) {this.generateClipPath();};
     this.cssClasses.forEach((cssClass: string) => {
@@ -34,13 +37,15 @@ class Component {
     this.hitBox = this.addBox("hit-box");
     this.addBox("bounding-box");
 
+    this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
+    return this;
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
       if (this.element == null) {
-        throw new Error("It's impossible to computeLayout before anchoring");
+        throw new Error("anchor must be called before computeLayout");
       } else if (this.element.node().nodeName === "svg") {
         // we are the root node, let's guess width and height for convenience
         xOffset = 0;
@@ -48,7 +53,7 @@ class Component {
         availableWidth  = parseFloat(this.element.attr("width" ));
         availableHeight = parseFloat(this.element.attr("height"));
       } else {
-        throw new Error("You need to pass non-null arguments when calling computeLayout on a non-root node");
+        throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
       }
     }
     if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
@@ -62,7 +67,7 @@ class Component {
           yOffset += availableHeight - this.rowMinimum();
           break;
         default:
-          throw new Error("unsupported alignment");
+          throw new Error(this.yAlignment + " is not a supported alignment");
       }
       availableHeight = this.rowMinimum();
     }
@@ -77,7 +82,7 @@ class Component {
           xOffset += availableWidth - this.colMinimum();
           break;
         default:
-          throw new Error("unsupported alignment");
+          throw new Error(this.xAlignment + " is not a supported alignment");
       }
       availableWidth = this.colMinimum();
     }
@@ -87,17 +92,24 @@ class Component {
     this.availableHeight = availableHeight;
     this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
     this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
+    return this;
   }
 
   public render() {
-    //no-op
+    return this;
   }
 
   private addBox(className?: string, parentElement?: D3.Selection) {
+    if (this.element == null) {
+      throw new Error("Adding boxes before anchoring is currently disallowed");
+    }
     var parentElement = parentElement == null ? this.element : parentElement;
     var box = parentElement.append("rect");
     if (className != null) {box.classed(className, true);};
     this.boxes.push(box);
+    if (this.availableWidth != null && this.availableHeight != null) {
+      box.attr("width", this.availableWidth).attr("height", this.availableHeight);
+    }
     return box;
   }
 
@@ -118,10 +130,6 @@ class Component {
     if (this.element != null) {
       interaction.anchor(this.hitBox);
     }
-  }
-
-  public zoom(translate, scale) {
-    this.render(); // if not overwritten, a zoom event just causes the component to rerender
   }
 
   public classed(cssClass: string): boolean;

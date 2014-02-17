@@ -39,13 +39,14 @@ class Axis extends Component {
 
     this.cachedScale = 1;
     this.cachedTranslate = 0;
-    this.scale.registerListener(this.rescale.bind(this));
+    this.scale.registerListener(() => this.rescale());
   }
 
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
     this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+    return this;
   }
 
   private transformString(translate: number, scale: number) {
@@ -54,7 +55,7 @@ class Axis extends Component {
   }
 
   public render() {
-    if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ")");};
+    if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
     if (this.orientation === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
     var domain = this.scale.domain();
     var extent = Math.abs(domain[1] - domain[0]);
@@ -87,6 +88,7 @@ class Axis extends Component {
     }
     // chai.assert.operator(this.element.node().getBBox().height, '<=', height, "axis height is appropriate");
     // chai.assert.operator(this.element.node().getBBox().width,  '<=', width, "axis width is appropriate");
+    return this;
   }
 
   public rescale() {

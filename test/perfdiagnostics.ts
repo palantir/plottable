@@ -1,4 +1,3 @@
-///<reference path="reference.ts" />
 
 module PerfDiagnostics {
   class PerfDiagnostics {

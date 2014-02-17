@@ -32,7 +32,7 @@ interface ZoomInfo {
 }
 
 class PanZoomInteraction extends Interaction {
-  private zoom;
+  private zoom: D3.Behavior.Zoom;
   public renderers: Component[];
   public xScale: QuantitiveScale;
   public yScale: QuantitiveScale;
@@ -43,7 +43,7 @@ class PanZoomInteraction extends Interaction {
     this.zoom = d3.behavior.zoom();
     this.zoom.x(this.xScale.scale);
     this.zoom.y(this.yScale.scale);
-    this.zoom.on("zoom", this.rerenderZoomed.bind(this));
+    this.zoom.on("zoom", () => this.rerenderZoomed());
 
     this.registerWithComponent();
   }
@@ -55,7 +55,7 @@ class PanZoomInteraction extends Interaction {
 
   private rerenderZoomed() {
     // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
-    // event listener machinery, let's grab the domain out of hte d3 scale and pipe it back into the TS scale
+    // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
     var xDomain = this.xScale.scale.domain();
     var yDomain = this.yScale.scale.domain();
     this.xScale.domain(xDomain);
@@ -94,14 +94,14 @@ class AreaInteraction extends Interaction {
   ) {
     super(rendererComponent);
     this.dragBehavior = d3.behavior.drag();
-    this.dragBehavior.on("dragstart", this.dragstart.bind(this));
-    this.dragBehavior.on("drag",      this.drag     .bind(this));
-    this.dragBehavior.on("dragend",   this.dragend  .bind(this));
+    this.dragBehavior.on("dragstart", () => this.dragstart());
+    this.dragBehavior.on("drag",      () => this.drag     ());
+    this.dragBehavior.on("dragend",   () => this.dragend  ());
     this.registerWithComponent();
   }
 
   private dragstart(){
-    this.dragBox.attr("height", 0).attr("width", 0);
+    this.clearBox();
     var availableWidth  = parseFloat(this.hitBox.attr("width"));
     var availableHeight = parseFloat(this.hitBox.attr("height"));
     // the constraint functions ensure that the selection rectangle will not exceed the hit box
@@ -136,8 +136,7 @@ class AreaInteraction extends Interaction {
     var yMin = Math.min(this.origin[1], this.location[1]);
     var yMax = Math.max(this.origin[1], this.location[1]);
     var pixelArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
-    var dataArea = this.rendererComponent.invertXYSelectionArea(pixelArea);
-    var fullArea = {pixel: pixelArea, data: dataArea};
+    var fullArea = this.rendererComponent.invertXYSelectionArea(pixelArea);
     if (this.areaCallback != null) {
       this.areaCallback(fullArea);
     }

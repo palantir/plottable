@@ -6,6 +6,8 @@
   },
   "devDependencies": {
     "chai": "1.9.0",
-    "mocha": "1.17.1"
+    "mocha": "1.17.1",
+    "jQuery": "2.1.0",
+    "jquery.simulate": "1.2.0"
   }
 }

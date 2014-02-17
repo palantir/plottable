@@ -60,12 +60,12 @@ module.exports = function(grunt) {
       files: ["src/*.ts", "test/*.ts"]
     },
     watch: {
+      "options": {
+        livereload: true
+      },
       "rebuild": {
-        "tasks": ["build:rebuild"],
-        "files": [
-          "Gruntfile.js",
-          "src/*.ts",
-        ]
+        "tasks": ["compile"],
+        "files": ["src/*.ts"]
       },
       "tests": {
         "tasks": ["ts:test", "tslint"],
@@ -75,21 +75,35 @@ module.exports = function(grunt) {
         "tasks": ["ts:examples", "tslint"],
         "files": ["examples/**.ts"]
       }
+    },
+    blanket_mocha: {
+      all: ['tests.html'],
+      options: {
+        threshold: 60
+      }
+    },
+    connect: {
+      server: {
+        options: {
+          port: 7007,
+          livereload: true
+        }
+      }
     }
   });
 
   require('load-grunt-tasks')(grunt);
 
   // default task (this is what runs when a task isn't specified)
-  grunt.registerTask("default", "build");
+  grunt.registerTask("default", "launch");
 
-  grunt.registerTask("build",
-    [
-      "compile",
-      "watch"
-    ]
-  );
+  grunt.registerTask("build" , ["compile", "watch"]);
+  grunt.registerTask("launch", ["connect", "build"]);
   grunt.registerTask("compile",
     ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]
     );
+
+  grunt.registerTask("test", ["blanket_mocha"]);
+
+  grunt.registerTask("watch-test", ["blanket_mocha", "watch:test"]);
 };

@@ -7,47 +7,128 @@ class Label extends Component {
   public yAlignment = "CENTER";
 
   private textElement: D3.Selection;
-  private text:string;
-  private orientation = "horizontal";
+  private text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
+  private orientation: string;
+  private textLength: number;
+  private textHeight: number;
 
-  constructor(text: string, orientation?: string) {
+  constructor(text = "", orientation = "horizontal") {
     super();
     this.classed(Label.CSS_CLASS, true);
     this.text = text;
     if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
       this.orientation = orientation;
-    } else if (orientation != null) {
+    } else {
       throw new Error(orientation + " is not a valid orientation for LabelComponent");
     }
   }
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
-    this.textElement = this.element.append("text").text(this.text);
+    this.textElement = this.element.append("text");
+    this.setText(this.text);
+    return this;
+  }
 
-    var bbox = (<SVGGElement> this.textElement.node()).getBBox();
-    this.textElement.attr("dy", -bbox.y);
-    var clientHeight = bbox.height;
-    var clientWidth = bbox.width;
-
+  public setText(text: string) {
+    this.text = text;
+    this.textElement.text(text);
+    this.measureAndSetTextSize();
     if (this.orientation === "horizontal") {
-      this.rowMinimum(clientHeight);
-      this.colMinimum(clientWidth);
+      this.rowMinimum(this.textHeight);
     } else {
-      this.colMinimum(clientHeight);
-      this.rowMinimum(clientWidth);
-      if (this.orientation === "vertical-right") {
-        this.textElement.attr("transform", "rotate(90)").attr("y", -clientHeight);
-      } else if (this.orientation === "vertical-left") {
-        this.textElement.attr("transform", "rotate(-90)").attr("x", -clientWidth);
+      this.colMinimum(this.textHeight);
+    }
+  }
+
+  private measureAndSetTextSize() {
+    var bbox = Utils.getBBox(this.textElement);
+    this.textHeight = bbox.height;
+    this.textLength = bbox.width;
+  }
+
+  private truncateTextToLength(availableLength: number) {
+    if (this.textLength <= availableLength) {
+      return;
+    }
+
+    this.textElement.text(this.text + "...");
+    var textNode = <SVGTextElement> this.textElement.node();
+    var dotLength = textNode.getSubStringLength(textNode.textContent.length-3, 3);
+    if (dotLength > availableLength) {
+      this.textElement.text(""); // no room even for ellipsis
+      this.measureAndSetTextSize();
+      return;
+    }
+
+    var numChars = this.text.length;
+    for (var i=1; i<numChars; i++) {
+      var testLength = textNode.getSubStringLength(0, i);
+      if ((testLength + dotLength) > availableLength) {
+        this.textElement.text(this.text.substr(0, i-1).trim() + "...");
+        this.measureAndSetTextSize();
+        return;
       }
     }
+  }
+
+  public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+    super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+
+    this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
+    var bbox = Utils.getBBox(this.textElement);
+    this.textElement.attr("dy", -bbox.y);
+
+    var xShift = 0;
+    var yShift = 0;
+
+    if (this.orientation === "horizontal") {
+      this.truncateTextToLength(this.availableWidth);
+      switch (this.xAlignment) {
+        case "LEFT":
+          break;
+        case "CENTER":
+          xShift = (this.availableWidth - this.textLength) / 2;
+          break;
+        case "RIGHT":
+          xShift = this.availableWidth - this.textLength;
+          break;
+        default:
+          throw new Error(this.xAlignment + " is not a supported alignment");
+      }
+    } else {
+      this.truncateTextToLength(this.availableHeight);
+      switch (this.yAlignment) {
+        case "TOP":
+          break;
+        case "CENTER":
+          xShift = (this.availableHeight - this.textLength) / 2;
+          break;
+        case "BOTTOM":
+          xShift = this.availableHeight - this.textLength;
+          break;
+        default:
+          throw new Error(this.yAlignment + " is not a supported alignment");
+      }
+
+      if (this.orientation === "vertical-right") {
+        this.textElement.attr("transform", "rotate(90)");
+        yShift = -this.textHeight;
+      } else { // vertical-left
+        this.textElement.attr("transform", "rotate(-90)");
+        xShift = -xShift - this.textLength; // flip xShift
+      }
+    }
+
+    this.textElement.attr("x", xShift);
+    this.textElement.attr("y", yShift);
+    return this;
   }
 }
 
 class TitleLabel extends Label {
   private static CSS_CLASS = "title-label";
-  constructor(text: string, orientation?: string) {
+  constructor(text?: string, orientation?: string) {
     super(text, orientation);
     this.classed(TitleLabel.CSS_CLASS, true);
   }
@@ -55,7 +136,7 @@ class TitleLabel extends Label {
 
 class AxisLabel extends Label {
   private static CSS_CLASS = "axis-label";
-  constructor(text: string, orientation?: string) {
+  constructor(text?: string, orientation?: string) {
     super(text, orientation);
     this.classed(AxisLabel.CSS_CLASS, true);
   }

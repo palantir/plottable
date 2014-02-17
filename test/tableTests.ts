@@ -4,44 +4,56 @@ var assert = chai.assert;
 
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
-  // child being a basic Renderer (todo: maybe change to basic component)
+  // child being a basic component
   var emptyDataset: IDataset = {data: [], seriesName: "blah"};
-  var rows: Renderer[][] = [];
-  var renderers: Renderer[] = [];
+  var rows: Component[][] = [];
+  var components: Component[] = [];
   for(var i=0; i<nRows; i++) {
     var cols = [];
     for(var j=0; j<nCols; j++) {
-      var r = new Renderer(emptyDataset);
+      var r = new Component();
       cols.push(r);
-      renderers.push(r);
+      components.push(r);
     }
     rows.push(cols);
   }
   var table = new Table(rows);
-  return {"table": table, "renderers": renderers};
+  return {"table": table, "components": components};
 }
 
-function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
-  var width = widthAndHeightPair[0];
-  var height = widthAndHeightPair[1];
-  assert.equal(bbox.width, width, "width: " + message);
-  assert.equal(bbox.height, height, "height: " + message);
-}
+describe("Tables", () => {
+  it("tables are classed properly", () => {
+    var table = new Table([[]]);
+    assert.isTrue(table.classed("table"));
+  });
 
-describe("Table layout", () => {
+  it("tables transform null instances into base components", () => {
+    var table = new Table([[null]]); // table with a single null component
+    var component = (<any> table).rows[0][0];
+    assert.isNotNull(component, "the component is not null");
+    assert.equal(component.constructor.name, "Component", "the component is a base Component");
+  });
+
+  it("tables with insufficient space throw InsufficientSpaceError", () => {
+    var svg = generateSVG(200, 200);
+    var c = new Component();
+    c.rowMinimum(300).colMinimum(300);
+    var t = new Table([[c]]);
+    t.anchor(svg);
+    assert.throws(() => t.computeLayout(), Error, "InsufficientSpaceError");
+    svg.remove();
+  });
 
   it("basic table with 2 rows 2 cols lays out properly", () => {
-    var tableAndRenderers = generateBasicTable(2,2);
-    var table = tableAndRenderers.table;
-    var renderers = tableAndRenderers.renderers;
+    var tableAndcomponents = generateBasicTable(2,2);
+    var table = tableAndcomponents.table;
+    var components = tableAndcomponents.components;
 
-    var svg = d3.select("body").append("svg:svg");
-    table.anchor(svg);
-    table.computeLayout(0, 0, 400, 400);
-    table.render();
+    var svg = generateSVG();
+    table.anchor(svg).computeLayout().render();
 
-    var elements = renderers.map((r) => r.element);
-    var translates = elements.map((e) => Utils.getTranslate(e));
+    var elements = components.map((r) => r.element);
+    var translates = elements.map((e) => getTranslate(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 200], "third element is located properly");
@@ -55,19 +67,17 @@ describe("Table layout", () => {
   });
 
   it("table with 2 rows 2 cols and margin/padding lays out properly", () => {
-    var tableAndRenderers = generateBasicTable(2,2);
-    var table = tableAndRenderers.table;
-    var renderers = tableAndRenderers.renderers;
+    var tableAndcomponents = generateBasicTable(2,2);
+    var table = tableAndcomponents.table;
+    var components = tableAndcomponents.components;
 
     table.padding(5,5);
 
-    var svg = d3.select("body").append("svg:svg");
-    table.anchor(svg);
-    table.computeLayout(0, 0, 415, 415);
-    table.render();
+    var svg = generateSVG(415, 415);
+    table.anchor(svg).computeLayout().render();
 
-    var elements = renderers.map((r) => r.element);
-    var translates = elements.map((e) => Utils.getTranslate(e));
+    var elements = components.map((r) => r.element);
+    var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Utils.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
     assert.deepEqual(translates[1], [210, 0], "second element is located properly");
@@ -81,29 +91,27 @@ describe("Table layout", () => {
   });
 
   it("table with fixed-size objects on every side lays out properly", () => {
-    var svg = d3.select("body").append("svg:svg");
-    var tableAndRenderers = generateBasicTable(3,3);
-    var table = tableAndRenderers.table;
-    var renderers = tableAndRenderers.renderers;
+    var svg = generateSVG();
+    var tableAndcomponents = generateBasicTable(3,3);
+    var table = tableAndcomponents.table;
+    var components = tableAndcomponents.components;
     // [0 1 2] \\
     // [3 4 5] \\
     // [6 7 8] \\
     // First, set everything to have no weight
-    renderers.forEach((r) => r.colWeight(0).rowWeight(0).colMinimum(0).rowMinimum(0));
+    components.forEach((r) => r.colWeight(0).rowWeight(0).colMinimum(0).rowMinimum(0));
     // give the axis-like objects a minimum
-    renderers[1].rowMinimum(30);
-    renderers[7].rowMinimum(30);
-    renderers[3].colMinimum(50);
-    renderers[5].colMinimum(50);
+    components[1].rowMinimum(30);
+    components[7].rowMinimum(30);
+    components[3].colMinimum(50);
+    components[5].colMinimum(50);
     // finally the center 'plot' object has a weight
-    renderers[4].rowWeight(1).colWeight(1);
+    components[4].rowWeight(1).colWeight(1);
 
-    table.anchor(svg);
-    table.computeLayout(0, 0, 400, 400);
-    table.render();
+    table.anchor(svg).computeLayout().render();
 
-    var elements = renderers.map((r) => r.element);
-    var translates = elements.map((e) => Utils.getTranslate(e));
+    var elements = components.map((r) => r.element);
+    var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Utils.getBBox(e));
     // test the translates
     assert.deepEqual(translates[1], [50, 0]  , "top axis translate");
@@ -118,5 +126,11 @@ describe("Table layout", () => {
     assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
     assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
     svg.remove();
+  });
+
+  it("you can't set colMinimum or rowMinimum on tables directly", () => {
+    var table = new Table([[]]);
+    assert.throws(() => table.rowMinimum(3), Error, "cannot be directly set");
+    assert.throws(() => table.colMinimum(3), Error, "cannot be directly set");
   });
 });
