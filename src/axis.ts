@@ -55,7 +55,7 @@ class Axis extends Component {
   }
 
   public render() {
-    if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ")");};
+    if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
     if (this.orientation === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
     var domain = this.scale.domain();
     var extent = Math.abs(domain[1] - domain[0]);

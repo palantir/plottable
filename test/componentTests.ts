@@ -114,9 +114,11 @@ describe("Component behavior", () => {
   it("clipPath works as expected", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
+    var expectedClipPathID: number = (<any> Component).clipPathId;
     c.anchor(svg).computeLayout(0, 0, 100, 100).render();
-    assert.equal((<any> Component).clipPathId, 1, "clipPathId incremented");
-    assert.equal(c.element.attr("clip-path"), "url(#clipPath0)", "the element has clip-path url attached");
+    assert.equal((<any> Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
+    var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
+    assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
     var clipRect = c.element.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
     assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
