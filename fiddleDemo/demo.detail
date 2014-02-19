@@ -1,0 +1,9 @@
+---
+name: Plottable.js jsFiddle Demo
+authors:
+  - Justin Lan
+resources:
+  - https://raw2.github.com/palantir/plottable/master/plottable.js
+  - https://raw2.github.com/palantir/plottable/master/style.css
+normalize_css: no
+...
