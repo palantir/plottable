@@ -25,6 +25,19 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
   assert.equal(bbox.height, height, "height: " + message);
 }
 
+function assertXY(el: D3.Selection, xExpected, yExpected, message) {
+  var x = el.attr("x");
+  var y = el.attr("y");
+  assert.equal(x, xExpected, "x: " + message);
+  assert.equal(y, yExpected, "y: " + message);
+}
+
+function assertWidthHeight(el: D3.Selection, widthExpected, heightExpected, message) {
+  var width = el.attr("width");
+  var height = el.attr("height");
+  assert.equal(width, widthExpected, "width: " + message);
+  assert.equal(height, heightExpected, "height: " + message);
+
 function makeLinearSeries(n: number): IDataset {
   function makePoint(x: number) {
     return {x: x, y: x};
