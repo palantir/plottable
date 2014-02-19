@@ -15,8 +15,8 @@ class Component {
 
   public availableWidth : number;
   public availableHeight: number;
-  private xOffset       : number;
-  private yOffset       : number;
+  public xOffset       : number;
+  public yOffset       : number;
 
   private cssClasses: string[] = ["component"];
 
