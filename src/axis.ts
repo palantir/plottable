@@ -55,7 +55,7 @@ class Axis extends Component {
   }
 
   public render() {
-    if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ")");};
+    if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
     if (this.orientation === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
     var domain = this.scale.domain();
     var extent = Math.abs(domain[1] - domain[0]);
@@ -86,8 +86,6 @@ class Axis extends Component {
     if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
       this.axisElement.classed("error", true);
     }
-    // chai.assert.operator(this.element.node().getBBox().height, '<=', height, "axis height is appropriate");
-    // chai.assert.operator(this.element.node().getBBox().width,  '<=', width, "axis width is appropriate");
     return this;
   }
 

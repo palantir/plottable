@@ -59,8 +59,6 @@ class Table extends Component {
     var sumPair = (p: number[]) => p[0] + p[1];
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
     var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
-    chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding, this.availableHeight, 1, "row heights sum to available height");
-    chai.assert.closeTo(d3.sum(colWidths ) + (this.nCols - 1) * this.colPadding, this.availableWidth , 1, "col widths sum to available width");
 
     var childYOffset = 0;
     this.rows.forEach((row: Component[], rowIndex: number) => {
@@ -70,10 +68,8 @@ class Table extends Component {
         component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
         childXOffset += colWidths[colIndex] + this.colPadding;
       });
-      chai.assert.operator(childXOffset - this.colPadding, "<=", this.availableWidth + 0.1, "final xOffset was <= availableWidth");
       childYOffset += rowHeights[rowIndex] + this.rowPadding;
     });
-    chai.assert.operator(childYOffset - this.rowPadding, "<=", this.availableHeight + 0.1, "final yOffset was <= availableHeight");
     return this;
   }
 

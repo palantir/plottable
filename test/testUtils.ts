@@ -37,6 +37,21 @@ function assertWidthHeight(el: D3.Selection, widthExpected, heightExpected, mess
   var height = el.attr("height");
   assert.equal(width, widthExpected, "width: " + message);
   assert.equal(height, heightExpected, "height: " + message);
+
+function makeLinearSeries(n: number): IDataset {
+  function makePoint(x: number) {
+    return {x: x, y: x};
+  }
+  var data = d3.range(n).map(makePoint);
+  return {data: data, seriesName: "linear-series"};
+}
+
+function makeQuadraticSeries(n: number): IDataset {
+  function makeQuadraticPoint(x: number) {
+    return {x: x, y: x*x};
+  }
+  var data = d3.range(n).map(makeQuadraticPoint);
+  return {data: data, seriesName: "quadratic-series"};
 }
 
 class MultiTestVerifier {

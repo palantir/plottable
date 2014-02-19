@@ -2,16 +2,7 @@
 
 var assert = chai.assert;
 
-function makeQuadraticSeries(n: number): IDataset {
-  function makePoint(x: number) {
-    return {x: x, y: x*x};
-  }
-  var data = d3.range(n).map(makePoint);
-  return {data: data, seriesName: "quadratic-series"};
-}
-
 var quadraticDataset = makeQuadraticSeries(10);
-
 
 describe("Renderers", () => {
 
