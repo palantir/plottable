@@ -169,7 +169,6 @@ var Component = (function () {
     Component.prototype.rowWeight = function (newVal) {
         if (newVal != null) {
             this.rowWeightVal = newVal;
-            chai.assert.operator(this.rowWeightVal, ">=", 0, "rowWeight is a reasonable number");
             return this;
         } else {
             return this.rowWeightVal;
@@ -179,7 +178,6 @@ var Component = (function () {
     Component.prototype.colWeight = function (newVal) {
         if (newVal != null) {
             this.colWeightVal = newVal;
-            chai.assert.operator(this.colWeightVal, ">=", 0, "colWeight is a reasonable number");
             return this;
         } else {
             return this.colWeightVal;
@@ -189,7 +187,6 @@ var Component = (function () {
     Component.prototype.rowMinimum = function (newVal) {
         if (newVal != null) {
             this.rowMinimumVal = newVal;
-            chai.assert.operator(this.rowMinimumVal, ">=", 0, "rowMinimum is a reasonable number");
             return this;
         } else {
             return this.rowMinimumVal;
@@ -199,7 +196,6 @@ var Component = (function () {
     Component.prototype.colMinimum = function (newVal) {
         if (newVal != null) {
             this.colMinimumVal = newVal;
-            chai.assert.operator(this.colMinimumVal, ">=", 0, "colMinimum is a reasonable number");
             return this;
         } else {
             return this.colMinimumVal;
@@ -869,8 +865,6 @@ var Table = (function (_super) {
         };
         var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
         var colWidths = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
-        chai.assert.closeTo(d3.sum(rowHeights) + (this.nRows - 1) * this.rowPadding, this.availableHeight, 1, "row heights sum to available height");
-        chai.assert.closeTo(d3.sum(colWidths) + (this.nCols - 1) * this.colPadding, this.availableWidth, 1, "col widths sum to available width");
 
         var childYOffset = 0;
         this.rows.forEach(function (row, rowIndex) {
@@ -879,10 +873,8 @@ var Table = (function (_super) {
                 component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
                 childXOffset += colWidths[colIndex] + _this.colPadding;
             });
-            chai.assert.operator(childXOffset - _this.colPadding, "<=", _this.availableWidth + 0.1, "final xOffset was <= availableWidth");
             childYOffset += rowHeights[rowIndex] + _this.rowPadding;
         });
-        chai.assert.operator(childYOffset - this.rowPadding, "<=", this.availableHeight + 0.1, "final yOffset was <= availableHeight");
         return this;
     };
 
@@ -1065,7 +1057,6 @@ var Axis = (function (_super) {
         if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
             this.axisElement.classed("error", true);
         }
-
         return this;
     };
 
