@@ -86,8 +86,6 @@ class Axis extends Component {
     if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
       this.axisElement.classed("error", true);
     }
-    // chai.assert.operator(this.element.node().getBBox().height, '<=', height, "axis height is appropriate");
-    // chai.assert.operator(this.element.node().getBBox().width,  '<=', width, "axis width is appropriate");
     return this;
   }
 
