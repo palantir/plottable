@@ -37,6 +37,7 @@ function assertWidthHeight(el: D3.Selection, widthExpected, heightExpected, mess
   var height = el.attr("height");
   assert.equal(width, widthExpected, "width: " + message);
   assert.equal(height, heightExpected, "height: " + message);
+}
 
 function makeLinearSeries(n: number): IDataset {
   function makePoint(x: number) {
