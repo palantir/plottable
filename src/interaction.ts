@@ -64,19 +64,6 @@ class PanZoomInteraction extends Interaction {
 }
 
 class AreaInteraction extends Interaction {
-  /*
-  This class is responsible for any kind of interaction in which you brush over an area
-  of a renderer and plan to execute some logic based on the selected area.
-  Right now it only works for XYRenderers, but we can make the interface more general in
-  the future.
-  You pass it a rendererComponent (:XYRenderer) and it sets up events so that you can draw
-  a rectangle over it. Then, you pass it callbacks that the AreaInteraction will execute on
-  the selected region. The first callback (areaCallback) will be passed a FullSelectionArea
-  object which contains info on both the pixel and data range of the selected region.
-  The selectionCallback will be passed a D3.Selection object that contains the elements bound
-  to the data in the selection region. You can use this, for example, to change their class
-  and display properties.
-  */
   private static CLASS_DRAG_BOX = "drag-box";
   private dragInitialized = false;
   private dragBehavior;
@@ -85,19 +72,20 @@ class AreaInteraction extends Interaction {
   private constrainX: (n: number) => number;
   private constrainY: (n: number) => number;
   private dragBox: D3.Selection;
+  private callbackToCall: (area: SelectionArea) => any;
 
-  constructor(
-    private rendererComponent: XYRenderer,
-    public areaCallback?: (a: FullSelectionArea) => any,
-    public selectionCallback?: (a: D3.Selection) => any,
-    public indicesCallback?: (a: number[]) => any
-  ) {
-    super(rendererComponent);
+  constructor(componentToListenTo: Component) {
+    super(componentToListenTo);
     this.dragBehavior = d3.behavior.drag();
     this.dragBehavior.on("dragstart", () => this.dragstart());
     this.dragBehavior.on("drag",      () => this.drag     ());
     this.dragBehavior.on("dragend",   () => this.dragend  ());
     this.registerWithComponent();
+  }
+
+  public callback(cb?: (a: SelectionArea) => any): AreaInteraction {
+    this.callbackToCall = cb;
+    return this;
   }
 
   private dragstart(){
@@ -125,84 +113,69 @@ class AreaInteraction extends Interaction {
   }
 
   private dragend(){
-    if (!this.dragInitialized) {
-      return;
-      // It records a tap as a dragstart+dragend, but this can have unintended consequences.
-      // only trigger logic if we actually did some dragging.
-    }
+    if (!this.dragInitialized) return;
+
     this.dragInitialized = false;
+    if (this.callbackToCall == null) return;
     var xMin = Math.min(this.origin[0], this.location[0]);
     var xMax = Math.max(this.origin[0], this.location[0]);
     var yMin = Math.min(this.origin[1], this.location[1]);
     var yMax = Math.max(this.origin[1], this.location[1]);
     var pixelArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
-    var fullArea = this.rendererComponent.invertXYSelectionArea(pixelArea);
-    if (this.areaCallback != null) {
-      this.areaCallback(fullArea);
-    }
-    if (this.selectionCallback != null) {
-      var selection = this.rendererComponent.getSelectionFromArea(fullArea);
-      this.selectionCallback(selection);
-    }
-    if (this.indicesCallback != null) {
-      var indices = this.rendererComponent.getDataIndicesFromArea(fullArea);
-      this.indicesCallback(indices);
-    }
+    this.callbackToCall(pixelArea);
   }
 
-  public clearBox() {
+  public clearBox(): AreaInteraction {
     this.dragBox.attr("height", 0).attr("width", 0);
+    return this;
   }
 
-  public anchor(hitBox: D3.Selection) {
+  public anchor(hitBox: D3.Selection): AreaInteraction {
     super.anchor(hitBox);
     var cname = AreaInteraction.CLASS_DRAG_BOX;
     var element = this.componentToListenTo.element;
     this.dragBox = element.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
     hitBox.call(this.dragBehavior);
+    return this;
   }
 }
 
-class BrushZoomInteraction extends AreaInteraction {
-  public xScale: QuantitiveScale;
-  public yScale: QuantitiveScale;
-  /*
-  This is an extension of the AreaInteraction which is used for zooming into a selected region.
-  It takes the XYRenderer to initialize the AreaInteraction on, and the xScale and yScale to be
-  scaled according to the domain of the data selected. Note that the xScale and yScale given to
-  the BrushZoomInteraction can be distinct from those that the renderer depends on, e.g. if you
-  make a sparkline, you do not want to update the sparkline's scales, but rather the scales of a
-  linked chart.
-  */
-  constructor(eventComponent: XYRenderer,
-    xScale: QuantitiveScale,
-    yScale: QuantitiveScale,
-    indicesCallback?: (a: number[]) => any
-  ) {
-    super(eventComponent);
-    this.xScale = xScale;
-    this.yScale = yScale;
-    this.areaCallback = this.zoom;
-    this.indicesCallback = indicesCallback;
+class ZoomCallbackGenerator {
+  private xScaleMappings = [];
+  private yScaleMappings = [];
+
+  public addXScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator {
+    if (targetScale == null) {
+      targetScale = listenerScale;
+    }
+    this.xScaleMappings.push([listenerScale, targetScale]);
+    return this;
   }
 
-  public zoom(area: FullSelectionArea) {
-    var originalXDomain = this.xScale.domain();
-    var originalYDomain = this.yScale.domain();
-    var xDomain = [area.data.xMin, area.data.xMax];
-    var yDomain = [area.data.yMin, area.data.yMax];
+  public addYScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator {
+    if (targetScale == null) {
+      targetScale = listenerScale;
+    }
+    this.yScaleMappings.push([listenerScale, targetScale]);
+    return this;
+  }
 
-    var xOrigDirection = originalXDomain[0] > originalXDomain[1];
-    var yOrigDirection = originalYDomain[0] > originalYDomain[1];
-    var xDirection = xDomain[0] > xDomain[1];
-    var yDirection = yDomain[0] > yDomain[1];
-    // make sure we don't change inversion of the scale by zooming
+  private updateScale(referenceScale: QuantitiveScale, targetScale: QuantitiveScale, pixelMin: number, pixelMax: number) {
+    var originalDomain = referenceScale.domain();
+    var newDomain = [referenceScale.invert(pixelMin), referenceScale.invert(pixelMax)];
+    var sameDirection = (newDomain[0] < newDomain[1]) === (originalDomain[0] < originalDomain[1]);
+    if (!sameDirection) {newDomain.reverse();}
+    targetScale.domain(newDomain);
+  }
 
-    if (xDirection !== xOrigDirection) {xDomain.reverse();};
-    if (yDirection !== yOrigDirection) {yDomain.reverse();};
-
-
-    this.xScale.domain(xDomain);
-    this.yScale.domain(yDomain);
+  public getCallback() {
+    return (area: SelectionArea) => {
+      this.xScaleMappings.forEach((sm: QuantitiveScale[]) => {
+        this.updateScale(sm[0], sm[1], area.xMin, area.xMax);
+      });
+      this.yScaleMappings.forEach((sm: QuantitiveScale[]) => {
+        this.updateScale(sm[0], sm[1], area.yMin, area.yMax);
+      });
+    };
   }
 }

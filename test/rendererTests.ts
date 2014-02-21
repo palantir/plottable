@@ -91,11 +91,13 @@ describe("Renderers", () => {
       var xScale: LinearScale;
       var yScale: LinearScale;
       var circleRenderer: CircleRenderer;
-      var pixelAreaFull: SelectionArea;
-      var pixelAreaPartial: SelectionArea;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
       var verifier = new MultiTestVerifier();
+      var pixelAreaFull = {xMin: 0, xMax: SVG_WIDTH, yMin: 0, yMax: SVG_HEIGHT};
+      var pixelAreaPart = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
+      var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
+      var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
 
       var circlesInArea;
       function getCircleRendererVerifier() {
@@ -132,8 +134,6 @@ describe("Renderers", () => {
         yScale = new LinearScale();
         circleRenderer = new CircleRenderer(quadraticDataset, xScale, yScale);
         circleRenderer.anchor(svg).computeLayout().render();
-        pixelAreaFull = {xMin: 0, xMax: SVG_WIDTH, yMin: 0, yMax: SVG_HEIGHT};
-        pixelAreaPartial = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
       });
 
       it("setup is handled properly", () => {
@@ -154,38 +154,32 @@ describe("Renderers", () => {
       });
 
       it("invertXYSelectionArea works", () => {
-        var expectedDataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
-        var actualDataAreaFull = circleRenderer.invertXYSelectionArea(pixelAreaFull).data;
-        assert.deepEqual(actualDataAreaFull, expectedDataAreaFull, "the full data area is as expected");
+        var actualDataAreaFull = circleRenderer.invertXYSelectionArea(pixelAreaFull);
+        assert.deepEqual(actualDataAreaFull, dataAreaFull, "the full data area is as expected");
 
-        var expectedDataAreaPartial = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
-        var actualDataAreaPartial = circleRenderer.invertXYSelectionArea(pixelAreaPartial).data;
+        var actualDataAreaPart = circleRenderer.invertXYSelectionArea(pixelAreaPart);
 
-        assert.closeTo(actualDataAreaPartial.xMin, expectedDataAreaPartial.xMin, 1, "partial xMin is close");
-        assert.closeTo(actualDataAreaPartial.xMax, expectedDataAreaPartial.xMax, 1, "partial xMax is close");
-        assert.closeTo(actualDataAreaPartial.yMin, expectedDataAreaPartial.yMin, 1, "partial yMin is close");
-        assert.closeTo(actualDataAreaPartial.yMax, expectedDataAreaPartial.yMax, 1, "partial yMax is close");
+        assert.closeTo(actualDataAreaPart.xMin, dataAreaPart.xMin, 1, "partial xMin is close");
+        assert.closeTo(actualDataAreaPart.xMax, dataAreaPart.xMax, 1, "partial xMax is close");
+        assert.closeTo(actualDataAreaPart.yMin, dataAreaPart.yMin, 1, "partial yMin is close");
+        assert.closeTo(actualDataAreaPart.yMax, dataAreaPart.yMax, 1, "partial yMax is close");
         verifier.end();
       });
 
       it("getSelectionFromArea works", () => {
-        var fullSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaFull);
-        var selectionFull = circleRenderer.getSelectionFromArea(fullSelectionArea);
+        var selectionFull = circleRenderer.getSelectionFromArea(dataAreaFull);
         assert.lengthOf(selectionFull[0], 10, "all 10 circles were selected by the full region");
 
-        var partialSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaPartial);
-        var selectionPartial = circleRenderer.getSelectionFromArea(partialSelectionArea);
+        var selectionPartial = circleRenderer.getSelectionFromArea(dataAreaPart);
         assert.lengthOf(selectionPartial[0], 2, "2 circles were selected by the partial region");
         verifier.end();
       });
 
       it("getDataIndicesFromArea works", () => {
-        var fullSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaFull);
-        var indicesFull = circleRenderer.getDataIndicesFromArea(fullSelectionArea);
+        var indicesFull = circleRenderer.getDataIndicesFromArea(dataAreaFull);
         assert.deepEqual(indicesFull, d3.range(10), "all 10 circles were selected by the full region");
 
-        var partialSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaPartial);
-        var indicesPartial = circleRenderer.getDataIndicesFromArea(partialSelectionArea);
+        var indicesPartial = circleRenderer.getDataIndicesFromArea(dataAreaPart);
         assert.deepEqual(indicesPartial, [6, 7], "2 circles were selected by the partial region");
         verifier.end();
       });
@@ -194,41 +188,37 @@ describe("Renderers", () => {
         before(() => {
           xScale.domain([0, 3]);
           yScale.domain([0, 9]);
+          dataAreaFull = {xMin: 0, xMax: 3, yMin: 9, yMax: 0};
+          dataAreaPart = {xMin: 1, xMax: 3, yMin: 6, yMax: 3};
         });
 
         it("invertXYSelectionArea works", () => {
-          var expectedDataAreaFull = {xMin: 0, xMax: 3, yMin: 9, yMax: 0};
-          var actualDataAreaFull = circleRenderer.invertXYSelectionArea(pixelAreaFull).data;
-          assert.deepEqual(actualDataAreaFull, expectedDataAreaFull, "the full data area is as expected");
+          var actualDataAreaFull = circleRenderer.invertXYSelectionArea(pixelAreaFull);
+          assert.deepEqual(actualDataAreaFull, dataAreaFull, "the full data area is as expected");
 
-          var expectedDataAreaPartial = {xMin: 1, xMax: 3, yMin: 6, yMax: 3};
-          var actualDataAreaPartial = circleRenderer.invertXYSelectionArea(pixelAreaPartial).data;
+          var actualDataAreaPart = circleRenderer.invertXYSelectionArea(pixelAreaPart);
 
-          assert.closeTo(actualDataAreaPartial.xMin, expectedDataAreaPartial.xMin, 1, "partial xMin is close");
-          assert.closeTo(actualDataAreaPartial.xMax, expectedDataAreaPartial.xMax, 1, "partial xMax is close");
-          assert.closeTo(actualDataAreaPartial.yMin, expectedDataAreaPartial.yMin, 1, "partial yMin is close");
-          assert.closeTo(actualDataAreaPartial.yMax, expectedDataAreaPartial.yMax, 1, "partial yMax is close");
+          assert.closeTo(actualDataAreaPart.xMin, dataAreaPart.xMin, 1, "partial xMin is close");
+          assert.closeTo(actualDataAreaPart.xMax, dataAreaPart.xMax, 1, "partial xMax is close");
+          assert.closeTo(actualDataAreaPart.yMin, dataAreaPart.yMin, 1, "partial yMin is close");
+          assert.closeTo(actualDataAreaPart.yMax, dataAreaPart.yMax, 1, "partial yMax is close");
           verifier.end();
         });
 
         it("getSelectionFromArea works", () => {
-          var fullSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaFull);
-          var selectionFull = circleRenderer.getSelectionFromArea(fullSelectionArea);
+          var selectionFull = circleRenderer.getSelectionFromArea(dataAreaFull);
           assert.lengthOf(selectionFull[0], 4, "four circles were selected by the full region");
 
-          var partialSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaPartial);
-          var selectionPartial = circleRenderer.getSelectionFromArea(partialSelectionArea);
+          var selectionPartial = circleRenderer.getSelectionFromArea(dataAreaPart);
           assert.lengthOf(selectionPartial[0], 1, "one circle was selected by the partial region");
           verifier.end();
         });
 
         it("getDataIndicesFromArea works", () => {
-          var fullSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaFull);
-          var indicesFull = circleRenderer.getDataIndicesFromArea(fullSelectionArea);
+          var indicesFull = circleRenderer.getDataIndicesFromArea(dataAreaFull);
           assert.deepEqual(indicesFull, [0,1,2,3], "four circles were selected by the full region");
 
-          var partialSelectionArea = circleRenderer.invertXYSelectionArea(pixelAreaPartial);
-          var indicesPartial = circleRenderer.getDataIndicesFromArea(partialSelectionArea);
+          var indicesPartial = circleRenderer.getDataIndicesFromArea(dataAreaPart);
           assert.deepEqual(indicesPartial, [2], "circle 2 was selected by the partial region");
           verifier.end();
         });

@@ -102,15 +102,12 @@ describe("Interactions", () => {
     });
 
     afterEach(() => {
-      interaction.areaCallback = null;
-      interaction.selectionCallback = null;
-      interaction.indicesCallback = null;
-      interaction.clearBox();
+      interaction.callback().clearBox();
     });
 
     it("All callbacks are notified with appropriate data when a drag finishes", () => {
       var areaCallbackCalled = false;
-      var areaCallback = (a: FullSelectionArea) => {
+      var areaCallback = (a: SelectionArea) => {
         areaCallbackCalled = true;
         var expectedPixelArea = {
           xMin: dragstartX,
@@ -118,27 +115,16 @@ describe("Interactions", () => {
           yMin: dragstartY,
           yMax: dragendY
         };
-        assert.deepEqual(a.pixel, expectedPixelArea, "areaCallback was passed the correct pixel area");
-      };
-      var selectionCallbackCalled = false;
-      var selectionCallback = (a: D3.Selection) => {
-        selectionCallbackCalled = true;
-      };
-      var indicesCallbackCalled = false;
-      var indicesCallback = (a: number[]) => {
-        indicesCallbackCalled = true;
+        assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
       };
 
-      interaction.areaCallback = areaCallback;
-      interaction.selectionCallback = selectionCallback;
-      interaction.indicesCallback = indicesCallback;
+
+      interaction.callback(areaCallback);
 
       // fake a drag event
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
 
       assert.isTrue(areaCallbackCalled, "areaCallback was called");
-      assert.isTrue(selectionCallbackCalled, "selectionCallback was called");
-      assert.isTrue(indicesCallbackCalled, "indicesCallback was called");
     });
 
     it("Highlights and un-highlights areas appropriately", () => {
@@ -166,7 +152,7 @@ describe("Interactions", () => {
       var xScale = new LinearScale();
       var yScale = new LinearScale();
 
-      var svgWidth = 400;
+      var svgWidth  = 400;
       var svgHeight = 400;
       var svg = generateSVG(svgWidth, svgHeight);
       var dataset = makeLinearSeries(11);
@@ -182,20 +168,26 @@ describe("Interactions", () => {
       var dragendY = 390;
 
       var expectedXDomain = [xScale.invert(dragstartX), xScale.invert(dragendX)];
-      var expectedYDomain = [yScale.invert(dragendY), yScale.invert(dragstartY)]; // reversed because Y scale is
+      var expectedYDomain = [yScale.invert(dragendY)  , yScale.invert(dragstartY)]; // reversed because Y scale is
 
       var indicesCallbackCalled = false;
-      var indicesCallback = (a: number[]) => {
+      var indicesCallback = (indices: number[]) => {
         indicesCallbackCalled = true;
         interaction.clearBox();
-        assert.deepEqual(a, [1, 2, 3, 4], "the correct points were selected");
-        assert.deepEqual(xScale.domain(), expectedXDomain, "X scale domain was updated correctly");
-        assert.deepEqual(yScale.domain(), expectedYDomain, "Y scale domain was updated correclty");
+        assert.deepEqual(indices, [1, 2, 3, 4], "the correct points were selected");
       };
-      var interaction = new BrushZoomInteraction(renderer, xScale, yScale, indicesCallback);
-
+      var zoomCallback = new ZoomCallbackGenerator().addXScale(xScale).addYScale(yScale).getCallback();
+      var callback = (a: SelectionArea) => {
+        var dataArea = renderer.invertXYSelectionArea(a);
+        var indices = renderer.getDataIndicesFromArea(dataArea);
+        indicesCallback(indices);
+        zoomCallback(a);
+      };
+      var interaction = new AreaInteraction(renderer).callback(callback);
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       assert.isTrue(indicesCallbackCalled, "indicesCallback was called");
+      assert.deepEqual(xScale.domain(), expectedXDomain, "X scale domain was updated correctly");
+      assert.deepEqual(yScale.domain(), expectedYDomain, "Y scale domain was updated correclty");
 
       svg.remove();
     });
