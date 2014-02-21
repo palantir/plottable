@@ -83,8 +83,7 @@ module Demo {
     var renderer1 = new LineRenderer(data1, xScale1, yScale1);
     var row1: Component[] = [leftAxesTable, renderer1, rightAxesTable];
     var yScale2 = new LinearScale();
-    var leftAxis = new YAxis(yScale2, "left");
-    leftAxis.xAlignment = "RIGHT";
+    var leftAxis = new YAxis(yScale2, "left").xAlign("RIGHT");
     var data2 = makeRandomData(1000, 100000);
     var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
     var toggleClass = function() {return !d3.select(this).classed("selected-point")};
