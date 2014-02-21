@@ -1,6 +1,6 @@
 {
   "name": "plottable.js",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "dependencies": {
     "d3": "3.4.1"
   },
