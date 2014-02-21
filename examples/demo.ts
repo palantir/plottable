@@ -89,7 +89,7 @@ module Demo {
     var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
     var toggleClass = function() {return !d3.select(this).classed("selected-point")};
     var cb = (s) => s.classed("selected-point", toggleClass);
-    var areaInteraction = new AreaInteraction(renderer2, null, cb);
+    var areaInteraction = new AreaInteraction(renderer2);
     var row2: Component[] = [leftAxis, renderer2, null];
     var bottomAxis = new XAxis(xScale1, "bottom");
     var row3: Component[] = [null, bottomAxis, null];
@@ -98,7 +98,9 @@ module Demo {
     var sparkline = new LineRenderer(data2, xScaleSpark, yScaleSpark);
     sparkline.rowWeight(0.25);
     var row4 = [null, sparkline, null];
-    var zoomInteraction = new BrushZoomInteraction(sparkline, xScale1, yScale2);
+    var zoomCallback = new ZoomCallbackGenerator().addXScale(xScaleSpark, xScale1).addYScale(yScaleSpark, yScale2).getCallback();
+
+    var zoomInteraction = new AreaInteraction(sparkline).callback(zoomCallback);
     var multiChart = new Table([row1, row2, row3, row4]);
     return multiChart;
   }
