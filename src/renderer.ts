@@ -73,17 +73,16 @@ class XYRenderer extends Renderer {
     return this;
   }
 
-  public invertXYSelectionArea(pixelArea: SelectionArea): FullSelectionArea {
+  public invertXYSelectionArea(pixelArea: SelectionArea): SelectionArea {
     var xMin = this.xScale.invert(pixelArea.xMin);
     var xMax = this.xScale.invert(pixelArea.xMax);
     var yMin = this.yScale.invert(pixelArea.yMin);
     var yMax = this.yScale.invert(pixelArea.yMax);
     var dataArea = {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
-    return {pixel: pixelArea, data: dataArea};
+    return dataArea;
   }
 
-  public getSelectionFromArea(area: FullSelectionArea) {
-    var dataArea = area.data;
+  public getSelectionFromArea(dataArea: SelectionArea) {
     var filterFunction = (d: any) => {
       var x = this.xAccessor(d);
       var y = this.yAccessor(d);
@@ -92,8 +91,7 @@ class XYRenderer extends Renderer {
     return this.dataSelection.filter(filterFunction);
   }
 
-  public getDataIndicesFromArea(area: FullSelectionArea) {
-    var dataArea = area.data;
+  public getDataIndicesFromArea(dataArea: SelectionArea): number[] {
     var filterFunction = (d: any) => {
       var x = this.xAccessor(d);
       var y = this.yAccessor(d);
@@ -108,7 +106,7 @@ class XYRenderer extends Renderer {
     return results;
   }
 
-  public rescale() {
+  private rescale() {
     if (this.element != null) {
       this.render();
     }
