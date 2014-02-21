@@ -1,7 +1,6 @@
 {
   "rules": {
     "class-name": true,
-    "curly": true,
     "eofline": true,
     "forin": true,
     "label-position": true,
@@ -14,7 +13,6 @@
     "no-empty": true,
     "no-eval": true,
     "no-trailing-whitespace": true,
-    "no-unreachable": true,
     "one-line": [true,
         "check-open-brace",
         "check-catch",
