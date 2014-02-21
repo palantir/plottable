@@ -168,17 +168,21 @@ describe("Interactions", () => {
       var dragendY = 390;
 
       var expectedXDomain = [xScale.invert(dragstartX), xScale.invert(dragendX)];
-      var expectedYDomain = [yScale.invert(dragendY), yScale.invert(dragstartY)]; // reversed because Y scale is
+      var expectedYDomain = [yScale.invert(dragendY)  , yScale.invert(dragstartY)]; // reversed because Y scale is
 
       var indicesCallbackCalled = false;
-      var indicesCallback = (a: SelectionArea) => {
-        var indices = renderer.getDataIndicesFromArea(a);
+      var indicesCallback = (indices: number[]) => {
         indicesCallbackCalled = true;
         interaction.clearBox();
         assert.deepEqual(indices, [1, 2, 3, 4], "the correct points were selected");
       };
       var zoomCallback = new ZoomCallbackGenerator().addXScale(xScale).addYScale(yScale).getCallback();
-      var callback = (a: SelectionArea) => {indicesCallback(a); zoomCallback(a);};
+      var callback = (a: SelectionArea) => {
+        var dataArea = renderer.invertXYSelectionArea(a);
+        var indices = renderer.getDataIndicesFromArea(dataArea);
+        indicesCallback(indices);
+        zoomCallback(a);
+      };
       var interaction = new AreaInteraction(renderer).callback(callback);
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       assert.isTrue(indicesCallbackCalled, "indicesCallback was called");

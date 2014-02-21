@@ -160,9 +160,9 @@ class ZoomCallbackGenerator {
     return this;
   }
 
-  private updateScale(referenceScale: QuantitiveScale, targetScale: QuantitiveScale, min: number, max: number) {
+  private updateScale(referenceScale: QuantitiveScale, targetScale: QuantitiveScale, pixelMin: number, pixelMax: number) {
     var originalDomain = referenceScale.domain();
-    var newDomain = [referenceScale.invert(min), referenceScale.invert(max)];
+    var newDomain = [referenceScale.invert(pixelMin), referenceScale.invert(pixelMax)];
     var sameDirection = (newDomain[0] < newDomain[1]) === (originalDomain[0] < originalDomain[1]);
     if (!sameDirection) {newDomain.reverse();}
     targetScale.domain(newDomain);
@@ -170,10 +170,10 @@ class ZoomCallbackGenerator {
 
   public getCallback() {
     return (area: SelectionArea) => {
-      this.xScaleMappings.forEach((sm) => {
+      this.xScaleMappings.forEach((sm: QuantitiveScale[]) => {
         this.updateScale(sm[0], sm[1], area.xMin, area.xMax);
       });
-      this.yScaleMappings.forEach((sm) => {
+      this.yScaleMappings.forEach((sm: QuantitiveScale[]) => {
         this.updateScale(sm[0], sm[1], area.yMin, area.yMax);
       });
     };
