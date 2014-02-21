@@ -1,5 +1,5 @@
 /*!
-Plottable v0.1.2 (https://github.com/palantir/plottable)
+Plottable v0.1.3 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -26,8 +26,8 @@ var Component = (function () {
         this.rowMinimumVal = 0;
         this.colMinimumVal = 0;
         this.cssClasses = ["component"];
-        this.xAlignment = "LEFT";
-        this.yAlignment = "TOP";
+        this.xAlignProportion = 0;
+        this.yAlignProportion = 0;
     }
     Component.prototype.anchor = function (element) {
         var _this = this;
@@ -54,6 +54,32 @@ var Component = (function () {
         return this;
     };
 
+    Component.prototype.xAlign = function (alignment) {
+        if (alignment === "LEFT") {
+            this.xAlignProportion = 0;
+        } else if (alignment === "CENTER") {
+            this.xAlignProportion = 0.5;
+        } else if (alignment === "RIGHT") {
+            this.xAlignProportion = 1;
+        } else {
+            throw new Error("Unsupported alignment");
+        }
+        return this;
+    };
+
+    Component.prototype.yAlign = function (alignment) {
+        if (alignment === "TOP") {
+            this.yAlignProportion = 0;
+        } else if (alignment === "CENTER") {
+            this.yAlignProportion = 0.5;
+        } else if (alignment === "BOTTOM") {
+            this.yAlignProportion = 1;
+        } else {
+            throw new Error("Unsupported alignment");
+        }
+        return this;
+    };
+
     Component.prototype.computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
         var _this = this;
         if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
@@ -69,33 +95,11 @@ var Component = (function () {
             }
         }
         if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
-            switch (this.yAlignment) {
-                case "TOP":
-                    break;
-                case "CENTER":
-                    yOffset += (availableHeight - this.rowMinimum()) / 2;
-                    break;
-                case "BOTTOM":
-                    yOffset += availableHeight - this.rowMinimum();
-                    break;
-                default:
-                    throw new Error(this.yAlignment + " is not a supported alignment");
-            }
+            yOffset += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
             availableHeight = this.rowMinimum();
         }
         if (this.colWeight() === 0 && this.colMinimum() !== 0) {
-            switch (this.xAlignment) {
-                case "LEFT":
-                    break;
-                case "CENTER":
-                    xOffset += (availableWidth - this.colMinimum()) / 2;
-                    break;
-                case "RIGHT":
-                    xOffset += availableWidth - this.colMinimum();
-                    break;
-                default:
-                    throw new Error(this.xAlignment + " is not a supported alignment");
-            }
+            xOffset += (availableWidth - this.colMinimum()) * this.xAlignProportion;
             availableWidth = this.colMinimum();
         }
         this.xOffset = xOffset;
@@ -335,13 +339,9 @@ var PanZoomInteraction = (function (_super) {
 
 var AreaInteraction = (function (_super) {
     __extends(AreaInteraction, _super);
-    function AreaInteraction(rendererComponent, areaCallback, selectionCallback, indicesCallback) {
+    function AreaInteraction(componentToListenTo) {
         var _this = this;
-        _super.call(this, rendererComponent);
-        this.rendererComponent = rendererComponent;
-        this.areaCallback = areaCallback;
-        this.selectionCallback = selectionCallback;
-        this.indicesCallback = indicesCallback;
+        _super.call(this, componentToListenTo);
         this.dragInitialized = false;
         this.origin = [0, 0];
         this.location = [0, 0];
@@ -357,6 +357,11 @@ var AreaInteraction = (function (_super) {
         });
         this.registerWithComponent();
     }
+    AreaInteraction.prototype.callback = function (cb) {
+        this.callbackToCall = cb;
+        return this;
+    };
+
     AreaInteraction.prototype.dragstart = function () {
         this.clearBox();
         var availableWidth = parseFloat(this.hitBox.attr("width"));
@@ -386,31 +391,23 @@ var AreaInteraction = (function (_super) {
     };
 
     AreaInteraction.prototype.dragend = function () {
-        if (!this.dragInitialized) {
+        if (!this.dragInitialized)
             return;
-        }
+
         this.dragInitialized = false;
+        if (this.callbackToCall == null)
+            return;
         var xMin = Math.min(this.origin[0], this.location[0]);
         var xMax = Math.max(this.origin[0], this.location[0]);
         var yMin = Math.min(this.origin[1], this.location[1]);
         var yMax = Math.max(this.origin[1], this.location[1]);
         var pixelArea = { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
-        var fullArea = this.rendererComponent.invertXYSelectionArea(pixelArea);
-        if (this.areaCallback != null) {
-            this.areaCallback(fullArea);
-        }
-        if (this.selectionCallback != null) {
-            var selection = this.rendererComponent.getSelectionFromArea(fullArea);
-            this.selectionCallback(selection);
-        }
-        if (this.indicesCallback != null) {
-            var indices = this.rendererComponent.getDataIndicesFromArea(fullArea);
-            this.indicesCallback(indices);
-        }
+        this.callbackToCall(pixelArea);
     };
 
     AreaInteraction.prototype.clearBox = function () {
         this.dragBox.attr("height", 0).attr("width", 0);
+        return this;
     };
 
     AreaInteraction.prototype.anchor = function (hitBox) {
@@ -419,45 +416,56 @@ var AreaInteraction = (function (_super) {
         var element = this.componentToListenTo.element;
         this.dragBox = element.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
         hitBox.call(this.dragBehavior);
+        return this;
     };
     AreaInteraction.CLASS_DRAG_BOX = "drag-box";
     return AreaInteraction;
 })(Interaction);
 
-var BrushZoomInteraction = (function (_super) {
-    __extends(BrushZoomInteraction, _super);
-    function BrushZoomInteraction(eventComponent, xScale, yScale, indicesCallback) {
-        _super.call(this, eventComponent);
-        this.xScale = xScale;
-        this.yScale = yScale;
-        this.areaCallback = this.zoom;
-        this.indicesCallback = indicesCallback;
+var ZoomCallbackGenerator = (function () {
+    function ZoomCallbackGenerator() {
+        this.xScaleMappings = [];
+        this.yScaleMappings = [];
     }
-    BrushZoomInteraction.prototype.zoom = function (area) {
-        var originalXDomain = this.xScale.domain();
-        var originalYDomain = this.yScale.domain();
-        var xDomain = [area.data.xMin, area.data.xMax];
-        var yDomain = [area.data.yMin, area.data.yMax];
-
-        var xOrigDirection = originalXDomain[0] > originalXDomain[1];
-        var yOrigDirection = originalYDomain[0] > originalYDomain[1];
-        var xDirection = xDomain[0] > xDomain[1];
-        var yDirection = yDomain[0] > yDomain[1];
-
-        if (xDirection !== xOrigDirection) {
-            xDomain.reverse();
+    ZoomCallbackGenerator.prototype.addXScale = function (listenerScale, targetScale) {
+        if (targetScale == null) {
+            targetScale = listenerScale;
         }
-        ;
-        if (yDirection !== yOrigDirection) {
-            yDomain.reverse();
-        }
-        ;
-
-        this.xScale.domain(xDomain);
-        this.yScale.domain(yDomain);
+        this.xScaleMappings.push([listenerScale, targetScale]);
+        return this;
     };
-    return BrushZoomInteraction;
-})(AreaInteraction);
+
+    ZoomCallbackGenerator.prototype.addYScale = function (listenerScale, targetScale) {
+        if (targetScale == null) {
+            targetScale = listenerScale;
+        }
+        this.yScaleMappings.push([listenerScale, targetScale]);
+        return this;
+    };
+
+    ZoomCallbackGenerator.prototype.updateScale = function (referenceScale, targetScale, pixelMin, pixelMax) {
+        var originalDomain = referenceScale.domain();
+        var newDomain = [referenceScale.invert(pixelMin), referenceScale.invert(pixelMax)];
+        var sameDirection = (newDomain[0] < newDomain[1]) === (originalDomain[0] < originalDomain[1]);
+        if (!sameDirection) {
+            newDomain.reverse();
+        }
+        targetScale.domain(newDomain);
+    };
+
+    ZoomCallbackGenerator.prototype.getCallback = function () {
+        var _this = this;
+        return function (area) {
+            _this.xScaleMappings.forEach(function (sm) {
+                _this.updateScale(sm[0], sm[1], area.xMin, area.xMax);
+            });
+            _this.yScaleMappings.forEach(function (sm) {
+                _this.updateScale(sm[0], sm[1], area.yMin, area.yMax);
+            });
+        };
+    };
+    return ZoomCallbackGenerator;
+})();
 var Label = (function (_super) {
     __extends(Label, _super);
     function Label(text, orientation) {
@@ -668,12 +676,11 @@ var XYRenderer = (function (_super) {
         var yMin = this.yScale.invert(pixelArea.yMin);
         var yMax = this.yScale.invert(pixelArea.yMax);
         var dataArea = { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
-        return { pixel: pixelArea, data: dataArea };
+        return dataArea;
     };
 
-    XYRenderer.prototype.getSelectionFromArea = function (area) {
+    XYRenderer.prototype.getSelectionFromArea = function (dataArea) {
         var _this = this;
-        var dataArea = area.data;
         var filterFunction = function (d) {
             var x = _this.xAccessor(d);
             var y = _this.yAccessor(d);
@@ -682,9 +689,8 @@ var XYRenderer = (function (_super) {
         return this.dataSelection.filter(filterFunction);
     };
 
-    XYRenderer.prototype.getDataIndicesFromArea = function (area) {
+    XYRenderer.prototype.getDataIndicesFromArea = function (dataArea) {
         var _this = this;
-        var dataArea = area.data;
         var filterFunction = function (d) {
             var x = _this.xAccessor(d);
             var y = _this.yAccessor(d);
@@ -1092,4 +1098,37 @@ var YAxis = (function (_super) {
     }
     return YAxis;
 })(Axis);
+var ComponentGroup = (function (_super) {
+    __extends(ComponentGroup, _super);
+    function ComponentGroup(components) {
+        _super.call(this);
+        this.components = components;
+    }
+    ComponentGroup.prototype.anchor = function (element) {
+        var _this = this;
+        _super.prototype.anchor.call(this, element);
+        this.components.forEach(function (c) {
+            return c.anchor(_this.element.append("g"));
+        });
+        return this;
+    };
+
+    ComponentGroup.prototype.computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+        var _this = this;
+        _super.prototype.computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+        this.components.forEach(function (c) {
+            c.computeLayout(_this.xOffset, _this.yOffset, _this.availableWidth, _this.availableHeight);
+        });
+        return this;
+    };
+
+    ComponentGroup.prototype.render = function () {
+        _super.prototype.render.call(this);
+        this.components.forEach(function (c) {
+            return c.render();
+        });
+        return this;
+    };
+    return ComponentGroup;
+})(Component);
 //# sourceMappingURL=plottable.js.map

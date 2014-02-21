@@ -105,13 +105,33 @@ module DemoDay {
       histogram.renderer1.render();
       histogram.renderer2.render();
     };
-    var areaInteraction = new AreaInteraction(scatterplot.renderer, null, selectionCallback, dataCallback);
-    var zoomCallback = (indices) => {
+
+    var firstCallback = (area: SelectionArea) => {
+      var r: XYRenderer = scatterplot.renderer;
+      var dataArea = r.invertXYSelectionArea(area);
+      var indices = r.getDataIndicesFromArea(dataArea);
+      var selection = r.getSelectionFromArea(dataArea);
+
+      dataCallback(indices);
+      selectionCallback(selection);
+    }
+
+    var areaInteraction = new AreaInteraction(scatterplot.renderer).callback(firstCallback);
+    var zoomCallback = new ZoomCallbackGenerator().addXScale(scatterplot.xSpark, scatterplot.xScale)
+                                                  .addYScale(scatterplot.ySpark, scatterplot.yScale)
+                                                  .getCallback();
+
+    var secondCallback = (area: SelectionArea) => {
+      var renderer: CircleRenderer = scatterplot.sparkline;
+      var dataArea = renderer.invertXYSelectionArea(area);
+      var indices  = renderer.getDataIndicesFromArea(dataArea);
       areaInteraction.clearBox();
       selectionCallback(null);
       dataCallback(indices);
+      zoomCallback(area);
     };
-    chart.c.zoom = new BrushZoomInteraction(scatterplot.sparkline, scatterplot.xScale, scatterplot.yScale, zoomCallback);
+
+    chart.c.zoom = new AreaInteraction(scatterplot.sparkline).callback(secondCallback);
   }
 
   function grabIndices(itemsToGrab: any[], indices: number[]) {

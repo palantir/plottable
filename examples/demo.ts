@@ -83,13 +83,12 @@ module Demo {
     var renderer1 = new LineRenderer(data1, xScale1, yScale1);
     var row1: Component[] = [leftAxesTable, renderer1, rightAxesTable];
     var yScale2 = new LinearScale();
-    var leftAxis = new YAxis(yScale2, "left");
-    leftAxis.xAlignment = "RIGHT";
+    var leftAxis = new YAxis(yScale2, "left").xAlign("RIGHT");
     var data2 = makeRandomData(1000, 100000);
     var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
     var toggleClass = function() {return !d3.select(this).classed("selected-point")};
     var cb = (s) => s.classed("selected-point", toggleClass);
-    var areaInteraction = new AreaInteraction(renderer2, null, cb);
+    var areaInteraction = new AreaInteraction(renderer2);
     var row2: Component[] = [leftAxis, renderer2, null];
     var bottomAxis = new XAxis(xScale1, "bottom");
     var row3: Component[] = [null, bottomAxis, null];
@@ -98,7 +97,9 @@ module Demo {
     var sparkline = new LineRenderer(data2, xScaleSpark, yScaleSpark);
     sparkline.rowWeight(0.25);
     var row4 = [null, sparkline, null];
-    var zoomInteraction = new BrushZoomInteraction(sparkline, xScale1, yScale2);
+    var zoomCallback = new ZoomCallbackGenerator().addXScale(xScaleSpark, xScale1).addYScale(yScaleSpark, yScale2).getCallback();
+
+    var zoomInteraction = new AreaInteraction(sparkline).callback(zoomCallback);
     var multiChart = new Table([row1, row2, row3, row4]);
     return multiChart;
   }
