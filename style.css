@@ -1,0 +1,103 @@
+
+body {
+  font: 10px sans-serif;
+}
+
+div {
+  display: inline;
+}
+
+.label text {
+  font-family: Helvetica;
+}
+
+.axis-label text {
+  font-size: 18pt;
+  font-style: italic;
+}
+
+.title-label text {
+  font-size: 36pt;
+}
+
+.text-label-vertical {
+  writing-mode: tb;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis path {
+  fill: none;
+  stroke: black;
+}
+
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+.random-data {
+  stroke: steelblue;
+}
+circle {
+  fill: steelblue;
+}
+rect {
+  fill: steelblue;
+}
+
+.table-rect {
+  fill: none;
+  stroke: royalblue;
+}
+
+.renderer-box {
+  fill: none;
+  stroke: red;
+}
+
+.axis-box {
+  fill: none;
+  stroke: green;
+}
+
+
+/*
+.error {
+  fill: pink;
+}
+*/
+
+.bounding-box {
+  fill: none;
+  stroke: black;
+}
+
+.table-container .bounding-box {
+  stroke: blue;
+}
+
+.renderer-container .bounding-box {
+  stroke: red;
+}
+
+.axis-container .bounding-box {
+  stroke: green;
+}
+
+
+.drag-box {
+  fill: aliceblue;
+  opacity: 1;
+
+}
+
+.selected-point {
+  fill: orange;
+  stroke: none;
+}

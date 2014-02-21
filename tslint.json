@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "class-name": true,
+    "eofline": true,
+    "forin": true,
+    "label-position": true,
+    "label-undefined": true,
+    "no-arg": true,
+    "no-bitwise": true,
+    "no-construct": true,
+    "no-duplicate-key": true,
+    "no-duplicate-variable": true,
+    "no-empty": true,
+    "no-eval": true,
+    "no-trailing-whitespace": true,
+    "one-line": [true,
+        "check-open-brace",
+        "check-catch",
+        "check-else"
+    ],
+    "quotemark": [true, "double"],
+    "radix": true,
+    "semicolon": true,
+    "triple-equals": [true, "allow-null-check"],
+    "variable-name": false
+  }
+}

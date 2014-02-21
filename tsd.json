@@ -1,0 +1,23 @@
+{
+  "version": "v1",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "installed": {
+    "chai/chai-assert.d.ts": {
+      "commit": "16dd1ab76fb4c65e532ca820dd45c875636521b6"
+    },
+    "d3/d3.d.ts": {
+      "commit": "16dd1ab76fb4c65e532ca820dd45c875636521b6"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "16dd1ab76fb4c65e532ca820dd45c875636521b6"
+    },
+    "jquery/jquery.d.ts": {
+      "commit": "dfa8d86385232fabd220c43a81a0bf4ca418f761"
+    },
+    "jquery.simulate/jquery.simulate.d.ts": {
+      "commit": "dfa8d86385232fabd220c43a81a0bf4ca418f761"
+    }
+  }
+}
