@@ -1,6 +1,3 @@
 .DS_Store
 *.tmp.txt
-build/*
 node_modules
-bower_components
-typings

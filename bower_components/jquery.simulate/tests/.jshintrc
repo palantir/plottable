@@ -1,0 +1,38 @@
+{
+	
+	"camelcase": true, 
+	"plusplus": true,
+	"forin": true,
+	"noarg": true,
+	"noempty": true,
+	"eqeqeq": true,
+	"bitwise": true,
+	"strict": true,
+	"undef": true,
+	"unused": true,
+	"curly": true,
+	"browser": true,
+	"devel": true,
+	"white": false,
+	"onevar": false,
+	
+	"globals": {
+		"jQuery": true,
+		"$": true,
+		"tests": true,
+		"test": true,
+		"module": true,
+		"QUnit": true,
+		"strictEqual": true,
+		"ok": true,
+		"equal": true,
+		"deepEqual": true,
+		"notStrictEqual": true,
+		"notEqual": true,
+		"stop": true,
+		"start": true,
+		"expect": true,
+		"asyncTest": true
+	}
+
+}
