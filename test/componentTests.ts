@@ -77,13 +77,11 @@ describe("Component behavior", () => {
     c.computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
-    c.xAlignment = "CENTER";
-    c.yAlignment = "CENTER";
+    c.xAlign("CENTER").yAlign("CENTER");
     c.computeLayout();
     assertComponentXY(c, 150, 100, "center component aligns correctly");
 
-    c.xAlignment = "RIGHT";
-    c.yAlignment = "BOTTOM";
+    c.xAlign("RIGHT").yAlign("BOTTOM");
     c.computeLayout();
     assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
     svg.remove();
@@ -94,8 +92,8 @@ describe("Component behavior", () => {
     assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
     assert.equal(c.rowWeight() , 0, "rowWeight  defaults to 0");
     assert.equal(c.colWeight() , 0, "colWeight  defaults to 0");
-    assert.equal(c.xAlignment, "LEFT", "xAlignment defaults to LEFT");
-    assert.equal(c.yAlignment, "TOP" , "yAlignment defaults to TOP");
+    assert.equal((<any> c).xAlignProportion, 0, "xAlignment defaults to LEFT");
+    assert.equal((<any> c).yAlignProportion, 0, "yAlignment defaults to TOP");
     svg.remove();
   });
 
@@ -163,16 +161,8 @@ describe("Component behavior", () => {
   });
 
   it("errors are thrown on bad alignments", () => {
-    c.rowWeight(0);
-    c.colWeight(0);
-    c.rowMinimum(10);
-    c.colMinimum(10);
-    c.xAlignment = "foo";
-    c.anchor(svg);
-    assert.throws(() => c.computeLayout(), Error, "not a supported alignment");
-    c.xAlignment = "CENTER";
-    c.yAlignment = "bar";
-    assert.throws(() => c.computeLayout(), Error, "not a supported alignment");
+    assert.throws(() => c.xAlign("foo"), Error, "Unsupported alignment");
+    assert.throws(() => c.yAlign("foo"), Error, "Unsupported alignment");
     svg.remove();
   });
 

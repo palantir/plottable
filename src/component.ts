@@ -20,8 +20,8 @@ class Component {
 
   private cssClasses: string[] = ["component"];
 
-  public xAlignment = "LEFT"; // LEFT, CENTER, RIGHT
-  public yAlignment = "TOP"; // TOP, CENTER, BOTTOM
+  private xAlignProportion = 0;
+  private yAlignProportion = 0;
 
   public anchor(element: D3.Selection) {
     if (element.node().childNodes.length > 0) {
@@ -42,6 +42,32 @@ class Component {
     return this;
   }
 
+  public xAlign(alignment: string): Component {
+    if (alignment === "LEFT") {
+      this.xAlignProportion = 0;
+    } else if (alignment === "CENTER") {
+      this.xAlignProportion = 0.5;
+    } else if (alignment === "RIGHT") {
+      this.xAlignProportion = 1;
+    } else {
+      throw new Error("Unsupported alignment");
+    }
+    return this;
+  }
+
+  public yAlign(alignment: string): Component {
+    if (alignment === "TOP") {
+      this.yAlignProportion = 0;
+    } else if (alignment === "CENTER") {
+      this.yAlignProportion = 0.5;
+    } else if (alignment === "BOTTOM") {
+      this.yAlignProportion = 1;
+    } else {
+      throw new Error("Unsupported alignment");
+    }
+    return this;
+  }
+
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
     if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
       if (this.element == null) {
@@ -57,33 +83,11 @@ class Component {
       }
     }
     if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
-      switch (this.yAlignment) {
-        case "TOP":
-          break;
-        case "CENTER":
-          yOffset += (availableHeight - this.rowMinimum()) / 2;
-          break;
-        case "BOTTOM":
-          yOffset += availableHeight - this.rowMinimum();
-          break;
-        default:
-          throw new Error(this.yAlignment + " is not a supported alignment");
-      }
+      yOffset += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
       availableHeight = this.rowMinimum();
     }
     if (this.colWeight() === 0 && this.colMinimum() !== 0) {
-      switch (this.xAlignment) {
-        case "LEFT":
-          break;
-        case "CENTER":
-          xOffset += (availableWidth - this.colMinimum()) / 2;
-          break;
-        case "RIGHT":
-          xOffset += availableWidth - this.colMinimum();
-          break;
-        default:
-          throw new Error(this.xAlignment + " is not a supported alignment");
-      }
+      xOffset += (availableWidth - this.colMinimum()) * this.xAlignProportion;
       availableWidth = this.colMinimum();
     }
     this.xOffset = xOffset;
