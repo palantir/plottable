@@ -1,0 +1,9 @@
+</style>
+<script src="http://palantir.github.io/plottable/plottable.js"></script>
+<link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/style.css">
+<style>
+/* --- Put any additional styles after this line --- */
+.demo-title { font-size: 24pt; }
+.quadratic-series circle {
+    fill: red;
+}

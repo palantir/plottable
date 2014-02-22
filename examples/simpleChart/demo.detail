@@ -1,0 +1,7 @@
+---
+name: Plottable.js Simple Chart Demo
+description: Creates a chart with an x-axis, y-axis, and circle renderer
+authors:
+  - Justin Lan
+normalize_css: no
+...
