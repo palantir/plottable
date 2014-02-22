@@ -1,4 +1,4 @@
-function createSimpleChart() {
+window.onload = function() {
   function makeQuadraticSeries(numPoints) {
       var data = [];
       for (var i = 0; i< numPoints; i++) {
@@ -9,7 +9,7 @@ function createSimpleChart() {
 
   var dataseries = makeQuadraticSeries(20);
 
-  var svg = d3.select("#chart");
+  var svg = d3.select("#simple-chart");
   svg.attr("width", 480).attr("height", 320);
   var xScale = new LinearScale();
   var yScale = new LinearScale();
@@ -19,4 +19,4 @@ function createSimpleChart() {
   var basicTable = new Table([[yAxis, renderAreaD1],
                               [null, xAxis]]);
   basicTable.anchor(svg).computeLayout().render();
-}
+};

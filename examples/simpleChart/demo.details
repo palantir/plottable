@@ -3,9 +3,5 @@ name: Plottable.js Simple Chart Demo
 description: Creates a chart with an x-axis, y-axis, and circle renderer
 authors:
   - Justin Lan
-resources:
-  - http://d3js.org/d3.v3.min.js
-  - http://palantir.github.io/plottable/plottable.js
-  - http://palantir.github.io/plottable/style.css
 normalize_css: no
 ...
