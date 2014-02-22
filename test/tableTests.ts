@@ -5,13 +5,12 @@ var assert = chai.assert;
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
-  var emptyDataset: IDataset = {data: [], seriesName: "blah"};
   var rows: Component[][] = [];
   var components: Component[] = [];
   for(var i=0; i<nRows; i++) {
     var cols = [];
     for(var j=0; j<nCols; j++) {
-      var r = new Component();
+      var r = new Component().rowWeight(1).colWeight(1);
       cols.push(r);
       components.push(r);
     }
@@ -34,13 +33,12 @@ describe("Tables", () => {
     assert.equal(component.constructor.name, "Component", "the component is a base Component");
   });
 
-  it("tables with insufficient space throw InsufficientSpaceError", () => {
+  it("tables with insufficient space throw Insufficient Space", () => {
     var svg = generateSVG(200, 200);
-    var c = new Component();
-    c.rowMinimum(300).colMinimum(300);
+    var c = new Component().rowMinimum(300).colMinimum(300);
     var t = new Table([[c]]);
     t.anchor(svg);
-    assert.throws(() => t.computeLayout(), Error, "InsufficientSpaceError");
+    assert.throws(() => t.computeLayout(), Error, "Insufficient Space");
     svg.remove();
   });
 
@@ -132,5 +130,22 @@ describe("Tables", () => {
     var table = new Table([[]]);
     assert.throws(() => table.rowMinimum(3), Error, "cannot be directly set");
     assert.throws(() => table.colMinimum(3), Error, "cannot be directly set");
+  });
+
+  it("tables guess weights intelligently", () => {
+    var c1 = new Component().rowWeight(0).colWeight(0);
+    var c2 = new Component().rowWeight(0).colWeight(0);
+    var table = new Table([[c1], [c2]]);
+    assert.equal(table.rowWeight(), 0, "the first table guessed 0 for rowWeight");
+    assert.equal(table.colWeight(), 0, "the first table guessed 0 for rowWeight");
+
+    c1.rowWeight(0);
+    c2.rowWeight(3);
+
+    assert.equal(table.rowWeight(), 1, "the table now guesses 1 for rowWeight");
+    assert.equal(table.colWeight(), 0, "the table still guesses 0 for colWeight");
+
+    assert.equal(table.rowWeight(2), table, "rowWeight returned the table");
+    assert.equal(table.rowWeight(), 2, "the rowWeight was overridden explicitly");
   });
 });

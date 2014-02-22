@@ -53,7 +53,6 @@ module Demo {
     var yScale = new LinearScale();
     var rightAxes = [new YAxis(yScale, "right"), new YAxis(yScale, "right")];
     var rightAxesTable = new Table([rightAxes]);
-    rightAxesTable.colWeight(0);
     var xAxis = new XAxis(xScale, "bottom");
     var data = makeRandomData(30);
     var renderArea = new LineRenderer(data, xScale, yScale);
@@ -75,10 +74,8 @@ module Demo {
     var yScale1 = new LinearScale();
     var leftAxes = [new YAxis(yScale1, "left"), new YAxis(yScale1, "left")];
     var leftAxesTable = new Table([leftAxes]);
-    leftAxesTable.colWeight(0);
     var rightAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
     var rightAxesTable = new Table([rightAxes]);
-    rightAxesTable.colWeight(0);
     var data1 = makeRandomData(30, .0005);
     var renderer1 = new LineRenderer(data1, xScale1, yScale1);
     var row1: Component[] = [leftAxesTable, renderer1, rightAxesTable];
@@ -131,12 +128,10 @@ module Demo {
   var yAxisRight = new YAxis(yScale, "right");
   var yAxisRightLabel = new AxisLabel("bp y right qd", "vertical-right");
   var yAxisRightTable = new Table([[yAxisRight, yAxisRightLabel]]);
-  yAxisRightTable.colWeight(0);
 
   var yAxisLeft = new YAxis(yScale, "left");
   var yAxisLeftLabel = new AxisLabel("bp y left qd", "vertical-left");
   var yAxisLeftTable = new Table([[yAxisLeftLabel, yAxisLeft]]);
-  yAxisLeftTable.colWeight(0);
 
   var data = makeRandomData(30);
   var renderArea = new LineRenderer(data, xScale, yScale);

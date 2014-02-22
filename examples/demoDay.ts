@@ -8,10 +8,8 @@ module DemoDay {
     s.yScale = new LinearScale();
     s.leftAxis = new YAxis(s.yScale, "left");
     var leftAxisTable = new Table([[new AxisLabel("y", "vertical-left"), s.leftAxis]]);
-    leftAxisTable.colWeight(0);
     s.xAxis = new XAxis(s.xScale, "bottom");
     var xAxisTable = new Table([[s.xAxis], [new AxisLabel("x")]]);
-    xAxisTable.rowWeight(0);
 
     s.renderer = new CircleRenderer(data, s.xScale, s.yScale, null, null, 1.5);
     s.xSpark = new LinearScale();
@@ -37,9 +35,7 @@ module DemoDay {
     h.xAxis1 = new XAxis(h.xScale1, "bottom");
     h.yAxis1 = new YAxis(h.yScale1, "right");
     var labelX1Table = new Table([[h.xAxis1], [new AxisLabel("X values")]]);
-    labelX1Table.rowWeight(0);
     var labelY1Table = new Table([[h.yAxis1, new AxisLabel("Counts", "vertical-right")]]);
-    labelY1Table.colWeight(0);
     var table1 = new Table([[h.renderer1, labelY1Table], [labelX1Table, null]]);
 
     var yExtent = d3.extent(data, (d) => d.y);
@@ -52,9 +48,7 @@ module DemoDay {
     h.xAxis2 = new XAxis(h.xScale2, "bottom");
     h.yAxis2 = new YAxis(h.yScale2, "right");
     var labelX2Table = new Table([[h.xAxis2], [new AxisLabel("Y values")]]);
-    labelX2Table.rowWeight(0);
     var labelY2Table = new Table([[h.yAxis2, new AxisLabel("Counts", "vertical-right")]]);
-    labelY2Table.colWeight(0);
     var table2 = new Table([[h.renderer2, labelY2Table], [labelX2Table, null]]);
 
     h.table = new Table([[table1], [table2]]);
