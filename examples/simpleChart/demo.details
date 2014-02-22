@@ -8,5 +8,5 @@ resources:
   - http://palantir.github.io/plottable/plottable.js
   - http://palantir.github.io/plottable/style.css
 normalize_css: no
-wrap: l
+wrap: onDomReady
 ...
