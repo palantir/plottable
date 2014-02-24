@@ -1,7 +1,11 @@
 window.onload = function() {
+  var xMean = 0;
+  var xStdDev = 1;
+  var yMean = 0;
+  var yStdDev = 1;
   var dataseries = {
     seriesName: "normal-data",
-    data: makeNormallyDistributedData()
+    data: makeNormallyDistributedData(100, xMean, xStdDev, yMean, yStdDev)
   };
 
   var svg = d3.select("#chart-with-labels");
@@ -15,7 +19,7 @@ window.onload = function() {
 
   var yScale = new LinearScale();
   var yAxis = new YAxis(yScale, "left");
-  var yLabel = new AxisLabel("y", "horizontal-left");
+  var yLabel = new AxisLabel("y", "vertical-left");
   var yAxisTable = new Table([[yLabel, yAxis]]);
 
   var renderAreaD1 = new CircleRenderer(dataseries, xScale, yScale);
