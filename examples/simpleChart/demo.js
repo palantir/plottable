@@ -7,7 +7,7 @@ window.onload = function() {
       return {data: data, seriesName: "quadratic-series"};
   }
 
-  var dataseries = makeQuadraticSeries(20);
+  var dataseries = makeRandomData(20);
 
   var svg = d3.select("#simple-chart");
   svg.attr("width", 480).attr("height", 320);
