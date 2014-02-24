@@ -18,7 +18,10 @@ class Table extends Component {
   private rowWeightSum: number;
   private colWeightSum: number;
 
-  constructor(rows: Component[][], rowWeightVal=1, colWeightVal=1) {
+  private guessRowWeight = true;
+  private guessColWeight = true;
+
+  constructor(rows: Component[][]) {
     super();
     this.classed(Table.CSS_CLASS, true);
     // Clean out any null components and replace them with base Components
@@ -28,7 +31,6 @@ class Table extends Component {
     this.cols = d3.transpose(rows);
     this.nRows = this.rows.length;
     this.nCols = this.cols.length;
-    super.rowWeight(rowWeightVal).colWeight(colWeightVal);
   }
 
   public anchor(element: D3.Selection) {
@@ -49,7 +51,7 @@ class Table extends Component {
     var freeWidth = this.availableWidth - this.colMinimum();
     var freeHeight = this.availableHeight - this.rowMinimum();
     if (freeWidth < 0 || freeHeight < 0) {
-      throw new Error("InsufficientSpaceError");
+      throw new Error("Insufficient Space");
     }
 
     // distribute remaining height to rows
@@ -101,6 +103,33 @@ class Table extends Component {
   }
 
   /* Getters */
+
+  public rowWeight(): number;
+  public rowWeight(newVal: number): Table;
+  public rowWeight(newVal?: number): any {
+    if (newVal != null || !this.guessRowWeight) {
+      this.guessRowWeight = false;
+      return super.rowWeight(newVal);
+    } else {
+      var componentWeights: number[][] = this.rows.map((r) => r.map((c) => c.rowWeight()));
+      var biggestWeight = d3.max(componentWeights.map((ws) => d3.max(ws)));
+      return biggestWeight > 0 ? 1 : 0;
+    }
+  }
+
+  public colWeight(): number;
+  public colWeight(newVal: number): Table;
+  public colWeight(newVal?: number): any {
+    if (newVal != null || !this.guessColWeight) {
+      this.guessColWeight = false;
+      return super.colWeight(newVal);
+    } else {
+      var componentWeights: number[][] = this.rows.map((r) => r.map((c) => c.colWeight()));
+      var biggestWeight = d3.max(componentWeights.map((ws) => d3.max(ws)));
+      return biggestWeight > 0 ? 1 : 0;
+    }
+  }
+
   public rowMinimum(): number;
   public rowMinimum(newVal: number): Component;
   public rowMinimum(newVal?: number): any {
