@@ -1,6 +1,9 @@
-
 .demo-title { font-size: 24pt; }
-.random-data circle {
+.series-1 .random-data circle {
     fill: red;
     stroke: none;
+}
+
+.series-2 .random-data {
+    stroke: green;
 }
