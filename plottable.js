@@ -1,5 +1,5 @@
 /*!
-Plottable v0.1.3 (https://github.com/palantir/plottable)
+Plottable v0.1.4 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -96,11 +96,11 @@ var Component = (function () {
         }
         if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
             yOffset += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-            availableHeight = this.rowMinimum();
+            availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
         }
         if (this.colWeight() === 0 && this.colMinimum() !== 0) {
             xOffset += (availableWidth - this.colMinimum()) * this.xAlignProportion;
-            availableWidth = this.colMinimum();
+            availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
         }
         this.xOffset = xOffset;
         this.yOffset = yOffset;
@@ -821,12 +821,12 @@ var BarRenderer = (function (_super) {
 })(XYRenderer);
 var Table = (function (_super) {
     __extends(Table, _super);
-    function Table(rows, rowWeightVal, colWeightVal) {
-        if (typeof rowWeightVal === "undefined") { rowWeightVal = 1; }
-        if (typeof colWeightVal === "undefined") { colWeightVal = 1; }
+    function Table(rows) {
         _super.call(this);
         this.rowPadding = 0;
         this.colPadding = 0;
+        this.guessRowWeight = true;
+        this.guessColWeight = true;
         this.classed(Table.CSS_CLASS, true);
 
         var cleanOutNulls = function (c) {
@@ -839,7 +839,6 @@ var Table = (function (_super) {
         this.cols = d3.transpose(rows);
         this.nRows = this.rows.length;
         this.nCols = this.cols.length;
-        _super.prototype.rowWeight.call(this, rowWeightVal).colWeight(colWeightVal);
     }
     Table.prototype.anchor = function (element) {
         var _this = this;
@@ -860,7 +859,7 @@ var Table = (function (_super) {
         var freeWidth = this.availableWidth - this.colMinimum();
         var freeHeight = this.availableHeight - this.rowMinimum();
         if (freeWidth < 0 || freeHeight < 0) {
-            throw new Error("InsufficientSpaceError");
+            throw new Error("Insufficient Space");
         }
 
         var rowProportionalSpace = Table.rowProportionalSpace(this.rows, freeHeight);
@@ -918,6 +917,40 @@ var Table = (function (_super) {
             });
         });
         return this;
+    };
+
+    Table.prototype.rowWeight = function (newVal) {
+        if (newVal != null || !this.guessRowWeight) {
+            this.guessRowWeight = false;
+            return _super.prototype.rowWeight.call(this, newVal);
+        } else {
+            var componentWeights = this.rows.map(function (r) {
+                return r.map(function (c) {
+                    return c.rowWeight();
+                });
+            });
+            var biggestWeight = d3.max(componentWeights.map(function (ws) {
+                return d3.max(ws);
+            }));
+            return biggestWeight > 0 ? 1 : 0;
+        }
+    };
+
+    Table.prototype.colWeight = function (newVal) {
+        if (newVal != null || !this.guessColWeight) {
+            this.guessColWeight = false;
+            return _super.prototype.colWeight.call(this, newVal);
+        } else {
+            var componentWeights = this.rows.map(function (r) {
+                return r.map(function (c) {
+                    return c.colWeight();
+                });
+            });
+            var biggestWeight = d3.max(componentWeights.map(function (ws) {
+                return d3.max(ws);
+            }));
+            return biggestWeight > 0 ? 1 : 0;
+        }
     };
 
     Table.prototype.rowMinimum = function (newVal) {
