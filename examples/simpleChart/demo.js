@@ -1,12 +1,4 @@
 window.onload = function() {
-  function makeQuadraticSeries(numPoints) {
-      var data = [];
-      for (var i = 0; i< numPoints; i++) {
-          data.push({x: i, y: i*i});
-      }
-      return {data: data, seriesName: "quadratic-series"};
-  }
-
   var dataseries = makeRandomData(20);
 
   var svg = d3.select("#simple-chart");
