@@ -84,11 +84,11 @@ class Component {
     }
     if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
       yOffset += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-      availableHeight = this.rowMinimum();
+      availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
     }
     if (this.colWeight() === 0 && this.colMinimum() !== 0) {
       xOffset += (availableWidth - this.colMinimum()) * this.xAlignProportion;
-      availableWidth = this.colMinimum();
+      availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
     }
     this.xOffset = xOffset;
     this.yOffset = yOffset;
