@@ -4,10 +4,10 @@ var assert = chai.assert;
 
 function assertComponentXY(component: Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
-  var xOffset = (<any> component).xOffset;
-  var yOffset = (<any> component).yOffset;
-  assert.equal(xOffset, x, "X: " + message);
-  assert.equal(yOffset, y, "Y: " + message);
+  var xOrigin = (<any> component).xOrigin;
+  var yOrigin = (<any> component).yOrigin;
+  assert.equal(xOrigin, x, "X: " + message);
+  assert.equal(yOrigin, y, "Y: " + message);
 }
 
 describe("Component behavior", () => {
@@ -39,8 +39,8 @@ describe("Component behavior", () => {
       c.anchor(svg).computeLayout();
       assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c).xOffset, 0 ,"xOffset defaulted to 0");
-      assert.equal((<any> c).yOffset, 0 ,"yOffset defaulted to 0");
+      assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
+      assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
       svg.remove();
     });
 

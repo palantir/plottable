@@ -15,8 +15,8 @@ class Component {
 
   public availableWidth : number;
   public availableHeight: number;
-  public xOffset        : number;
-  public yOffset        : number;
+  public xOrigin        : number;
+  public yOrigin        : number;
 
   private cssClasses: string[] = ["component"];
 
@@ -68,14 +68,14 @@ class Component {
     return this;
   }
 
-  public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-    if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
+  public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
+    if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
       if (this.element == null) {
         throw new Error("anchor must be called before computeLayout");
       } else if (this.element.node().nodeName === "svg") {
         // we are the root node, let's guess width and height for convenience
-        xOffset = 0;
-        yOffset = 0;
+        xOrigin = 0;
+        yOrigin = 0;
         availableWidth  = parseFloat(this.element.attr("width" ));
         availableHeight = parseFloat(this.element.attr("height"));
       } else {
@@ -83,18 +83,18 @@ class Component {
       }
     }
     if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
-      yOffset += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
+      yOrigin += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
       availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
     }
     if (this.colWeight() === 0 && this.colMinimum() !== 0) {
-      xOffset += (availableWidth - this.colMinimum()) * this.xAlignProportion;
+      xOrigin += (availableWidth - this.colMinimum()) * this.xAlignProportion;
       availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
     }
-    this.xOffset = xOffset;
-    this.yOffset = yOffset;
+    this.xOrigin = xOrigin;
+    this.yOrigin = yOrigin;
     this.availableWidth = availableWidth;
     this.availableHeight = availableHeight;
-    this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
+    this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
     this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
     return this;
   }
