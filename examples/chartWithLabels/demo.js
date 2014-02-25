@@ -1,4 +1,5 @@
-window.onload = function() {
+
+function makeChartWithLabels() {
     var xMean = 0;
     var xStdDev = 1;
     var yMean = 0;
@@ -27,3 +28,5 @@ window.onload = function() {
                                 [null, xAxisTable]]);
     basicTable.anchor(svg).computeLayout().render();
 };
+
+window.onload = makeChartWithLabels;
