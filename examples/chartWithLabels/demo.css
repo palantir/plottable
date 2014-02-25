@@ -1,4 +1,7 @@
-
+</style>
+<link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/style.css">
+<style type="text/css">
+/*-- Add custom styles after this line --*/
 .demo-title { font-size: 24pt; }
 .normal-data circle {
     fill: red;

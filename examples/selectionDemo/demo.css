@@ -3,7 +3,7 @@
 <style type="text/css">
 /*-- Add custom styles after this line --*/
 .demo-title { font-size: 24pt; }
-.random-data circle {
+.selected-point{
     fill: red;
-    stroke: none;
+    stroke: red;
 }
