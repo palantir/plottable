@@ -12,7 +12,7 @@ class Label extends Component {
   constructor(text = "", orientation = "horizontal") {
     super();
     this.classed(Label.CSS_CLASS, true);
-    this.text = text;
+    this.setText(text);
     if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
       this.orientation = orientation;
     } else {
@@ -30,8 +30,10 @@ class Label extends Component {
 
   public setText(text: string) {
     this.text = text;
-    this.textElement.text(text);
-    this.measureAndSetTextSize();
+    if (this.element != null) {
+      this.textElement.text(text);
+      this.measureAndSetTextSize();
+    }
   }
 
   private measureAndSetTextSize() {
