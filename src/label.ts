@@ -85,7 +85,7 @@ class Label extends Component {
       xShift = (this.availableWidth  - this.textLength) * this.xAlignProportion;
     } else {
       this.truncateTextToLength(this.availableHeight);
-      yShift = (this.availableHeight - this.textLength) * this.yAlignProportion;
+      xShift = (this.availableHeight - this.textLength) * this.yAlignProportion;
 
       if (this.orientation === "vertical-right") {
         this.textElement.attr("transform", "rotate(90)");
