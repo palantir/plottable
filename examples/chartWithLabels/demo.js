@@ -15,12 +15,12 @@ window.onload = function() {
   var xAxis = new XAxis(xScale, "bottom");
   var xLabel = new AxisLabel("x"); // defaults to horizontal
   var xAxisTable = new Table([[xAxis],
-                              [xLabel]]);
+                              [xLabel]]); // groups the x Axis and Label
 
   var yScale = new LinearScale();
   var yAxis = new YAxis(yScale, "left");
   var yLabel = new AxisLabel("y", "vertical-left");
-  var yAxisTable = new Table([[yLabel, yAxis]]);
+  var yAxisTable = new Table([[yLabel, yAxis]]); // groups the y Axis and label
 
   var renderAreaD1 = new CircleRenderer(dataseries, xScale, yScale);
   var basicTable = new Table([[yAxisTable, renderAreaD1],
