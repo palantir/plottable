@@ -25,6 +25,16 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
   assert.equal(bbox.height, height, "height: " + message);
 }
 
+function assertBBoxInclusion(outerEl, innerEl) {
+  var outerBox = outerEl.node().getBoundingClientRect();
+  var innerBox = innerEl.node().getBoundingClientRect();
+  assert.operator(outerBox.left,   "<=", innerBox.left,   "bounding rect left included"  );
+  assert.operator(outerBox.right,  ">=", innerBox.right,  "bounding rect right included" );
+  assert.operator(outerBox.top,    "<=", innerBox.top,    "bounding rect top included"   );
+  assert.operator(outerBox.bottom, ">=", innerBox.bottom, "bounding rect bottom included");
+}
+
+
 function assertXY(el: D3.Selection, xExpected, yExpected, message) {
   var x = el.attr("x");
   var y = el.attr("y");

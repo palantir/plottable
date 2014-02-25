@@ -13,15 +13,18 @@ class Component {
   private rowMinimumVal = 0;
   private colMinimumVal = 0;
 
-  public availableWidth : number;
+  public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
   public availableHeight: number;
-  public xOffset        : number;
-  public yOffset        : number;
+  public xOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
+  public yOrigin        : number;
+  private xOffsetVal = 0; // Offset from Origin, used for alignment and floating positioning
+  private yOffsetVal = 0;
+  public xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
+  public yAlignProportion = 0;
+
 
   private cssClasses: string[] = ["component"];
 
-  private xAlignProportion = 0;
-  private yAlignProportion = 0;
 
   public anchor(element: D3.Selection) {
     if (element.node().childNodes.length > 0) {
@@ -68,33 +71,52 @@ class Component {
     return this;
   }
 
-  public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-    if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
+  public xOffset(offset: number): Component {
+    this.xOffsetVal = offset;
+    return this;
+  }
+
+  public yOffset(offset: number): Component {
+    this.yOffsetVal = offset;
+    return this;
+  }
+
+  public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
+    if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
       if (this.element == null) {
         throw new Error("anchor must be called before computeLayout");
       } else if (this.element.node().nodeName === "svg") {
         // we are the root node, let's guess width and height for convenience
-        xOffset = 0;
-        yOffset = 0;
+        xOrigin = 0;
+        yOrigin = 0;
         availableWidth  = parseFloat(this.element.attr("width" ));
         availableHeight = parseFloat(this.element.attr("height"));
       } else {
         throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
       }
     }
-    if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
-      yOffset += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-      availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
-    }
+    this.xOrigin = xOrigin;
+    this.yOrigin = yOrigin;
+    var xPosition = this.xOrigin;
+    var yPosition = this.yOrigin;
+
     if (this.colWeight() === 0 && this.colMinimum() !== 0) {
-      xOffset += (availableWidth - this.colMinimum()) * this.xAlignProportion;
+      // The component has free space, so it makes sense to think about how to position or offset it
+      xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
+      xPosition += this.xOffsetVal;
+      // Decrease size so hitbox / bounding box and children are sized correctly
       availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
     }
-    this.xOffset = xOffset;
-    this.yOffset = yOffset;
-    this.availableWidth = availableWidth;
+
+    if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
+      yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
+      yPosition += this.yOffsetVal;
+      availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
+    }
+
+    this.availableWidth  = availableWidth;
     this.availableHeight = availableHeight;
-    this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
+    this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
     this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
     return this;
   }
