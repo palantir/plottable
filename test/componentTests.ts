@@ -88,6 +88,33 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
+  it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
+      c.rowMinimum(100).colMinimum(100);
+      c.anchor(svg);
+      c.xOffset(20).yOffset(20);
+      c.computeLayout();
+      assertComponentXY(c, 20, 20, "top-left component offsets correctly");
+
+      c.xAlignment("CENTER").yAlignment("CENTER");
+      c.computeLayout();
+      assertComponentXY(c, 170, 120, "center component offsets correctly");
+
+      c.xAlignment("RIGHT").yAlignment("BOTTOM");
+      c.computeLayout();
+      assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
+
+      c.xOffset(0).yOffset(0);
+      c.computeLayout();
+      assertComponentXY(c, 300, 200, "bottom-right component offset resets");
+
+      c.xOffset(-20).yOffset(-30);
+      c.computeLayout();
+      assertComponentXY(c, 280, 170, "negative offsets work properly");
+
+      svg.remove();
+    });
+
+
   it("component defaults are as expected", () => {
     assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
     assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
