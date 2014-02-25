@@ -3,7 +3,11 @@
 <style type="text/css">
 /*-- Add custom styles after this line --*/
 .demo-title { font-size: 24pt; }
-.selected-point{
+.normal-data circle {
     fill: red;
-    stroke: red;
+    stroke: none;
+}
+circle.selected-point {
+    fill: blue;
+    stroke: blue;
 }
