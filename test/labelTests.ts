@@ -92,14 +92,5 @@ describe("Labels", () => {
 
   it("unsupported alignments and orientations are unsupported", () => {
     assert.throws(() => new Label("foo", "bar"), Error, "not a valid orientation");
-    var l1 = new Label("foo", "horizontal");
-    var svg = generateSVG(10, 10);
-    l1.anchor(svg);
-    l1.xAlignment = "bar";
-    l1.yAlignment = "bar";
-    assert.throws(() => l1.computeLayout(), Error, "supported alignment");
-    (<any> l1).orientation = "vertical-left";
-    assert.throws(() => l1.computeLayout(), Error, "supported alignment");
-    svg.remove();
   });
 });

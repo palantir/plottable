@@ -14,14 +14,17 @@ class Component {
   private colMinimumVal = 0;
 
   public availableWidth : number;
-  public availableHeight: number;
+  public availableHeight: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
   public xOrigin        : number;
-  public yOrigin        : number;
+  public yOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
+  private xOffsetVal = 0;
+  private yOffsetVal = 0; // Offset from Origin, used for alignment and floating positioning
+  public xAlignProportion = 0;
+  public yAlignProportion = 0;
+
 
   private cssClasses: string[] = ["component"];
 
-  private xAlignProportion = 0;
-  private yAlignProportion = 0;
 
   public anchor(element: D3.Selection) {
     if (element.node().childNodes.length > 0) {
@@ -42,7 +45,7 @@ class Component {
     return this;
   }
 
-  public xAlign(alignment: string): Component {
+  public xAlignment(alignment: string): Component {
     if (alignment === "LEFT") {
       this.xAlignProportion = 0;
     } else if (alignment === "CENTER") {
@@ -55,7 +58,7 @@ class Component {
     return this;
   }
 
-  public yAlign(alignment: string): Component {
+  public yAlignment(alignment: string): Component {
     if (alignment === "TOP") {
       this.yAlignProportion = 0;
     } else if (alignment === "CENTER") {
@@ -65,6 +68,16 @@ class Component {
     } else {
       throw new Error("Unsupported alignment");
     }
+    return this;
+  }
+
+  public xOffset(offset: number): Component {
+    this.xOffsetVal = offset;
+    return this;
+  }
+
+  public yOffset(offset: number): Component {
+    this.yOffsetVal = offset;
     return this;
   }
 
@@ -82,19 +95,28 @@ class Component {
         throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
       }
     }
-    if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
-      yOrigin += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-      availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
-    }
-    if (this.colWeight() === 0 && this.colMinimum() !== 0) {
-      xOrigin += (availableWidth - this.colMinimum()) * this.xAlignProportion;
-      availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
-    }
     this.xOrigin = xOrigin;
     this.yOrigin = yOrigin;
-    this.availableWidth = availableWidth;
+    var xPosition = this.xOrigin;
+    var yPosition = this.yOrigin;
+
+    if (this.colWeight() === 0 && this.colMinimum() !== 0) {
+      // The component has free space, so it makes sense to think about how to position or offset it
+      xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
+      xPosition += this.xOffsetVal;
+      // Decrease size so hitbox / bounding box and children are sized correctly
+      availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
+    }
+
+    if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
+      yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
+      yPosition += this.yOffsetVal;
+      availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
+    }
+
+    this.availableWidth  = availableWidth;
     this.availableHeight = availableHeight;
-    this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
+    this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
     this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
     return this;
   }
