@@ -15,7 +15,7 @@ window.onload = function() {
     var lastSelection = null; // initially, nothing is selected
     var selectPoints = function(pixelArea) {
         if (lastSelection != null) {
-            lastSelection.classed("seleted-point", false); // clear out the last set of selected points
+            lastSelection.classed("selected-point", false); // clear out the last set of selected points
         }
         var selectionArea = renderAreaD1.invertXYSelectionArea(pixelArea);
         var selected = renderAreaD1.getSelectionFromArea(selectionArea);
