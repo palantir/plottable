@@ -13,13 +13,13 @@ class Component {
   private rowMinimumVal = 0;
   private colMinimumVal = 0;
 
-  public availableWidth : number;
-  public availableHeight: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-  public xOrigin        : number;
-  public yOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
-  private xOffsetVal = 0;
-  private yOffsetVal = 0; // Offset from Origin, used for alignment and floating positioning
-  public xAlignProportion = 0;
+  public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+  public availableHeight: number;
+  public xOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
+  public yOrigin        : number;
+  private xOffsetVal = 0; // Offset from Origin, used for alignment and floating positioning
+  private yOffsetVal = 0;
+  public xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
   public yAlignProportion = 0;
 
 
@@ -45,7 +45,7 @@ class Component {
     return this;
   }
 
-  public xAlignment(alignment: string): Component {
+  public xAlign(alignment: string): Component {
     if (alignment === "LEFT") {
       this.xAlignProportion = 0;
     } else if (alignment === "CENTER") {
@@ -58,7 +58,7 @@ class Component {
     return this;
   }
 
-  public yAlignment(alignment: string): Component {
+  public yAlign(alignment: string): Component {
     if (alignment === "TOP") {
       this.yAlignProportion = 0;
     } else if (alignment === "CENTER") {

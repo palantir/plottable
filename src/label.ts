@@ -18,7 +18,7 @@ class Label extends Component {
     } else {
       throw new Error(orientation + " is not a valid orientation for LabelComponent");
     }
-    this.xAlignment("CENTER").yAlignment("CENTER"); // the defaults
+    this.xAlign("CENTER").yAlign("CENTER"); // the defaults
   }
 
   public anchor(element: D3.Selection) {

@@ -78,11 +78,11 @@ describe("Component behavior", () => {
     c.computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
-    c.xAlignment("CENTER").yAlignment("CENTER");
+    c.xAlign("CENTER").yAlign("CENTER");
     c.computeLayout();
     assertComponentXY(c, 150, 100, "center component aligns correctly");
 
-    c.xAlignment("RIGHT").yAlignment("BOTTOM");
+    c.xAlign("RIGHT").yAlign("BOTTOM");
     c.computeLayout();
     assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
     svg.remove();
@@ -95,11 +95,11 @@ describe("Component behavior", () => {
       c.computeLayout();
       assertComponentXY(c, 20, 20, "top-left component offsets correctly");
 
-      c.xAlignment("CENTER").yAlignment("CENTER");
+      c.xAlign("CENTER").yAlign("CENTER");
       c.computeLayout();
       assertComponentXY(c, 170, 120, "center component offsets correctly");
 
-      c.xAlignment("RIGHT").yAlignment("BOTTOM");
+      c.xAlign("RIGHT").yAlign("BOTTOM");
       c.computeLayout();
       assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
 
@@ -120,8 +120,8 @@ describe("Component behavior", () => {
     assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
     assert.equal(c.rowWeight() , 0, "rowWeight  defaults to 0");
     assert.equal(c.colWeight() , 0, "colWeight  defaults to 0");
-    assert.equal((<any> c).xAlignProportion, 0, "xAlignmentProportion defaults to 0");
-    assert.equal((<any> c).yAlignProportion, 0, "yAlignmentProportion defaults to 0");
+    assert.equal((<any> c).xAlignProportion, 0, "xAlignProportion defaults to 0");
+    assert.equal((<any> c).yAlignProportion, 0, "yAlignProportion defaults to 0");
     assert.equal((<any> c).xOffsetVal, 0, "xOffset defaults to 0");
     assert.equal((<any> c).yOffsetVal, 0, "yOffset defaults to 0");
     svg.remove();
@@ -191,8 +191,8 @@ describe("Component behavior", () => {
   });
 
   it("errors are thrown on bad alignments", () => {
-    assert.throws(() => c.xAlignment("foo"), Error, "Unsupported alignment");
-    assert.throws(() => c.yAlignment("foo"), Error, "Unsupported alignment");
+    assert.throws(() => c.xAlign("foo"), Error, "Unsupported alignment");
+    assert.throws(() => c.yAlign("foo"), Error, "Unsupported alignment");
     svg.remove();
   });
 
