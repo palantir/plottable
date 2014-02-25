@@ -4,10 +4,11 @@ var assert = chai.assert;
 
 function assertComponentXY(component: Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
-  var xOffset = (<any> component).xOffset;
-  var yOffset = (<any> component).yOffset;
-  assert.equal(xOffset, x, "X: " + message);
-  assert.equal(yOffset, y, "Y: " + message);
+  var translate = d3.transform(component.element.attr("transform")).translate;
+  var xActual = translate[0];
+  var yActual = translate[1];
+  assert.equal(xActual, x, "X: " + message);
+  assert.equal(yActual, y, "Y: " + message);
 }
 
 describe("Component behavior", () => {
@@ -39,8 +40,8 @@ describe("Component behavior", () => {
       c.anchor(svg).computeLayout();
       assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      assert.equal((<any> c).xOffset, 0 ,"xOffset defaulted to 0");
-      assert.equal((<any> c).yOffset, 0 ,"yOffset defaulted to 0");
+      assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
+      assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
       svg.remove();
     });
 
@@ -87,13 +88,42 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
+  it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
+      c.rowMinimum(100).colMinimum(100);
+      c.anchor(svg);
+      c.xOffset(20).yOffset(20);
+      c.computeLayout();
+      assertComponentXY(c, 20, 20, "top-left component offsets correctly");
+
+      c.xAlign("CENTER").yAlign("CENTER");
+      c.computeLayout();
+      assertComponentXY(c, 170, 120, "center component offsets correctly");
+
+      c.xAlign("RIGHT").yAlign("BOTTOM");
+      c.computeLayout();
+      assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
+
+      c.xOffset(0).yOffset(0);
+      c.computeLayout();
+      assertComponentXY(c, 300, 200, "bottom-right component offset resets");
+
+      c.xOffset(-20).yOffset(-30);
+      c.computeLayout();
+      assertComponentXY(c, 280, 170, "negative offsets work properly");
+
+      svg.remove();
+    });
+
+
   it("component defaults are as expected", () => {
     assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
     assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
     assert.equal(c.rowWeight() , 0, "rowWeight  defaults to 0");
     assert.equal(c.colWeight() , 0, "colWeight  defaults to 0");
-    assert.equal((<any> c).xAlignProportion, 0, "xAlignment defaults to LEFT");
-    assert.equal((<any> c).yAlignProportion, 0, "yAlignment defaults to TOP");
+    assert.equal((<any> c).xAlignProportion, 0, "xAlignProportion defaults to 0");
+    assert.equal((<any> c).yAlignProportion, 0, "yAlignProportion defaults to 0");
+    assert.equal((<any> c).xOffsetVal, 0, "xOffset defaults to 0");
+    assert.equal((<any> c).yOffsetVal, 0, "yOffset defaults to 0");
     svg.remove();
   });
 

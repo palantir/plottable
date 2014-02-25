@@ -1,0 +1,7 @@
+---
+name: Plottable.js Chart with Area Interaction Interaction demo
+description: Creates a chart that demonstrates the Area Interaction
+authors:
+  - Justin Lan
+normalize_css: no
+...

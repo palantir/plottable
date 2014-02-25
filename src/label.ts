@@ -3,9 +3,6 @@
 class Label extends Component {
   private static CSS_CLASS = "label";
 
-  public xAlignment = "CENTER";
-  public yAlignment = "CENTER";
-
   private textElement: D3.Selection;
   private text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
   private orientation: string;
@@ -15,12 +12,13 @@ class Label extends Component {
   constructor(text = "", orientation = "horizontal") {
     super();
     this.classed(Label.CSS_CLASS, true);
-    this.text = text;
+    this.setText(text);
     if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
       this.orientation = orientation;
     } else {
       throw new Error(orientation + " is not a valid orientation for LabelComponent");
     }
+    this.xAlign("CENTER").yAlign("CENTER"); // the defaults
   }
 
   public anchor(element: D3.Selection) {
@@ -32,12 +30,9 @@ class Label extends Component {
 
   public setText(text: string) {
     this.text = text;
-    this.textElement.text(text);
-    this.measureAndSetTextSize();
-    if (this.orientation === "horizontal") {
-      this.rowMinimum(this.textHeight);
-    } else {
-      this.colMinimum(this.textHeight);
+    if (this.element != null) {
+      this.textElement.text(text);
+      this.measureAndSetTextSize();
     }
   }
 
@@ -45,6 +40,11 @@ class Label extends Component {
     var bbox = Utils.getBBox(this.textElement);
     this.textHeight = bbox.height;
     this.textLength = bbox.width;
+    if (this.orientation === "horizontal") {
+      this.rowMinimum(this.textHeight);
+    } else {
+      this.colMinimum(this.textHeight);
+    }
   }
 
   private truncateTextToLength(availableLength: number) {
@@ -84,32 +84,10 @@ class Label extends Component {
 
     if (this.orientation === "horizontal") {
       this.truncateTextToLength(this.availableWidth);
-      switch (this.xAlignment) {
-        case "LEFT":
-          break;
-        case "CENTER":
-          xShift = (this.availableWidth - this.textLength) / 2;
-          break;
-        case "RIGHT":
-          xShift = this.availableWidth - this.textLength;
-          break;
-        default:
-          throw new Error(this.xAlignment + " is not a supported alignment");
-      }
+      xShift = (this.availableWidth  - this.textLength) * this.xAlignProportion;
     } else {
       this.truncateTextToLength(this.availableHeight);
-      switch (this.yAlignment) {
-        case "TOP":
-          break;
-        case "CENTER":
-          xShift = (this.availableHeight - this.textLength) / 2;
-          break;
-        case "BOTTOM":
-          xShift = this.availableHeight - this.textLength;
-          break;
-        default:
-          throw new Error(this.yAlignment + " is not a supported alignment");
-      }
+      xShift = (this.availableHeight - this.textLength) * this.yAlignProportion;
 
       if (this.orientation === "vertical-right") {
         this.textElement.attr("transform", "rotate(90)");
