@@ -47,29 +47,10 @@ class Label extends Component {
     }
   }
 
-  private truncateTextToLength(availableLength: number) {
-    if (this.textLength <= availableLength) {
-      return;
-    }
-
-    this.textElement.text(this.text + "...");
-    var textNode = <SVGTextElement> this.textElement.node();
-    var dotLength = textNode.getSubStringLength(textNode.textContent.length-3, 3);
-    if (dotLength > availableLength) {
-      this.textElement.text(""); // no room even for ellipsis
-      this.measureAndSetTextSize();
-      return;
-    }
-
-    var numChars = this.text.length;
-    for (var i=1; i<numChars; i++) {
-      var testLength = textNode.getSubStringLength(0, i);
-      if ((testLength + dotLength) > availableLength) {
-        this.textElement.text(this.text.substr(0, i-1).trim() + "...");
-        this.measureAndSetTextSize();
-        return;
-      }
-    }
+  private truncateTextAndRemeasure(availableLength: number) {
+    var shortText = Utils.truncateTextToLength(this.text, availableLength, this.textElement);
+    this.textElement.text(shortText);
+    this.measureAndSetTextSize();
   }
 
   public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -83,10 +64,10 @@ class Label extends Component {
     var yShift = 0;
 
     if (this.orientation === "horizontal") {
-      this.truncateTextToLength(this.availableWidth);
+      this.truncateTextAndRemeasure(this.availableWidth);
       xShift = (this.availableWidth  - this.textLength) * this.xAlignProportion;
     } else {
-      this.truncateTextToLength(this.availableHeight);
+      this.truncateTextAndRemeasure(this.availableHeight);
       xShift = (this.availableHeight - this.textLength) * this.yAlignProportion;
 
       if (this.orientation === "vertical-right") {
