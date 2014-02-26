@@ -1,4 +1,4 @@
-window.onload = function() {
+function makeChartWithAreaInteraction() {
     var dataseries = makeRandomData(50);
 
     var svg = d3.select("#selection-demo");
@@ -26,3 +26,5 @@ window.onload = function() {
 
     basicTable.anchor(svg).computeLayout().render();
 };
+
+window.onload = makeChartWithAreaInteraction;

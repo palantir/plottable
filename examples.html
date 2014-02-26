@@ -1,0 +1,175 @@
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://palantir.github.io/plottable/plottable.js"></script>
+  <script src="http://palantir.github.io/plottable/build/exampleUtil.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
+
+  <style>
+    .example {
+
+    }
+    .source, .output {
+      display: inline-block;
+      vertical-align: top
+    }
+    code {
+      font-size: 8pt;
+    }
+    .fiddle-link {
+      font-size: 12pt;
+    }
+    .prettyprint {
+      padding: 5px;
+    }
+  </style>
+
+  <title>Plottable.js: Examples</title>
+</head>
+
+<body>
+
+<hr>
+<h1>Basic Chart</h1>
+<div class="example">
+  <span class="source">
+    <h2> Source </h2>
+
+    <span>
+      <script>
+        $.get("examples/simpleChart/demo.js", function(data) {
+          $("#simple-chart-source").html(data);
+        });
+      </script>
+      <pre class="prettyprint">
+        <code id="simple-chart-source">
+        </code>
+      </pre>
+    </span>
+
+    <p class="fiddle-link">
+      <a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/examples/simpleChart/">Open this example on jsFiddle.</a>
+    </p>
+  </span>
+
+  <span class="output">
+    <h2> Output </h2>
+    <link rel="stylesheet" type="text/css" href="examples/simpleChart/demo.css">
+    <script src="examples/simpleChart/demo.js">
+    </script>
+    <svg id="simple-chart"></svg>
+  </span>
+</div>
+
+<hr>
+<h1>Chart with Subplots</h1>
+<div class="example">
+  <span class="source">
+    <h2> Source </h2>
+
+    <span>
+      <script>
+        $.get("examples/chartWithSubplots/demo.js", function(data) {
+          $("#chart-with-subplots-source").html(data);
+        });
+      </script>
+      <pre class="prettyprint">
+        <code id="chart-with-subplots-source">
+        </code>
+      </pre>
+    </span>
+
+    <p class="fiddle-link">
+      <a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/examples/chartWithSubplots/">Open this example on jsFiddle.</a>
+    </p>
+  </span>
+
+  <span class="output">
+    <h2> Output </h2>
+    <link rel="stylesheet" type="text/css" href="examples/chartWithSubplots/demo.css">
+    <script src="examples/chartWithSubplots/demo.js">
+    </script>
+    <svg id="chart-with-subplots"></svg>
+  </span>
+</div>
+
+<hr>
+<h1>Chart with Labels and Nested Tables</h1>
+<div class="example">
+  <span class="source">
+    <h2> Source </h2>
+
+    <span>
+      <script>
+        $.get("examples/chartWithLabels/demo.js", function(data) {
+          $("#chart-with-labels-source").html(data);
+        });
+      </script>
+      <pre class="prettyprint">
+        <code id="chart-with-labels-source">
+        </code>
+      </pre>
+    </span>
+
+    <p class="fiddle-link">
+      <a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/examples/chartWithLabels/">Open this example on jsFiddle.</a>
+    </p>
+  </span>
+
+  <span class="output">
+    <h2> Output </h2>
+    <link rel="stylesheet" type="text/css" href="examples/chartWithLabels/demo.css">
+    <script src="examples/chartWithLabels/demo.js">
+    </script>
+    <svg id="chart-with-labels"></svg>
+  </span>
+</div>
+
+
+<hr>
+<h1>Chart with Area Interaction</h1>
+<div class="example">
+  <span class="source">
+    <h2> Source </h2>
+
+    <span>
+      <script>
+        $.get("examples/selectionDemo/demo.js", function(data) {
+          $("#selection-demo-source").html(data);
+        });
+      </script>
+      <pre class="prettyprint">
+        <code id="selection-demo-source">
+        </code>
+      </pre>
+    </span>
+
+    <p class="fiddle-link">
+      <a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/examples/selectionDemo/">Open this example on jsFiddle.</a>
+    </p>
+  </span>
+
+  <span class="output">
+    <h2> Output </h2>
+    <link rel="stylesheet" type="text/css" href="examples/selectionDemo/demo.css">
+    <script src="examples/selectionDemo/demo.js">
+    </script>
+    <svg id="selection-demo"></svg>
+  </span>
+</div>
+
+
+<script>
+  window.onload = function(){
+    makeSimpleChart();
+    makeChartWithSubplots();
+    makeChartWithLabels();
+    makeChartWithAreaInteraction();
+  }
+</script>
+
+</body>
+</html>

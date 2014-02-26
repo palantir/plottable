@@ -131,7 +131,7 @@ class Table extends Component {
   }
 
   public rowMinimum(): number;
-  public rowMinimum(newVal: number): Component;
+  public rowMinimum(newVal: number): Table;
   public rowMinimum(newVal?: number): any {
     if (newVal != null) {
       throw new Error("Row minimum cannot be directly set on Table");
@@ -142,7 +142,7 @@ class Table extends Component {
   }
 
   public colMinimum(): number;
-  public colMinimum(newVal: number): Component;
+  public colMinimum(newVal: number): Table;
   public colMinimum(newVal?: number): any {
     if (newVal != null) {
       throw new Error("Col minimum cannot be directly set on Table");

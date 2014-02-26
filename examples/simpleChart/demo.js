@@ -1,4 +1,5 @@
-window.onload = function() {
+
+function makeSimpleChart() {
     var dataseries = makeRandomData(20);
 
     var svg = d3.select("#simple-chart");
@@ -15,3 +16,5 @@ window.onload = function() {
                                 [null, xAxis]]);
     basicTable.anchor(svg).computeLayout().render();
 };
+
+window.onload = makeSimpleChart;

@@ -1,4 +1,5 @@
-window.onload = function() {
+
+function makeChartWithSubplots() {
     var dataseries1 = makeRandomData(30);
     var dataseries2 = makeRandomData(30);
 
@@ -19,3 +20,5 @@ window.onload = function() {
                                 [null,   xAxis,        null]]);
     basicTable.anchor(svg).computeLayout().render();
 };
+
+window.onload = makeChartWithSubplots;
