@@ -44,7 +44,7 @@ module Utils {
 
   export function getTextHeight(textElement: D3.Selection) {
     var originalText = textElement.text();
-    textElement.text("l");
+    textElement.text("bqpdl");
     var height = Utils.getBBox(textElement).height;
     textElement.text(originalText);
     return height;
