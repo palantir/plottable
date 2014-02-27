@@ -64,5 +64,6 @@ describe("Legends", () => {
     var rightEdge = legend.element.select("text").node().getBoundingClientRect().right;
     var rightEdgeBBox = legend.element.select(".bounding-box").node().getBoundingClientRect().right;
     assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
+    svg.remove();
   });
 });
