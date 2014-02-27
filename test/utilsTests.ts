@@ -40,7 +40,6 @@ describe("Utils", () => {
     textEl.style("font-size", "20pt");
     textEl.text("hello, world");
     var height1 = Utils.getTextHeight(textEl);
-    console.log("height1:", height1);
     textEl.style("font-size", "30pt");
     var height2 = Utils.getTextHeight(textEl);
     assert.operator(height1, "<", height2, "measured height is greater when font size is increased");
