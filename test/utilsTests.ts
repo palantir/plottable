@@ -51,8 +51,5 @@ describe("Utils", () => {
     assert.equal(Utils.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
     assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
     svg.remove();
-
-
-
   });
 });
