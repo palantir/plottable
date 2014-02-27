@@ -60,7 +60,6 @@ class Legend extends Component {
     legend.append("text")
         .attr("x", textHeight)
         .attr("y", Legend.MARGIN + textHeight / 2)
-        // .attr("dy", ".35em")
         .text(function(d, i) {return Utils.truncateTextToLength(d, availableWidth, d3.select(this));});
     return this;
   }
