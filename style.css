@@ -47,7 +47,7 @@ div {
 circle {
   fill: steelblue;
 }
-rect {
+.bar-renderer .render-area rect {
   fill: steelblue;
 }
 
