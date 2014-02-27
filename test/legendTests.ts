@@ -56,7 +56,7 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it.only("a legend with a long label does not overflow horizontally", () => {
+  it("a legend with a long label does not overflow horizontally", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
     legend.anchor(svg).computeLayout().render();
     var text = legend.element.select("text").text();
