@@ -2,6 +2,7 @@
 
 class Legend extends Component {
   private static CSS_CLASS = "legend";
+  private static SUBELEMENT_CLASS = "legend-row";
   private static MARGIN = 5;
 
   private colorScale: ColorScale;
@@ -9,6 +10,7 @@ class Legend extends Component {
 
   constructor(colorScale?: ColorScale) {
     super();
+    this.classed(Legend.CSS_CLASS, true);
     this.colMinimum(120); // the default width
     this.colorScale = colorScale;
     this.xAlign("RIGHT").yAlign("TOP");
@@ -32,10 +34,8 @@ class Legend extends Component {
   }
 
   private measureTextHeight(): number {
-    if (this.element == null) {
-      throw new Error("It is not presently possible to measure the text height before anchoring");
-    }
-    var fakeLegendEl = this.element.append("g").classed(Legend.CSS_CLASS, true);
+    // note: can't be called before anchoring atm
+    var fakeLegendEl = this.element.append("g").classed(Legend.SUBELEMENT_CLASS, true);
     var textHeight = Utils.getTextHeight(fakeLegendEl.append("text"));
     fakeLegendEl.remove();
     return textHeight;
@@ -47,20 +47,21 @@ class Legend extends Component {
     var textHeight = this.measureTextHeight();
     var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
 
-    var legend: D3.EnterSelection = this.element.selectAll(Legend.CSS_CLASS).data(domain)
-      .enter()
-        .append("g").classed(Legend.CSS_CLASS, true)
+    this.element.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
+    var legend: D3.UpdateSelection = this.element.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain)
+    var legendEnter = legend.enter()
+        .append("g").classed(Legend.SUBELEMENT_CLASS, true)
         .attr("transform", (d, i) => "translate(0," + i * textHeight + ")");
-    legend.append("rect")
+    legendEnter.append("rect")
         .attr("x", Legend.MARGIN)
         .attr("y", Legend.MARGIN)
         .attr("width",  textHeight - Legend.MARGIN * 2)
-        .attr("height", textHeight - Legend.MARGIN * 2)
-        .attr("fill", this.colorScale.scale);
-    legend.append("text")
+        .attr("height", textHeight - Legend.MARGIN * 2);
+    legendEnter.append("text")
         .attr("x", textHeight)
         .attr("y", Legend.MARGIN + textHeight / 2)
-        .text(function(d, i) {return Utils.truncateTextToLength(d, availableWidth, d3.select(this));});
+    legend.selectAll("rect").attr("fill", this.colorScale.scale);
+    legend.selectAll("text").text(function(d, i) {return Utils.truncateTextToLength(d, availableWidth, d3.select(this));});
     return this;
   }
 }
