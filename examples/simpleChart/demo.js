@@ -12,8 +12,10 @@ function makeSimpleChart() {
     var yAxis = new YAxis(yScale, "left");
 
     var renderAreaD1 = new CircleRenderer(dataseries, xScale, yScale);
-    var basicTable = new Table([[yAxis, renderAreaD1],
-                                [null, xAxis]]);
+    var basicTable = new Table().addComponent(0, 0, yAxis)
+                                .addComponent(0, 1, renderAreaD1)
+                                .addComponent(1, 1, xAxis);
+
     basicTable.anchor(svg).computeLayout().render();
 };
 
