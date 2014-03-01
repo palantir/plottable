@@ -33,7 +33,7 @@ describe("Tables", () => {
     var firstComponent = row[0];
     assert.lengthOf(rows, 1, "there is one row");
     assert.lengthOf(row, 1, "the row has one element");
-    assert.isTrue(firstComponent.isNullComponent, "the row only has a null component");
+    assert.isTrue(firstComponent.constructor.name === "Component", "the row only has a null component");
 
     (<any> t).padTableToSize(5,2);
     assert.lengthOf(rows, 5, "there are five rows");
@@ -46,7 +46,7 @@ describe("Tables", () => {
     var row1 = [null, c0];
     var row2 = [new Component(), null];
     var table = new Table([row1, row2]);
-    assert.isTrue((<any> table).rows[0][0].isNullComponent, "the first element was turned into a null component");
+    assert.isTrue((<any> table).rows[0][0].constructor.name === "Component", "the first element was turned into a null component");
     assert.equal((<any> table).rows[0][1], c0, "the component is in the right spot");
     var c1 = new Component();
     table.addComponent(2, 2, c1);
@@ -65,16 +65,9 @@ describe("Tables", () => {
     assert.lengthOf(rows[1], 2, "two cols in second row");
     assert.equal(rows[0][0], c1, "first component added correctly");
     assert.equal(rows[1][1], c2, "second component added correctly");
-    assert.isTrue(rows[0][1].isNullComponent, "added a null component to 0,1");
-    assert.isTrue(rows[1][0].isNullComponent, "added a null component to 1,0");
+    assert.isTrue(rows[0][1].constructor.name === "Component", "added a null component to 0,1");
+    assert.isTrue(rows[1][0].constructor.name === "Component", "added a null component to 1,0");
   })
-
-  // it("tables transform null instances into base components", () => {
-  //   var table = new Table([[null]]); // table with a single null component
-  //   var component = (<any> table).rows[0][0];
-  //   assert.isNotNull(component, "the component is not null");
-  //   assert.equal(component.constructor.name, "Component", "the component is a base Component");
-  // });
 
   it("tables with insufficient space throw Insufficient Space", () => {
     var svg = generateSVG(200, 200);

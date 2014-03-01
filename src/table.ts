@@ -24,7 +24,7 @@ class Table extends Component {
   constructor(rows: Component[][] = []) {
     super();
     this.classed(Table.CSS_CLASS, true);
-    var cleanOutNulls = (c: Component) => c == null ? new NullComponent() : c;
+    var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
     rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
     this.rows = rows;
     this.cols = d3.transpose(this.rows);
@@ -40,7 +40,8 @@ class Table extends Component {
       this.padTableToSize(row + 1, col + 1);
     }
 
-    if (!this.rows[row][col].isNullComponent) {
+    if (this.rows[row][col].constructor.name !== "Component") {
+      // The bsae component is only used as a placeholder component
       throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
     }
 
@@ -56,7 +57,7 @@ class Table extends Component {
       }
       for (var j=0; j<nCols; j++) {
         if (this.rows[i][j] == undefined) {
-          this.rows[i][j] = new NullComponent();
+          this.rows[i][j] = new Component();
         }
       }
     }
