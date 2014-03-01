@@ -86,7 +86,7 @@ describe("Labels", () => {
   it("text in a tiny box is truncated to empty string", () => {
     var svg = generateSVG(10, 10);
     var label = new TitleLabel("Yeah, not gonna fit...");
-    label.anchor(svg).computeLayout().render();
+    label.renderTo(svg);
     var text = label.element.select("text");
     assert.equal(text.text(), "", "text was truncated to empty string");
     svg.remove();

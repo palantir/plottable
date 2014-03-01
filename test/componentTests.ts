@@ -185,7 +185,7 @@ describe("Component behavior", () => {
 
   it("boxes work as expected", () => {
     assert.throws(() => (<any> c).addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
-    c.anchor(svg).computeLayout().render();
+    c.renderTo(svg);
     (<any> c).addBox("post-anchor");
     var e = c.element;
     var boxStrings = [".hit-box", ".bounding-box", ".post-anchor"];
@@ -212,7 +212,7 @@ describe("Component behavior", () => {
     var interaction1: any = {anchor: (hb) => hitBox1 = hb.node()};
     var interaction2: any = {anchor: (hb) => hitBox2 = hb.node()};
     c.registerInteraction(interaction1);
-    c.anchor(svg).computeLayout().render();
+    c.renderTo(svg);
     c.registerInteraction(interaction2);
     var hitNode = c.hitBox.node();
     assert.equal(hitBox1, hitNode, "hitBox1 was registerd");

@@ -10,7 +10,7 @@ describe("Axes", () => {
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
     var axis = new XAxis(xScale, "bottom");
-    axis.anchor(svg).computeLayout().render();
+    axis.renderTo(svg);
     var ticks = svg.selectAll(".tick");
     assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
     svg.remove();
