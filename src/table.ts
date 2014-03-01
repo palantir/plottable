@@ -35,10 +35,7 @@ class Table extends Component {
       throw new Error("addComponent cannot be called after anchoring (for the moment)");
     }
 
-    this.padTableToSize(row, col);
-    if (row >= this.rows.length || col >= this.cols.length) {
-      this.padTableToSize(row + 1, col + 1);
-    }
+    this.padTableToSize(row + 1, col + 1);
 
     if (this.rows[row][col].constructor.name !== "Component") {
       // The bsae component is only used as a placeholder component
