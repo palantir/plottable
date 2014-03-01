@@ -21,6 +21,36 @@ describe("Component behavior", () => {
     c = new Component();
   });
 
+  it("renderTo works properly", () => {
+    c.rowWeight(1).colWeight(1);
+    var anchored = false;
+    var computed = false;
+    var rendered = false;
+    var oldAnchor = c.anchor.bind(c);
+    var oldCompute = c.computeLayout.bind(c);
+    var oldRender = c.render.bind(c);
+    c.anchor = (el) => {
+      oldAnchor(el);
+      anchored = true;
+      return c;
+    };
+    c.computeLayout = (x?, y?, w?, h?) => {
+      oldCompute(x, y, w, h);
+      computed = true;
+      return c;
+    };
+    c.render = () => {
+      oldRender();
+      rendered = true;
+      return c;
+    };
+    c.renderTo(svg);
+    assert.isTrue(anchored, "anchor was called");
+    assert.isTrue(computed, "computeLayout was called");
+    assert.isTrue(rendered, "render was called");
+    svg.remove();
+  });
+
   describe("anchor", () => {
     it("anchoring works as expected", () => {
       c.anchor(svg);
