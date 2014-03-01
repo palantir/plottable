@@ -1,5 +1,5 @@
 /*!
-Plottable v0.1.4 (https://github.com/palantir/plottable)
+Plottable v0.2.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -15,6 +15,43 @@ var Utils;
         return element.node().getBBox();
     }
     Utils.getBBox = getBBox;
+
+    function truncateTextToLength(text, length, element) {
+        var originalText = element.text();
+        element.text(text);
+        var bbox = Utils.getBBox(element);
+        var textLength = bbox.width;
+        if (textLength < length) {
+            element.text(originalText);
+            return text;
+        }
+        element.text(text + "...");
+        var textNode = element.node();
+        var dotLength = textNode.getSubStringLength(textNode.textContent.length - 3, 3);
+        if (dotLength > length) {
+            element.text(originalText);
+            return "";
+        }
+
+        var numChars = text.length;
+        for (var i = 1; i < numChars; i++) {
+            var testLength = textNode.getSubStringLength(0, i);
+            if (testLength + dotLength > length) {
+                element.text(originalText);
+                return text.substr(0, i - 1).trim() + "...";
+            }
+        }
+    }
+    Utils.truncateTextToLength = truncateTextToLength;
+
+    function getTextHeight(textElement) {
+        var originalText = textElement.text();
+        textElement.text("bqpdl");
+        var height = Utils.getBBox(textElement).height;
+        textElement.text(originalText);
+        return height;
+    }
+    Utils.getTextHeight = getTextHeight;
 })(Utils || (Utils = {}));
 var Component = (function () {
     function Component() {
@@ -25,9 +62,11 @@ var Component = (function () {
         this.colWeightVal = 0;
         this.rowMinimumVal = 0;
         this.colMinimumVal = 0;
-        this.cssClasses = ["component"];
+        this.xOffsetVal = 0;
+        this.yOffsetVal = 0;
         this.xAlignProportion = 0;
         this.yAlignProportion = 0;
+        this.cssClasses = ["component"];
     }
     Component.prototype.anchor = function (element) {
         var _this = this;
@@ -80,33 +119,51 @@ var Component = (function () {
         return this;
     };
 
-    Component.prototype.computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+    Component.prototype.xOffset = function (offset) {
+        this.xOffsetVal = offset;
+        return this;
+    };
+
+    Component.prototype.yOffset = function (offset) {
+        this.yOffsetVal = offset;
+        return this;
+    };
+
+    Component.prototype.computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
         var _this = this;
-        if (xOffset == null || yOffset == null || availableWidth == null || availableHeight == null) {
+        if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
             if (this.element == null) {
                 throw new Error("anchor must be called before computeLayout");
             } else if (this.element.node().nodeName === "svg") {
-                xOffset = 0;
-                yOffset = 0;
+                xOrigin = 0;
+                yOrigin = 0;
                 availableWidth = parseFloat(this.element.attr("width"));
                 availableHeight = parseFloat(this.element.attr("height"));
             } else {
                 throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
             }
         }
-        if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
-            yOffset += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-            availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
-        }
+        this.xOrigin = xOrigin;
+        this.yOrigin = yOrigin;
+        var xPosition = this.xOrigin;
+        var yPosition = this.yOrigin;
+
         if (this.colWeight() === 0 && this.colMinimum() !== 0) {
-            xOffset += (availableWidth - this.colMinimum()) * this.xAlignProportion;
+            xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
+            xPosition += this.xOffsetVal;
+
             availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
         }
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
+
+        if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
+            yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
+            yPosition += this.yOffsetVal;
+            availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
+        }
+
         this.availableWidth = availableWidth;
         this.availableHeight = availableHeight;
-        this.element.attr("transform", "translate(" + this.xOffset + "," + this.yOffset + ")");
+        this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
         this.boxes.forEach(function (b) {
             return b.attr("width", _this.availableWidth).attr("height", _this.availableHeight);
         });
@@ -293,6 +350,42 @@ var LinearScale = (function (_super) {
     };
     return LinearScale;
 })(QuantitiveScale);
+
+var ColorScale = (function (_super) {
+    __extends(ColorScale, _super);
+    function ColorScale(scaleType) {
+        var scale;
+        switch (scaleType) {
+            case "Category10":
+            case "category10":
+            case "10":
+                scale = d3.scale.category10();
+                break;
+            case "Category20":
+            case "category20":
+            case "20":
+                scale = d3.scale.category20();
+                break;
+            case "Category20b":
+            case "category20b":
+            case "20b":
+                scale = d3.scale.category20b();
+                break;
+            case "Category20c":
+            case "category20c":
+            case "20c":
+                scale = d3.scale.category20c();
+                break;
+            case null:
+            case undefined:
+                scale = d3.scale.ordinal();
+            default:
+                throw new Error("Unsupported ColorScale type");
+        }
+        _super.call(this, scale);
+    }
+    return ColorScale;
+})(Scale);
 var Interaction = (function () {
     function Interaction(componentToListenTo) {
         this.componentToListenTo = componentToListenTo;
@@ -472,15 +565,14 @@ var Label = (function (_super) {
         if (typeof text === "undefined") { text = ""; }
         if (typeof orientation === "undefined") { orientation = "horizontal"; }
         _super.call(this);
-        this.xAlignment = "CENTER";
-        this.yAlignment = "CENTER";
         this.classed(Label.CSS_CLASS, true);
-        this.text = text;
+        this.setText(text);
         if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
             this.orientation = orientation;
         } else {
             throw new Error(orientation + " is not a valid orientation for LabelComponent");
         }
+        this.xAlign("CENTER").yAlign("CENTER");
     }
     Label.prototype.anchor = function (element) {
         _super.prototype.anchor.call(this, element);
@@ -491,12 +583,9 @@ var Label = (function (_super) {
 
     Label.prototype.setText = function (text) {
         this.text = text;
-        this.textElement.text(text);
-        this.measureAndSetTextSize();
-        if (this.orientation === "horizontal") {
-            this.rowMinimum(this.textHeight);
-        } else {
-            this.colMinimum(this.textHeight);
+        if (this.element != null) {
+            this.textElement.text(text);
+            this.measureAndSetTextSize();
         }
     };
 
@@ -504,31 +593,17 @@ var Label = (function (_super) {
         var bbox = Utils.getBBox(this.textElement);
         this.textHeight = bbox.height;
         this.textLength = bbox.width;
+        if (this.orientation === "horizontal") {
+            this.rowMinimum(this.textHeight);
+        } else {
+            this.colMinimum(this.textHeight);
+        }
     };
 
-    Label.prototype.truncateTextToLength = function (availableLength) {
-        if (this.textLength <= availableLength) {
-            return;
-        }
-
-        this.textElement.text(this.text + "...");
-        var textNode = this.textElement.node();
-        var dotLength = textNode.getSubStringLength(textNode.textContent.length - 3, 3);
-        if (dotLength > availableLength) {
-            this.textElement.text("");
-            this.measureAndSetTextSize();
-            return;
-        }
-
-        var numChars = this.text.length;
-        for (var i = 1; i < numChars; i++) {
-            var testLength = textNode.getSubStringLength(0, i);
-            if ((testLength + dotLength) > availableLength) {
-                this.textElement.text(this.text.substr(0, i - 1).trim() + "...");
-                this.measureAndSetTextSize();
-                return;
-            }
-        }
+    Label.prototype.truncateTextAndRemeasure = function (availableLength) {
+        var shortText = Utils.truncateTextToLength(this.text, availableLength, this.textElement);
+        this.textElement.text(shortText);
+        this.measureAndSetTextSize();
     };
 
     Label.prototype.computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
@@ -542,33 +617,11 @@ var Label = (function (_super) {
         var yShift = 0;
 
         if (this.orientation === "horizontal") {
-            this.truncateTextToLength(this.availableWidth);
-            switch (this.xAlignment) {
-                case "LEFT":
-                    break;
-                case "CENTER":
-                    xShift = (this.availableWidth - this.textLength) / 2;
-                    break;
-                case "RIGHT":
-                    xShift = this.availableWidth - this.textLength;
-                    break;
-                default:
-                    throw new Error(this.xAlignment + " is not a supported alignment");
-            }
+            this.truncateTextAndRemeasure(this.availableWidth);
+            xShift = (this.availableWidth - this.textLength) * this.xAlignProportion;
         } else {
-            this.truncateTextToLength(this.availableHeight);
-            switch (this.yAlignment) {
-                case "TOP":
-                    break;
-                case "CENTER":
-                    xShift = (this.availableHeight - this.textLength) / 2;
-                    break;
-                case "BOTTOM":
-                    xShift = this.availableHeight - this.textLength;
-                    break;
-                default:
-                    throw new Error(this.yAlignment + " is not a supported alignment");
-            }
+            this.truncateTextAndRemeasure(this.availableHeight);
+            xShift = (this.availableHeight - this.textLength) * this.yAlignProportion;
 
             if (this.orientation === "vertical-right") {
                 this.textElement.attr("transform", "rotate(90)");
@@ -822,13 +875,13 @@ var BarRenderer = (function (_super) {
 var Table = (function (_super) {
     __extends(Table, _super);
     function Table(rows) {
+        if (typeof rows === "undefined") { rows = []; }
         _super.call(this);
         this.rowPadding = 0;
         this.colPadding = 0;
         this.guessRowWeight = true;
         this.guessColWeight = true;
         this.classed(Table.CSS_CLASS, true);
-
         var cleanOutNulls = function (c) {
             return c == null ? new Component() : c;
         };
@@ -836,10 +889,38 @@ var Table = (function (_super) {
             return row.map(cleanOutNulls);
         });
         this.rows = rows;
-        this.cols = d3.transpose(rows);
-        this.nRows = this.rows.length;
-        this.nCols = this.cols.length;
+        this.cols = d3.transpose(this.rows);
     }
+    Table.prototype.addComponent = function (row, col, component) {
+        if (this.element != null) {
+            throw new Error("addComponent cannot be called after anchoring (for the moment)");
+        }
+
+        this.padTableToSize(row + 1, col + 1);
+
+        var currentComponent = this.rows[row][col];
+        if (currentComponent.constructor.name !== "Component") {
+            throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
+        }
+
+        this.rows[row][col] = component;
+        this.cols = d3.transpose(this.rows);
+        return this;
+    };
+
+    Table.prototype.padTableToSize = function (nRows, nCols) {
+        for (var i = 0; i < nRows; i++) {
+            if (this.rows[i] === undefined) {
+                this.rows[i] = [];
+            }
+            for (var j = 0; j < nCols; j++) {
+                if (this.rows[i][j] === undefined) {
+                    this.rows[i][j] = new Component();
+                }
+            }
+        }
+    };
+
     Table.prototype.anchor = function (element) {
         var _this = this;
         _super.prototype.anchor.call(this, element);
@@ -1011,6 +1092,61 @@ var ScaleDomainCoordinator = (function () {
     };
     return ScaleDomainCoordinator;
 })();
+var Legend = (function (_super) {
+    __extends(Legend, _super);
+    function Legend(colorScale) {
+        _super.call(this);
+        this.classed(Legend.CSS_CLASS, true);
+        this.colMinimum(120);
+        this.colorScale = colorScale;
+        this.xAlign("RIGHT").yAlign("TOP");
+        this.xOffset(5).yOffset(5);
+    }
+    Legend.prototype.scale = function (scale) {
+        this.colorScale = scale;
+        return this;
+    };
+
+    Legend.prototype.rowMinimum = function (newVal) {
+        if (newVal != null) {
+            throw new Error("Row minimum cannot be directly set on Legend");
+        } else {
+            var textHeight = this.measureTextHeight();
+            return this.colorScale.domain().length * textHeight;
+        }
+    };
+
+    Legend.prototype.measureTextHeight = function () {
+        var fakeLegendEl = this.element.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+        var textHeight = Utils.getTextHeight(fakeLegendEl.append("text"));
+        fakeLegendEl.remove();
+        return textHeight;
+    };
+
+    Legend.prototype.render = function () {
+        _super.prototype.render.call(this);
+        var domain = this.colorScale.domain();
+        var textHeight = this.measureTextHeight();
+        var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
+
+        this.element.selectAll("." + Legend.SUBELEMENT_CLASS).remove();
+        var legend = this.element.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
+        var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
+            return "translate(0," + i * textHeight + ")";
+        });
+        legendEnter.append("rect").attr("x", Legend.MARGIN).attr("y", Legend.MARGIN).attr("width", textHeight - Legend.MARGIN * 2).attr("height", textHeight - Legend.MARGIN * 2);
+        legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
+        legend.selectAll("rect").attr("fill", this.colorScale.scale);
+        legend.selectAll("text").text(function (d, i) {
+            return Utils.truncateTextToLength(d, availableWidth, d3.select(this));
+        });
+        return this;
+    };
+    Legend.CSS_CLASS = "legend";
+    Legend.SUBELEMENT_CLASS = "legend-row";
+    Legend.MARGIN = 5;
+    return Legend;
+})(Component);
 var Axis = (function (_super) {
     __extends(Axis, _super);
     function Axis(scale, orientation, formatter) {
@@ -1134,9 +1270,18 @@ var YAxis = (function (_super) {
 var ComponentGroup = (function (_super) {
     __extends(ComponentGroup, _super);
     function ComponentGroup(components) {
+        if (typeof components === "undefined") { components = []; }
         _super.call(this);
         this.components = components;
     }
+    ComponentGroup.prototype.addComponent = function (c) {
+        this.components.push(c);
+        if (this.element != null) {
+            c.anchor(this.element.append("g"));
+        }
+        return this;
+    };
+
     ComponentGroup.prototype.anchor = function (element) {
         var _this = this;
         _super.prototype.anchor.call(this, element);
@@ -1146,11 +1291,11 @@ var ComponentGroup = (function (_super) {
         return this;
     };
 
-    ComponentGroup.prototype.computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+    ComponentGroup.prototype.computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
         var _this = this;
-        _super.prototype.computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+        _super.prototype.computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
         this.components.forEach(function (c) {
-            c.computeLayout(_this.xOffset, _this.yOffset, _this.availableWidth, _this.availableHeight);
+            c.computeLayout(_this.xOrigin, _this.yOrigin, _this.availableWidth, _this.availableHeight);
         });
         return this;
     };
