@@ -53,18 +53,6 @@ describe("Tables", () => {
     assert.equal((<any> table).rows[2][2], c1, "the inserted component went to the right spot");
   });
 
-  it("base components are overwritten by the addComponent constructor, and other components are not", () => {
-    var c0 = new Component();
-    var c1 = new Table();
-    var c2 = new Table();
-    var t = new Table();
-    t.addComponent(0, 0, c0);
-    t.addComponent(0, 2, c1);
-    t.addComponent(0, 0, c2);
-    assert.equal((<any> t).rows[0][0], c2, "the baseComponent was overwritten by the table");
-    assert.throws(() => t.addComponent(0, 2, c2), Error, "component already exists");
-  });
-
   it("tables can be constructed by adding components in matrix style", () => {
     var table = new Table();
     var c1 = new Component();
@@ -79,7 +67,20 @@ describe("Tables", () => {
     assert.equal(rows[1][1], c2, "second component added correctly");
     assert.isTrue(rows[0][1].constructor.name === "Component", "added a null component to 0,1");
     assert.isTrue(rows[1][0].constructor.name === "Component", "added a null component to 1,0");
-  })
+  });
+
+  it("base components are overwritten by the addComponent constructor, and other components are not", () => {
+    var c0 = new Component();
+    var c1 = new Table();
+    var c2 = new Table();
+    var t = new Table();
+    t.addComponent(0, 0, c0);
+    t.addComponent(0, 2, c1);
+    t.addComponent(0, 0, c2);
+    assert.equal((<any> t).rows[0][0], c2, "the baseComponent was overwritten by the table");
+    assert.throws(() => t.addComponent(0, 2, c2), Error, "component already exists");
+  });
+
 
   it("tables with insufficient space throw Insufficient Space", () => {
     var svg = generateSVG(200, 200);
