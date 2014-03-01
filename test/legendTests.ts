@@ -97,5 +97,6 @@ describe("Legends", () => {
 
   it("rowMinimum can't be set on a legend", () => {
     assert.throws(() => legend.rowMinimum(5), Error, "cannot be directly set");
+    svg.remove();
   });
 });

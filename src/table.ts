@@ -37,7 +37,8 @@ class Table extends Component {
 
     this.padTableToSize(row + 1, col + 1);
 
-    if (this.rows[row][col].constructor.name !== "Component") {
+    var currentComponent = <any> this.rows[row][col];
+    if (currentComponent.constructor.name !== "Component") {
       // The bsae component is only used as a placeholder component
       throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
     }
@@ -49,11 +50,11 @@ class Table extends Component {
 
   private padTableToSize(nRows: number, nCols: number) {
     for (var i=0; i<nRows; i++) {
-      if (this.rows[i] == undefined) {
+      if (this.rows[i] === undefined) {
         this.rows[i] = [];
       }
       for (var j=0; j<nCols; j++) {
-        if (this.rows[i][j] == undefined) {
+        if (this.rows[i][j] === undefined) {
           this.rows[i][j] = new Component();
         }
       }
