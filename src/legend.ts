@@ -48,7 +48,7 @@ class Legend extends Component {
     var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
 
     this.element.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
-    var legend: D3.UpdateSelection = this.element.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain)
+    var legend: D3.UpdateSelection = this.element.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
     var legendEnter = legend.enter()
         .append("g").classed(Legend.SUBELEMENT_CLASS, true)
         .attr("transform", (d, i) => "translate(0," + i * textHeight + ")");
@@ -59,7 +59,7 @@ class Legend extends Component {
         .attr("height", textHeight - Legend.MARGIN * 2);
     legendEnter.append("text")
         .attr("x", textHeight)
-        .attr("y", Legend.MARGIN + textHeight / 2)
+        .attr("y", Legend.MARGIN + textHeight / 2);
     legend.selectAll("rect").attr("fill", this.colorScale.scale);
     legend.selectAll("text").text(function(d, i) {return Utils.truncateTextToLength(d, availableWidth, d3.select(this));});
     return this;
