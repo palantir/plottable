@@ -97,7 +97,7 @@ describe("Tables", () => {
     var components = tableAndcomponents.components;
 
     var svg = generateSVG();
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
@@ -121,7 +121,7 @@ describe("Tables", () => {
     table.padding(5,5);
 
     var svg = generateSVG(415, 415);
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
@@ -155,7 +155,7 @@ describe("Tables", () => {
     // finally the center 'plot' object has a weight
     components[4].rowWeight(1).colWeight(1);
 
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));

@@ -52,7 +52,7 @@ describe("Renderers", () => {
         var xAccessor = (d) => d.foo;
         var yAccessor = (d) => d.bar;
         lineRenderer = new LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
-        lineRenderer.anchor(svg).computeLayout().render();
+        lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
       });
 
@@ -133,7 +133,7 @@ describe("Renderers", () => {
         xScale = new LinearScale();
         yScale = new LinearScale();
         circleRenderer = new CircleRenderer(quadraticDataset, xScale, yScale);
-        circleRenderer.anchor(svg).computeLayout().render();
+        circleRenderer.renderTo(svg);
       });
 
       it("setup is handled properly", () => {

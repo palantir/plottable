@@ -39,7 +39,7 @@ describe("Interactions", () => {
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
       var renderer = new CircleRenderer(dataset, xScale, yScale);
-      renderer.anchor(svg).computeLayout().render();
+      renderer.renderTo(svg);
 
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
@@ -97,7 +97,7 @@ describe("Interactions", () => {
       xScale = new LinearScale();
       yScale = new LinearScale();
       renderer = new CircleRenderer(dataset, xScale, yScale);
-      renderer.anchor(svg).computeLayout().render();
+      renderer.renderTo(svg);
       interaction = new AreaInteraction(renderer);
     });
 
@@ -157,7 +157,7 @@ describe("Interactions", () => {
       var svg = generateSVG(svgWidth, svgHeight);
       var dataset = makeLinearSeries(11);
       var renderer = new CircleRenderer(dataset, xScale, yScale);
-      renderer.anchor(svg).computeLayout().render();
+      renderer.renderTo(svg);
 
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();

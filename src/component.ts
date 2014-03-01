@@ -22,9 +22,7 @@ class Component {
   public xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
   public yAlignProportion = 0;
 
-
   private cssClasses: string[] = ["component"];
-
 
   public anchor(element: D3.Selection) {
     if (element.node().childNodes.length > 0) {
@@ -42,42 +40,6 @@ class Component {
 
     this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
-    return this;
-  }
-
-  public xAlign(alignment: string): Component {
-    if (alignment === "LEFT") {
-      this.xAlignProportion = 0;
-    } else if (alignment === "CENTER") {
-      this.xAlignProportion = 0.5;
-    } else if (alignment === "RIGHT") {
-      this.xAlignProportion = 1;
-    } else {
-      throw new Error("Unsupported alignment");
-    }
-    return this;
-  }
-
-  public yAlign(alignment: string): Component {
-    if (alignment === "TOP") {
-      this.yAlignProportion = 0;
-    } else if (alignment === "CENTER") {
-      this.yAlignProportion = 0.5;
-    } else if (alignment === "BOTTOM") {
-      this.yAlignProportion = 1;
-    } else {
-      throw new Error("Unsupported alignment");
-    }
-    return this;
-  }
-
-  public xOffset(offset: number): Component {
-    this.xOffsetVal = offset;
-    return this;
-  }
-
-  public yOffset(offset: number): Component {
-    this.yOffsetVal = offset;
     return this;
   }
 
@@ -122,6 +84,54 @@ class Component {
   }
 
   public render() {
+    return this;
+  }
+
+  public renderTo(element: D3.Selection): Component {
+    // When called on top-level-component, a shortcut for component.anchor(svg).computeLayout().render()
+    if (this.element == null) {
+      this.anchor(element);
+    };
+    if (this.element !== element) {
+      throw new Error("Can't renderTo a different element than was anchored to");
+    }
+    this.computeLayout().render();
+    return this;
+  }
+
+  public xAlign(alignment: string): Component {
+    if (alignment === "LEFT") {
+      this.xAlignProportion = 0;
+    } else if (alignment === "CENTER") {
+      this.xAlignProportion = 0.5;
+    } else if (alignment === "RIGHT") {
+      this.xAlignProportion = 1;
+    } else {
+      throw new Error("Unsupported alignment");
+    }
+    return this;
+  }
+
+  public yAlign(alignment: string): Component {
+    if (alignment === "TOP") {
+      this.yAlignProportion = 0;
+    } else if (alignment === "CENTER") {
+      this.yAlignProportion = 0.5;
+    } else if (alignment === "BOTTOM") {
+      this.yAlignProportion = 1;
+    } else {
+      throw new Error("Unsupported alignment");
+    }
+    return this;
+  }
+
+  public xOffset(offset: number): Component {
+    this.xOffsetVal = offset;
+    return this;
+  }
+
+  public yOffset(offset: number): Component {
+    this.yOffsetVal = offset;
     return this;
   }
 
