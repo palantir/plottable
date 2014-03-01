@@ -9,11 +9,13 @@ module TSCDemo {
   var lineRenderer = new LineRenderer(data, xScale, yScale);
   var bottomAxis = new XAxis(xScale, "bottom");
 
-  var chart = new Table([[left, lineRenderer]
-                        ,[null, bottomAxis]]);
+  var chart = new Table()
+            .addComponent(0, 0, left)
+            .addComponent(0, 1, lineRenderer)
+            .addComponent(1, 1, bottomAxis);
 
-  var outerTable = new Table([ [new TitleLabel("A Chart")],
-                               [chart] ])
+  var outerTable = new Table().addComponent(0, 0, new TitleLabel("A Chart"))
+                              .addComponent(1, 0, chart);
 
   var svg = d3.select("#table");
   outerTable.anchor(svg);

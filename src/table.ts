@@ -21,16 +21,43 @@ class Table extends Component {
   private guessRowWeight = true;
   private guessColWeight = true;
 
-  constructor(rows: Component[][]) {
+  constructor(rows: Component[][] = []) {
     super();
     this.classed(Table.CSS_CLASS, true);
-    // Clean out any null components and replace them with base Components
     var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
     rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
     this.rows = rows;
-    this.cols = d3.transpose(rows);
-    this.nRows = this.rows.length;
-    this.nCols = this.cols.length;
+    this.cols = d3.transpose(this.rows);
+  }
+
+  public addComponent(row: number, col: number, component: Component): Table {
+    if (this.element != null) {
+      throw new Error("addComponent cannot be called after anchoring (for the moment)");
+    }
+
+    this.padTableToSize(row + 1, col + 1);
+
+    if (this.rows[row][col].constructor.name !== "Component") {
+      // The bsae component is only used as a placeholder component
+      throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
+    }
+
+    this.rows[row][col] = component;
+    this.cols = d3.transpose(this.rows);
+    return this;
+  }
+
+  private padTableToSize(nRows: number, nCols: number) {
+    for (var i=0; i<nRows; i++) {
+      if (this.rows[i] == undefined) {
+        this.rows[i] = [];
+      }
+      for (var j=0; j<nCols; j++) {
+        if (this.rows[i][j] == undefined) {
+          this.rows[i][j] = new Component();
+        }
+      }
+    }
   }
 
   public anchor(element: D3.Selection) {
@@ -131,7 +158,7 @@ class Table extends Component {
   }
 
   public rowMinimum(): number;
-  public rowMinimum(newVal: number): Component;
+  public rowMinimum(newVal: number): Table;
   public rowMinimum(newVal?: number): any {
     if (newVal != null) {
       throw new Error("Row minimum cannot be directly set on Table");
@@ -142,7 +169,7 @@ class Table extends Component {
   }
 
   public colMinimum(): number;
-  public colMinimum(newVal: number): Component;
+  public colMinimum(newVal: number): Table;
   public colMinimum(newVal?: number): any {
     if (newVal != null) {
       throw new Error("Col minimum cannot be directly set on Table");

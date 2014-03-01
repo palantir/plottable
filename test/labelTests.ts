@@ -33,8 +33,9 @@ describe("Labels", () => {
     var text = element.select("text");
     label.computeLayout();
     label.render();
-    var bbox = Utils.getBBox(text);
-    assert.equal(bbox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
+    var textBBox = Utils.getBBox(text);
+    assertBBoxInclusion(element.select(".bounding-box"), text);
+    assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
     svg.remove();
   });
@@ -47,8 +48,9 @@ describe("Labels", () => {
     var text = element.select("text");
     label.computeLayout();
     label.render();
-    var bbox = Utils.getBBox(text);
-    assert.equal(bbox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
+    var textBBox = Utils.getBBox(text);
+    assertBBoxInclusion(element.select(".bounding-box"), text);
+    assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
     svg.remove();
   });
@@ -92,14 +94,5 @@ describe("Labels", () => {
 
   it("unsupported alignments and orientations are unsupported", () => {
     assert.throws(() => new Label("foo", "bar"), Error, "not a valid orientation");
-    var l1 = new Label("foo", "horizontal");
-    var svg = generateSVG(10, 10);
-    l1.anchor(svg);
-    l1.xAlignment = "bar";
-    l1.yAlignment = "bar";
-    assert.throws(() => l1.computeLayout(), Error, "supported alignment");
-    (<any> l1).orientation = "vertical-left";
-    assert.throws(() => l1.computeLayout(), Error, "supported alignment");
-    svg.remove();
   });
 });
