@@ -48,7 +48,17 @@ describe("Component behavior", () => {
     assert.isTrue(anchored, "anchor was called");
     assert.isTrue(computed, "computeLayout was called");
     assert.isTrue(rendered, "render was called");
+    anchored = false;
+    computed = false;
+    rendered = true;
+    c.renderTo(svg);
+    assert.isFalse(anchored, "anchor was not called a second time");
+    assert.isTrue(computed, "computeLayout was called a second time");
+    assert.isTrue(rendered, "render was called a second time");
+    var svg2 = generateSVG();
+    assert.throws(() => c.renderTo(svg2), Error, "different element");
     svg.remove();
+    svg2.remove();
   });
 
   describe("anchor", () => {
