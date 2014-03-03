@@ -22,7 +22,6 @@ describe("Component behavior", () => {
   });
 
   it("renderTo works properly", () => {
-    c.rowWeight(1).colWeight(1);
     var anchored = false;
     var computed = false;
     var rendered = false;
@@ -158,8 +157,6 @@ describe("Component behavior", () => {
   it("component defaults are as expected", () => {
     assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
     assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
-    assert.equal(c.rowWeight() , 0, "rowWeight  defaults to 0");
-    assert.equal(c.colWeight() , 0, "colWeight  defaults to 0");
     assert.equal((<any> c).xAlignProportion, 0, "xAlignProportion defaults to 0");
     assert.equal((<any> c).yAlignProportion, 0, "yAlignProportion defaults to 0");
     assert.equal((<any> c).xOffsetVal, 0, "xOffset defaults to 0");
@@ -172,10 +169,6 @@ describe("Component behavior", () => {
     assert.equal(c.rowMinimum(), 12, "rowMinimum setter works");
     c.colMinimum(14);
     assert.equal(c.colMinimum(), 14, "colMinimum setter works");
-    c.rowWeight(16);
-    assert.equal(c.rowWeight(), 16, "rowWeight setter works");
-    c.colWeight(18);
-    assert.equal(c.colWeight(), 18, "colWeight setter works");
     svg.remove();
   });
 

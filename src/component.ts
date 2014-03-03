@@ -8,8 +8,8 @@ class Component {
   private boxes: D3.Selection[] = [];
   public clipPathEnabled = false;
 
-  private rowWeightVal  = 0;
-  private colWeightVal  = 0;
+  public fixedWidthVal = true;
+  public fixedHeightVal = true;
   private rowMinimumVal = 0;
   private colMinimumVal = 0;
 
@@ -62,7 +62,7 @@ class Component {
     var xPosition = this.xOrigin;
     var yPosition = this.yOrigin;
 
-    if (this.colWeight() === 0 && this.colMinimum() !== 0) {
+    if (this.colMinimum() !== 0 && this.fixedWidthVal) {
       // The component has free space, so it makes sense to think about how to position or offset it
       xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
       xPosition += this.xOffsetVal;
@@ -70,7 +70,7 @@ class Component {
       availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
     }
 
-    if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
+    if (this.rowMinimum() !== 0 && this.fixedHeightVal) {
       yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
       yPosition += this.yOffsetVal;
       availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
@@ -192,28 +192,6 @@ class Component {
     }
   }
 
-  public rowWeight(): number;
-  public rowWeight(newVal: number): Component;
-  public rowWeight(newVal?: number): any {
-    if (newVal != null) {
-      this.rowWeightVal = newVal;
-      return this;
-    } else {
-      return this.rowWeightVal;
-    }
-  }
-
-  public colWeight(): number;
-  public colWeight(newVal: number): Component;
-  public colWeight(newVal?: number): any {
-    if (newVal != null) {
-      this.colWeightVal = newVal;
-      return this;
-    } else {
-      return this.colWeightVal;
-    }
-  }
-
   public rowMinimum(): number;
   public rowMinimum(newVal: number): Component;
   public rowMinimum(newVal?: number): any {
@@ -234,5 +212,13 @@ class Component {
     } else {
       return this.colMinimumVal;
     }
+  }
+
+  public fixedWidth(): boolean {
+    return this.fixedWidthVal;
+  }
+
+  public fixedHeight(): boolean {
+    return this.fixedHeightVal;
   }
 }

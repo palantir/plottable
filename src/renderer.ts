@@ -10,9 +10,9 @@ class Renderer extends Component {
 
   constructor(dataset: IDataset = {seriesName: "", data: []}) {
     super();
-    super.rowWeight(1);
-    super.colWeight(1);
     this.clipPathEnabled = true;
+    this.fixedWidthVal = false;
+    this.fixedHeightVal = false;
 
     this.dataset = dataset;
     this.classed(Renderer.CSS_CLASS, true);

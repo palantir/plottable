@@ -92,7 +92,7 @@ module Demo {
     var xScaleSpark = new LinearScale();
     var yScaleSpark = new LinearScale();
     var sparkline = new LineRenderer(data2, xScaleSpark, yScaleSpark);
-    sparkline.rowWeight(0.25);
+
     var row4 = [null, sparkline, null];
     var zoomCallback = new ZoomCallbackGenerator().addXScale(xScaleSpark, xScale1).addYScale(yScaleSpark, yScale2).getCallback();
 

@@ -15,6 +15,11 @@ class Label extends Component {
     this.setText(text);
     if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
       this.orientation = orientation;
+      if (orientation === "horizontal") {
+        this.fixedWidthVal = false;
+      } else {
+        this.fixedHeightVal = false;
+      }
     } else {
       throw new Error(orientation + " is not a valid orientation for LabelComponent");
     }

@@ -2,24 +2,25 @@
 
 module TSCDemo {
 
-  var yScale = new LinearScale();
-  var xScale = new LinearScale();
-  var left = new YAxis(yScale, "left");
-  var data = makeRandomData(1000, 200);
-  var lineRenderer = new LineRenderer(data, xScale, yScale);
-  var bottomAxis = new XAxis(xScale, "bottom");
+  // make a chart with two axes
+  function makeMultiAxisChart() {
+    var xScale = new LinearScale();
+    var yScale = new LinearScale();
+    var rightAxes = [new YAxis(yScale, "right"), new YAxis(yScale, "right")];
+    var rightAxesTable = new Table([rightAxes]);
+    var xAxis = new XAxis(xScale, "bottom");
+    var data = makeRandomData(30);
+    var renderArea = new LineRenderer(data, xScale, yScale);
+    var rootTable = new Table([[renderArea, rightAxesTable], [xAxis, null]])
+    return rootTable;
 
-  var chart = new Table()
-            .addComponent(0, 0, left)
-            .addComponent(0, 1, lineRenderer)
-            .addComponent(1, 1, bottomAxis);
+  }
 
-  var outerTable = new Table().addComponent(0, 0, new TitleLabel("A Chart"))
-                              .addComponent(1, 0, chart);
-
-  var svg = d3.select("#table");
-  outerTable.anchor(svg);
-  outerTable.computeLayout();
-  outerTable.render();
+  var svg3 = d3.select("#table");
+  var multiaxischart = makeMultiAxisChart();
+  multiaxischart.anchor(svg3);
+  svg3.attr("width", 400).attr("height",400);
+  multiaxischart.computeLayout();
+  multiaxischart.render();
 
 }
