@@ -4,6 +4,7 @@ Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
+///<reference path="reference.ts" />
 var Utils;
 (function (Utils) {
     function inRange(x, a, b) {
@@ -16,6 +17,12 @@ var Utils;
     }
     Utils.getBBox = getBBox;
 
+    /** Truncates a text string to a max length, given the element in which to draw the text
+    * @param {string} text: The string to put in the text element, and truncate
+    * @param {D3.Selection} element: The element in which to measure and place the text
+    * @param {number} length: How much space to truncate text into
+    * @returns {string} text - the shortened text
+    */
     function truncateTextToLength(text, length, element) {
         var originalText = element.text();
         element.text(text);
@@ -53,6 +60,7 @@ var Utils;
     }
     Utils.getTextHeight = getTextHeight;
 })(Utils || (Utils = {}));
+///<reference path="reference.ts" />
 var Component = (function () {
     function Component() {
         this.registeredInteractions = [];
@@ -86,7 +94,7 @@ var Component = (function () {
         this.hitBox = this.addBox("hit-box");
         this.addBox("bounding-box");
 
-        this.hitBox.style("fill", "#ffffff").style("opacity", 0);
+        this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         this.registeredInteractions.forEach(function (r) {
             return r.anchor(_this.hitBox);
         });
@@ -99,6 +107,7 @@ var Component = (function () {
             if (this.element == null) {
                 throw new Error("anchor must be called before computeLayout");
             } else if (this.element.node().nodeName === "svg") {
+                // we are the root node, let's guess width and height for convenience
                 xOrigin = 0;
                 yOrigin = 0;
                 availableWidth = parseFloat(this.element.attr("width"));
@@ -113,9 +122,11 @@ var Component = (function () {
         var yPosition = this.yOrigin;
 
         if (this.colMinimum() !== 0 && this.isFixedWidth()) {
+            // The component has free space, so it makes sense to think about how to position or offset it
             xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
             xPosition += this.xOffsetVal;
 
+            // Decrease size so hitbox / bounding box and children are sized correctly
             availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
         }
 
@@ -139,6 +150,7 @@ var Component = (function () {
     };
 
     Component.prototype.renderTo = function (element) {
+        // When called on top-level-component, a shortcut for component.anchor(svg).computeLayout().render()
         if (this.element == null) {
             this.anchor(element);
         }
@@ -204,6 +216,7 @@ var Component = (function () {
     };
 
     Component.prototype.generateClipPath = function () {
+        // The clip path will prevent content from overflowing its component space.
         var clipPathId = Component.clipPathId++;
         this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
         var clipPathParent = this.element.append("clipPath").attr("id", "clipPath" + clipPathId);
@@ -211,6 +224,9 @@ var Component = (function () {
     };
 
     Component.prototype.registerInteraction = function (interaction) {
+        // Interactions can be registered before or after anchoring. If registered before, they are
+        // pushed to this.registeredInteractions and registered during anchoring. If after, they are
+        // registered immediately
         this.registeredInteractions.push(interaction);
         if (this.element != null) {
             interaction.anchor(this.hitBox);
@@ -267,6 +283,7 @@ var Component = (function () {
     Component.clipPathId = 0;
     return Component;
 })();
+///<reference path="reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -388,6 +405,7 @@ var ColorScale = (function (_super) {
     }
     return ColorScale;
 })(Scale);
+///<reference path="reference.ts" />
 var Interaction = (function () {
     function Interaction(componentToListenTo) {
         this.componentToListenTo = componentToListenTo;
@@ -398,6 +416,9 @@ var Interaction = (function () {
 
     Interaction.prototype.registerWithComponent = function () {
         this.componentToListenTo.registerInteraction(this);
+        // It would be nice to have a call to this in the Interaction constructor, but
+        // can't do this right now because that depends on listenToHitBox being callable, which depends on the subclass
+        // constructor finishing first.
     };
     return Interaction;
 })();
@@ -424,6 +445,8 @@ var PanZoomInteraction = (function (_super) {
     };
 
     PanZoomInteraction.prototype.rerenderZoomed = function () {
+        // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
+        // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
         var xDomain = this.xScale.scale.domain();
         var yDomain = this.yScale.scale.domain();
         this.xScale.domain(xDomain);
@@ -462,6 +485,7 @@ var AreaInteraction = (function (_super) {
         var availableWidth = parseFloat(this.hitBox.attr("width"));
         var availableHeight = parseFloat(this.hitBox.attr("height"));
 
+        // the constraint functions ensure that the selection rectangle will not exceed the hit box
         var constraintFunction = function (min, max) {
             return function (x) {
                 return Math.min(Math.max(x, min), max);
@@ -561,6 +585,7 @@ var ZoomCallbackGenerator = (function () {
     };
     return ZoomCallbackGenerator;
 })();
+///<reference path="reference.ts" />
 var Label = (function (_super) {
     __extends(Label, _super);
     function Label(text, orientation) {
@@ -579,7 +604,7 @@ var Label = (function (_super) {
         } else {
             throw new Error(orientation + " is not a valid orientation for LabelComponent");
         }
-        this.xAlign("CENTER").yAlign("CENTER");
+        this.xAlign("CENTER").yAlign("CENTER"); // the defaults
     }
     Label.prototype.anchor = function (element) {
         _super.prototype.anchor.call(this, element);
@@ -616,7 +641,7 @@ var Label = (function (_super) {
     Label.prototype.computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
 
-        this.textElement.attr("dy", 0);
+        this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
         var bbox = Utils.getBBox(this.textElement);
         this.textElement.attr("dy", -bbox.y);
 
@@ -635,7 +660,7 @@ var Label = (function (_super) {
                 yShift = -this.textHeight;
             } else {
                 this.textElement.attr("transform", "rotate(-90)");
-                xShift = -xShift - this.textLength;
+                xShift = -xShift - this.textLength; // flip xShift
             }
         }
 
@@ -666,6 +691,7 @@ var AxisLabel = (function (_super) {
     AxisLabel.CSS_CLASS = "axis-label";
     return AxisLabel;
 })(Label);
+///<reference path="reference.ts" />
 var Renderer = (function (_super) {
     __extends(Renderer, _super);
     function Renderer(dataset) {
@@ -845,7 +871,7 @@ var BarRenderer = (function (_super) {
         if (!Utils.inRange(0, yDomain[0], yDomain[1])) {
             var newMin = 0;
             var newMax = yDomain[1];
-            this.yScale.widenDomain([newMin, newMax]);
+            this.yScale.widenDomain([newMin, newMax]); // TODO: make this handle reversed scales
         }
 
         this.x2Accessor = (x2Accessor != null) ? x2Accessor : BarRenderer.defaultX2Accessor;
@@ -879,6 +905,7 @@ var BarRenderer = (function (_super) {
     };
     return BarRenderer;
 })(XYRenderer);
+///<reference path="reference.ts" />
 var Table = (function (_super) {
     __extends(Table, _super);
     function Table(rows) {
@@ -940,6 +967,7 @@ var Table = (function (_super) {
         var _this = this;
         _super.prototype.anchor.call(this, element);
 
+        // recursively anchor children
         this.rows.forEach(function (row, rowIndex) {
             row.forEach(function (component, colIndex) {
                 component.anchor(_this.element.append("g"));
@@ -952,6 +980,7 @@ var Table = (function (_super) {
         var _this = this;
         _super.prototype.computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
 
+        // calculate the amount of free space by recursive col-/row- Minimum() calls
         var freeWidth = this.availableWidth - this.colMinimum();
         var freeHeight = this.availableHeight - this.rowMinimum();
         if (freeWidth < 0 || freeHeight < 0) {
@@ -966,6 +995,7 @@ var Table = (function (_super) {
             return c.isFixedWidth();
         });
 
+        // distribute remaining height to rows
         var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
         var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
 
@@ -979,6 +1009,7 @@ var Table = (function (_super) {
         this.rows.forEach(function (row, rowIndex) {
             var childXOffset = 0;
             row.forEach(function (component, colIndex) {
+                // recursively compute layout
                 component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
                 childXOffset += colWidths[colIndex] + _this.colPadding;
             });
@@ -988,6 +1019,9 @@ var Table = (function (_super) {
     };
 
     Table.calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
+        // If the row/col weight was explicitly set, then return it outright
+        // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
+        // then weight is 0, otherwise weight is 1
         return setWeights.map(function (w, i) {
             if (w != null) {
                 return w;
@@ -1015,6 +1049,7 @@ var Table = (function (_super) {
     };
 
     Table.prototype.render = function () {
+        // recursively render children
         this.rows.forEach(function (row, rowIndex) {
             row.forEach(function (component, colIndex) {
                 component.render();
@@ -1023,6 +1058,7 @@ var Table = (function (_super) {
         return this;
     };
 
+    /* Getters */
     Table.prototype.rowWeight = function (index, weight) {
         this.rowWeights[index] = weight;
         return this;
@@ -1093,10 +1129,15 @@ var Table = (function (_super) {
     Table.CSS_CLASS = "table";
     return Table;
 })(Component);
+///<reference path="reference.ts" />
 var ScaleDomainCoordinator = (function () {
     function ScaleDomainCoordinator(scales) {
         var _this = this;
         this.scales = scales;
+        /* This class is responsible for maintaining coordination between linked scales.
+        It registers event listeners for when one of its scales changes its domain. When the scale
+        does change its domain, it re-propogates the change to every linked scale.
+        */
         this.rescaleInProgress = false;
         this.scales.forEach(function (s) {
             return s.registerListener(function (sx) {
@@ -1117,12 +1158,13 @@ var ScaleDomainCoordinator = (function () {
     };
     return ScaleDomainCoordinator;
 })();
+///<reference path="reference.ts" />
 var Legend = (function (_super) {
     __extends(Legend, _super);
     function Legend(colorScale) {
         _super.call(this);
         this.classed(Legend.CSS_CLASS, true);
-        this.colMinimum(120);
+        this.colMinimum(120); // the default width
         this.colorScale = colorScale;
         this.xAlign("RIGHT").yAlign("TOP");
         this.xOffset(5).yOffset(5);
@@ -1142,6 +1184,7 @@ var Legend = (function (_super) {
     };
 
     Legend.prototype.measureTextHeight = function () {
+        // note: can't be called before anchoring atm
         var fakeLegendEl = this.element.append("g").classed(Legend.SUBELEMENT_CLASS, true);
         var textHeight = Utils.getTextHeight(fakeLegendEl.append("text"));
         fakeLegendEl.remove();
@@ -1154,7 +1197,7 @@ var Legend = (function (_super) {
         var textHeight = this.measureTextHeight();
         var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
 
-        this.element.selectAll("." + Legend.SUBELEMENT_CLASS).remove();
+        this.element.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
         var legend = this.element.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
         var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
             return "translate(0," + i * textHeight + ")";
@@ -1172,6 +1215,7 @@ var Legend = (function (_super) {
     Legend.MARGIN = 5;
     return Legend;
 })(Component);
+///<reference path="reference.ts" />
 var Axis = (function (_super) {
     __extends(Axis, _super);
     function Axis(scale, orientation, formatter) {
@@ -1209,7 +1253,7 @@ var Axis = (function (_super) {
 
     Axis.prototype.anchor = function (element) {
         _super.prototype.anchor.call(this, element);
-        this.axisElement = this.element.append("g").classed("axis", true);
+        this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
         return this;
     };
 
@@ -1239,6 +1283,7 @@ var Axis = (function (_super) {
             newDomain = standardOrder ? [new Date(min - extent), new Date(max + extent)] : [new Date(max + extent), new Date(min - extent)];
         }
 
+        // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
         if (this.scale.ticks != null) {
             var scale = this.scale;
             var nTicks = 10;
@@ -1262,10 +1307,25 @@ var Axis = (function (_super) {
 
     Axis.prototype.rescale = function () {
         return (this.element != null) ? this.render() : null;
+        // short circuit, we don't care about perf.
+        // var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
+        // var tickSelection = this.element.selectAll(".tick");
+        // (<any> tickSelection).call(tickTransform, this.scale.scale);
+        // this.axisElement.attr("transform","");
     };
 
     Axis.prototype.zoom = function (translatePair, scale) {
         return this.render();
+        // var translate = this.isXAligned ? translatePair[0] : translatePair[1];
+        // if (scale != null && scale !== this.cachedScale) {
+        //   this.cachedTranslate = translate;
+        //   this.cachedScale = scale;
+        //   this.rescale();
+        // } else {
+        //   translate -= this.cachedTranslate;
+        //   var transform = this.transformString(translate, scale);
+        //   this.axisElement.attr("transform", transform);
+        // }
     };
     Axis.CSS_CLASS = "axis";
     Axis.yWidth = 50;
@@ -1294,6 +1354,7 @@ var YAxis = (function (_super) {
     }
     return YAxis;
 })(Axis);
+///<reference path="reference.ts" />
 var ComponentGroup = (function (_super) {
     __extends(ComponentGroup, _super);
     function ComponentGroup(components) {

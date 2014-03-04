@@ -1,8 +1,14 @@
-/// <reference path="../typings/d3/d3.d.ts" />
-/// <reference path="../src/interfaces.d.ts" />
+/// <reference path="typings/d3/d3.d.ts" />
+/// <reference path="src/interfaces.d.ts" />
 declare module Utils {
     function inRange(x: number, a: number, b: number): boolean;
     function getBBox(element: D3.Selection): SVGRect;
+    /** Truncates a text string to a max length, given the element in which to draw the text
+    * @param {string} text: The string to put in the text element, and truncate
+    * @param {D3.Selection} element: The element in which to measure and place the text
+    * @param {number} length: How much space to truncate text into
+    * @returns {string} text - the shortened text
+    */
     function truncateTextToLength(text: string, length: number, element: D3.Selection): string;
     function getTextHeight(textElement: D3.Selection): number;
 }
