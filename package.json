@@ -7,6 +7,9 @@
     "url": "https://github.com/palantir/plottable.git"
   },
   "author": "Palantir Technologies",
+  "scripts": {
+    "test": "grunt test"
+  },
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-cli": "0.1.6",
