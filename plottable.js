@@ -58,8 +58,8 @@ var Component = (function () {
         this.registeredInteractions = [];
         this.boxes = [];
         this.clipPathEnabled = false;
-        this.rowWeightVal = 0;
-        this.colWeightVal = 0;
+        this.fixedWidthVal = true;
+        this.fixedHeightVal = true;
         this.rowMinimumVal = 0;
         this.colMinimumVal = 0;
         this.xOffsetVal = 0;
@@ -90,6 +90,63 @@ var Component = (function () {
         this.registeredInteractions.forEach(function (r) {
             return r.anchor(_this.hitBox);
         });
+        return this;
+    };
+
+    Component.prototype.computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+        var _this = this;
+        if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
+            if (this.element == null) {
+                throw new Error("anchor must be called before computeLayout");
+            } else if (this.element.node().nodeName === "svg") {
+                xOrigin = 0;
+                yOrigin = 0;
+                availableWidth = parseFloat(this.element.attr("width"));
+                availableHeight = parseFloat(this.element.attr("height"));
+            } else {
+                throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
+            }
+        }
+        this.xOrigin = xOrigin;
+        this.yOrigin = yOrigin;
+        var xPosition = this.xOrigin;
+        var yPosition = this.yOrigin;
+
+        if (this.colMinimum() !== 0 && this.isFixedWidth()) {
+            xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
+            xPosition += this.xOffsetVal;
+
+            availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
+        }
+
+        if (this.rowMinimum() !== 0 && this.isFixedHeight()) {
+            yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
+            yPosition += this.yOffsetVal;
+            availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
+        }
+
+        this.availableWidth = availableWidth;
+        this.availableHeight = availableHeight;
+        this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+        this.boxes.forEach(function (b) {
+            return b.attr("width", _this.availableWidth).attr("height", _this.availableHeight);
+        });
+        return this;
+    };
+
+    Component.prototype.render = function () {
+        return this;
+    };
+
+    Component.prototype.renderTo = function (element) {
+        if (this.element == null) {
+            this.anchor(element);
+        }
+        ;
+        if (this.element !== element) {
+            throw new Error("Can't renderTo a different element than was anchored to");
+        }
+        this.computeLayout().render();
         return this;
     };
 
@@ -126,51 +183,6 @@ var Component = (function () {
 
     Component.prototype.yOffset = function (offset) {
         this.yOffsetVal = offset;
-        return this;
-    };
-
-    Component.prototype.computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
-        var _this = this;
-        if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
-            if (this.element == null) {
-                throw new Error("anchor must be called before computeLayout");
-            } else if (this.element.node().nodeName === "svg") {
-                xOrigin = 0;
-                yOrigin = 0;
-                availableWidth = parseFloat(this.element.attr("width"));
-                availableHeight = parseFloat(this.element.attr("height"));
-            } else {
-                throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
-            }
-        }
-        this.xOrigin = xOrigin;
-        this.yOrigin = yOrigin;
-        var xPosition = this.xOrigin;
-        var yPosition = this.yOrigin;
-
-        if (this.colWeight() === 0 && this.colMinimum() !== 0) {
-            xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
-            xPosition += this.xOffsetVal;
-
-            availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
-        }
-
-        if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
-            yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-            yPosition += this.yOffsetVal;
-            availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
-        }
-
-        this.availableWidth = availableWidth;
-        this.availableHeight = availableHeight;
-        this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-        this.boxes.forEach(function (b) {
-            return b.attr("width", _this.availableWidth).attr("height", _this.availableHeight);
-        });
-        return this;
-    };
-
-    Component.prototype.render = function () {
         return this;
     };
 
@@ -227,24 +239,6 @@ var Component = (function () {
         }
     };
 
-    Component.prototype.rowWeight = function (newVal) {
-        if (newVal != null) {
-            this.rowWeightVal = newVal;
-            return this;
-        } else {
-            return this.rowWeightVal;
-        }
-    };
-
-    Component.prototype.colWeight = function (newVal) {
-        if (newVal != null) {
-            this.colWeightVal = newVal;
-            return this;
-        } else {
-            return this.colWeightVal;
-        }
-    };
-
     Component.prototype.rowMinimum = function (newVal) {
         if (newVal != null) {
             this.rowMinimumVal = newVal;
@@ -261,6 +255,14 @@ var Component = (function () {
         } else {
             return this.colMinimumVal;
         }
+    };
+
+    Component.prototype.isFixedWidth = function () {
+        return this.fixedWidthVal;
+    };
+
+    Component.prototype.isFixedHeight = function () {
+        return this.fixedHeightVal;
     };
     Component.clipPathId = 0;
     return Component;
@@ -569,6 +571,11 @@ var Label = (function (_super) {
         this.setText(text);
         if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
             this.orientation = orientation;
+            if (orientation === "horizontal") {
+                this.fixedWidthVal = false;
+            } else {
+                this.fixedHeightVal = false;
+            }
         } else {
             throw new Error(orientation + " is not a valid orientation for LabelComponent");
         }
@@ -664,9 +671,9 @@ var Renderer = (function (_super) {
     function Renderer(dataset) {
         if (typeof dataset === "undefined") { dataset = { seriesName: "", data: [] }; }
         _super.call(this);
-        _super.prototype.rowWeight.call(this, 1);
-        _super.prototype.colWeight.call(this, 1);
         this.clipPathEnabled = true;
+        this.fixedWidthVal = false;
+        this.fixedHeightVal = false;
 
         this.dataset = dataset;
         this.classed(Renderer.CSS_CLASS, true);
@@ -879,8 +886,6 @@ var Table = (function (_super) {
         _super.call(this);
         this.rowPadding = 0;
         this.colPadding = 0;
-        this.guessRowWeight = true;
-        this.guessColWeight = true;
         this.classed(Table.CSS_CLASS, true);
         var cleanOutNulls = function (c) {
             return c == null ? new Component() : c;
@@ -889,7 +894,12 @@ var Table = (function (_super) {
             return row.map(cleanOutNulls);
         });
         this.rows = rows;
-        this.cols = d3.transpose(this.rows);
+        this.rowWeights = this.rows.map(function () {
+            return null;
+        });
+        this.colWeights = d3.transpose(this.rows).map(function () {
+            return null;
+        });
     }
     Table.prototype.addComponent = function (row, col, component) {
         if (this.element != null) {
@@ -904,7 +914,6 @@ var Table = (function (_super) {
         }
 
         this.rows[row][col] = component;
-        this.cols = d3.transpose(this.rows);
         return this;
     };
 
@@ -912,11 +921,17 @@ var Table = (function (_super) {
         for (var i = 0; i < nRows; i++) {
             if (this.rows[i] === undefined) {
                 this.rows[i] = [];
+                this.rowWeights[i] = null;
             }
             for (var j = 0; j < nCols; j++) {
                 if (this.rows[i][j] === undefined) {
                     this.rows[i][j] = new Component();
                 }
+            }
+        }
+        for (j = 0; j < nCols; j++) {
+            if (this.colWeights[j] === undefined) {
+                this.colWeights[j] = null;
             }
         }
     };
@@ -943,8 +958,16 @@ var Table = (function (_super) {
             throw new Error("Insufficient Space");
         }
 
-        var rowProportionalSpace = Table.rowProportionalSpace(this.rows, freeHeight);
-        var colProportionalSpace = Table.colProportionalSpace(this.cols, freeWidth);
+        var cols = d3.transpose(this.rows);
+        var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, function (c) {
+            return c.isFixedHeight();
+        });
+        var colWeights = Table.calcComponentWeights(this.colWeights, cols, function (c) {
+            return c.isFixedWidth();
+        });
+
+        var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
+        var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
 
         var sumPair = function (p) {
             return p[0] + p[1];
@@ -964,23 +987,23 @@ var Table = (function (_super) {
         return this;
     };
 
-    Table.rowProportionalSpace = function (rows, freeHeight) {
-        return Table.calculateProportionalSpace(rows, freeHeight, function (c) {
-            return c.rowWeight();
+    Table.calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
+        return setWeights.map(function (w, i) {
+            if (w != null) {
+                return w;
+            }
+            var fixities = componentGroups[i].map(fixityAccessor);
+            var allFixed = fixities.reduce(function (a, b) {
+                return a && b;
+            });
+            return allFixed ? 0 : 1;
         });
     };
-    Table.colProportionalSpace = function (cols, freeWidth) {
-        return Table.calculateProportionalSpace(cols, freeWidth, function (c) {
-            return c.colWeight();
-        });
-    };
-    Table.calculateProportionalSpace = function (componentGroups, freeSpace, spaceAccessor) {
-        var weights = componentGroups.map(function (group) {
-            return d3.max(group, spaceAccessor);
-        });
+
+    Table.calcProportionalSpace = function (weights, freeSpace) {
         var weightSum = d3.sum(weights);
         if (weightSum === 0) {
-            var numGroups = componentGroups.length;
+            var numGroups = weights.length;
             return weights.map(function (w) {
                 return freeSpace / numGroups;
             });
@@ -1000,38 +1023,14 @@ var Table = (function (_super) {
         return this;
     };
 
-    Table.prototype.rowWeight = function (newVal) {
-        if (newVal != null || !this.guessRowWeight) {
-            this.guessRowWeight = false;
-            return _super.prototype.rowWeight.call(this, newVal);
-        } else {
-            var componentWeights = this.rows.map(function (r) {
-                return r.map(function (c) {
-                    return c.rowWeight();
-                });
-            });
-            var biggestWeight = d3.max(componentWeights.map(function (ws) {
-                return d3.max(ws);
-            }));
-            return biggestWeight > 0 ? 1 : 0;
-        }
+    Table.prototype.rowWeight = function (index, weight) {
+        this.rowWeights[index] = weight;
+        return this;
     };
 
-    Table.prototype.colWeight = function (newVal) {
-        if (newVal != null || !this.guessColWeight) {
-            this.guessColWeight = false;
-            return _super.prototype.colWeight.call(this, newVal);
-        } else {
-            var componentWeights = this.rows.map(function (r) {
-                return r.map(function (c) {
-                    return c.colWeight();
-                });
-            });
-            var biggestWeight = d3.max(componentWeights.map(function (ws) {
-                return d3.max(ws);
-            }));
-            return biggestWeight > 0 ? 1 : 0;
-        }
+    Table.prototype.colWeight = function (index, weight) {
+        this.colWeights[index] = weight;
+        return this;
     };
 
     Table.prototype.rowMinimum = function (newVal) {
@@ -1051,12 +1050,13 @@ var Table = (function (_super) {
         if (newVal != null) {
             throw new Error("Col minimum cannot be directly set on Table");
         } else {
-            this.colMinimums = this.cols.map(function (col) {
+            var cols = d3.transpose(this.rows);
+            this.colMinimums = cols.map(function (col) {
                 return d3.max(col, function (r) {
                     return r.colMinimum();
                 });
             });
-            return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);
+            return d3.sum(this.colMinimums) + this.colPadding * (cols.length - 1);
         }
     };
 
@@ -1064,6 +1064,31 @@ var Table = (function (_super) {
         this.rowPadding = rowPadding;
         this.colPadding = colPadding;
         return this;
+    };
+
+    Table.fixedSpace = function (componentGroup, fixityAccessor) {
+        var all = function (bools) {
+            return bools.reduce(function (a, b) {
+                return a && b;
+            });
+        };
+        var groupIsFixed = function (components) {
+            return all(components.map(fixityAccessor));
+        };
+        return all(componentGroup.map(groupIsFixed));
+    };
+
+    Table.prototype.isFixedWidth = function () {
+        var cols = d3.transpose(this.rows);
+        return Table.fixedSpace(cols, function (c) {
+            return c.isFixedWidth();
+        });
+    };
+
+    Table.prototype.isFixedHeight = function () {
+        return Table.fixedSpace(this.rows, function (c) {
+            return c.isFixedHeight();
+        });
     };
     Table.CSS_CLASS = "table";
     return Table;
@@ -1254,6 +1279,7 @@ var XAxis = (function (_super) {
         if (typeof formatter === "undefined") { formatter = null; }
         _super.call(this, scale, orientation, formatter);
         _super.prototype.rowMinimum.call(this, Axis.xHeight);
+        this.fixedWidthVal = false;
     }
     return XAxis;
 })(Axis);
@@ -1264,6 +1290,7 @@ var YAxis = (function (_super) {
         if (typeof formatter === "undefined") { formatter = null; }
         _super.call(this, scale, orientation, formatter);
         _super.prototype.colMinimum.call(this, Axis.yWidth);
+        this.fixedHeightVal = false;
     }
     return YAxis;
 })(Axis);
