@@ -10,13 +10,13 @@ module SparklineDemo {
   var xSpark = new LinearScale();
   var ySpark = new LinearScale();
   var sparkline = new LineRenderer(data, xSpark, ySpark);
-  sparkline.rowWeight(0.3);
 
   var r1: Component[] = [left, renderer];
   var r2: Component[] = [null, bottomAxis];
   var r3: Component[] = [null, sparkline];
 
   var chart = new Table([r1, r2, r3]);
+  chart.rowWeight(2, 0.25);
 
   var zoomCallback = new ZoomCallbackGenerator()
                       .addXScale(xSpark, xScale)

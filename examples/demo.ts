@@ -92,12 +92,12 @@ module Demo {
     var xScaleSpark = new LinearScale();
     var yScaleSpark = new LinearScale();
     var sparkline = new LineRenderer(data2, xScaleSpark, yScaleSpark);
-    sparkline.rowWeight(0.25);
     var row4 = [null, sparkline, null];
     var zoomCallback = new ZoomCallbackGenerator().addXScale(xScaleSpark, xScale1).addYScale(yScaleSpark, yScale2).getCallback();
 
     var zoomInteraction = new AreaInteraction(sparkline).callback(zoomCallback);
     var multiChart = new Table([row1, row2, row3, row4]);
+    multiChart.rowWeight(3, 0.25);
     return multiChart;
   }
 

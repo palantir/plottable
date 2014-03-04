@@ -6,20 +6,12 @@ class Table extends Component {
   private colPadding = 0;
 
   private rows: Component[][];
-  private cols: Component[][];
-  private nRows: number;
-  private nCols: number;
   private rowMinimums: number[];
   private colMinimums: number[];
 
   private rowWeights: number[];
   private colWeights: number[];
 
-  private rowWeightSum: number;
-  private colWeightSum: number;
-
-  private guessRowWeight = true;
-  private guessColWeight = true;
 
   constructor(rows: Component[][] = []) {
     super();
@@ -27,7 +19,8 @@ class Table extends Component {
     var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
     rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
     this.rows = rows;
-    this.cols = d3.transpose(this.rows);
+    this.rowWeights = this.rows.map(() => null);
+    this.colWeights = d3.transpose(this.rows).map(() => null);
   }
 
   public addComponent(row: number, col: number, component: Component): Table {
@@ -44,7 +37,6 @@ class Table extends Component {
     }
 
     this.rows[row][col] = component;
-    this.cols = d3.transpose(this.rows);
     return this;
   }
 
@@ -52,11 +44,17 @@ class Table extends Component {
     for (var i=0; i<nRows; i++) {
       if (this.rows[i] === undefined) {
         this.rows[i] = [];
+        this.rowWeights[i] = null;
       }
       for (var j=0; j<nCols; j++) {
         if (this.rows[i][j] === undefined) {
           this.rows[i][j] = new Component();
         }
+      }
+    }
+    for (j=0; j<nCols; j++) {
+      if (this.colWeights[j] === undefined) {
+        this.colWeights[j] = null;
       }
     }
   }
@@ -82,9 +80,12 @@ class Table extends Component {
       throw new Error("Insufficient Space");
     }
 
+    var cols = d3.transpose(this.rows);
+    var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => c.isFixedHeight());
+    var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => c.isFixedWidth());
     // distribute remaining height to rows
-    var rowProportionalSpace = Table.rowProportionalSpace(this.rows, freeHeight);
-    var colProportionalSpace = Table.colProportionalSpace(this.cols, freeWidth);
+    var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
+    var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
 
     var sumPair = (p: number[]) => p[0] + p[1];
     var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
@@ -103,17 +104,26 @@ class Table extends Component {
     return this;
   }
 
-  private static rowProportionalSpace(rows: Component[][], freeHeight: number) {
-    return Table.calculateProportionalSpace(rows, freeHeight, (c: Component) => c.rowWeight());
+  private static calcComponentWeights(setWeights: number[],
+                                      componentGroups: Component[][],
+                                      fixityAccessor: (c: Component) => boolean) {
+    // If the row/col weight was explicitly set, then return it outright
+    // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
+    // then weight is 0, otherwise weight is 1
+    return setWeights.map((w, i) => {
+      if (w != null) {
+        return w;
+      }
+      var fixities = componentGroups[i].map(fixityAccessor);
+      var allFixed = fixities.reduce((a, b) => a && b);
+      return allFixed ? 0 : 1;
+    });
   }
-  private static colProportionalSpace(cols: Component[][], freeWidth: number) {
-    return Table.calculateProportionalSpace(cols, freeWidth, (c: Component) => c.colWeight());
-  }
-  private static calculateProportionalSpace(componentGroups: Component[][], freeSpace: number, spaceAccessor: (c: Component) => number) {
-    var weights = componentGroups.map((group) => d3.max(group, spaceAccessor));
+
+  private static calcProportionalSpace(weights: number[], freeSpace: number): number[] {
     var weightSum = d3.sum(weights);
     if (weightSum === 0) {
-      var numGroups = componentGroups.length;
+      var numGroups = weights.length;
       return weights.map((w) => freeSpace / numGroups);
     } else {
       return weights.map((w) => freeSpace * w / weightSum);
@@ -132,30 +142,14 @@ class Table extends Component {
 
   /* Getters */
 
-  public rowWeight(): number;
-  public rowWeight(newVal: number): Table;
-  public rowWeight(newVal?: number): any {
-    if (newVal != null || !this.guessRowWeight) {
-      this.guessRowWeight = false;
-      return super.rowWeight(newVal);
-    } else {
-      var componentWeights: number[][] = this.rows.map((r) => r.map((c) => c.rowWeight()));
-      var biggestWeight = d3.max(componentWeights.map((ws) => d3.max(ws)));
-      return biggestWeight > 0 ? 1 : 0;
-    }
+  public rowWeight(index: number, weight: number) {
+    this.rowWeights[index] = weight;
+    return this;
   }
 
-  public colWeight(): number;
-  public colWeight(newVal: number): Table;
-  public colWeight(newVal?: number): any {
-    if (newVal != null || !this.guessColWeight) {
-      this.guessColWeight = false;
-      return super.colWeight(newVal);
-    } else {
-      var componentWeights: number[][] = this.rows.map((r) => r.map((c) => c.colWeight()));
-      var biggestWeight = d3.max(componentWeights.map((ws) => d3.max(ws)));
-      return biggestWeight > 0 ? 1 : 0;
-    }
+  public colWeight(index: number, weight: number) {
+    this.colWeights[index] = weight;
+    return this;
   }
 
   public rowMinimum(): number;
@@ -175,8 +169,9 @@ class Table extends Component {
     if (newVal != null) {
       throw new Error("Col minimum cannot be directly set on Table");
     } else {
-      this.colMinimums = this.cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
-      return d3.sum(this.colMinimums) + this.colPadding * (this.cols.length - 1);
+      var cols = d3.transpose(this.rows);
+      this.colMinimums = cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
+      return d3.sum(this.colMinimums) + this.colPadding * (cols.length - 1);
     }
   }
 
@@ -184,5 +179,20 @@ class Table extends Component {
     this.rowPadding = rowPadding;
     this.colPadding = colPadding;
     return this;
+  }
+
+  private static fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
+    var all = (bools: boolean[]) => bools.reduce((a, b) => a && b);
+    var groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
+    return all(componentGroup.map(groupIsFixed));
+  }
+
+  public isFixedWidth(): boolean {
+    var cols = d3.transpose(this.rows);
+    return Table.fixedSpace(cols, (c: Component) => c.isFixedWidth());
+  }
+
+  public isFixedHeight(): boolean {
+    return Table.fixedSpace(this.rows, (c: Component) => c.isFixedHeight());
   }
 }

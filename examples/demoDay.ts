@@ -15,11 +15,11 @@ module DemoDay {
     s.xSpark = new LinearScale();
     s.ySpark = new LinearScale();
     s.sparkline = new CircleRenderer(data, s.xSpark, s.ySpark, null, null, 0.5);
-    s.sparkline.rowWeight(0.25);
     var r1 = [leftAxisTable, s.renderer];
     var r2 = [null, xAxisTable];
     var r3 = [null, s.sparkline];
     s.table = new Table([r1,r2,r3]);
+    s.table.rowWeight(2, 0.25);
     return s;
   }
 

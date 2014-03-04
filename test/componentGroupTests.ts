@@ -5,8 +5,8 @@ var assert = chai.assert;
 describe("ComponentGroups", () => {
   it("components in componentGroups overlap", () => {
     var c1 = new Component().rowMinimum(10).colMinimum(10);
-    var c2 = new Component().rowWeight(1).colWeight(1);
-    var c3 = new Component().rowWeight(3).colWeight(3);
+    var c2 = new Component();
+    var c3 = new Component();
 
     var cg = new ComponentGroup([c1, c2, c3]);
     var svg = generateSVG(400, 400);
@@ -26,7 +26,7 @@ describe("ComponentGroups", () => {
   it("components can be added before and after anchoring", () => {
     var c1 = new Component().rowMinimum(10).colMinimum(10);
     var c2 = new Component().rowMinimum(20).colMinimum(20);
-    var c3 = new Component().rowWeight(3).colWeight(3);
+    var c3 = new Component();
 
     var cg = new ComponentGroup([c1]);
     var svg = generateSVG(400, 400);

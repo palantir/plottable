@@ -19,8 +19,6 @@ describe("Labels", () => {
     var text = element.select("text");
     var bbox = Utils.getBBox(text);
     assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
-    assert.equal(0, label.colWeight(), "label.colWeight is 0");
-    assert.equal(0, label.rowWeight(), "label.rowWeight is 0");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
   });
