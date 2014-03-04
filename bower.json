@@ -1,5 +1,5 @@
 {
-  "name": "plottable.js",
+  "name": "plottablejs",
   "version": "0.2.0",
   "dependencies": {
     "d3": "3.4.1"
