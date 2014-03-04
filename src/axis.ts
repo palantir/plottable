@@ -117,6 +117,7 @@ class XAxis extends Axis {
   constructor(scale: Scale, orientation: string, formatter: any = null) {
     super(scale, orientation, formatter);
     super.rowMinimum(Axis.xHeight);
+    this.fixedWidthVal = false;
   }
 }
 
@@ -124,5 +125,6 @@ class YAxis extends Axis {
   constructor(scale: Scale, orientation: string, formatter: any = null) {
     super(scale, orientation, formatter);
     super.colMinimum(Axis.yWidth);
+    this.fixedHeightVal = false;
   }
 }

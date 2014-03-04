@@ -8,8 +8,8 @@ class Component {
   private boxes: D3.Selection[] = [];
   public clipPathEnabled = false;
 
-  private rowWeightVal  = 0;
-  private colWeightVal  = 0;
+  public fixedWidthVal = true;
+  public fixedHeightVal = true;
   private rowMinimumVal = 0;
   private colMinimumVal = 0;
 
@@ -22,9 +22,7 @@ class Component {
   public xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
   public yAlignProportion = 0;
 
-
   private cssClasses: string[] = ["component"];
-
 
   public anchor(element: D3.Selection) {
     if (element.node().childNodes.length > 0) {
@@ -42,6 +40,62 @@ class Component {
 
     this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
     this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
+    return this;
+  }
+
+  public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
+    if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
+      if (this.element == null) {
+        throw new Error("anchor must be called before computeLayout");
+      } else if (this.element.node().nodeName === "svg") {
+        // we are the root node, let's guess width and height for convenience
+        xOrigin = 0;
+        yOrigin = 0;
+        availableWidth  = parseFloat(this.element.attr("width" ));
+        availableHeight = parseFloat(this.element.attr("height"));
+      } else {
+        throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
+      }
+    }
+    this.xOrigin = xOrigin;
+    this.yOrigin = yOrigin;
+    var xPosition = this.xOrigin;
+    var yPosition = this.yOrigin;
+
+    if (this.colMinimum() !== 0 && this.isFixedWidth()) {
+      // The component has free space, so it makes sense to think about how to position or offset it
+      xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
+      xPosition += this.xOffsetVal;
+      // Decrease size so hitbox / bounding box and children are sized correctly
+      availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
+    }
+
+    if (this.rowMinimum() !== 0 && this.isFixedHeight()) {
+      yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
+      yPosition += this.yOffsetVal;
+      availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
+    }
+
+    this.availableWidth  = availableWidth;
+    this.availableHeight = availableHeight;
+    this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
+    this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
+    return this;
+  }
+
+  public render() {
+    return this;
+  }
+
+  public renderTo(element: D3.Selection): Component {
+    // When called on top-level-component, a shortcut for component.anchor(svg).computeLayout().render()
+    if (this.element == null) {
+      this.anchor(element);
+    };
+    if (this.element !== element) {
+      throw new Error("Can't renderTo a different element than was anchored to");
+    }
+    this.computeLayout().render();
     return this;
   }
 
@@ -78,50 +132,6 @@ class Component {
 
   public yOffset(offset: number): Component {
     this.yOffsetVal = offset;
-    return this;
-  }
-
-  public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
-    if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
-      if (this.element == null) {
-        throw new Error("anchor must be called before computeLayout");
-      } else if (this.element.node().nodeName === "svg") {
-        // we are the root node, let's guess width and height for convenience
-        xOrigin = 0;
-        yOrigin = 0;
-        availableWidth  = parseFloat(this.element.attr("width" ));
-        availableHeight = parseFloat(this.element.attr("height"));
-      } else {
-        throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
-      }
-    }
-    this.xOrigin = xOrigin;
-    this.yOrigin = yOrigin;
-    var xPosition = this.xOrigin;
-    var yPosition = this.yOrigin;
-
-    if (this.colWeight() === 0 && this.colMinimum() !== 0) {
-      // The component has free space, so it makes sense to think about how to position or offset it
-      xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
-      xPosition += this.xOffsetVal;
-      // Decrease size so hitbox / bounding box and children are sized correctly
-      availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
-    }
-
-    if (this.rowWeight() === 0 && this.rowMinimum() !== 0) {
-      yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-      yPosition += this.yOffsetVal;
-      availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
-    }
-
-    this.availableWidth  = availableWidth;
-    this.availableHeight = availableHeight;
-    this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-    this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
-    return this;
-  }
-
-  public render() {
     return this;
   }
 
@@ -182,28 +192,6 @@ class Component {
     }
   }
 
-  public rowWeight(): number;
-  public rowWeight(newVal: number): Component;
-  public rowWeight(newVal?: number): any {
-    if (newVal != null) {
-      this.rowWeightVal = newVal;
-      return this;
-    } else {
-      return this.rowWeightVal;
-    }
-  }
-
-  public colWeight(): number;
-  public colWeight(newVal: number): Component;
-  public colWeight(newVal?: number): any {
-    if (newVal != null) {
-      this.colWeightVal = newVal;
-      return this;
-    } else {
-      return this.colWeightVal;
-    }
-  }
-
   public rowMinimum(): number;
   public rowMinimum(newVal: number): Component;
   public rowMinimum(newVal?: number): any {
@@ -224,5 +212,13 @@ class Component {
     } else {
       return this.colMinimumVal;
     }
+  }
+
+  public isFixedWidth(): boolean {
+    return this.fixedWidthVal;
+  }
+
+  public isFixedHeight(): boolean {
+    return this.fixedHeightVal;
   }
 }

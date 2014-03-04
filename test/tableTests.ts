@@ -10,7 +10,7 @@ function generateBasicTable(nRows, nCols) {
   var components: Component[] = [];
   for(var i=0; i<nRows; i++) {
     for(var j=0; j<nCols; j++) {
-      var r = new Component().rowWeight(1).colWeight(1);
+      var r = new Component();
       table.addComponent(i, j, r);
       components.push(r);
     }
@@ -95,9 +95,14 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
+    // force the components to have non-fixed layout; eg. as if they were renderers
+    components.forEach((c) => {
+      c.fixedWidthVal = false;
+      c.fixedHeightVal = false;
+    });
 
     var svg = generateSVG();
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
@@ -117,11 +122,16 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
+    // force the components to have non-fixed layout; eg. as if they were renderers
+    components.forEach((c) => {
+      c.fixedWidthVal = false;
+      c.fixedHeightVal = false;
+    });
 
     table.padding(5,5);
 
     var svg = generateSVG(415, 415);
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
@@ -146,16 +156,17 @@ describe("Tables", () => {
     // [3 4 5] \\
     // [6 7 8] \\
     // First, set everything to have no weight
-    components.forEach((r) => r.colWeight(0).rowWeight(0).colMinimum(0).rowMinimum(0));
+    components.forEach((r) => r.colMinimum(0).rowMinimum(0));
     // give the axis-like objects a minimum
     components[1].rowMinimum(30);
     components[7].rowMinimum(30);
     components[3].colMinimum(50);
     components[5].colMinimum(50);
+    components[4].fixedWidthVal = false;
+    components[4].fixedHeightVal = false;
     // finally the center 'plot' object has a weight
-    components[4].rowWeight(1).colWeight(1);
 
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
@@ -181,20 +192,18 @@ describe("Tables", () => {
     assert.throws(() => table.colMinimum(3), Error, "cannot be directly set");
   });
 
-  it("tables guess weights intelligently", () => {
-    var c1 = new Component().rowWeight(0).colWeight(0);
-    var c2 = new Component().rowWeight(0).colWeight(0);
-    var table = new Table().addComponent(0, 0, c1).addComponent(1, 0, c2);
-    assert.equal(table.rowWeight(), 0, "the first table guessed 0 for rowWeight");
-    assert.equal(table.colWeight(), 0, "the first table guessed 0 for rowWeight");
-
-    c1.rowWeight(0);
-    c2.rowWeight(3);
-
-    assert.equal(table.rowWeight(), 1, "the table now guesses 1 for rowWeight");
-    assert.equal(table.colWeight(), 0, "the table still guesses 0 for colWeight");
-
-    assert.equal(table.rowWeight(2), table, "rowWeight returned the table");
-    assert.equal(table.rowWeight(), 2, "the rowWeight was overridden explicitly");
+  it("table space fixity calculates properly", () => {
+    var tableAndcomponents = generateBasicTable(3,3);
+    var table = tableAndcomponents.table;
+    var components = tableAndcomponents.components;
+    assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
+    assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+    components[0].fixedWidthVal = false;
+    assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
+    assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+    components[8].fixedHeightVal = false;
+    components[0].fixedWidthVal = true;
+    assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
+    assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
 });
