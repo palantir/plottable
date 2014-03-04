@@ -62,7 +62,7 @@ class Component {
     var xPosition = this.xOrigin;
     var yPosition = this.yOrigin;
 
-    if (this.colMinimum() !== 0 && this.fixedWidthVal) {
+    if (this.colMinimum() !== 0 && this.fixedWidth()) {
       // The component has free space, so it makes sense to think about how to position or offset it
       xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
       xPosition += this.xOffsetVal;
@@ -70,7 +70,7 @@ class Component {
       availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
     }
 
-    if (this.rowMinimum() !== 0 && this.fixedHeightVal) {
+    if (this.rowMinimum() !== 0 && this.fixedHeight()) {
       yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
       yPosition += this.yOffsetVal;
       availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;

@@ -95,6 +95,11 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
+    // force the components to have non-fixed layout; eg. as if they were renderers
+    components.forEach((c) => {
+      c.fixedWidthVal = false;
+      c.fixedHeightVal = false;
+    });
 
     var svg = generateSVG();
     table.renderTo(svg);
@@ -117,6 +122,11 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
+    // force the components to have non-fixed layout; eg. as if they were renderers
+    components.forEach((c) => {
+      c.fixedWidthVal = false;
+      c.fixedHeightVal = false;
+    });
 
     table.padding(5,5);
 

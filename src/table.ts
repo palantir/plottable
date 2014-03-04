@@ -21,8 +21,6 @@ class Table extends Component {
     this.rows = rows;
     this.rowWeights = this.rows.map(() => null);
     this.colWeights = d3.transpose(this.rows).map(() => null);
-    this.fixedWidthVal = false;
-    this.fixedHeightVal = false;
   }
 
   public addComponent(row: number, col: number, component: Component): Table {
