@@ -24,6 +24,11 @@ class Component {
 
   private cssClasses: string[] = ["component"];
 
+  /**
+   * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+   * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
+   * @returns {Component} The calling component.
+   */
   public anchor(element: D3.Selection) {
     if (element.node().childNodes.length > 0) {
       throw new Error("Can't anchor to a non-empty element");
@@ -43,6 +48,16 @@ class Component {
     return this;
   }
 
+  /**
+   * Computes the size, position, and alignment from the specified values.
+   * If no parameters are supplied and the component is a root node,
+   * they are inferred from the size of the component's element.
+   * @param {number} xOrigin
+   * @param {number} yOrigin
+   * @param {number} availableWidth
+   * @param {number} availableHeight
+   * @returns {Component} The calling Component.
+   */
   public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
     if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
       if (this.element == null) {
@@ -83,6 +98,10 @@ class Component {
     return this;
   }
 
+  /**
+   * Renders the component.
+   * @returns {Component} The calling Component.
+   */
   public render() {
     return this;
   }
@@ -98,7 +117,11 @@ class Component {
     this.computeLayout().render();
     return this;
   }
-
+  /**
+   * Sets the x alignment of the Component.
+   * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
+   * @returns {Component} The calling Component.
+   */
   public xAlign(alignment: string): Component {
     if (alignment === "LEFT") {
       this.xAlignProportion = 0;
@@ -112,6 +135,11 @@ class Component {
     return this;
   }
 
+  /**
+   * Sets the y alignment of the Component.
+   * @param {string} alignment The y alignment of the Component (one of TOP/CENTER/BOTTOM).
+   * @returns {Component} The calling Component.
+   */
   public yAlign(alignment: string): Component {
     if (alignment === "TOP") {
       this.yAlignProportion = 0;
@@ -125,11 +153,21 @@ class Component {
     return this;
   }
 
+  /**
+   * Sets the x offset of the Component.
+   * @param {number} offset The desired x offset, in pixels.
+   * @returns {Component} The calling Component.
+   */
   public xOffset(offset: number): Component {
     this.xOffsetVal = offset;
     return this;
   }
 
+  /**
+   * Sets the y offset of the Component.
+   * @param {number} offset The desired y offset, in pixels.
+   * @returns {Component} The calling Component.
+   */
   public yOffset(offset: number): Component {
     this.yOffsetVal = offset;
     return this;
@@ -149,7 +187,7 @@ class Component {
     return box;
   }
 
-  public generateClipPath() {
+  private generateClipPath() {
     // The clip path will prevent content from overflowing its component space.
     var clipPathId = Component.clipPathId++;
     this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
@@ -158,6 +196,11 @@ class Component {
     this.addBox("clip-rect", clipPathParent);
   }
 
+  /**
+   * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
+   * @param {Interaction} interaction The Interaction to attach to the Component.
+   * @return {Component} The calling Component.
+   */
   public registerInteraction(interaction: Interaction) {
     // Interactions can be registered before or after anchoring. If registered before, they are
     // pushed to this.registeredInteractions and registered during anchoring. If after, they are
@@ -166,8 +209,15 @@ class Component {
     if (this.element != null) {
       interaction.anchor(this.hitBox);
     }
+    return this;
   }
 
+  /**
+   * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+   * @param {string} cssClass The CSS class to add/remove/check for.
+   * @param {boolean} [addClass] Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
+   * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+   */
   public classed(cssClass: string): boolean;
   public classed(cssClass: string, addClass: boolean): Component;
   public classed(cssClass: string, addClass?:boolean): any {
@@ -192,6 +242,11 @@ class Component {
     }
   }
 
+  /**
+   * Sets or retrieves the Component's minimum height.
+   * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
+   * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
+   */
   public rowMinimum(): number;
   public rowMinimum(newVal: number): Component;
   public rowMinimum(newVal?: number): any {
@@ -203,6 +258,11 @@ class Component {
     }
   }
 
+  /**
+   * Sets or retrieves the Component's minimum width.
+   * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
+   * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
+   */
   public colMinimum(): number;
   public colMinimum(newVal: number): Component;
   public colMinimum(newVal?: number): any {

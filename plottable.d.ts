@@ -32,21 +32,81 @@ declare class Component {
     public xAlignProportion: number;
     public yAlignProportion: number;
     private cssClasses;
+    /**
+    * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+    * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
+    * @returns {Component} The calling component.
+    */
     public anchor(element: D3.Selection): Component;
+    /**
+    * Computes the size, position, and alignment from the specified values.
+    * If no parameters are supplied and the component is a root node,
+    * they are inferred from the size of the component's element.
+    * @param {number} xOrigin
+    * @param {number} yOrigin
+    * @param {number} availableWidth
+    * @param {number} availableHeight
+    * @returns {Component} The calling Component.
+    */
     public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Component;
+    /**
+    * Renders the component.
+    * @returns {Component} The calling Component.
+    */
     public render(): Component;
     public renderTo(element: D3.Selection): Component;
+    /**
+    * Sets the x alignment of the Component.
+    * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
+    * @returns {Component} The calling Component.
+    */
     public xAlign(alignment: string): Component;
+    /**
+    * Sets the y alignment of the Component.
+    * @param {string} alignment The y alignment of the Component (one of TOP/CENTER/BOTTOM).
+    * @returns {Component} The calling Component.
+    */
     public yAlign(alignment: string): Component;
+    /**
+    * Sets the x offset of the Component.
+    * @param {number} offset The desired x offset, in pixels.
+    * @returns {Component} The calling Component.
+    */
     public xOffset(offset: number): Component;
+    /**
+    * Sets the y offset of the Component.
+    * @param {number} offset The desired y offset, in pixels.
+    * @returns {Component} The calling Component.
+    */
     public yOffset(offset: number): Component;
     private addBox(className?, parentElement?);
-    public generateClipPath(): void;
-    public registerInteraction(interaction: Interaction): void;
+    private generateClipPath();
+    /**
+    * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
+    * @param {Interaction} interaction The Interaction to attach to the Component.
+    * @return {Component} The calling Component.
+    */
+    public registerInteraction(interaction: Interaction): Component;
+    /**
+    * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+    * @param {string} cssClass The CSS class to add/remove/check for.
+    * @param {boolean} [addClass] Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
+    * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+    */
     public classed(cssClass: string): boolean;
     public classed(cssClass: string, addClass: boolean): Component;
+    /**
+    * Sets or retrieves the Component's minimum height.
+    * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
+    * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
+    */
     public rowMinimum(): number;
     public rowMinimum(newVal: number): Component;
+    /**
+    * Sets or retrieves the Component's minimum width.
+    * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
+    * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
+    */
     public colMinimum(): number;
     public colMinimum(newVal: number): Component;
     public isFixedWidth(): boolean;
@@ -55,29 +115,90 @@ declare class Component {
 declare class Scale implements IBroadcaster {
     public scale: D3.Scale.Scale;
     private broadcasterCallbacks;
+    /**
+    * Creates a new Scale.
+    * @constructor
+    * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
+    */
     constructor(scale: D3.Scale.Scale);
-    public public(value: any): any;
+    /**
+    * Retrieves the current domain, or sets the Scale's domain to the specified values.
+    * @param {any[]} [values] The new value for the domain.
+    * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+    */
     public domain(): any[];
     public domain(values: any[]): Scale;
+    /**
+    * Retrieves the current range, or sets the Scale's range to the specified values.
+    * @param {any[]} [values] The new value for the range.
+    * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
+    */
     public range(): any[];
     public range(values: any[]): Scale;
+    /**
+    * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+    * @returns {Scale} A copy of the calling Scale.
+    */
     public copy(): Scale;
+    /**
+    * Registers a callback to be called when the scale's domain is changed.
+    * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
+    * @returns {Scale} The Calling Scale.
+    */
     public registerListener(callback: IBroadcasterCallback): Scale;
 }
 declare class QuantitiveScale extends Scale {
     public scale: D3.Scale.QuantitiveScale;
+    /**
+    * Creates a new QuantitiveScale.
+    * @constructor
+    * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
+    */
     constructor(scale: D3.Scale.QuantitiveScale);
+    /**
+    * Retrieves the domain value corresponding to a supplied range value.
+    * @param {number} value: A value from the Scale's range.
+    * @returns {number} The domain value corresponding to the supplied range value.
+    */
     public invert(value: number): number;
+    /**
+    * Generates tick values.
+    * @param {number} count The number of ticks to generate.
+    * @returns {any[]} The generated ticks.
+    */
     public ticks(count: number): any[];
+    /**
+    * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
+    * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
+    */
     public copy(): QuantitiveScale;
+    /**
+    * Expands the QuantitiveScale's domain to cover the new region.
+    * @param {number} newDomain The additional domain to be covered by the QuantitiveScale.
+    * @returns {QuantitiveScale} The scale.
+    */
     public widenDomain(newDomain: number[]): QuantitiveScale;
 }
 declare class LinearScale extends QuantitiveScale {
+    /**
+    * Creates a new LinearScale.
+    * @constructor
+    * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the LinearScale. If not supplied, uses a default scale.
+    */
     constructor();
     constructor(scale: D3.Scale.LinearScale);
+    /**
+    * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
+    * @returns {LinearScale} A copy of the calling LinearScale.
+    */
     public copy(): LinearScale;
 }
 declare class ColorScale extends Scale {
+    /**
+    * Creates a ColorScale.
+    * @constructor
+    * @param {string} [scaleType] the type of color scale to create (Category10/Category20/Category20b/Category20c)
+    */
     constructor(scaleType?: string);
 }
 declare class Interaction {
@@ -247,10 +368,10 @@ declare class Legend extends Component {
     public render(): Legend;
 }
 declare class Axis extends Component {
-    public scale: Scale;
-    public orientation: string;
-    public formatter: any;
     private static CSS_CLASS;
+    private scale;
+    private orientation;
+    private formatter;
     static yWidth: number;
     static xHeight: number;
     public axisElement: D3.Selection;
@@ -260,17 +381,37 @@ declare class Axis extends Component {
     private isXAligned;
     private static axisXTransform(selection, x);
     private static axisYTransform(selection, y);
-    constructor(scale: Scale, orientation: string, formatter: any);
+    /**
+    * Creates an Axis.
+    * @constructor
+    * @param {Scale} scale The Scale to base the Axis on.
+    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+    * @param {any} [formatter] a D3 formatter
+    */
+    constructor(scale: Scale, orientation: string, formatter?: any);
     public anchor(element: D3.Selection): Axis;
     private transformString(translate, scale);
     public render(): Axis;
-    public rescale(): Axis;
-    public zoom(translatePair: number[], scale: number): Axis;
+    private rescale();
 }
 declare class XAxis extends Axis {
+    /**
+    * Creates an XAxis (a horizontal Axis).
+    * @constructor
+    * @param {Scale} scale The Scale to base the Axis on.
+    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+    * @param {any} [formatter] a D3 formatter
+    */
     constructor(scale: Scale, orientation: string, formatter?: any);
 }
 declare class YAxis extends Axis {
+    /**
+    * Creates a YAxis (a vertical Axis).
+    * @constructor
+    * @param {Scale} scale The Scale to base the Axis on.
+    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+    * @param {any} [formatter] a D3 formatter
+    */
     constructor(scale: Scale, orientation: string, formatter?: any);
 }
 declare class ComponentGroup extends Component {

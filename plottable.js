@@ -76,6 +76,11 @@ var Component = (function () {
         this.yAlignProportion = 0;
         this.cssClasses = ["component"];
     }
+    /**
+    * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+    * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
+    * @returns {Component} The calling component.
+    */
     Component.prototype.anchor = function (element) {
         var _this = this;
         if (element.node().childNodes.length > 0) {
@@ -101,6 +106,16 @@ var Component = (function () {
         return this;
     };
 
+    /**
+    * Computes the size, position, and alignment from the specified values.
+    * If no parameters are supplied and the component is a root node,
+    * they are inferred from the size of the component's element.
+    * @param {number} xOrigin
+    * @param {number} yOrigin
+    * @param {number} availableWidth
+    * @param {number} availableHeight
+    * @returns {Component} The calling Component.
+    */
     Component.prototype.computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
         var _this = this;
         if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
@@ -145,6 +160,10 @@ var Component = (function () {
         return this;
     };
 
+    /**
+    * Renders the component.
+    * @returns {Component} The calling Component.
+    */
     Component.prototype.render = function () {
         return this;
     };
@@ -162,6 +181,11 @@ var Component = (function () {
         return this;
     };
 
+    /**
+    * Sets the x alignment of the Component.
+    * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
+    * @returns {Component} The calling Component.
+    */
     Component.prototype.xAlign = function (alignment) {
         if (alignment === "LEFT") {
             this.xAlignProportion = 0;
@@ -175,6 +199,11 @@ var Component = (function () {
         return this;
     };
 
+    /**
+    * Sets the y alignment of the Component.
+    * @param {string} alignment The y alignment of the Component (one of TOP/CENTER/BOTTOM).
+    * @returns {Component} The calling Component.
+    */
     Component.prototype.yAlign = function (alignment) {
         if (alignment === "TOP") {
             this.yAlignProportion = 0;
@@ -188,11 +217,21 @@ var Component = (function () {
         return this;
     };
 
+    /**
+    * Sets the x offset of the Component.
+    * @param {number} offset The desired x offset, in pixels.
+    * @returns {Component} The calling Component.
+    */
     Component.prototype.xOffset = function (offset) {
         this.xOffsetVal = offset;
         return this;
     };
 
+    /**
+    * Sets the y offset of the Component.
+    * @param {number} offset The desired y offset, in pixels.
+    * @returns {Component} The calling Component.
+    */
     Component.prototype.yOffset = function (offset) {
         this.yOffsetVal = offset;
         return this;
@@ -223,6 +262,11 @@ var Component = (function () {
         this.addBox("clip-rect", clipPathParent);
     };
 
+    /**
+    * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
+    * @param {Interaction} interaction The Interaction to attach to the Component.
+    * @return {Component} The calling Component.
+    */
     Component.prototype.registerInteraction = function (interaction) {
         // Interactions can be registered before or after anchoring. If registered before, they are
         // pushed to this.registeredInteractions and registered during anchoring. If after, they are
@@ -231,6 +275,7 @@ var Component = (function () {
         if (this.element != null) {
             interaction.anchor(this.hitBox);
         }
+        return this;
     };
 
     Component.prototype.classed = function (cssClass, addClass) {
@@ -291,40 +336,50 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var Scale = (function () {
+    /**
+    * Creates a new Scale.
+    * @constructor
+    * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
+    */
     function Scale(scale) {
         this.broadcasterCallbacks = [];
         this.scale = scale;
     }
-    Scale.prototype.public = function (value) {
-        return this.scale(value);
-    };
-
     Scale.prototype.domain = function (values) {
         var _this = this;
-        if (values != null) {
+        if (values == null) {
+            return this.scale.domain();
+        } else {
             this.scale.domain(values);
             this.broadcasterCallbacks.forEach(function (b) {
                 return b(_this);
             });
             return this;
-        } else {
-            return this.scale.domain();
         }
     };
 
     Scale.prototype.range = function (values) {
-        if (values != null) {
+        if (values == null) {
+            return this.scale.range();
+        } else {
             this.scale.range(values);
             return this;
-        } else {
-            return this.scale.range();
         }
     };
 
+    /**
+    * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+    * @returns {Scale} A copy of the calling Scale.
+    */
     Scale.prototype.copy = function () {
         return new Scale(this.scale.copy());
     };
 
+    /**
+    * Registers a callback to be called when the scale's domain is changed.
+    * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
+    * @returns {Scale} The Calling Scale.
+    */
     Scale.prototype.registerListener = function (callback) {
         this.broadcasterCallbacks.push(callback);
         return this;
@@ -334,21 +389,45 @@ var Scale = (function () {
 
 var QuantitiveScale = (function (_super) {
     __extends(QuantitiveScale, _super);
+    /**
+    * Creates a new QuantitiveScale.
+    * @constructor
+    * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
+    */
     function QuantitiveScale(scale) {
         _super.call(this, scale);
     }
+    /**
+    * Retrieves the domain value corresponding to a supplied range value.
+    * @param {number} value: A value from the Scale's range.
+    * @returns {number} The domain value corresponding to the supplied range value.
+    */
     QuantitiveScale.prototype.invert = function (value) {
         return this.scale.invert(value);
     };
 
+    /**
+    * Generates tick values.
+    * @param {number} count The number of ticks to generate.
+    * @returns {any[]} The generated ticks.
+    */
     QuantitiveScale.prototype.ticks = function (count) {
         return this.scale.ticks(count);
     };
 
+    /**
+    * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
+    * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
+    */
     QuantitiveScale.prototype.copy = function () {
         return new QuantitiveScale(this.scale.copy());
     };
 
+    /**
+    * Expands the QuantitiveScale's domain to cover the new region.
+    * @param {number} newDomain The additional domain to be covered by the QuantitiveScale.
+    * @returns {QuantitiveScale} The scale.
+    */
     QuantitiveScale.prototype.widenDomain = function (newDomain) {
         var currentDomain = this.domain();
         var wideDomain = [Math.min(newDomain[0], currentDomain[0]), Math.max(newDomain[1], currentDomain[1])];
@@ -364,6 +443,10 @@ var LinearScale = (function (_super) {
         _super.call(this, scale == null ? d3.scale.linear() : scale);
         this.domain([Infinity, -Infinity]);
     }
+    /**
+    * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
+    * @returns {LinearScale} A copy of the calling LinearScale.
+    */
     LinearScale.prototype.copy = function () {
         return new LinearScale(this.scale.copy());
     };
@@ -372,6 +455,11 @@ var LinearScale = (function (_super) {
 
 var ColorScale = (function (_super) {
     __extends(ColorScale, _super);
+    /**
+    * Creates a ColorScale.
+    * @constructor
+    * @param {string} [scaleType] the type of color scale to create (Category10/Category20/Category20b/Category20c)
+    */
     function ColorScale(scaleType) {
         var scale;
         switch (scaleType) {
@@ -1218,18 +1306,26 @@ var Legend = (function (_super) {
 ///<reference path="reference.ts" />
 var Axis = (function (_super) {
     __extends(Axis, _super);
+    /**
+    * Creates an Axis.
+    * @constructor
+    * @param {Scale} scale The Scale to base the Axis on.
+    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+    * @param {any} [formatter] a D3 formatter
+    */
     function Axis(scale, orientation, formatter) {
         var _this = this;
         _super.call(this);
         this.scale = scale;
-        this.orientation = orientation;
-        this.formatter = formatter;
         this.classed(Axis.CSS_CLASS, true);
         this.clipPathEnabled = true;
+        this.orientation = orientation;
         this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
         this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
-        if (this.formatter == null) {
+        if (formatter == null) {
             this.formatter = d3.format(".3s");
+        } else {
+            this.formatter = formatter;
         }
         this.d3axis.tickFormat(this.formatter);
 
@@ -1308,26 +1404,9 @@ var Axis = (function (_super) {
     Axis.prototype.rescale = function () {
         return (this.element != null) ? this.render() : null;
         // short circuit, we don't care about perf.
-        // var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
-        // var tickSelection = this.element.selectAll(".tick");
-        // (<any> tickSelection).call(tickTransform, this.scale.scale);
-        // this.axisElement.attr("transform","");
-    };
-
-    Axis.prototype.zoom = function (translatePair, scale) {
-        return this.render();
-        // var translate = this.isXAligned ? translatePair[0] : translatePair[1];
-        // if (scale != null && scale !== this.cachedScale) {
-        //   this.cachedTranslate = translate;
-        //   this.cachedScale = scale;
-        //   this.rescale();
-        // } else {
-        //   translate -= this.cachedTranslate;
-        //   var transform = this.transformString(translate, scale);
-        //   this.axisElement.attr("transform", transform);
-        // }
     };
     Axis.CSS_CLASS = "axis";
+
     Axis.yWidth = 50;
     Axis.xHeight = 30;
     return Axis;
@@ -1335,6 +1414,13 @@ var Axis = (function (_super) {
 
 var XAxis = (function (_super) {
     __extends(XAxis, _super);
+    /**
+    * Creates an XAxis (a horizontal Axis).
+    * @constructor
+    * @param {Scale} scale The Scale to base the Axis on.
+    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+    * @param {any} [formatter] a D3 formatter
+    */
     function XAxis(scale, orientation, formatter) {
         if (typeof formatter === "undefined") { formatter = null; }
         _super.call(this, scale, orientation, formatter);
@@ -1346,6 +1432,13 @@ var XAxis = (function (_super) {
 
 var YAxis = (function (_super) {
     __extends(YAxis, _super);
+    /**
+    * Creates a YAxis (a vertical Axis).
+    * @constructor
+    * @param {Scale} scale The Scale to base the Axis on.
+    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+    * @param {any} [formatter] a D3 formatter
+    */
     function YAxis(scale, orientation, formatter) {
         if (typeof formatter === "undefined") { formatter = null; }
         _super.call(this, scale, orientation, formatter);

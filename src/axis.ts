@@ -2,6 +2,10 @@
 
 class Axis extends Component {
   private static CSS_CLASS = "axis";
+  private scale: Scale;
+  private orientation: string;
+  private formatter: any;
+
   public static yWidth = 50;
   public static xHeight = 30;
   public axisElement: D3.Selection;
@@ -22,18 +26,25 @@ class Axis extends Component {
     });
   }
 
-  constructor(
-    public scale: Scale,
-    public orientation: string,
-    public formatter: any
-  ) {
+  /**
+   * Creates an Axis.
+   * @constructor
+   * @param {Scale} scale The Scale to base the Axis on.
+   * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+   * @param {any} [formatter] a D3 formatter
+   */
+  constructor(scale: Scale, orientation: string, formatter?: any) {
     super();
+    this.scale = scale;
     this.classed(Axis.CSS_CLASS, true);
     this.clipPathEnabled = true;
+    this.orientation = orientation;
     this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
     this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
-    if (this.formatter == null) {
+    if (formatter == null) {
       this.formatter = d3.format(".3s");
+    } else {
+      this.formatter = formatter;
     }
     this.d3axis.tickFormat(this.formatter);
 
@@ -41,7 +52,6 @@ class Axis extends Component {
     this.cachedTranslate = 0;
     this.scale.registerListener(() => this.rescale());
   }
-
 
   public anchor(element: D3.Selection) {
     super.anchor(element);
@@ -89,31 +99,20 @@ class Axis extends Component {
     return this;
   }
 
-  public rescale() {
+  private rescale() {
     return (this.element != null) ? this.render() : null;
     // short circuit, we don't care about perf.
-    // var tickTransform = this.isXAligned ? Axis.axisXTransform : Axis.axisYTransform;
-    // var tickSelection = this.element.selectAll(".tick");
-    // (<any> tickSelection).call(tickTransform, this.scale.scale);
-    // this.axisElement.attr("transform","");
-  }
-
-  public zoom(translatePair: number[], scale: number) {
-    return this.render(); //short-circuit, we dont need the performant cleverness for present demo
-    // var translate = this.isXAligned ? translatePair[0] : translatePair[1];
-    // if (scale != null && scale !== this.cachedScale) {
-    //   this.cachedTranslate = translate;
-    //   this.cachedScale = scale;
-    //   this.rescale();
-    // } else {
-    //   translate -= this.cachedTranslate;
-    //   var transform = this.transformString(translate, scale);
-    //   this.axisElement.attr("transform", transform);
-    // }
   }
 }
 
 class XAxis extends Axis {
+  /**
+   * Creates an XAxis (a horizontal Axis).
+   * @constructor
+   * @param {Scale} scale The Scale to base the Axis on.
+   * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+   * @param {any} [formatter] a D3 formatter
+   */
   constructor(scale: Scale, orientation: string, formatter: any = null) {
     super(scale, orientation, formatter);
     super.rowMinimum(Axis.xHeight);
@@ -122,6 +121,13 @@ class XAxis extends Axis {
 }
 
 class YAxis extends Axis {
+  /**
+   * Creates a YAxis (a vertical Axis).
+   * @constructor
+   * @param {Scale} scale The Scale to base the Axis on.
+   * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+   * @param {any} [formatter] a D3 formatter
+   */
   constructor(scale: Scale, orientation: string, formatter: any = null) {
     super(scale, orientation, formatter);
     super.colMinimum(Axis.yWidth);
