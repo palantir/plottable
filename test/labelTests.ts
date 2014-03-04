@@ -35,7 +35,7 @@ describe("Labels", () => {
     label.render();
     var textBBox = Utils.getBBox(text);
     assertBBoxInclusion(element.select(".bounding-box"), text);
-    assert.closeTo(textBBox.height, label.colMinimum(), 1, "text height === label.colMinimum() (it's rotated)");
+    assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
     svg.remove();
   });
@@ -50,7 +50,7 @@ describe("Labels", () => {
     label.render();
     var textBBox = Utils.getBBox(text);
     assertBBoxInclusion(element.select(".bounding-box"), text);
-    assert.closeTo(textBBox.height, label.colMinimum(), 1, "text height === label.colMinimum() (it's rotated)");
+    assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
     svg.remove();
   });
