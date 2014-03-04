@@ -42,7 +42,7 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it("a legend with many labels does not overflow vertically", () => {
+  it.skip("a legend with many labels does not overflow vertically", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
     legend.anchor(svg).computeLayout().render();
 
