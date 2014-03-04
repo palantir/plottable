@@ -81,8 +81,8 @@ class Table extends Component {
     }
 
     var cols = d3.transpose(this.rows);
-    var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => c.fixedHeight());
-    var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => c.fixedWidth ());
+    var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => c.isFixedHeight());
+    var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => c.isFixedWidth());
     // distribute remaining height to rows
     var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
     var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
@@ -187,12 +187,12 @@ class Table extends Component {
     return all(componentGroup.map(groupIsFixed));
   }
 
-  public fixedWidth(): boolean {
+  public isFixedWidth(): boolean {
     var cols = d3.transpose(this.rows);
-    return Table.fixedSpace(cols, (c: Component) => c.fixedWidth());
+    return Table.fixedSpace(cols, (c: Component) => c.isFixedWidth());
   }
 
-  public fixedHeight(): boolean {
-    return Table.fixedSpace(this.rows, (c: Component) => c.fixedHeight());
+  public isFixedHeight(): boolean {
+    return Table.fixedSpace(this.rows, (c: Component) => c.isFixedHeight());
   }
 }
