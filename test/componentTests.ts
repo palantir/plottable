@@ -21,7 +21,7 @@ describe("Component behavior", () => {
     c = new Component();
   });
 
-  it("renderTo works properly", () => {
+  it.skip("renderTo works properly", () => {
     var anchored = false;
     var computed = false;
     var rendered = false;
