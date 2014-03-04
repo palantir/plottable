@@ -103,7 +103,7 @@ module.exports = function(grunt) {
     ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]
     );
 
-  grunt.registerTask("test", ["blanket_mocha"]);
+  grunt.registerTask("test", ["compile", "blanket_mocha"]);
 
   grunt.registerTask("watch-test", ["blanket_mocha", "watch:test"]);
 };
