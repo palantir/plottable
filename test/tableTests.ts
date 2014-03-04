@@ -196,9 +196,6 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(3,3);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
-    // [0 1 2] \\
-    // [3 4 5] \\
-    // [6 7 8] \\
     assert.isTrue(table.fixedWidth(), "fixed width when all subcomponents fixed width");
     assert.isTrue(table.fixedHeight(), "fixedHeight when all subcomponents fixed height");
     components[0].fixedWidthVal = false;
