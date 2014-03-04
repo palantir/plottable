@@ -14,20 +14,20 @@ module.exports = function(grunt) {
   grunt.initConfig({
     concat: {
       license: {
-        src: ["license_header.txt", "build/plottable.js"],
-        dest: "build/plottable.js",
+        src: ["license_header.txt", "plottable.js"],
+        dest: "plottable.js",
       },
     },
     ts: {
       dev: {
         src: ["src/*.ts"],
-        out: "build/plottable.js",
+        out: "plottable.js",
         // watch: "src",
         options: {
           target: 'es5',
           sourceMap: true,
           declaration: true,
-          removeComments: true
+          removeComments: false
         }
       },
       test: {
