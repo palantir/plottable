@@ -3,11 +3,21 @@
 class ComponentGroup extends Component {
   private components: Component[];
 
+  /**
+   * Creates a ComponentGroup.
+   * @constructor
+   * @param {Component[]} [components] The Components in the ComponentGroup.
+   */
   constructor(components: Component[] = []){
     super();
     this.components = components;
   }
 
+  /**
+   * Adds a Component to the ComponentGroup.
+   * @param {Component} c The Component to add.
+   * @returns {ComponentGroup} The calling ComponentGroup.
+   */
   public addComponent(c: Component): ComponentGroup {
     this.components.push(c);
     if (this.element != null) {

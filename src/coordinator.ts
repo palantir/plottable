@@ -6,7 +6,15 @@ class ScaleDomainCoordinator {
   does change its domain, it re-propogates the change to every linked scale.
   */
   private rescaleInProgress = false;
-  constructor(private scales: Scale[]) {
+  private scales: Scale[];
+
+  /**
+   * Creates a ScaleDomainCoordinator.
+   * @constructor
+   * @param {Scale[]} scales A list of scales whose domains should be linked.
+   */
+  constructor(scales: Scale[]) {
+    this.scales = scales;
     this.scales.forEach((s) => s.registerListener((sx: Scale) => this.rescale(sx)));
   }
 

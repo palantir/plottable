@@ -7,11 +7,18 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 ///<reference path="reference.ts" />
 var Utils;
 (function (Utils) {
+    /**
+    * Checks if x is between a and b.
+    */
     function inRange(x, a, b) {
         return (Math.min(a, b) <= x && x <= Math.max(a, b));
     }
     Utils.inRange = inRange;
 
+    /**
+    * Gets the bounding box of an element.
+    * @param {D3.Selection} element
+    */
     function getBBox(element) {
         return element.node().getBBox();
     }
@@ -51,6 +58,11 @@ var Utils;
     }
     Utils.truncateTextToLength = truncateTextToLength;
 
+    /**
+    * Gets the height of a text element, as rendered.
+    * @param {D3.Selection} textElement
+    * @return {number} The height of the text element, in pixels.
+    */
     function getTextHeight(textElement) {
         var originalText = textElement.text();
         textElement.text("bqpdl");
@@ -505,6 +517,11 @@ var ColorScale = (function (_super) {
 })(Scale);
 ///<reference path="reference.ts" />
 var Interaction = (function () {
+    /**
+    * Creates an Interaction.
+    * @constructor
+    * @param {Component} componentToListenTo The component to listen for interactions on.
+    */
     function Interaction(componentToListenTo) {
         this.componentToListenTo = componentToListenTo;
     }
@@ -512,6 +529,10 @@ var Interaction = (function () {
         this.hitBox = hitBox;
     };
 
+    /**
+    * Registers the Interaction on the Component it's listening to.
+    * Should not be invoked externally; To be called only at the end of subclassing constructors.
+    */
     Interaction.prototype.registerWithComponent = function () {
         this.componentToListenTo.registerInteraction(this);
         // It would be nice to have a call to this in the Interaction constructor, but
@@ -523,7 +544,14 @@ var Interaction = (function () {
 
 var PanZoomInteraction = (function (_super) {
     __extends(PanZoomInteraction, _super);
-    function PanZoomInteraction(componentToListenTo, renderers, xScale, yScale) {
+    /**
+    * Creates a PanZoomInteraction.
+    * @constructor
+    * @param {Component} componentToListenTo The component to listen for interactions on.
+    * @param {QuantitiveScale} xScale The X scale to update on panning/zooming.
+    * @param {QuantitiveScale} yScale The Y scale to update on panning/zooming.
+    */
+    function PanZoomInteraction(componentToListenTo, xScale, yScale) {
         var _this = this;
         _super.call(this, componentToListenTo);
         this.xScale = xScale;
@@ -555,6 +583,10 @@ var PanZoomInteraction = (function (_super) {
 
 var AreaInteraction = (function (_super) {
     __extends(AreaInteraction, _super);
+    /**
+    * Creates an AreaInteraction.
+    * @param {Component} componentToListenTo The component to listen for interactions on.
+    */
     function AreaInteraction(componentToListenTo) {
         var _this = this;
         _super.call(this, componentToListenTo);
@@ -573,6 +605,11 @@ var AreaInteraction = (function (_super) {
         });
         this.registerWithComponent();
     }
+    /**
+    * Adds a callback to be called when the AreaInteraction triggers.
+    * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+    * @returns {AreaInteraction} The calling AreaInteraction.
+    */
     AreaInteraction.prototype.callback = function (cb) {
         this.callbackToCall = cb;
         return this;
@@ -622,6 +659,10 @@ var AreaInteraction = (function (_super) {
         this.callbackToCall(pixelArea);
     };
 
+    /**
+    * Clears the highlighted drag-selection box drawn by the AreaInteraction.
+    * @returns {AreaInteraction} The calling AreaInteraction.
+    */
     AreaInteraction.prototype.clearBox = function () {
         this.dragBox.attr("height", 0).attr("width", 0);
         return this;
@@ -644,6 +685,13 @@ var ZoomCallbackGenerator = (function () {
         this.xScaleMappings = [];
         this.yScaleMappings = [];
     }
+    /**
+    * Adds listen-update pair of X scales.
+    * @param {QuantitiveScale} listenerScale An X scale to listen for events on.
+    * @param {QuantitiveScale} [targetScale] An X scale to update when events occur.
+    * If not supplied, listenerScale will be updated when an event occurs.
+    * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
+    */
     ZoomCallbackGenerator.prototype.addXScale = function (listenerScale, targetScale) {
         if (targetScale == null) {
             targetScale = listenerScale;
@@ -652,6 +700,13 @@ var ZoomCallbackGenerator = (function () {
         return this;
     };
 
+    /**
+    * Adds listen-update pair of Y scales.
+    * @param {QuantitiveScale} listenerScale A Y scale to listen for events on.
+    * @param {QuantitiveScale} [targetScale] A Y scale to update when events occur.
+    * If not supplied, listenerScale will be updated when an event occurs.
+    * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
+    */
     ZoomCallbackGenerator.prototype.addYScale = function (listenerScale, targetScale) {
         if (targetScale == null) {
             targetScale = listenerScale;
@@ -670,6 +725,10 @@ var ZoomCallbackGenerator = (function () {
         targetScale.domain(newDomain);
     };
 
+    /**
+    * Generates a callback that can be passed to Interactions.
+    * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
+    */
     ZoomCallbackGenerator.prototype.getCallback = function () {
         var _this = this;
         return function (area) {
@@ -1335,14 +1394,19 @@ var Table = (function (_super) {
 })(Component);
 ///<reference path="reference.ts" />
 var ScaleDomainCoordinator = (function () {
+    /**
+    * Creates a ScaleDomainCoordinator.
+    * @constructor
+    * @param {Scale[]} scales A list of scales whose domains should be linked.
+    */
     function ScaleDomainCoordinator(scales) {
         var _this = this;
-        this.scales = scales;
         /* This class is responsible for maintaining coordination between linked scales.
         It registers event listeners for when one of its scales changes its domain. When the scale
         does change its domain, it re-propogates the change to every linked scale.
         */
         this.rescaleInProgress = false;
+        this.scales = scales;
         this.scales.forEach(function (s) {
             return s.registerListener(function (sx) {
                 return _this.rescale(sx);
@@ -1365,6 +1429,11 @@ var ScaleDomainCoordinator = (function () {
 ///<reference path="reference.ts" />
 var Legend = (function (_super) {
     __extends(Legend, _super);
+    /**
+    * Creates a Legend.
+    * @constructor
+    * @param {ColorScale} colorScale
+    */
     function Legend(colorScale) {
         _super.call(this);
         this.classed(Legend.CSS_CLASS, true);
@@ -1373,6 +1442,11 @@ var Legend = (function (_super) {
         this.xAlign("RIGHT").yAlign("TOP");
         this.xOffset(5).yOffset(5);
     }
+    /**
+    * Assigns a new ColorScale to the Legend.
+    * @param {ColorScale} scale
+    * @returns {Legend} The calling Legend.
+    */
     Legend.prototype.scale = function (scale) {
         this.colorScale = scale;
         return this;
@@ -1566,11 +1640,21 @@ var YAxis = (function (_super) {
 ///<reference path="reference.ts" />
 var ComponentGroup = (function (_super) {
     __extends(ComponentGroup, _super);
+    /**
+    * Creates a ComponentGroup.
+    * @constructor
+    * @param {Component[]} [components] The Components in the ComponentGroup.
+    */
     function ComponentGroup(components) {
         if (typeof components === "undefined") { components = []; }
         _super.call(this);
         this.components = components;
     }
+    /**
+    * Adds a Component to the ComponentGroup.
+    * @param {Component} c The Component to add.
+    * @returns {ComponentGroup} The calling ComponentGroup.
+    */
     ComponentGroup.prototype.addComponent = function (c) {
         this.components.push(c);
         if (this.element != null) {

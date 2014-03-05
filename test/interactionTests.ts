@@ -44,7 +44,7 @@ describe("Interactions", () => {
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
 
-      var interaction = new PanZoomInteraction(renderer, [], xScale, yScale);
+      var interaction = new PanZoomInteraction(renderer, xScale, yScale);
 
       var hb = renderer.element.select(".hit-box").node();
       var dragDistancePixelX = 10;

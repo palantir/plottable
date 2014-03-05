@@ -1,5 +1,12 @@
 declare module Utils {
+    /**
+    * Checks if x is between a and b.
+    */
     function inRange(x: number, a: number, b: number): boolean;
+    /**
+    * Gets the bounding box of an element.
+    * @param {D3.Selection} element
+    */
     function getBBox(element: D3.Selection): SVGRect;
     /** Truncates a text string to a max length, given the element in which to draw the text
     * @param {string} text: The string to put in the text element, and truncate
@@ -8,6 +15,11 @@ declare module Utils {
     * @returns {string} text - the shortened text
     */
     function truncateTextToLength(text: string, length: number, element: D3.Selection): string;
+    /**
+    * Gets the height of a text element, as rendered.
+    * @param {D3.Selection} textElement
+    * @return {number} The height of the text element, in pixels.
+    */
     function getTextHeight(textElement: D3.Selection): number;
 }
 declare class Component {
@@ -212,8 +224,17 @@ declare class ColorScale extends Scale {
 declare class Interaction {
     public hitBox: D3.Selection;
     public componentToListenTo: Component;
+    /**
+    * Creates an Interaction.
+    * @constructor
+    * @param {Component} componentToListenTo The component to listen for interactions on.
+    */
     constructor(componentToListenTo: Component);
     public anchor(hitBox: D3.Selection): void;
+    /**
+    * Registers the Interaction on the Component it's listening to.
+    * Should not be invoked externally; To be called only at the end of subclassing constructors.
+    */
     public registerWithComponent(): void;
 }
 interface ZoomInfo {
@@ -222,10 +243,16 @@ interface ZoomInfo {
 }
 declare class PanZoomInteraction extends Interaction {
     private zoom;
-    public renderers: Component[];
     public xScale: QuantitiveScale;
     public yScale: QuantitiveScale;
-    constructor(componentToListenTo: Component, renderers: Component[], xScale: QuantitiveScale, yScale: QuantitiveScale);
+    /**
+    * Creates a PanZoomInteraction.
+    * @constructor
+    * @param {Component} componentToListenTo The component to listen for interactions on.
+    * @param {QuantitiveScale} xScale The X scale to update on panning/zooming.
+    * @param {QuantitiveScale} yScale The Y scale to update on panning/zooming.
+    */
+    constructor(componentToListenTo: Component, xScale: QuantitiveScale, yScale: QuantitiveScale);
     public anchor(hitBox: D3.Selection): void;
     private rerenderZoomed();
 }
@@ -239,20 +266,51 @@ declare class AreaInteraction extends Interaction {
     private constrainY;
     private dragBox;
     private callbackToCall;
+    /**
+    * Creates an AreaInteraction.
+    * @param {Component} componentToListenTo The component to listen for interactions on.
+    */
     constructor(componentToListenTo: Component);
+    /**
+    * Adds a callback to be called when the AreaInteraction triggers.
+    * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+    * @returns {AreaInteraction} The calling AreaInteraction.
+    */
     public callback(cb?: (a: SelectionArea) => any): AreaInteraction;
     private dragstart();
     private drag();
     private dragend();
+    /**
+    * Clears the highlighted drag-selection box drawn by the AreaInteraction.
+    * @returns {AreaInteraction} The calling AreaInteraction.
+    */
     public clearBox(): AreaInteraction;
     public anchor(hitBox: D3.Selection): AreaInteraction;
 }
 declare class ZoomCallbackGenerator {
     private xScaleMappings;
     private yScaleMappings;
+    /**
+    * Adds listen-update pair of X scales.
+    * @param {QuantitiveScale} listenerScale An X scale to listen for events on.
+    * @param {QuantitiveScale} [targetScale] An X scale to update when events occur.
+    * If not supplied, listenerScale will be updated when an event occurs.
+    * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
+    */
     public addXScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator;
+    /**
+    * Adds listen-update pair of Y scales.
+    * @param {QuantitiveScale} listenerScale A Y scale to listen for events on.
+    * @param {QuantitiveScale} [targetScale] A Y scale to update when events occur.
+    * If not supplied, listenerScale will be updated when an event occurs.
+    * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
+    */
     public addYScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator;
     private updateScale(referenceScale, targetScale, pixelMin, pixelMax);
+    /**
+    * Generates a callback that can be passed to Interactions.
+    * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
+    */
     public getCallback(): (area: SelectionArea) => void;
 }
 declare class Label extends Component {
@@ -463,8 +521,13 @@ declare class Table extends Component {
     public isFixedHeight(): boolean;
 }
 declare class ScaleDomainCoordinator {
-    private scales;
     private rescaleInProgress;
+    private scales;
+    /**
+    * Creates a ScaleDomainCoordinator.
+    * @constructor
+    * @param {Scale[]} scales A list of scales whose domains should be linked.
+    */
     constructor(scales: Scale[]);
     public rescale(scale: Scale): void;
 }
@@ -474,7 +537,17 @@ declare class Legend extends Component {
     private static MARGIN;
     private colorScale;
     private maxWidth;
+    /**
+    * Creates a Legend.
+    * @constructor
+    * @param {ColorScale} colorScale
+    */
     constructor(colorScale?: ColorScale);
+    /**
+    * Assigns a new ColorScale to the Legend.
+    * @param {ColorScale} scale
+    * @returns {Legend} The calling Legend.
+    */
     public scale(scale: ColorScale): Legend;
     public rowMinimum(): number;
     public rowMinimum(newVal: number): Legend;
@@ -530,7 +603,17 @@ declare class YAxis extends Axis {
 }
 declare class ComponentGroup extends Component {
     private components;
+    /**
+    * Creates a ComponentGroup.
+    * @constructor
+    * @param {Component[]} [components] The Components in the ComponentGroup.
+    */
     constructor(components?: Component[]);
+    /**
+    * Adds a Component to the ComponentGroup.
+    * @param {Component} c The Component to add.
+    * @returns {ComponentGroup} The calling ComponentGroup.
+    */
     public addComponent(c: Component): ComponentGroup;
     public anchor(element: D3.Selection): ComponentGroup;
     public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;

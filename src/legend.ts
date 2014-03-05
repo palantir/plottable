@@ -8,6 +8,11 @@ class Legend extends Component {
   private colorScale: ColorScale;
   private maxWidth: number;
 
+  /**
+   * Creates a Legend.
+   * @constructor
+   * @param {ColorScale} colorScale
+   */
   constructor(colorScale?: ColorScale) {
     super();
     this.classed(Legend.CSS_CLASS, true);
@@ -17,6 +22,11 @@ class Legend extends Component {
     this.xOffset(5).yOffset(5);
   }
 
+  /**
+   * Assigns a new ColorScale to the Legend.
+   * @param {ColorScale} scale
+   * @returns {Legend} The calling Legend.
+   */
   public scale(scale: ColorScale): Legend {
     this.colorScale = scale;
     return this;

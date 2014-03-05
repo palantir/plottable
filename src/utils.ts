@@ -1,10 +1,17 @@
 ///<reference path="reference.ts" />
 
 module Utils {
+  /**
+   * Checks if x is between a and b.
+   */
   export function inRange(x: number, a: number, b: number) {
     return (Math.min(a,b) <= x && x <= Math.max(a,b));
   }
 
+  /**
+   * Gets the bounding box of an element.
+   * @param {D3.Selection} element
+   */
   export function getBBox(element: D3.Selection): SVGRect {
     return (<any> element.node()).getBBox();
   }
@@ -42,6 +49,11 @@ module Utils {
     }
   }
 
+  /**
+   * Gets the height of a text element, as rendered.
+   * @param {D3.Selection} textElement
+   * @return {number} The height of the text element, in pixels.
+   */
   export function getTextHeight(textElement: D3.Selection) {
     var originalText = textElement.text();
     textElement.text("bqpdl");
