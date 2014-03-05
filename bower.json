@@ -1,9 +1,14 @@
 {
-  "name": "plottablejs",
+  "name": "plottable",
   "version": "0.2.0",
+  "ignore": [
+    "**/*",
+    "!plottable.js",
+    "!plottable.d.ts"
+  ],
   "keywords": ["plottable", "plottablejs", "plottable.js"],
   "dependencies": {
-    "d3": "3.4.1"
+    "d3": ">=3.4.1"
   },
   "devDependencies": {
     "chai": "1.9.0",
