@@ -1,5 +1,3 @@
-/// <reference path="typings/d3/d3.d.ts" />
-/// <reference path="src/interfaces.d.ts" />
 declare module Utils {
     function inRange(x: number, a: number, b: number): boolean;
     function getBBox(element: D3.Selection): SVGRect;
@@ -539,4 +537,24 @@ declare class ComponentGroup extends Component {
     public render(): ComponentGroup;
     public isFixedWidth(): boolean;
     public isFixedHeight(): boolean;
+}
+interface IDataset {
+    data: any[];
+    seriesName: string;
+}
+interface SelectionArea {
+    xMin: number;
+    xMax: number;
+    yMin: number;
+    yMax: number;
+}
+interface FullSelectionArea {
+    pixel: SelectionArea;
+    data: SelectionArea;
+}
+interface IBroadcasterCallback {
+    (broadcaster: IBroadcaster, ...args: any[]): any;
+}
+interface IBroadcaster {
+    registerListener: (cb: IBroadcasterCallback) => IBroadcaster;
 }
