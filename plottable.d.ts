@@ -109,7 +109,17 @@ declare class Component {
     */
     public colMinimum(): number;
     public colMinimum(newVal: number): Component;
+    /**
+    * Checks if the Component has a fixed width or scales to fill available space.
+    * Returns true by default on the base Component class.
+    * @return {boolean} Whether the component has a fixed width.
+    */
     public isFixedWidth(): boolean;
+    /**
+    * Checks if the Component has a fixed height or scales to fill available space.
+    * Returns true by default on the base Component class.
+    * @return {boolean} Whether the component has a fixed height.
+    */
     public isFixedHeight(): boolean;
 }
 declare class Scale implements IBroadcaster {
@@ -254,9 +264,20 @@ declare class Label extends Component {
     private orientation;
     private textLength;
     private textHeight;
+    /**
+    * Creates a Label.
+    * @constructor
+    * @param {string} [text] The text of the Label.
+    * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
+    */
     constructor(text?: string, orientation?: string);
     public anchor(element: D3.Selection): Label;
-    public setText(text: string): void;
+    /**
+    * Sets the text on the Label.
+    * @param {string} text The new text for the Label.
+    * @returns {Label} The calling Label.
+    */
+    public setText(text: string): Label;
     private measureAndSetTextSize();
     private truncateTextAndRemeasure(availableLength);
     public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
@@ -275,7 +296,17 @@ declare class Renderer extends Component {
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
+    /**
+    * Creates a Renderer.
+    * @constructor
+    * @param {IDataset} [dataset] The dataset associated with the Renderer.
+    */
     constructor(dataset?: IDataset);
+    /**
+    * Sets a new dataset on the Renderer.
+    * @param {IDataset} dataset The new dataset to be associated with the Renderer.
+    * @returns {Renderer} The calling Renderer.
+    */
     public data(dataset: IDataset): Renderer;
     public anchor(element: D3.Selection): Renderer;
 }
@@ -291,10 +322,34 @@ declare class XYRenderer extends Renderer {
     public yScale: QuantitiveScale;
     public xAccessor: IAccessor;
     public yAccessor: IAccessor;
+    /**
+    * Creates an XYRenderer.
+    * @constructor
+    * @param {IDataset} dataset The dataset to render.
+    * @param {QuantitiveScale} xScale The x scale to use.
+    * @param {QuantitiveScale} yScale The y scale to use.
+    * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+    * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+    */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
     public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): XYRenderer;
+    /**
+    * Converts a SelectionArea with pixel ranges to one with data ranges.
+    * @param {SelectionArea} pixelArea The selected area, in pixels.
+    * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
+    */
     public invertXYSelectionArea(pixelArea: SelectionArea): SelectionArea;
+    /**
+    * Gets the data in a selected area.
+    * @param {SelectionArea} dataArea The selected area.
+    * @returns {D3.UpdateSelection} The data in the selected area.
+    */
     public getSelectionFromArea(dataArea: SelectionArea): D3.UpdateSelection;
+    /**
+    * Gets the indices of data in a selected area
+    * @param {SelectionArea} dataArea The selected area.
+    * @returns {number[]} An array of the indices of datapoints in the selected area.
+    */
     public getDataIndicesFromArea(dataArea: SelectionArea): number[];
     private rescale();
 }
@@ -302,6 +357,15 @@ declare class LineRenderer extends XYRenderer {
     private static CSS_CLASS;
     private path;
     private line;
+    /**
+    * Creates a LineRenderer.
+    * @constructor
+    * @param {IDataset} dataset The dataset to render.
+    * @param {QuantitiveScale} xScale The x scale to use.
+    * @param {QuantitiveScale} yScale The y scale to use.
+    * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+    * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+    */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
     public anchor(element: D3.Selection): LineRenderer;
     public render(): LineRenderer;
@@ -309,6 +373,16 @@ declare class LineRenderer extends XYRenderer {
 declare class CircleRenderer extends XYRenderer {
     private static CSS_CLASS;
     public size: number;
+    /**
+    * Creates a CircleRenderer.
+    * @constructor
+    * @param {IDataset} dataset The dataset to render.
+    * @param {QuantitiveScale} xScale The x scale to use.
+    * @param {QuantitiveScale} yScale The y scale to use.
+    * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+    * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+    * @param {number} [size] The radius of the circles, in pixels.
+    */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size?: number);
     public render(): CircleRenderer;
 }
@@ -317,6 +391,16 @@ declare class BarRenderer extends XYRenderer {
     private static defaultX2Accessor;
     public barPaddingPx: number;
     public x2Accessor: IAccessor;
+    /**
+    * Creates a BarRenderer.
+    * @constructor
+    * @param {IDataset} dataset The dataset to render.
+    * @param {QuantitiveScale} xScale The x scale to use.
+    * @param {QuantitiveScale} yScale The y scale to use.
+    * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
+    * @param {IAccessor} [x2Accessor] A function for extracting the end position of each bar from the data.
+    * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
+    */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, x2Accessor?: IAccessor, yAccessor?: IAccessor);
     public render(): BarRenderer;
 }
@@ -329,7 +413,19 @@ declare class Table extends Component {
     private colMinimums;
     private rowWeights;
     private colWeights;
+    /**
+    * Creates a Table.
+    * @constructor
+    * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
+    * null can be used if a cell is empty.
+    */
     constructor(rows?: Component[][]);
+    /**
+    * Adds a Component in the specified cell.
+    * @param {number} row The row in which to add the Component.
+    * @param {number} col The column in which to add the Component.
+    * @param {Component} component The Component to be added.
+    */
     public addComponent(row: number, col: number, component: Component): Table;
     private padTableToSize(nRows, nCols);
     public anchor(element: D3.Selection): Table;
@@ -337,13 +433,33 @@ declare class Table extends Component {
     private static calcComponentWeights(setWeights, componentGroups, fixityAccessor);
     private static calcProportionalSpace(weights, freeSpace);
     public render(): Table;
+    /**
+    * Sets the row and column padding on the Table.
+    * @param {number} rowPadding The padding above and below each row, in pixels.
+    * @param {number} colPadding the padding to the left and right of each column, in pixels.
+    * @returns {Table} The calling Table.
+    */
+    public padding(rowPadding: number, colPadding: number): Table;
+    /**
+    * Sets the layout weight of a particular row.
+    * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
+    * @param {number} index The index of the row.
+    * @param {number} weight The weight to be set on the row.
+    * @returns {Table} The calling Table.
+    */
     public rowWeight(index: number, weight: number): Table;
+    /**
+    * Sets the layout weight of a particular column.
+    * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
+    * @param {number} index The index of the column.
+    * @param {number} weight The weight to be set on the column.
+    * @returns {Table} The calling Table.
+    */
     public colWeight(index: number, weight: number): Table;
     public rowMinimum(): number;
     public rowMinimum(newVal: number): Table;
     public colMinimum(): number;
     public colMinimum(newVal: number): Table;
-    public padding(rowPadding: number, colPadding: number): Table;
     private static fixedSpace(componentGroup, fixityAccessor);
     public isFixedWidth(): boolean;
     public isFixedHeight(): boolean;

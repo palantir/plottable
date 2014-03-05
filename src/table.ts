@@ -13,6 +13,12 @@ class Table extends Component {
   private colWeights: number[];
 
 
+  /**
+   * Creates a Table.
+   * @constructor
+   * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
+   * null can be used if a cell is empty.
+   */
   constructor(rows: Component[][] = []) {
     super();
     this.classed(Table.CSS_CLASS, true);
@@ -23,6 +29,12 @@ class Table extends Component {
     this.colWeights = d3.transpose(this.rows).map(() => null);
   }
 
+  /**
+   * Adds a Component in the specified cell.
+   * @param {number} row The row in which to add the Component.
+   * @param {number} col The column in which to add the Component.
+   * @param {Component} component The Component to be added.
+   */
   public addComponent(row: number, col: number, component: Component): Table {
     if (this.element != null) {
       throw new Error("addComponent cannot be called after anchoring (for the moment)");
@@ -32,7 +44,7 @@ class Table extends Component {
 
     var currentComponent = <any> this.rows[row][col];
     if (currentComponent.constructor.name !== "Component") {
-      // The bsae component is only used as a placeholder component
+      // The base component is only used as a placeholder component
       throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
     }
 
@@ -140,13 +152,37 @@ class Table extends Component {
     return this;
   }
 
-  /* Getters */
+  /**
+   * Sets the row and column padding on the Table.
+   * @param {number} rowPadding The padding above and below each row, in pixels.
+   * @param {number} colPadding the padding to the left and right of each column, in pixels.
+   * @returns {Table} The calling Table.
+   */
+  public padding(rowPadding: number, colPadding: number) {
+    this.rowPadding = rowPadding;
+    this.colPadding = colPadding;
+    return this;
+  }
 
+  /**
+   * Sets the layout weight of a particular row.
+   * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
+   * @param {number} index The index of the row.
+   * @param {number} weight The weight to be set on the row.
+   * @returns {Table} The calling Table.
+   */
   public rowWeight(index: number, weight: number) {
     this.rowWeights[index] = weight;
     return this;
   }
 
+  /**
+   * Sets the layout weight of a particular column.
+   * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
+   * @param {number} index The index of the column.
+   * @param {number} weight The weight to be set on the column.
+   * @returns {Table} The calling Table.
+   */
   public colWeight(index: number, weight: number) {
     this.colWeights[index] = weight;
     return this;
@@ -173,12 +209,6 @@ class Table extends Component {
       this.colMinimums = cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
       return d3.sum(this.colMinimums) + this.colPadding * (cols.length - 1);
     }
-  }
-
-  public padding(rowPadding: number, colPadding: number) {
-    this.rowPadding = rowPadding;
-    this.colPadding = colPadding;
-    return this;
   }
 
   private static fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {

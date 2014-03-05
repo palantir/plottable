@@ -318,10 +318,20 @@ var Component = (function () {
         }
     };
 
+    /**
+    * Checks if the Component has a fixed width or scales to fill available space.
+    * Returns true by default on the base Component class.
+    * @return {boolean} Whether the component has a fixed width.
+    */
     Component.prototype.isFixedWidth = function () {
         return this.fixedWidthVal;
     };
 
+    /**
+    * Checks if the Component has a fixed height or scales to fill available space.
+    * Returns true by default on the base Component class.
+    * @return {boolean} Whether the component has a fixed height.
+    */
     Component.prototype.isFixedHeight = function () {
         return this.fixedHeightVal;
     };
@@ -676,6 +686,12 @@ var ZoomCallbackGenerator = (function () {
 ///<reference path="reference.ts" />
 var Label = (function (_super) {
     __extends(Label, _super);
+    /**
+    * Creates a Label.
+    * @constructor
+    * @param {string} [text] The text of the Label.
+    * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
+    */
     function Label(text, orientation) {
         if (typeof text === "undefined") { text = ""; }
         if (typeof orientation === "undefined") { orientation = "horizontal"; }
@@ -701,12 +717,18 @@ var Label = (function (_super) {
         return this;
     };
 
+    /**
+    * Sets the text on the Label.
+    * @param {string} text The new text for the Label.
+    * @returns {Label} The calling Label.
+    */
     Label.prototype.setText = function (text) {
         this.text = text;
         if (this.element != null) {
             this.textElement.text(text);
             this.measureAndSetTextSize();
         }
+        return this;
     };
 
     Label.prototype.measureAndSetTextSize = function () {
@@ -782,6 +804,11 @@ var AxisLabel = (function (_super) {
 ///<reference path="reference.ts" />
 var Renderer = (function (_super) {
     __extends(Renderer, _super);
+    /**
+    * Creates a Renderer.
+    * @constructor
+    * @param {IDataset} [dataset] The dataset associated with the Renderer.
+    */
     function Renderer(dataset) {
         if (typeof dataset === "undefined") { dataset = { seriesName: "", data: [] }; }
         _super.call(this);
@@ -792,6 +819,11 @@ var Renderer = (function (_super) {
         this.dataset = dataset;
         this.classed(Renderer.CSS_CLASS, true);
     }
+    /**
+    * Sets a new dataset on the Renderer.
+    * @param {IDataset} dataset The new dataset to be associated with the Renderer.
+    * @returns {Renderer} The calling Renderer.
+    */
     Renderer.prototype.data = function (dataset) {
         this.renderArea.classed(this.dataset.seriesName, false);
         this.dataset = dataset;
@@ -812,6 +844,15 @@ var Renderer = (function (_super) {
 
 var XYRenderer = (function (_super) {
     __extends(XYRenderer, _super);
+    /**
+    * Creates an XYRenderer.
+    * @constructor
+    * @param {IDataset} dataset The dataset to render.
+    * @param {QuantitiveScale} xScale The x scale to use.
+    * @param {QuantitiveScale} yScale The y scale to use.
+    * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+    * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+    */
     function XYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
         var _this = this;
         _super.call(this, dataset);
@@ -844,6 +885,11 @@ var XYRenderer = (function (_super) {
         return this;
     };
 
+    /**
+    * Converts a SelectionArea with pixel ranges to one with data ranges.
+    * @param {SelectionArea} pixelArea The selected area, in pixels.
+    * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
+    */
     XYRenderer.prototype.invertXYSelectionArea = function (pixelArea) {
         var xMin = this.xScale.invert(pixelArea.xMin);
         var xMax = this.xScale.invert(pixelArea.xMax);
@@ -853,6 +899,11 @@ var XYRenderer = (function (_super) {
         return dataArea;
     };
 
+    /**
+    * Gets the data in a selected area.
+    * @param {SelectionArea} dataArea The selected area.
+    * @returns {D3.UpdateSelection} The data in the selected area.
+    */
     XYRenderer.prototype.getSelectionFromArea = function (dataArea) {
         var _this = this;
         var filterFunction = function (d) {
@@ -863,6 +914,11 @@ var XYRenderer = (function (_super) {
         return this.dataSelection.filter(filterFunction);
     };
 
+    /**
+    * Gets the indices of data in a selected area
+    * @param {SelectionArea} dataArea The selected area.
+    * @returns {number[]} An array of the indices of datapoints in the selected area.
+    */
     XYRenderer.prototype.getDataIndicesFromArea = function (dataArea) {
         var _this = this;
         var filterFunction = function (d) {
@@ -897,6 +953,15 @@ var XYRenderer = (function (_super) {
 
 var LineRenderer = (function (_super) {
     __extends(LineRenderer, _super);
+    /**
+    * Creates a LineRenderer.
+    * @constructor
+    * @param {IDataset} dataset The dataset to render.
+    * @param {QuantitiveScale} xScale The x scale to use.
+    * @param {QuantitiveScale} yScale The y scale to use.
+    * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+    * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+    */
     function LineRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
         _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
         this.classed(LineRenderer.CSS_CLASS, true);
@@ -925,6 +990,16 @@ var LineRenderer = (function (_super) {
 
 var CircleRenderer = (function (_super) {
     __extends(CircleRenderer, _super);
+    /**
+    * Creates a CircleRenderer.
+    * @constructor
+    * @param {IDataset} dataset The dataset to render.
+    * @param {QuantitiveScale} xScale The x scale to use.
+    * @param {QuantitiveScale} yScale The y scale to use.
+    * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+    * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+    * @param {number} [size] The radius of the circles, in pixels.
+    */
     function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, size) {
         if (typeof size === "undefined") { size = 3; }
         _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
@@ -950,6 +1025,16 @@ var CircleRenderer = (function (_super) {
 
 var BarRenderer = (function (_super) {
     __extends(BarRenderer, _super);
+    /**
+    * Creates a BarRenderer.
+    * @constructor
+    * @param {IDataset} dataset The dataset to render.
+    * @param {QuantitiveScale} xScale The x scale to use.
+    * @param {QuantitiveScale} yScale The y scale to use.
+    * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
+    * @param {IAccessor} [x2Accessor] A function for extracting the end position of each bar from the data.
+    * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
+    */
     function BarRenderer(dataset, xScale, yScale, xAccessor, x2Accessor, yAccessor) {
         _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
         this.barPaddingPx = 1;
@@ -996,6 +1081,12 @@ var BarRenderer = (function (_super) {
 ///<reference path="reference.ts" />
 var Table = (function (_super) {
     __extends(Table, _super);
+    /**
+    * Creates a Table.
+    * @constructor
+    * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
+    * null can be used if a cell is empty.
+    */
     function Table(rows) {
         if (typeof rows === "undefined") { rows = []; }
         _super.call(this);
@@ -1016,6 +1107,12 @@ var Table = (function (_super) {
             return null;
         });
     }
+    /**
+    * Adds a Component in the specified cell.
+    * @param {number} row The row in which to add the Component.
+    * @param {number} col The column in which to add the Component.
+    * @param {Component} component The Component to be added.
+    */
     Table.prototype.addComponent = function (row, col, component) {
         if (this.element != null) {
             throw new Error("addComponent cannot be called after anchoring (for the moment)");
@@ -1146,12 +1243,37 @@ var Table = (function (_super) {
         return this;
     };
 
-    /* Getters */
+    /**
+    * Sets the row and column padding on the Table.
+    * @param {number} rowPadding The padding above and below each row, in pixels.
+    * @param {number} colPadding the padding to the left and right of each column, in pixels.
+    * @returns {Table} The calling Table.
+    */
+    Table.prototype.padding = function (rowPadding, colPadding) {
+        this.rowPadding = rowPadding;
+        this.colPadding = colPadding;
+        return this;
+    };
+
+    /**
+    * Sets the layout weight of a particular row.
+    * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
+    * @param {number} index The index of the row.
+    * @param {number} weight The weight to be set on the row.
+    * @returns {Table} The calling Table.
+    */
     Table.prototype.rowWeight = function (index, weight) {
         this.rowWeights[index] = weight;
         return this;
     };
 
+    /**
+    * Sets the layout weight of a particular column.
+    * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
+    * @param {number} index The index of the column.
+    * @param {number} weight The weight to be set on the column.
+    * @returns {Table} The calling Table.
+    */
     Table.prototype.colWeight = function (index, weight) {
         this.colWeights[index] = weight;
         return this;
@@ -1182,12 +1304,6 @@ var Table = (function (_super) {
             });
             return d3.sum(this.colMinimums) + this.colPadding * (cols.length - 1);
         }
-    };
-
-    Table.prototype.padding = function (rowPadding, colPadding) {
-        this.rowPadding = rowPadding;
-        this.colPadding = colPadding;
-        return this;
     };
 
     Table.fixedSpace = function (componentGroup, fixityAccessor) {

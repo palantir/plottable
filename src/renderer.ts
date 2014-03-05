@@ -8,6 +8,11 @@ class Renderer extends Component {
   public element: D3.Selection;
   public scales: Scale[];
 
+  /**
+   * Creates a Renderer.
+   * @constructor
+   * @param {IDataset} [dataset] The dataset associated with the Renderer.
+   */
   constructor(dataset: IDataset = {seriesName: "", data: []}) {
     super();
     this.clipPathEnabled = true;
@@ -18,6 +23,11 @@ class Renderer extends Component {
     this.classed(Renderer.CSS_CLASS, true);
   }
 
+  /**
+   * Sets a new dataset on the Renderer.
+   * @param {IDataset} dataset The new dataset to be associated with the Renderer.
+   * @returns {Renderer} The calling Renderer.
+   */
   public data(dataset: IDataset): Renderer {
     this.renderArea.classed(this.dataset.seriesName, false);
     this.dataset = dataset;
@@ -45,6 +55,16 @@ class XYRenderer extends Renderer {
   public yScale: QuantitiveScale;
   public xAccessor: IAccessor;
   public yAccessor: IAccessor;
+
+  /**
+   * Creates an XYRenderer.
+   * @constructor
+   * @param {IDataset} dataset The dataset to render.
+   * @param {QuantitiveScale} xScale The x scale to use.
+   * @param {QuantitiveScale} yScale The y scale to use.
+   * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+   * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+   */
   constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset);
     this.classed(XYRenderer.CSS_CLASS);
@@ -73,6 +93,11 @@ class XYRenderer extends Renderer {
     return this;
   }
 
+  /**
+   * Converts a SelectionArea with pixel ranges to one with data ranges.
+   * @param {SelectionArea} pixelArea The selected area, in pixels.
+   * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
+   */
   public invertXYSelectionArea(pixelArea: SelectionArea): SelectionArea {
     var xMin = this.xScale.invert(pixelArea.xMin);
     var xMax = this.xScale.invert(pixelArea.xMax);
@@ -82,6 +107,11 @@ class XYRenderer extends Renderer {
     return dataArea;
   }
 
+  /**
+   * Gets the data in a selected area.
+   * @param {SelectionArea} dataArea The selected area.
+   * @returns {D3.UpdateSelection} The data in the selected area.
+   */
   public getSelectionFromArea(dataArea: SelectionArea) {
     var filterFunction = (d: any) => {
       var x = this.xAccessor(d);
@@ -91,6 +121,11 @@ class XYRenderer extends Renderer {
     return this.dataSelection.filter(filterFunction);
   }
 
+  /**
+   * Gets the indices of data in a selected area
+   * @param {SelectionArea} dataArea The selected area.
+   * @returns {number[]} An array of the indices of datapoints in the selected area.
+   */
   public getDataIndicesFromArea(dataArea: SelectionArea): number[] {
     var filterFunction = (d: any) => {
       var x = this.xAccessor(d);
@@ -119,6 +154,15 @@ class LineRenderer extends XYRenderer {
   private path: D3.Selection;
   private line: D3.Svg.Line;
 
+  /**
+   * Creates a LineRenderer.
+   * @constructor
+   * @param {IDataset} dataset The dataset to render.
+   * @param {QuantitiveScale} xScale The x scale to use.
+   * @param {QuantitiveScale} yScale The y scale to use.
+   * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+   * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+   */
   constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
     this.classed(LineRenderer.CSS_CLASS, true);
@@ -146,7 +190,19 @@ class LineRenderer extends XYRenderer {
 class CircleRenderer extends XYRenderer {
   private static CSS_CLASS = "circle-renderer";
   public size: number;
-  constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size=3) {
+
+  /**
+   * Creates a CircleRenderer.
+   * @constructor
+   * @param {IDataset} dataset The dataset to render.
+   * @param {QuantitiveScale} xScale The x scale to use.
+   * @param {QuantitiveScale} yScale The y scale to use.
+   * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+   * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+   * @param {number} [size] The radius of the circles, in pixels.
+   */
+  constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale,
+              xAccessor?: IAccessor, yAccessor?: IAccessor, size=3) {
     super(dataset, xScale, yScale, xAccessor, yAccessor);
     this.classed(CircleRenderer.CSS_CLASS, true);
     this.size = size;
@@ -171,6 +227,16 @@ class BarRenderer extends XYRenderer {
 
   public x2Accessor: IAccessor;
 
+  /**
+   * Creates a BarRenderer.
+   * @constructor
+   * @param {IDataset} dataset The dataset to render.
+   * @param {QuantitiveScale} xScale The x scale to use.
+   * @param {QuantitiveScale} yScale The y scale to use.
+   * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
+   * @param {IAccessor} [x2Accessor] A function for extracting the end position of each bar from the data.
+   * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
+   */
   constructor(dataset: IDataset,
               xScale: QuantitiveScale,
               yScale: QuantitiveScale,

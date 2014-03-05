@@ -274,10 +274,20 @@ class Component {
     }
   }
 
+  /**
+   * Checks if the Component has a fixed width or scales to fill available space.
+   * Returns true by default on the base Component class.
+   * @return {boolean} Whether the component has a fixed width.
+   */
   public isFixedWidth(): boolean {
     return this.fixedWidthVal;
   }
 
+  /**
+   * Checks if the Component has a fixed height or scales to fill available space.
+   * Returns true by default on the base Component class.
+   * @return {boolean} Whether the component has a fixed height.
+   */
   public isFixedHeight(): boolean {
     return this.fixedHeightVal;
   }

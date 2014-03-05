@@ -9,6 +9,12 @@ class Label extends Component {
   private textLength: number;
   private textHeight: number;
 
+  /**
+   * Creates a Label.
+   * @constructor
+   * @param {string} [text] The text of the Label.
+   * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
+   */
   constructor(text = "", orientation = "horizontal") {
     super();
     this.classed(Label.CSS_CLASS, true);
@@ -33,12 +39,18 @@ class Label extends Component {
     return this;
   }
 
+  /**
+   * Sets the text on the Label.
+   * @param {string} text The new text for the Label.
+   * @returns {Label} The calling Label.
+   */
   public setText(text: string) {
     this.text = text;
     if (this.element != null) {
       this.textElement.text(text);
       this.measureAndSetTextSize();
     }
+    return this;
   }
 
   private measureAndSetTextSize() {
