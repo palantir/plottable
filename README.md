@@ -17,4 +17,3 @@ Setup Instructions:
 
     npm install
     bower install
-    tsd reinstall
