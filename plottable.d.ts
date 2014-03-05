@@ -421,4 +421,6 @@ declare class ComponentGroup extends Component {
     public anchor(element: D3.Selection): ComponentGroup;
     public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
     public render(): ComponentGroup;
+    public isFixedWidth(): boolean;
+    public isFixedHeight(): boolean;
 }

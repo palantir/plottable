@@ -1488,6 +1488,24 @@ var ComponentGroup = (function (_super) {
         });
         return this;
     };
+
+    ComponentGroup.prototype.isFixedWidth = function () {
+        var widthFixities = this.components.map(function (c) {
+            return c.isFixedWidth();
+        });
+        return widthFixities.reduce(function (a, b) {
+            return a && b;
+        });
+    };
+
+    ComponentGroup.prototype.isFixedHeight = function () {
+        var heightFixities = this.components.map(function (c) {
+            return c.isFixedHeight();
+        });
+        return heightFixities.reduce(function (a, b) {
+            return a && b;
+        });
+    };
     return ComponentGroup;
 })(Component);
 //# sourceMappingURL=plottable.js.map
