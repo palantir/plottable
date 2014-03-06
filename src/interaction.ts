@@ -174,8 +174,8 @@ module Plottable {
     public anchor(hitBox: D3.Selection): AreaInteraction {
       super.anchor(hitBox);
       var cname = AreaInteraction.CLASS_DRAG_BOX;
-      var element = this.componentToListenTo.element;
-      this.dragBox = element.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+      var foreground = this.componentToListenTo.foregroundContainer;
+      this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
       hitBox.call(this.dragBehavior);
       return this;
     }

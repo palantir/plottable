@@ -21,6 +21,7 @@ declare module Plottable {
         function truncateTextToLength(text: string, length: number, element: D3.Selection): string;
         /**
         * Gets the height of a text element, as rendered.
+        *
         * @param {D3.Selection} textElement
         * @return {number} The height of the text element, in pixels.
         */
@@ -34,6 +35,8 @@ declare module Plottable {
         private hitBox;
         private interactionsToRegister;
         private boxes;
+        private boxContainer;
+        public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
         public fixedWidthVal: boolean;
         public fixedHeightVal: boolean;

@@ -7,6 +7,8 @@ module Plottable {
     private hitBox: D3.Selection;
     private interactionsToRegister: Interaction[] = [];
     private boxes: D3.Selection[] = [];
+    private boxContainer: D3.Selection;
+    public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
 
     public fixedWidthVal = true;
@@ -36,7 +38,13 @@ module Plottable {
         throw new Error("Can't anchor to a non-empty element");
       }
       this.element = element;
-      if (this.clipPathEnabled) {this.generateClipPath();};
+      this.boxContainer = this.element.append("g").classed("box-container", true);
+      this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
+
+      if (this.clipPathEnabled) {
+        this.generateClipPath();
+      };
+
       this.cssClasses.forEach((cssClass: string) => {
         this.element.classed(cssClass, true);
       });
@@ -184,7 +192,7 @@ module Plottable {
       if (this.element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
-      var parentElement = parentElement == null ? this.element : parentElement;
+      var parentElement = parentElement == null ? this.boxContainer : parentElement;
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
       this.boxes.push(box);
@@ -198,7 +206,7 @@ module Plottable {
       // The clip path will prevent content from overflowing its component space.
       var clipPathId = Component.clipPathId++;
       this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
-      var clipPathParent = this.element.append("clipPath")
+      var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + clipPathId);
       this.addBox("clip-rect", clipPathParent);
     }
