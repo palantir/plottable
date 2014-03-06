@@ -12,6 +12,7 @@ module Plottable {
 
     /**
      * Creates a Label.
+     *
      * @constructor
      * @param {string} [text] The text of the Label.
      * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
@@ -42,6 +43,7 @@ module Plottable {
 
     /**
      * Sets the text on the Label.
+     *
      * @param {string} text The new text for the Label.
      * @returns {Label} The calling Label.
      */

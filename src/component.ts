@@ -27,6 +27,7 @@ module Plottable {
 
     /**
      * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+     *
      * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
      * @returns {Component} The calling component.
      */
@@ -52,6 +53,7 @@ module Plottable {
      * Computes the size, position, and alignment from the specified values.
      * If no parameters are supplied and the component is a root node,
      * they are inferred from the size of the component's element.
+     *
      * @param {number} xOrigin
      * @param {number} yOrigin
      * @param {number} availableWidth
@@ -100,6 +102,7 @@ module Plottable {
 
     /**
      * Renders the component.
+     *
      * @returns {Component} The calling Component.
      */
     public render() {
@@ -119,6 +122,7 @@ module Plottable {
     }
     /**
      * Sets the x alignment of the Component.
+     *
      * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
      * @returns {Component} The calling Component.
      */
@@ -137,6 +141,7 @@ module Plottable {
 
     /**
      * Sets the y alignment of the Component.
+     *
      * @param {string} alignment The y alignment of the Component (one of TOP/CENTER/BOTTOM).
      * @returns {Component} The calling Component.
      */
@@ -155,6 +160,7 @@ module Plottable {
 
     /**
      * Sets the x offset of the Component.
+     *
      * @param {number} offset The desired x offset, in pixels.
      * @returns {Component} The calling Component.
      */
@@ -165,6 +171,7 @@ module Plottable {
 
     /**
      * Sets the y offset of the Component.
+     *
      * @param {number} offset The desired y offset, in pixels.
      * @returns {Component} The calling Component.
      */
@@ -198,6 +205,7 @@ module Plottable {
 
     /**
      * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
+     *
      * @param {Interaction} interaction The Interaction to attach to the Component.
      * @return {Component} The calling Component.
      */
@@ -219,6 +227,7 @@ module Plottable {
 
     /**
      * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+     *
      * @param {string} cssClass The CSS class to add/remove/check for.
      * @param {boolean} [addClass] Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
      * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
@@ -249,6 +258,7 @@ module Plottable {
 
     /**
      * Sets or retrieves the Component's minimum height.
+     *
      * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
      * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
      */
@@ -265,6 +275,7 @@ module Plottable {
 
     /**
      * Sets or retrieves the Component's minimum width.
+     *
      * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
      * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
      */
@@ -282,6 +293,7 @@ module Plottable {
     /**
      * Checks if the Component has a fixed width or scales to fill available space.
      * Returns true by default on the base Component class.
+     *
      * @return {boolean} Whether the component has a fixed width.
      */
     public isFixedWidth(): boolean {
@@ -291,6 +303,7 @@ module Plottable {
     /**
      * Checks if the Component has a fixed height or scales to fill available space.
      * Returns true by default on the base Component class.
+     *
      * @return {boolean} Whether the component has a fixed height.
      */
     public isFixedHeight(): boolean {

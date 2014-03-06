@@ -6,6 +6,7 @@ module Plottable {
 
     /**
      * Creates a ComponentGroup.
+     *
      * @constructor
      * @param {Component[]} [components] The Components in the ComponentGroup.
      */
@@ -16,6 +17,7 @@ module Plottable {
 
     /**
      * Adds a Component to the ComponentGroup.
+     *
      * @param {Component} c The Component to add.
      * @returns {ComponentGroup} The calling ComponentGroup.
      */

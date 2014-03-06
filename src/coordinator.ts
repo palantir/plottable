@@ -11,6 +11,7 @@ module Plottable {
 
     /**
      * Creates a ScaleDomainCoordinator.
+     *
      * @constructor
      * @param {Scale[]} scales A list of scales whose domains should be linked.
      */

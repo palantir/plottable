@@ -11,6 +11,7 @@ module Plottable {
 
     /**
      * Creates a Legend.
+     *
      * @constructor
      * @param {ColorScale} colorScale
      */
@@ -25,6 +26,7 @@ module Plottable {
 
     /**
      * Assigns a new ColorScale to the Legend.
+     *
      * @param {ColorScale} scale
      * @returns {Legend} The calling Legend.
      */

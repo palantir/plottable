@@ -29,6 +29,7 @@ module Plottable {
 
     /**
      * Creates an Axis.
+     *
      * @constructor
      * @param {Scale} scale The Scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -109,6 +110,7 @@ module Plottable {
   export class XAxis extends Axis {
     /**
      * Creates an XAxis (a horizontal Axis).
+     *
      * @constructor
      * @param {Scale} scale The Scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -124,6 +126,7 @@ module Plottable {
   export class YAxis extends Axis {
     /**
      * Creates a YAxis (a vertical Axis).
+     *
      * @constructor
      * @param {Scale} scale The Scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)

@@ -7,9 +7,12 @@ declare module Plottable {
         /**
         * Gets the bounding box of an element.
         * @param {D3.Selection} element
+        * @returns {SVGRed} The bounding box.
         */
         function getBBox(element: D3.Selection): SVGRect;
-        /** Truncates a text string to a max length, given the element in which to draw the text
+        /**
+        * Truncates a text string to a max length, given the element in which to draw the text
+        *
         * @param {string} text: The string to put in the text element, and truncate
         * @param {D3.Selection} element: The element in which to measure and place the text
         * @param {number} length: How much space to truncate text into
@@ -47,6 +50,7 @@ declare module Plottable {
         private cssClasses;
         /**
         * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+        *
         * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
         * @returns {Component} The calling component.
         */
@@ -55,6 +59,7 @@ declare module Plottable {
         * Computes the size, position, and alignment from the specified values.
         * If no parameters are supplied and the component is a root node,
         * they are inferred from the size of the component's element.
+        *
         * @param {number} xOrigin
         * @param {number} yOrigin
         * @param {number} availableWidth
@@ -64,30 +69,35 @@ declare module Plottable {
         public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Component;
         /**
         * Renders the component.
+        *
         * @returns {Component} The calling Component.
         */
         public render(): Component;
         public renderTo(element: D3.Selection): Component;
         /**
         * Sets the x alignment of the Component.
+        *
         * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
         * @returns {Component} The calling Component.
         */
         public xAlign(alignment: string): Component;
         /**
         * Sets the y alignment of the Component.
+        *
         * @param {string} alignment The y alignment of the Component (one of TOP/CENTER/BOTTOM).
         * @returns {Component} The calling Component.
         */
         public yAlign(alignment: string): Component;
         /**
         * Sets the x offset of the Component.
+        *
         * @param {number} offset The desired x offset, in pixels.
         * @returns {Component} The calling Component.
         */
         public xOffset(offset: number): Component;
         /**
         * Sets the y offset of the Component.
+        *
         * @param {number} offset The desired y offset, in pixels.
         * @returns {Component} The calling Component.
         */
@@ -96,12 +106,14 @@ declare module Plottable {
         private generateClipPath();
         /**
         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
+        *
         * @param {Interaction} interaction The Interaction to attach to the Component.
         * @return {Component} The calling Component.
         */
         public registerInteraction(interaction: Plottable.Interaction): Component;
         /**
         * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+        *
         * @param {string} cssClass The CSS class to add/remove/check for.
         * @param {boolean} [addClass] Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
         * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
@@ -110,6 +122,7 @@ declare module Plottable {
         public classed(cssClass: string, addClass: boolean): Component;
         /**
         * Sets or retrieves the Component's minimum height.
+        *
         * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
         * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
         */
@@ -117,6 +130,7 @@ declare module Plottable {
         public rowMinimum(newVal: number): Component;
         /**
         * Sets or retrieves the Component's minimum width.
+        *
         * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
         * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
         */
@@ -125,12 +139,14 @@ declare module Plottable {
         /**
         * Checks if the Component has a fixed width or scales to fill available space.
         * Returns true by default on the base Component class.
+        *
         * @return {boolean} Whether the component has a fixed width.
         */
         public isFixedWidth(): boolean;
         /**
         * Checks if the Component has a fixed height or scales to fill available space.
         * Returns true by default on the base Component class.
+        *
         * @return {boolean} Whether the component has a fixed height.
         */
         public isFixedHeight(): boolean;
@@ -233,6 +249,7 @@ declare module Plottable {
         public componentToListenTo: Plottable.Component;
         /**
         * Creates an Interaction.
+        *
         * @constructor
         * @param {Component} componentToListenTo The component to listen for interactions on.
         */
@@ -254,6 +271,7 @@ declare module Plottable {
         public yScale: Plottable.QuantitiveScale;
         /**
         * Creates a PanZoomInteraction.
+        *
         * @constructor
         * @param {Component} componentToListenTo The component to listen for interactions on.
         * @param {QuantitiveScale} xScale The X scale to update on panning/zooming.
@@ -275,11 +293,13 @@ declare module Plottable {
         private callbackToCall;
         /**
         * Creates an AreaInteraction.
+        *
         * @param {Component} componentToListenTo The component to listen for interactions on.
         */
         constructor(componentToListenTo: Plottable.Component);
         /**
         * Adds a callback to be called when the AreaInteraction triggers.
+        *
         * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
@@ -289,6 +309,7 @@ declare module Plottable {
         private dragend();
         /**
         * Clears the highlighted drag-selection box drawn by the AreaInteraction.
+        *
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
         public clearBox(): AreaInteraction;
@@ -299,6 +320,7 @@ declare module Plottable {
         private yScaleMappings;
         /**
         * Adds listen-update pair of X scales.
+        *
         * @param {QuantitiveScale} listenerScale An X scale to listen for events on.
         * @param {QuantitiveScale} [targetScale] An X scale to update when events occur.
         * If not supplied, listenerScale will be updated when an event occurs.
@@ -307,6 +329,7 @@ declare module Plottable {
         public addXScale(listenerScale: Plottable.QuantitiveScale, targetScale?: Plottable.QuantitiveScale): ZoomCallbackGenerator;
         /**
         * Adds listen-update pair of Y scales.
+        *
         * @param {QuantitiveScale} listenerScale A Y scale to listen for events on.
         * @param {QuantitiveScale} [targetScale] A Y scale to update when events occur.
         * If not supplied, listenerScale will be updated when an event occurs.
@@ -316,6 +339,7 @@ declare module Plottable {
         private updateScale(referenceScale, targetScale, pixelMin, pixelMax);
         /**
         * Generates a callback that can be passed to Interactions.
+        *
         * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
         */
         public getCallback(): (area: Plottable.SelectionArea) => void;
@@ -331,6 +355,7 @@ declare module Plottable {
         private textHeight;
         /**
         * Creates a Label.
+        *
         * @constructor
         * @param {string} [text] The text of the Label.
         * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
@@ -339,6 +364,7 @@ declare module Plottable {
         public anchor(element: D3.Selection): Label;
         /**
         * Sets the text on the Label.
+        *
         * @param {string} text The new text for the Label.
         * @returns {Label} The calling Label.
         */
@@ -365,12 +391,14 @@ declare module Plottable {
         public scales: Plottable.Scale[];
         /**
         * Creates a Renderer.
+        *
         * @constructor
         * @param {IDataset} [dataset] The dataset associated with the Renderer.
         */
         constructor(dataset?: Plottable.IDataset);
         /**
         * Sets a new dataset on the Renderer.
+        *
         * @param {IDataset} dataset The new dataset to be associated with the Renderer.
         * @returns {Renderer} The calling Renderer.
         */
@@ -391,6 +419,7 @@ declare module Plottable {
         public yAccessor: IAccessor;
         /**
         * Creates an XYRenderer.
+        *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {QuantitiveScale} xScale The x scale to use.
@@ -402,18 +431,21 @@ declare module Plottable {
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): XYRenderer;
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
+        *
         * @param {SelectionArea} pixelArea The selected area, in pixels.
         * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
         */
         public invertXYSelectionArea(pixelArea: Plottable.SelectionArea): Plottable.SelectionArea;
         /**
         * Gets the data in a selected area.
+        *
         * @param {SelectionArea} dataArea The selected area.
         * @returns {D3.UpdateSelection} The data in the selected area.
         */
         public getSelectionFromArea(dataArea: Plottable.SelectionArea): D3.UpdateSelection;
         /**
         * Gets the indices of data in a selected area
+        *
         * @param {SelectionArea} dataArea The selected area.
         * @returns {number[]} An array of the indices of datapoints in the selected area.
         */
@@ -426,6 +458,7 @@ declare module Plottable {
         private line;
         /**
         * Creates a LineRenderer.
+        *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {QuantitiveScale} xScale The x scale to use.
@@ -442,6 +475,7 @@ declare module Plottable {
         public size: number;
         /**
         * Creates a CircleRenderer.
+        *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {QuantitiveScale} xScale The x scale to use.
@@ -460,6 +494,7 @@ declare module Plottable {
         public x2Accessor: IAccessor;
         /**
         * Creates a BarRenderer.
+        *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {QuantitiveScale} xScale The x scale to use.
@@ -484,6 +519,7 @@ declare module Plottable {
         private colWeights;
         /**
         * Creates a Table.
+        *
         * @constructor
         * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
         * null can be used if a cell is empty.
@@ -491,6 +527,7 @@ declare module Plottable {
         constructor(rows?: Plottable.Component[][]);
         /**
         * Adds a Component in the specified cell.
+        *
         * @param {number} row The row in which to add the Component.
         * @param {number} col The column in which to add the Component.
         * @param {Component} component The Component to be added.
@@ -504,6 +541,7 @@ declare module Plottable {
         public render(): Table;
         /**
         * Sets the row and column padding on the Table.
+        *
         * @param {number} rowPadding The padding above and below each row, in pixels.
         * @param {number} colPadding the padding to the left and right of each column, in pixels.
         * @returns {Table} The calling Table.
@@ -512,6 +550,7 @@ declare module Plottable {
         /**
         * Sets the layout weight of a particular row.
         * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
+        *
         * @param {number} index The index of the row.
         * @param {number} weight The weight to be set on the row.
         * @returns {Table} The calling Table.
@@ -520,6 +559,7 @@ declare module Plottable {
         /**
         * Sets the layout weight of a particular column.
         * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
+        *
         * @param {number} index The index of the column.
         * @param {number} weight The weight to be set on the column.
         * @returns {Table} The calling Table.
@@ -540,6 +580,7 @@ declare module Plottable {
         private scales;
         /**
         * Creates a ScaleDomainCoordinator.
+        *
         * @constructor
         * @param {Scale[]} scales A list of scales whose domains should be linked.
         */
@@ -556,12 +597,14 @@ declare module Plottable {
         private maxWidth;
         /**
         * Creates a Legend.
+        *
         * @constructor
         * @param {ColorScale} colorScale
         */
         constructor(colorScale?: Plottable.ColorScale);
         /**
         * Assigns a new ColorScale to the Legend.
+        *
         * @param {ColorScale} scale
         * @returns {Legend} The calling Legend.
         */
@@ -589,6 +632,7 @@ declare module Plottable {
         private static axisYTransform(selection, y);
         /**
         * Creates an Axis.
+        *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -603,6 +647,7 @@ declare module Plottable {
     class XAxis extends Axis {
         /**
         * Creates an XAxis (a horizontal Axis).
+        *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -613,6 +658,7 @@ declare module Plottable {
     class YAxis extends Axis {
         /**
         * Creates a YAxis (a vertical Axis).
+        *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -626,12 +672,14 @@ declare module Plottable {
         private components;
         /**
         * Creates a ComponentGroup.
+        *
         * @constructor
         * @param {Component[]} [components] The Components in the ComponentGroup.
         */
         constructor(components?: Plottable.Component[]);
         /**
         * Adds a Component to the ComponentGroup.
+        *
         * @param {Component} c The Component to add.
         * @returns {ComponentGroup} The calling ComponentGroup.
         */

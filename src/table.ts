@@ -16,6 +16,7 @@ module Plottable {
 
     /**
      * Creates a Table.
+     *
      * @constructor
      * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
      * null can be used if a cell is empty.
@@ -32,6 +33,7 @@ module Plottable {
 
     /**
      * Adds a Component in the specified cell.
+     *
      * @param {number} row The row in which to add the Component.
      * @param {number} col The column in which to add the Component.
      * @param {Component} component The Component to be added.
@@ -155,6 +157,7 @@ module Plottable {
 
     /**
      * Sets the row and column padding on the Table.
+     *
      * @param {number} rowPadding The padding above and below each row, in pixels.
      * @param {number} colPadding the padding to the left and right of each column, in pixels.
      * @returns {Table} The calling Table.
@@ -168,6 +171,7 @@ module Plottable {
     /**
      * Sets the layout weight of a particular row.
      * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
+     *
      * @param {number} index The index of the row.
      * @param {number} weight The weight to be set on the row.
      * @returns {Table} The calling Table.
@@ -180,6 +184,7 @@ module Plottable {
     /**
      * Sets the layout weight of a particular column.
      * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
+     *
      * @param {number} index The index of the column.
      * @param {number} weight The weight to be set on the column.
      * @returns {Table} The calling Table.

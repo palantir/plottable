@@ -12,12 +12,15 @@ module Plottable {
     /**
      * Gets the bounding box of an element.
      * @param {D3.Selection} element
+     * @returns {SVGRed} The bounding box.
      */
     export function getBBox(element: D3.Selection): SVGRect {
       return (<any> element.node()).getBBox();
     }
 
-    /** Truncates a text string to a max length, given the element in which to draw the text
+    /**
+     * Truncates a text string to a max length, given the element in which to draw the text
+     *
      * @param {string} text: The string to put in the text element, and truncate
      * @param {D3.Selection} element: The element in which to measure and place the text
      * @param {number} length: How much space to truncate text into
@@ -52,6 +55,7 @@ module Plottable {
 
     /**
      * Gets the height of a text element, as rendered.
+     *
      * @param {D3.Selection} textElement
      * @return {number} The height of the text element, in pixels.
      */

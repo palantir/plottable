@@ -11,6 +11,7 @@ module Plottable {
 
     /**
      * Creates a Renderer.
+     *
      * @constructor
      * @param {IDataset} [dataset] The dataset associated with the Renderer.
      */
@@ -26,6 +27,7 @@ module Plottable {
 
     /**
      * Sets a new dataset on the Renderer.
+     *
      * @param {IDataset} dataset The new dataset to be associated with the Renderer.
      * @returns {Renderer} The calling Renderer.
      */
@@ -59,6 +61,7 @@ module Plottable {
 
     /**
      * Creates an XYRenderer.
+     *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
      * @param {QuantitiveScale} xScale The x scale to use.
@@ -96,6 +99,7 @@ module Plottable {
 
     /**
      * Converts a SelectionArea with pixel ranges to one with data ranges.
+     *
      * @param {SelectionArea} pixelArea The selected area, in pixels.
      * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
      */
@@ -110,6 +114,7 @@ module Plottable {
 
     /**
      * Gets the data in a selected area.
+     *
      * @param {SelectionArea} dataArea The selected area.
      * @returns {D3.UpdateSelection} The data in the selected area.
      */
@@ -124,6 +129,7 @@ module Plottable {
 
     /**
      * Gets the indices of data in a selected area
+     *
      * @param {SelectionArea} dataArea The selected area.
      * @returns {number[]} An array of the indices of datapoints in the selected area.
      */
@@ -156,6 +162,7 @@ module Plottable {
 
     /**
      * Creates a LineRenderer.
+     *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
      * @param {QuantitiveScale} xScale The x scale to use.
@@ -193,6 +200,7 @@ module Plottable {
 
     /**
      * Creates a CircleRenderer.
+     *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
      * @param {QuantitiveScale} xScale The x scale to use.
@@ -229,6 +237,7 @@ module Plottable {
 
     /**
      * Creates a BarRenderer.
+     *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
      * @param {QuantitiveScale} xScale The x scale to use.

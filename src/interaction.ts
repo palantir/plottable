@@ -13,6 +13,7 @@ module Plottable {
 
     /**
      * Creates an Interaction.
+     *
      * @constructor
      * @param {Component} componentToListenTo The component to listen for interactions on.
      */
@@ -49,6 +50,7 @@ module Plottable {
 
     /**
      * Creates a PanZoomInteraction.
+     *
      * @constructor
      * @param {Component} componentToListenTo The component to listen for interactions on.
      * @param {QuantitiveScale} xScale The X scale to update on panning/zooming.
@@ -94,6 +96,7 @@ module Plottable {
 
     /**
      * Creates an AreaInteraction.
+     *
      * @param {Component} componentToListenTo The component to listen for interactions on.
      */
     constructor(componentToListenTo: Component) {
@@ -107,6 +110,7 @@ module Plottable {
 
     /**
      * Adds a callback to be called when the AreaInteraction triggers.
+     *
      * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
      * @returns {AreaInteraction} The calling AreaInteraction.
      */
@@ -159,6 +163,7 @@ module Plottable {
 
     /**
      * Clears the highlighted drag-selection box drawn by the AreaInteraction.
+     *
      * @returns {AreaInteraction} The calling AreaInteraction.
      */
     public clearBox(): AreaInteraction {
@@ -182,6 +187,7 @@ module Plottable {
 
     /**
      * Adds listen-update pair of X scales.
+     *
      * @param {QuantitiveScale} listenerScale An X scale to listen for events on.
      * @param {QuantitiveScale} [targetScale] An X scale to update when events occur.
      * If not supplied, listenerScale will be updated when an event occurs.
@@ -197,6 +203,7 @@ module Plottable {
 
     /**
      * Adds listen-update pair of Y scales.
+     *
      * @param {QuantitiveScale} listenerScale A Y scale to listen for events on.
      * @param {QuantitiveScale} [targetScale] A Y scale to update when events occur.
      * If not supplied, listenerScale will be updated when an event occurs.
@@ -220,6 +227,7 @@ module Plottable {
 
     /**
      * Generates a callback that can be passed to Interactions.
+     *
      * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
      */
     public getCallback() {
