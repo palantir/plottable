@@ -191,7 +191,7 @@ describe("Component behavior", () => {
     c.renderTo(svg);
     (<any> c).addBox("post-anchor");
     var e = c.element;
-    var boxStrings = [".hit-box", ".bounding-box", ".post-anchor"];
+    var boxStrings = [".bounding-box", ".post-anchor"];
 
     boxStrings.forEach((s) => {
       var box = e.select(s);
@@ -200,12 +200,35 @@ describe("Component behavior", () => {
       assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
       assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
     });
+    svg.remove();
+  });
 
-    var hitBox = (<any> c).hitBox;
-    var hitBoxFill = hitBox.style("fill");
-    var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
-    assert.isTrue(hitBoxFilled, hitBoxFill + "<- this should be filled, so the hitbox will detect events");
-    assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
+  it("hitboxes are created iff there are registered interactions", () => {
+    function verifyHitbox(component: Component) {
+      var hitBox = (<any> component).hitBox;
+      assert.isNotNull(hitBox, "the hitbox was created");
+      var hitBoxFill = hitBox.style("fill");
+      var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
+      assert.isTrue(hitBoxFilled, hitBoxFill + " <- this should be filled, so the hitbox will detect events");
+      assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
+    }
+
+    c.anchor(svg);
+    assert.isUndefined((<any> c).hitBox, "no hitBox was created when there were no registered interactions");
+    svg.remove();
+    svg = generateSVG();
+
+    c = new Component();
+    var i = new Interaction(c).registerWithComponent();
+    c.anchor(svg);
+    verifyHitbox(c);
+    svg.remove();
+    svg = generateSVG();
+
+    c = new Component();
+    c.anchor(svg);
+    i = new Interaction(c).registerWithComponent();
+    verifyHitbox(c);
     svg.remove();
   });
 
@@ -217,7 +240,7 @@ describe("Component behavior", () => {
     c.registerInteraction(interaction1);
     c.renderTo(svg);
     c.registerInteraction(interaction2);
-    var hitNode = c.hitBox.node();
+    var hitNode = (<any> c).hitBox.node();
     assert.equal(hitBox1, hitNode, "hitBox1 was registerd");
     assert.equal(hitBox2, hitNode, "hitBox2 was registerd");
     svg.remove();

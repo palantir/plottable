@@ -25,8 +25,8 @@ declare module Utils {
 declare class Component {
     private static clipPathId;
     public element: D3.Selection;
-    public hitBox: D3.Selection;
-    private registeredInteractions;
+    private hitBox;
+    private interactionsToRegister;
     private boxes;
     public clipPathEnabled: boolean;
     public fixedWidthVal: boolean;
@@ -235,7 +235,7 @@ declare class Interaction {
     * Registers the Interaction on the Component it's listening to.
     * Should not be invoked externally; To be called only at the end of subclassing constructors.
     */
-    public registerWithComponent(): void;
+    public registerWithComponent(): Interaction;
 }
 interface ZoomInfo {
     translate: number[];

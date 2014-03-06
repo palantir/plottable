@@ -3,8 +3,8 @@
 class Component {
   private static clipPathId = 0; // Used for unique namespacing for the clipPaths
   public element: D3.Selection;
-  public hitBox: D3.Selection;
-  private registeredInteractions: Interaction[] = [];
+  private hitBox: D3.Selection;
+  private interactionsToRegister: Interaction[] = [];
   private boxes: D3.Selection[] = [];
   public clipPathEnabled = false;
 
@@ -40,11 +40,10 @@ class Component {
     });
     this.cssClasses = null;
 
-    this.hitBox = this.addBox("hit-box");
     this.addBox("bounding-box");
 
-    this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
-    this.registeredInteractions.forEach((r) => r.anchor(this.hitBox));
+    this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
+    this.interactionsToRegister = null;
     return this;
   }
 
@@ -203,11 +202,16 @@ class Component {
    */
   public registerInteraction(interaction: Interaction) {
     // Interactions can be registered before or after anchoring. If registered before, they are
-    // pushed to this.registeredInteractions and registered during anchoring. If after, they are
+    // pushed to this.interactionsToRegister and registered during anchoring. If after, they are
     // registered immediately
-    this.registeredInteractions.push(interaction);
     if (this.element != null) {
+      if (this.hitBox == null) {
+          this.hitBox = this.addBox("hit-box");
+          this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
+      }
       interaction.anchor(this.hitBox);
+    } else {
+      this.interactionsToRegister.push(interaction);
     }
     return this;
   }

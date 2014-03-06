@@ -27,11 +27,12 @@ class Interaction {
    * Registers the Interaction on the Component it's listening to.
    * Should not be invoked externally; To be called only at the end of subclassing constructors.
    */
-  public registerWithComponent() {
+  public registerWithComponent(): Interaction {
     this.componentToListenTo.registerInteraction(this);
     // It would be nice to have a call to this in the Interaction constructor, but
     // can't do this right now because that depends on listenToHitBox being callable, which depends on the subclass
     // constructor finishing first.
+    return this;
   }
 }
 

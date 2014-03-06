@@ -75,7 +75,7 @@ var Utils;
 ///<reference path="reference.ts" />
 var Component = (function () {
     function Component() {
-        this.registeredInteractions = [];
+        this.interactionsToRegister = [];
         this.boxes = [];
         this.clipPathEnabled = false;
         this.fixedWidthVal = true;
@@ -108,13 +108,12 @@ var Component = (function () {
         });
         this.cssClasses = null;
 
-        this.hitBox = this.addBox("hit-box");
         this.addBox("bounding-box");
 
-        this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
-        this.registeredInteractions.forEach(function (r) {
-            return r.anchor(_this.hitBox);
+        this.interactionsToRegister.forEach(function (r) {
+            return _this.registerInteraction(r);
         });
+        this.interactionsToRegister = null;
         return this;
     };
 
@@ -281,11 +280,16 @@ var Component = (function () {
     */
     Component.prototype.registerInteraction = function (interaction) {
         // Interactions can be registered before or after anchoring. If registered before, they are
-        // pushed to this.registeredInteractions and registered during anchoring. If after, they are
+        // pushed to this.interactionsToRegister and registered during anchoring. If after, they are
         // registered immediately
-        this.registeredInteractions.push(interaction);
         if (this.element != null) {
+            if (this.hitBox == null) {
+                this.hitBox = this.addBox("hit-box");
+                this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
+            }
             interaction.anchor(this.hitBox);
+        } else {
+            this.interactionsToRegister.push(interaction);
         }
         return this;
     };
@@ -535,9 +539,11 @@ var Interaction = (function () {
     */
     Interaction.prototype.registerWithComponent = function () {
         this.componentToListenTo.registerInteraction(this);
+
         // It would be nice to have a call to this in the Interaction constructor, but
         // can't do this right now because that depends on listenToHitBox being callable, which depends on the subclass
         // constructor finishing first.
+        return this;
     };
     return Interaction;
 })();
