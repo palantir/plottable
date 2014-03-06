@@ -206,7 +206,7 @@ module Plottable {
       // The clip path will prevent content from overflowing its component space.
       var clipPathId = Component.clipPathId++;
       this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
-      var clipPathParent = this.element.append("clipPath")
+      var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + clipPathId);
       this.addBox("clip-rect", clipPathParent);
     }

@@ -19,13 +19,16 @@ var Plottable;
         /**
         * Gets the bounding box of an element.
         * @param {D3.Selection} element
+        * @returns {SVGRed} The bounding box.
         */
         function getBBox(element) {
             return element.node().getBBox();
         }
         Utils.getBBox = getBBox;
 
-        /** Truncates a text string to a max length, given the element in which to draw the text
+        /**
+        * Truncates a text string to a max length, given the element in which to draw the text
+        *
         * @param {string} text: The string to put in the text element, and truncate
         * @param {D3.Selection} element: The element in which to measure and place the text
         * @param {number} length: How much space to truncate text into
@@ -61,6 +64,7 @@ var Plottable;
 
         /**
         * Gets the height of a text element, as rendered.
+        *
         * @param {D3.Selection} textElement
         * @return {number} The height of the text element, in pixels.
         */
@@ -95,6 +99,7 @@ var Plottable;
         }
         /**
         * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+        *
         * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
         * @returns {Component} The calling component.
         */
@@ -130,6 +135,7 @@ var Plottable;
         * Computes the size, position, and alignment from the specified values.
         * If no parameters are supplied and the component is a root node,
         * they are inferred from the size of the component's element.
+        *
         * @param {number} xOrigin
         * @param {number} yOrigin
         * @param {number} availableWidth
@@ -182,6 +188,7 @@ var Plottable;
 
         /**
         * Renders the component.
+        *
         * @returns {Component} The calling Component.
         */
         Component.prototype.render = function () {
@@ -203,6 +210,7 @@ var Plottable;
 
         /**
         * Sets the x alignment of the Component.
+        *
         * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
         * @returns {Component} The calling Component.
         */
@@ -221,6 +229,7 @@ var Plottable;
 
         /**
         * Sets the y alignment of the Component.
+        *
         * @param {string} alignment The y alignment of the Component (one of TOP/CENTER/BOTTOM).
         * @returns {Component} The calling Component.
         */
@@ -239,6 +248,7 @@ var Plottable;
 
         /**
         * Sets the x offset of the Component.
+        *
         * @param {number} offset The desired x offset, in pixels.
         * @returns {Component} The calling Component.
         */
@@ -249,6 +259,7 @@ var Plottable;
 
         /**
         * Sets the y offset of the Component.
+        *
         * @param {number} offset The desired y offset, in pixels.
         * @returns {Component} The calling Component.
         */
@@ -278,12 +289,13 @@ var Plottable;
             // The clip path will prevent content from overflowing its component space.
             var clipPathId = Component.clipPathId++;
             this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
-            var clipPathParent = this.element.append("clipPath").attr("id", "clipPath" + clipPathId);
+            var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + clipPathId);
             this.addBox("clip-rect", clipPathParent);
         };
 
         /**
         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
+        *
         * @param {Interaction} interaction The Interaction to attach to the Component.
         * @return {Component} The calling Component.
         */
@@ -346,6 +358,7 @@ var Plottable;
         /**
         * Checks if the Component has a fixed width or scales to fill available space.
         * Returns true by default on the base Component class.
+        *
         * @return {boolean} Whether the component has a fixed width.
         */
         Component.prototype.isFixedWidth = function () {
@@ -355,6 +368,7 @@ var Plottable;
         /**
         * Checks if the Component has a fixed height or scales to fill available space.
         * Returns true by default on the base Component class.
+        *
         * @return {boolean} Whether the component has a fixed height.
         */
         Component.prototype.isFixedHeight = function () {
@@ -543,6 +557,7 @@ var Plottable;
     var Interaction = (function () {
         /**
         * Creates an Interaction.
+        *
         * @constructor
         * @param {Component} componentToListenTo The component to listen for interactions on.
         */
@@ -573,6 +588,7 @@ var Plottable;
         __extends(PanZoomInteraction, _super);
         /**
         * Creates a PanZoomInteraction.
+        *
         * @constructor
         * @param {Component} componentToListenTo The component to listen for interactions on.
         * @param {QuantitiveScale} xScale The X scale to update on panning/zooming.
@@ -613,6 +629,7 @@ var Plottable;
         __extends(AreaInteraction, _super);
         /**
         * Creates an AreaInteraction.
+        *
         * @param {Component} componentToListenTo The component to listen for interactions on.
         */
         function AreaInteraction(componentToListenTo) {
@@ -635,6 +652,7 @@ var Plottable;
         }
         /**
         * Adds a callback to be called when the AreaInteraction triggers.
+        *
         * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
@@ -692,6 +710,7 @@ var Plottable;
 
         /**
         * Clears the highlighted drag-selection box drawn by the AreaInteraction.
+        *
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
         AreaInteraction.prototype.clearBox = function () {
@@ -719,6 +738,7 @@ var Plottable;
         }
         /**
         * Adds listen-update pair of X scales.
+        *
         * @param {QuantitiveScale} listenerScale An X scale to listen for events on.
         * @param {QuantitiveScale} [targetScale] An X scale to update when events occur.
         * If not supplied, listenerScale will be updated when an event occurs.
@@ -734,6 +754,7 @@ var Plottable;
 
         /**
         * Adds listen-update pair of Y scales.
+        *
         * @param {QuantitiveScale} listenerScale A Y scale to listen for events on.
         * @param {QuantitiveScale} [targetScale] A Y scale to update when events occur.
         * If not supplied, listenerScale will be updated when an event occurs.
@@ -759,6 +780,7 @@ var Plottable;
 
         /**
         * Generates a callback that can be passed to Interactions.
+        *
         * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
         */
         ZoomCallbackGenerator.prototype.getCallback = function () {
@@ -783,6 +805,7 @@ var Plottable;
         __extends(Label, _super);
         /**
         * Creates a Label.
+        *
         * @constructor
         * @param {string} [text] The text of the Label.
         * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
@@ -814,6 +837,7 @@ var Plottable;
 
         /**
         * Sets the text on the Label.
+        *
         * @param {string} text The new text for the Label.
         * @returns {Label} The calling Label.
         */
@@ -907,6 +931,7 @@ var Plottable;
         __extends(Renderer, _super);
         /**
         * Creates a Renderer.
+        *
         * @constructor
         * @param {IDataset} [dataset] The dataset associated with the Renderer.
         */
@@ -922,6 +947,7 @@ var Plottable;
         }
         /**
         * Sets a new dataset on the Renderer.
+        *
         * @param {IDataset} dataset The new dataset to be associated with the Renderer.
         * @returns {Renderer} The calling Renderer.
         */
@@ -948,6 +974,7 @@ var Plottable;
         __extends(XYRenderer, _super);
         /**
         * Creates an XYRenderer.
+        *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {QuantitiveScale} xScale The x scale to use.
@@ -989,6 +1016,7 @@ var Plottable;
 
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
+        *
         * @param {SelectionArea} pixelArea The selected area, in pixels.
         * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
         */
@@ -1003,6 +1031,7 @@ var Plottable;
 
         /**
         * Gets the data in a selected area.
+        *
         * @param {SelectionArea} dataArea The selected area.
         * @returns {D3.UpdateSelection} The data in the selected area.
         */
@@ -1018,6 +1047,7 @@ var Plottable;
 
         /**
         * Gets the indices of data in a selected area
+        *
         * @param {SelectionArea} dataArea The selected area.
         * @returns {number[]} An array of the indices of datapoints in the selected area.
         */
@@ -1058,6 +1088,7 @@ var Plottable;
         __extends(LineRenderer, _super);
         /**
         * Creates a LineRenderer.
+        *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {QuantitiveScale} xScale The x scale to use.
@@ -1096,6 +1127,7 @@ var Plottable;
         __extends(CircleRenderer, _super);
         /**
         * Creates a CircleRenderer.
+        *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {QuantitiveScale} xScale The x scale to use.
@@ -1132,6 +1164,7 @@ var Plottable;
         __extends(BarRenderer, _super);
         /**
         * Creates a BarRenderer.
+        *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {QuantitiveScale} xScale The x scale to use.
@@ -1192,6 +1225,7 @@ var Plottable;
         __extends(Table, _super);
         /**
         * Creates a Table.
+        *
         * @constructor
         * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
         * null can be used if a cell is empty.
@@ -1218,6 +1252,7 @@ var Plottable;
         }
         /**
         * Adds a Component in the specified cell.
+        *
         * @param {number} row The row in which to add the Component.
         * @param {number} col The column in which to add the Component.
         * @param {Component} component The Component to be added.
@@ -1354,6 +1389,7 @@ var Plottable;
 
         /**
         * Sets the row and column padding on the Table.
+        *
         * @param {number} rowPadding The padding above and below each row, in pixels.
         * @param {number} colPadding the padding to the left and right of each column, in pixels.
         * @returns {Table} The calling Table.
@@ -1367,6 +1403,7 @@ var Plottable;
         /**
         * Sets the layout weight of a particular row.
         * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
+        *
         * @param {number} index The index of the row.
         * @param {number} weight The weight to be set on the row.
         * @returns {Table} The calling Table.
@@ -1379,6 +1416,7 @@ var Plottable;
         /**
         * Sets the layout weight of a particular column.
         * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
+        *
         * @param {number} index The index of the column.
         * @param {number} weight The weight to be set on the column.
         * @returns {Table} The calling Table.
@@ -1450,6 +1488,7 @@ var Plottable;
     var ScaleDomainCoordinator = (function () {
         /**
         * Creates a ScaleDomainCoordinator.
+        *
         * @constructor
         * @param {Scale[]} scales A list of scales whose domains should be linked.
         */
@@ -1489,6 +1528,7 @@ var Plottable;
         __extends(Legend, _super);
         /**
         * Creates a Legend.
+        *
         * @constructor
         * @param {ColorScale} colorScale
         */
@@ -1502,6 +1542,7 @@ var Plottable;
         }
         /**
         * Assigns a new ColorScale to the Legend.
+        *
         * @param {ColorScale} scale
         * @returns {Legend} The calling Legend.
         */
@@ -1560,6 +1601,7 @@ var Plottable;
         __extends(Axis, _super);
         /**
         * Creates an Axis.
+        *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -1669,6 +1711,7 @@ var Plottable;
         __extends(XAxis, _super);
         /**
         * Creates an XAxis (a horizontal Axis).
+        *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -1688,6 +1731,7 @@ var Plottable;
         __extends(YAxis, _super);
         /**
         * Creates a YAxis (a vertical Axis).
+        *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -1710,6 +1754,7 @@ var Plottable;
         __extends(ComponentGroup, _super);
         /**
         * Creates a ComponentGroup.
+        *
         * @constructor
         * @param {Component[]} [components] The Components in the ComponentGroup.
         */
@@ -1720,6 +1765,7 @@ var Plottable;
         }
         /**
         * Adds a Component to the ComponentGroup.
+        *
         * @param {Component} c The Component to add.
         * @returns {ComponentGroup} The calling ComponentGroup.
         */

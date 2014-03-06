@@ -193,7 +193,7 @@ describe("Component behavior", () => {
     assert.equal((<any> Plottable.Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
     var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
     assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
-    var clipRect = c.element.select(".clip-rect");
+    var clipRect = (<any> c).boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
     assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
     svg.remove();
