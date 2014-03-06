@@ -171,6 +171,7 @@ describe("Interactions", () => {
       var expectedYDomain = [yScale.invert(dragendY)  , yScale.invert(dragstartY)]; // reversed because Y scale is
 
       var indicesCallbackCalled = false;
+      var interaction: any;
       var indicesCallback = (indices: number[]) => {
         indicesCallbackCalled = true;
         interaction.clearBox();
@@ -183,7 +184,7 @@ describe("Interactions", () => {
         indicesCallback(indices);
         zoomCallback(a);
       };
-      var interaction = new Plottable.AreaInteraction(renderer).callback(callback);
+      interaction = new Plottable.AreaInteraction(renderer).callback(callback);
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       assert.isTrue(indicesCallbackCalled, "indicesCallback was called");
       assert.deepEqual(xScale.domain(), expectedXDomain, "X scale domain was updated correctly");

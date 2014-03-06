@@ -669,12 +669,15 @@ var Plottable;
         };
 
         AreaInteraction.prototype.dragend = function () {
-            if (!this.dragInitialized)
+            if (!this.dragInitialized) {
                 return;
+            }
 
             this.dragInitialized = false;
-            if (this.callbackToCall == null)
+            if (this.callbackToCall == null) {
                 return;
+            }
+
             var xMin = Math.min(this.origin[0], this.location[0]);
             var xMax = Math.max(this.origin[0], this.location[0]);
             var yMin = Math.min(this.origin[1], this.location[1]);
