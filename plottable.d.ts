@@ -31,6 +31,8 @@ declare module Plottable {
         private hitBox;
         private interactionsToRegister;
         private boxes;
+        private boxContainer;
+        public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
         public fixedWidthVal: boolean;
         public fixedHeightVal: boolean;

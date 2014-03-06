@@ -104,10 +104,14 @@ var Plottable;
                 throw new Error("Can't anchor to a non-empty element");
             }
             this.element = element;
+            this.boxContainer = this.element.append("g").classed("box-container", true);
+            this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
+
             if (this.clipPathEnabled) {
                 this.generateClipPath();
             }
             ;
+
             this.cssClasses.forEach(function (cssClass) {
                 _this.element.classed(cssClass, true);
             });
@@ -257,7 +261,7 @@ var Plottable;
             if (this.element == null) {
                 throw new Error("Adding boxes before anchoring is currently disallowed");
             }
-            var parentElement = parentElement == null ? this.element : parentElement;
+            var parentElement = parentElement == null ? this.boxContainer : parentElement;
             var box = parentElement.append("rect");
             if (className != null) {
                 box.classed(className, true);
@@ -698,8 +702,8 @@ var Plottable;
         AreaInteraction.prototype.anchor = function (hitBox) {
             _super.prototype.anchor.call(this, hitBox);
             var cname = AreaInteraction.CLASS_DRAG_BOX;
-            var element = this.componentToListenTo.element;
-            this.dragBox = element.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+            var foreground = this.componentToListenTo.foregroundContainer;
+            this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
             hitBox.call(this.dragBehavior);
             return this;
         };
