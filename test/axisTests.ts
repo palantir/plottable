@@ -6,7 +6,7 @@ describe("Axes", () => {
   // TODO: Rewrite these tests when the Axis class gets refactored
   it("Renders ticks", () => {
     var svg = generateSVG(500, 100);
-    var xScale = new LinearScale();
+    var xScale = new Plottable.LinearScale();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
     var axis = new Plottable.XAxis(xScale, "bottom");

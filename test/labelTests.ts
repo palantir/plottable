@@ -6,7 +6,7 @@ describe("Labels", () => {
 
   it("Standard text title label generates properly", () => {
     var svg = generateSVG(400, 80);
-    var label = new TitleLabel("A CHART TITLE");
+    var label = new Plottable.TitleLabel("A CHART TITLE");
     label.anchor(svg);
     label.computeLayout();
 
@@ -17,7 +17,7 @@ describe("Labels", () => {
     assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
 
     var text = element.select("text");
-    var bbox = Utils.getBBox(text);
+    var bbox = Plottable.Utils.getBBox(text);
     assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
@@ -25,13 +25,13 @@ describe("Labels", () => {
 
   it("Left-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
-    var label = new AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
+    var label = new Plottable.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
     label.anchor(svg);
     var element = label.element;
     var text = element.select("text");
     label.computeLayout();
     label.render();
-    var textBBox = Utils.getBBox(text);
+    var textBBox = Plottable.Utils.getBBox(text);
     assertBBoxInclusion(element.select(".bounding-box"), text);
     assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
@@ -40,13 +40,13 @@ describe("Labels", () => {
 
   it("Right-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
-    var label = new AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
+    var label = new Plottable.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
     label.anchor(svg);
     var element = label.element;
     var text = element.select("text");
     label.computeLayout();
     label.render();
-    var textBBox = Utils.getBBox(text);
+    var textBBox = Plottable.Utils.getBBox(text);
     assertBBoxInclusion(element.select(".bounding-box"), text);
     assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
@@ -55,7 +55,7 @@ describe("Labels", () => {
 
   it("Label text can be changed after label is created", () => {
     var svg = generateSVG(400, 80);
-    var label = new TitleLabel();
+    var label = new Plottable.TitleLabel();
     label.anchor(svg);
     var textEl = label.element.select("text");
     assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
@@ -69,13 +69,13 @@ describe("Labels", () => {
   it("Superlong text is handled in a sane fashion", () => {
     var svgWidth = 400;
     var svg = generateSVG(svgWidth, 80);
-    var label = new TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
+    var label = new Plottable.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
     label.anchor(svg);
     var element = label.element;
     var text = element.select("text");
     label.computeLayout();
     label.render();
-    var bbox = Utils.getBBox(text);
+    var bbox = Plottable.Utils.getBBox(text);
     assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
@@ -83,7 +83,7 @@ describe("Labels", () => {
 
   it("text in a tiny box is truncated to empty string", () => {
     var svg = generateSVG(10, 10);
-    var label = new TitleLabel("Yeah, not gonna fit...");
+    var label = new Plottable.TitleLabel("Yeah, not gonna fit...");
     label.renderTo(svg);
     var text = label.element.select("text");
     assert.equal(text.text(), "", "text was truncated to empty string");
@@ -91,6 +91,6 @@ describe("Labels", () => {
   });
 
   it("unsupported alignments and orientations are unsupported", () => {
-    assert.throws(() => new Label("foo", "bar"), Error, "not a valid orientation");
+    assert.throws(() => new Plottable.Label("foo", "bar"), Error, "not a valid orientation");
   });
 });

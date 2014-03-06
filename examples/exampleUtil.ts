@@ -1,4 +1,4 @@
-function makeRandomData(numPoints, scaleFactor=1): IDataset {
+function makeRandomData(numPoints, scaleFactor=1): Plottable.IDataset {
   var data = [];
   for (var i = 0; i < numPoints; i++) {
     var x = Math.random();
@@ -23,7 +23,7 @@ function makeBinFunction(accessor, range, nBins) {
   return (d) => binByVal(d, accessor, range, nBins);
 }
 
-function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
+function binByVal(data: any[], accessor: Plottable.IAccessor, range=[0,100], nBins=10) {
   if (accessor == null) {accessor = (d) => d.x};
   var min = range[0];
   var max = range[1];
@@ -53,7 +53,7 @@ function binByVal(data: any[], accessor: IAccessor, range=[0,100], nBins=10) {
   })
   return bins;
 }
-function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue = 10): IDataset {
+function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue = 10): Plottable.IDataset {
   var data = [];
   for (var i=0; i < numBuckets; i++) {
     data.push({

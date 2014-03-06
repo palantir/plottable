@@ -49,7 +49,7 @@ function assertWidthHeight(el: D3.Selection, widthExpected, heightExpected, mess
   assert.equal(height, heightExpected, "height: " + message);
 }
 
-function makeLinearSeries(n: number): IDataset {
+function makeLinearSeries(n: number): Plottable.IDataset {
   function makePoint(x: number) {
     return {x: x, y: x};
   }
@@ -57,7 +57,7 @@ function makeLinearSeries(n: number): IDataset {
   return {data: data, seriesName: "linear-series"};
 }
 
-function makeQuadraticSeries(n: number): IDataset {
+function makeQuadraticSeries(n: number): Plottable.IDataset {
   function makeQuadraticPoint(x: number) {
     return {x: x, y: x*x};
   }

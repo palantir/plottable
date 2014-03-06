@@ -1,26 +1,27 @@
+module Plottable {
+  export interface IDataset {
+    data: any[];
+    seriesName: string;
+  }
 
-interface IDataset {
-  data: any[];
-  seriesName: string;
-}
+  export interface SelectionArea {
+    xMin: number;
+    xMax: number;
+    yMin: number;
+    yMax: number;
+  }
 
-interface SelectionArea {
-  xMin: number;
-  xMax: number;
-  yMin: number;
-  yMax: number;
-}
-
-interface FullSelectionArea {
-  pixel: SelectionArea;
-  data: SelectionArea;
-}
+  export interface FullSelectionArea {
+    pixel: SelectionArea;
+    data: SelectionArea;
+  }
 
 
-interface IBroadcasterCallback {
-  (broadcaster: IBroadcaster, ...args: any[]): any;
-}
+  export interface IBroadcasterCallback {
+    (broadcaster: IBroadcaster, ...args: any[]): any;
+  }
 
-interface IBroadcaster {
-  registerListener: (cb: IBroadcasterCallback) => IBroadcaster;
+  export interface IBroadcaster {
+    registerListener: (cb: IBroadcasterCallback) => IBroadcaster;
+  }
 }
