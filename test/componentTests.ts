@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-function assertComponentXY(component: Component, x: number, y: number, message: string) {
+function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform(component.element.attr("transform")).translate;
   var xActual = translate[0];
@@ -13,12 +13,12 @@ function assertComponentXY(component: Component, x: number, y: number, message: 
 
 describe("Component behavior", () => {
   var svg: D3.Selection;
-  var c: Component;
+  var c: Plottable.Component;
   var SVG_WIDTH = 400;
   var SVG_HEIGHT = 300;
   beforeEach(() => {
     svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    c = new Component();
+    c = new Plottable.Component();
   });
 
   it.skip("renderTo works properly", () => {
@@ -175,9 +175,9 @@ describe("Component behavior", () => {
   it("clipPath works as expected", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
-    var expectedClipPathID: number = (<any> Component).clipPathId;
+    var expectedClipPathID: number = (<any> Plottable.Component).clipPathId;
     c.anchor(svg).computeLayout(0, 0, 100, 100).render();
-    assert.equal((<any> Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
+    assert.equal((<any> Plottable.Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
     var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
     assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
     var clipRect = c.element.select(".clip-rect");
@@ -196,7 +196,7 @@ describe("Component behavior", () => {
     boxStrings.forEach((s) => {
       var box = e.select(s);
       assert.isNotNull(box.node(), s + " box was created");
-      var bb = Utils.getBBox(box);
+      var bb = Plottable.Utils.getBBox(box);
       assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
       assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
     });
@@ -204,7 +204,7 @@ describe("Component behavior", () => {
   });
 
   it("hitboxes are created iff there are registered interactions", () => {
-    function verifyHitbox(component: Component) {
+    function verifyHitbox(component: Plottable.Component) {
       var hitBox = (<any> component).hitBox;
       assert.isNotNull(hitBox, "the hitbox was created");
       var hitBoxFill = hitBox.style("fill");
@@ -218,16 +218,16 @@ describe("Component behavior", () => {
     svg.remove();
     svg = generateSVG();
 
-    c = new Component();
-    var i = new Interaction(c).registerWithComponent();
+    c = new Plottable.Component();
+    var i = new Plottable.Interaction(c).registerWithComponent();
     c.anchor(svg);
     verifyHitbox(c);
     svg.remove();
     svg = generateSVG();
 
-    c = new Component();
+    c = new Plottable.Component();
     c.anchor(svg);
-    i = new Interaction(c).registerWithComponent();
+    i = new Plottable.Interaction(c).registerWithComponent();
     verifyHitbox(c);
     svg.remove();
   });

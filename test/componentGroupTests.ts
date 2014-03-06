@@ -4,11 +4,11 @@ var assert = chai.assert;
 
 describe("ComponentGroups", () => {
   it("components in componentGroups overlap", () => {
-    var c1 = new Component().rowMinimum(10).colMinimum(10);
-    var c2 = new Component();
-    var c3 = new Component();
+    var c1 = new Plottable.Component().rowMinimum(10).colMinimum(10);
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
 
-    var cg = new ComponentGroup([c1, c2, c3]);
+    var cg = new Plottable.ComponentGroup([c1, c2, c3]);
     var svg = generateSVG(400, 400);
     cg.anchor(svg);
     (<any> c1).addBox("test-box1");
@@ -25,11 +25,11 @@ describe("ComponentGroups", () => {
   });
 
   it("components can be added before and after anchoring", () => {
-    var c1 = new Component().rowMinimum(10).colMinimum(10);
-    var c2 = new Component().rowMinimum(20).colMinimum(20);
-    var c3 = new Component();
+    var c1 = new Plottable.Component().rowMinimum(10).colMinimum(10);
+    var c2 = new Plottable.Component().rowMinimum(20).colMinimum(20);
+    var c3 = new Plottable.Component();
 
-    var cg = new ComponentGroup([c1]);
+    var cg = new Plottable.ComponentGroup([c1]);
     var svg = generateSVG(400, 400);
     cg.addComponent(c2).anchor(svg);
     (<any> c1).addBox("test-box1");
@@ -48,11 +48,11 @@ describe("ComponentGroups", () => {
   });
 
   it("component fixity is computed appropriately", () => {
-    var cg = new ComponentGroup();
-    var c1 = new Component();
+    var cg = new Plottable.ComponentGroup();
+    var c1 = new Plottable.Component();
     c1.fixedHeightVal = false;
     c1.fixedWidthVal  = false;
-    var c2 = new Component();
+    var c2 = new Plottable.Component();
     c2.fixedHeightVal = false;
     c2.fixedWidthVal  = false;
 

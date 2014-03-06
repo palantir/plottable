@@ -4,13 +4,13 @@ var assert = chai.assert;
 
 describe("Legends", () => {
   var svg: D3.Selection;
-  var color: ColorScale;
-  var legend: Legend;
+  var color: Plottable.ColorScale;
+  var legend: Plottable.Legend;
 
   beforeEach(() => {
     svg = generateSVG(400, 400);
-    color = new ColorScale("Category10");
-    legend = new Legend(color);
+    color = new Plottable.ColorScale("Category10");
+    legend = new Plottable.Legend(color);
   });
 
   it("a basic legend renders", () => {
@@ -49,7 +49,7 @@ describe("Legends", () => {
     var totalHeight = 0;
     var legends = legend.element.selectAll(".legend-row");
     legends.each(function(d, i) {
-      totalHeight += Utils.getBBox(d3.select(this).select("text")).height;
+      totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
     });
     assert.lengthOf(legends[0], 8, "there were 8 legends");
     assert.operator(totalHeight, "<=", legend.rowMinimum(), "the legend did not overflow its requested space");

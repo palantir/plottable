@@ -8,14 +8,14 @@ describe("Renderers", () => {
 
   describe("base Renderer", () => {
     it("Renderers default correctly", () => {
-      var r = new Renderer();
+      var r = new Plottable.Renderer();
       assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
     });
 
     it("Base renderer functionality works", () => {
       var svg = generateSVG(400, 300);
       var d1 = {data: ["foo"], seriesName: "bar"};
-      var r = new Renderer(d1);
+      var r = new Plottable.Renderer(d1);
       r.anchor(svg).computeLayout();
       var renderArea = r.element.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
@@ -45,11 +45,11 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(500, 500);
-        xScale = new LinearScale();
-        yScale = new LinearScale();
+        xScale = new Plottable.LinearScale();
+        yScale = new Plottable.LinearScale();
         var xAccessor = (d) => d.foo;
         var yAccessor = (d) => d.bar;
-        lineRenderer = new LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
+        lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
         lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
       });
@@ -86,9 +86,9 @@ describe("Renderers", () => {
 
     describe("Example CircleRenderer with quadratic series", () => {
       var svg: D3.Selection;
-      var xScale: LinearScale;
-      var yScale: LinearScale;
-      var circleRenderer: CircleRenderer;
+      var xScale: Plottable.LinearScale;
+      var yScale: Plottable.LinearScale;
+      var circleRenderer: Plottable.CircleRenderer;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
       var verifier = new MultiTestVerifier();
@@ -128,9 +128,9 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new LinearScale();
-        yScale = new LinearScale();
-        circleRenderer = new CircleRenderer(quadraticDataset, xScale, yScale);
+        xScale = new Plottable.LinearScale();
+        yScale = new Plottable.LinearScale();
+        circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
         circleRenderer.renderTo(svg);
       });
 
@@ -237,9 +237,9 @@ describe("Renderers", () => {
 
     describe("Bar Renderer", () => {
       var svg: D3.Selection;
-      var xScale: LinearScale;
-      var yScale: LinearScale;
-      var barRenderer: BarRenderer;
+      var xScale: Plottable.LinearScale;
+      var yScale: Plottable.LinearScale;
+      var barRenderer: Plottable.BarRenderer;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       var verifier = new MultiTestVerifier();
@@ -249,9 +249,9 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new LinearScale();
-        yScale = new LinearScale();
-        barRenderer = new BarRenderer(dataset, xScale, yScale);
+        xScale = new Plottable.LinearScale();
+        yScale = new Plottable.LinearScale();
+        barRenderer = new Plottable.BarRenderer(dataset, xScale, yScale);
         barRenderer.anchor(svg).computeLayout();
       });
 

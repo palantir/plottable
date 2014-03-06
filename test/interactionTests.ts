@@ -33,18 +33,18 @@ describe("Interactions", () => {
     it("Pans properly", () => {
       // The only difference between pan and zoom is internal to d3
       // Simulating zoom events is painful, so panning will suffice here
-      var xScale = new LinearScale();
-      var yScale = new LinearScale();
+      var xScale = new Plottable.LinearScale();
+      var yScale = new Plottable.LinearScale();
 
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
-      var renderer = new CircleRenderer(dataset, xScale, yScale);
+      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
       renderer.renderTo(svg);
 
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
 
-      var interaction = new PanZoomInteraction(renderer, xScale, yScale);
+      var interaction = new Plottable.PanZoomInteraction(renderer, xScale, yScale);
 
       var hb = renderer.element.select(".hit-box").node();
       var dragDistancePixelX = 10;
@@ -60,7 +60,7 @@ describe("Interactions", () => {
       assert.notDeepEqual(xDomainAfter, xDomainBefore, "x domain was changed by panning");
       assert.notDeepEqual(yDomainAfter, yDomainBefore, "y domain was changed by panning");
 
-      function getSlope(scale: LinearScale) {
+      function getSlope(scale: Plottable.LinearScale) {
         var range = scale.range();
         var domain = scale.domain();
         return (domain[1]-domain[0])/(range[1]-range[0]);
@@ -80,11 +80,11 @@ describe("Interactions", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
-    var dataset: IDataset;
-    var xScale: QuantitiveScale;
-    var yScale: QuantitiveScale;
-    var renderer: XYRenderer;
-    var interaction: AreaInteraction;
+    var dataset: Plottable.IDataset;
+    var xScale: Plottable.QuantitiveScale;
+    var yScale: Plottable.QuantitiveScale;
+    var renderer: Plottable.XYRenderer;
+    var interaction: Plottable.AreaInteraction;
 
     var dragstartX = 20;
     var dragstartY = svgHeight-100;
@@ -94,11 +94,11 @@ describe("Interactions", () => {
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
       dataset = makeLinearSeries(10);
-      xScale = new LinearScale();
-      yScale = new LinearScale();
-      renderer = new CircleRenderer(dataset, xScale, yScale);
+      xScale = new Plottable.LinearScale();
+      yScale = new Plottable.LinearScale();
+      renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
       renderer.renderTo(svg);
-      interaction = new AreaInteraction(renderer);
+      interaction = new Plottable.AreaInteraction(renderer);
     });
 
     afterEach(() => {
@@ -107,7 +107,7 @@ describe("Interactions", () => {
 
     it("All callbacks are notified with appropriate data when a drag finishes", () => {
       var areaCallbackCalled = false;
-      var areaCallback = (a: SelectionArea) => {
+      var areaCallback = (a: Plottable.SelectionArea) => {
         areaCallbackCalled = true;
         var expectedPixelArea = {
           xMin: dragstartX,
@@ -129,7 +129,7 @@ describe("Interactions", () => {
 
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
-      var dragBoxClass = "." + (<any> AreaInteraction).CLASS_DRAG_BOX;
+      var dragBoxClass = "." + (<any> Plottable.AreaInteraction).CLASS_DRAG_BOX;
       var dragBox = renderer.element.select(dragBoxClass);
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY)};
@@ -149,14 +149,14 @@ describe("Interactions", () => {
 
   describe("BrushZoomInteraction", () => {
     it("Zooms in correctly on drag", () =>{
-      var xScale = new LinearScale();
-      var yScale = new LinearScale();
+      var xScale = new Plottable.LinearScale();
+      var yScale = new Plottable.LinearScale();
 
       var svgWidth  = 400;
       var svgHeight = 400;
       var svg = generateSVG(svgWidth, svgHeight);
       var dataset = makeLinearSeries(11);
-      var renderer = new CircleRenderer(dataset, xScale, yScale);
+      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
       renderer.renderTo(svg);
 
       var xDomainBefore = xScale.domain();
@@ -176,14 +176,14 @@ describe("Interactions", () => {
         interaction.clearBox();
         assert.deepEqual(indices, [1, 2, 3, 4], "the correct points were selected");
       };
-      var zoomCallback = new ZoomCallbackGenerator().addXScale(xScale).addYScale(yScale).getCallback();
-      var callback = (a: SelectionArea) => {
+      var zoomCallback = new Plottable.ZoomCallbackGenerator().addXScale(xScale).addYScale(yScale).getCallback();
+      var callback = (a: Plottable.SelectionArea) => {
         var dataArea = renderer.invertXYSelectionArea(a);
         var indices = renderer.getDataIndicesFromArea(dataArea);
         indicesCallback(indices);
         zoomCallback(a);
       };
-      var interaction = new AreaInteraction(renderer).callback(callback);
+      var interaction = new Plottable.AreaInteraction(renderer).callback(callback);
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       assert.isTrue(indicesCallbackCalled, "indicesCallback was called");
       assert.deepEqual(xScale.domain(), expectedXDomain, "X scale domain was updated correctly");
