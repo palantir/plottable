@@ -6,9 +6,9 @@ module DemoDay {
     var s: any = {};
     s.xScale = new LinearScale();
     s.yScale = new LinearScale();
-    s.leftAxis = new YAxis(s.yScale, "left");
+    s.leftAxis = new Plottable.YAxis(s.yScale, "left");
     var leftAxisTable = new Table([[new AxisLabel("y", "vertical-left"), s.leftAxis]]);
-    s.xAxis = new XAxis(s.xScale, "bottom");
+    s.xAxis = new Plottable.XAxis(s.xScale, "bottom");
     var xAxisTable = new Table([[s.xAxis], [new AxisLabel("x")]]);
 
     s.renderer = new CircleRenderer(data, s.xScale, s.yScale, null, null, 1.5);
@@ -32,8 +32,8 @@ module DemoDay {
     var data1 = h.bin1(data);
     var ds1 = {data: data1, seriesName: "xVals"}
     h.renderer1 = new BarRenderer(ds1, h.xScale1, h.yScale1);
-    h.xAxis1 = new XAxis(h.xScale1, "bottom");
-    h.yAxis1 = new YAxis(h.yScale1, "right");
+    h.xAxis1 = new Plottable.XAxis(h.xScale1, "bottom");
+    h.yAxis1 = new Plottable.YAxis(h.yScale1, "right");
     var labelX1Table = new Table([[h.xAxis1], [new AxisLabel("X values")]]);
     var labelY1Table = new Table([[h.yAxis1, new AxisLabel("Counts", "vertical-right")]]);
     var table1 = new Table([[h.renderer1, labelY1Table], [labelX1Table, null]]);
@@ -45,8 +45,8 @@ module DemoDay {
     var data2 = h.bin2(data);
     var ds2 = {data: data2, seriesName: "yVals"}
     h.renderer2 = new BarRenderer(ds2, h.xScale2, h.yScale2);
-    h.xAxis2 = new XAxis(h.xScale2, "bottom");
-    h.yAxis2 = new YAxis(h.yScale2, "right");
+    h.xAxis2 = new Plottable.XAxis(h.xScale2, "bottom");
+    h.yAxis2 = new Plottable.YAxis(h.yScale2, "right");
     var labelX2Table = new Table([[h.xAxis2], [new AxisLabel("Y values")]]);
     var labelY2Table = new Table([[h.yAxis2, new AxisLabel("Counts", "vertical-right")]]);
     var table2 = new Table([[h.renderer2, labelY2Table], [labelX2Table, null]]);

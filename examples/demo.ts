@@ -8,8 +8,8 @@ module Demo {
   svg1.attr("width", 500).attr("height", 500);
   var xScale = new LinearScale();
   var yScale = new LinearScale();
-  var xAxis = new XAxis(xScale, "bottom");
-  var yAxis = new YAxis(yScale, "right");
+  var xAxis = new Plottable.XAxis(xScale, "bottom");
+  var yAxis = new Plottable.YAxis(yScale, "right");
   var data = makeRandomData(30);
   var renderAreaD1 = new CircleRenderer(data, xScale, yScale);
   var basicTable = new Table([[renderAreaD1, yAxis], [xAxis, null]])
@@ -26,8 +26,8 @@ module Demo {
   function makeBasicChartTable() {
     var xScale = new LinearScale();
     var yScale = new LinearScale();
-    var xAxis = new XAxis(xScale, "bottom");
-    var yAxis = new YAxis(yScale, "right");
+    var xAxis = new Plottable.XAxis(xScale, "bottom");
+    var yAxis = new Plottable.YAxis(yScale, "right");
     var data = makeRandomData(30);
     var renderArea = new LineRenderer(data, xScale, yScale);
     var rootTable = new Table([[renderArea, yAxis], [xAxis, null]])
@@ -51,9 +51,9 @@ module Demo {
   function makeMultiAxisChart() {
     var xScale = new LinearScale();
     var yScale = new LinearScale();
-    var rightAxes = [new YAxis(yScale, "right"), new YAxis(yScale, "right")];
+    var rightAxes = [new Plottable.YAxis(yScale, "right"), new Plottable.YAxis(yScale, "right")];
     var rightAxesTable = new Table([rightAxes]);
-    var xAxis = new XAxis(xScale, "bottom");
+    var xAxis = new Plottable.XAxis(xScale, "bottom");
     var data = makeRandomData(30);
     var renderArea = new LineRenderer(data, xScale, yScale);
     var rootTable = new Table([[renderArea, rightAxesTable], [xAxis, null]])
@@ -72,22 +72,22 @@ module Demo {
   function makeSparklineMultichart() {
     var xScale1 = new LinearScale();
     var yScale1 = new LinearScale();
-    var leftAxes = [new YAxis(yScale1, "left"), new YAxis(yScale1, "left")];
+    var leftAxes = [new Plottable.YAxis(yScale1, "left"), new Plottable.YAxis(yScale1, "left")];
     var leftAxesTable = new Table([leftAxes]);
-    var rightAxes = [new YAxis(yScale1, "right"), new YAxis(yScale1, "right")];
+    var rightAxes = [new Plottable.YAxis(yScale1, "right"), new Plottable.YAxis(yScale1, "right")];
     var rightAxesTable = new Table([rightAxes]);
     var data1 = makeRandomData(30, .0005);
     var renderer1 = new LineRenderer(data1, xScale1, yScale1);
     var row1: Component[] = [leftAxesTable, renderer1, rightAxesTable];
     var yScale2 = new LinearScale();
-    var leftAxis = new YAxis(yScale2, "left").xAlign("RIGHT");
+    var leftAxis = new Plottable.YAxis(yScale2, "left").xAlign("RIGHT");
     var data2 = makeRandomData(1000, 100000);
     var renderer2 = new CircleRenderer(data2, xScale1, yScale2);
     var toggleClass = function() {return !d3.select(this).classed("selected-point")};
     var cb = (s) => s.classed("selected-point", toggleClass);
     var areaInteraction = new AreaInteraction(renderer2);
     var row2: Component[] = [leftAxis, renderer2, null];
-    var bottomAxis = new XAxis(xScale1, "bottom");
+    var bottomAxis = new Plottable.XAxis(xScale1, "bottom");
     var row3: Component[] = [null, bottomAxis, null];
     var xScaleSpark = new LinearScale();
     var yScaleSpark = new LinearScale();
@@ -113,23 +113,23 @@ module Demo {
   // function makeChartWithGivenNumAxes(left=1, right=0, top=0, bottom=1){
   //   var xScale = new LinearScale();
   //   var yScale = new LinearScale();
-  //   var leftAxes = iterate(left, () => new yAxis(yScale, "right"))
-  //   var rightAxes = iterate(right, () => new yAxis(yScale, "right"))
-  //   var topAxes = iterate(top, () => new xAxis(yScale, "bottom"))
-  //   var bottomAxes = iterate(bottom, () => new xAxis(yScale, "bottom"))
+  //   var leftAxes = iterate(left, () => new Plottable.yAxis(yScale, "right"))
+  //   var rightAxes = iterate(right, () => new Plottable.yAxis(yScale, "right"))
+  //   var topAxes = iterate(top, () => new Plottable.xAxis(yScale, "bottom"))
+  //   var bottomAxes = iterate(bottom, () => new Plottable.xAxis(yScale, "bottom"))
   // }
 
   var svg5 = d3.select("#svg5");
   svg5.attr("width", 500).attr("height", 500);
   var xScale = new LinearScale();
   var yScale = new LinearScale();
-  var xAxis = new XAxis(xScale, "bottom");
+  var xAxis = new Plottable.XAxis(xScale, "bottom");
 
-  var yAxisRight = new YAxis(yScale, "right");
+  var yAxisRight = new Plottable.YAxis(yScale, "right");
   var yAxisRightLabel = new AxisLabel("bp y right qd", "vertical-right");
   var yAxisRightTable = new Table([[yAxisRight, yAxisRightLabel]]);
 
-  var yAxisLeft = new YAxis(yScale, "left");
+  var yAxisLeft = new Plottable.YAxis(yScale, "left");
   var yAxisLeftLabel = new AxisLabel("bp y left qd", "vertical-left");
   var yAxisLeftTable = new Table([[yAxisLeftLabel, yAxisLeft]]);
 
@@ -148,8 +148,8 @@ module Demo {
   svg6.attr("width", 500).attr("height", 500);
   var xScale = new LinearScale();
   var yScale = new LinearScale();
-  var xAxis = new XAxis(xScale, "bottom");
-  var yAxis = new YAxis(yScale, "left");
+  var xAxis = new Plottable.XAxis(xScale, "bottom");
+  var yAxis = new Plottable.YAxis(yScale, "left");
 
   var bucketData = makeRandomBucketData(10, 10, 80);
 

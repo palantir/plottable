@@ -4,10 +4,10 @@ module TSCDemo {
 
   var yScale = new LinearScale();
   var xScale = new LinearScale();
-  var left = new YAxis(yScale, "left");
+  var left = new Plottable.YAxis(yScale, "left");
   var data = makeRandomData(1000, 200);
   var lineRenderer = new LineRenderer(data, xScale, yScale);
-  var bottomAxis = new XAxis(xScale, "bottom");
+  var bottomAxis = new Plottable.XAxis(xScale, "bottom");
 
   var chart = new Table()
             .addComponent(0, 0, left)
