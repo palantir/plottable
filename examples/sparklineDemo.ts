@@ -3,10 +3,10 @@
 module SparklineDemo {
   var yScale = new LinearScale();
   var xScale = new LinearScale();
-  var left = new YAxis(yScale, "left");
+  var left = new Plottable.YAxis(yScale, "left");
   var data = makeRandomData(100, 200);
   var renderer = new CircleRenderer(data, xScale, yScale);
-  var bottomAxis = new XAxis(xScale, "bottom");
+  var bottomAxis = new Plottable.XAxis(xScale, "bottom");
   var xSpark = new LinearScale();
   var ySpark = new LinearScale();
   var sparkline = new LineRenderer(data, xSpark, ySpark);

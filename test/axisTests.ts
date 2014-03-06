@@ -9,7 +9,7 @@ describe("Axes", () => {
     var xScale = new LinearScale();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
-    var axis = new XAxis(xScale, "bottom");
+    var axis = new Plottable.XAxis(xScale, "bottom");
     axis.renderTo(svg);
     var ticks = svg.selectAll(".tick");
     assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");

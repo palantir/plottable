@@ -554,52 +554,54 @@ declare class Legend extends Component {
     private measureTextHeight();
     public render(): Legend;
 }
-declare class Axis extends Component {
-    private static CSS_CLASS;
-    private scale;
-    private orientation;
-    private formatter;
-    static yWidth: number;
-    static xHeight: number;
-    public axisElement: D3.Selection;
-    public d3axis: D3.Svg.Axis;
-    private cachedScale;
-    private cachedTranslate;
-    private isXAligned;
-    private static axisXTransform(selection, x);
-    private static axisYTransform(selection, y);
-    /**
-    * Creates an Axis.
-    * @constructor
-    * @param {Scale} scale The Scale to base the Axis on.
-    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-    * @param {any} [formatter] a D3 formatter
-    */
-    constructor(scale: Scale, orientation: string, formatter?: any);
-    public anchor(element: D3.Selection): Axis;
-    private transformString(translate, scale);
-    public render(): Axis;
-    private rescale();
-}
-declare class XAxis extends Axis {
-    /**
-    * Creates an XAxis (a horizontal Axis).
-    * @constructor
-    * @param {Scale} scale The Scale to base the Axis on.
-    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-    * @param {any} [formatter] a D3 formatter
-    */
-    constructor(scale: Scale, orientation: string, formatter?: any);
-}
-declare class YAxis extends Axis {
-    /**
-    * Creates a YAxis (a vertical Axis).
-    * @constructor
-    * @param {Scale} scale The Scale to base the Axis on.
-    * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-    * @param {any} [formatter] a D3 formatter
-    */
-    constructor(scale: Scale, orientation: string, formatter?: any);
+declare module Plottable {
+    class Axis extends Component {
+        private static CSS_CLASS;
+        private scale;
+        private orientation;
+        private formatter;
+        static yWidth: number;
+        static xHeight: number;
+        public axisElement: D3.Selection;
+        public d3axis: D3.Svg.Axis;
+        private cachedScale;
+        private cachedTranslate;
+        private isXAligned;
+        private static axisXTransform(selection, x);
+        private static axisYTransform(selection, y);
+        /**
+        * Creates an Axis.
+        * @constructor
+        * @param {Scale} scale The Scale to base the Axis on.
+        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {any} [formatter] a D3 formatter
+        */
+        constructor(scale: Scale, orientation: string, formatter?: any);
+        public anchor(element: D3.Selection): Axis;
+        private transformString(translate, scale);
+        public render(): Axis;
+        private rescale();
+    }
+    class XAxis extends Axis {
+        /**
+        * Creates an XAxis (a horizontal Axis).
+        * @constructor
+        * @param {Scale} scale The Scale to base the Axis on.
+        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {any} [formatter] a D3 formatter
+        */
+        constructor(scale: Scale, orientation: string, formatter?: any);
+    }
+    class YAxis extends Axis {
+        /**
+        * Creates a YAxis (a vertical Axis).
+        * @constructor
+        * @param {Scale} scale The Scale to base the Axis on.
+        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {any} [formatter] a D3 formatter
+        */
+        constructor(scale: Scale, orientation: string, formatter?: any);
+    }
 }
 declare class ComponentGroup extends Component {
     private components;
