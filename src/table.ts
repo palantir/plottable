@@ -27,8 +27,8 @@ module Plottable {
       var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
       rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
       this.rows = rows;
-      this.rowWeights = this.rows.map(() => null);
-      this.colWeights = d3.transpose(this.rows).map(() => null);
+      this.rowWeights = this.rows.map(():any => null);
+      this.colWeights = d3.transpose(this.rows).map(():any => null);
     }
 
     /**

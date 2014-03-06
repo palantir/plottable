@@ -15,18 +15,6 @@ module Plottable {
     private cachedTranslate: number;
     private isXAligned: boolean;
 
-    private static axisXTransform(selection, x) {
-      selection.attr("transform", function(d) {
-        return "translate(" + x(d) + ",0)";
-      });
-    }
-
-    private static axisYTransform(selection, y) {
-      selection.attr("transform", function(d) {
-        return "translate(0," + y(d) + ")";
-      });
-    }
-
     /**
      * Creates an Axis.
      *
@@ -88,7 +76,7 @@ module Plottable {
         var ticks = scale.ticks(nTicks);
         var numericDomain = scale.domain();
         var interval = numericDomain[1] - numericDomain[0];
-        var cleanTick = (n) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
+        var cleanTick = (n: number) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
         ticks = ticks.map(cleanTick);
         this.d3axis.tickValues(ticks);
       }

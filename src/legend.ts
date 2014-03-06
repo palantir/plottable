@@ -64,7 +64,7 @@ module Plottable {
       var legend: D3.UpdateSelection = this.element.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true)
-          .attr("transform", (d, i) => "translate(0," + i * textHeight + ")");
+          .attr("transform", (d: any, i: number) => "translate(0," + i * textHeight + ")");
       legendEnter.append("rect")
           .attr("x", Legend.MARGIN)
           .attr("y", Legend.MARGIN)
@@ -74,7 +74,8 @@ module Plottable {
           .attr("x", textHeight)
           .attr("y", Legend.MARGIN + textHeight / 2);
       legend.selectAll("rect").attr("fill", this.colorScale.scale);
-      legend.selectAll("text").text(function(d, i) {return Utils.truncateTextToLength(d, availableWidth, d3.select(this));});
+      legend.selectAll("text")
+            .text(function(d: any, i: number) {return Utils.truncateTextToLength(d, availableWidth, d3.select(this));});
       return this;
     }
   }

@@ -139,7 +139,7 @@ module Plottable {
         var y = this.yAccessor(d);
         return Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Utils.inRange(y, dataArea.yMin, dataArea.yMax);
       };
-      var results = [];
+      var results: number[] = [];
       this.dataset.data.forEach((d, i) => {
         if (filterFunction(d)) {
           results.push(i);

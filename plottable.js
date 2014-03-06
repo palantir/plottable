@@ -1629,18 +1629,6 @@ var Plottable;
                 return _this.rescale();
             });
         }
-        Axis.axisXTransform = function (selection, x) {
-            selection.attr("transform", function (d) {
-                return "translate(" + x(d) + ",0)";
-            });
-        };
-
-        Axis.axisYTransform = function (selection, y) {
-            selection.attr("transform", function (d) {
-                return "translate(0," + y(d) + ")";
-            });
-        };
-
         Axis.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
             this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element

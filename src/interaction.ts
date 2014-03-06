@@ -86,7 +86,7 @@ module Plottable {
   export class AreaInteraction extends Interaction {
     private static CLASS_DRAG_BOX = "drag-box";
     private dragInitialized = false;
-    private dragBehavior;
+    private dragBehavior: D3.Behavior.Drag;
     private origin = [0,0];
     private location = [0,0];
     private constrainX: (n: number) => number;
@@ -124,7 +124,7 @@ module Plottable {
       var availableWidth  = parseFloat(this.hitBox.attr("width"));
       var availableHeight = parseFloat(this.hitBox.attr("height"));
       // the constraint functions ensure that the selection rectangle will not exceed the hit box
-      var constraintFunction = (min, max) => (x) => Math.min(Math.max(x, min), max);
+      var constraintFunction = (min: number, max: number) => (x: number) => Math.min(Math.max(x, min), max);
       this.constrainX = constraintFunction(0, availableWidth);
       this.constrainY = constraintFunction(0, availableHeight);
     }
@@ -182,8 +182,8 @@ module Plottable {
   }
 
   export class ZoomCallbackGenerator {
-    private xScaleMappings = [];
-    private yScaleMappings = [];
+    private xScaleMappings: QuantitiveScale[][] = [];
+    private yScaleMappings: QuantitiveScale[][] = [];
 
     /**
      * Adds listen-update pair of X scales.

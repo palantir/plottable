@@ -631,8 +631,6 @@ declare module Plottable {
         private cachedScale;
         private cachedTranslate;
         private isXAligned;
-        private static axisXTransform(selection, x);
-        private static axisYTransform(selection, y);
         /**
         * Creates an Axis.
         *
