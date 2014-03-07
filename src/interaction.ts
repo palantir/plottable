@@ -245,7 +245,6 @@ module Plottable {
   export class MousemoveInteraction extends Interaction {
     constructor(componentToListenTo: Component) {
       super(componentToListenTo);
-      // this.registerWithComponent();
     }
 
     public anchor(hitBox: D3.Selection) {
