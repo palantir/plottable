@@ -241,4 +241,66 @@ module Plottable {
       };
     }
   }
+
+  export class MousemoveInteraction extends Interaction {
+    constructor(componentToListenTo: Component) {
+      super(componentToListenTo);
+    }
+
+    public anchor(hitBox: D3.Selection) {
+      super.anchor(hitBox);
+      hitBox.on("mousemove", () => {
+        var xy = d3.mouse(hitBox.node());
+        var x = xy[0];
+        var y = xy[1];
+        this.mousemove(x, y);
+      });
+    }
+
+    public mousemove(x: number, y: number) {
+      return; //no-op
+    }
+  }
+
+  export class CrosshairsInteraction extends MousemoveInteraction {
+    private renderer: XYRenderer;
+
+    private circle: D3.Selection;
+    private xLine: D3.Selection;
+    private yLine: D3.Selection;
+
+    constructor(renderer: XYRenderer) {
+      super(renderer);
+      this.renderer = renderer;
+      this.registerWithComponent();
+    }
+
+    public anchor(hitBox: D3.Selection) {
+      super.anchor(hitBox);
+      var container = this.renderer.foregroundContainer.append("g").classed("crosshairs", true);
+      this.circle = container.append("circle").classed("centerpoint", true);
+      this.xLine = container.append("path").classed("x-line", true);
+      this.yLine = container.append("path").classed("y-line", true);
+      this.circle.attr("r", 5);
+    }
+
+    public mousemove(x: number, y: number) {
+      var domainX = this.renderer.xScale.invert(x);
+      var data = this.renderer.dataset.data;
+      var dataIndex = OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
+      dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
+      var dataPoint = data[dataIndex];
+
+      var dataX = this.renderer.xAccessor(dataPoint);
+      var dataY = this.renderer.yAccessor(dataPoint);
+      var pixelX = this.renderer.xScale.scale(dataX);
+      var pixelY = this.renderer.yScale.scale(dataY);
+      this.circle.attr("cx", pixelX).attr("cy", pixelY);
+
+      var width = this.renderer.availableWidth;
+      var height = this.renderer.availableHeight;
+      this.xLine.attr("d", "M 0 " + pixelY + " L " + width + " " + pixelY);
+      this.yLine.attr("d", "M " + pixelX + " 0 L " + pixelX + " " + height);
+    }
+  }
 }

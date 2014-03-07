@@ -18,6 +18,14 @@ describe("Utils", () => {
     svg.remove();
   });
 
+  it("sortedIndex works properly", () => {
+    var a = [1,2,3,4,5];
+    var si = Plottable.OSUtils.sortedIndex;
+    assert.equal(si(0, a), 0, "return 0 when val is <= arr[0]");
+    assert.equal(si(6, a), a.length, "returns a.length when val >= arr[arr.length-1]");
+    assert.equal(si(1.5, a), 1, "returns 1 when val is between the first and second elements");
+  });
+
   it("truncateTextToLength works properly", () => {
     var svg = generateSVG();
     var textEl = svg.append("text").attr("x", 20).attr("y", 50);

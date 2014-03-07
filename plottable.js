@@ -80,6 +80,35 @@ var Plottable;
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
+// This file contains open source utilities, along with their copyright notices
+var Plottable;
+(function (Plottable) {
+    (function (OSUtils) {
+        
+
+        function sortedIndex(val, arr, accessor) {
+            var low = 0;
+            var high = arr.length;
+            while (low < high) {
+                /* tslint:disable:no-bitwise */
+                var mid = (low + high) >>> 1;
+
+                /* tslint:enable:no-bitwise */
+                var x = accessor == null ? arr[mid] : accessor(arr[mid]);
+                if (x < val) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+            return low;
+        }
+        OSUtils.sortedIndex = sortedIndex;
+        ;
+    })(Plottable.OSUtils || (Plottable.OSUtils = {}));
+    var OSUtils = Plottable.OSUtils;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Component = (function () {
@@ -802,6 +831,67 @@ var Plottable;
         return ZoomCallbackGenerator;
     })();
     Plottable.ZoomCallbackGenerator = ZoomCallbackGenerator;
+
+    var MousemoveInteraction = (function (_super) {
+        __extends(MousemoveInteraction, _super);
+        function MousemoveInteraction(componentToListenTo) {
+            _super.call(this, componentToListenTo);
+        }
+        MousemoveInteraction.prototype.anchor = function (hitBox) {
+            var _this = this;
+            _super.prototype.anchor.call(this, hitBox);
+            hitBox.on("mousemove", function () {
+                var xy = d3.mouse(hitBox.node());
+                var x = xy[0];
+                var y = xy[1];
+                _this.mousemove(x, y);
+            });
+        };
+
+        MousemoveInteraction.prototype.mousemove = function (x, y) {
+            return;
+        };
+        return MousemoveInteraction;
+    })(Interaction);
+    Plottable.MousemoveInteraction = MousemoveInteraction;
+
+    var CrosshairsInteraction = (function (_super) {
+        __extends(CrosshairsInteraction, _super);
+        function CrosshairsInteraction(renderer) {
+            _super.call(this, renderer);
+            this.renderer = renderer;
+            this.registerWithComponent();
+        }
+        CrosshairsInteraction.prototype.anchor = function (hitBox) {
+            _super.prototype.anchor.call(this, hitBox);
+            var container = this.renderer.foregroundContainer.append("g").classed("crosshairs", true);
+            this.circle = container.append("circle").classed("centerpoint", true);
+            this.xLine = container.append("path").classed("x-line", true);
+            this.yLine = container.append("path").classed("y-line", true);
+            this.circle.attr("r", 5);
+        };
+
+        CrosshairsInteraction.prototype.mousemove = function (x, y) {
+            var domainX = this.renderer.xScale.invert(x);
+            var data = this.renderer.dataset.data;
+            var dataIndex = Plottable.OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
+            dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
+            var dataPoint = data[dataIndex];
+
+            var dataX = this.renderer.xAccessor(dataPoint);
+            var dataY = this.renderer.yAccessor(dataPoint);
+            var pixelX = this.renderer.xScale.scale(dataX);
+            var pixelY = this.renderer.yScale.scale(dataY);
+            this.circle.attr("cx", pixelX).attr("cy", pixelY);
+
+            var width = this.renderer.availableWidth;
+            var height = this.renderer.availableHeight;
+            this.xLine.attr("d", "M 0 " + pixelY + " L " + width + " " + pixelY);
+            this.yLine.attr("d", "M " + pixelX + " 0 L " + pixelX + " " + height);
+        };
+        return CrosshairsInteraction;
+    })(MousemoveInteraction);
+    Plottable.CrosshairsInteraction = CrosshairsInteraction;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
 var Plottable;

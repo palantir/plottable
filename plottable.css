@@ -65,6 +65,15 @@
   stroke: green;
 }
 
+.plottable .crosshairs .centerpoint {
+  fill: none;
+  stroke: black;
+}
+
+.plottable .crosshairs path {
+  stroke: black;
+}
+
 
 /*
 .error {
