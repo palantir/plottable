@@ -292,7 +292,7 @@ module Plottable {
     public mousemove(x: number, y: number) {
       var domainX = this.renderer.xScale.invert(x);
       var data = this.renderer.dataset.data;
-      var dataIndex = Utils.sortedIndex(domainX, data, this.renderer.xAccessor);
+      var dataIndex = OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
       dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
       var dataPoint = data[dataIndex];
 

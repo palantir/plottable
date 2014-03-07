@@ -1,4 +1,5 @@
 /// <reference path="utils.ts" />
+/// <reference path="osUtils.ts" />
 /// <reference path="component.ts" />
 /// <reference path="scale.ts" />
 //grunt-start

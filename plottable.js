@@ -26,28 +26,6 @@ var Plottable;
         }
         Utils.getBBox = getBBox;
 
-        
-
-        function sortedIndex(val, arr, accessor) {
-            var low = 0;
-            var high = arr.length;
-            while (low < high) {
-                /* tslint:disable:no-bitwise */
-                var mid = (low + high) >>> 1;
-
-                /* tslint:enable:no-bitwise */
-                var x = accessor == null ? arr[mid] : accessor(arr[mid]);
-                if (x < val) {
-                    low = mid + 1;
-                } else {
-                    high = mid;
-                }
-            }
-            return low;
-        }
-        Utils.sortedIndex = sortedIndex;
-        ;
-
         /**
         * Truncates a text string to a max length, given the element in which to draw the text
         *
@@ -870,7 +848,7 @@ var Plottable;
         CrosshairsInteraction.prototype.mousemove = function (x, y) {
             var domainX = this.renderer.xScale.invert(x);
             var data = this.renderer.dataset.data;
-            var dataIndex = Plottable.Utils.sortedIndex(domainX, data, this.renderer.xAccessor);
+            var dataIndex = Plottable.OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
             dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
             var dataPoint = data[dataIndex];
 
@@ -1902,4 +1880,33 @@ var Plottable;
         return ComponentGroup;
     })(Plottable.Component);
     Plottable.ComponentGroup = ComponentGroup;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+// This file contains open source utilities, along with their copyright notices
+var Plottable;
+(function (Plottable) {
+    (function (OSUtils) {
+        
+
+        function sortedIndex(val, arr, accessor) {
+            var low = 0;
+            var high = arr.length;
+            while (low < high) {
+                /* tslint:disable:no-bitwise */
+                var mid = (low + high) >>> 1;
+
+                /* tslint:enable:no-bitwise */
+                var x = accessor == null ? arr[mid] : accessor(arr[mid]);
+                if (x < val) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+            return low;
+        }
+        OSUtils.sortedIndex = sortedIndex;
+        ;
+    })(Plottable.OSUtils || (Plottable.OSUtils = {}));
+    var OSUtils = Plottable.OSUtils;
 })(Plottable || (Plottable = {}));
