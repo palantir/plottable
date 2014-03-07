@@ -11,6 +11,20 @@ declare module Plottable {
         */
         function getBBox(element: D3.Selection): SVGRect;
         /**
+        * Returns the sortedIndex for inserting a value into an array.
+        * Takes a number and an array of numbers OR an array of objects and an accessor that returns a number.
+        * @param {number} value: The numerical value to insert
+        * @param {any[]} arr: Array to find insertion index, can be number[] or any[] (if accessor provided)
+        * @param {IAccessor} accessor: If provided, this function is called on members of arr to determine insertion index
+        * @returns {number} The insertion index.
+        * The behavior is undefined for arrays that are unsorted
+        * If there are multiple valid insertion indices that maintain sorted order (e.g. addign 1 to [1,1,1,1,1]) then
+        * the behavior must satisfy that the array is sorted post-insertion, but is otherwise unspecified.
+        * This is based on Underscore.js's implementation of sortedIndex.
+        */
+        function sortedIndex(val: number, arr: number[]): number;
+        function sortedIndex(val: number, arr: any[], accessor: Plottable.IAccessor): number;
+        /**
         * Truncates a text string to a max length, given the element in which to draw the text
         *
         * @param {string} text: The string to put in the text element, and truncate
@@ -346,6 +360,22 @@ declare module Plottable {
         * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
         */
         public getCallback(): (area: Plottable.SelectionArea) => void;
+    }
+    class MousemoveInteraction extends Interaction {
+        constructor(componentToListenTo: Plottable.Component);
+        public anchor(hitBox: D3.Selection): void;
+        public mousemove(x: number, y: number): void;
+    }
+    class CrosshairsInteraction extends MousemoveInteraction {
+        private renderer;
+        private xAxis;
+        private yAxis;
+        private circle;
+        private xLine;
+        private yLine;
+        constructor(renderer: Plottable.XYRenderer, xAxis: Plottable.XAxis, yAxis: Plottable.YAxis);
+        public anchor(hitBox: D3.Selection): void;
+        public mousemove(x: number, y: number): void;
     }
 }
 declare module Plottable {
