@@ -4,6 +4,7 @@
   "ignore": [
     "**/*",
     "!plottable.js",
+    "!plottable.css",
     "!plottable.d.ts"
   ],
   "keywords": ["plottable", "plottablejs", "plottable.js"],
