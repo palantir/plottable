@@ -836,7 +836,6 @@ var Plottable;
         __extends(MousemoveInteraction, _super);
         function MousemoveInteraction(componentToListenTo) {
             _super.call(this, componentToListenTo);
-            // this.registerWithComponent();
         }
         MousemoveInteraction.prototype.anchor = function (hitBox) {
             var _this = this;
