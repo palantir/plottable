@@ -14,24 +14,25 @@ module.exports = function(grunt) {
   grunt.initConfig({
     concat: {
       license: {
-        src: ["license_header.txt", "build/plottable.js"],
-        dest: "build/plottable.js",
+        src: ["license_header.txt", "plottable.js"],
+        dest: "plottable.js",
       },
     },
     ts: {
       dev: {
-        src: ["src/*.ts"],
-        out: "build/plottable.js",
+        src: ["src/*.ts", "typings/**/*.d.ts"],
+        out: "plottable.js",
         // watch: "src",
         options: {
           target: 'es5',
-          sourceMap: true,
+          noImplicitAny: true,
+          sourceMap: false,
           declaration: true,
-          removeComments: true
+          removeComments: false
         }
       },
       test: {
-        src: ["test/*.ts"],
+        src: ["test/*.ts", "typings/**/*.d.ts"],
         out: "build/tests.js",
         // watch: "test",
         options: {
@@ -42,7 +43,7 @@ module.exports = function(grunt) {
         }
       },
       examples: {
-        src: ["examples/*.ts"],
+        src: ["examples/*.ts", "typings/**/*.d.ts"],
         outDir: "build",
         // watch: "examples",
         options: {
@@ -97,13 +98,9 @@ module.exports = function(grunt) {
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("default", "launch");
 
+  grunt.registerTask("compile", ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]);
   grunt.registerTask("build" , ["compile", "watch"]);
   grunt.registerTask("launch", ["connect", "build"]);
-  grunt.registerTask("compile",
-    ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]
-    );
-
-  grunt.registerTask("test", ["blanket_mocha"]);
-
+  grunt.registerTask("test", ["compile", "blanket_mocha"]);
   grunt.registerTask("watch-test", ["blanket_mocha", "watch:test"]);
 };

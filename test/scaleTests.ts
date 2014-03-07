@@ -4,10 +4,10 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale's copy() works correctly", () => {
-    var testCallback: IBroadcasterCallback = (broadcaster: IBroadcaster) => {
+    var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.IBroadcaster) => {
       return true; // doesn't do anything
     };
-    var scale = new Scale(d3.scale.linear());
+    var scale = new Plottable.Scale(d3.scale.linear());
     scale.registerListener(testCallback);
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
@@ -17,9 +17,9 @@ describe("Scales", () => {
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
-    var scale = new Scale(d3.scale.linear());
+    var scale = new Plottable.Scale(d3.scale.linear());
     var callbackWasCalled = false;
-    var testCallback: IBroadcasterCallback = (broadcaster: IBroadcaster) => {
+    var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.IBroadcaster) => {
       assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
@@ -29,7 +29,7 @@ describe("Scales", () => {
   });
 
   it("QuantitiveScale.widenDomain() functions correctly", () => {
-    var scale = new QuantitiveScale(d3.scale.linear());
+    var scale = new Plottable.QuantitiveScale(d3.scale.linear());
     assert.deepEqual(scale.domain(), [0, 1], "Initial domain is [0, 1]");
     scale.widenDomain([1, 2]);
     assert.deepEqual(scale.domain(), [0, 2], "Domain was wided to [0, 2]");
@@ -40,7 +40,7 @@ describe("Scales", () => {
   });
 
   it("Linear Scales default to a domain of [Infinity, -Infinity]", () => {
-    var scale = new LinearScale();
+    var scale = new Plottable.LinearScale();
     var domain = scale.domain();
     assert.deepEqual(domain, [Infinity, -Infinity]);
   });

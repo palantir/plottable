@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-function assertComponentXY(component: Component, x: number, y: number, message: string) {
+function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform(component.element.attr("transform")).translate;
   var xActual = translate[0];
@@ -13,12 +13,51 @@ function assertComponentXY(component: Component, x: number, y: number, message: 
 
 describe("Component behavior", () => {
   var svg: D3.Selection;
-  var c: Component;
+  var c: Plottable.Component;
   var SVG_WIDTH = 400;
   var SVG_HEIGHT = 300;
   beforeEach(() => {
     svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    c = new Component();
+    c = new Plottable.Component();
+  });
+
+  it.skip("renderTo works properly", () => {
+    var anchored = false;
+    var computed = false;
+    var rendered = false;
+    var oldAnchor = c.anchor.bind(c);
+    var oldCompute = c.computeLayout.bind(c);
+    var oldRender = c.render.bind(c);
+    c.anchor = (el) => {
+      oldAnchor(el);
+      anchored = true;
+      return c;
+    };
+    c.computeLayout = (x?, y?, w?, h?) => {
+      oldCompute(x, y, w, h);
+      computed = true;
+      return c;
+    };
+    c.render = () => {
+      oldRender();
+      rendered = true;
+      return c;
+    };
+    c.renderTo(svg);
+    assert.isTrue(anchored, "anchor was called");
+    assert.isTrue(computed, "computeLayout was called");
+    assert.isTrue(rendered, "render was called");
+    anchored = false;
+    computed = false;
+    rendered = true;
+    c.renderTo(svg);
+    assert.isFalse(anchored, "anchor was not called a second time");
+    assert.isTrue(computed, "computeLayout was called a second time");
+    assert.isTrue(rendered, "render was called a second time");
+    var svg2 = generateSVG();
+    assert.throws(() => c.renderTo(svg2), Error, "different element");
+    svg.remove();
+    svg2.remove();
   });
 
   describe("anchor", () => {
@@ -72,6 +111,19 @@ describe("Component behavior", () => {
     });
   });
 
+  it("subelement containers are ordered properly", () => {
+    c.renderTo(svg);
+    c.element.append("g").classed("foo", true);
+    var gs = c.element.selectAll("g");
+    var g0 = d3.select(gs[0][0]);
+    var g1 = d3.select(gs[0][1]);
+    var g2 = d3.select(gs[0][2]);
+    assert.isTrue(g0.classed("box-container"), "the first g is a box container");
+    assert.isTrue(g1.classed("foreground-container"), "the second g is a foreground container");
+    assert.isTrue(g2.classed("foo"), "the third g is the foo we appended");
+    svg.remove();
+  });
+
   it("fixed-width component will align to the right spot", () => {
     c.rowMinimum(100).colMinimum(100);
     c.anchor(svg);
@@ -118,8 +170,6 @@ describe("Component behavior", () => {
   it("component defaults are as expected", () => {
     assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
     assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
-    assert.equal(c.rowWeight() , 0, "rowWeight  defaults to 0");
-    assert.equal(c.colWeight() , 0, "colWeight  defaults to 0");
     assert.equal((<any> c).xAlignProportion, 0, "xAlignProportion defaults to 0");
     assert.equal((<any> c).yAlignProportion, 0, "yAlignProportion defaults to 0");
     assert.equal((<any> c).xOffsetVal, 0, "xOffset defaults to 0");
@@ -132,22 +182,18 @@ describe("Component behavior", () => {
     assert.equal(c.rowMinimum(), 12, "rowMinimum setter works");
     c.colMinimum(14);
     assert.equal(c.colMinimum(), 14, "colMinimum setter works");
-    c.rowWeight(16);
-    assert.equal(c.rowWeight(), 16, "rowWeight setter works");
-    c.colWeight(18);
-    assert.equal(c.colWeight(), 18, "colWeight setter works");
     svg.remove();
   });
 
   it("clipPath works as expected", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
-    var expectedClipPathID: number = (<any> Component).clipPathId;
+    var expectedClipPathID: number = (<any> Plottable.Component).clipPathId;
     c.anchor(svg).computeLayout(0, 0, 100, 100).render();
-    assert.equal((<any> Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
+    assert.equal((<any> Plottable.Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
     var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
     assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
-    var clipRect = c.element.select(".clip-rect");
+    var clipRect = (<any> c).boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
     assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
     svg.remove();
@@ -155,24 +201,48 @@ describe("Component behavior", () => {
 
   it("boxes work as expected", () => {
     assert.throws(() => (<any> c).addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
-    c.anchor(svg).computeLayout().render();
+    c.renderTo(svg);
     (<any> c).addBox("post-anchor");
     var e = c.element;
-    var boxStrings = [".hit-box", ".bounding-box", ".post-anchor"];
+    var boxContainer = e.select(".box-container");
+    var boxStrings = [".bounding-box", ".post-anchor"];
 
     boxStrings.forEach((s) => {
-      var box = e.select(s);
-      assert.isNotNull(box.node(), s + " box was created");
-      var bb = Utils.getBBox(box);
+      var box = boxContainer.select(s);
+      assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
+      var bb = Plottable.Utils.getBBox(box);
       assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
       assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
     });
+    svg.remove();
+  });
 
-    var hitBox = (<any> c).hitBox;
-    var hitBoxFill = hitBox.style("fill");
-    var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
-    assert.isTrue(hitBoxFilled, hitBoxFill + "<- this should be filled, so the hitbox will detect events");
-    assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
+  it("hitboxes are created iff there are registered interactions", () => {
+    function verifyHitbox(component: Plottable.Component) {
+      var hitBox = (<any> component).hitBox;
+      assert.isNotNull(hitBox, "the hitbox was created");
+      var hitBoxFill = hitBox.style("fill");
+      var hitBoxFilled = hitBoxFill === "#ffffff" || hitBoxFill === "rgb(255, 255, 255)";
+      assert.isTrue(hitBoxFilled, hitBoxFill + " <- this should be filled, so the hitbox will detect events");
+      assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
+    }
+
+    c.anchor(svg);
+    assert.isUndefined((<any> c).hitBox, "no hitBox was created when there were no registered interactions");
+    svg.remove();
+    svg = generateSVG();
+
+    c = new Plottable.Component();
+    var i = new Plottable.Interaction(c).registerWithComponent();
+    c.anchor(svg);
+    verifyHitbox(c);
+    svg.remove();
+    svg = generateSVG();
+
+    c = new Plottable.Component();
+    c.anchor(svg);
+    i = new Plottable.Interaction(c).registerWithComponent();
+    verifyHitbox(c);
     svg.remove();
   });
 
@@ -182,9 +252,9 @@ describe("Component behavior", () => {
     var interaction1: any = {anchor: (hb) => hitBox1 = hb.node()};
     var interaction2: any = {anchor: (hb) => hitBox2 = hb.node()};
     c.registerInteraction(interaction1);
-    c.anchor(svg).computeLayout().render();
+    c.renderTo(svg);
     c.registerInteraction(interaction2);
-    var hitNode = c.hitBox.node();
+    var hitNode = (<any> c).hitBox.node();
     assert.equal(hitBox1, hitNode, "hitBox1 was registerd");
     assert.equal(hitBox2, hitNode, "hitBox2 was registerd");
     svg.remove();

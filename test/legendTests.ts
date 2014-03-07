@@ -4,18 +4,18 @@ var assert = chai.assert;
 
 describe("Legends", () => {
   var svg: D3.Selection;
-  var color: ColorScale;
-  var legend: Legend;
+  var color: Plottable.ColorScale;
+  var legend: Plottable.Legend;
 
   beforeEach(() => {
     svg = generateSVG(400, 400);
-    color = new ColorScale("Category10");
-    legend = new Legend(color);
+    color = new Plottable.ColorScale("Category10");
+    legend = new Plottable.Legend(color);
   });
 
   it("a basic legend renders", () => {
     color.domain(["foo", "bar", "baz"]);
-    legend.anchor(svg).computeLayout().render();
+    legend.renderTo(svg);
     var legends = legend.element.selectAll(".legend-row");
 
     legends.each(function(d, i) {
@@ -42,14 +42,14 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it("a legend with many labels does not overflow vertically", () => {
+  it.skip("a legend with many labels does not overflow vertically", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
-    legend.anchor(svg).computeLayout().render();
+    legend.renderTo(svg);
 
     var totalHeight = 0;
     var legends = legend.element.selectAll(".legend-row");
     legends.each(function(d, i) {
-      totalHeight += Utils.getBBox(d3.select(this).select("text")).height;
+      totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
     });
     assert.lengthOf(legends[0], 8, "there were 8 legends");
     assert.operator(totalHeight, "<=", legend.rowMinimum(), "the legend did not overflow its requested space");
@@ -58,7 +58,7 @@ describe("Legends", () => {
 
   it("a legend with a long label does not overflow horizontally", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
-    legend.anchor(svg).computeLayout().render();
+    legend.renderTo(svg);
     var text = legend.element.select("text").text();
     assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
     var rightEdge = legend.element.select("text").node().getBoundingClientRect().right;
@@ -69,7 +69,7 @@ describe("Legends", () => {
 
   it("calling legend.render multiple times does not add more elements", () => {
     color.domain(["foo", "bar", "baz"]);
-    legend.anchor(svg).computeLayout().render();
+    legend.renderTo(svg);
     var numRows = legend.element.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows initially");
     legend.render();
@@ -80,7 +80,7 @@ describe("Legends", () => {
 
   it("re-rendering the legend with a new domain will do the right thing", () => {
     color.domain(["foo", "bar", "baz"]);
-    legend.anchor(svg).computeLayout().render();
+    legend.renderTo(svg);
     var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
     color.domain(newDomain);
     legend.computeLayout().render();

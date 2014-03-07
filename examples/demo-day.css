@@ -1,14 +1,14 @@
-.demo-table-title text {
+.plottable .demo-table-title text {
   text-decoration: underline;
 }
 
-.scatterplot-title text {
+.plottable .scatterplot-title text {
   font-size: 24pt;
 }
 
-.histogram-title text {
+.plottable .histogram-title text {
   font-size: 24pt;
 
-.axis-label text {
+.plottable .axis-label text {
   font-size: 12pt;
 }

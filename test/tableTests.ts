@@ -5,12 +5,12 @@ var assert = chai.assert;
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
-  var table = new Table();
-  var rows: Component[][] = [];
-  var components: Component[] = [];
+  var table = new Plottable.Table();
+  var rows: Plottable.Component[][] = [];
+  var components: Plottable.Component[] = [];
   for(var i=0; i<nRows; i++) {
     for(var j=0; j<nCols; j++) {
-      var r = new Component().rowWeight(1).colWeight(1);
+      var r = new Plottable.Component();
       table.addComponent(i, j, r);
       components.push(r);
     }
@@ -20,12 +20,12 @@ function generateBasicTable(nRows, nCols) {
 
 describe("Tables", () => {
   it("tables are classed properly", () => {
-    var table = new Table();
+    var table = new Plottable.Table();
     assert.isTrue(table.classed("table"));
   });
 
   it("padTableToSize works properly", () => {
-    var t = new Table();
+    var t = new Plottable.Table();
     assert.deepEqual((<any> t).rows, [], "the table rows is an empty list");
     (<any> t).padTableToSize(1,1);
     var rows = (<any> t).rows;
@@ -42,21 +42,21 @@ describe("Tables", () => {
   });
 
   it("table constructor can take a list of lists of components", () => {
-    var c0 = new Component();
+    var c0 = new Plottable.Component();
     var row1 = [null, c0];
-    var row2 = [new Component(), null];
-    var table = new Table([row1, row2]);
+    var row2 = [new Plottable.Component(), null];
+    var table = new Plottable.Table([row1, row2]);
     assert.isTrue((<any> table).rows[0][0].constructor.name === "Component", "the first element was turned into a null component");
     assert.equal((<any> table).rows[0][1], c0, "the component is in the right spot");
-    var c1 = new Component();
+    var c1 = new Plottable.Component();
     table.addComponent(2, 2, c1);
     assert.equal((<any> table).rows[2][2], c1, "the inserted component went to the right spot");
   });
 
   it("tables can be constructed by adding components in matrix style", () => {
-    var table = new Table();
-    var c1 = new Component();
-    var c2 = new Component();
+    var table = new Plottable.Table();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
     table.addComponent(0, 0, c1);
     table.addComponent(1, 1, c2);
     var rows = (<any> table).rows;
@@ -70,10 +70,10 @@ describe("Tables", () => {
   });
 
   it("base components are overwritten by the addComponent constructor, and other components are not", () => {
-    var c0 = new Component();
-    var c1 = new Table();
-    var c2 = new Table();
-    var t = new Table();
+    var c0 = new Plottable.Component();
+    var c1 = new Plottable.Table();
+    var c2 = new Plottable.Table();
+    var t = new Plottable.Table();
     t.addComponent(0, 0, c0);
     t.addComponent(0, 2, c1);
     t.addComponent(0, 0, c2);
@@ -84,8 +84,8 @@ describe("Tables", () => {
 
   it("tables with insufficient space throw Insufficient Space", () => {
     var svg = generateSVG(200, 200);
-    var c = new Component().rowMinimum(300).colMinimum(300);
-    var t = new Table().addComponent(0, 0, c);
+    var c = new Plottable.Component().rowMinimum(300).colMinimum(300);
+    var t = new Plottable.Table().addComponent(0, 0, c);
     t.anchor(svg);
     assert.throws(() => t.computeLayout(), Error, "Insufficient Space");
     svg.remove();
@@ -95,9 +95,14 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
+    // force the components to have non-fixed layout; eg. as if they were renderers
+    components.forEach((c) => {
+      c.fixedWidthVal = false;
+      c.fixedHeightVal = false;
+    });
 
     var svg = generateSVG();
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
@@ -105,7 +110,7 @@ describe("Tables", () => {
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 200], "third element is located properly");
     assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-    var bboxes = elements.map((e) => Utils.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.Utils.getBBox(e));
     bboxes.forEach((b) => {
       assert.equal(b.width, 200, "bbox is 200 pixels wide");
       assert.equal(b.height, 200, "bbox is 200 pixels tall");
@@ -117,15 +122,20 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
+    // force the components to have non-fixed layout; eg. as if they were renderers
+    components.forEach((c) => {
+      c.fixedWidthVal = false;
+      c.fixedHeightVal = false;
+    });
 
     table.padding(5,5);
 
     var svg = generateSVG(415, 415);
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
-    var bboxes = elements.map((e) => Utils.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.Utils.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
     assert.deepEqual(translates[1], [210, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 210], "third element is located properly");
@@ -146,20 +156,21 @@ describe("Tables", () => {
     // [3 4 5] \\
     // [6 7 8] \\
     // First, set everything to have no weight
-    components.forEach((r) => r.colWeight(0).rowWeight(0).colMinimum(0).rowMinimum(0));
+    components.forEach((r) => r.colMinimum(0).rowMinimum(0));
     // give the axis-like objects a minimum
     components[1].rowMinimum(30);
     components[7].rowMinimum(30);
     components[3].colMinimum(50);
     components[5].colMinimum(50);
+    components[4].fixedWidthVal = false;
+    components[4].fixedHeightVal = false;
     // finally the center 'plot' object has a weight
-    components[4].rowWeight(1).colWeight(1);
 
-    table.anchor(svg).computeLayout().render();
+    table.renderTo(svg);
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
-    var bboxes = elements.map((e) => Utils.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.Utils.getBBox(e));
     // test the translates
     assert.deepEqual(translates[1], [50, 0]  , "top axis translate");
     assert.deepEqual(translates[7], [50, 370], "bottom axis translate");
@@ -176,25 +187,23 @@ describe("Tables", () => {
   });
 
   it("you can't set colMinimum or rowMinimum on tables directly", () => {
-    var table = new Table();
+    var table = new Plottable.Table();
     assert.throws(() => table.rowMinimum(3), Error, "cannot be directly set");
     assert.throws(() => table.colMinimum(3), Error, "cannot be directly set");
   });
 
-  it("tables guess weights intelligently", () => {
-    var c1 = new Component().rowWeight(0).colWeight(0);
-    var c2 = new Component().rowWeight(0).colWeight(0);
-    var table = new Table().addComponent(0, 0, c1).addComponent(1, 0, c2);
-    assert.equal(table.rowWeight(), 0, "the first table guessed 0 for rowWeight");
-    assert.equal(table.colWeight(), 0, "the first table guessed 0 for rowWeight");
-
-    c1.rowWeight(0);
-    c2.rowWeight(3);
-
-    assert.equal(table.rowWeight(), 1, "the table now guesses 1 for rowWeight");
-    assert.equal(table.colWeight(), 0, "the table still guesses 0 for colWeight");
-
-    assert.equal(table.rowWeight(2), table, "rowWeight returned the table");
-    assert.equal(table.rowWeight(), 2, "the rowWeight was overridden explicitly");
+  it("table space fixity calculates properly", () => {
+    var tableAndcomponents = generateBasicTable(3,3);
+    var table = tableAndcomponents.table;
+    var components = tableAndcomponents.components;
+    assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
+    assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+    components[0].fixedWidthVal = false;
+    assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
+    assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+    components[8].fixedHeightVal = false;
+    components[0].fixedWidthVal = true;
+    assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
+    assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
 });

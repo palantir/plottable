@@ -28,10 +28,10 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
 function assertBBoxInclusion(outerEl, innerEl) {
   var outerBox = outerEl.node().getBoundingClientRect();
   var innerBox = innerEl.node().getBoundingClientRect();
-  assert.operator(outerBox.left,   "<=", innerBox.left,   "bounding rect left included"  );
-  assert.operator(outerBox.right,  ">=", innerBox.right,  "bounding rect right included" );
-  assert.operator(outerBox.top,    "<=", innerBox.top,    "bounding rect top included"   );
-  assert.operator(outerBox.bottom, ">=", innerBox.bottom, "bounding rect bottom included");
+  assert.operator(outerBox.left,   "<=", innerBox.left + 0.5,   "bounding rect left included"  );
+  assert.operator(outerBox.top,    "<=", innerBox.top + 0.5,    "bounding rect top included"   );
+  assert.operator(outerBox.right  + 0.5, ">=", innerBox.right,  "bounding rect right included" );
+  assert.operator(outerBox.bottom + 0.5, ">=", innerBox.bottom, "bounding rect bottom included");
 }
 
 
@@ -49,7 +49,7 @@ function assertWidthHeight(el: D3.Selection, widthExpected, heightExpected, mess
   assert.equal(height, heightExpected, "height: " + message);
 }
 
-function makeLinearSeries(n: number): IDataset {
+function makeLinearSeries(n: number): Plottable.IDataset {
   function makePoint(x: number) {
     return {x: x, y: x};
   }
@@ -57,7 +57,7 @@ function makeLinearSeries(n: number): IDataset {
   return {data: data, seriesName: "linear-series"};
 }
 
-function makeQuadraticSeries(n: number): IDataset {
+function makeQuadraticSeries(n: number): Plottable.IDataset {
   function makeQuadraticPoint(x: number) {
     return {x: x, y: x*x};
   }

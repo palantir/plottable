@@ -3,6 +3,12 @@
 <style type="text/css">
 /*-- Add custom styles after this line --*/
 .demo-title { font-size: 24pt; }
-.series-2 .random-data {
+
+.plottable .series-1 .random-data circle {
+    fill: red;
+    stroke: none;
+}
+
+.plottable .series-2 .random-data {
     stroke: green;
 }
