@@ -29,6 +29,48 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    module OSUtils {
+        /**
+        * Returns the sortedIndex for inserting a value into an array.
+        * Takes a number and an array of numbers OR an array of objects and an accessor that returns a number.
+        * @param {number} value: The numerical value to insert
+        * @param {any[]} arr: Array to find insertion index, can be number[] or any[] (if accessor provided)
+        * @param {IAccessor} accessor: If provided, this function is called on members of arr to determine insertion index
+        * @returns {number} The insertion index.
+        * The behavior is undefined for arrays that are unsorted
+        * If there are multiple valid insertion indices that maintain sorted order (e.g. addign 1 to [1,1,1,1,1]) then
+        * the behavior must satisfy that the array is sorted post-insertion, but is otherwise unspecified.
+        * This is a modified version of Underscore.js's implementation of sortedIndex.
+        * Underscore.js is released under the MIT License:
+        Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative
+        Reporters & Editors
+        
+        Permission is hereby granted, free of charge, to any person
+        obtaining a copy of this software and associated documentation
+        files (the "Software"), to deal in the Software without
+        restriction, including without limitation the rights to use,
+        copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the
+        Software is furnished to do so, subject to the following
+        conditions:
+        
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+        OTHER DEALINGS IN THE SOFTWARE.
+        */
+        function sortedIndex(val: number, arr: number[]): number;
+        function sortedIndex(val: number, arr: any[], accessor: Plottable.IAccessor): number;
+    }
+}
+declare module Plottable {
     class Component {
         private static clipPathId;
         public element: D3.Selection;
@@ -354,12 +396,10 @@ declare module Plottable {
     }
     class CrosshairsInteraction extends MousemoveInteraction {
         private renderer;
-        private xAxis;
-        private yAxis;
         private circle;
         private xLine;
         private yLine;
-        constructor(renderer: Plottable.XYRenderer, xAxis: Plottable.XAxis, yAxis: Plottable.YAxis);
+        constructor(renderer: Plottable.XYRenderer);
         public anchor(hitBox: D3.Selection): void;
         public mousemove(x: number, y: number): void;
     }
@@ -728,47 +768,5 @@ declare module Plottable {
     }
     interface IBroadcaster {
         registerListener: (cb: IBroadcasterCallback) => IBroadcaster;
-    }
-}
-declare module Plottable {
-    module OSUtils {
-        /**
-        * Returns the sortedIndex for inserting a value into an array.
-        * Takes a number and an array of numbers OR an array of objects and an accessor that returns a number.
-        * @param {number} value: The numerical value to insert
-        * @param {any[]} arr: Array to find insertion index, can be number[] or any[] (if accessor provided)
-        * @param {IAccessor} accessor: If provided, this function is called on members of arr to determine insertion index
-        * @returns {number} The insertion index.
-        * The behavior is undefined for arrays that are unsorted
-        * If there are multiple valid insertion indices that maintain sorted order (e.g. addign 1 to [1,1,1,1,1]) then
-        * the behavior must satisfy that the array is sorted post-insertion, but is otherwise unspecified.
-        * This is a modified version of Underscore.js's implementation of sortedIndex.
-        * Underscore.js is released under the MIT License:
-        Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative
-        Reporters & Editors
-        
-        Permission is hereby granted, free of charge, to any person
-        obtaining a copy of this software and associated documentation
-        files (the "Software"), to deal in the Software without
-        restriction, including without limitation the rights to use,
-        copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the
-        Software is furnished to do so, subject to the following
-        conditions:
-        
-        The above copyright notice and this permission notice shall be
-        included in all copies or substantial portions of the Software.
-        
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-        OTHER DEALINGS IN THE SOFTWARE.
-        */
-        function sortedIndex(val: number, arr: number[]): number;
-        function sortedIndex(val: number, arr: any[], accessor: Plottable.IAccessor): number;
     }
 }

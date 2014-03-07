@@ -1,9 +1,3 @@
-/*!
-Plottable v0.2.2 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -78,6 +72,35 @@ var Plottable;
         Utils.getTextHeight = getTextHeight;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+// This file contains open source utilities, along with their copyright notices
+var Plottable;
+(function (Plottable) {
+    (function (OSUtils) {
+        
+
+        function sortedIndex(val, arr, accessor) {
+            var low = 0;
+            var high = arr.length;
+            while (low < high) {
+                /* tslint:disable:no-bitwise */
+                var mid = (low + high) >>> 1;
+
+                /* tslint:enable:no-bitwise */
+                var x = accessor == null ? arr[mid] : accessor(arr[mid]);
+                if (x < val) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+            return low;
+        }
+        OSUtils.sortedIndex = sortedIndex;
+        ;
+    })(Plottable.OSUtils || (Plottable.OSUtils = {}));
+    var OSUtils = Plottable.OSUtils;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
 var Plottable;
@@ -829,11 +852,9 @@ var Plottable;
 
     var CrosshairsInteraction = (function (_super) {
         __extends(CrosshairsInteraction, _super);
-        function CrosshairsInteraction(renderer, xAxis, yAxis) {
+        function CrosshairsInteraction(renderer) {
             _super.call(this, renderer);
             this.renderer = renderer;
-            this.xAxis = xAxis;
-            this.yAxis = yAxis;
             this.registerWithComponent();
         }
         CrosshairsInteraction.prototype.anchor = function (hitBox) {
@@ -1880,33 +1901,4 @@ var Plottable;
         return ComponentGroup;
     })(Plottable.Component);
     Plottable.ComponentGroup = ComponentGroup;
-})(Plottable || (Plottable = {}));
-///<reference path="reference.ts" />
-// This file contains open source utilities, along with their copyright notices
-var Plottable;
-(function (Plottable) {
-    (function (OSUtils) {
-        
-
-        function sortedIndex(val, arr, accessor) {
-            var low = 0;
-            var high = arr.length;
-            while (low < high) {
-                /* tslint:disable:no-bitwise */
-                var mid = (low + high) >>> 1;
-
-                /* tslint:enable:no-bitwise */
-                var x = accessor == null ? arr[mid] : accessor(arr[mid]);
-                if (x < val) {
-                    low = mid + 1;
-                } else {
-                    high = mid;
-                }
-            }
-            return low;
-        }
-        OSUtils.sortedIndex = sortedIndex;
-        ;
-    })(Plottable.OSUtils || (Plottable.OSUtils = {}));
-    var OSUtils = Plottable.OSUtils;
 })(Plottable || (Plottable = {}));

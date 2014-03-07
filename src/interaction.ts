@@ -265,18 +265,14 @@ module Plottable {
 
   export class CrosshairsInteraction extends MousemoveInteraction {
     private renderer: XYRenderer;
-    private xAxis: XAxis;
-    private yAxis: YAxis;
 
     private circle: D3.Selection;
     private xLine: D3.Selection;
     private yLine: D3.Selection;
 
-    constructor(renderer: XYRenderer, xAxis: XAxis, yAxis: YAxis) {
+    constructor(renderer: XYRenderer) {
       super(renderer);
       this.renderer = renderer;
-      this.xAxis = xAxis;
-      this.yAxis = yAxis;
       this.registerWithComponent();
     }
 
