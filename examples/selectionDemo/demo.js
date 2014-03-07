@@ -1,3 +1,4 @@
+
 function makeChartWithAreaInteraction() {
     var dataseries = makeRandomData(50);
 

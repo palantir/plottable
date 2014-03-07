@@ -12,8 +12,10 @@ function makeSimpleChart() {
     var yAxis = new Plottable.YAxis(yScale, "left");
 
     var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
-    var basicTable = new Plottable.Table([[yAxis, renderAreaD1],
-                                          [null, xAxis]]);
+    var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
+                                          .addComponent(0, 1, renderAreaD1)
+                                          .addComponent(1, 1, xAxis);
+
     basicTable.anchor(svg).computeLayout().render();
 };
 
