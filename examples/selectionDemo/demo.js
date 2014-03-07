@@ -3,15 +3,15 @@ function makeChartWithAreaInteraction() {
 
     var svg = d3.select("#selection-demo");
     svg.attr("width", 480).attr("height", 320);
-    var xScale = new LinearScale();
-    var xAxis = new XAxis(xScale, "bottom");
-    var yScale = new LinearScale();
-    var yAxis = new YAxis(yScale, "left");
-    var renderAreaD1 = new CircleRenderer(dataseries, xScale, yScale);
-    var basicTable = new Table([[yAxis, renderAreaD1],
-                                [null, xAxis]]);
+    var xScale = new Plottable.LinearScale();
+    var xAxis = new Plottable.XAxis(xScale, "bottom");
+    var yScale = new Plottable.LinearScale();
+    var yAxis = new Plottable.YAxis(yScale, "left");
+    var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+    var basicTable = new Plottable.Table([[yAxis, renderAreaD1],
+                                          [null, xAxis]]);
 
-    var areaInteraction = new AreaInteraction(renderAreaD1); // attach a new AreaInteraction to the render area
+    var areaInteraction = new Plottable.AreaInteraction(renderAreaD1); // attach a new AreaInteraction to the render area
     var lastSelection = null; // initially, nothing is selected
     var selectPoints = function(pixelArea) {
         if (lastSelection != null) {

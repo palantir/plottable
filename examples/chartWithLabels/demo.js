@@ -12,20 +12,20 @@ function makeChartWithLabels() {
     var svg = d3.select("#chart-with-labels");
     svg.attr("width", 480).attr("height", 320);
 
-    var xScale = new LinearScale();
-    var xAxis = new XAxis(xScale, "bottom");
-    var xLabel = new AxisLabel("x"); // defaults to horizontal
-    var xAxisTable = new Table([[xAxis],
-                                [xLabel]]); // groups the x Axis and Label
+    var xScale = new Plottable.LinearScale();
+    var xAxis = new Plottable.XAxis(xScale, "bottom");
+    var xLabel = new Plottable.AxisLabel("x"); // defaults to horizontal
+    var xAxisTable = new Plottable.Table([[xAxis],
+                                          [xLabel]]); // groups the x Axis and Label
 
-    var yScale = new LinearScale();
-    var yAxis = new YAxis(yScale, "left");
-    var yLabel = new AxisLabel("y", "vertical-left");
-    var yAxisTable = new Table([[yLabel, yAxis]]); // groups the y Axis and label
+    var yScale = new Plottable.LinearScale();
+    var yAxis = new Plottable.YAxis(yScale, "left");
+    var yLabel = new Plottable.AxisLabel("y", "vertical-left");
+    var yAxisTable = new Plottable.Table([[yLabel, yAxis]]); // groups the y Axis and label
 
-    var renderAreaD1 = new CircleRenderer(dataseries, xScale, yScale);
-    var basicTable = new Table([[yAxisTable, renderAreaD1],
-                                [null, xAxisTable]]);
+    var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+    var basicTable = new Plottable.Table([[yAxisTable, renderAreaD1],
+                                          [null, xAxisTable]]);
     basicTable.anchor(svg).computeLayout().render();
 };
 
