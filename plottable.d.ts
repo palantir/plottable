@@ -42,6 +42,9 @@ declare module Plottable {
         public fixedHeightVal: boolean;
         private rowMinimumVal;
         private colMinimumVal;
+        private isTopLevelComponent;
+        private globalAvailableWidth;
+        private globalAvailableHeight;
         public availableWidth: number;
         public availableHeight: number;
         public xOrigin: number;

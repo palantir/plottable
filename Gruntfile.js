@@ -37,7 +37,7 @@ module.exports = function(grunt) {
         // watch: "test",
         options: {
           target: 'es5',
-          sourceMap: true,
+          sourceMap: false,
           declaration: false,
           removeComments: false
         }
