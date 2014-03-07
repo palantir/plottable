@@ -1,67 +1,66 @@
-
-body {
-  font: 10px sans-serif;
-}
-
-div {
+.plottable div {
   display: inline;
 }
 
-.label text {
+.plottable .label text {
   font-family: Helvetica;
 }
 
-.axis-label text {
+.plottable .axis-label text {
   font-size: 18pt;
   font-style: italic;
 }
 
-.title-label text {
+.plottable .title-label text {
   font-size: 36pt;
 }
 
-.text-label-vertical {
+.plottable .text-label-vertical {
   writing-mode: tb;
 }
 
-.axis path,
-.axis line {
+.plottable .axis path,
+.plottable .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-.axis path {
+.plottable .axis path {
   fill: none;
   stroke: black;
 }
 
-.line {
+.plottable .axis text {
+  font: 10px sans-serif;
+}
+
+.plottable .line {
   fill: none;
   stroke-width: 1.5px;
   vector-effect: non-scaling-stroke;
 }
-.random-data {
+.plottable .random-data {
   stroke: steelblue;
 }
-circle {
+.plottable circle {
   fill: steelblue;
 }
-.bar-renderer .render-area rect {
+.plottable .bar-renderer .render-area rect {
   fill: steelblue;
 }
 
-.table-rect {
+.plottable .table-rect {
   fill: none;
   stroke: royalblue;
 }
 
-.renderer-box {
+.plottable .renderer-box {
   fill: none;
   stroke: red;
 }
 
-.axis-box {
+.plottable .axis-box {
   fill: none;
   stroke: green;
 }
@@ -73,31 +72,31 @@ circle {
 }
 */
 
-.bounding-box {
+.plottable .bounding-box {
   fill: none;
   stroke: black;
 }
 
-.table-container .bounding-box {
+.plottable .table-container .bounding-box {
   stroke: blue;
 }
 
-.renderer-container .bounding-box {
+.plottable .renderer-container .bounding-box {
   stroke: red;
 }
 
-.axis-container .bounding-box {
+.plottable .axis-container .bounding-box {
   stroke: green;
 }
 
 
-.drag-box {
+.plottable .drag-box {
   fill: aliceblue;
   opacity: 1;
 
 }
 
-.selected-point {
+.plottable .selected-point {
   fill: orange;
   stroke: none;
 }
