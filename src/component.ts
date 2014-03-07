@@ -41,6 +41,11 @@ module Plottable {
       this.boxContainer = this.element.append("g").classed("box-container", true);
       this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
 
+      if (this.element.node().nodeName === "svg") {
+        // root node gets the "plottable" CSS class
+        this.element.classed("plottable", true);
+      }
+
       if (this.clipPathEnabled) {
         this.generateClipPath();
       };

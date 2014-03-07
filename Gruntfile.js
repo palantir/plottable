@@ -26,7 +26,7 @@ module.exports = function(grunt) {
         options: {
           target: 'es5',
           noImplicitAny: true,
-          sourceMap: true,
+          sourceMap: false,
           declaration: true,
           removeComments: false
         }
