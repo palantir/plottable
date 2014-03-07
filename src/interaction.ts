@@ -284,8 +284,8 @@ module Plottable {
       super.anchor(hitBox);
       var container = this.renderer.foregroundContainer.append("g").classed("crosshairs", true);
       this.circle = container.append("circle").classed("centerpoint", true);
-      this.xLine = container.append("path").classed("x-line", true).attr("stroke", "black");
-      this.yLine = container.append("path").classed("y-line", true).attr("stroke", "black");
+      this.xLine = container.append("path").classed("x-line", true);
+      this.yLine = container.append("path").classed("y-line", true);
       this.circle.attr("r", 5);
     }
 
