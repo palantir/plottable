@@ -117,9 +117,11 @@ describe("Component behavior", () => {
     var g0 = d3.select(gs[0][0]);
     var g1 = d3.select(gs[0][1]);
     var g2 = d3.select(gs[0][2]);
-    assert.isTrue(g0.classed("box-container"), "the first g is a box container");
+    var g3 = d3.select(gs[0][3]);
+    assert.isTrue(g0.classed("background-container"), "the first g is a background container");
     assert.isTrue(g1.classed("content"), "the second g is a content container");
     assert.isTrue(g2.classed("foreground-container"), "the third g is a foreground container");
+    assert.isTrue(g3.classed("box-container"), "the fourth g is a box container");
     svg.remove();
   });
 
