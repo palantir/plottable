@@ -303,7 +303,7 @@ declare module Plottable {
         public anchor(hitBox: D3.Selection): void;
         /**
         * Registers the Interaction on the Component it's listening to.
-        * Should not be invoked externally; To be called only at the end of subclassing constructors.
+        * This needs to be called to activate the interaction.
         */
         public registerWithComponent(): Interaction;
     }

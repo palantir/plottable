@@ -27,13 +27,10 @@ module Plottable {
 
     /**
      * Registers the Interaction on the Component it's listening to.
-     * Should not be invoked externally; To be called only at the end of subclassing constructors.
+     * This needs to be called to activate the interaction.
      */
     public registerWithComponent(): Interaction {
       this.componentToListenTo.registerInteraction(this);
-      // It would be nice to have a call to this in the Interaction constructor, but
-      // can't do this right now because that depends on listenToHitBox being callable, which depends on the subclass
-      // constructor finishing first.
       return this;
     }
   }
@@ -64,8 +61,6 @@ module Plottable {
       this.zoom.x(this.xScale.scale);
       this.zoom.y(this.yScale.scale);
       this.zoom.on("zoom", () => this.rerenderZoomed());
-
-      this.registerWithComponent();
     }
 
     public anchor(hitBox: D3.Selection) {
@@ -105,7 +100,6 @@ module Plottable {
       this.dragBehavior.on("dragstart", () => this.dragstart());
       this.dragBehavior.on("drag",      () => this.drag     ());
       this.dragBehavior.on("dragend",   () => this.dragend  ());
-      this.registerWithComponent();
     }
 
     /**
@@ -272,7 +266,6 @@ module Plottable {
     constructor(renderer: XYRenderer) {
       super(renderer);
       this.renderer = renderer;
-      this.registerWithComponent();
     }
 
     public anchor(hitBox: D3.Selection) {

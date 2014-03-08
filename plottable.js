@@ -4,12 +4,6 @@ Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
-/*!
-Plottable v0.2.2 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -612,14 +606,10 @@ var Plottable;
 
         /**
         * Registers the Interaction on the Component it's listening to.
-        * Should not be invoked externally; To be called only at the end of subclassing constructors.
+        * This needs to be called to activate the interaction.
         */
         Interaction.prototype.registerWithComponent = function () {
             this.componentToListenTo.registerInteraction(this);
-
-            // It would be nice to have a call to this in the Interaction constructor, but
-            // can't do this right now because that depends on listenToHitBox being callable, which depends on the subclass
-            // constructor finishing first.
             return this;
         };
         return Interaction;
@@ -647,8 +637,6 @@ var Plottable;
             this.zoom.on("zoom", function () {
                 return _this.rerenderZoomed();
             });
-
-            this.registerWithComponent();
         }
         PanZoomInteraction.prototype.anchor = function (hitBox) {
             _super.prototype.anchor.call(this, hitBox);
@@ -690,7 +678,6 @@ var Plottable;
             this.dragBehavior.on("dragend", function () {
                 return _this.dragend();
             });
-            this.registerWithComponent();
         }
         /**
         * Adds a callback to be called when the AreaInteraction triggers.
@@ -868,7 +855,6 @@ var Plottable;
         function CrosshairsInteraction(renderer) {
             _super.call(this, renderer);
             this.renderer = renderer;
-            this.registerWithComponent();
         }
         CrosshairsInteraction.prototype.anchor = function (hitBox) {
             _super.prototype.anchor.call(this, hitBox);
