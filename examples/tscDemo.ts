@@ -22,6 +22,6 @@ module TSCDemo {
   outerTable.computeLayout();
   outerTable.render();
 
-  new Plottable.CrosshairsInteraction(lineRenderer);
+  new Plottable.CrosshairsInteraction(lineRenderer).registerWithComponent();
 
 }

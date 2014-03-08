@@ -45,7 +45,7 @@ module Plottable {
 
     public anchor(element: D3.Selection) {
       super.anchor(element);
-      this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+      this.axisElement = this.content.append("g").classed("axis", true); // TODO: remove extraneous sub-element
       return this;
     }
 

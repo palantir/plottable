@@ -10,13 +10,13 @@ describe("Labels", () => {
     label.anchor(svg);
     label.computeLayout();
 
-    var element = label.element;
+    var content = label.content;
     assert.isTrue(label.element.classed("label"), "title element has label css class");
     assert.isTrue(label.element.classed("title-label"), "title element has title-label css class");
-    var textChildren = element.selectAll("text");
+    var textChildren = content.selectAll("text");
     assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
 
-    var text = element.select("text");
+    var text = content.select("text");
     var bbox = Plottable.Utils.getBBox(text);
     assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
@@ -27,12 +27,12 @@ describe("Labels", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
     label.anchor(svg);
-    var element = label.element;
-    var text = element.select("text");
+    var content = label.content;
+    var text = content.select("text");
     label.computeLayout();
     label.render();
     var textBBox = Plottable.Utils.getBBox(text);
-    assertBBoxInclusion(element.select(".bounding-box"), text);
+    assertBBoxInclusion(label.element.select(".bounding-box"), text);
     assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
     svg.remove();
@@ -42,12 +42,12 @@ describe("Labels", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
     label.anchor(svg);
-    var element = label.element;
-    var text = element.select("text");
+    var content = label.content;
+    var text = content.select("text");
     label.computeLayout();
     label.render();
     var textBBox = Plottable.Utils.getBBox(text);
-    assertBBoxInclusion(element.select(".bounding-box"), text);
+    assertBBoxInclusion(label.element.select(".bounding-box"), text);
     assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
     svg.remove();
@@ -57,7 +57,7 @@ describe("Labels", () => {
     var svg = generateSVG(400, 80);
     var label = new Plottable.TitleLabel();
     label.anchor(svg);
-    var textEl = label.element.select("text");
+    var textEl = label.content.select("text");
     assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
     assert.equal(label.rowMinimum(), 0, "rowMin is 0 for empty string");
     label.setText("hello world");
@@ -71,8 +71,8 @@ describe("Labels", () => {
     var svg = generateSVG(svgWidth, 80);
     var label = new Plottable.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
     label.anchor(svg);
-    var element = label.element;
-    var text = element.select("text");
+    var content = label.content;
+    var text = content.select("text");
     label.computeLayout();
     label.render();
     var bbox = Plottable.Utils.getBBox(text);
@@ -85,7 +85,7 @@ describe("Labels", () => {
     var svg = generateSVG(10, 10);
     var label = new Plottable.TitleLabel("Yeah, not gonna fit...");
     label.renderTo(svg);
-    var text = label.element.select("text");
+    var text = label.content.select("text");
     assert.equal(text.text(), "", "text was truncated to empty string");
     svg.remove();
   });

@@ -74,10 +74,12 @@ declare module Plottable {
     class Component {
         private static clipPathId;
         public element: D3.Selection;
+        public content: D3.Selection;
         private hitBox;
         private interactionsToRegister;
         private boxes;
         private boxContainer;
+        public backgroundContainer: D3.Selection;
         public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
         public fixedWidthVal: boolean;

@@ -40,7 +40,7 @@ module Plottable {
 
     public anchor(element: D3.Selection) {
       super.anchor(element);
-      this.renderArea = this.element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
+      this.renderArea = this.content.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
       return this;
     }
   }
