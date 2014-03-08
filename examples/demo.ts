@@ -38,8 +38,8 @@ module Demo {
 
   var metaTable = new Plottable.Table([[t1, t2], [t3, t4]]);
   metaTable.padding(5, 5);
-  metaTable.anchor(svg2);
   svg2.attr("width", 800).attr("height", 600);
+  metaTable.anchor(svg2);
   metaTable.computeLayout();
   metaTable.render();
 
@@ -59,8 +59,8 @@ module Demo {
 
   var svg3 = d3.select("#svg3");
   var multiaxischart = makeMultiAxisChart();
-  multiaxischart.anchor(svg3);
   svg3.attr("width", 400).attr("height",400);
+  multiaxischart.anchor(svg3);
   multiaxischart.computeLayout();
   multiaxischart.render();
 
@@ -101,8 +101,8 @@ module Demo {
 
   var svg4 = d3.select("#svg4");
   var multichart = makeSparklineMultichart();
-  multichart.anchor(svg4);
   svg4.attr("width",800).attr("height",600);
+  multichart.anchor(svg4);
   multichart.computeLayout();
   multichart.render();
   // svg4.selectAll("g").remove()

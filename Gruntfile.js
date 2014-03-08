@@ -48,7 +48,7 @@ module.exports = function(grunt) {
         // watch: "examples",
         options: {
           target: 'es5',
-          sourceMap: true,
+          sourceMap: false,
           declaration: false,
           removeComments: false
         }
