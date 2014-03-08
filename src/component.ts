@@ -17,8 +17,6 @@ module Plottable {
     private colMinimumVal = 0;
 
     private isTopLevelComponent = false;
-    private globalAvailableWidth = 0; // master width and height of top-level svg. Only relevant for top-level components.
-    private globalAvailableHeight = 0;
 
     public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     public availableHeight: number;
@@ -45,8 +43,8 @@ module Plottable {
         // svg node gets the "plottable" CSS class
         element.classed("plottable", true);
         this.element = element.append("g");
-        this.globalAvailableWidth  = parseFloat(element.attr("width" ));
-        this.globalAvailableHeight = parseFloat(element.attr("height"));
+        this.element.attr("width", element.attr("width"));
+        this.element.attr("height", element.attr("height"));
         this.isTopLevelComponent = true;
       } else {
         this.element = element;
@@ -90,8 +88,8 @@ module Plottable {
           // we are the root node, height and width have already been set
           xOrigin = 0;
           yOrigin = 0;
-          availableWidth  = this.globalAvailableWidth;
-          availableHeight = this.globalAvailableHeight;
+          availableWidth  = parseFloat(this.element.attr("width"));
+          availableHeight = parseFloat(this.element.attr("height"));
         } else {
           throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }

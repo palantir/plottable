@@ -92,8 +92,6 @@ var Plottable;
             this.rowMinimumVal = 0;
             this.colMinimumVal = 0;
             this.isTopLevelComponent = false;
-            this.globalAvailableWidth = 0;
-            this.globalAvailableHeight = 0;
             this.xOffsetVal = 0;
             this.yOffsetVal = 0;
             this.xAlignProportion = 0;
@@ -115,8 +113,8 @@ var Plottable;
                 // svg node gets the "plottable" CSS class
                 element.classed("plottable", true);
                 this.element = element.append("g");
-                this.globalAvailableWidth = parseFloat(element.attr("width"));
-                this.globalAvailableHeight = parseFloat(element.attr("height"));
+                this.element.attr("width", element.attr("width"));
+                this.element.attr("height", element.attr("height"));
                 this.isTopLevelComponent = true;
             } else {
                 this.element = element;
@@ -164,8 +162,8 @@ var Plottable;
                     // we are the root node, height and width have already been set
                     xOrigin = 0;
                     yOrigin = 0;
-                    availableWidth = this.globalAvailableWidth;
-                    availableHeight = this.globalAvailableHeight;
+                    availableWidth = parseFloat(this.element.attr("width"));
+                    availableHeight = parseFloat(this.element.attr("height"));
                 } else {
                     throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
                 }
