@@ -16,6 +16,8 @@ module Plottable {
     private rowMinimumVal = 0;
     private colMinimumVal = 0;
 
+    private isTopLevelComponent = false;
+
     public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     public availableHeight: number;
     public xOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
@@ -37,23 +39,28 @@ module Plottable {
       if (element.node().childNodes.length > 0) {
         throw new Error("Can't anchor to a non-empty element");
       }
-      this.element = element;
-      this.boxContainer = this.element.append("g").classed("box-container", true);
-      this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
-
-      if (this.element.node().nodeName === "svg") {
-        // root node gets the "plottable" CSS class
-        this.element.classed("plottable", true);
+      if (element.node().nodeName === "svg") {
+        // svg node gets the "plottable" CSS class
+        element.classed("plottable", true);
+        this.element = element.append("g");
+        this.element.attr("width", element.attr("width"));
+        this.element.attr("height", element.attr("height"));
+        this.isTopLevelComponent = true;
+      } else {
+        this.element = element;
       }
-
-      if (this.clipPathEnabled) {
-        this.generateClipPath();
-      };
 
       this.cssClasses.forEach((cssClass: string) => {
         this.element.classed(cssClass, true);
       });
       this.cssClasses = null;
+
+      this.boxContainer = this.element.append("g").classed("box-container", true);
+      this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
+
+      if (this.clipPathEnabled) {
+        this.generateClipPath();
+      };
 
       this.addBox("bounding-box");
 
@@ -77,14 +84,14 @@ module Plottable {
       if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
         if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
-        } else if (this.element.node().nodeName === "svg") {
-          // we are the root node, let's guess width and height for convenience
+        } else if (this.isTopLevelComponent) {
+          // we are the root node, height and width have already been set
           xOrigin = 0;
           yOrigin = 0;
-          availableWidth  = parseFloat(this.element.attr("width" ));
+          availableWidth  = parseFloat(this.element.attr("width"));
           availableHeight = parseFloat(this.element.attr("height"));
         } else {
-          throw new Error("null arguments cannot be passed to computeLayout() on a non-root (non-<svg>) node");
+          throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }
       }
       this.xOrigin = xOrigin;
@@ -126,9 +133,6 @@ module Plottable {
       // When called on top-level-component, a shortcut for component.anchor(svg).computeLayout().render()
       if (this.element == null) {
         this.anchor(element);
-      };
-      if (this.element !== element) {
-        throw new Error("Can't renderTo a different element than was anchored to");
       }
       this.computeLayout().render();
       return this;

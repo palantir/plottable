@@ -63,7 +63,7 @@ describe("Component behavior", () => {
   describe("anchor", () => {
     it("anchoring works as expected", () => {
       c.anchor(svg);
-      assert.equal(c.element, svg, "the component anchored to the svg");
+      assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the svg");
       svg.remove();
     });
 
