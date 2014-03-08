@@ -111,6 +111,7 @@ module DemoDay {
     }
 
     var areaInteraction = new Plottable.AreaInteraction(scatterplot.renderer).callback(firstCallback);
+    areaInteraction.registerWithComponent();
     var zoomCallback = new Plottable.ZoomCallbackGenerator().addXScale(scatterplot.xSpark, scatterplot.xScale)
                                                   .addYScale(scatterplot.ySpark, scatterplot.yScale)
                                                   .getCallback();
@@ -126,6 +127,7 @@ module DemoDay {
     };
 
     chart.c.zoom = new Plottable.AreaInteraction(scatterplot.sparkline).callback(secondCallback);
+    chart.c.zoom.registerWithComponent();
   }
 
   function grabIndices(itemsToGrab: any[], indices: number[]) {

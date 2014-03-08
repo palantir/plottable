@@ -45,6 +45,7 @@ describe("Interactions", () => {
       var yDomainBefore = yScale.domain();
 
       var interaction = new Plottable.PanZoomInteraction(renderer, xScale, yScale);
+      interaction.registerWithComponent();
 
       var hb = renderer.element.select(".hit-box").node();
       var dragDistancePixelX = 10;
@@ -99,6 +100,7 @@ describe("Interactions", () => {
       renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
       renderer.renderTo(svg);
       interaction = new Plottable.AreaInteraction(renderer);
+      interaction.registerWithComponent();
     });
 
     afterEach(() => {
@@ -186,6 +188,8 @@ describe("Interactions", () => {
         zoomCallback(a);
       };
       interaction = new Plottable.AreaInteraction(renderer).callback(callback);
+      interaction.registerWithComponent();
+
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       assert.isTrue(indicesCallbackCalled, "indicesCallback was called");
       assert.deepEqual(xScale.domain(), expectedXDomain, "X scale domain was updated correctly");
@@ -205,6 +209,7 @@ describe("Interactions", () => {
       var yScale = new Plottable.LinearScale();
       var circleRenderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
       var crosshairs = new Plottable.CrosshairsInteraction(circleRenderer);
+      crosshairs.registerWithComponent();
       circleRenderer.renderTo(svg);
 
       var crosshairsG = circleRenderer.foregroundContainer.select(".crosshairs");

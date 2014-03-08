@@ -23,6 +23,7 @@ module SparklineDemo {
                       .addYScale(ySpark, yScale)
                       .getCallback();
   var zoomInteraction = new Plottable.AreaInteraction(sparkline).callback(zoomCallback);
+  zoomInteraction.registerWithComponent();
 
   // var toggleClass = function() {return !d3.select(this).classed("selected-point")};
   // var cb = (s) => s.classed("selected-point", toggleClass);
