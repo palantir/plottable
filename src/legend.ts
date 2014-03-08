@@ -48,7 +48,7 @@ module Plottable {
 
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
-      var fakeLegendEl = this.element.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var textHeight = Utils.getTextHeight(fakeLegendEl.append("text"));
       fakeLegendEl.remove();
       return textHeight;
@@ -60,8 +60,8 @@ module Plottable {
       var textHeight = this.measureTextHeight();
       var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
 
-      this.element.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
-      var legend: D3.UpdateSelection = this.element.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
+      this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
+      var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true)
           .attr("transform", (d: any, i: number) => "translate(0," + i * textHeight + ")");

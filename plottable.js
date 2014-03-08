@@ -154,8 +154,10 @@ var Plottable;
             });
             this.cssClasses = null;
 
-            this.boxContainer = this.element.append("g").classed("box-container", true);
+            this.backgroundContainer = this.element.append("g").classed("background-container", true);
+            this.content = this.element.append("g").classed("content", true);
             this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
+            this.boxContainer = this.element.append("g").classed("box-container", true);
 
             if (this.clipPathEnabled) {
                 this.generateClipPath();
@@ -750,8 +752,8 @@ var Plottable;
         AreaInteraction.prototype.anchor = function (hitBox) {
             _super.prototype.anchor.call(this, hitBox);
             var cname = AreaInteraction.CLASS_DRAG_BOX;
-            var foreground = this.componentToListenTo.foregroundContainer;
-            this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+            var background = this.componentToListenTo.backgroundContainer;
+            this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
             hitBox.call(this.dragBehavior);
             return this;
         };
@@ -919,7 +921,7 @@ var Plottable;
         }
         Label.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
-            this.textElement = this.element.append("text");
+            this.textElement = this.content.append("text");
             this.setText(this.text);
             return this;
         };
@@ -1049,7 +1051,7 @@ var Plottable;
 
         Renderer.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
-            this.renderArea = this.element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
+            this.renderArea = this.content.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
             return this;
         };
         Renderer.CSS_CLASS = "renderer";
@@ -1388,7 +1390,7 @@ var Plottable;
             // recursively anchor children
             this.rows.forEach(function (row, rowIndex) {
                 row.forEach(function (component, colIndex) {
-                    component.anchor(_this.element.append("g"));
+                    component.anchor(_this.content.append("g"));
                 });
             });
             return this;
@@ -1651,7 +1653,7 @@ var Plottable;
 
         Legend.prototype.measureTextHeight = function () {
             // note: can't be called before anchoring atm
-            var fakeLegendEl = this.element.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+            var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
             var textHeight = Plottable.Utils.getTextHeight(fakeLegendEl.append("text"));
             fakeLegendEl.remove();
             return textHeight;
@@ -1663,8 +1665,8 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
 
-            this.element.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
-            var legend = this.element.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
+            this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
+            var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
             var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
                 return "translate(0," + i * textHeight + ")";
             });
@@ -1720,7 +1722,7 @@ var Plottable;
         }
         Axis.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
-            this.axisElement = this.element.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+            this.axisElement = this.content.append("g").classed("axis", true); // TODO: remove extraneous sub-element
             return this;
         };
 
@@ -1849,7 +1851,7 @@ var Plottable;
         ComponentGroup.prototype.addComponent = function (c) {
             this.components.push(c);
             if (this.element != null) {
-                c.anchor(this.element.append("g"));
+                c.anchor(this.content.append("g"));
             }
             return this;
         };
@@ -1858,7 +1860,7 @@ var Plottable;
             var _this = this;
             _super.prototype.anchor.call(this, element);
             this.components.forEach(function (c) {
-                return c.anchor(_this.element.append("g"));
+                return c.anchor(_this.content.append("g"));
             });
             return this;
         };

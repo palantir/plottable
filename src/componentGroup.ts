@@ -24,14 +24,14 @@ module Plottable {
     public addComponent(c: Component): ComponentGroup {
       this.components.push(c);
       if (this.element != null) {
-        c.anchor(this.element.append("g"));
+        c.anchor(this.content.append("g"));
       }
       return this;
     }
 
     public anchor(element: D3.Selection): ComponentGroup {
       super.anchor(element);
-      this.components.forEach((c) => c.anchor(this.element.append("g")));
+      this.components.forEach((c) => c.anchor(this.content.append("g")));
       return this;
     }
 

@@ -79,7 +79,7 @@ module Plottable {
       // recursively anchor children
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
-          component.anchor(this.element.append("g"));
+          component.anchor(this.content.append("g"));
         });
       });
       return this;

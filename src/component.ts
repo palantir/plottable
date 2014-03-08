@@ -4,10 +4,12 @@ module Plottable {
   export class Component {
     private static clipPathId = 0; // Used for unique namespacing for the clipPaths
     public element: D3.Selection;
+    public content: D3.Selection;
     private hitBox: D3.Selection;
     private interactionsToRegister: Interaction[] = [];
     private boxes: D3.Selection[] = [];
     private boxContainer: D3.Selection;
+    public backgroundContainer: D3.Selection;
     public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
 
@@ -55,8 +57,10 @@ module Plottable {
       });
       this.cssClasses = null;
 
-      this.boxContainer = this.element.append("g").classed("box-container", true);
+      this.backgroundContainer = this.element.append("g").classed("background-container", true);
+      this.content = this.element.append("g").classed("content", true);
       this.foregroundContainer = this.element.append("g").classed("foreground-container", true);
+      this.boxContainer = this.element.append("g").classed("box-container", true);
 
       if (this.clipPathEnabled) {
         this.generateClipPath();

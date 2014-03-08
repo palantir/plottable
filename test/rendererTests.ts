@@ -17,7 +17,7 @@ describe("Renderers", () => {
       var d1 = {data: ["foo"], seriesName: "bar"};
       var r = new Plottable.Renderer(d1);
       r.anchor(svg).computeLayout();
-      var renderArea = r.element.select(".render-area");
+      var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       assert.isTrue(renderArea.classed("bar"), "the render area is classed w/ dataset.seriesName");
       assert.deepEqual(r.dataset, d1, "the dataset is set properly");
