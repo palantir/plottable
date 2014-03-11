@@ -726,7 +726,7 @@ declare module Plottable {
         static yWidth: number;
         static xHeight: number;
         public axisElement: D3.Selection;
-        public axis: D3.Svg.Axis;
+        private d3Axis;
         private axisScale;
         private cachedScale;
         private cachedTranslate;

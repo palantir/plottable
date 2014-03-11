@@ -7,7 +7,7 @@ module Plottable {
     public static yWidth = 50;
     public static xHeight = 30;
     public axisElement: D3.Selection;
-    public axis: D3.Svg.Axis;
+    private d3Axis: D3.Svg.Axis;
     private axisScale: Scale;
     private cachedScale: number;
     private cachedTranslate: number;
@@ -24,14 +24,14 @@ module Plottable {
     constructor(axisScale: Scale, orientation: string, formatter?: any) {
       super();
       this.axisScale = axisScale;
-      this.axis = d3.svg.axis().scale(axisScale._internalScale).orient(orientation);
+      this.d3Axis = d3.svg.axis().scale(axisScale._internalScale).orient(orientation);
       this.classed(Axis.CSS_CLASS, true);
       this.clipPathEnabled = true;
       this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
       if (formatter == null) {
         formatter = d3.format(".3s");
       }
-      this.axis.tickFormat(formatter);
+      this.d3Axis.tickFormat(formatter);
       this.axisScale.registerListener(() => this.rescale());
     }
 
@@ -44,7 +44,7 @@ module Plottable {
     public render() {
       if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
       if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
-      var domain = this.axis.scale().domain();
+      var domain = this.d3Axis.scale().domain();
       var extent = Math.abs(domain[1] - domain[0]);
       var min = +d3.min(domain);
       var max = +d3.max(domain);
@@ -65,10 +65,10 @@ module Plottable {
         var interval = numericDomain[1] - numericDomain[0];
         var cleanTick = (n: number) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
         ticks = ticks.map(cleanTick);
-        this.axis.tickValues(ticks);
+        this.d3Axis.tickValues(ticks);
       }
 
-      this.axisElement.call(this.axis);
+      this.axisElement.call(this.d3Axis);
       var bbox = (<any> this.axisElement.node()).getBBox();
       if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
         this.axisElement.classed("error", true);
@@ -88,7 +88,7 @@ module Plottable {
         return this.axisScale;
       } else {
         this.axisScale = newScale;
-        this.axis.scale(newScale._internalScale);
+        this.d3Axis.scale(newScale._internalScale);
         return this;
       }
     }
@@ -97,9 +97,9 @@ module Plottable {
     public orient(newOrient: string): Axis;
     public orient(newOrient?: string): any {
       if (newOrient == null) {
-        return this.axis.orient();
+        return this.d3Axis.orient();
       } else {
-        this.axis.orient(newOrient);
+        this.d3Axis.orient(newOrient);
         return this;
       }
     }
@@ -108,9 +108,9 @@ module Plottable {
     public ticks(...args: any[]): Axis;
     public ticks(...args: any[]): any {
       if (args == null || args.length === 0) {
-        return this.axis.ticks();
+        return this.d3Axis.ticks();
       } else {
-        this.axis.ticks(args);
+        this.d3Axis.ticks(args);
         return this;
       }
     }
@@ -119,9 +119,9 @@ module Plottable {
     public tickValues(...args: any[]): Axis;
     public tickValues(...args: any[]): any {
       if (args == null) {
-        return this.axis.tickValues();
+        return this.d3Axis.tickValues();
       } else {
-        this.axis.tickValues(args);
+        this.d3Axis.tickValues(args);
         return this;
       }
     }
@@ -131,13 +131,13 @@ module Plottable {
     public tickSize(inner: number, outer: number): Axis;
     public tickSize(inner?: number, outer?: number): any {
       if (inner != null && outer != null) {
-        this.axis.tickSize(inner, outer);
+        this.d3Axis.tickSize(inner, outer);
         return this;
       } else if (inner != null) {
-        this.axis.tickSize(inner);
+        this.d3Axis.tickSize(inner);
         return this;
       } else {
-        return this.axis.tickSize();
+        return this.d3Axis.tickSize();
       }
     }
 
@@ -145,9 +145,9 @@ module Plottable {
     public innerTickSize(val: number): Axis;
     public innerTickSize(val?: number): any {
       if (val == null) {
-        return this.axis.innerTickSize();
+        return this.d3Axis.innerTickSize();
       } else {
-        this.axis.innerTickSize(val);
+        this.d3Axis.innerTickSize(val);
         return this;
       }
     }
@@ -156,9 +156,9 @@ module Plottable {
     public outerTickSize(val: number): Axis;
     public outerTickSize(val?: number): any {
       if (val == null) {
-        return this.axis.outerTickSize();
+        return this.d3Axis.outerTickSize();
       } else {
-        this.axis.outerTickSize(val);
+        this.d3Axis.outerTickSize(val);
         return this;
       }
     }
@@ -167,9 +167,9 @@ module Plottable {
     public tickPadding(val: number): Axis;
     public tickPadding(val?: number): any {
       if (val == null) {
-        return this.axis.tickPadding();
+        return this.d3Axis.tickPadding();
       } else {
-        this.axis.tickPadding(val);
+        this.d3Axis.tickPadding(val);
         return this;
       }
     }
@@ -179,9 +179,9 @@ module Plottable {
     public tickFormat(formatter: (value: any) => string): Axis;
     public tickFormat(formatter?: (value: any) => string): any {
       if (formatter == null) {
-        return this.axis.tickFormat();
+        return this.d3Axis.tickFormat();
       } else {
-        this.axis.tickFormat(formatter);
+        this.d3Axis.tickFormat(formatter);
         return this;
       }
     }

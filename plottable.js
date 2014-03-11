@@ -1760,14 +1760,14 @@ var Plottable;
             var _this = this;
             _super.call(this);
             this.axisScale = axisScale;
-            this.axis = d3.svg.axis().scale(axisScale._internalScale).orient(orientation);
+            this.d3Axis = d3.svg.axis().scale(axisScale._internalScale).orient(orientation);
             this.classed(Axis.CSS_CLASS, true);
             this.clipPathEnabled = true;
             this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
             if (formatter == null) {
                 formatter = d3.format(".3s");
             }
-            this.axis.tickFormat(formatter);
+            this.d3Axis.tickFormat(formatter);
             this.axisScale.registerListener(function () {
                 return _this.rescale();
             });
@@ -1787,7 +1787,7 @@ var Plottable;
                 this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");
             }
             ;
-            var domain = this.axis.scale().domain();
+            var domain = this.d3Axis.scale().domain();
             var extent = Math.abs(domain[1] - domain[0]);
             var min = +d3.min(domain);
             var max = +d3.max(domain);
@@ -1810,10 +1810,10 @@ var Plottable;
                     return Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
                 };
                 ticks = ticks.map(cleanTick);
-                this.axis.tickValues(ticks);
+                this.d3Axis.tickValues(ticks);
             }
 
-            this.axisElement.call(this.axis);
+            this.axisElement.call(this.d3Axis);
             var bbox = this.axisElement.node().getBBox();
             if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
                 this.axisElement.classed("error", true);
@@ -1831,16 +1831,16 @@ var Plottable;
                 return this.axisScale;
             } else {
                 this.axisScale = newScale;
-                this.axis.scale(newScale._internalScale);
+                this.d3Axis.scale(newScale._internalScale);
                 return this;
             }
         };
 
         Axis.prototype.orient = function (newOrient) {
             if (newOrient == null) {
-                return this.axis.orient();
+                return this.d3Axis.orient();
             } else {
-                this.axis.orient(newOrient);
+                this.d3Axis.orient(newOrient);
                 return this;
             }
         };
@@ -1851,9 +1851,9 @@ var Plottable;
                 args[_i] = arguments[_i + 0];
             }
             if (args == null || args.length === 0) {
-                return this.axis.ticks();
+                return this.d3Axis.ticks();
             } else {
-                this.axis.ticks(args);
+                this.d3Axis.ticks(args);
                 return this;
             }
         };
@@ -1864,57 +1864,57 @@ var Plottable;
                 args[_i] = arguments[_i + 0];
             }
             if (args == null) {
-                return this.axis.tickValues();
+                return this.d3Axis.tickValues();
             } else {
-                this.axis.tickValues(args);
+                this.d3Axis.tickValues(args);
                 return this;
             }
         };
 
         Axis.prototype.tickSize = function (inner, outer) {
             if (inner != null && outer != null) {
-                this.axis.tickSize(inner, outer);
+                this.d3Axis.tickSize(inner, outer);
                 return this;
             } else if (inner != null) {
-                this.axis.tickSize(inner);
+                this.d3Axis.tickSize(inner);
                 return this;
             } else {
-                return this.axis.tickSize();
+                return this.d3Axis.tickSize();
             }
         };
 
         Axis.prototype.innerTickSize = function (val) {
             if (val == null) {
-                return this.axis.innerTickSize();
+                return this.d3Axis.innerTickSize();
             } else {
-                this.axis.innerTickSize(val);
+                this.d3Axis.innerTickSize(val);
                 return this;
             }
         };
 
         Axis.prototype.outerTickSize = function (val) {
             if (val == null) {
-                return this.axis.outerTickSize();
+                return this.d3Axis.outerTickSize();
             } else {
-                this.axis.outerTickSize(val);
+                this.d3Axis.outerTickSize(val);
                 return this;
             }
         };
 
         Axis.prototype.tickPadding = function (val) {
             if (val == null) {
-                return this.axis.tickPadding();
+                return this.d3Axis.tickPadding();
             } else {
-                this.axis.tickPadding(val);
+                this.d3Axis.tickPadding(val);
                 return this;
             }
         };
 
         Axis.prototype.tickFormat = function (formatter) {
             if (formatter == null) {
-                return this.axis.tickFormat();
+                return this.d3Axis.tickFormat();
             } else {
-                this.axis.tickFormat(formatter);
+                this.d3Axis.tickFormat(formatter);
                 return this;
             }
         };
