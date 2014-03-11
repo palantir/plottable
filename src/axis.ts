@@ -9,8 +9,6 @@ module Plottable {
     public axisElement: D3.Selection;
     private d3Axis: D3.Svg.Axis;
     private axisScale: Scale;
-    private cachedScale: number;
-    private cachedTranslate: number;
     private isXAligned: boolean;
 
     /**

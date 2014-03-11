@@ -728,8 +728,6 @@ declare module Plottable {
         public axisElement: D3.Selection;
         private d3Axis;
         private axisScale;
-        private cachedScale;
-        private cachedTranslate;
         private isXAligned;
         /**
         * Creates an Axis.
