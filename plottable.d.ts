@@ -727,7 +727,7 @@ declare module Plottable {
         static xHeight: number;
         public axisElement: D3.Selection;
         public axis: D3.Svg.Axis;
-        public innerScale: Plottable.Scale;
+        private axisScale;
         private cachedScale;
         private cachedTranslate;
         private isXAligned;
@@ -739,7 +739,7 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(innerScale: Plottable.Scale, orientation: string, formatter?: any);
+        constructor(axisScale: Plottable.Scale, orientation: string, formatter?: any);
         public anchor(element: D3.Selection): Axis;
         public render(): Axis;
         private rescale();

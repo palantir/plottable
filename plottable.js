@@ -1,3 +1,9 @@
+/*!
+Plottable v0.3.0 (https://github.com/palantir/plottable)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1750,11 +1756,11 @@ var Plottable;
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        function Axis(innerScale, orientation, formatter) {
+        function Axis(axisScale, orientation, formatter) {
             var _this = this;
             _super.call(this);
-            this.innerScale = innerScale;
-            this.axis = d3.svg.axis().scale(innerScale.scale).orient(orientation);
+            this.axisScale = axisScale;
+            this.axis = d3.svg.axis().scale(axisScale._internalScale).orient(orientation);
             this.classed(Axis.CSS_CLASS, true);
             this.clipPathEnabled = true;
             this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
@@ -1762,7 +1768,7 @@ var Plottable;
                 formatter = d3.format(".3s");
             }
             this.axis.tickFormat(formatter);
-            this.innerScale.registerListener(function () {
+            this.axisScale.registerListener(function () {
                 return _this.rescale();
             });
         }
@@ -1794,8 +1800,8 @@ var Plottable;
             }
 
             // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
-            if (this.innerScale.ticks != null) {
-                var scale = this.innerScale;
+            if (this.axisScale.ticks != null) {
+                var scale = this.axisScale;
                 var nTicks = 10;
                 var ticks = scale.ticks(nTicks);
                 var numericDomain = scale.domain();
@@ -1822,10 +1828,10 @@ var Plottable;
 
         Axis.prototype.scale = function (newScale) {
             if (newScale == null) {
-                return this.innerScale;
+                return this.axisScale;
             } else {
-                this.innerScale = newScale;
-                this.axis.scale(newScale.scale);
+                this.axisScale = newScale;
+                this.axis.scale(newScale._internalScale);
                 return this;
             }
         };
