@@ -202,7 +202,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class Scale implements Plottable.IBroadcaster {
-        public _internalScale: D3.Scale.Scale;
+        public _d3Scale: D3.Scale.Scale;
         private broadcasterCallbacks;
         /**
         * Creates a new Scale.
@@ -244,7 +244,7 @@ declare module Plottable {
         public registerListener(callback: Plottable.IBroadcasterCallback): Scale;
     }
     class QuantitiveScale extends Scale {
-        public _internalScale: D3.Scale.QuantitiveScale;
+        public _d3Scale: D3.Scale.QuantitiveScale;
         /**
         * Creates a new QuantitiveScale.
         * @constructor

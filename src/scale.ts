@@ -2,7 +2,7 @@
 
 module Plottable {
   export class Scale implements IBroadcaster {
-    public _internalScale: D3.Scale.Scale;
+    public _d3Scale: D3.Scale.Scale;
     private broadcasterCallbacks: IBroadcasterCallback[] = [];
 
     /**
@@ -11,7 +11,7 @@ module Plottable {
      * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
     constructor(scale: D3.Scale.Scale) {
-      this._internalScale = scale;
+      this._d3Scale = scale;
     }
 
     /**
@@ -21,7 +21,7 @@ module Plottable {
      * @returns {any} The range value corresponding to the supplied domain value.
      */
     public scale(value: any) {
-      return this._internalScale(value);
+      return this._d3Scale(value);
     }
 
     /**
@@ -33,9 +33,9 @@ module Plottable {
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
-        return this._internalScale.domain();
+        return this._d3Scale.domain();
       } else {
-        this._internalScale.domain(values);
+        this._d3Scale.domain(values);
         this.broadcasterCallbacks.forEach((b) => b(this));
         return this;
       }
@@ -50,9 +50,9 @@ module Plottable {
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {
-        return this._internalScale.range();
+        return this._d3Scale.range();
       } else {
-        this._internalScale.range(values);
+        this._d3Scale.range(values);
         return this;
       }
     }
@@ -62,7 +62,7 @@ module Plottable {
      * @returns {Scale} A copy of the calling Scale.
      */
     public copy(): Scale {
-      return new Scale(this._internalScale.copy());
+      return new Scale(this._d3Scale.copy());
     }
 
     /**
@@ -77,7 +77,7 @@ module Plottable {
   }
 
   export class QuantitiveScale extends Scale {
-    public _internalScale: D3.Scale.QuantitiveScale;
+    public _d3Scale: D3.Scale.QuantitiveScale;
 
     /**
      * Creates a new QuantitiveScale.
@@ -94,7 +94,7 @@ module Plottable {
      * @returns {number} The domain value corresponding to the supplied range value.
      */
     public invert(value: number) {
-      return this._internalScale.invert(value);
+      return this._d3Scale.invert(value);
     }
 
     /**
@@ -102,7 +102,7 @@ module Plottable {
      * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
      */
     public copy(): QuantitiveScale {
-      return new QuantitiveScale(this._internalScale.copy());
+      return new QuantitiveScale(this._d3Scale.copy());
     }
 
     /**
@@ -127,9 +127,9 @@ module Plottable {
     public interpolate(factory: D3.Transition.Interpolate): QuantitiveScale;
     public interpolate(factory?: D3.Transition.Interpolate): any {
       if (factory == null) {
-        return this._internalScale.interpolate();
+        return this._d3Scale.interpolate();
       }
-      this._internalScale.interpolate(factory);
+      this._d3Scale.interpolate(factory);
       return this;
     }
 
@@ -139,7 +139,7 @@ module Plottable {
      * @param {number[]} values The new range value for the range.
      */
     public rangeRound(values: number[]) {
-      this._internalScale.rangeRound(values);
+      this._d3Scale.rangeRound(values);
       return this;
     }
 
@@ -153,9 +153,9 @@ module Plottable {
     public clamp(clamp: boolean): QuantitiveScale;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
-        return this._internalScale.clamp();
+        return this._d3Scale.clamp();
       }
-      this._internalScale.clamp(clamp);
+      this._d3Scale.clamp(clamp);
       return this;
     }
 
@@ -165,8 +165,8 @@ module Plottable {
      * @param {number} [count] The number of ticks that should fit inside the new domain.
      */
     public nice(count?: number) {
-      this._internalScale.nice(count);
-      this.domain(this._internalScale.domain()); // nice() can change the domain, so update all listeners
+      this._d3Scale.nice(count);
+      this.domain(this._d3Scale.domain()); // nice() can change the domain, so update all listeners
       return this;
     }
 
@@ -176,7 +176,7 @@ module Plottable {
      * @returns {any[]} The generated ticks.
      */
     public ticks(count?: number) {
-      return this._internalScale.ticks(count);
+      return this._d3Scale.ticks(count);
     }
 
     /**
@@ -187,7 +187,7 @@ module Plottable {
      * @returns {(n: number) => string} A formatting function.
      */
     public tickFormat(count: number, format?: string): (n: number) => string {
-      return this._internalScale.tickFormat(count, format);
+      return this._d3Scale.tickFormat(count, format);
     }
   }
 
@@ -210,7 +210,7 @@ module Plottable {
      * @returns {LinearScale} A copy of the calling LinearScale.
      */
     public copy(): LinearScale {
-      return new LinearScale(this._internalScale.copy());
+      return new LinearScale(this._d3Scale.copy());
     }
   }
 

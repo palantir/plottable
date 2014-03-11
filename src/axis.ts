@@ -24,7 +24,7 @@ module Plottable {
     constructor(axisScale: Scale, orientation: string, formatter?: any) {
       super();
       this.axisScale = axisScale;
-      this.d3Axis = d3.svg.axis().scale(axisScale._internalScale).orient(orientation);
+      this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
       this.classed(Axis.CSS_CLASS, true);
       this.clipPathEnabled = true;
       this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
@@ -88,7 +88,7 @@ module Plottable {
         return this.axisScale;
       } else {
         this.axisScale = newScale;
-        this.d3Axis.scale(newScale._internalScale);
+        this.d3Axis.scale(newScale._d3Scale);
         return this;
       }
     }
