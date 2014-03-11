@@ -1364,25 +1364,6 @@ var Plottable;
             return this;
         };
 
-        Table.prototype.padTableToSize = function (nRows, nCols) {
-            for (var i = 0; i < nRows; i++) {
-                if (this.rows[i] === undefined) {
-                    this.rows[i] = [];
-                    this.rowWeights[i] = null;
-                }
-                for (var j = 0; j < nCols; j++) {
-                    if (this.rows[i][j] === undefined) {
-                        this.rows[i][j] = new Plottable.Component();
-                    }
-                }
-            }
-            for (j = 0; j < nCols; j++) {
-                if (this.colWeights[j] === undefined) {
-                    this.colWeights[j] = null;
-                }
-            }
-        };
-
         Table.prototype.anchor = function (element) {
             var _this = this;
             _super.prototype.anchor.call(this, element);
@@ -1436,36 +1417,6 @@ var Plottable;
                 childYOffset += rowHeights[rowIndex] + _this.rowPadding;
             });
             return this;
-        };
-
-        Table.calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
-            // If the row/col weight was explicitly set, then return it outright
-            // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
-            // then weight is 0, otherwise weight is 1
-            return setWeights.map(function (w, i) {
-                if (w != null) {
-                    return w;
-                }
-                var fixities = componentGroups[i].map(fixityAccessor);
-                var allFixed = fixities.reduce(function (a, b) {
-                    return a && b;
-                });
-                return allFixed ? 0 : 1;
-            });
-        };
-
-        Table.calcProportionalSpace = function (weights, freeSpace) {
-            var weightSum = d3.sum(weights);
-            if (weightSum === 0) {
-                var numGroups = weights.length;
-                return weights.map(function (w) {
-                    return freeSpace / numGroups;
-                });
-            } else {
-                return weights.map(function (w) {
-                    return freeSpace * w / weightSum;
-                });
-            }
         };
 
         Table.prototype.render = function () {
@@ -1544,18 +1495,6 @@ var Plottable;
             }
         };
 
-        Table.fixedSpace = function (componentGroup, fixityAccessor) {
-            var all = function (bools) {
-                return bools.reduce(function (a, b) {
-                    return a && b;
-                });
-            };
-            var groupIsFixed = function (components) {
-                return all(components.map(fixityAccessor));
-            };
-            return all(componentGroup.map(groupIsFixed));
-        };
-
         Table.prototype.isFixedWidth = function () {
             var cols = d3.transpose(this.rows);
             return Table.fixedSpace(cols, function (c) {
@@ -1567,6 +1506,67 @@ var Plottable;
             return Table.fixedSpace(this.rows, function (c) {
                 return c.isFixedHeight();
             });
+        };
+
+        Table.prototype.padTableToSize = function (nRows, nCols) {
+            for (var i = 0; i < nRows; i++) {
+                if (this.rows[i] === undefined) {
+                    this.rows[i] = [];
+                    this.rowWeights[i] = null;
+                }
+                for (var j = 0; j < nCols; j++) {
+                    if (this.rows[i][j] === undefined) {
+                        this.rows[i][j] = new Plottable.Component();
+                    }
+                }
+            }
+            for (j = 0; j < nCols; j++) {
+                if (this.colWeights[j] === undefined) {
+                    this.colWeights[j] = null;
+                }
+            }
+        };
+
+        Table.calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
+            // If the row/col weight was explicitly set, then return it outright
+            // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
+            // then weight is 0, otherwise weight is 1
+            return setWeights.map(function (w, i) {
+                if (w != null) {
+                    return w;
+                }
+                var fixities = componentGroups[i].map(fixityAccessor);
+                var allFixed = fixities.reduce(function (a, b) {
+                    return a && b;
+                });
+                return allFixed ? 0 : 1;
+            });
+        };
+
+        Table.calcProportionalSpace = function (weights, freeSpace) {
+            var weightSum = d3.sum(weights);
+            if (weightSum === 0) {
+                var numGroups = weights.length;
+                return weights.map(function (w) {
+                    return freeSpace / numGroups;
+                });
+            } else {
+                return weights.map(function (w) {
+                    return freeSpace * w / weightSum;
+                });
+            }
+        };
+
+        Table.fixedSpace = function (componentGroup, fixityAccessor) {
+            var all = function (bools) {
+                return bools.reduce(function (a, b) {
+                    return a && b;
+                });
+            };
+            var groupIsFixed = function (components) {
+                return all(components.map(fixityAccessor));
+            };
+            return all(componentGroup.map(groupIsFixed));
         };
         Table.CSS_CLASS = "table";
         return Table;

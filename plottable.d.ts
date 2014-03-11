@@ -595,11 +595,8 @@ declare module Plottable {
         * @param {Component} component The Component to be added.
         */
         public addComponent(row: number, col: number, component: Plottable.Component): Table;
-        private padTableToSize(nRows, nCols);
         public anchor(element: D3.Selection): Table;
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Table;
-        private static calcComponentWeights(setWeights, componentGroups, fixityAccessor);
-        private static calcProportionalSpace(weights, freeSpace);
         public render(): Table;
         /**
         * Sets the row and column padding on the Table.
@@ -631,9 +628,12 @@ declare module Plottable {
         public rowMinimum(newVal: number): Table;
         public colMinimum(): number;
         public colMinimum(newVal: number): Table;
-        private static fixedSpace(componentGroup, fixityAccessor);
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+        private padTableToSize(nRows, nCols);
+        private static calcComponentWeights(setWeights, componentGroups, fixityAccessor);
+        private static calcProportionalSpace(weights, freeSpace);
+        private static fixedSpace(componentGroup, fixityAccessor);
     }
 }
 declare module Plottable {
