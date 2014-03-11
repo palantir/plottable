@@ -2,6 +2,8 @@
 
 module Plottable {
   export class ComponentGroup extends Component {
+    private static CSS_CLASS = "component-group";
+
     private components: Component[];
 
     /**
@@ -12,6 +14,7 @@ module Plottable {
      */
     constructor(components: Component[] = []){
       super();
+      this.classed(ComponentGroup.CSS_CLASS, true);
       this.components = components;
     }
 
