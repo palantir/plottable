@@ -723,13 +723,11 @@ declare module Plottable {
 declare module Plottable {
     class Axis extends Plottable.Component {
         private static CSS_CLASS;
-        private scale;
-        private orientation;
-        private formatter;
         static yWidth: number;
         static xHeight: number;
         public axisElement: D3.Selection;
-        public d3axis: D3.Svg.Axis;
+        public axis: D3.Svg.Axis;
+        public innerScale: Plottable.Scale;
         private cachedScale;
         private cachedTranslate;
         private isXAligned;
@@ -741,11 +739,29 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Plottable.Scale, orientation: string, formatter?: any);
+        constructor(innerScale: Plottable.Scale, orientation: string, formatter?: any);
         public anchor(element: D3.Selection): Axis;
-        private transformString(translate, scale);
         public render(): Axis;
         private rescale();
+        public scale(): Plottable.Scale;
+        public scale(newScale: Plottable.Scale): Axis;
+        public orient(): string;
+        public orient(newOrient: string): Axis;
+        public ticks(): any[];
+        public ticks(...args: any[]): Axis;
+        public tickValues(): any[];
+        public tickValues(...args: any[]): Axis;
+        public tickSize(): number;
+        public tickSize(inner: number): Axis;
+        public tickSize(inner: number, outer: number): Axis;
+        public innerTickSize(): number;
+        public innerTickSize(val: number): Axis;
+        public outerTickSize(): number;
+        public outerTickSize(val: number): Axis;
+        public tickPadding(): number;
+        public tickPadding(val: number): Axis;
+        public tickFormat(): (value: any) => string;
+        public tickFormat(formatter: (value: any) => string): Axis;
     }
     class XAxis extends Axis {
         /**

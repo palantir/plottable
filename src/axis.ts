@@ -3,14 +3,12 @@
 module Plottable {
   export class Axis extends Component {
     private static CSS_CLASS = "axis";
-    private scale: Scale;
-    private orientation: string;
-    private formatter: any;
 
     public static yWidth = 50;
     public static xHeight = 30;
     public axisElement: D3.Selection;
-    public d3axis: D3.Svg.Axis;
+    public axis: D3.Svg.Axis;
+    public innerScale: Scale;
     private cachedScale: number;
     private cachedTranslate: number;
     private isXAligned: boolean;
@@ -23,24 +21,18 @@ module Plottable {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      * @param {any} [formatter] a D3 formatter
      */
-    constructor(scale: Scale, orientation: string, formatter?: any) {
+    constructor(innerScale: Scale, orientation: string, formatter?: any) {
       super();
-      this.scale = scale;
+      this.innerScale = innerScale;
+      this.axis = d3.svg.axis().scale(innerScale.scale).orient(orientation);
       this.classed(Axis.CSS_CLASS, true);
       this.clipPathEnabled = true;
-      this.orientation = orientation;
-      this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
-      this.d3axis = d3.svg.axis().scale(this.scale._internalScale).orient(this.orientation);
+      this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
       if (formatter == null) {
-        this.formatter = d3.format(".3s");
-      } else {
-        this.formatter = formatter;
+        formatter = d3.format(".3s");
       }
-      this.d3axis.tickFormat(this.formatter);
-
-      this.cachedScale = 1;
-      this.cachedTranslate = 0;
-      this.scale.registerListener(() => this.rescale());
+      this.axis.tickFormat(formatter);
+      this.innerScale.registerListener(() => this.rescale());
     }
 
     public anchor(element: D3.Selection) {
@@ -49,15 +41,10 @@ module Plottable {
       return this;
     }
 
-    private transformString(translate: number, scale: number) {
-      var translateS = this.isXAligned ? "" + translate : "0," + translate;
-      return "translate(" + translateS + ")";
-    }
-
     public render() {
-      if (this.orientation === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
-      if (this.orientation === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
-      var domain = this.scale.domain();
+      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
+      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
+      var domain = this.axis.scale().domain();
       var extent = Math.abs(domain[1] - domain[0]);
       var min = +d3.min(domain);
       var max = +d3.max(domain);
@@ -70,18 +57,18 @@ module Plottable {
       }
 
       // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
-      if ((<QuantitiveScale> this.scale).ticks != null) {
-        var scale = <QuantitiveScale> this.scale;
+      if ((<QuantitiveScale> this.innerScale).ticks != null) {
+        var scale = <QuantitiveScale> this.innerScale;
         var nTicks = 10;
         var ticks = scale.ticks(nTicks);
         var numericDomain = scale.domain();
         var interval = numericDomain[1] - numericDomain[0];
         var cleanTick = (n: number) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
         ticks = ticks.map(cleanTick);
-        this.d3axis.tickValues(ticks);
+        this.axis.tickValues(ticks);
       }
 
-      this.axisElement.call(this.d3axis);
+      this.axisElement.call(this.axis);
       var bbox = (<any> this.axisElement.node()).getBBox();
       if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
         this.axisElement.classed("error", true);
@@ -92,6 +79,111 @@ module Plottable {
     private rescale() {
       return (this.element != null) ? this.render() : null;
       // short circuit, we don't care about perf.
+    }
+
+    public scale(): Scale;
+    public scale(newScale: Scale): Axis;
+    public scale(newScale?: Scale): any {
+      if (newScale == null) {
+        return this.innerScale;
+      } else {
+        this.innerScale = newScale;
+        this.axis.scale(newScale.scale);
+        return this;
+      }
+    }
+
+    public orient(): string;
+    public orient(newOrient: string): Axis;
+    public orient(newOrient?: string): any {
+      if (newOrient == null) {
+        return this.axis.orient();
+      } else {
+        this.axis.orient(newOrient);
+        return this;
+      }
+    }
+
+    public ticks(): any[];
+    public ticks(...args: any[]): Axis;
+    public ticks(...args: any[]): any {
+      if (args == null || args.length === 0) {
+        return this.axis.ticks();
+      } else {
+        this.axis.ticks(args);
+        return this;
+      }
+    }
+
+    public tickValues(): any[];
+    public tickValues(...args: any[]): Axis;
+    public tickValues(...args: any[]): any {
+      if (args == null) {
+        return this.axis.tickValues();
+      } else {
+        this.axis.tickValues(args);
+        return this;
+      }
+    }
+
+    public tickSize(): number;
+    public tickSize(inner: number): Axis;
+    public tickSize(inner: number, outer: number): Axis;
+    public tickSize(inner?: number, outer?: number): any {
+      if (inner != null && outer != null) {
+        this.axis.tickSize(inner, outer);
+        return this;
+      } else if (inner != null) {
+        this.axis.tickSize(inner);
+        return this;
+      } else {
+        return this.axis.tickSize();
+      }
+    }
+
+    public innerTickSize(): number;
+    public innerTickSize(val: number): Axis;
+    public innerTickSize(val?: number): any {
+      if (val == null) {
+        return this.axis.innerTickSize();
+      } else {
+        this.axis.innerTickSize(val);
+        return this;
+      }
+    }
+
+    public outerTickSize(): number;
+    public outerTickSize(val: number): Axis;
+    public outerTickSize(val?: number): any {
+      if (val == null) {
+        return this.axis.outerTickSize();
+      } else {
+        this.axis.outerTickSize(val);
+        return this;
+      }
+    }
+
+    public tickPadding(): number;
+    public tickPadding(val: number): Axis;
+    public tickPadding(val?: number): any {
+      if (val == null) {
+        return this.axis.tickPadding();
+      } else {
+        this.axis.tickPadding(val);
+        return this;
+      }
+    }
+
+
+    public tickFormat(): (value: any) => string;
+    public tickFormat(formatter: (value: any) => string): Axis;
+    public tickFormat(formatter?: (value: any) => string): any {
+      if (formatter == null) {
+        return this.axis.tickFormat();
+      } else {
+        this.axis.tickFormat(formatter);
+        return this;
+      }
     }
   }
 
