@@ -1,3 +1,9 @@
+/*!
+Plottable v0.3.0 (https://github.com/palantir/plottable)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1724,7 +1730,7 @@ var Plottable;
             });
             legendEnter.append("rect").attr("x", Legend.MARGIN).attr("y", Legend.MARGIN).attr("width", textHeight - Legend.MARGIN * 2).attr("height", textHeight - Legend.MARGIN * 2);
             legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
-            legend.selectAll("rect").attr("fill", this.colorScale.scale);
+            legend.selectAll("rect").attr("fill", this.colorScale._internalScale);
             legend.selectAll("text").text(function (d, i) {
                 return Plottable.Utils.truncateTextToLength(d, availableWidth, d3.select(this));
             });
@@ -1758,7 +1764,7 @@ var Plottable;
             this.clipPathEnabled = true;
             this.orientation = orientation;
             this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
-            this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
+            this.d3axis = d3.svg.axis().scale(this.scale._internalScale).orient(this.orientation);
             if (formatter == null) {
                 this.formatter = d3.format(".3s");
             } else {

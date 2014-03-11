@@ -30,7 +30,7 @@ module Plottable {
       this.clipPathEnabled = true;
       this.orientation = orientation;
       this.isXAligned = this.orientation === "bottom" || this.orientation === "top";
-      this.d3axis = d3.svg.axis().scale(this.scale.scale).orient(this.orientation);
+      this.d3axis = d3.svg.axis().scale(this.scale._internalScale).orient(this.orientation);
       if (formatter == null) {
         this.formatter = d3.format(".3s");
       } else {
