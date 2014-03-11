@@ -1,9 +1,3 @@
-/*!
-Plottable v0.3.0 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -434,14 +428,24 @@ var Plottable;
         */
         function Scale(scale) {
             this.broadcasterCallbacks = [];
-            this.scale = scale;
+            this._internalScale = scale;
         }
+        /**
+        * Returns the range value corresponding to a given domain value.
+        *
+        * @param value {any} A domain value to be scaled.
+        * @returns {any} The range value corresponding to the supplied domain value.
+        */
+        Scale.prototype.scale = function (value) {
+            return this._internalScale(value);
+        };
+
         Scale.prototype.domain = function (values) {
             var _this = this;
             if (values == null) {
-                return this.scale.domain();
+                return this._internalScale.domain();
             } else {
-                this.scale.domain(values);
+                this._internalScale.domain(values);
                 this.broadcasterCallbacks.forEach(function (b) {
                     return b(_this);
                 });
@@ -451,9 +455,9 @@ var Plottable;
 
         Scale.prototype.range = function (values) {
             if (values == null) {
-                return this.scale.range();
+                return this._internalScale.range();
             } else {
-                this.scale.range(values);
+                this._internalScale.range(values);
                 return this;
             }
         };
@@ -463,7 +467,7 @@ var Plottable;
         * @returns {Scale} A copy of the calling Scale.
         */
         Scale.prototype.copy = function () {
-            return new Scale(this.scale.copy());
+            return new Scale(this._internalScale.copy());
         };
 
         /**
@@ -495,16 +499,7 @@ var Plottable;
         * @returns {number} The domain value corresponding to the supplied range value.
         */
         QuantitiveScale.prototype.invert = function (value) {
-            return this.scale.invert(value);
-        };
-
-        /**
-        * Generates tick values.
-        * @param {number} count The number of ticks to generate.
-        * @returns {any[]} The generated ticks.
-        */
-        QuantitiveScale.prototype.ticks = function (count) {
-            return this.scale.ticks(count);
+            return this._internalScale.invert(value);
         };
 
         /**
@@ -512,7 +507,7 @@ var Plottable;
         * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
         */
         QuantitiveScale.prototype.copy = function () {
-            return new QuantitiveScale(this.scale.copy());
+            return new QuantitiveScale(this._internalScale.copy());
         };
 
         /**
@@ -525,6 +520,63 @@ var Plottable;
             var wideDomain = [Math.min(newDomain[0], currentDomain[0]), Math.max(newDomain[1], currentDomain[1])];
             this.domain(wideDomain);
             return this;
+        };
+
+        QuantitiveScale.prototype.interpolate = function (factory) {
+            if (factory == null) {
+                return this._internalScale.interpolate();
+            }
+            this._internalScale.interpolate(factory);
+            return this;
+        };
+
+        /**
+        * Sets the range of the QuantitiveScale and sets the interpolator to d3.interpolateRound.
+        *
+        * @param {number[]} values The new range value for the range.
+        */
+        QuantitiveScale.prototype.rangeRound = function (values) {
+            this._internalScale.rangeRound(values);
+            return this;
+        };
+
+        QuantitiveScale.prototype.clamp = function (clamp) {
+            if (clamp == null) {
+                return this._internalScale.clamp();
+            }
+            this._internalScale.clamp(clamp);
+            return this;
+        };
+
+        /**
+        * Extends the scale's domain so it starts and ends with "nice" values.
+        *
+        * @param {number} [count] The number of ticks that should fit inside the new domain.
+        */
+        QuantitiveScale.prototype.nice = function (count) {
+            this._internalScale.nice(count);
+            this.domain(this._internalScale.domain()); // nice() can change the domain, so update all listeners
+            return this;
+        };
+
+        /**
+        * Generates tick values.
+        * @param {number} [count] The number of ticks to generate.
+        * @returns {any[]} The generated ticks.
+        */
+        QuantitiveScale.prototype.ticks = function (count) {
+            return this._internalScale.ticks(count);
+        };
+
+        /**
+        * Gets a tick formatting function for displaying tick values.
+        *
+        * @param {number} count The number of ticks to be displayed
+        * @param {string} [format] A format specifier string.
+        * @returns {(n: number) => string} A formatting function.
+        */
+        QuantitiveScale.prototype.tickFormat = function (count, format) {
+            return this._internalScale.tickFormat(count, format);
         };
         return QuantitiveScale;
     })(Scale);
@@ -541,7 +593,7 @@ var Plottable;
         * @returns {LinearScale} A copy of the calling LinearScale.
         */
         LinearScale.prototype.copy = function () {
-            return new LinearScale(this.scale.copy());
+            return new LinearScale(this._internalScale.copy());
         };
         return LinearScale;
     })(QuantitiveScale);
@@ -634,8 +686,8 @@ var Plottable;
             this.xScale = xScale;
             this.yScale = yScale;
             this.zoom = d3.behavior.zoom();
-            this.zoom.x(this.xScale.scale);
-            this.zoom.y(this.yScale.scale);
+            this.zoom.x(this.xScale._internalScale);
+            this.zoom.y(this.yScale._internalScale);
             this.zoom.on("zoom", function () {
                 return _this.rerenderZoomed();
             });
@@ -648,8 +700,8 @@ var Plottable;
         PanZoomInteraction.prototype.rerenderZoomed = function () {
             // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
             // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-            var xDomain = this.xScale.scale.domain();
-            var yDomain = this.yScale.scale.domain();
+            var xDomain = this.xScale._internalScale.domain();
+            var yDomain = this.yScale._internalScale.domain();
             this.xScale.domain(xDomain);
             this.yScale.domain(yDomain);
         };

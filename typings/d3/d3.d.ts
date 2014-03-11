@@ -1684,35 +1684,19 @@ declare module D3 {
                 (...arguments: any[]): Axis;
             };
 
-            tickValues: {
-                (): any[];
-                (...arguments: any[]): Axis;
-            };
-
-            tickSize: {
-                (): number;
-                (inner: number, outer?: number): Axis;
-            }
-
-            innerTickSize: {
-                (): number;
-                (value: number): Axis;
-            }
-
-            outerTickSize: {
-                (): number;
-                (value: number): Axis;
-            }
-
             tickPadding: {
                 (): number;
                 (padding: number): Axis;
             };
 
-            tickFormat: {
-                (): (value: any) => string;
-                (formatter: (value: any) => string): Axis;
+            tickValues: {
+                (): any[];
+                (values: any[]): Axis;
             };
+
+            tickSubdivide(count: number): Axis;
+            tickSize(major?: number, minor?: number, end?: number): Axis;
+            tickFormat(formatter: (value: any) => string): Axis;
         }
 
         export interface Arc {
@@ -2575,7 +2559,7 @@ declare module D3 {
             * get a formatter for displaying tick values
             *
             * @param count Aproximate representative values to return.
-            * @param format? The format specifier to use.
+            * @param format The optional format specifier to use.
             */
             tickFormat(count: number, format?: string): (n: number) => string;
             /**

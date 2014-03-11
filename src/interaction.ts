@@ -58,8 +58,8 @@ module Plottable {
       this.xScale = xScale;
       this.yScale = yScale;
       this.zoom = d3.behavior.zoom();
-      this.zoom.x(this.xScale.scale);
-      this.zoom.y(this.yScale.scale);
+      this.zoom.x(this.xScale._internalScale);
+      this.zoom.y(this.yScale._internalScale);
       this.zoom.on("zoom", () => this.rerenderZoomed());
     }
 
@@ -71,8 +71,8 @@ module Plottable {
     private rerenderZoomed() {
       // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
       // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-      var xDomain = this.xScale.scale.domain();
-      var yDomain = this.yScale.scale.domain();
+      var xDomain = this.xScale._internalScale.domain();
+      var yDomain = this.yScale._internalScale.domain();
       this.xScale.domain(xDomain);
       this.yScale.domain(yDomain);
     }

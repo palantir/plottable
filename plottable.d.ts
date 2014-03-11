@@ -202,7 +202,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class Scale implements Plottable.IBroadcaster {
-        public scale: D3.Scale.Scale;
+        public _internalScale: D3.Scale.Scale;
         private broadcasterCallbacks;
         /**
         * Creates a new Scale.
@@ -210,6 +210,13 @@ declare module Plottable {
         * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
         */
         constructor(scale: D3.Scale.Scale);
+        /**
+        * Returns the range value corresponding to a given domain value.
+        *
+        * @param value {any} A domain value to be scaled.
+        * @returns {any} The range value corresponding to the supplied domain value.
+        */
+        public scale(value: any): any;
         /**
         * Retrieves the current domain, or sets the Scale's domain to the specified values.
         * @param {any[]} [values] The new value for the domain.
@@ -237,7 +244,7 @@ declare module Plottable {
         public registerListener(callback: Plottable.IBroadcasterCallback): Scale;
     }
     class QuantitiveScale extends Scale {
-        public scale: D3.Scale.QuantitiveScale;
+        public _internalScale: D3.Scale.QuantitiveScale;
         /**
         * Creates a new QuantitiveScale.
         * @constructor
@@ -251,12 +258,6 @@ declare module Plottable {
         */
         public invert(value: number): number;
         /**
-        * Generates tick values.
-        * @param {number} count The number of ticks to generate.
-        * @returns {any[]} The generated ticks.
-        */
-        public ticks(count: number): any[];
-        /**
         * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
         * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
         */
@@ -267,6 +268,48 @@ declare module Plottable {
         * @returns {QuantitiveScale} The scale.
         */
         public widenDomain(newDomain: number[]): QuantitiveScale;
+        /**
+        * Sets or gets the QuantitiveScale's output interpolator
+        *
+        * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
+        * @returns {D3.Transition.Interpolate|QuantitiveScale} The current output interpolator, or the calling QuantitiveScale.
+        */
+        public interpolate(): D3.Transition.Interpolate;
+        public interpolate(factory: D3.Transition.Interpolate): QuantitiveScale;
+        /**
+        * Sets the range of the QuantitiveScale and sets the interpolator to d3.interpolateRound.
+        *
+        * @param {number[]} values The new range value for the range.
+        */
+        public rangeRound(values: number[]): QuantitiveScale;
+        /**
+        * Gets or sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+        *
+        * @param {boolean} [clamp] Whether or not to clamp the QuantitiveScale.
+        * @returns {boolean|QuantitiveScale} The current clamp status, or the calling QuantitiveScale.
+        */
+        public clamp(): boolean;
+        public clamp(clamp: boolean): QuantitiveScale;
+        /**
+        * Extends the scale's domain so it starts and ends with "nice" values.
+        *
+        * @param {number} [count] The number of ticks that should fit inside the new domain.
+        */
+        public nice(count?: number): QuantitiveScale;
+        /**
+        * Generates tick values.
+        * @param {number} [count] The number of ticks to generate.
+        * @returns {any[]} The generated ticks.
+        */
+        public ticks(count?: number): any[];
+        /**
+        * Gets a tick formatting function for displaying tick values.
+        *
+        * @param {number} count The number of ticks to be displayed
+        * @param {string} [format] A format specifier string.
+        * @returns {(n: number) => string} A formatting function.
+        */
+        public tickFormat(count: number, format?: string): (n: number) => string;
     }
     class LinearScale extends QuantitiveScale {
         /**
