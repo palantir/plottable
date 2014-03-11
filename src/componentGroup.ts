@@ -53,13 +53,11 @@ module Plottable {
     }
 
     public isFixedWidth(): boolean {
-      var widthFixities = this.components.map((c) => c.isFixedWidth());
-      return widthFixities.reduce((a, b) => a && b);
+      return this.components.every((c) => c.isFixedWidth());
     }
 
     public isFixedHeight(): boolean {
-      var heightFixities = this.components.map((c) => c.isFixedHeight());
-      return heightFixities.reduce((a, b) => a && b);
+      return this.components.every((c) => c.isFixedHeight());
     }
   }
 }
