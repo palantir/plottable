@@ -786,6 +786,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class ComponentGroup extends Plottable.Component {
+        private static CSS_CLASS;
         private components;
         /**
         * Creates a ComponentGroup.

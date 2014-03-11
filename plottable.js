@@ -1980,6 +1980,7 @@ var Plottable;
         function ComponentGroup(components) {
             if (typeof components === "undefined") { components = []; }
             _super.call(this);
+            this.classed(ComponentGroup.CSS_CLASS, true);
             this.components = components;
         }
         /**
@@ -2009,7 +2010,7 @@ var Plottable;
             var _this = this;
             _super.prototype.computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             this.components.forEach(function (c) {
-                c.computeLayout(_this.xOrigin, _this.yOrigin, _this.availableWidth, _this.availableHeight);
+                c.computeLayout(0, 0, _this.availableWidth, _this.availableHeight);
             });
             return this;
         };
@@ -2033,6 +2034,7 @@ var Plottable;
                 return c.isFixedHeight();
             });
         };
+        ComponentGroup.CSS_CLASS = "component-group";
         return ComponentGroup;
     })(Plottable.Component);
     Plottable.ComponentGroup = ComponentGroup;
