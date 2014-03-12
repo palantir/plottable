@@ -1319,10 +1319,11 @@ var Plottable;
         * @param {QuantitiveScale} xScale The x scale to use.
         * @param {QuantitiveScale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-        * @param {IAccessor} [x2Accessor] A function for extracting the end position of each bar from the data.
+        * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
-        function BarRenderer(dataset, xScale, yScale, xAccessor, x2Accessor, yAccessor) {
+        function BarRenderer(dataset, xScale, yScale, xAccessor, dxAccessor, yAccessor) {
+            var _this = this;
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
             this.barPaddingPx = 1;
             this.classed(BarRenderer.CSS_CLASS, true);
@@ -1334,9 +1335,11 @@ var Plottable;
                 this.yScale.widenDomain([newMin, newMax]); // TODO: make this handle reversed scales
             }
 
-            this.x2Accessor = (x2Accessor != null) ? x2Accessor : BarRenderer.defaultX2Accessor;
+            this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
 
-            var x2Extent = d3.extent(dataset.data, this.x2Accessor);
+            var x2Extent = d3.extent(dataset.data, function (d) {
+                return _this.xAccessor(d) + _this.dxAccessor(d);
+            });
             this.xScale.widenDomain(x2Extent);
         }
         BarRenderer.prototype.render = function () {
@@ -1346,13 +1349,15 @@ var Plottable;
             var maxScaledY = Math.max(yRange[0], yRange[1]);
 
             this.dataSelection = this.renderArea.selectAll("rect").data(this.dataset.data);
+            var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
+            var xrr = this.xScale.range()[1] - this.xScale.range()[0];
             this.dataSelection.enter().append("rect");
             this.dataSelection.attr("x", function (d) {
                 return _this.xScale.scale(_this.xAccessor(d)) + _this.barPaddingPx;
             }).attr("y", function (d) {
                 return _this.yScale.scale(_this.yAccessor(d));
             }).attr("width", function (d) {
-                return (_this.xScale.scale(_this.x2Accessor(d)) - _this.xScale.scale(_this.xAccessor(d)) - 2 * _this.barPaddingPx);
+                return _this.xScale.scale(_this.dxAccessor(d)) - _this.xScale.scale(0) - 2 * _this.barPaddingPx;
             }).attr("height", function (d) {
                 return maxScaledY - _this.yScale.scale(_this.yAccessor(d));
             });
@@ -1360,8 +1365,8 @@ var Plottable;
             return this;
         };
         BarRenderer.CSS_CLASS = "bar-renderer";
-        BarRenderer.defaultX2Accessor = function (d) {
-            return d.x2;
+        BarRenderer.defaultDxAccessor = function (d) {
+            return d.dx;
         };
         return BarRenderer;
     })(XYRenderer);

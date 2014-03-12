@@ -594,9 +594,9 @@ declare module Plottable {
     }
     class BarRenderer extends XYRenderer {
         private static CSS_CLASS;
-        private static defaultX2Accessor;
+        private static defaultDxAccessor;
         public barPaddingPx: number;
-        public x2Accessor: IAccessor;
+        public dxAccessor: IAccessor;
         /**
         * Creates a BarRenderer.
         *
@@ -605,10 +605,10 @@ declare module Plottable {
         * @param {QuantitiveScale} xScale The x scale to use.
         * @param {QuantitiveScale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-        * @param {IAccessor} [x2Accessor] A function for extracting the end position of each bar from the data.
+        * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, x2Accessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
         public render(): BarRenderer;
     }
 }

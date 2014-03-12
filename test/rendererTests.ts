@@ -243,8 +243,11 @@ describe("Renderers", () => {
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       var verifier = new MultiTestVerifier();
-      var d0 = {x: 0, x2: 1, y: 1};
-      var d1 = {x: 2, x2: 6, y: 4};
+      var d0 = {x: -2, dx: 1, y: 1};
+      var d1 = {x: 0, dx: 4, y: 4};
+      // Choosing data with a negative x value is significant, since there is
+      // a potential failure mode involving the xDomain with an initial
+      // point below 0
       var dataset = {seriesName: "sampleBarData", data: [d0, d1]};
 
       before(() => {
