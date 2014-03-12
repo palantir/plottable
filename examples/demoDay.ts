@@ -94,8 +94,8 @@ module DemoDay {
       var yBins = histogram.bin2(selectedData);
       chart.c.xBins = xBins;
       chart.c.yBins = yBins;
-      histogram.renderer1.data({metadata: {cssClass: "xBins"}, data: xBins})
-      histogram.renderer2.data({metadata: {cssClass: "yBins"}, data: yBins})
+      histogram.renderer1.dataset({metadata: {cssClass: "xBins"}, data: xBins})
+      histogram.renderer2.dataset({metadata: {cssClass: "yBins"}, data: yBins})
       histogram.renderer1.render();
       histogram.renderer2.render();
     };

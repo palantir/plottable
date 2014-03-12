@@ -1083,6 +1083,9 @@ var Plottable;
 (function (Plottable) {
     var Renderer = (function (_super) {
         __extends(Renderer, _super);
+        // A perf-efficient approach to rendering scale changes would be to transform
+        // the container rather than re-render. In the event that the data is changed,
+        // it will be necessary to do a regular rerender.
         /**
         * Creates a Renderer.
         *
@@ -1091,12 +1094,19 @@ var Plottable;
         */
         function Renderer(dataset) {
             _super.call(this);
+            this.rerenderUpdateSelection = true;
+            // A perf-efficient manner of rendering would be to calculate attributes only
+            // on new nodes, and assume that old nodes (ie the update selection) can
+            // maintain their current attributes. If we change the metadata or an
+            // accessor function, then this property will not be true, and we will need
+            // to recompute attributes on the entire update selection.
+            this.requireRerender = false;
             this.clipPathEnabled = true;
             this.fixedWidthVal = false;
             this.fixedHeightVal = false;
             this.classed(Renderer.CSS_CLASS, true);
             if (dataset != null) {
-                this.data(dataset);
+                this.dataset(dataset);
             }
         }
         /**
@@ -1105,12 +1115,24 @@ var Plottable;
         * @param {IDataset} dataset The new dataset to be associated with the Renderer.
         * @returns {Renderer} The calling Renderer.
         */
-        Renderer.prototype.data = function (dataset) {
-            var oldCSSClass = this.metadata != null ? this.metadata.cssClass : null;
+        Renderer.prototype.dataset = function (dataset) {
+            this.data(dataset.data);
+            this.metadata(dataset.metadata);
+            return this;
+        };
+
+        Renderer.prototype.metadata = function (metadata) {
+            var oldCSSClass = this.metadataV != null ? this.metadataV.cssClass : null;
             this.classed(oldCSSClass, false);
-            this.dataArray = dataset.data;
-            this.metadata = dataset.metadata;
-            this.classed(this.metadata.cssClass, true);
+            this.metadataV = metadata;
+            this.classed(this.metadataV.cssClass, true);
+            this.rerenderUpdateSelection = true;
+            return this;
+        };
+
+        Renderer.prototype.data = function (data) {
+            this.dataArray = data;
+            this.requireRerender = true;
             return this;
         };
 
@@ -1123,8 +1145,6 @@ var Plottable;
         return Renderer;
     })(Plottable.Component);
     Plottable.Renderer = Renderer;
-
-    ;
 
     var XYRenderer = (function (_super) {
         __extends(XYRenderer, _super);
@@ -1151,9 +1171,16 @@ var Plottable;
 
             var data = dataset.data;
 
-            var xDomain = d3.extent(data, this.xAccessor);
+            var appliedXAccessor = function (d) {
+                return _this.xAccessor(d, null, _this.metadataV);
+            };
+            var xDomain = d3.extent(data, appliedXAccessor);
             this.xScale.widenDomain(xDomain);
-            var yDomain = d3.extent(data, this.yAccessor);
+
+            var appliedYAccessor = function (d) {
+                return _this.yAccessor(d, null, _this.metadataV);
+            };
+            var yDomain = d3.extent(data, appliedYAccessor);
             this.yScale.widenDomain(yDomain);
 
             this.xScale.registerListener(function () {
@@ -1185,6 +1212,16 @@ var Plottable;
             return dataArea;
         };
 
+        XYRenderer.prototype.getDataFilterFunction = function (dataArea) {
+            var _this = this;
+            var filterFunction = function (d, i) {
+                var x = _this.xAccessor(d, i, _this.metadataV);
+                var y = _this.yAccessor(d, i, _this.metadataV);
+                return Plottable.Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Plottable.Utils.inRange(y, dataArea.yMin, dataArea.yMax);
+            };
+            return filterFunction;
+        };
+
         /**
         * Gets the data in a selected area.
         *
@@ -1192,12 +1229,7 @@ var Plottable;
         * @returns {D3.UpdateSelection} The data in the selected area.
         */
         XYRenderer.prototype.getSelectionFromArea = function (dataArea) {
-            var _this = this;
-            var filterFunction = function (d) {
-                var x = _this.xAccessor(d);
-                var y = _this.yAccessor(d);
-                return Plottable.Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Plottable.Utils.inRange(y, dataArea.yMin, dataArea.yMax);
-            };
+            var filterFunction = this.getDataFilterFunction(dataArea);
             return this.dataSelection.filter(filterFunction);
         };
 
@@ -1208,15 +1240,10 @@ var Plottable;
         * @returns {number[]} An array of the indices of datapoints in the selected area.
         */
         XYRenderer.prototype.getDataIndicesFromArea = function (dataArea) {
-            var _this = this;
-            var filterFunction = function (d) {
-                var x = _this.xAccessor(d);
-                var y = _this.yAccessor(d);
-                return Plottable.Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Plottable.Utils.inRange(y, dataArea.yMin, dataArea.yMax);
-            };
+            var filterFunction = this.getDataFilterFunction(dataArea);
             var results = [];
             this.dataArray.forEach(function (d, i) {
-                if (filterFunction(d)) {
+                if (filterFunction(d, i)) {
                     results.push(i);
                 }
             });
@@ -1265,10 +1292,10 @@ var Plottable;
         LineRenderer.prototype.render = function () {
             var _this = this;
             _super.prototype.render.call(this);
-            this.line = d3.svg.line().x(function (datum) {
-                return _this.xScale.scale(_this.xAccessor(datum));
-            }).y(function (datum) {
-                return _this.yScale.scale(_this.yAccessor(datum));
+            this.line = d3.svg.line().x(function (d, i) {
+                return _this.xScale.scale(_this.xAccessor(d, i, _this.metadataV));
+            }).y(function (d, i) {
+                return _this.yScale.scale(_this.yAccessor(d, i, _this.metadataV));
             });
             this.dataSelection = this.path.classed("line", true).datum(this.dataArray);
             this.path.attr("d", this.line);
@@ -1303,10 +1330,10 @@ var Plottable;
             _super.prototype.render.call(this);
             this.dataSelection = this.renderArea.selectAll("circle").data(this.dataArray);
             this.dataSelection.enter().append("circle");
-            this.dataSelection.attr("cx", function (datum) {
-                return _this.xScale.scale(_this.xAccessor(datum));
-            }).attr("cy", function (datum) {
-                return _this.yScale.scale(_this.yAccessor(datum));
+            this.dataSelection.attr("cx", function (d, i) {
+                return _this.xScale.scale(_this.xAccessor(d, i, _this.metadataV));
+            }).attr("cy", function (d, i) {
+                return _this.yScale.scale(_this.yAccessor(d, i, _this.metadataV));
             }).attr("r", this.size);
             this.dataSelection.exit().remove();
             return this;
@@ -1344,9 +1371,10 @@ var Plottable;
 
             this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
 
-            var x2Extent = d3.extent(dataset.data, function (d) {
-                return _this.xAccessor(d) + _this.dxAccessor(d);
-            });
+            var x2Accessor = function (d) {
+                return _this.xAccessor(d, null, _this.metadataV) + _this.dxAccessor(d, null, _this.metadataV);
+            };
+            var x2Extent = d3.extent(dataset.data, x2Accessor);
             this.xScale.widenDomain(x2Extent);
         }
         BarRenderer.prototype.render = function () {
@@ -1359,15 +1387,33 @@ var Plottable;
             var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
             var xrr = this.xScale.range()[1] - this.xScale.range()[0];
             this.dataSelection.enter().append("rect");
-            this.dataSelection.attr("x", function (d) {
-                return _this.xScale.scale(_this.xAccessor(d)) + _this.barPaddingPx;
-            }).attr("y", function (d) {
-                return _this.yScale.scale(_this.yAccessor(d));
-            }).attr("width", function (d) {
-                return _this.xScale.scale(_this.dxAccessor(d)) - _this.xScale.scale(0) - 2 * _this.barPaddingPx;
-            }).attr("height", function (d) {
-                return maxScaledY - _this.yScale.scale(_this.yAccessor(d));
-            });
+
+            var xFunction = function (d, i) {
+                var x = _this.xAccessor(d, i, _this.metadataV);
+                var scaledX = _this.xScale.scale(x);
+                return scaledX + _this.barPaddingPx;
+            };
+
+            var yFunction = function (d, i) {
+                var y = _this.yAccessor(d, i, _this.metadataV);
+                var scaledY = _this.yScale.scale(y);
+                return scaledY;
+            };
+
+            var widthFunction = function (d, i) {
+                var dx = _this.dxAccessor(d, i, _this.metadataV);
+                var scaledDx = _this.xScale.scale(dx);
+                var scaledOffset = _this.xScale.scale(0);
+                return scaledDx - scaledOffset - 2 * _this.barPaddingPx;
+            };
+
+            var heightFunction = function (d, i) {
+                var y = _this.yAccessor(d, i, _this.metadataV);
+                var scaledY = _this.yScale.scale(y);
+                return maxScaledY - scaledY;
+            };
+
+            this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction);
             this.dataSelection.exit().remove();
             return this;
         };
@@ -2050,4 +2096,8 @@ var Plottable;
         return ComponentGroup;
     })(Plottable.Component);
     Plottable.ComponentGroup = ComponentGroup;
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
+    ;
 })(Plottable || (Plottable = {}));
