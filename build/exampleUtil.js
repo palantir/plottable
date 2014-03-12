@@ -69,7 +69,7 @@ function binByVal(data, accessor, range, nBins) {
     var bins = counts.map(function (count, i) {
         var bin = {};
         bin.x = binBeginnings[i];
-        bin.x2 = binEndings[i];
+        bin.dx = spread / nBins;
         bin.y = count;
         return bin;
     });
@@ -81,7 +81,7 @@ function makeRandomBucketData(numBuckets, bucketWidth, maxValue) {
     for (var i = 0; i < numBuckets; i++) {
         data.push({
             x: i * bucketWidth,
-            x2: (i + 1) * bucketWidth,
+            dx: bucketWidth,
             y: Math.round(Math.random() * maxValue)
         });
     }
@@ -90,4 +90,3 @@ function makeRandomBucketData(numBuckets, bucketWidth, maxValue) {
         "seriesName": "random-buckets"
     };
 }
-//# sourceMappingURL=exampleUtil.js.map

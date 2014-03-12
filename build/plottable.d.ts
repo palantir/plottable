@@ -3,6 +3,8 @@
 declare module Utils {
     function inRange(x: number, a: number, b: number): boolean;
     function getBBox(element: D3.Selection): SVGRect;
+    function truncateTextToLength(text: string, length: number, element: D3.Selection): string;
+    function getTextHeight(textElement: D3.Selection): number;
 }
 declare class Component {
     private static clipPathId;
@@ -17,15 +19,19 @@ declare class Component {
     private colMinimumVal;
     public availableWidth: number;
     public availableHeight: number;
-    public xOffset: number;
-    public yOffset: number;
+    public xOrigin: number;
+    public yOrigin: number;
+    private xOffsetVal;
+    private yOffsetVal;
+    public xAlignProportion: number;
+    public yAlignProportion: number;
     private cssClasses;
-    private xAlignProportion;
-    private yAlignProportion;
     public anchor(element: D3.Selection): Component;
     public xAlign(alignment: string): Component;
     public yAlign(alignment: string): Component;
-    public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Component;
+    public xOffset(offset: number): Component;
+    public yOffset(offset: number): Component;
+    public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Component;
     public render(): Component;
     private addBox(className?, parentElement?);
     public generateClipPath(): void;
@@ -65,6 +71,9 @@ declare class LinearScale extends QuantitiveScale {
     constructor();
     constructor(scale: D3.Scale.LinearScale);
     public copy(): LinearScale;
+}
+declare class ColorScale extends Scale {
+    constructor(scaleType?: string);
 }
 declare class Interaction {
     public hitBox: D3.Selection;
@@ -114,8 +123,6 @@ declare class ZoomCallbackGenerator {
 }
 declare class Label extends Component {
     private static CSS_CLASS;
-    public xAlignment: string;
-    public yAlignment: string;
     private textElement;
     private text;
     private orientation;
@@ -125,7 +132,7 @@ declare class Label extends Component {
     public anchor(element: D3.Selection): Label;
     public setText(text: string): void;
     private measureAndSetTextSize();
-    private truncateTextToLength(availableLength);
+    private truncateTextAndRemeasure(availableLength);
     public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
 }
 declare class TitleLabel extends Label {
@@ -201,17 +208,25 @@ declare class Table extends Component {
     private colWeights;
     private rowWeightSum;
     private colWeightSum;
-    constructor(rows: Component[][], rowWeightVal?: number, colWeightVal?: number);
+    private guessRowWeight;
+    private guessColWeight;
+    constructor(rows?: Component[][]);
+    public addComponent(row: number, col: number, component: Component): Table;
+    private padTableToSize(nRows, nCols);
     public anchor(element: D3.Selection): Table;
     public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Table;
     private static rowProportionalSpace(rows, freeHeight);
     private static colProportionalSpace(cols, freeWidth);
     private static calculateProportionalSpace(componentGroups, freeSpace, spaceAccessor);
     public render(): Table;
+    public rowWeight(): number;
+    public rowWeight(newVal: number): Table;
+    public colWeight(): number;
+    public colWeight(newVal: number): Table;
     public rowMinimum(): number;
-    public rowMinimum(newVal: number): Component;
+    public rowMinimum(newVal: number): Table;
     public colMinimum(): number;
-    public colMinimum(newVal: number): Component;
+    public colMinimum(newVal: number): Table;
     public padding(rowPadding: number, colPadding: number): Table;
 }
 declare class ScaleDomainCoordinator {
@@ -219,6 +234,19 @@ declare class ScaleDomainCoordinator {
     private rescaleInProgress;
     constructor(scales: Scale[]);
     public rescale(scale: Scale): void;
+}
+declare class Legend extends Component {
+    private static CSS_CLASS;
+    private static SUBELEMENT_CLASS;
+    private static MARGIN;
+    private colorScale;
+    private maxWidth;
+    constructor(colorScale?: ColorScale);
+    public scale(scale: ColorScale): Legend;
+    public rowMinimum(): number;
+    public rowMinimum(newVal: number): Legend;
+    private measureTextHeight();
+    public render(): Legend;
 }
 declare class Axis extends Component {
     public scale: Scale;
@@ -249,8 +277,9 @@ declare class YAxis extends Axis {
 }
 declare class ComponentGroup extends Component {
     private components;
-    constructor(components: Component[]);
+    constructor(components?: Component[]);
+    public addComponent(c: Component): ComponentGroup;
     public anchor(element: D3.Selection): ComponentGroup;
-    public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
+    public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
     public render(): ComponentGroup;
 }
