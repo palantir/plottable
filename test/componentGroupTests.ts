@@ -70,4 +70,30 @@ describe("ComponentGroups", () => {
     assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
     assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
   });
+
+  it("componentGroup subcomponents have xOffset, yOffset of 0", () => {
+    var cg = new Plottable.ComponentGroup();
+    var c1 = new Plottable.Component();
+    c1.fixedHeightVal = false;
+    c1.fixedWidthVal  = false;
+    var c2 = new Plottable.Component();
+    c2.fixedHeightVal = false;
+    c2.fixedWidthVal  = false;
+    cg.addComponent(c1).addComponent(c2);
+
+    var svg = generateSVG();
+    cg.anchor(svg);
+    cg.computeLayout(50, 50, 350, 350);
+
+    var cgTranslate = d3.transform(cg.element.attr("transform")).translate;
+    var c1Translate = d3.transform(c1.element.attr("transform")).translate;
+    var c2Translate = d3.transform(c2.element.attr("transform")).translate;
+    assert.equal(cgTranslate[0], 50, "componentGroup has 50 xOffset");
+    assert.equal(cgTranslate[1], 50, "componentGroup has 50 yOffset");
+    assert.equal(c1Translate[0], 0, "componentGroup has 0 xOffset");
+    assert.equal(c1Translate[1], 0, "componentGroup has 0 yOffset");
+    assert.equal(c2Translate[0], 0, "componentGroup has 0 xOffset");
+    assert.equal(c2Translate[1], 0, "componentGroup has 0 yOffset");
+    svg.remove();
+    });
 });

@@ -17,7 +17,7 @@ describe("Renderers", () => {
       var d1 = {data: ["foo"], seriesName: "bar"};
       var r = new Plottable.Renderer(d1);
       r.anchor(svg).computeLayout();
-      var renderArea = r.element.select(".render-area");
+      var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       assert.isTrue(renderArea.classed("bar"), "the render area is classed w/ dataset.seriesName");
       assert.deepEqual(r.dataset, d1, "the dataset is set properly");
@@ -243,8 +243,11 @@ describe("Renderers", () => {
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       var verifier = new MultiTestVerifier();
-      var d0 = {x: 0, x2: 1, y: 1};
-      var d1 = {x: 2, x2: 6, y: 4};
+      var d0 = {x: -2, dx: 1, y: 1};
+      var d1 = {x: 0, dx: 4, y: 4};
+      // Choosing data with a negative x value is significant, since there is
+      // a potential failure mode involving the xDomain with an initial
+      // point below 0
       var dataset = {seriesName: "sampleBarData", data: [d0, d1]};
 
       before(() => {

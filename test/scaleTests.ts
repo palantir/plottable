@@ -17,7 +17,7 @@ describe("Scales", () => {
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
-    var scale = new Plottable.Scale(d3.scale.linear());
+    var scale = new Plottable.QuantitiveScale(d3.scale.linear());
     var callbackWasCalled = false;
     var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.IBroadcaster) => {
       assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
@@ -26,6 +26,11 @@ describe("Scales", () => {
     scale.registerListener(testCallback);
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
+
+    scale.domain([0.08, 9.92]);
+    callbackWasCalled = false;
+    scale.nice();
+    assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
   });
 
   it("QuantitiveScale.widenDomain() functions correctly", () => {

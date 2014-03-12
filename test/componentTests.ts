@@ -21,49 +21,10 @@ describe("Component behavior", () => {
     c = new Plottable.Component();
   });
 
-  it.skip("renderTo works properly", () => {
-    var anchored = false;
-    var computed = false;
-    var rendered = false;
-    var oldAnchor = c.anchor.bind(c);
-    var oldCompute = c.computeLayout.bind(c);
-    var oldRender = c.render.bind(c);
-    c.anchor = (el) => {
-      oldAnchor(el);
-      anchored = true;
-      return c;
-    };
-    c.computeLayout = (x?, y?, w?, h?) => {
-      oldCompute(x, y, w, h);
-      computed = true;
-      return c;
-    };
-    c.render = () => {
-      oldRender();
-      rendered = true;
-      return c;
-    };
-    c.renderTo(svg);
-    assert.isTrue(anchored, "anchor was called");
-    assert.isTrue(computed, "computeLayout was called");
-    assert.isTrue(rendered, "render was called");
-    anchored = false;
-    computed = false;
-    rendered = true;
-    c.renderTo(svg);
-    assert.isFalse(anchored, "anchor was not called a second time");
-    assert.isTrue(computed, "computeLayout was called a second time");
-    assert.isTrue(rendered, "render was called a second time");
-    var svg2 = generateSVG();
-    assert.throws(() => c.renderTo(svg2), Error, "different element");
-    svg.remove();
-    svg2.remove();
-  });
-
   describe("anchor", () => {
     it("anchoring works as expected", () => {
       c.anchor(svg);
-      assert.equal(c.element, svg, "the component anchored to the svg");
+      assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the svg");
       svg.remove();
     });
 
@@ -113,14 +74,15 @@ describe("Component behavior", () => {
 
   it("subelement containers are ordered properly", () => {
     c.renderTo(svg);
-    c.element.append("g").classed("foo", true);
     var gs = c.element.selectAll("g");
     var g0 = d3.select(gs[0][0]);
     var g1 = d3.select(gs[0][1]);
     var g2 = d3.select(gs[0][2]);
-    assert.isTrue(g0.classed("box-container"), "the first g is a box container");
-    assert.isTrue(g1.classed("foreground-container"), "the second g is a foreground container");
-    assert.isTrue(g2.classed("foo"), "the third g is the foo we appended");
+    var g3 = d3.select(gs[0][3]);
+    assert.isTrue(g0.classed("background-container"), "the first g is a background container");
+    assert.isTrue(g1.classed("content"), "the second g is a content container");
+    assert.isTrue(g2.classed("foreground-container"), "the third g is a foreground container");
+    assert.isTrue(g3.classed("box-container"), "the fourth g is a box container");
     svg.remove();
   });
 

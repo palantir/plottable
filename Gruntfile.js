@@ -37,7 +37,7 @@ module.exports = function(grunt) {
         // watch: "test",
         options: {
           target: 'es5',
-          sourceMap: true,
+          sourceMap: false,
           declaration: false,
           removeComments: false
         }
@@ -48,7 +48,7 @@ module.exports = function(grunt) {
         // watch: "examples",
         options: {
           target: 'es5',
-          sourceMap: true,
+          sourceMap: false,
           declaration: false,
           removeComments: false
         }
@@ -80,7 +80,7 @@ module.exports = function(grunt) {
     blanket_mocha: {
       all: ['tests.html'],
       options: {
-        threshold: 60
+        threshold: 90
       }
     },
     connect: {

@@ -16,7 +16,7 @@ describe("Legends", () => {
   it("a basic legend renders", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var legends = legend.element.selectAll(".legend-row");
+    var legends = legend.content.selectAll(".legend-row");
 
     legends.each(function(d, i) {
       assert.equal(d, color.domain()[i], "the data was set properly");
@@ -47,7 +47,7 @@ describe("Legends", () => {
     legend.renderTo(svg);
 
     var totalHeight = 0;
-    var legends = legend.element.selectAll(".legend-row");
+    var legends = legend.content.selectAll(".legend-row");
     legends.each(function(d, i) {
       totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
     });
@@ -59,9 +59,9 @@ describe("Legends", () => {
   it("a legend with a long label does not overflow horizontally", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
     legend.renderTo(svg);
-    var text = legend.element.select("text").text();
+    var text = legend.content.select("text").text();
     assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
-    var rightEdge = legend.element.select("text").node().getBoundingClientRect().right;
+    var rightEdge = legend.content.select("text").node().getBoundingClientRect().right;
     var rightEdgeBBox = legend.element.select(".bounding-box").node().getBoundingClientRect().right;
     assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
     svg.remove();
@@ -70,10 +70,10 @@ describe("Legends", () => {
   it("calling legend.render multiple times does not add more elements", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var numRows = legend.element.selectAll(".legend-row")[0].length;
+    var numRows = legend.content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows initially");
     legend.render();
-    numRows = legend.element.selectAll(".legend-row")[0].length;
+    numRows = legend.content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows after second render");
     svg.remove();
   });
@@ -84,14 +84,14 @@ describe("Legends", () => {
     var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
     color.domain(newDomain);
     legend.computeLayout().render();
-    legend.element.selectAll(".legend-row").each(function(d, i) {
+    legend.content.selectAll(".legend-row").each(function(d, i) {
       assert.equal(d, newDomain[i], "the data was set properly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
       var fill = d3.select(this).select("rect").attr("fill");
       assert.equal(fill, color.scale(d), "the fill was set properly");
     });
-    assert.lengthOf(legend.element.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
+    assert.lengthOf(legend.content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
     svg.remove();
   });
 

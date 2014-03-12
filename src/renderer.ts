@@ -40,7 +40,7 @@ module Plottable {
 
     public anchor(element: D3.Selection) {
       super.anchor(element);
-      this.renderArea = element.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
+      this.renderArea = this.content.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
       return this;
     }
   }
@@ -230,10 +230,10 @@ module Plottable {
 
   export class BarRenderer extends XYRenderer {
     private static CSS_CLASS = "bar-renderer";
-    private static defaultX2Accessor = (d: any) => d.x2;
+    private static defaultDxAccessor = (d: any) => d.dx;
     public barPaddingPx = 1;
 
-    public x2Accessor: IAccessor;
+    public dxAccessor: IAccessor;
 
     /**
      * Creates a BarRenderer.
@@ -243,14 +243,14 @@ module Plottable {
      * @param {QuantitiveScale} xScale The x scale to use.
      * @param {QuantitiveScale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-     * @param {IAccessor} [x2Accessor] A function for extracting the end position of each bar from the data.
+     * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
      * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
      */
     constructor(dataset: IDataset,
                 xScale: QuantitiveScale,
                 yScale: QuantitiveScale,
                 xAccessor?: IAccessor,
-                x2Accessor?: IAccessor,
+                dxAccessor?: IAccessor,
                 yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed(BarRenderer.CSS_CLASS, true);
@@ -262,9 +262,9 @@ module Plottable {
         this.yScale.widenDomain([newMin, newMax]); // TODO: make this handle reversed scales
       }
 
-      this.x2Accessor = (x2Accessor != null) ? x2Accessor : BarRenderer.defaultX2Accessor;
+      this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
 
-      var x2Extent = d3.extent(dataset.data, this.x2Accessor);
+      var x2Extent = d3.extent(dataset.data, (d: any) => this.xAccessor(d) + this.dxAccessor(d));
       this.xScale.widenDomain(x2Extent);
     }
 
@@ -274,12 +274,13 @@ module Plottable {
       var maxScaledY = Math.max(yRange[0], yRange[1]);
 
       this.dataSelection = this.renderArea.selectAll("rect").data(this.dataset.data);
+      var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
+      var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");
       this.dataSelection
             .attr("x", (d: any) => this.xScale.scale(this.xAccessor(d)) + this.barPaddingPx)
             .attr("y", (d: any) => this.yScale.scale(this.yAccessor(d)))
-            .attr("width", (d: any) => (this.xScale.scale(this.x2Accessor(d)) - this.xScale.scale(this.xAccessor(d))
-                                            - 2 * this.barPaddingPx))
+            .attr("width", (d: any) => this.xScale.scale(this.dxAccessor(d)) - this.xScale.scale(0) - 2 * this.barPaddingPx)
             .attr("height", (d: any) => maxScaledY - this.yScale.scale(this.yAccessor(d)) );
       this.dataSelection.exit().remove();
       return this;

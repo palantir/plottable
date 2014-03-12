@@ -27,13 +27,10 @@ module Plottable {
 
     /**
      * Registers the Interaction on the Component it's listening to.
-     * Should not be invoked externally; To be called only at the end of subclassing constructors.
+     * This needs to be called to activate the interaction.
      */
     public registerWithComponent(): Interaction {
       this.componentToListenTo.registerInteraction(this);
-      // It would be nice to have a call to this in the Interaction constructor, but
-      // can't do this right now because that depends on listenToHitBox being callable, which depends on the subclass
-      // constructor finishing first.
       return this;
     }
   }
@@ -61,11 +58,9 @@ module Plottable {
       this.xScale = xScale;
       this.yScale = yScale;
       this.zoom = d3.behavior.zoom();
-      this.zoom.x(this.xScale.scale);
-      this.zoom.y(this.yScale.scale);
+      this.zoom.x(this.xScale._d3Scale);
+      this.zoom.y(this.yScale._d3Scale);
       this.zoom.on("zoom", () => this.rerenderZoomed());
-
-      this.registerWithComponent();
     }
 
     public anchor(hitBox: D3.Selection) {
@@ -76,8 +71,8 @@ module Plottable {
     private rerenderZoomed() {
       // HACKHACK since the d3.zoom.x modifies d3 scales and not our TS scales, and the TS scales have the
       // event listener machinery, let's grab the domain out of the d3 scale and pipe it back into the TS scale
-      var xDomain = this.xScale.scale.domain();
-      var yDomain = this.yScale.scale.domain();
+      var xDomain = this.xScale._d3Scale.domain();
+      var yDomain = this.yScale._d3Scale.domain();
       this.xScale.domain(xDomain);
       this.yScale.domain(yDomain);
     }
@@ -105,7 +100,6 @@ module Plottable {
       this.dragBehavior.on("dragstart", () => this.dragstart());
       this.dragBehavior.on("drag",      () => this.drag     ());
       this.dragBehavior.on("dragend",   () => this.dragend  ());
-      this.registerWithComponent();
     }
 
     /**
@@ -174,8 +168,8 @@ module Plottable {
     public anchor(hitBox: D3.Selection): AreaInteraction {
       super.anchor(hitBox);
       var cname = AreaInteraction.CLASS_DRAG_BOX;
-      var foreground = this.componentToListenTo.foregroundContainer;
-      this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+      var background = this.componentToListenTo.backgroundContainer;
+      this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
       hitBox.call(this.dragBehavior);
       return this;
     }
@@ -239,6 +233,67 @@ module Plottable {
           this.updateScale(sm[0], sm[1], area.yMin, area.yMax);
         });
       };
+    }
+  }
+
+  export class MousemoveInteraction extends Interaction {
+    constructor(componentToListenTo: Component) {
+      super(componentToListenTo);
+    }
+
+    public anchor(hitBox: D3.Selection) {
+      super.anchor(hitBox);
+      hitBox.on("mousemove", () => {
+        var xy = d3.mouse(hitBox.node());
+        var x = xy[0];
+        var y = xy[1];
+        this.mousemove(x, y);
+      });
+    }
+
+    public mousemove(x: number, y: number) {
+      return; //no-op
+    }
+  }
+
+  export class CrosshairsInteraction extends MousemoveInteraction {
+    private renderer: XYRenderer;
+
+    private circle: D3.Selection;
+    private xLine: D3.Selection;
+    private yLine: D3.Selection;
+
+    constructor(renderer: XYRenderer) {
+      super(renderer);
+      this.renderer = renderer;
+    }
+
+    public anchor(hitBox: D3.Selection) {
+      super.anchor(hitBox);
+      var container = this.renderer.foregroundContainer.append("g").classed("crosshairs", true);
+      this.circle = container.append("circle").classed("centerpoint", true);
+      this.xLine = container.append("path").classed("x-line", true);
+      this.yLine = container.append("path").classed("y-line", true);
+      this.circle.attr("r", 5);
+    }
+
+    public mousemove(x: number, y: number) {
+      var domainX = this.renderer.xScale.invert(x);
+      var data = this.renderer.dataset.data;
+      var dataIndex = OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
+      dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
+      var dataPoint = data[dataIndex];
+
+      var dataX = this.renderer.xAccessor(dataPoint);
+      var dataY = this.renderer.yAccessor(dataPoint);
+      var pixelX = this.renderer.xScale.scale(dataX);
+      var pixelY = this.renderer.yScale.scale(dataY);
+      this.circle.attr("cx", pixelX).attr("cy", pixelY);
+
+      var width = this.renderer.availableWidth;
+      var height = this.renderer.availableHeight;
+      this.xLine.attr("d", "M 0 " + pixelY + " L " + width + " " + pixelY);
+      this.yLine.attr("d", "M " + pixelX + " 0 L " + pixelX + " " + height);
     }
   }
 }

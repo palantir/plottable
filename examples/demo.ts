@@ -15,8 +15,8 @@ module Demo {
   basicTable.anchor(svg1);
   basicTable.computeLayout();
   basicTable.render();
-  new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
-
+  var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
+  pzi.registerWithComponent();
   // make a table with four nested tables
   var svg2 = d3.select("#svg2");
 
@@ -38,8 +38,8 @@ module Demo {
 
   var metaTable = new Plottable.Table([[t1, t2], [t3, t4]]);
   metaTable.padding(5, 5);
-  metaTable.anchor(svg2);
   svg2.attr("width", 800).attr("height", 600);
+  metaTable.anchor(svg2);
   metaTable.computeLayout();
   metaTable.render();
 
@@ -59,8 +59,8 @@ module Demo {
 
   var svg3 = d3.select("#svg3");
   var multiaxischart = makeMultiAxisChart();
-  multiaxischart.anchor(svg3);
   svg3.attr("width", 400).attr("height",400);
+  multiaxischart.anchor(svg3);
   multiaxischart.computeLayout();
   multiaxischart.render();
 
@@ -82,6 +82,7 @@ module Demo {
     var toggleClass = function() {return !d3.select(this).classed("selected-point")};
     var cb = (s) => s.classed("selected-point", toggleClass);
     var areaInteraction = new Plottable.AreaInteraction(renderer2);
+    areaInteraction.registerWithComponent();
     var row2: Plottable.Component[] = [leftAxis, renderer2, null];
     var bottomAxis = new Plottable.XAxis(xScale1, "bottom");
     var row3: Plottable.Component[] = [null, bottomAxis, null];
@@ -92,6 +93,7 @@ module Demo {
     var zoomCallback = new Plottable.ZoomCallbackGenerator().addXScale(xScaleSpark, xScale1).addYScale(yScaleSpark, yScale2).getCallback();
 
     var zoomInteraction = new Plottable.AreaInteraction(sparkline).callback(zoomCallback);
+    zoomInteraction.registerWithComponent();
     var multiChart = new Plottable.Table([row1, row2, row3, row4]);
     multiChart.rowWeight(3, 0.25);
     return multiChart;
@@ -99,8 +101,8 @@ module Demo {
 
   var svg4 = d3.select("#svg4");
   var multichart = makeSparklineMultichart();
-  multichart.anchor(svg4);
   svg4.attr("width",800).attr("height",600);
+  multichart.anchor(svg4);
   multichart.computeLayout();
   multichart.render();
   // svg4.selectAll("g").remove()

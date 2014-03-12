@@ -36,7 +36,7 @@ module Plottable {
 
     public anchor(element: D3.Selection) {
       super.anchor(element);
-      this.textElement = this.element.append("text");
+      this.textElement = this.content.append("text");
       this.setText(this.text);
       return this;
     }

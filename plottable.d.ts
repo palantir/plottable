@@ -29,19 +29,64 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    module OSUtils {
+        /**
+        * Returns the sortedIndex for inserting a value into an array.
+        * Takes a number and an array of numbers OR an array of objects and an accessor that returns a number.
+        * @param {number} value: The numerical value to insert
+        * @param {any[]} arr: Array to find insertion index, can be number[] or any[] (if accessor provided)
+        * @param {IAccessor} accessor: If provided, this function is called on members of arr to determine insertion index
+        * @returns {number} The insertion index.
+        * The behavior is undefined for arrays that are unsorted
+        * If there are multiple valid insertion indices that maintain sorted order (e.g. addign 1 to [1,1,1,1,1]) then
+        * the behavior must satisfy that the array is sorted post-insertion, but is otherwise unspecified.
+        * This is a modified version of Underscore.js's implementation of sortedIndex.
+        * Underscore.js is released under the MIT License:
+        Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative
+        Reporters & Editors
+        
+        Permission is hereby granted, free of charge, to any person
+        obtaining a copy of this software and associated documentation
+        files (the "Software"), to deal in the Software without
+        restriction, including without limitation the rights to use,
+        copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the
+        Software is furnished to do so, subject to the following
+        conditions:
+        
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+        OTHER DEALINGS IN THE SOFTWARE.
+        */
+        function sortedIndex(val: number, arr: number[]): number;
+        function sortedIndex(val: number, arr: any[], accessor: Plottable.IAccessor): number;
+    }
+}
+declare module Plottable {
     class Component {
         private static clipPathId;
         public element: D3.Selection;
+        public content: D3.Selection;
         private hitBox;
         private interactionsToRegister;
         private boxes;
         private boxContainer;
+        public backgroundContainer: D3.Selection;
         public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
         public fixedWidthVal: boolean;
         public fixedHeightVal: boolean;
         private rowMinimumVal;
         private colMinimumVal;
+        private isTopLevelComponent;
         public availableWidth: number;
         public availableHeight: number;
         public xOrigin: number;
@@ -157,7 +202,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class Scale implements Plottable.IBroadcaster {
-        public scale: D3.Scale.Scale;
+        public _d3Scale: D3.Scale.Scale;
         private broadcasterCallbacks;
         /**
         * Creates a new Scale.
@@ -165,6 +210,13 @@ declare module Plottable {
         * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
         */
         constructor(scale: D3.Scale.Scale);
+        /**
+        * Returns the range value corresponding to a given domain value.
+        *
+        * @param value {any} A domain value to be scaled.
+        * @returns {any} The range value corresponding to the supplied domain value.
+        */
+        public scale(value: any): any;
         /**
         * Retrieves the current domain, or sets the Scale's domain to the specified values.
         * @param {any[]} [values] The new value for the domain.
@@ -192,7 +244,7 @@ declare module Plottable {
         public registerListener(callback: Plottable.IBroadcasterCallback): Scale;
     }
     class QuantitiveScale extends Scale {
-        public scale: D3.Scale.QuantitiveScale;
+        public _d3Scale: D3.Scale.QuantitiveScale;
         /**
         * Creates a new QuantitiveScale.
         * @constructor
@@ -206,12 +258,6 @@ declare module Plottable {
         */
         public invert(value: number): number;
         /**
-        * Generates tick values.
-        * @param {number} count The number of ticks to generate.
-        * @returns {any[]} The generated ticks.
-        */
-        public ticks(count: number): any[];
-        /**
         * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
         * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
         */
@@ -222,6 +268,48 @@ declare module Plottable {
         * @returns {QuantitiveScale} The scale.
         */
         public widenDomain(newDomain: number[]): QuantitiveScale;
+        /**
+        * Sets or gets the QuantitiveScale's output interpolator
+        *
+        * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
+        * @returns {D3.Transition.Interpolate|QuantitiveScale} The current output interpolator, or the calling QuantitiveScale.
+        */
+        public interpolate(): D3.Transition.Interpolate;
+        public interpolate(factory: D3.Transition.Interpolate): QuantitiveScale;
+        /**
+        * Sets the range of the QuantitiveScale and sets the interpolator to d3.interpolateRound.
+        *
+        * @param {number[]} values The new range value for the range.
+        */
+        public rangeRound(values: number[]): QuantitiveScale;
+        /**
+        * Gets or sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+        *
+        * @param {boolean} [clamp] Whether or not to clamp the QuantitiveScale.
+        * @returns {boolean|QuantitiveScale} The current clamp status, or the calling QuantitiveScale.
+        */
+        public clamp(): boolean;
+        public clamp(clamp: boolean): QuantitiveScale;
+        /**
+        * Extends the scale's domain so it starts and ends with "nice" values.
+        *
+        * @param {number} [count] The number of ticks that should fit inside the new domain.
+        */
+        public nice(count?: number): QuantitiveScale;
+        /**
+        * Generates tick values.
+        * @param {number} [count] The number of ticks to generate.
+        * @returns {any[]} The generated ticks.
+        */
+        public ticks(count?: number): any[];
+        /**
+        * Gets a tick formatting function for displaying tick values.
+        *
+        * @param {number} count The number of ticks to be displayed
+        * @param {string} [format] A format specifier string.
+        * @returns {(n: number) => string} A formatting function.
+        */
+        public tickFormat(count: number, format?: string): (n: number) => string;
     }
     class LinearScale extends QuantitiveScale {
         /**
@@ -260,7 +348,7 @@ declare module Plottable {
         public anchor(hitBox: D3.Selection): void;
         /**
         * Registers the Interaction on the Component it's listening to.
-        * Should not be invoked externally; To be called only at the end of subclassing constructors.
+        * This needs to be called to activate the interaction.
         */
         public registerWithComponent(): Interaction;
     }
@@ -346,6 +434,20 @@ declare module Plottable {
         * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
         */
         public getCallback(): (area: Plottable.SelectionArea) => void;
+    }
+    class MousemoveInteraction extends Interaction {
+        constructor(componentToListenTo: Plottable.Component);
+        public anchor(hitBox: D3.Selection): void;
+        public mousemove(x: number, y: number): void;
+    }
+    class CrosshairsInteraction extends MousemoveInteraction {
+        private renderer;
+        private circle;
+        private xLine;
+        private yLine;
+        constructor(renderer: Plottable.XYRenderer);
+        public anchor(hitBox: D3.Selection): void;
+        public mousemove(x: number, y: number): void;
     }
 }
 declare module Plottable {
@@ -492,9 +594,9 @@ declare module Plottable {
     }
     class BarRenderer extends XYRenderer {
         private static CSS_CLASS;
-        private static defaultX2Accessor;
+        private static defaultDxAccessor;
         public barPaddingPx: number;
-        public x2Accessor: IAccessor;
+        public dxAccessor: IAccessor;
         /**
         * Creates a BarRenderer.
         *
@@ -503,10 +605,10 @@ declare module Plottable {
         * @param {QuantitiveScale} xScale The x scale to use.
         * @param {QuantitiveScale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-        * @param {IAccessor} [x2Accessor] A function for extracting the end position of each bar from the data.
+        * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, x2Accessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
         public render(): BarRenderer;
     }
 }
@@ -536,11 +638,8 @@ declare module Plottable {
         * @param {Component} component The Component to be added.
         */
         public addComponent(row: number, col: number, component: Plottable.Component): Table;
-        private padTableToSize(nRows, nCols);
         public anchor(element: D3.Selection): Table;
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Table;
-        private static calcComponentWeights(setWeights, componentGroups, fixityAccessor);
-        private static calcProportionalSpace(weights, freeSpace);
         public render(): Table;
         /**
         * Sets the row and column padding on the Table.
@@ -572,9 +671,12 @@ declare module Plottable {
         public rowMinimum(newVal: number): Table;
         public colMinimum(): number;
         public colMinimum(newVal: number): Table;
-        private static fixedSpace(componentGroup, fixityAccessor);
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+        private padTableToSize(nRows, nCols);
+        private static calcComponentWeights(setWeights, componentGroups, fixityAccessor);
+        private static calcProportionalSpace(weights, freeSpace);
+        private static fixedSpace(componentGroup, fixityAccessor);
     }
 }
 declare module Plottable {
@@ -621,15 +723,11 @@ declare module Plottable {
 declare module Plottable {
     class Axis extends Plottable.Component {
         private static CSS_CLASS;
-        private scale;
-        private orientation;
-        private formatter;
         static yWidth: number;
         static xHeight: number;
         public axisElement: D3.Selection;
-        public d3axis: D3.Svg.Axis;
-        private cachedScale;
-        private cachedTranslate;
+        private d3Axis;
+        private axisScale;
         private isXAligned;
         /**
         * Creates an Axis.
@@ -639,11 +737,29 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Plottable.Scale, orientation: string, formatter?: any);
+        constructor(axisScale: Plottable.Scale, orientation: string, formatter?: any);
         public anchor(element: D3.Selection): Axis;
-        private transformString(translate, scale);
         public render(): Axis;
         private rescale();
+        public scale(): Plottable.Scale;
+        public scale(newScale: Plottable.Scale): Axis;
+        public orient(): string;
+        public orient(newOrient: string): Axis;
+        public ticks(): any[];
+        public ticks(...args: any[]): Axis;
+        public tickValues(): any[];
+        public tickValues(...args: any[]): Axis;
+        public tickSize(): number;
+        public tickSize(inner: number): Axis;
+        public tickSize(inner: number, outer: number): Axis;
+        public innerTickSize(): number;
+        public innerTickSize(val: number): Axis;
+        public outerTickSize(): number;
+        public outerTickSize(val: number): Axis;
+        public tickPadding(): number;
+        public tickPadding(val: number): Axis;
+        public tickFormat(): (value: any) => string;
+        public tickFormat(formatter: (value: any) => string): Axis;
     }
     class XAxis extends Axis {
         /**
@@ -670,6 +786,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class ComponentGroup extends Plottable.Component {
+        private static CSS_CLASS;
         private components;
         /**
         * Creates a ComponentGroup.

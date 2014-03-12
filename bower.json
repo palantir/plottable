@@ -1,9 +1,10 @@
 {
   "name": "plottable",
-  "version": "0.2.2",
+  "version": "0.3.1",
   "ignore": [
     "**/*",
     "!plottable.js",
+    "!plottable.css",
     "!plottable.d.ts"
   ],
   "keywords": ["plottable", "plottablejs", "plottable.js"],

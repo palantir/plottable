@@ -45,6 +45,7 @@ describe("Interactions", () => {
       var yDomainBefore = yScale.domain();
 
       var interaction = new Plottable.PanZoomInteraction(renderer, xScale, yScale);
+      interaction.registerWithComponent();
 
       var hb = renderer.element.select(".hit-box").node();
       var dragDistancePixelX = 10;
@@ -99,6 +100,7 @@ describe("Interactions", () => {
       renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
       renderer.renderTo(svg);
       interaction = new Plottable.AreaInteraction(renderer);
+      interaction.registerWithComponent();
     });
 
     afterEach(() => {
@@ -130,7 +132,7 @@ describe("Interactions", () => {
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       var dragBoxClass = "." + (<any> Plottable.AreaInteraction).CLASS_DRAG_BOX;
-      var dragBox = renderer.foregroundContainer.select(dragBoxClass);
+      var dragBox = renderer.backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
       var expectedStartPosition = {x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY)};
@@ -186,10 +188,53 @@ describe("Interactions", () => {
         zoomCallback(a);
       };
       interaction = new Plottable.AreaInteraction(renderer).callback(callback);
+      interaction.registerWithComponent();
+
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
       assert.isTrue(indicesCallbackCalled, "indicesCallback was called");
       assert.deepEqual(xScale.domain(), expectedXDomain, "X scale domain was updated correctly");
       assert.deepEqual(yScale.domain(), expectedYDomain, "Y scale domain was updated correclty");
+
+      svg.remove();
+    });
+  });
+
+  describe("CrosshairsInteraction", () => {
+    it("Crosshairs manifest basic functionality", () => {
+      var svg = generateSVG(400, 400);
+      var dp = (x, y) => { return {x: x, y: y}; };
+      var data = [dp(0, 0), dp(20, 10), dp(40, 40)];
+      var dataset = {seriesName: "foo", data: data};
+      var xScale = new Plottable.LinearScale();
+      var yScale = new Plottable.LinearScale();
+      var circleRenderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
+      var crosshairs = new Plottable.CrosshairsInteraction(circleRenderer);
+      crosshairs.registerWithComponent();
+      circleRenderer.renderTo(svg);
+
+      var crosshairsG = circleRenderer.foregroundContainer.select(".crosshairs");
+      var circle = crosshairsG.select("circle");
+      var xLine = crosshairsG.select(".x-line");
+      var yLine = crosshairsG.select(".y-line");
+
+      crosshairs.mousemove(0,0);
+      assert.equal(circle.attr("cx"), 0, "the crosshairs are at x=0");
+      assert.equal(circle.attr("cy"), 400, "the crosshairs are at y=400");
+      assert.equal(xLine.attr("d"), "M 0 400 L 400 400", "the xLine behaves properly at y=400");
+      assert.equal(yLine.attr("d"), "M 0 0 L 0 400", "the yLine behaves properly at x=0");
+
+      crosshairs.mousemove(30, 0);
+      // It should stay in the same position
+      assert.equal(circle.attr("cx"), 0, "the crosshairs are at x=0 still");
+      assert.equal(circle.attr("cy"), 400, "the crosshairs are at y=400 still");
+      assert.equal(xLine.attr("d"), "M 0 400 L 400 400", "the xLine behaves properly at y=400");
+      assert.equal(yLine.attr("d"), "M 0 0 L 0 400", "the yLine behaves properly at x=0");
+
+      crosshairs.mousemove(300, 0);
+      assert.equal(circle.attr("cx"), 200, "the crosshairs are at x=200");
+      assert.equal(circle.attr("cy"), 300, "the crosshairs are at y=300");
+      assert.equal(xLine.attr("d"), "M 0 300 L 400 300", "the xLine behaves properly at y=300");
+      assert.equal(yLine.attr("d"), "M 200 0 L 200 400", "the yLine behaves properly at x=200");
 
       svg.remove();
     });
