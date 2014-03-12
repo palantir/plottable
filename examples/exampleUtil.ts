@@ -45,7 +45,6 @@ function binByVal(data: any[], accessor: Plottable.IAccessor, range=[0,100], nBi
     if (!found) {counts[counts.length-1]++};
   });
   var bins = counts.map((count, i) => {
-    console.log(binBeginnings[i], spread/nBins, binBeginnings[i] + spread/nBins - binEndings[i] < 0.01);
     var bin: any = {};
     bin.x = binBeginnings[i];
     bin.dx = spread / nBins;
