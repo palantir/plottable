@@ -21,45 +21,6 @@ describe("Component behavior", () => {
     c = new Plottable.Component();
   });
 
-  it.skip("renderTo works properly", () => {
-    var anchored = false;
-    var computed = false;
-    var rendered = false;
-    var oldAnchor = c.anchor.bind(c);
-    var oldCompute = c.computeLayout.bind(c);
-    var oldRender = c.render.bind(c);
-    c.anchor = (el) => {
-      oldAnchor(el);
-      anchored = true;
-      return c;
-    };
-    c.computeLayout = (x?, y?, w?, h?) => {
-      oldCompute(x, y, w, h);
-      computed = true;
-      return c;
-    };
-    c.render = () => {
-      oldRender();
-      rendered = true;
-      return c;
-    };
-    c.renderTo(svg);
-    assert.isTrue(anchored, "anchor was called");
-    assert.isTrue(computed, "computeLayout was called");
-    assert.isTrue(rendered, "render was called");
-    anchored = false;
-    computed = false;
-    rendered = true;
-    c.renderTo(svg);
-    assert.isFalse(anchored, "anchor was not called a second time");
-    assert.isTrue(computed, "computeLayout was called a second time");
-    assert.isTrue(rendered, "render was called a second time");
-    var svg2 = generateSVG();
-    assert.throws(() => c.renderTo(svg2), Error, "different element");
-    svg.remove();
-    svg2.remove();
-  });
-
   describe("anchor", () => {
     it("anchoring works as expected", () => {
       c.anchor(svg);
