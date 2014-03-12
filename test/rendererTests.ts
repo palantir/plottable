@@ -14,18 +14,20 @@ describe("Renderers", () => {
 
     it("Base renderer functionality works", () => {
       var svg = generateSVG(400, 300);
-      var d1 = {data: ["foo"], seriesName: "bar"};
+      var d1 = {data: ["foo"], metadata: {cssClass: "bar"}};
       var r = new Plottable.Renderer(d1);
       r.anchor(svg).computeLayout();
       var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
-      assert.isTrue(renderArea.classed("bar"), "the render area is classed w/ dataset.seriesName");
-      assert.deepEqual(r.dataset, d1, "the dataset is set properly");
-      var d2 = {data: ["bar"], seriesName: "boo"};
+      assert.isTrue(r.element.classed("bar"), "the element is classed w/ metadata.cssClass");
+      assert.deepEqual(r.dataArray, d1.data, "the data is set properly");
+      assert.deepEqual(r.metadata,  d1.metadata,  "the metadata is set properly");
+      var d2 = {data: ["bar"], metadata: {cssClass: "boo"}};
       r.data(d2);
-      assert.isFalse(renderArea.classed("bar"), "the renderArea is no longer classed bar");
-      assert.isTrue(renderArea.classed("boo"), "the renderArea is now classed boo");
-      assert.deepEqual(r.dataset, d2, "the dataset was replaced properly");
+      assert.isFalse(r.element.classed("bar"), "the element is no longer classed bar");
+      assert.isTrue (r.element.classed("boo"), "the element is now classed boo");
+      assert.deepEqual(r.dataArray, d2.data, "the data is set properly");
+      assert.deepEqual(r.metadata, d2.metadata, "the metadata is set properly");
       svg.remove();
     });
   });
@@ -39,7 +41,7 @@ describe("Renderers", () => {
       var xScale;
       var yScale;
       var lineRenderer;
-      var simpleDataset = {seriesName: "simpleDataset", data: [{foo: 0, bar:0}, {foo:1, bar:1}]};
+      var simpleDataset = {metadata: {cssClass: "simpleDataset"}, data: [{foo: 0, bar:0}, {foo:1, bar:1}]};
       var renderArea;
       var verifier = new MultiTestVerifier();
 
@@ -248,7 +250,7 @@ describe("Renderers", () => {
       // Choosing data with a negative x value is significant, since there is
       // a potential failure mode involving the xDomain with an initial
       // point below 0
-      var dataset = {seriesName: "sampleBarData", data: [d0, d1]};
+      var dataset = {metadata: {cssClass: "sampleBarData"}, data: [d0, d1]};
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);

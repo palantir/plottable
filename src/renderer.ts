@@ -4,7 +4,8 @@ module Plottable {
   export class Renderer extends Component {
     private static CSS_CLASS = "renderer";
 
-    public dataset: IDataset;
+    public dataArray: any[];
+    public metadata: IMetadata;
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
@@ -15,14 +16,13 @@ module Plottable {
      * @constructor
      * @param {IDataset} [dataset] The dataset associated with the Renderer.
      */
-    constructor(dataset: IDataset = {seriesName: "", data: []}) {
+    constructor(dataset: IDataset = {metadata: {}, data: []}) {
       super();
       this.clipPathEnabled = true;
       this.fixedWidthVal = false;
       this.fixedHeightVal = false;
-
-      this.dataset = dataset;
       this.classed(Renderer.CSS_CLASS, true);
+      this.data(dataset);
     }
 
     /**
@@ -32,15 +32,17 @@ module Plottable {
      * @returns {Renderer} The calling Renderer.
      */
     public data(dataset: IDataset): Renderer {
-      this.renderArea.classed(this.dataset.seriesName, false);
-      this.dataset = dataset;
-      this.renderArea.classed(dataset.seriesName, true);
+      var oldCSSClass = this.metadata != null ? this.metadata.cssClass : null;
+      this.classed(oldCSSClass, false);
+      this.dataArray = dataset.data;
+      this.metadata = dataset.metadata;
+      this.classed(this.metadata.cssClass, true);
       return this;
     }
 
     public anchor(element: D3.Selection) {
       super.anchor(element);
-      this.renderArea = this.content.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
+      this.renderArea = this.content.append("g").classed("render-area", true);
       return this;
     }
   }
@@ -140,7 +142,7 @@ module Plottable {
         return Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Utils.inRange(y, dataArea.yMin, dataArea.yMax);
       };
       var results: number[] = [];
-      this.dataset.data.forEach((d, i) => {
+      this.dataArray.forEach((d, i) => {
         if (filterFunction(d)) {
           results.push(i);
         }
@@ -187,8 +189,7 @@ module Plottable {
                         .x((datum: any) => this.xScale.scale(this.xAccessor(datum)))
                         .y((datum: any) => this.yScale.scale(this.yAccessor(datum)));
       this.dataSelection = this.path.classed("line", true)
-        .classed(this.dataset.seriesName, true)
-        .datum(this.dataset.data);
+        .datum(this.dataArray);
       this.path.attr("d", this.line);
       return this;
     }
@@ -218,7 +219,7 @@ module Plottable {
 
     public render() {
       super.render();
-      this.dataSelection = this.renderArea.selectAll("circle").data(this.dataset.data);
+      this.dataSelection = this.renderArea.selectAll("circle").data(this.dataArray);
       this.dataSelection.enter().append("circle");
       this.dataSelection.attr("cx", (datum: any) => this.xScale.scale(this.xAccessor(datum)))
                         .attr("cy", (datum: any) => this.yScale.scale(this.yAccessor(datum)))
@@ -273,7 +274,7 @@ module Plottable {
       var yRange = this.yScale.range();
       var maxScaledY = Math.max(yRange[0], yRange[1]);
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this.dataset.data);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this.dataArray);
       var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");

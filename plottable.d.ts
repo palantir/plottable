@@ -490,7 +490,8 @@ declare module Plottable {
 declare module Plottable {
     class Renderer extends Plottable.Component {
         private static CSS_CLASS;
-        public dataset: Plottable.IDataset;
+        public dataArray: any[];
+        public metadata: Plottable.IMetadata;
         public renderArea: D3.Selection;
         public element: D3.Selection;
         public scales: Plottable.Scale[];
@@ -812,7 +813,11 @@ declare module Plottable {
 declare module Plottable {
     interface IDataset {
         data: any[];
-        seriesName: string;
+        metadata: IMetadata;
+    }
+    interface IMetadata {
+        cssClass?: string;
+        color?: string;
     }
     interface SelectionArea {
         xMin: number;

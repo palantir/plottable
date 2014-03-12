@@ -1,9 +1,3 @@
-/*!
-Plottable v0.3.1 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -355,12 +349,17 @@ var Plottable;
 
         Component.prototype.classed = function (cssClass, addClass) {
             if (addClass == null) {
-                if (this.element == null) {
+                if (cssClass == null) {
+                    return false;
+                } else if (this.element == null) {
                     return (this.cssClasses.indexOf(cssClass) !== -1);
                 } else {
                     return this.element.classed(cssClass);
                 }
             } else {
+                if (cssClass == null) {
+                    return this;
+                }
                 if (this.element == null) {
                     var classIndex = this.cssClasses.indexOf(cssClass);
                     if (addClass && classIndex === -1) {
@@ -927,7 +926,7 @@ var Plottable;
 
         CrosshairsInteraction.prototype.mousemove = function (x, y) {
             var domainX = this.renderer.xScale.invert(x);
-            var data = this.renderer.dataset.data;
+            var data = this.renderer.dataArray;
             var dataIndex = Plottable.OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
             dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
             var dataPoint = data[dataIndex];
@@ -1085,14 +1084,13 @@ var Plottable;
         * @param {IDataset} [dataset] The dataset associated with the Renderer.
         */
         function Renderer(dataset) {
-            if (typeof dataset === "undefined") { dataset = { seriesName: "", data: [] }; }
+            if (typeof dataset === "undefined") { dataset = { metadata: {}, data: [] }; }
             _super.call(this);
             this.clipPathEnabled = true;
             this.fixedWidthVal = false;
             this.fixedHeightVal = false;
-
-            this.dataset = dataset;
             this.classed(Renderer.CSS_CLASS, true);
+            this.data(dataset);
         }
         /**
         * Sets a new dataset on the Renderer.
@@ -1101,15 +1099,17 @@ var Plottable;
         * @returns {Renderer} The calling Renderer.
         */
         Renderer.prototype.data = function (dataset) {
-            this.renderArea.classed(this.dataset.seriesName, false);
-            this.dataset = dataset;
-            this.renderArea.classed(dataset.seriesName, true);
+            var oldCSSClass = this.metadata != null ? this.metadata.cssClass : null;
+            this.classed(oldCSSClass, false);
+            this.dataArray = dataset.data;
+            this.metadata = dataset.metadata;
+            this.classed(this.metadata.cssClass, true);
             return this;
         };
 
         Renderer.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
-            this.renderArea = this.content.append("g").classed("render-area", true).classed(this.dataset.seriesName, true);
+            this.renderArea = this.content.append("g").classed("render-area", true);
             return this;
         };
         Renderer.CSS_CLASS = "renderer";
@@ -1208,7 +1208,7 @@ var Plottable;
                 return Plottable.Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Plottable.Utils.inRange(y, dataArea.yMin, dataArea.yMax);
             };
             var results = [];
-            this.dataset.data.forEach(function (d, i) {
+            this.dataArray.forEach(function (d, i) {
                 if (filterFunction(d)) {
                     results.push(i);
                 }
@@ -1263,7 +1263,7 @@ var Plottable;
             }).y(function (datum) {
                 return _this.yScale.scale(_this.yAccessor(datum));
             });
-            this.dataSelection = this.path.classed("line", true).classed(this.dataset.seriesName, true).datum(this.dataset.data);
+            this.dataSelection = this.path.classed("line", true).datum(this.dataArray);
             this.path.attr("d", this.line);
             return this;
         };
@@ -1294,7 +1294,7 @@ var Plottable;
         CircleRenderer.prototype.render = function () {
             var _this = this;
             _super.prototype.render.call(this);
-            this.dataSelection = this.renderArea.selectAll("circle").data(this.dataset.data);
+            this.dataSelection = this.renderArea.selectAll("circle").data(this.dataArray);
             this.dataSelection.enter().append("circle");
             this.dataSelection.attr("cx", function (datum) {
                 return _this.xScale.scale(_this.xAccessor(datum));
@@ -1348,7 +1348,7 @@ var Plottable;
             var yRange = this.yScale.range();
             var maxScaledY = Math.max(yRange[0], yRange[1]);
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this.dataset.data);
+            this.dataSelection = this.renderArea.selectAll("rect").data(this.dataArray);
             var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
             var xrr = this.xScale.range()[1] - this.xScale.range()[0];
             this.dataSelection.enter().append("rect");

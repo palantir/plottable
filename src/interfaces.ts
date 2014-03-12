@@ -1,7 +1,12 @@
 module Plottable {
   export interface IDataset {
     data: any[];
-    seriesName: string;
+    metadata: IMetadata;
+  }
+
+  export interface IMetadata {
+    cssClass?: string;
+    color?: string;
   }
 
   export interface SelectionArea {
