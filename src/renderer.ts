@@ -4,7 +4,7 @@ module Plottable {
   export class Renderer extends Component {
     private static CSS_CLASS = "renderer";
 
-    public dataArray: any[];
+    public _data: any[];
     public _metadata: IMetadata;
     public renderArea: D3.Selection;
     public element: D3.Selection;
@@ -61,7 +61,7 @@ module Plottable {
     }
 
     public data(data: any[]): Renderer {
-      this.dataArray = data;
+      this._data = data;
       this._requireRerender = true;
       return this;
     }
@@ -179,7 +179,7 @@ module Plottable {
     public getDataIndicesFromArea(dataArea: SelectionArea): number[] {
       var filterFunction = this.getDataFilterFunction(dataArea);
       var results: number[] = [];
-      this.dataArray.forEach((d, i) => {
+      this._data.forEach((d, i) => {
         if (filterFunction(d, i)) {
           results.push(i);
         }
@@ -226,7 +226,7 @@ module Plottable {
             .x((d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
             .y((d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)));
       this.dataSelection = this.path.classed("line", true)
-        .datum(this.dataArray);
+        .datum(this._data);
       this.path.attr("d", this.line);
     }
   }
@@ -255,7 +255,7 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      this.dataSelection = this.renderArea.selectAll("circle").data(this.dataArray);
+      this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
       this.dataSelection.enter().append("circle");
       this.dataSelection.attr("cx", (d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
                         .attr("cy", (d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)))
@@ -311,7 +311,7 @@ module Plottable {
       var yRange = this.yScale.range();
       var maxScaledY = Math.max(yRange[0], yRange[1]);
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this.dataArray);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
       var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");

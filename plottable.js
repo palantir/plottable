@@ -932,7 +932,7 @@ var Plottable;
 
         CrosshairsInteraction.prototype.mousemove = function (x, y) {
             var domainX = this.renderer.xScale.invert(x);
-            var data = this.renderer.dataArray;
+            var data = this.renderer._data;
             var dataIndex = Plottable.OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
             dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
             var dataPoint = data[dataIndex];
@@ -1131,7 +1131,7 @@ var Plottable;
         };
 
         Renderer.prototype.data = function (data) {
-            this.dataArray = data;
+            this._data = data;
             this._requireRerender = true;
             return this;
         };
@@ -1253,7 +1253,7 @@ var Plottable;
         XYRenderer.prototype.getDataIndicesFromArea = function (dataArea) {
             var filterFunction = this.getDataFilterFunction(dataArea);
             var results = [];
-            this.dataArray.forEach(function (d, i) {
+            this._data.forEach(function (d, i) {
                 if (filterFunction(d, i)) {
                     results.push(i);
                 }
@@ -1308,7 +1308,7 @@ var Plottable;
             }).y(function (d, i) {
                 return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
             });
-            this.dataSelection = this.path.classed("line", true).datum(this.dataArray);
+            this.dataSelection = this.path.classed("line", true).datum(this._data);
             this.path.attr("d", this.line);
         };
         LineRenderer.CSS_CLASS = "line-renderer";
@@ -1338,7 +1338,7 @@ var Plottable;
         CircleRenderer.prototype._paint = function () {
             var _this = this;
             _super.prototype._paint.call(this);
-            this.dataSelection = this.renderArea.selectAll("circle").data(this.dataArray);
+            this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
             this.dataSelection.enter().append("circle");
             this.dataSelection.attr("cx", function (d, i) {
                 return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
@@ -1392,7 +1392,7 @@ var Plottable;
             var yRange = this.yScale.range();
             var maxScaledY = Math.max(yRange[0], yRange[1]);
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this.dataArray);
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
             var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
             var xrr = this.xScale.range()[1] - this.xScale.range()[0];
             this.dataSelection.enter().append("rect");

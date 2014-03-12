@@ -490,7 +490,7 @@ declare module Plottable {
 declare module Plottable {
     class Renderer extends Plottable.Component {
         private static CSS_CLASS;
-        public dataArray: any[];
+        public _data: any[];
         public _metadata: Plottable.IMetadata;
         public renderArea: D3.Selection;
         public element: D3.Selection;
