@@ -10,6 +10,7 @@ module Plottable {
     private d3Axis: D3.Svg.Axis;
     private axisScale: Scale;
     private isXAligned: boolean;
+    private tickPositioning = "center";
 
     /**
      * Creates an Axis.
@@ -87,6 +88,24 @@ module Plottable {
       } else {
         this.axisScale = newScale;
         this.d3Axis.scale(newScale._d3Scale);
+        return this;
+      }
+    }
+
+    /**
+     * Sets or gets the tick label position relative to the tick marks.
+     * The exact consequences of particular tick label positionings depends on the subclass implementation.
+     *
+     * @param {string} [position] The relative position of the tick label.
+     * @returns {string|Axis} The current tick label position, or the calling Axis.
+     */
+    public tickLabelPosition(): string;
+    public tickLabelPosition(position: string): Axis;
+    public tickLabelPosition(position?: string): any {
+      if (position == null) {
+        return this.tickPositioning;
+      } else {
+        this.tickPositioning = position;
         return this;
       }
     }
@@ -172,7 +191,6 @@ module Plottable {
       }
     }
 
-
     public tickFormat(): (value: any) => string;
     public tickFormat(formatter: (value: any) => string): Axis;
     public tickFormat(formatter?: (value: any) => string): any {
@@ -191,13 +209,53 @@ module Plottable {
      *
      * @constructor
      * @param {Scale} scale The Scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     * @param {string} orientation The orientation of the Axis (top/bottom)
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
       super(scale, orientation, formatter);
       super.rowMinimum(Axis.xHeight);
       this.fixedWidthVal = false;
+      this.tickLabelPosition("CENTER");
+    }
+
+    /**
+     * Sets or gets the tick label position relative to the tick marks.
+     *
+     * @param {string} [position] The relative position of the tick label (LEFT/CENTER/RIGHT).
+     * @returns {string|XAxis} The current tick label position, or the calling XAxis.
+     */
+    public tickLabelPosition(): string;
+    public tickLabelPosition(position: string): XAxis;
+    public tickLabelPosition(position?: string): any {
+      if (position == null) {
+        return super.tickLabelPosition();
+      } else if (position === "LEFT" || position === "CENTER" || position === "RIGHT") {
+        if (position !== "CENTER") {
+          this.tickSize(12); // longer than default tick size
+        }
+        return super.tickLabelPosition(position);
+      } else {
+        throw new Error(position + " is not a valid tick label position for XAxis");
+      }
+    }
+
+    public render() {
+      super.render();
+      if (this.tickLabelPosition() === "RIGHT") {
+        this.axisElement.selectAll("text")
+                          .attr("y", "0px")
+                          .attr("dx", "0.2em")
+                          .attr("dy", "1em")
+                          .style("text-anchor", "start");
+      } else if (this.tickLabelPosition() === "LEFT") {
+        this.axisElement.selectAll("text")
+                          .attr("y", "0px")
+                          .attr("dx", "-0.2em")
+                          .attr("dy", "1em")
+                          .style("text-anchor", "end");
+      }
+      return this;
     }
   }
 
@@ -207,13 +265,51 @@ module Plottable {
      *
      * @constructor
      * @param {Scale} scale The Scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     * @param {string} orientation The orientation of the Axis (left/right)
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
       super(scale, orientation, formatter);
       super.colMinimum(Axis.yWidth);
       this.fixedHeightVal = false;
+      this.tickLabelPosition("MIDDLE");
+    }
+
+    /**
+     * Sets or gets the tick label position relative to the tick marks.
+     *
+     * @param {string} [position] The relative position of the tick label (TOP/MIDDLE/BOTTOM).
+     * @returns {string|YAxis} The current tick label position, or the calling YAxis.
+     */
+    public tickLabelPosition(): string;
+    public tickLabelPosition(position: string): YAxis;
+    public tickLabelPosition(position?: string): any {
+      if (position == null) {
+        return super.tickLabelPosition();
+      } else if (position === "TOP" || position === "MIDDLE" || position === "BOTTOM") {
+        if (position !== "MIDDLE") {
+          this.tickSize(30); // longer than default tick size
+        }
+        return super.tickLabelPosition(position);
+      } else {
+        throw new Error(position + " is not a valid tick label position for YAxis");
+      }
+    }
+
+    public render() {
+      super.render();
+      if (this.tickLabelPosition() === "TOP") {
+        this.axisElement.selectAll("text")
+                          .attr("x", "0px")
+                          .attr("dx", "-0.2em")
+                          .attr("dy", "-0.25em");
+      } else if (this.tickLabelPosition() === "BOTTOM") {
+        this.axisElement.selectAll("text")
+                          .attr("x", "0px")
+                          .attr("dx", "-0.2em")
+                          .attr("dy", "1em");
+      }
+      return this;
     }
   }
 }
