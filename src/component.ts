@@ -257,12 +257,17 @@ module Plottable {
     public classed(cssClass: string, addClass: boolean): Component;
     public classed(cssClass: string, addClass?:boolean): any {
       if (addClass == null) {
-        if (this.element == null) {
+        if (cssClass == null) {
+          return false;
+        } else if (this.element == null) {
           return (this.cssClasses.indexOf(cssClass) !== -1);
         } else {
           return this.element.classed(cssClass);
         }
       } else {
+        if (cssClass == null) {
+          return this;
+        }
         if (this.element == null) {
           var classIndex = this.cssClasses.indexOf(cssClass);
           if (addClass && classIndex === -1) {

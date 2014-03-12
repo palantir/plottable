@@ -245,6 +245,8 @@ describe("Component behavior", () => {
     assert.isTrue(c.classed("CSS-POSTANCHOR"));
     c.classed("CSS-POSTANCHOR", false);
     assert.isFalse(c.classed("CSS-POSTANCHOR"));
+    assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
+    assert.equal(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
     svg.remove();
   });
 });
