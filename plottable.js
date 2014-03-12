@@ -1,3 +1,9 @@
+/*!
+Plottable v0.3.1 (https://github.com/palantir/plottable)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1084,13 +1090,14 @@ var Plottable;
         * @param {IDataset} [dataset] The dataset associated with the Renderer.
         */
         function Renderer(dataset) {
-            if (typeof dataset === "undefined") { dataset = { metadata: {}, data: [] }; }
             _super.call(this);
             this.clipPathEnabled = true;
             this.fixedWidthVal = false;
             this.fixedHeightVal = false;
             this.classed(Renderer.CSS_CLASS, true);
-            this.data(dataset);
+            if (dataset != null) {
+                this.data(dataset);
+            }
         }
         /**
         * Sets a new dataset on the Renderer.

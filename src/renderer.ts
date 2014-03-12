@@ -16,13 +16,15 @@ module Plottable {
      * @constructor
      * @param {IDataset} [dataset] The dataset associated with the Renderer.
      */
-    constructor(dataset: IDataset = {metadata: {}, data: []}) {
+    constructor(dataset?: IDataset) {
       super();
       this.clipPathEnabled = true;
       this.fixedWidthVal = false;
       this.fixedHeightVal = false;
       this.classed(Renderer.CSS_CLASS, true);
-      this.data(dataset);
+      if (dataset != null) {
+        this.data(dataset);
+      }
     }
 
     /**
