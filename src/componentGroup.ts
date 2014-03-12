@@ -2,6 +2,8 @@
 
 module Plottable {
   export class ComponentGroup extends Component {
+    private static CSS_CLASS = "component-group";
+
     private components: Component[];
 
     /**
@@ -12,6 +14,7 @@ module Plottable {
      */
     constructor(components: Component[] = []){
       super();
+      this.classed(ComponentGroup.CSS_CLASS, true);
       this.components = components;
     }
 
@@ -41,7 +44,7 @@ module Plottable {
                  availableHeight?: number): ComponentGroup {
       super.computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       this.components.forEach((c) => {
-        c.computeLayout(this.xOrigin, this.yOrigin, this.availableWidth, this.availableHeight);
+        c.computeLayout(0, 0, this.availableWidth, this.availableHeight);
       });
       return this;
     }
@@ -53,13 +56,11 @@ module Plottable {
     }
 
     public isFixedWidth(): boolean {
-      var widthFixities = this.components.map((c) => c.isFixedWidth());
-      return widthFixities.reduce((a, b) => a && b);
+      return this.components.every((c) => c.isFixedWidth());
     }
 
     public isFixedHeight(): boolean {
-      var heightFixities = this.components.map((c) => c.isFixedHeight());
-      return heightFixities.reduce((a, b) => a && b);
+      return this.components.every((c) => c.isFixedHeight());
     }
   }
 }

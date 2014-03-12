@@ -47,7 +47,7 @@ function binByVal(data: any[], accessor: Plottable.IAccessor, range=[0,100], nBi
   var bins = counts.map((count, i) => {
     var bin: any = {};
     bin.x = binBeginnings[i];
-    bin.x2 = binEndings[i];
+    bin.dx = spread / nBins;
     bin.y = count;
     return bin;
   })
@@ -58,7 +58,7 @@ function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue 
   for (var i=0; i < numBuckets; i++) {
     data.push({
       x: i * bucketWidth,
-      x2: (i+1) * bucketWidth,
+      dx: bucketWidth,
       y: Math.round(Math.random() * maxValue)
     });
   }

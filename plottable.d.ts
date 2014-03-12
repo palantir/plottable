@@ -594,9 +594,9 @@ declare module Plottable {
     }
     class BarRenderer extends XYRenderer {
         private static CSS_CLASS;
-        private static defaultX2Accessor;
+        private static defaultDxAccessor;
         public barPaddingPx: number;
-        public x2Accessor: IAccessor;
+        public dxAccessor: IAccessor;
         /**
         * Creates a BarRenderer.
         *
@@ -605,10 +605,10 @@ declare module Plottable {
         * @param {QuantitiveScale} xScale The x scale to use.
         * @param {QuantitiveScale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-        * @param {IAccessor} [x2Accessor] A function for extracting the end position of each bar from the data.
+        * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, x2Accessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
         public render(): BarRenderer;
     }
 }
@@ -638,11 +638,8 @@ declare module Plottable {
         * @param {Component} component The Component to be added.
         */
         public addComponent(row: number, col: number, component: Plottable.Component): Table;
-        private padTableToSize(nRows, nCols);
         public anchor(element: D3.Selection): Table;
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Table;
-        private static calcComponentWeights(setWeights, componentGroups, fixityAccessor);
-        private static calcProportionalSpace(weights, freeSpace);
         public render(): Table;
         /**
         * Sets the row and column padding on the Table.
@@ -674,9 +671,12 @@ declare module Plottable {
         public rowMinimum(newVal: number): Table;
         public colMinimum(): number;
         public colMinimum(newVal: number): Table;
-        private static fixedSpace(componentGroup, fixityAccessor);
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+        private padTableToSize(nRows, nCols);
+        private static calcComponentWeights(setWeights, componentGroups, fixityAccessor);
+        private static calcProportionalSpace(weights, freeSpace);
+        private static fixedSpace(componentGroup, fixityAccessor);
     }
 }
 declare module Plottable {
@@ -814,6 +814,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class ComponentGroup extends Plottable.Component {
+        private static CSS_CLASS;
         private components;
         /**
         * Creates a ComponentGroup.
