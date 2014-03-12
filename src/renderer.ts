@@ -5,19 +5,19 @@ module Plottable {
     private static CSS_CLASS = "renderer";
 
     public dataArray: any[];
-    public metadataV: IMetadata;
+    public _metadata: IMetadata;
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
 
-    private rerenderUpdateSelection = true;
+    public _rerenderUpdateSelection = true;
     // A perf-efficient manner of rendering would be to calculate attributes only
     // on new nodes, and assume that old nodes (ie the update selection) can
     // maintain their current attributes. If we change the metadata or an
     // accessor function, then this property will not be true, and we will need
     // to recompute attributes on the entire update selection.
 
-    private requireRerender = false;
+    public _requireRerender = false;
     // A perf-efficient approach to rendering scale changes would be to transform
     // the container rather than re-render. In the event that the data is changed,
     // it will be necessary to do a regular rerender.
@@ -52,18 +52,29 @@ module Plottable {
     }
 
     public metadata(metadata: IMetadata): Renderer {
-      var oldCSSClass = this.metadataV != null ? this.metadataV.cssClass : null;
+      var oldCSSClass = this._metadata != null ? this._metadata.cssClass : null;
       this.classed(oldCSSClass, false);
-      this.metadataV = metadata;
-      this.classed(this.metadataV.cssClass, true);
-      this.rerenderUpdateSelection = true;
+      this._metadata = metadata;
+      this.classed(this._metadata.cssClass, true);
+      this._rerenderUpdateSelection = true;
       return this;
     }
 
     public data(data: any[]): Renderer {
       this.dataArray = data;
-      this.requireRerender = true;
+      this._requireRerender = true;
       return this;
+    }
+
+    public render(): Renderer {
+      this._paint();
+      this._requireRerender = false;
+      this._rerenderUpdateSelection = false;
+      return this;
+    }
+
+    public _paint() {
+      // no-op
     }
 
     public anchor(element: D3.Selection) {
@@ -105,11 +116,11 @@ module Plottable {
 
       var data = dataset.data;
 
-      var appliedXAccessor = (d: any) => this.xAccessor(d, null, this.metadataV);
+      var appliedXAccessor = (d: any) => this.xAccessor(d, null, this._metadata);
       var xDomain = d3.extent(data, appliedXAccessor);
       this.xScale.widenDomain(xDomain);
 
-      var appliedYAccessor = (d: any) => this.yAccessor(d, null, this.metadataV);
+      var appliedYAccessor = (d: any) => this.yAccessor(d, null, this._metadata);
       var yDomain = d3.extent(data, appliedYAccessor);
       this.yScale.widenDomain(yDomain);
 
@@ -141,8 +152,8 @@ module Plottable {
 
     private getDataFilterFunction(dataArea: SelectionArea): (d: any, i: number) => boolean {
       var filterFunction = (d: any, i: number) => {
-        var x = this.xAccessor(d, i, this.metadataV);
-        var y = this.yAccessor(d, i, this.metadataV);
+        var x = this.xAccessor(d, i, this._metadata);
+        var y = this.yAccessor(d, i, this._metadata);
         return Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Utils.inRange(y, dataArea.yMin, dataArea.yMax);
       };
       return filterFunction;
@@ -209,15 +220,14 @@ module Plottable {
       return this;
     }
 
-    public render() {
-      super.render();
+    public _paint() {
+      super._paint();
       this.line = d3.svg.line()
-            .x((d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this.metadataV)))
-            .y((d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this.metadataV)));
+            .x((d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
+            .y((d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)));
       this.dataSelection = this.path.classed("line", true)
         .datum(this.dataArray);
       this.path.attr("d", this.line);
-      return this;
     }
   }
 
@@ -243,15 +253,14 @@ module Plottable {
       this.size = size;
     }
 
-    public render() {
-      super.render();
+    public _paint() {
+      super._paint();
       this.dataSelection = this.renderArea.selectAll("circle").data(this.dataArray);
       this.dataSelection.enter().append("circle");
-      this.dataSelection.attr("cx", (d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this.metadataV)))
-                        .attr("cy", (d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this.metadataV)))
+      this.dataSelection.attr("cx", (d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
+                        .attr("cy", (d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)))
                         .attr("r", this.size);
       this.dataSelection.exit().remove();
-      return this;
     }
   }
 
@@ -292,13 +301,13 @@ module Plottable {
       this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
 
 
-      var x2Accessor = (d: any) => this.xAccessor(d, null, this.metadataV) + this.dxAccessor(d, null, this.metadataV);
+      var x2Accessor = (d: any) => this.xAccessor(d, null, this._metadata) + this.dxAccessor(d, null, this._metadata);
       var x2Extent = d3.extent(dataset.data, x2Accessor);
       this.xScale.widenDomain(x2Extent);
     }
 
-    public render() {
-      super.render();
+    public _paint() {
+      super._paint();
       var yRange = this.yScale.range();
       var maxScaledY = Math.max(yRange[0], yRange[1]);
 
@@ -308,26 +317,26 @@ module Plottable {
       this.dataSelection.enter().append("rect");
 
       var xFunction = (d: any, i: number) => {
-        var x = this.xAccessor(d, i, this.metadataV);
+        var x = this.xAccessor(d, i, this._metadata);
         var scaledX = this.xScale.scale(x);
         return scaledX + this.barPaddingPx;
       };
 
       var yFunction = (d: any, i: number) => {
-        var y = this.yAccessor(d, i, this.metadataV);
+        var y = this.yAccessor(d, i, this._metadata);
         var scaledY = this.yScale.scale(y);
         return scaledY;
       };
 
       var widthFunction = (d: any, i: number) => {
-        var dx = this.dxAccessor(d, i, this.metadataV);
+        var dx = this.dxAccessor(d, i, this._metadata);
         var scaledDx = this.xScale.scale(dx);
         var scaledOffset = this.xScale.scale(0);
         return scaledDx - scaledOffset - 2 * this.barPaddingPx;
       };
 
       var heightFunction = (d: any, i: number) => {
-        var y = this.yAccessor(d, i, this.metadataV);
+        var y = this.yAccessor(d, i, this._metadata);
         var scaledY = this.yScale.scale(y);
         return maxScaledY - scaledY;
       };
@@ -338,7 +347,6 @@ module Plottable {
             .attr("width", widthFunction)
             .attr("height", heightFunction);
       this.dataSelection.exit().remove();
-      return this;
     }
   }
 }

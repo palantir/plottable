@@ -491,12 +491,12 @@ declare module Plottable {
     class Renderer extends Plottable.Component {
         private static CSS_CLASS;
         public dataArray: any[];
-        public metadataV: Plottable.IMetadata;
+        public _metadata: Plottable.IMetadata;
         public renderArea: D3.Selection;
         public element: D3.Selection;
         public scales: Plottable.Scale[];
-        private rerenderUpdateSelection;
-        private requireRerender;
+        public _rerenderUpdateSelection: boolean;
+        public _requireRerender: boolean;
         /**
         * Creates a Renderer.
         *
@@ -513,6 +513,8 @@ declare module Plottable {
         public dataset(dataset: Plottable.IDataset): Renderer;
         public metadata(metadata: Plottable.IMetadata): Renderer;
         public data(data: any[]): Renderer;
+        public render(): Renderer;
+        public _paint(): void;
         public anchor(element: D3.Selection): Renderer;
     }
     class XYRenderer extends Renderer {
@@ -576,7 +578,7 @@ declare module Plottable {
         */
         constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor);
         public anchor(element: D3.Selection): LineRenderer;
-        public render(): LineRenderer;
+        public _paint(): void;
     }
     class CircleRenderer extends XYRenderer {
         private static CSS_CLASS;
@@ -593,7 +595,7 @@ declare module Plottable {
         * @param {number} [size] The radius of the circles, in pixels.
         */
         constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor, size?: number);
-        public render(): CircleRenderer;
+        public _paint(): void;
     }
     class BarRenderer extends XYRenderer {
         private static CSS_CLASS;
@@ -612,7 +614,7 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
         constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, dxAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor);
-        public render(): BarRenderer;
+        public _paint(): void;
     }
 }
 declare module Plottable {

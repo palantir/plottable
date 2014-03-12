@@ -21,13 +21,13 @@ describe("Renderers", () => {
       assert.isNotNull(renderArea.node(), "there is a render-area");
       assert.isTrue(r.element.classed("bar"), "the element is classed w/ metadata.cssClass");
       assert.deepEqual(r.dataArray, d1.data, "the data is set properly");
-      assert.deepEqual(r.metadataV,  d1.metadata,  "the metadata is set properly");
+      assert.deepEqual(r._metadata,  d1.metadata,  "the metadata is set properly");
       var d2 = {data: ["bar"], metadata: {cssClass: "boo"}};
       r.dataset(d2);
       assert.isFalse(r.element.classed("bar"), "the element is no longer classed bar");
       assert.isTrue (r.element.classed("boo"), "the element is now classed boo");
       assert.deepEqual(r.dataArray, d2.data, "the data is set properly");
-      assert.deepEqual(r.metadataV, d2.metadata, "the metadata is set properly");
+      assert.deepEqual(r._metadata, d2.metadata, "the metadata is set properly");
       svg.remove();
     });
   });

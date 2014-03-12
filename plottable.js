@@ -1094,13 +1094,13 @@ var Plottable;
         */
         function Renderer(dataset) {
             _super.call(this);
-            this.rerenderUpdateSelection = true;
+            this._rerenderUpdateSelection = true;
             // A perf-efficient manner of rendering would be to calculate attributes only
             // on new nodes, and assume that old nodes (ie the update selection) can
             // maintain their current attributes. If we change the metadata or an
             // accessor function, then this property will not be true, and we will need
             // to recompute attributes on the entire update selection.
-            this.requireRerender = false;
+            this._requireRerender = false;
             this.clipPathEnabled = true;
             this.fixedWidthVal = false;
             this.fixedHeightVal = false;
@@ -1122,18 +1122,29 @@ var Plottable;
         };
 
         Renderer.prototype.metadata = function (metadata) {
-            var oldCSSClass = this.metadataV != null ? this.metadataV.cssClass : null;
+            var oldCSSClass = this._metadata != null ? this._metadata.cssClass : null;
             this.classed(oldCSSClass, false);
-            this.metadataV = metadata;
-            this.classed(this.metadataV.cssClass, true);
-            this.rerenderUpdateSelection = true;
+            this._metadata = metadata;
+            this.classed(this._metadata.cssClass, true);
+            this._rerenderUpdateSelection = true;
             return this;
         };
 
         Renderer.prototype.data = function (data) {
             this.dataArray = data;
-            this.requireRerender = true;
+            this._requireRerender = true;
             return this;
+        };
+
+        Renderer.prototype.render = function () {
+            this._paint();
+            this._requireRerender = false;
+            this._rerenderUpdateSelection = false;
+            return this;
+        };
+
+        Renderer.prototype._paint = function () {
+            // no-op
         };
 
         Renderer.prototype.anchor = function (element) {
@@ -1172,13 +1183,13 @@ var Plottable;
             var data = dataset.data;
 
             var appliedXAccessor = function (d) {
-                return _this.xAccessor(d, null, _this.metadataV);
+                return _this.xAccessor(d, null, _this._metadata);
             };
             var xDomain = d3.extent(data, appliedXAccessor);
             this.xScale.widenDomain(xDomain);
 
             var appliedYAccessor = function (d) {
-                return _this.yAccessor(d, null, _this.metadataV);
+                return _this.yAccessor(d, null, _this._metadata);
             };
             var yDomain = d3.extent(data, appliedYAccessor);
             this.yScale.widenDomain(yDomain);
@@ -1215,8 +1226,8 @@ var Plottable;
         XYRenderer.prototype.getDataFilterFunction = function (dataArea) {
             var _this = this;
             var filterFunction = function (d, i) {
-                var x = _this.xAccessor(d, i, _this.metadataV);
-                var y = _this.yAccessor(d, i, _this.metadataV);
+                var x = _this.xAccessor(d, i, _this._metadata);
+                var y = _this.yAccessor(d, i, _this._metadata);
                 return Plottable.Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Plottable.Utils.inRange(y, dataArea.yMin, dataArea.yMax);
             };
             return filterFunction;
@@ -1289,17 +1300,16 @@ var Plottable;
             return this;
         };
 
-        LineRenderer.prototype.render = function () {
+        LineRenderer.prototype._paint = function () {
             var _this = this;
-            _super.prototype.render.call(this);
+            _super.prototype._paint.call(this);
             this.line = d3.svg.line().x(function (d, i) {
-                return _this.xScale.scale(_this.xAccessor(d, i, _this.metadataV));
+                return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
             }).y(function (d, i) {
-                return _this.yScale.scale(_this.yAccessor(d, i, _this.metadataV));
+                return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
             });
             this.dataSelection = this.path.classed("line", true).datum(this.dataArray);
             this.path.attr("d", this.line);
-            return this;
         };
         LineRenderer.CSS_CLASS = "line-renderer";
         return LineRenderer;
@@ -1325,18 +1335,17 @@ var Plottable;
             this.classed(CircleRenderer.CSS_CLASS, true);
             this.size = size;
         }
-        CircleRenderer.prototype.render = function () {
+        CircleRenderer.prototype._paint = function () {
             var _this = this;
-            _super.prototype.render.call(this);
+            _super.prototype._paint.call(this);
             this.dataSelection = this.renderArea.selectAll("circle").data(this.dataArray);
             this.dataSelection.enter().append("circle");
             this.dataSelection.attr("cx", function (d, i) {
-                return _this.xScale.scale(_this.xAccessor(d, i, _this.metadataV));
+                return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
             }).attr("cy", function (d, i) {
-                return _this.yScale.scale(_this.yAccessor(d, i, _this.metadataV));
+                return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
             }).attr("r", this.size);
             this.dataSelection.exit().remove();
-            return this;
         };
         CircleRenderer.CSS_CLASS = "circle-renderer";
         return CircleRenderer;
@@ -1372,14 +1381,14 @@ var Plottable;
             this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
 
             var x2Accessor = function (d) {
-                return _this.xAccessor(d, null, _this.metadataV) + _this.dxAccessor(d, null, _this.metadataV);
+                return _this.xAccessor(d, null, _this._metadata) + _this.dxAccessor(d, null, _this._metadata);
             };
             var x2Extent = d3.extent(dataset.data, x2Accessor);
             this.xScale.widenDomain(x2Extent);
         }
-        BarRenderer.prototype.render = function () {
+        BarRenderer.prototype._paint = function () {
             var _this = this;
-            _super.prototype.render.call(this);
+            _super.prototype._paint.call(this);
             var yRange = this.yScale.range();
             var maxScaledY = Math.max(yRange[0], yRange[1]);
 
@@ -1389,33 +1398,32 @@ var Plottable;
             this.dataSelection.enter().append("rect");
 
             var xFunction = function (d, i) {
-                var x = _this.xAccessor(d, i, _this.metadataV);
+                var x = _this.xAccessor(d, i, _this._metadata);
                 var scaledX = _this.xScale.scale(x);
                 return scaledX + _this.barPaddingPx;
             };
 
             var yFunction = function (d, i) {
-                var y = _this.yAccessor(d, i, _this.metadataV);
+                var y = _this.yAccessor(d, i, _this._metadata);
                 var scaledY = _this.yScale.scale(y);
                 return scaledY;
             };
 
             var widthFunction = function (d, i) {
-                var dx = _this.dxAccessor(d, i, _this.metadataV);
+                var dx = _this.dxAccessor(d, i, _this._metadata);
                 var scaledDx = _this.xScale.scale(dx);
                 var scaledOffset = _this.xScale.scale(0);
                 return scaledDx - scaledOffset - 2 * _this.barPaddingPx;
             };
 
             var heightFunction = function (d, i) {
-                var y = _this.yAccessor(d, i, _this.metadataV);
+                var y = _this.yAccessor(d, i, _this._metadata);
                 var scaledY = _this.yScale.scale(y);
                 return maxScaledY - scaledY;
             };
 
             this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction);
             this.dataSelection.exit().remove();
-            return this;
         };
         BarRenderer.CSS_CLASS = "bar-renderer";
         BarRenderer.defaultDxAccessor = function (d) {
