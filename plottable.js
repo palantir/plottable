@@ -1094,7 +1094,7 @@ var Plottable;
         */
         function Renderer(dataset) {
             _super.call(this);
-            this._rerenderUpdateSelection = true;
+            this._rerenderUpdateSelection = false;
             // A perf-efficient manner of rendering would be to calculate attributes only
             // on new nodes, and assume that old nodes (ie the update selection) can
             // maintain their current attributes. If we change the metadata or an
@@ -1127,6 +1127,7 @@ var Plottable;
             this._metadata = metadata;
             this.classed(this._metadata.cssClass, true);
             this._rerenderUpdateSelection = true;
+            this._requireRerender = true;
             return this;
         };
 

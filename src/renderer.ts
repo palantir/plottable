@@ -10,7 +10,7 @@ module Plottable {
     public element: D3.Selection;
     public scales: Scale[];
 
-    public _rerenderUpdateSelection = true;
+    public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only
     // on new nodes, and assume that old nodes (ie the update selection) can
     // maintain their current attributes. If we change the metadata or an
@@ -57,6 +57,7 @@ module Plottable {
       this._metadata = metadata;
       this.classed(this._metadata.cssClass, true);
       this._rerenderUpdateSelection = true;
+      this._requireRerender = true;
       return this;
     }
 

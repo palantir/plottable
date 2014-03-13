@@ -30,9 +30,69 @@ describe("Renderers", () => {
       assert.deepEqual(r._metadata, d2.metadata, "the metadata is set properly");
       svg.remove();
     });
+
+    it("rerenderUpdateSelection and requireRerender flags updated appropriately", () => {
+      var r = new Plottable.Renderer();
+      var svg = generateSVG();
+      r.renderTo(svg);
+      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update");
+      assert.isFalse(r._requireRerender, "dont require rerender");
+      var metadata = {};
+      r.metadata(metadata);
+      assert.isTrue(r._rerenderUpdateSelection, "rerenderingUpdate req after metadata set");
+      assert.isTrue(r._requireRerender, "rerender required when metadata set");
+
+      r.renderTo(svg);
+      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update after render");
+      assert.isFalse(r._requireRerender, "dont require rerender after render");
+
+      var data = [];
+      r.data(data);
+      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update after setting data");
+      assert.isTrue(r._requireRerender, "rerender required when data set");
+      svg.remove();
+    });
   });
 
   describe("XYRenderer functionality", () => {
+
+    it("the accessors properly access data, index, and metadata", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.LinearScale();
+      var yScale = new Plottable.LinearScale();
+      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      var metadata = {foo: 10, bar: 20};
+      var xAccessor = (d, i?, m?) => d.x + i * m.foo;
+      var yAccessor = (d, i?, m?) => m.bar;
+      var dataset = {data: data, metadata: metadata};
+      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor);
+      xScale.domain([0, 400]);
+      yScale.domain([400, 0]);
+      renderer.renderTo(svg);
+      var circles = renderer.renderArea.selectAll("circle");
+      var c1 = d3.select(circles[0][0]);
+      var c2 = d3.select(circles[0][1]);
+      assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
+      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
+      assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
+      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct");
+
+      data = [{x: 2, y:2}, {x:4, y:4}];
+      renderer.data(data).renderTo(svg);
+      assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
+      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
+      assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
+      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
+
+      metadata = {foo: 0, bar: 0};
+      renderer.metadata(metadata).renderTo(svg);
+      assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
+      assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
+      assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
+      assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+
+      svg.remove();
+    });
 
     describe("Basic LineRenderer functionality, with custom accessors", () => {
       // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
