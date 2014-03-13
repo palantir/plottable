@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>Axes Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../plottable.css">
+    <style>
+      .plottable .axis text {
+        /*font-size: 12px;*/
+      }
+    </style>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../plottable.js"></script>
+    <script src="../build/exampleUtil.js"></script>
+
+    <script>
+      window.onload = function() {
+        var dataseries = makeRandomData(20);
+
+        var svg = d3.select("#axis-test");
+        svg.attr("width", 640).attr("height", 480);
+
+        var xScale = new Plottable.LinearScale();
+        var xAxisLeft = new Plottable.XAxis(xScale, "bottom").tickLabelPosition("left");
+        var xAxisCenter = new Plottable.XAxis(xScale, "bottom");
+        var xAxisRight = new Plottable.XAxis(xScale, "bottom").tickLabelPosition("right");
+        var xAxisTable = new Plottable.Table([[xAxisLeft],
+                                              [xAxisCenter],
+                                              [xAxisRight]]);
+
+        var xAxisLeft2 = new Plottable.XAxis(xScale, "top").tickLabelPosition("left");
+        var xAxisCenter2 = new Plottable.XAxis(xScale, "top");
+        var xAxisRight2 = new Plottable.XAxis(xScale, "top").tickLabelPosition("right");
+        var xAxisTable2 = new Plottable.Table([[xAxisLeft2],
+                                              [xAxisCenter2],
+                                              [xAxisRight2]]);
+
+        var yScale = new Plottable.LinearScale();
+        var yAxisTop = new Plottable.YAxis(yScale, "left").tickLabelPosition("top");
+        var yAxisMiddle = new Plottable.YAxis(yScale, "left");
+        var yAxisBottom = new Plottable.YAxis(yScale, "left").tickLabelPosition("bottom");
+        var yAxisTable = new Plottable.Table([[yAxisTop, yAxisMiddle, yAxisBottom]]);
+
+        var yAxisTop2 = new Plottable.YAxis(yScale, "right").tickLabelPosition("top");
+        var yAxisMiddle2 = new Plottable.YAxis(yScale, "right");
+        var yAxisBottom2 = new Plottable.YAxis(yScale, "right").tickLabelPosition("bottom");
+        var yAxisTable2 = new Plottable.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
+
+        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+        var basicTable = new Plottable.Table([[null, xAxisTable2, null],
+                                              [yAxisTable, renderAreaD1, yAxisTable2],
+                                              [null, xAxisTable, null]]);
+
+        basicTable.anchor(svg).computeLayout().render();
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="axis-test"></svg>
+  </body>
+
+</html>

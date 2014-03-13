@@ -724,7 +724,7 @@ declare module Plottable {
         public axisElement: D3.Selection;
         private d3Axis;
         private axisScale;
-        private isXAligned;
+        private tickPositioning;
         /**
         * Creates an Axis.
         *
@@ -736,9 +736,19 @@ declare module Plottable {
         constructor(axisScale: Scale, orientation: string, formatter?: any);
         public anchor(element: D3.Selection): Axis;
         public render(): Axis;
+        public _hideCutOffTickLabels(): Axis;
         private rescale();
         public scale(): Scale;
         public scale(newScale: Scale): Axis;
+        /**
+        * Sets or gets the tick label position relative to the tick marks.
+        * The exact consequences of particular tick label positionings depends on the subclass implementation.
+        *
+        * @param {string} [position] The relative position of the tick label.
+        * @returns {string|Axis} The current tick label position, or the calling Axis.
+        */
+        public tickLabelPosition(): string;
+        public tickLabelPosition(position: string): Axis;
         public orient(): string;
         public orient(newOrient: string): Axis;
         public ticks(): any[];
@@ -763,10 +773,19 @@ declare module Plottable {
         *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
-        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {string} orientation The orientation of the Axis (top/bottom)
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
+        /**
+        * Sets or gets the tick label position relative to the tick marks.
+        *
+        * @param {string} [position] The relative position of the tick label (left/center/right).
+        * @returns {string|XAxis} The current tick label position, or the calling XAxis.
+        */
+        public tickLabelPosition(): string;
+        public tickLabelPosition(position: string): XAxis;
+        public render(): XAxis;
     }
     class YAxis extends Axis {
         /**
@@ -774,10 +793,19 @@ declare module Plottable {
         *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
-        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {string} orientation The orientation of the Axis (left/right)
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
+        /**
+        * Sets or gets the tick label position relative to the tick marks.
+        *
+        * @param {string} [position] The relative position of the tick label (top/middle/bottom).
+        * @returns {string|YAxis} The current tick label position, or the calling YAxis.
+        */
+        public tickLabelPosition(): string;
+        public tickLabelPosition(position: string): YAxis;
+        public render(): YAxis;
     }
 }
 declare module Plottable {

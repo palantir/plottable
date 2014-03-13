@@ -1834,11 +1834,12 @@ var Plottable;
         function Axis(axisScale, orientation, formatter) {
             var _this = this;
             _super.call(this);
+            this.tickPositioning = "center";
             this.axisScale = axisScale;
+            orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
             this.classed("axis", true);
             this.clipPathEnabled = true;
-            this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
             if (formatter == null) {
                 formatter = d3.format(".3s");
             }
@@ -1849,7 +1850,7 @@ var Plottable;
         }
         Axis.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
-            this.axisElement = this.content.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+            this.axisElement = this.content.append("g").classed("axis", true);
             return this;
         };
 
@@ -1889,10 +1890,33 @@ var Plottable;
             }
 
             this.axisElement.call(this.d3Axis);
+
+            this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
+
             var bbox = this.axisElement.node().getBBox();
             if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
                 this.axisElement.classed("error", true);
             }
+            return this;
+        };
+
+        Axis.prototype._hideCutOffTickLabels = function () {
+            var availableWidth = this.availableWidth;
+            var availableHeight = this.availableHeight;
+            var tickLabels = this.axisElement.selectAll(".tick").select("text");
+
+            var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+            function boxIsInside(inner, outer) {
+                return (outer.left <= inner.left && inner.right <= outer.right && outer.top <= inner.top && inner.bottom <= outer.bottom);
+            }
+
+            tickLabels.each(function (d) {
+                if (!boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+                    d3.select(this).style("visibility", "hidden");
+                }
+            });
+
             return this;
         };
 
@@ -1907,6 +1931,15 @@ var Plottable;
             } else {
                 this.axisScale = newScale;
                 this.d3Axis.scale(newScale._d3Scale);
+                return this;
+            }
+        };
+
+        Axis.prototype.tickLabelPosition = function (position) {
+            if (position == null) {
+                return this.tickPositioning;
+            } else {
+                this.tickPositioning = position;
                 return this;
             }
         };
@@ -2006,15 +2039,57 @@ var Plottable;
         *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
-        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {string} orientation The orientation of the Axis (top/bottom)
         * @param {any} [formatter] a D3 formatter
         */
         function XAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
+            var orientationLC = orientation.toLowerCase();
+            if (orientationLC !== "top" && orientationLC !== "bottom") {
+                throw new Error(orientation + " is not a valid orientation for XAxis");
+            }
             _super.call(this, scale, orientation, formatter);
             _super.prototype.rowMinimum.call(this, Axis.xHeight);
             this.fixedWidthVal = false;
+            this.tickLabelPosition("center");
         }
+        XAxis.prototype.tickLabelPosition = function (position) {
+            if (position == null) {
+                return _super.prototype.tickLabelPosition.call(this);
+            } else {
+                var positionLC = position.toLowerCase();
+                if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
+                    if (positionLC !== "center") {
+                        this.tickSize(12); // longer than default tick size
+                    }
+                    return _super.prototype.tickLabelPosition.call(this, positionLC);
+                } else {
+                    throw new Error(position + " is not a valid tick label position for XAxis");
+                }
+            }
+        };
+
+        XAxis.prototype.render = function () {
+            _super.prototype.render.call(this);
+            if (this.tickLabelPosition() !== "center") {
+                var tickTextLabels = this.axisElement.selectAll("text");
+                tickTextLabels.attr("y", "0px");
+
+                if (this.orient() === "bottom") {
+                    tickTextLabels.attr("dy", "1em");
+                } else {
+                    tickTextLabels.attr("dy", "-0.25em");
+                }
+
+                if (this.tickLabelPosition() === "right") {
+                    tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
+                } else if (this.tickLabelPosition() === "left") {
+                    tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
+                }
+            }
+            this._hideCutOffTickLabels();
+            return this;
+        };
         return XAxis;
     })(Axis);
     Plottable.XAxis = XAxis;
@@ -2026,15 +2101,57 @@ var Plottable;
         *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
-        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {string} orientation The orientation of the Axis (left/right)
         * @param {any} [formatter] a D3 formatter
         */
         function YAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
+            var orientationLC = orientation.toLowerCase();
+            if (orientationLC !== "left" && orientationLC !== "right") {
+                throw new Error(orientation + " is not a valid orientation for YAxis");
+            }
             _super.call(this, scale, orientation, formatter);
             _super.prototype.colMinimum.call(this, Axis.yWidth);
             this.fixedHeightVal = false;
+            this.tickLabelPosition("MIDDLE");
         }
+        YAxis.prototype.tickLabelPosition = function (position) {
+            if (position == null) {
+                return _super.prototype.tickLabelPosition.call(this);
+            } else {
+                var positionLC = position.toLowerCase();
+                if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
+                    if (positionLC !== "middle") {
+                        this.tickSize(30); // longer than default tick size
+                    }
+                    return _super.prototype.tickLabelPosition.call(this, positionLC);
+                } else {
+                    throw new Error(position + " is not a valid tick label position for YAxis");
+                }
+            }
+        };
+
+        YAxis.prototype.render = function () {
+            _super.prototype.render.call(this);
+            if (this.tickLabelPosition() !== "middle") {
+                var tickTextLabels = this.axisElement.selectAll("text");
+                tickTextLabels.attr("x", "0px");
+
+                if (this.orient() === "left") {
+                    tickTextLabels.attr("dx", "-0.25em");
+                } else {
+                    tickTextLabels.attr("dx", "0.25em");
+                }
+
+                if (this.tickLabelPosition() === "top") {
+                    tickTextLabels.attr("dy", "-0.3em");
+                } else if (this.tickLabelPosition() === "bottom") {
+                    tickTextLabels.attr("dy", "1em");
+                }
+            }
+            this._hideCutOffTickLabels();
+            return this;
+        };
         return YAxis;
     })(Axis);
     Plottable.YAxis = YAxis;
