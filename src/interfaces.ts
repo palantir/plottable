@@ -9,6 +9,10 @@ module Plottable {
     color?: string;
   }
 
+  export interface IAccessor {
+    (datum: any, index?: number, metadata?: any): any;
+  };
+
   export interface SelectionArea {
     xMin: number;
     xMax: number;
@@ -20,7 +24,6 @@ module Plottable {
     pixel: SelectionArea;
     data: SelectionArea;
   }
-
 
   export interface IBroadcasterCallback {
     (broadcaster: IBroadcaster, ...args: any[]): any;
