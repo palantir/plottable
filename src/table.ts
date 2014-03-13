@@ -2,7 +2,6 @@
 
 module Plottable {
   export class Table extends Component {
-    private static CSS_CLASS = "table";
     private rowPadding = 0;
     private colPadding = 0;
 
@@ -25,7 +24,7 @@ module Plottable {
      */
     constructor(rows: Component[][] = []) {
       super();
-      this.classed(Table.CSS_CLASS, true);
+      this.classed("table", true);
       var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
       rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
       this.rows = rows;
