@@ -1780,7 +1780,7 @@ var Plottable;
         }
         Axis.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
-            this.axisElement = this.content.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+            this.axisElement = this.content.append("g").classed("axis", true);
             return this;
         };
 
@@ -1824,6 +1824,35 @@ var Plottable;
             if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
                 this.axisElement.classed("error", true);
             }
+            return this;
+        };
+
+        /**
+        * Hides any tick labels that lie partly outside of the axis' bounding box.
+        *
+        * @returns {Axis} The calling Axis.
+        */
+        Axis.prototype.hideCutOffTickLabels = function () {
+            var availableWidth = this.availableWidth;
+            var availableHeight = this.availableHeight;
+            var tickLabels = this.axisElement.selectAll(".tick").select("text");
+            var firstTick = tickLabels[0][0];
+            var lastTick = tickLabels[0][tickLabels[0].length - 1];
+
+            var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+            function boxIsInside(inner, outer) {
+                return (outer.left <= inner.left && inner.right <= outer.right && outer.top <= inner.top && inner.bottom <= outer.bottom);
+            }
+
+            if (!boxIsInside(firstTick.getBoundingClientRect(), boundingBox)) {
+                d3.select(firstTick).style("visibility", "hidden");
+            }
+
+            if (!boxIsInside(lastTick.getBoundingClientRect(), boundingBox)) {
+                d3.select(lastTick).style("visibility", "hidden");
+            }
+
             return this;
         };
 
@@ -1973,11 +2002,23 @@ var Plottable;
 
         XAxis.prototype.render = function () {
             _super.prototype.render.call(this);
-            if (this.tickLabelPosition() === "RIGHT") {
-                this.axisElement.selectAll("text").attr("y", "0px").attr("dx", "0.2em").attr("dy", "1em").style("text-anchor", "start");
-            } else if (this.tickLabelPosition() === "LEFT") {
-                this.axisElement.selectAll("text").attr("y", "0px").attr("dx", "-0.2em").attr("dy", "1em").style("text-anchor", "end");
+            if (this.tickLabelPosition() !== "CENTER") {
+                var tickTextLabels = this.axisElement.selectAll("text");
+                tickTextLabels.attr("y", "0px");
+
+                if (this.orient() === "bottom") {
+                    tickTextLabels.attr("dy", "1em");
+                } else {
+                    tickTextLabels.attr("dy", "-0.25em");
+                }
+
+                if (this.tickLabelPosition() === "RIGHT") {
+                    tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
+                } else if (this.tickLabelPosition() === "LEFT") {
+                    tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
+                }
             }
+            this.hideCutOffTickLabels();
             return this;
         };
         return XAxis;
@@ -2016,11 +2057,23 @@ var Plottable;
 
         YAxis.prototype.render = function () {
             _super.prototype.render.call(this);
-            if (this.tickLabelPosition() === "TOP") {
-                this.axisElement.selectAll("text").attr("x", "0px").attr("dx", "-0.2em").attr("dy", "-0.25em");
-            } else if (this.tickLabelPosition() === "BOTTOM") {
-                this.axisElement.selectAll("text").attr("x", "0px").attr("dx", "-0.2em").attr("dy", "1em");
+            if (this.tickLabelPosition() !== "MIDDLE") {
+                var tickTextLabels = this.axisElement.selectAll("text");
+                tickTextLabels.attr("x", "0px");
+
+                if (this.orient() === "left") {
+                    tickTextLabels.attr("dx", "-0.25em");
+                } else {
+                    tickTextLabels.attr("dx", "0.25em");
+                }
+
+                if (this.tickLabelPosition() === "TOP") {
+                    tickTextLabels.attr("dy", "-0.25em");
+                } else if (this.tickLabelPosition() === "BOTTOM") {
+                    tickTextLabels.attr("dy", "1em");
+                }
             }
+            this.hideCutOffTickLabels();
             return this;
         };
         return YAxis;

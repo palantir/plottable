@@ -741,6 +741,12 @@ declare module Plottable {
         constructor(axisScale: Plottable.Scale, orientation: string, formatter?: any);
         public anchor(element: D3.Selection): Axis;
         public render(): Axis;
+        /**
+        * Hides any tick labels that lie partly outside of the axis' bounding box.
+        *
+        * @returns {Axis} The calling Axis.
+        */
+        public hideCutOffTickLabels(): Axis;
         private rescale();
         public scale(): Plottable.Scale;
         public scale(newScale: Plottable.Scale): Axis;
