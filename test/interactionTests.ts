@@ -204,7 +204,7 @@ describe("Interactions", () => {
       var svg = generateSVG(400, 400);
       var dp = (x, y) => { return {x: x, y: y}; };
       var data = [dp(0, 0), dp(20, 10), dp(40, 40)];
-      var dataset = {seriesName: "foo", data: data};
+      var dataset = {metadata: {cssClass: "foo"}, data: data};
       var xScale = new Plottable.LinearScale();
       var yScale = new Plottable.LinearScale();
       var circleRenderer = new Plottable.CircleRenderer(dataset, xScale, yScale);

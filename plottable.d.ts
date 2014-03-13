@@ -490,10 +490,13 @@ declare module Plottable {
 declare module Plottable {
     class Renderer extends Plottable.Component {
         private static CSS_CLASS;
-        public dataset: Plottable.IDataset;
+        public _data: any[];
+        public _metadata: Plottable.IMetadata;
         public renderArea: D3.Selection;
         public element: D3.Selection;
         public scales: Plottable.Scale[];
+        public _rerenderUpdateSelection: boolean;
+        public _requireRerender: boolean;
         /**
         * Creates a Renderer.
         *
@@ -507,11 +510,12 @@ declare module Plottable {
         * @param {IDataset} dataset The new dataset to be associated with the Renderer.
         * @returns {Renderer} The calling Renderer.
         */
-        public data(dataset: Plottable.IDataset): Renderer;
+        public dataset(dataset: Plottable.IDataset): Renderer;
+        public metadata(metadata: Plottable.IMetadata): Renderer;
+        public data(data: any[]): Renderer;
+        public render(): Renderer;
+        public _paint(): void;
         public anchor(element: D3.Selection): Renderer;
-    }
-    interface IAccessor {
-        (d: any): number;
     }
     class XYRenderer extends Renderer {
         private static CSS_CLASS;
@@ -520,8 +524,8 @@ declare module Plottable {
         private static defaultYAccessor;
         public xScale: Plottable.QuantitiveScale;
         public yScale: Plottable.QuantitiveScale;
-        public xAccessor: IAccessor;
-        public yAccessor: IAccessor;
+        public xAccessor: Plottable.IAccessor;
+        public yAccessor: Plottable.IAccessor;
         /**
         * Creates an XYRenderer.
         *
@@ -532,7 +536,7 @@ declare module Plottable {
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor);
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): XYRenderer;
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
@@ -541,6 +545,7 @@ declare module Plottable {
         * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
         */
         public invertXYSelectionArea(pixelArea: Plottable.SelectionArea): Plottable.SelectionArea;
+        private getDataFilterFunction(dataArea);
         /**
         * Gets the data in a selected area.
         *
@@ -571,9 +576,9 @@ declare module Plottable {
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor);
         public anchor(element: D3.Selection): LineRenderer;
-        public render(): LineRenderer;
+        public _paint(): void;
     }
     class CircleRenderer extends XYRenderer {
         private static CSS_CLASS;
@@ -589,14 +594,14 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         * @param {number} [size] The radius of the circles, in pixels.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size?: number);
-        public render(): CircleRenderer;
+        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor, size?: number);
+        public _paint(): void;
     }
     class BarRenderer extends XYRenderer {
         private static CSS_CLASS;
         private static defaultDxAccessor;
         public barPaddingPx: number;
-        public dxAccessor: IAccessor;
+        public dxAccessor: Plottable.IAccessor;
         /**
         * Creates a BarRenderer.
         *
@@ -608,8 +613,8 @@ declare module Plottable {
         * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
-        public render(): BarRenderer;
+        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, dxAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor);
+        public _paint(): void;
     }
 }
 declare module Plottable {
@@ -622,6 +627,8 @@ declare module Plottable {
         private colMinimums;
         private rowWeights;
         private colWeights;
+        private nRows;
+        private nCols;
         /**
         * Creates a Table.
         *
@@ -846,7 +853,14 @@ declare module Plottable {
 declare module Plottable {
     interface IDataset {
         data: any[];
-        seriesName: string;
+        metadata: IMetadata;
+    }
+    interface IMetadata {
+        cssClass?: string;
+        color?: string;
+    }
+    interface IAccessor {
+        (datum: any, index?: number, metadata?: any): any;
     }
     interface SelectionArea {
         xMin: number;

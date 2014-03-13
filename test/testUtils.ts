@@ -54,7 +54,7 @@ function makeLinearSeries(n: number): Plottable.IDataset {
     return {x: x, y: x};
   }
   var data = d3.range(n).map(makePoint);
-  return {data: data, seriesName: "linear-series"};
+  return {data: data, metadata: {cssClass: "linear-series"}};
 }
 
 function makeQuadraticSeries(n: number): Plottable.IDataset {
@@ -62,7 +62,7 @@ function makeQuadraticSeries(n: number): Plottable.IDataset {
     return {x: x, y: x*x};
   }
   var data = d3.range(n).map(makeQuadraticPoint);
-  return {data: data, seriesName: "quadratic-series"};
+  return {data: data, metadata: {cssClass: "quadratic-series"}};
 }
 
 class MultiTestVerifier {

@@ -6,7 +6,7 @@ function makeRandomData(numPoints, scaleFactor=1): Plottable.IDataset {
     data.push(r);
   }
   data.sort((a: any, b: any) => a.x - b.x);
-  return {"data": data, "seriesName": "random-data"};
+  return {data: data, metadata: {cssClass: "random-data"}};
 }
 
 function makeNormallyDistributedData(n=100, xMean?, xStdDev?, yMean?, yStdDev?) {
@@ -64,6 +64,6 @@ function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue 
   }
   return {
     "data": data,
-    "seriesName": "random-buckets"
+    metadata: {cssClass: "random-buckets"}
   };
 }

@@ -30,7 +30,7 @@ module DemoDay {
     h.yScale1 = new Plottable.LinearScale();
     h.bin1 = makeBinFunction((d) => d.x, xExtent, N_BINS);
     var data1 = h.bin1(data);
-    var ds1 = {data: data1, seriesName: "xVals"}
+    var ds1 = {data: data1, metadata: {cssClass: "xVals"}}
     h.renderer1 = new Plottable.BarRenderer(ds1, h.xScale1, h.yScale1);
     h.xAxis1 = new Plottable.XAxis(h.xScale1, "bottom");
     h.yAxis1 = new Plottable.YAxis(h.yScale1, "right");
@@ -43,7 +43,7 @@ module DemoDay {
     h.yScale2 = new Plottable.LinearScale();
     h.bin2 = makeBinFunction((d) => d.y, yExtent, N_BINS);
     var data2 = h.bin2(data);
-    var ds2 = {data: data2, seriesName: "yVals"}
+    var ds2 = {data: data2, metadata: {cssClass: "yVals"}}
     h.renderer2 = new Plottable.BarRenderer(ds2, h.xScale2, h.yScale2);
     h.xAxis2 = new Plottable.XAxis(h.xScale2, "bottom");
     h.yAxis2 = new Plottable.YAxis(h.yScale2, "right");
@@ -94,8 +94,8 @@ module DemoDay {
       var yBins = histogram.bin2(selectedData);
       chart.c.xBins = xBins;
       chart.c.yBins = yBins;
-      histogram.renderer1.data({seriesName: "xBins", data: xBins})
-      histogram.renderer2.data({seriesName: "yBins", data: yBins})
+      histogram.renderer1.dataset({metadata: {cssClass: "xBins"}, data: xBins})
+      histogram.renderer2.dataset({metadata: {cssClass: "yBins"}, data: yBins})
       histogram.renderer1.render();
       histogram.renderer2.render();
     };
@@ -139,7 +139,7 @@ module DemoDay {
   var clump4 = makeNormallyDistributedData(200, -25, 1, 20, 5);
 
   var clumpData = clump1.concat(clump2, clump3, clump4);
-  var dataset = {seriesName: "clumpedData", data: clumpData};
+  var dataset = {metadata: {cssClass: "clumpedData"}, data: clumpData};
 
   var chartSH = makeScatterHisto(dataset);
 
