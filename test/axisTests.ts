@@ -39,7 +39,7 @@ describe("Axes", () => {
     for (i=0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
-      assert.isTrue( (labelRect.right <= markRect.left), "tick label is to the left of the mark");
+      assert.operator(labelRect.right, "<=", markRect.left, "tick label is to the left of the mark");
     }
 
     xAxis.tickLabelPosition("RIGHT");
@@ -49,7 +49,7 @@ describe("Axes", () => {
     for (i=0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
-      assert.isTrue( (markRect.right <= labelRect.left), "tick label is to the right of the mark");
+      assert.operator(markRect.right, "<=", labelRect.left, "tick label is to the right of the mark");
     }
     svg.remove();
   });
@@ -77,7 +77,7 @@ describe("Axes", () => {
     for (i=0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
-      assert.isTrue( (labelRect.bottom <= markRect.top), "tick label above the mark");
+      assert.operator(labelRect.bottom, "<=", markRect.top, "tick label above the mark");
     }
 
     yAxis.tickLabelPosition("BOTTOM");
@@ -87,7 +87,7 @@ describe("Axes", () => {
     for (i=0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
-      assert.isTrue( (markRect.bottom <= labelRect.top), "tick label is below the mark");
+      assert.operator(markRect.bottom, "<=", labelRect.top, "tick label is below the mark");
     }
     svg.remove();
   });

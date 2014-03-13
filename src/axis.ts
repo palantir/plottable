@@ -68,6 +68,9 @@ module Plottable {
       }
 
       this.axisElement.call(this.d3Axis);
+
+      this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
+
       var bbox = (<any> this.axisElement.node()).getBBox();
       if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
         this.axisElement.classed("error", true);
@@ -96,13 +99,11 @@ module Plottable {
                 inner.bottom <= outer.bottom);
       }
 
-      if (!boxIsInside(firstTick.getBoundingClientRect(), boundingBox)) {
-        d3.select(firstTick).style("visibility", "hidden");
-      }
-
-      if (!boxIsInside(lastTick.getBoundingClientRect(), boundingBox)) {
-        d3.select(lastTick).style("visibility", "hidden");
-      }
+      tickLabels.each(function (d: any){
+        if (!boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+          d3.select(this).style("visibility", "hidden");
+        }
+      });
 
       return this;
     }
