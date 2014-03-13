@@ -968,7 +968,7 @@ var Plottable;
             if (typeof text === "undefined") { text = ""; }
             if (typeof orientation === "undefined") { orientation = "horizontal"; }
             _super.call(this);
-            this.classed(Label.CSS_CLASS, true);
+            this.classed("label", true);
             this.setText(text);
             if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
                 this.orientation = orientation;
@@ -1051,7 +1051,6 @@ var Plottable;
             this.textElement.attr("y", yShift);
             return this;
         };
-        Label.CSS_CLASS = "label";
         return Label;
     })(Plottable.Component);
     Plottable.Label = Label;
@@ -1060,9 +1059,8 @@ var Plottable;
         __extends(TitleLabel, _super);
         function TitleLabel(text, orientation) {
             _super.call(this, text, orientation);
-            this.classed(TitleLabel.CSS_CLASS, true);
+            this.classed("title-label", true);
         }
-        TitleLabel.CSS_CLASS = "title-label";
         return TitleLabel;
     })(Label);
     Plottable.TitleLabel = TitleLabel;
@@ -1071,9 +1069,8 @@ var Plottable;
         __extends(AxisLabel, _super);
         function AxisLabel(text, orientation) {
             _super.call(this, text, orientation);
-            this.classed(AxisLabel.CSS_CLASS, true);
+            this.classed("axis-label", true);
         }
-        AxisLabel.CSS_CLASS = "axis-label";
         return AxisLabel;
     })(Label);
     Plottable.AxisLabel = AxisLabel;
@@ -1104,7 +1101,7 @@ var Plottable;
             this.clipPathEnabled = true;
             this.fixedWidthVal = false;
             this.fixedHeightVal = false;
-            this.classed(Renderer.CSS_CLASS, true);
+            this.classed("renderer", true);
             if (dataset != null) {
                 this.dataset(dataset);
             }
@@ -1153,7 +1150,6 @@ var Plottable;
             this.renderArea = this.content.append("g").classed("render-area", true);
             return this;
         };
-        Renderer.CSS_CLASS = "renderer";
         return Renderer;
     })(Plottable.Component);
     Plottable.Renderer = Renderer;
@@ -1173,7 +1169,7 @@ var Plottable;
         function XYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
             var _this = this;
             _super.call(this, dataset);
-            this.classed(XYRenderer.CSS_CLASS);
+            this.classed("xy-renderer");
 
             this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
             this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
@@ -1267,8 +1263,6 @@ var Plottable;
                 this.render();
             }
         };
-        XYRenderer.CSS_CLASS = "xy-renderer";
-
         XYRenderer.defaultXAccessor = function (d) {
             return d.x;
         };
@@ -1293,7 +1287,7 @@ var Plottable;
         */
         function LineRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.classed(LineRenderer.CSS_CLASS, true);
+            this.classed("line-renderer", true);
         }
         LineRenderer.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
@@ -1312,7 +1306,6 @@ var Plottable;
             this.dataSelection = this.path.classed("line", true).datum(this._data);
             this.path.attr("d", this.line);
         };
-        LineRenderer.CSS_CLASS = "line-renderer";
         return LineRenderer;
     })(XYRenderer);
     Plottable.LineRenderer = LineRenderer;
@@ -1333,7 +1326,7 @@ var Plottable;
         function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, size) {
             if (typeof size === "undefined") { size = 3; }
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.classed(CircleRenderer.CSS_CLASS, true);
+            this.classed("circle-renderer", true);
             this.size = size;
         }
         CircleRenderer.prototype._paint = function () {
@@ -1348,7 +1341,6 @@ var Plottable;
             }).attr("r", this.size);
             this.dataSelection.exit().remove();
         };
-        CircleRenderer.CSS_CLASS = "circle-renderer";
         return CircleRenderer;
     })(XYRenderer);
     Plottable.CircleRenderer = CircleRenderer;
@@ -1370,7 +1362,7 @@ var Plottable;
             var _this = this;
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
             this.barPaddingPx = 1;
-            this.classed(BarRenderer.CSS_CLASS, true);
+            this.classed("bar-renderer", true);
 
             var yDomain = this.yScale.domain();
             if (!Plottable.Utils.inRange(0, yDomain[0], yDomain[1])) {
@@ -1426,7 +1418,6 @@ var Plottable;
             this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction);
             this.dataSelection.exit().remove();
         };
-        BarRenderer.CSS_CLASS = "bar-renderer";
         BarRenderer.defaultDxAccessor = function (d) {
             return d.dx;
         };
@@ -1451,7 +1442,7 @@ var Plottable;
             _super.call(this);
             this.rowPadding = 0;
             this.colPadding = 0;
-            this.classed(Table.CSS_CLASS, true);
+            this.classed("table", true);
             var cleanOutNulls = function (c) {
                 return c == null ? new Plottable.Component() : c;
             };
@@ -1699,7 +1690,6 @@ var Plottable;
             };
             return all(componentGroup.map(groupIsFixed));
         };
-        Table.CSS_CLASS = "table";
         return Table;
     })(Plottable.Component);
     Plottable.Table = Table;
@@ -1756,7 +1746,7 @@ var Plottable;
         */
         function Legend(colorScale) {
             _super.call(this);
-            this.classed(Legend.CSS_CLASS, true);
+            this.classed("legend", true);
             this.colMinimum(120); // the default width
             this.colorScale = colorScale;
             this.xAlign("RIGHT").yAlign("TOP");
@@ -1809,13 +1799,25 @@ var Plottable;
             });
             return this;
         };
-        Legend.CSS_CLASS = "legend";
         Legend.SUBELEMENT_CLASS = "legend-row";
         Legend.MARGIN = 5;
         return Legend;
     })(Plottable.Component);
     Plottable.Legend = Legend;
 })(Plottable || (Plottable = {}));
+/// <reference path="utils.ts" />
+/// <reference path="osUtils.ts" />
+/// <reference path="component.ts" />
+/// <reference path="scale.ts" />
+//grunt-start
+/// <reference path="axis.ts" />
+/// <reference path="interaction.ts" />
+/// <reference path="label.ts" />
+/// <reference path="renderer.ts" />
+/// <reference path="table.ts" />
+/// <reference path="coordinator.ts" />
+/// <reference path="legend.ts" />
+//grunt-end
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1836,7 +1838,7 @@ var Plottable;
             this.axisScale = axisScale;
             orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
-            this.classed(Axis.CSS_CLASS, true);
+            this.classed("axis", true);
             this.clipPathEnabled = true;
             if (formatter == null) {
                 formatter = d3.format(".3s");
@@ -2031,8 +2033,6 @@ var Plottable;
                 return this;
             }
         };
-        Axis.CSS_CLASS = "axis";
-
         Axis.yWidth = 50;
         Axis.xHeight = 30;
         return Axis;
@@ -2177,7 +2177,7 @@ var Plottable;
         function ComponentGroup(components) {
             if (typeof components === "undefined") { components = []; }
             _super.call(this);
-            this.classed(ComponentGroup.CSS_CLASS, true);
+            this.classed("component-group", true);
             this.components = components;
         }
         /**
@@ -2231,7 +2231,6 @@ var Plottable;
                 return c.isFixedHeight();
             });
         };
-        ComponentGroup.CSS_CLASS = "component-group";
         return ComponentGroup;
     })(Plottable.Component);
     Plottable.ComponentGroup = ComponentGroup;

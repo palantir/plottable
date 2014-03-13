@@ -67,7 +67,7 @@ declare module Plottable {
         OTHER DEALINGS IN THE SOFTWARE.
         */
         function sortedIndex(val: number, arr: number[]): number;
-        function sortedIndex(val: number, arr: any[], accessor: Plottable.IAccessor): number;
+        function sortedIndex(val: number, arr: any[], accessor: IAccessor): number;
     }
 }
 declare module Plottable {
@@ -158,7 +158,7 @@ declare module Plottable {
         * @param {Interaction} interaction The Interaction to attach to the Component.
         * @return {Component} The calling Component.
         */
-        public registerInteraction(interaction: Plottable.Interaction): Component;
+        public registerInteraction(interaction: Interaction): Component;
         /**
         * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
         *
@@ -201,7 +201,7 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class Scale implements Plottable.IBroadcaster {
+    class Scale implements IBroadcaster {
         public _d3Scale: D3.Scale.Scale;
         private broadcasterCallbacks;
         /**
@@ -241,7 +241,7 @@ declare module Plottable {
         * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
         * @returns {Scale} The Calling Scale.
         */
-        public registerListener(callback: Plottable.IBroadcasterCallback): Scale;
+        public registerListener(callback: IBroadcasterCallback): Scale;
     }
     class QuantitiveScale extends Scale {
         public _d3Scale: D3.Scale.QuantitiveScale;
@@ -337,14 +337,14 @@ declare module Plottable {
 declare module Plottable {
     class Interaction {
         public hitBox: D3.Selection;
-        public componentToListenTo: Plottable.Component;
+        public componentToListenTo: Component;
         /**
         * Creates an Interaction.
         *
         * @constructor
         * @param {Component} componentToListenTo The component to listen for interactions on.
         */
-        constructor(componentToListenTo: Plottable.Component);
+        constructor(componentToListenTo: Component);
         public anchor(hitBox: D3.Selection): void;
         /**
         * Registers the Interaction on the Component it's listening to.
@@ -358,8 +358,8 @@ declare module Plottable {
     }
     class PanZoomInteraction extends Interaction {
         private zoom;
-        public xScale: Plottable.QuantitiveScale;
-        public yScale: Plottable.QuantitiveScale;
+        public xScale: QuantitiveScale;
+        public yScale: QuantitiveScale;
         /**
         * Creates a PanZoomInteraction.
         *
@@ -368,7 +368,7 @@ declare module Plottable {
         * @param {QuantitiveScale} xScale The X scale to update on panning/zooming.
         * @param {QuantitiveScale} yScale The Y scale to update on panning/zooming.
         */
-        constructor(componentToListenTo: Plottable.Component, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale);
+        constructor(componentToListenTo: Component, xScale: QuantitiveScale, yScale: QuantitiveScale);
         public anchor(hitBox: D3.Selection): void;
         private rerenderZoomed();
     }
@@ -387,14 +387,14 @@ declare module Plottable {
         *
         * @param {Component} componentToListenTo The component to listen for interactions on.
         */
-        constructor(componentToListenTo: Plottable.Component);
+        constructor(componentToListenTo: Component);
         /**
         * Adds a callback to be called when the AreaInteraction triggers.
         *
         * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
-        public callback(cb?: (a: Plottable.SelectionArea) => any): AreaInteraction;
+        public callback(cb?: (a: SelectionArea) => any): AreaInteraction;
         private dragstart();
         private drag();
         private dragend();
@@ -417,7 +417,7 @@ declare module Plottable {
         * If not supplied, listenerScale will be updated when an event occurs.
         * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
         */
-        public addXScale(listenerScale: Plottable.QuantitiveScale, targetScale?: Plottable.QuantitiveScale): ZoomCallbackGenerator;
+        public addXScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator;
         /**
         * Adds listen-update pair of Y scales.
         *
@@ -426,17 +426,17 @@ declare module Plottable {
         * If not supplied, listenerScale will be updated when an event occurs.
         * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
         */
-        public addYScale(listenerScale: Plottable.QuantitiveScale, targetScale?: Plottable.QuantitiveScale): ZoomCallbackGenerator;
+        public addYScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator;
         private updateScale(referenceScale, targetScale, pixelMin, pixelMax);
         /**
         * Generates a callback that can be passed to Interactions.
         *
         * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
         */
-        public getCallback(): (area: Plottable.SelectionArea) => void;
+        public getCallback(): (area: SelectionArea) => void;
     }
     class MousemoveInteraction extends Interaction {
-        constructor(componentToListenTo: Plottable.Component);
+        constructor(componentToListenTo: Component);
         public anchor(hitBox: D3.Selection): void;
         public mousemove(x: number, y: number): void;
     }
@@ -445,14 +445,13 @@ declare module Plottable {
         private circle;
         private xLine;
         private yLine;
-        constructor(renderer: Plottable.XYRenderer);
+        constructor(renderer: XYRenderer);
         public anchor(hitBox: D3.Selection): void;
         public mousemove(x: number, y: number): void;
     }
 }
 declare module Plottable {
-    class Label extends Plottable.Component {
-        private static CSS_CLASS;
+    class Label extends Component {
         private textElement;
         private text;
         private orientation;
@@ -479,22 +478,19 @@ declare module Plottable {
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
     }
     class TitleLabel extends Label {
-        private static CSS_CLASS;
         constructor(text?: string, orientation?: string);
     }
     class AxisLabel extends Label {
-        private static CSS_CLASS;
         constructor(text?: string, orientation?: string);
     }
 }
 declare module Plottable {
-    class Renderer extends Plottable.Component {
-        private static CSS_CLASS;
+    class Renderer extends Component {
         public _data: any[];
-        public _metadata: Plottable.IMetadata;
+        public _metadata: IMetadata;
         public renderArea: D3.Selection;
         public element: D3.Selection;
-        public scales: Plottable.Scale[];
+        public scales: Scale[];
         public _rerenderUpdateSelection: boolean;
         public _requireRerender: boolean;
         /**
@@ -503,29 +499,28 @@ declare module Plottable {
         * @constructor
         * @param {IDataset} [dataset] The dataset associated with the Renderer.
         */
-        constructor(dataset?: Plottable.IDataset);
+        constructor(dataset?: IDataset);
         /**
         * Sets a new dataset on the Renderer.
         *
         * @param {IDataset} dataset The new dataset to be associated with the Renderer.
         * @returns {Renderer} The calling Renderer.
         */
-        public dataset(dataset: Plottable.IDataset): Renderer;
-        public metadata(metadata: Plottable.IMetadata): Renderer;
+        public dataset(dataset: IDataset): Renderer;
+        public metadata(metadata: IMetadata): Renderer;
         public data(data: any[]): Renderer;
         public render(): Renderer;
         public _paint(): void;
         public anchor(element: D3.Selection): Renderer;
     }
     class XYRenderer extends Renderer {
-        private static CSS_CLASS;
         public dataSelection: D3.UpdateSelection;
         private static defaultXAccessor;
         private static defaultYAccessor;
-        public xScale: Plottable.QuantitiveScale;
-        public yScale: Plottable.QuantitiveScale;
-        public xAccessor: Plottable.IAccessor;
-        public yAccessor: Plottable.IAccessor;
+        public xScale: QuantitiveScale;
+        public yScale: QuantitiveScale;
+        public xAccessor: IAccessor;
+        public yAccessor: IAccessor;
         /**
         * Creates an XYRenderer.
         *
@@ -536,7 +531,7 @@ declare module Plottable {
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor);
+        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): XYRenderer;
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
@@ -544,7 +539,7 @@ declare module Plottable {
         * @param {SelectionArea} pixelArea The selected area, in pixels.
         * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
         */
-        public invertXYSelectionArea(pixelArea: Plottable.SelectionArea): Plottable.SelectionArea;
+        public invertXYSelectionArea(pixelArea: SelectionArea): SelectionArea;
         private getDataFilterFunction(dataArea);
         /**
         * Gets the data in a selected area.
@@ -552,18 +547,17 @@ declare module Plottable {
         * @param {SelectionArea} dataArea The selected area.
         * @returns {D3.UpdateSelection} The data in the selected area.
         */
-        public getSelectionFromArea(dataArea: Plottable.SelectionArea): D3.UpdateSelection;
+        public getSelectionFromArea(dataArea: SelectionArea): D3.UpdateSelection;
         /**
         * Gets the indices of data in a selected area
         *
         * @param {SelectionArea} dataArea The selected area.
         * @returns {number[]} An array of the indices of datapoints in the selected area.
         */
-        public getDataIndicesFromArea(dataArea: Plottable.SelectionArea): number[];
+        public getDataIndicesFromArea(dataArea: SelectionArea): number[];
         private rescale();
     }
     class LineRenderer extends XYRenderer {
-        private static CSS_CLASS;
         private path;
         private line;
         /**
@@ -576,12 +570,11 @@ declare module Plottable {
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor);
+        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
         public anchor(element: D3.Selection): LineRenderer;
         public _paint(): void;
     }
     class CircleRenderer extends XYRenderer {
-        private static CSS_CLASS;
         public size: number;
         /**
         * Creates a CircleRenderer.
@@ -594,14 +587,13 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         * @param {number} [size] The radius of the circles, in pixels.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor, size?: number);
+        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size?: number);
         public _paint(): void;
     }
     class BarRenderer extends XYRenderer {
-        private static CSS_CLASS;
         private static defaultDxAccessor;
         public barPaddingPx: number;
-        public dxAccessor: Plottable.IAccessor;
+        public dxAccessor: IAccessor;
         /**
         * Creates a BarRenderer.
         *
@@ -613,13 +605,12 @@ declare module Plottable {
         * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
-        constructor(dataset: Plottable.IDataset, xScale: Plottable.QuantitiveScale, yScale: Plottable.QuantitiveScale, xAccessor?: Plottable.IAccessor, dxAccessor?: Plottable.IAccessor, yAccessor?: Plottable.IAccessor);
+        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
         public _paint(): void;
     }
 }
 declare module Plottable {
-    class Table extends Plottable.Component {
-        private static CSS_CLASS;
+    class Table extends Component {
         private rowPadding;
         private colPadding;
         private rows;
@@ -636,7 +627,7 @@ declare module Plottable {
         * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
         * null can be used if a cell is empty.
         */
-        constructor(rows?: Plottable.Component[][]);
+        constructor(rows?: Component[][]);
         /**
         * Adds a Component in the specified cell.
         *
@@ -644,7 +635,7 @@ declare module Plottable {
         * @param {number} col The column in which to add the Component.
         * @param {Component} component The Component to be added.
         */
-        public addComponent(row: number, col: number, component: Plottable.Component): Table;
+        public addComponent(row: number, col: number, component: Component): Table;
         public anchor(element: D3.Selection): Table;
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Table;
         public render(): Table;
@@ -696,13 +687,12 @@ declare module Plottable {
         * @constructor
         * @param {Scale[]} scales A list of scales whose domains should be linked.
         */
-        constructor(scales: Plottable.Scale[]);
-        public rescale(scale: Plottable.Scale): void;
+        constructor(scales: Scale[]);
+        public rescale(scale: Scale): void;
     }
 }
 declare module Plottable {
-    class Legend extends Plottable.Component {
-        private static CSS_CLASS;
+    class Legend extends Component {
         private static SUBELEMENT_CLASS;
         private static MARGIN;
         private colorScale;
@@ -713,14 +703,14 @@ declare module Plottable {
         * @constructor
         * @param {ColorScale} colorScale
         */
-        constructor(colorScale?: Plottable.ColorScale);
+        constructor(colorScale?: ColorScale);
         /**
         * Assigns a new ColorScale to the Legend.
         *
         * @param {ColorScale} scale
         * @returns {Legend} The calling Legend.
         */
-        public scale(scale: Plottable.ColorScale): Legend;
+        public scale(scale: ColorScale): Legend;
         public rowMinimum(): number;
         public rowMinimum(newVal: number): Legend;
         private measureTextHeight();
@@ -728,8 +718,7 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class Axis extends Plottable.Component {
-        private static CSS_CLASS;
+    class Axis extends Component {
         static yWidth: number;
         static xHeight: number;
         public axisElement: D3.Selection;
@@ -744,7 +733,7 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(axisScale: Plottable.Scale, orientation: string, formatter?: any);
+        constructor(axisScale: Scale, orientation: string, formatter?: any);
         public anchor(element: D3.Selection): Axis;
         public render(): Axis;
         /**
@@ -754,8 +743,8 @@ declare module Plottable {
         */
         public hideCutOffTickLabels(): Axis;
         private rescale();
-        public scale(): Plottable.Scale;
-        public scale(newScale: Plottable.Scale): Axis;
+        public scale(): Scale;
+        public scale(newScale: Scale): Axis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         * The exact consequences of particular tick label positionings depends on the subclass implementation.
@@ -792,7 +781,7 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (top/bottom)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Plottable.Scale, orientation: string, formatter?: any);
+        constructor(scale: Scale, orientation: string, formatter?: any);
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -812,7 +801,7 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Plottable.Scale, orientation: string, formatter?: any);
+        constructor(scale: Scale, orientation: string, formatter?: any);
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -825,8 +814,7 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class ComponentGroup extends Plottable.Component {
-        private static CSS_CLASS;
+    class ComponentGroup extends Component {
         private components;
         /**
         * Creates a ComponentGroup.
@@ -834,14 +822,14 @@ declare module Plottable {
         * @constructor
         * @param {Component[]} [components] The Components in the ComponentGroup.
         */
-        constructor(components?: Plottable.Component[]);
+        constructor(components?: Component[]);
         /**
         * Adds a Component to the ComponentGroup.
         *
         * @param {Component} c The Component to add.
         * @returns {ComponentGroup} The calling ComponentGroup.
         */
-        public addComponent(c: Plottable.Component): ComponentGroup;
+        public addComponent(c: Component): ComponentGroup;
         public anchor(element: D3.Selection): ComponentGroup;
         public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
         public render(): ComponentGroup;

@@ -2,8 +2,6 @@
 
 module Plottable {
   export class Axis extends Component {
-    private static CSS_CLASS = "axis";
-
     public static yWidth = 50;
     public static xHeight = 30;
     public axisElement: D3.Selection;
@@ -24,7 +22,7 @@ module Plottable {
       this.axisScale = axisScale;
       orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
-      this.classed(Axis.CSS_CLASS, true);
+      this.classed("axis", true);
       this.clipPathEnabled = true;
       if (formatter == null) {
         formatter = d3.format(".3s");

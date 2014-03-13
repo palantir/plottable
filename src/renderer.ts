@@ -2,8 +2,6 @@
 
 module Plottable {
   export class Renderer extends Component {
-    private static CSS_CLASS = "renderer";
-
     public _data: any[];
     public _metadata: IMetadata;
     public renderArea: D3.Selection;
@@ -33,7 +31,7 @@ module Plottable {
       this.clipPathEnabled = true;
       this.fixedWidthVal = false;
       this.fixedHeightVal = false;
-      this.classed(Renderer.CSS_CLASS, true);
+      this.classed("renderer", true);
       if (dataset != null) {
         this.dataset(dataset);
       }
@@ -86,7 +84,6 @@ module Plottable {
   }
 
   export class XYRenderer extends Renderer {
-    private static CSS_CLASS = "xy-renderer";
     public dataSelection: D3.UpdateSelection;
     private static defaultXAccessor = (d: any) => d.x;
     private static defaultYAccessor = (d: any) => d.y;
@@ -107,7 +104,7 @@ module Plottable {
      */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
       super(dataset);
-      this.classed(XYRenderer.CSS_CLASS);
+      this.classed("xy-renderer");
 
       this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
       this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
@@ -196,11 +193,10 @@ module Plottable {
   }
 
   export class LineRenderer extends XYRenderer {
-    private static CSS_CLASS = "line-renderer";
     private path: D3.Selection;
     private line: D3.Svg.Line;
 
-    /**
+/**
      * Creates a LineRenderer.
      *
      * @constructor
@@ -212,7 +208,7 @@ module Plottable {
      */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this.classed(LineRenderer.CSS_CLASS, true);
+      this.classed("line-renderer", true);
     }
 
     public anchor(element: D3.Selection) {
@@ -233,7 +229,6 @@ module Plottable {
   }
 
   export class CircleRenderer extends XYRenderer {
-    private static CSS_CLASS = "circle-renderer";
     public size: number;
 
     /**
@@ -250,7 +245,7 @@ module Plottable {
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: IAccessor, yAccessor?: IAccessor, size=3) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this.classed(CircleRenderer.CSS_CLASS, true);
+      this.classed("circle-renderer", true);
       this.size = size;
     }
 
@@ -266,7 +261,6 @@ module Plottable {
   }
 
   export class BarRenderer extends XYRenderer {
-    private static CSS_CLASS = "bar-renderer";
     private static defaultDxAccessor = (d: any) => d.dx;
     public barPaddingPx = 1;
 
@@ -290,7 +284,7 @@ module Plottable {
                 dxAccessor?: IAccessor,
                 yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this.classed(BarRenderer.CSS_CLASS, true);
+      this.classed("bar-renderer", true);
 
       var yDomain = this.yScale.domain();
       if (!Utils.inRange(0, yDomain[0], yDomain[1])) {
