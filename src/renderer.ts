@@ -9,6 +9,7 @@ module Plottable {
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
+    public _colorAccessor: IAccessor;
 
     public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only
@@ -71,6 +72,13 @@ module Plottable {
       this._paint();
       this._requireRerender = false;
       this._rerenderUpdateSelection = false;
+      return this;
+    }
+
+    public colorAccessor(a: IAccessor): Renderer {
+      this._colorAccessor = a;
+      this._requireRerender = true;
+      this._rerenderUpdateSelection = true;
       return this;
     }
 
@@ -229,6 +237,7 @@ module Plottable {
       this.dataSelection = this.path.classed("line", true)
         .datum(this._data);
       this.path.attr("d", this.line);
+      this.path.attr("stroke", this._colorAccessor(this._data[0], 0, this._metadata));
     }
   }
 
@@ -260,7 +269,8 @@ module Plottable {
       this.dataSelection.enter().append("circle");
       this.dataSelection.attr("cx", (d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
                         .attr("cy", (d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)))
-                        .attr("r", this.size);
+                        .attr("r", this.size)
+                        .attr("fill", (d: any, i: number) => this._colorAccessor(d, i, this._metadata));
       this.dataSelection.exit().remove();
     }
   }
@@ -342,11 +352,16 @@ module Plottable {
         return maxScaledY - scaledY;
       };
 
+      var colorFunction = (d: any, i: number) => {
+        return this._colorAccessor(d, i, this._metadata);
+      };
+
       this.dataSelection
             .attr("x", xFunction)
             .attr("y", yFunction)
             .attr("width", widthFunction)
-            .attr("height", heightFunction);
+            .attr("height", heightFunction)
+            .attr("fill", colorFunction);
       this.dataSelection.exit().remove();
     }
   }
