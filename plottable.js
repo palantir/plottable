@@ -2137,7 +2137,7 @@ var Plottable;
                 }
 
                 if (this.tickLabelPosition() === "TOP") {
-                    tickTextLabels.attr("dy", "-0.25em");
+                    tickTextLabels.attr("dy", "-0.3em");
                 } else if (this.tickLabelPosition() === "BOTTOM") {
                     tickTextLabels.attr("dy", "1em");
                 }
