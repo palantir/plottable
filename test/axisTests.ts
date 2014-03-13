@@ -3,7 +3,6 @@
 var assert = chai.assert;
 
 describe("Axes", () => {
-  // TODO: Rewrite these tests when the Axis class gets refactored
   it("Renders ticks", () => {
     var svg = generateSVG(500, 100);
     var xScale = new Plottable.LinearScale();
@@ -32,7 +31,7 @@ describe("Axes", () => {
         "tick label position defaults to centered");
     }
 
-    xAxis.tickLabelPosition("LEFT");
+    xAxis.tickLabelPosition("left");
     xAxis.render();
     tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
@@ -42,7 +41,7 @@ describe("Axes", () => {
       assert.operator(labelRect.right, "<=", markRect.left, "tick label is to the left of the mark");
     }
 
-    xAxis.tickLabelPosition("RIGHT");
+    xAxis.tickLabelPosition("right");
     xAxis.render();
     tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
@@ -70,7 +69,7 @@ describe("Axes", () => {
         "tick label position defaults to middle");
     }
 
-    yAxis.tickLabelPosition("TOP");
+    yAxis.tickLabelPosition("top");
     yAxis.render();
     tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
@@ -80,7 +79,7 @@ describe("Axes", () => {
       assert.operator(labelRect.bottom, "<=", markRect.top, "tick label above the mark");
     }
 
-    yAxis.tickLabelPosition("BOTTOM");
+    yAxis.tickLabelPosition("bottom");
     yAxis.render();
     tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];

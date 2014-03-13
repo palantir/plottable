@@ -735,7 +735,6 @@ declare module Plottable {
         public axisElement: D3.Selection;
         private d3Axis;
         private axisScale;
-        private isXAligned;
         private tickPositioning;
         /**
         * Creates an Axis.
@@ -797,7 +796,7 @@ declare module Plottable {
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
-        * @param {string} [position] The relative position of the tick label (LEFT/CENTER/RIGHT).
+        * @param {string} [position] The relative position of the tick label (left/center/right).
         * @returns {string|XAxis} The current tick label position, or the calling XAxis.
         */
         public tickLabelPosition(): string;
@@ -817,7 +816,7 @@ declare module Plottable {
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
-        * @param {string} [position] The relative position of the tick label (TOP/MIDDLE/BOTTOM).
+        * @param {string} [position] The relative position of the tick label (top/middle/bottom).
         * @returns {string|YAxis} The current tick label position, or the calling YAxis.
         */
         public tickLabelPosition(): string;

@@ -1834,10 +1834,10 @@ var Plottable;
             _super.call(this);
             this.tickPositioning = "center";
             this.axisScale = axisScale;
+            orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
             this.classed(Axis.CSS_CLASS, true);
             this.clipPathEnabled = true;
-            this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
             if (formatter == null) {
                 formatter = d3.format(".3s");
             }
@@ -2051,27 +2051,34 @@ var Plottable;
         */
         function XAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
+            var orientationLC = orientation.toLowerCase();
+            if (orientationLC !== "top" && orientationLC !== "bottom") {
+                throw new Error(orientation + " is not a valid orientation for XAxis");
+            }
             _super.call(this, scale, orientation, formatter);
             _super.prototype.rowMinimum.call(this, Axis.xHeight);
             this.fixedWidthVal = false;
-            this.tickLabelPosition("CENTER");
+            this.tickLabelPosition("center");
         }
         XAxis.prototype.tickLabelPosition = function (position) {
             if (position == null) {
                 return _super.prototype.tickLabelPosition.call(this);
-            } else if (position === "LEFT" || position === "CENTER" || position === "RIGHT") {
-                if (position !== "CENTER") {
-                    this.tickSize(12); // longer than default tick size
-                }
-                return _super.prototype.tickLabelPosition.call(this, position);
             } else {
-                throw new Error(position + " is not a valid tick label position for XAxis");
+                var positionLC = position.toLowerCase();
+                if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
+                    if (positionLC !== "center") {
+                        this.tickSize(12); // longer than default tick size
+                    }
+                    return _super.prototype.tickLabelPosition.call(this, positionLC);
+                } else {
+                    throw new Error(position + " is not a valid tick label position for XAxis");
+                }
             }
         };
 
         XAxis.prototype.render = function () {
             _super.prototype.render.call(this);
-            if (this.tickLabelPosition() !== "CENTER") {
+            if (this.tickLabelPosition() !== "center") {
                 var tickTextLabels = this.axisElement.selectAll("text");
                 tickTextLabels.attr("y", "0px");
 
@@ -2081,9 +2088,9 @@ var Plottable;
                     tickTextLabels.attr("dy", "-0.25em");
                 }
 
-                if (this.tickLabelPosition() === "RIGHT") {
+                if (this.tickLabelPosition() === "right") {
                     tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
-                } else if (this.tickLabelPosition() === "LEFT") {
+                } else if (this.tickLabelPosition() === "left") {
                     tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
                 }
             }
@@ -2106,6 +2113,10 @@ var Plottable;
         */
         function YAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
+            var orientationLC = orientation.toLowerCase();
+            if (orientationLC !== "left" && orientationLC !== "right") {
+                throw new Error(orientation + " is not a valid orientation for YAxis");
+            }
             _super.call(this, scale, orientation, formatter);
             _super.prototype.colMinimum.call(this, Axis.yWidth);
             this.fixedHeightVal = false;
@@ -2114,19 +2125,22 @@ var Plottable;
         YAxis.prototype.tickLabelPosition = function (position) {
             if (position == null) {
                 return _super.prototype.tickLabelPosition.call(this);
-            } else if (position === "TOP" || position === "MIDDLE" || position === "BOTTOM") {
-                if (position !== "MIDDLE") {
-                    this.tickSize(30); // longer than default tick size
-                }
-                return _super.prototype.tickLabelPosition.call(this, position);
             } else {
-                throw new Error(position + " is not a valid tick label position for YAxis");
+                var positionLC = position.toLowerCase();
+                if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
+                    if (positionLC !== "middle") {
+                        this.tickSize(30); // longer than default tick size
+                    }
+                    return _super.prototype.tickLabelPosition.call(this, positionLC);
+                } else {
+                    throw new Error(position + " is not a valid tick label position for YAxis");
+                }
             }
         };
 
         YAxis.prototype.render = function () {
             _super.prototype.render.call(this);
-            if (this.tickLabelPosition() !== "MIDDLE") {
+            if (this.tickLabelPosition() !== "middle") {
                 var tickTextLabels = this.axisElement.selectAll("text");
                 tickTextLabels.attr("x", "0px");
 
@@ -2136,9 +2150,9 @@ var Plottable;
                     tickTextLabels.attr("dx", "0.25em");
                 }
 
-                if (this.tickLabelPosition() === "TOP") {
+                if (this.tickLabelPosition() === "top") {
                     tickTextLabels.attr("dy", "-0.3em");
-                } else if (this.tickLabelPosition() === "BOTTOM") {
+                } else if (this.tickLabelPosition() === "bottom") {
                     tickTextLabels.attr("dy", "1em");
                 }
             }

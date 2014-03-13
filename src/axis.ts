@@ -9,7 +9,6 @@ module Plottable {
     public axisElement: D3.Selection;
     private d3Axis: D3.Svg.Axis;
     private axisScale: Scale;
-    private isXAligned: boolean;
     private tickPositioning = "center";
 
     /**
@@ -23,10 +22,10 @@ module Plottable {
     constructor(axisScale: Scale, orientation: string, formatter?: any) {
       super();
       this.axisScale = axisScale;
+      orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
       this.classed(Axis.CSS_CLASS, true);
       this.clipPathEnabled = true;
-      this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
       if (formatter == null) {
         formatter = d3.format(".3s");
       }
@@ -246,16 +245,20 @@ module Plottable {
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
+      var orientationLC = orientation.toLowerCase();
+      if (orientationLC !== "top" && orientationLC !== "bottom") {
+        throw new Error(orientation + " is not a valid orientation for XAxis");
+      }
       super(scale, orientation, formatter);
       super.rowMinimum(Axis.xHeight);
       this.fixedWidthVal = false;
-      this.tickLabelPosition("CENTER");
+      this.tickLabelPosition("center");
     }
 
     /**
      * Sets or gets the tick label position relative to the tick marks.
      *
-     * @param {string} [position] The relative position of the tick label (LEFT/CENTER/RIGHT).
+     * @param {string} [position] The relative position of the tick label (left/center/right).
      * @returns {string|XAxis} The current tick label position, or the calling XAxis.
      */
     public tickLabelPosition(): string;
@@ -263,19 +266,22 @@ module Plottable {
     public tickLabelPosition(position?: string): any {
       if (position == null) {
         return super.tickLabelPosition();
-      } else if (position === "LEFT" || position === "CENTER" || position === "RIGHT") {
-        if (position !== "CENTER") {
-          this.tickSize(12); // longer than default tick size
-        }
-        return super.tickLabelPosition(position);
       } else {
-        throw new Error(position + " is not a valid tick label position for XAxis");
+        var positionLC = position.toLowerCase();
+        if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
+          if (positionLC !== "center") {
+            this.tickSize(12); // longer than default tick size
+          }
+          return super.tickLabelPosition(positionLC);
+        } else {
+          throw new Error(position + " is not a valid tick label position for XAxis");
+        }
       }
     }
 
     public render() {
       super.render();
-      if (this.tickLabelPosition() !== "CENTER") {
+      if (this.tickLabelPosition() !== "center") {
         var tickTextLabels = this.axisElement.selectAll("text");
         tickTextLabels.attr("y", "0px");
 
@@ -285,9 +291,9 @@ module Plottable {
           tickTextLabels.attr("dy", "-0.25em");
         }
 
-        if (this.tickLabelPosition() === "RIGHT") {
+        if (this.tickLabelPosition() === "right") {
           tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
-        } else if (this.tickLabelPosition() === "LEFT") {
+        } else if (this.tickLabelPosition() === "left") {
           tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
         }
       }
@@ -306,6 +312,10 @@ module Plottable {
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
+      var orientationLC = orientation.toLowerCase();
+      if (orientationLC !== "left" && orientationLC !== "right") {
+        throw new Error(orientation + " is not a valid orientation for YAxis");
+      }
       super(scale, orientation, formatter);
       super.colMinimum(Axis.yWidth);
       this.fixedHeightVal = false;
@@ -315,7 +325,7 @@ module Plottable {
     /**
      * Sets or gets the tick label position relative to the tick marks.
      *
-     * @param {string} [position] The relative position of the tick label (TOP/MIDDLE/BOTTOM).
+     * @param {string} [position] The relative position of the tick label (top/middle/bottom).
      * @returns {string|YAxis} The current tick label position, or the calling YAxis.
      */
     public tickLabelPosition(): string;
@@ -323,19 +333,22 @@ module Plottable {
     public tickLabelPosition(position?: string): any {
       if (position == null) {
         return super.tickLabelPosition();
-      } else if (position === "TOP" || position === "MIDDLE" || position === "BOTTOM") {
-        if (position !== "MIDDLE") {
-          this.tickSize(30); // longer than default tick size
-        }
-        return super.tickLabelPosition(position);
       } else {
-        throw new Error(position + " is not a valid tick label position for YAxis");
+        var positionLC = position.toLowerCase();
+        if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
+          if (positionLC !== "middle") {
+            this.tickSize(30); // longer than default tick size
+          }
+          return super.tickLabelPosition(positionLC);
+        } else {
+          throw new Error(position + " is not a valid tick label position for YAxis");
+        }
       }
     }
 
     public render() {
       super.render();
-      if (this.tickLabelPosition() !== "MIDDLE") {
+      if (this.tickLabelPosition() !== "middle") {
         var tickTextLabels = this.axisElement.selectAll("text");
         tickTextLabels.attr("x", "0px");
 
@@ -345,9 +358,9 @@ module Plottable {
           tickTextLabels.attr("dx", "0.25em");
         }
 
-        if (this.tickLabelPosition() === "TOP") {
+        if (this.tickLabelPosition() === "top") {
           tickTextLabels.attr("dy", "-0.3em");
-        } else if (this.tickLabelPosition() === "BOTTOM") {
+        } else if (this.tickLabelPosition() === "bottom") {
           tickTextLabels.attr("dy", "1em");
         }
       }
