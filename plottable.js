@@ -1900,17 +1900,10 @@ var Plottable;
             return this;
         };
 
-        /**
-        * Hides any tick labels that lie partly outside of the axis' bounding box.
-        *
-        * @returns {Axis} The calling Axis.
-        */
-        Axis.prototype.hideCutOffTickLabels = function () {
+        Axis.prototype._hideCutOffTickLabels = function () {
             var availableWidth = this.availableWidth;
             var availableHeight = this.availableHeight;
             var tickLabels = this.axisElement.selectAll(".tick").select("text");
-            var firstTick = tickLabels[0][0];
-            var lastTick = tickLabels[0][tickLabels[0].length - 1];
 
             var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
@@ -2094,7 +2087,7 @@ var Plottable;
                     tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
                 }
             }
-            this.hideCutOffTickLabels();
+            this._hideCutOffTickLabels();
             return this;
         };
         return XAxis;
@@ -2156,7 +2149,7 @@ var Plottable;
                     tickTextLabels.attr("dy", "1em");
                 }
             }
-            this.hideCutOffTickLabels();
+            this._hideCutOffTickLabels();
             return this;
         };
         return YAxis;
