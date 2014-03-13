@@ -81,6 +81,16 @@ describe("Tables", () => {
     assert.throws(() => t.addComponent(0, 2, c2), Error, "component already exists");
   });
 
+  it("addComponent works even if a component is added with a high column and low row index", () => {
+    // Solves #180, a weird bug
+    var t = new Plottable.Table();
+    var svg = generateSVG();
+    t.addComponent(1, 0, new Plottable.Component());
+    t.addComponent(0, 2, new Plottable.Component());
+    t.renderTo(svg); //would throw an error without the fix (tested);
+    svg.remove();
+  });
+
 
   it("tables with insufficient space throw Insufficient Space", () => {
     var svg = generateSVG(200, 200);
