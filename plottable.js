@@ -1459,6 +1459,10 @@ var Plottable;
                 return row.map(cleanOutNulls);
             });
             this.rows = rows;
+            this.nRows = rows.length;
+            this.nCols = rows.length > 0 ? d3.max(rows, function (r) {
+                return r.length;
+            }) : 0;
             this.rowWeights = this.rows.map(function () {
                 return null;
             });
@@ -1478,7 +1482,9 @@ var Plottable;
                 throw new Error("addComponent cannot be called after anchoring (for the moment)");
             }
 
-            this.padTableToSize(row + 1, col + 1);
+            this.nRows = Math.max(row, this.nRows);
+            this.nCols = Math.max(col, this.nCols);
+            this.padTableToSize(this.nRows + 1, this.nCols + 1);
 
             var currentComponent = this.rows[row][col];
             if (currentComponent.constructor.name !== "Component") {

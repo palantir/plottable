@@ -627,6 +627,8 @@ declare module Plottable {
         private colMinimums;
         private rowWeights;
         private colWeights;
+        private nRows;
+        private nCols;
         /**
         * Creates a Table.
         *

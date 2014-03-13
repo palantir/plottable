@@ -13,6 +13,9 @@ module Plottable {
     private rowWeights: number[];
     private colWeights: number[];
 
+    private nRows: number;
+    private nCols: number;
+
     /**
      * Creates a Table.
      *
@@ -26,6 +29,8 @@ module Plottable {
       var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
       rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
       this.rows = rows;
+      this.nRows = rows.length;
+      this.nCols = rows.length > 0 ? d3.max(rows, (r) => r.length) : 0;
       this.rowWeights = this.rows.map(():any => null);
       this.colWeights = d3.transpose(this.rows).map(():any => null);
     }
@@ -42,7 +47,9 @@ module Plottable {
         throw new Error("addComponent cannot be called after anchoring (for the moment)");
       }
 
-      this.padTableToSize(row + 1, col + 1);
+      this.nRows = Math.max(row, this.nRows);
+      this.nCols = Math.max(col, this.nCols);
+      this.padTableToSize(this.nRows + 1, this.nCols + 1);
 
       var currentComponent = <any> this.rows[row][col];
       if (currentComponent.constructor.name !== "Component") {
