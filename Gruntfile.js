@@ -140,6 +140,8 @@ module.exports = function(grunt) {
                                   "sed:private_definitions",
                                   "sed:protected_definitions"]);
 
+  grunt.registerTask("update-built", ["dist-compile", "gitcommit"]);
+
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
 };
