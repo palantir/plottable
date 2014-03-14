@@ -1912,10 +1912,6 @@ var Plottable;
 
             this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
 
-            var bbox = this.axisElement.node().getBBox();
-            if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
-                this.axisElement.classed("error", true);
-            }
             return this;
         };
 
@@ -2072,6 +2068,12 @@ var Plottable;
             this.fixedWidthVal = false;
             this.tickLabelPosition("center");
         }
+        XAxis.prototype.anchor = function (element) {
+            _super.prototype.anchor.call(this, element);
+            this.axisElement.classed("x-axis", true);
+            return this;
+        };
+
         XAxis.prototype.tickLabelPosition = function (position) {
             if (position == null) {
                 return _super.prototype.tickLabelPosition.call(this);
@@ -2134,6 +2136,12 @@ var Plottable;
             this.fixedHeightVal = false;
             this.tickLabelPosition("MIDDLE");
         }
+        YAxis.prototype.anchor = function (element) {
+            _super.prototype.anchor.call(this, element);
+            this.axisElement.classed("y-axis", true);
+            return this;
+        };
+
         YAxis.prototype.tickLabelPosition = function (position) {
             if (position == null) {
                 return _super.prototype.tickLabelPosition.call(this);

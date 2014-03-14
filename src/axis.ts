@@ -68,10 +68,6 @@ module Plottable {
 
       this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
 
-      var bbox = (<any> this.axisElement.node()).getBBox();
-      if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
-        this.axisElement.classed("error", true);
-      }
       return this;
     }
 
@@ -246,6 +242,12 @@ module Plottable {
       this.tickLabelPosition("center");
     }
 
+    public anchor(element: D3.Selection): XAxis {
+      super.anchor(element);
+      this.axisElement.classed("x-axis", true);
+      return this;
+    }
+
     /**
      * Sets or gets the tick label position relative to the tick marks.
      *
@@ -311,6 +313,12 @@ module Plottable {
       super.colMinimum(Axis.yWidth);
       this.fixedHeightVal = false;
       this.tickLabelPosition("MIDDLE");
+    }
+
+    public anchor(element: D3.Selection): YAxis {
+      super.anchor(element);
+      this.axisElement.classed("y-axis", true);
+      return this;
     }
 
     /**

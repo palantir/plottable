@@ -694,6 +694,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
+        public anchor(element: D3.Selection): XAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -714,6 +715,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
+        public anchor(element: D3.Selection): YAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
