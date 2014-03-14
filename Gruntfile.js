@@ -90,6 +90,18 @@ module.exports = function(grunt) {
           livereload: true
         }
       }
+    },
+    sed: {
+      private_definitions: {
+        pattern: "\n *private [^:;]*(: [^;]*)?;",
+        replacement: "",
+        path: "plottable.d.ts"
+      },
+      protected_definitions: {
+        pattern: "\n *public _[^:;]*(: [^;]*)?;",
+        replacement: "",
+        path: "plottable.d.ts"
+      },
     }
   });
 
@@ -97,10 +109,15 @@ module.exports = function(grunt) {
 
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("default", "launch");
-
-  grunt.registerTask("compile", ["ts:dev", "ts:test", "ts:examples", "tslint", "concat:license"]);
+  grunt.registerTask("compile", [
+                                  "ts:dev",
+                                  "concat:license",
+                                  "ts:test",
+                                  "ts:examples",
+                                  "tslint",
+                                  "sed:private_definitions",
+                                  "sed:protected_definitions"]);
   grunt.registerTask("build" , ["compile", "watch"]);
   grunt.registerTask("launch", ["connect", "build"]);
   grunt.registerTask("test", ["compile", "blanket_mocha"]);
-  grunt.registerTask("watch-test", ["blanket_mocha", "watch:test"]);
 };

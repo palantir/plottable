@@ -968,7 +968,7 @@ var Plottable;
             if (typeof text === "undefined") { text = ""; }
             if (typeof orientation === "undefined") { orientation = "horizontal"; }
             _super.call(this);
-            this.classed(Label.CSS_CLASS, true);
+            this.classed("label", true);
             this.setText(text);
             if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
                 this.orientation = orientation;
@@ -1051,7 +1051,6 @@ var Plottable;
             this.textElement.attr("y", yShift);
             return this;
         };
-        Label.CSS_CLASS = "label";
         return Label;
     })(Plottable.Component);
     Plottable.Label = Label;
@@ -1060,9 +1059,8 @@ var Plottable;
         __extends(TitleLabel, _super);
         function TitleLabel(text, orientation) {
             _super.call(this, text, orientation);
-            this.classed(TitleLabel.CSS_CLASS, true);
+            this.classed("title-label", true);
         }
-        TitleLabel.CSS_CLASS = "title-label";
         return TitleLabel;
     })(Label);
     Plottable.TitleLabel = TitleLabel;
@@ -1071,9 +1069,8 @@ var Plottable;
         __extends(AxisLabel, _super);
         function AxisLabel(text, orientation) {
             _super.call(this, text, orientation);
-            this.classed(AxisLabel.CSS_CLASS, true);
+            this.classed("axis-label", true);
         }
-        AxisLabel.CSS_CLASS = "axis-label";
         return AxisLabel;
     })(Label);
     Plottable.AxisLabel = AxisLabel;
@@ -1104,7 +1101,7 @@ var Plottable;
             this.clipPathEnabled = true;
             this.fixedWidthVal = false;
             this.fixedHeightVal = false;
-            this.classed(Renderer.CSS_CLASS, true);
+            this.classed("renderer", true);
             if (dataset != null) {
                 this.dataset(dataset);
             }
@@ -1153,7 +1150,6 @@ var Plottable;
             this.renderArea = this.content.append("g").classed("render-area", true);
             return this;
         };
-        Renderer.CSS_CLASS = "renderer";
         return Renderer;
     })(Plottable.Component);
     Plottable.Renderer = Renderer;
@@ -1173,7 +1169,7 @@ var Plottable;
         function XYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
             var _this = this;
             _super.call(this, dataset);
-            this.classed(XYRenderer.CSS_CLASS);
+            this.classed("xy-renderer");
 
             this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
             this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
@@ -1267,8 +1263,6 @@ var Plottable;
                 this.render();
             }
         };
-        XYRenderer.CSS_CLASS = "xy-renderer";
-
         XYRenderer.defaultXAccessor = function (d) {
             return d.x;
         };
@@ -1293,7 +1287,7 @@ var Plottable;
         */
         function LineRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.classed(LineRenderer.CSS_CLASS, true);
+            this.classed("line-renderer", true);
         }
         LineRenderer.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
@@ -1312,7 +1306,6 @@ var Plottable;
             this.dataSelection = this.path.classed("line", true).datum(this._data);
             this.path.attr("d", this.line);
         };
-        LineRenderer.CSS_CLASS = "line-renderer";
         return LineRenderer;
     })(XYRenderer);
     Plottable.LineRenderer = LineRenderer;
@@ -1333,7 +1326,7 @@ var Plottable;
         function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, size) {
             if (typeof size === "undefined") { size = 3; }
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.classed(CircleRenderer.CSS_CLASS, true);
+            this.classed("circle-renderer", true);
             this.size = size;
         }
         CircleRenderer.prototype._paint = function () {
@@ -1348,7 +1341,6 @@ var Plottable;
             }).attr("r", this.size);
             this.dataSelection.exit().remove();
         };
-        CircleRenderer.CSS_CLASS = "circle-renderer";
         return CircleRenderer;
     })(XYRenderer);
     Plottable.CircleRenderer = CircleRenderer;
@@ -1370,7 +1362,7 @@ var Plottable;
             var _this = this;
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
             this.barPaddingPx = 1;
-            this.classed(BarRenderer.CSS_CLASS, true);
+            this.classed("bar-renderer", true);
 
             var yDomain = this.yScale.domain();
             if (!Plottable.Utils.inRange(0, yDomain[0], yDomain[1])) {
@@ -1426,7 +1418,6 @@ var Plottable;
             this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction);
             this.dataSelection.exit().remove();
         };
-        BarRenderer.CSS_CLASS = "bar-renderer";
         BarRenderer.defaultDxAccessor = function (d) {
             return d.dx;
         };
@@ -1451,7 +1442,7 @@ var Plottable;
             _super.call(this);
             this.rowPadding = 0;
             this.colPadding = 0;
-            this.classed(Table.CSS_CLASS, true);
+            this.classed("table", true);
             var cleanOutNulls = function (c) {
                 return c == null ? new Plottable.Component() : c;
             };
@@ -1699,7 +1690,6 @@ var Plottable;
             };
             return all(componentGroup.map(groupIsFixed));
         };
-        Table.CSS_CLASS = "table";
         return Table;
     })(Plottable.Component);
     Plottable.Table = Table;
@@ -1756,7 +1746,7 @@ var Plottable;
         */
         function Legend(colorScale) {
             _super.call(this);
-            this.classed(Legend.CSS_CLASS, true);
+            this.classed("legend", true);
             this.colMinimum(120); // the default width
             this.colorScale = colorScale;
             this.xAlign("RIGHT").yAlign("TOP");
@@ -1809,13 +1799,25 @@ var Plottable;
             });
             return this;
         };
-        Legend.CSS_CLASS = "legend";
         Legend.SUBELEMENT_CLASS = "legend-row";
         Legend.MARGIN = 5;
         return Legend;
     })(Plottable.Component);
     Plottable.Legend = Legend;
 })(Plottable || (Plottable = {}));
+/// <reference path="utils.ts" />
+/// <reference path="osUtils.ts" />
+/// <reference path="component.ts" />
+/// <reference path="scale.ts" />
+//grunt-start
+/// <reference path="axis.ts" />
+/// <reference path="interaction.ts" />
+/// <reference path="label.ts" />
+/// <reference path="renderer.ts" />
+/// <reference path="table.ts" />
+/// <reference path="coordinator.ts" />
+/// <reference path="legend.ts" />
+//grunt-end
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1832,11 +1834,12 @@ var Plottable;
         function Axis(axisScale, orientation, formatter) {
             var _this = this;
             _super.call(this);
+            this.tickPositioning = "center";
             this.axisScale = axisScale;
+            orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
-            this.classed(Axis.CSS_CLASS, true);
+            this.classed("axis", true);
             this.clipPathEnabled = true;
-            this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
             if (formatter == null) {
                 formatter = d3.format(".3s");
             }
@@ -1847,7 +1850,7 @@ var Plottable;
         }
         Axis.prototype.anchor = function (element) {
             _super.prototype.anchor.call(this, element);
-            this.axisElement = this.content.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+            this.axisElement = this.content.append("g").classed("axis", true);
             return this;
         };
 
@@ -1887,10 +1890,33 @@ var Plottable;
             }
 
             this.axisElement.call(this.d3Axis);
+
+            this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
+
             var bbox = this.axisElement.node().getBBox();
             if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
                 this.axisElement.classed("error", true);
             }
+            return this;
+        };
+
+        Axis.prototype._hideCutOffTickLabels = function () {
+            var availableWidth = this.availableWidth;
+            var availableHeight = this.availableHeight;
+            var tickLabels = this.axisElement.selectAll(".tick").select("text");
+
+            var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+            function boxIsInside(inner, outer) {
+                return (outer.left <= inner.left && inner.right <= outer.right && outer.top <= inner.top && inner.bottom <= outer.bottom);
+            }
+
+            tickLabels.each(function (d) {
+                if (!boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+                    d3.select(this).style("visibility", "hidden");
+                }
+            });
+
             return this;
         };
 
@@ -1905,6 +1931,15 @@ var Plottable;
             } else {
                 this.axisScale = newScale;
                 this.d3Axis.scale(newScale._d3Scale);
+                return this;
+            }
+        };
+
+        Axis.prototype.tickLabelPosition = function (position) {
+            if (position == null) {
+                return this.tickPositioning;
+            } else {
+                this.tickPositioning = position;
                 return this;
             }
         };
@@ -1991,8 +2026,6 @@ var Plottable;
                 return this;
             }
         };
-        Axis.CSS_CLASS = "axis";
-
         Axis.yWidth = 50;
         Axis.xHeight = 30;
         return Axis;
@@ -2006,15 +2039,57 @@ var Plottable;
         *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
-        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {string} orientation The orientation of the Axis (top/bottom)
         * @param {any} [formatter] a D3 formatter
         */
         function XAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
+            var orientationLC = orientation.toLowerCase();
+            if (orientationLC !== "top" && orientationLC !== "bottom") {
+                throw new Error(orientation + " is not a valid orientation for XAxis");
+            }
             _super.call(this, scale, orientation, formatter);
             _super.prototype.rowMinimum.call(this, Axis.xHeight);
             this.fixedWidthVal = false;
+            this.tickLabelPosition("center");
         }
+        XAxis.prototype.tickLabelPosition = function (position) {
+            if (position == null) {
+                return _super.prototype.tickLabelPosition.call(this);
+            } else {
+                var positionLC = position.toLowerCase();
+                if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
+                    if (positionLC !== "center") {
+                        this.tickSize(12); // longer than default tick size
+                    }
+                    return _super.prototype.tickLabelPosition.call(this, positionLC);
+                } else {
+                    throw new Error(position + " is not a valid tick label position for XAxis");
+                }
+            }
+        };
+
+        XAxis.prototype.render = function () {
+            _super.prototype.render.call(this);
+            if (this.tickLabelPosition() !== "center") {
+                var tickTextLabels = this.axisElement.selectAll("text");
+                tickTextLabels.attr("y", "0px");
+
+                if (this.orient() === "bottom") {
+                    tickTextLabels.attr("dy", "1em");
+                } else {
+                    tickTextLabels.attr("dy", "-0.25em");
+                }
+
+                if (this.tickLabelPosition() === "right") {
+                    tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
+                } else if (this.tickLabelPosition() === "left") {
+                    tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
+                }
+            }
+            this._hideCutOffTickLabels();
+            return this;
+        };
         return XAxis;
     })(Axis);
     Plottable.XAxis = XAxis;
@@ -2026,15 +2101,57 @@ var Plottable;
         *
         * @constructor
         * @param {Scale} scale The Scale to base the Axis on.
-        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {string} orientation The orientation of the Axis (left/right)
         * @param {any} [formatter] a D3 formatter
         */
         function YAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
+            var orientationLC = orientation.toLowerCase();
+            if (orientationLC !== "left" && orientationLC !== "right") {
+                throw new Error(orientation + " is not a valid orientation for YAxis");
+            }
             _super.call(this, scale, orientation, formatter);
             _super.prototype.colMinimum.call(this, Axis.yWidth);
             this.fixedHeightVal = false;
+            this.tickLabelPosition("MIDDLE");
         }
+        YAxis.prototype.tickLabelPosition = function (position) {
+            if (position == null) {
+                return _super.prototype.tickLabelPosition.call(this);
+            } else {
+                var positionLC = position.toLowerCase();
+                if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
+                    if (positionLC !== "middle") {
+                        this.tickSize(30); // longer than default tick size
+                    }
+                    return _super.prototype.tickLabelPosition.call(this, positionLC);
+                } else {
+                    throw new Error(position + " is not a valid tick label position for YAxis");
+                }
+            }
+        };
+
+        YAxis.prototype.render = function () {
+            _super.prototype.render.call(this);
+            if (this.tickLabelPosition() !== "middle") {
+                var tickTextLabels = this.axisElement.selectAll("text");
+                tickTextLabels.attr("x", "0px");
+
+                if (this.orient() === "left") {
+                    tickTextLabels.attr("dx", "-0.25em");
+                } else {
+                    tickTextLabels.attr("dx", "0.25em");
+                }
+
+                if (this.tickLabelPosition() === "top") {
+                    tickTextLabels.attr("dy", "-0.3em");
+                } else if (this.tickLabelPosition() === "bottom") {
+                    tickTextLabels.attr("dy", "1em");
+                }
+            }
+            this._hideCutOffTickLabels();
+            return this;
+        };
         return YAxis;
     })(Axis);
     Plottable.YAxis = YAxis;
@@ -2053,7 +2170,7 @@ var Plottable;
         function ComponentGroup(components) {
             if (typeof components === "undefined") { components = []; }
             _super.call(this);
-            this.classed(ComponentGroup.CSS_CLASS, true);
+            this.classed("component-group", true);
             this.components = components;
         }
         /**
@@ -2107,7 +2224,6 @@ var Plottable;
                 return c.isFixedHeight();
             });
         };
-        ComponentGroup.CSS_CLASS = "component-group";
         return ComponentGroup;
     })(Plottable.Component);
     Plottable.ComponentGroup = ComponentGroup;
