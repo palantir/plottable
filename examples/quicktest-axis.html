@@ -45,6 +45,8 @@
         var yAxisTable2 = new Plottable.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
         var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+
+        var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale).registerWithComponent();
         var basicTable = new Plottable.Table([[null, xAxisTable2, null],
                                               [yAxisTable, renderAreaD1, yAxisTable2],
                                               [null, xAxisTable, null]]);
