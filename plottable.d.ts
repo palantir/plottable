@@ -72,19 +72,30 @@ declare module Plottable {
 }
 declare module Plottable {
     class Component {
+        private static clipPathId;
         public element: D3.Selection;
         public content: D3.Selection;
+        private hitBox;
+        private interactionsToRegister;
+        private boxes;
+        private boxContainer;
         public backgroundContainer: D3.Selection;
         public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
         public fixedWidthVal: boolean;
         public fixedHeightVal: boolean;
+        private rowMinimumVal;
+        private colMinimumVal;
+        private isTopLevelComponent;
         public availableWidth: number;
         public availableHeight: number;
         public xOrigin: number;
         public yOrigin: number;
+        private xOffsetVal;
+        private yOffsetVal;
         public xAlignProportion: number;
         public yAlignProportion: number;
+        private cssClasses;
         /**
         * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
         *
@@ -139,6 +150,8 @@ declare module Plottable {
         * @returns {Component} The calling Component.
         */
         public yOffset(offset: number): Component;
+        private addBox(className?, parentElement?);
+        private generateClipPath();
         /**
         * Attaches an Interaction to the Component, so that the Interaction will listen for events on the Component.
         *
@@ -189,6 +202,8 @@ declare module Plottable {
 }
 declare module Plottable {
     class Scale implements IBroadcaster {
+        public _d3Scale: D3.Scale.Scale;
+        private broadcasterCallbacks;
         /**
         * Creates a new Scale.
         * @constructor
@@ -229,6 +244,7 @@ declare module Plottable {
         public registerListener(callback: IBroadcasterCallback): Scale;
     }
     class QuantitiveScale extends Scale {
+        public _d3Scale: D3.Scale.QuantitiveScale;
         /**
         * Creates a new QuantitiveScale.
         * @constructor
@@ -341,6 +357,7 @@ declare module Plottable {
         scale: number[];
     }
     class PanZoomInteraction extends Interaction {
+        private zoom;
         public xScale: QuantitiveScale;
         public yScale: QuantitiveScale;
         /**
@@ -353,8 +370,18 @@ declare module Plottable {
         */
         constructor(componentToListenTo: Component, xScale: QuantitiveScale, yScale: QuantitiveScale);
         public anchor(hitBox: D3.Selection): void;
+        private rerenderZoomed();
     }
     class AreaInteraction extends Interaction {
+        private static CLASS_DRAG_BOX;
+        private dragInitialized;
+        private dragBehavior;
+        private origin;
+        private location;
+        private constrainX;
+        private constrainY;
+        private dragBox;
+        private callbackToCall;
         /**
         * Creates an AreaInteraction.
         *
@@ -368,6 +395,9 @@ declare module Plottable {
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
         public callback(cb?: (a: SelectionArea) => any): AreaInteraction;
+        private dragstart();
+        private drag();
+        private dragend();
         /**
         * Clears the highlighted drag-selection box drawn by the AreaInteraction.
         *
@@ -377,6 +407,8 @@ declare module Plottable {
         public anchor(hitBox: D3.Selection): AreaInteraction;
     }
     class ZoomCallbackGenerator {
+        private xScaleMappings;
+        private yScaleMappings;
         /**
         * Adds listen-update pair of X scales.
         *
@@ -395,6 +427,7 @@ declare module Plottable {
         * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
         */
         public addYScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator;
+        private updateScale(referenceScale, targetScale, pixelMin, pixelMax);
         /**
         * Generates a callback that can be passed to Interactions.
         *
@@ -408,6 +441,10 @@ declare module Plottable {
         public mousemove(x: number, y: number): void;
     }
     class CrosshairsInteraction extends MousemoveInteraction {
+        private renderer;
+        private circle;
+        private xLine;
+        private yLine;
         constructor(renderer: XYRenderer);
         public anchor(hitBox: D3.Selection): void;
         public mousemove(x: number, y: number): void;
@@ -415,6 +452,11 @@ declare module Plottable {
 }
 declare module Plottable {
     class Label extends Component {
+        private textElement;
+        private text;
+        private orientation;
+        private textLength;
+        private textHeight;
         /**
         * Creates a Label.
         *
@@ -431,6 +473,8 @@ declare module Plottable {
         * @returns {Label} The calling Label.
         */
         public setText(text: string): Label;
+        private measureAndSetTextSize();
+        private truncateTextAndRemeasure(availableLength);
         public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
     }
     class TitleLabel extends Label {
@@ -442,9 +486,15 @@ declare module Plottable {
 }
 declare module Plottable {
     class Renderer extends Component {
+        public _data: any[];
+        public _metadata: IMetadata;
         public renderArea: D3.Selection;
         public element: D3.Selection;
         public scales: Scale[];
+        public _colorAccessor: IAccessor;
+        private static defaultColorAccessor;
+        public _rerenderUpdateSelection: boolean;
+        public _requireRerender: boolean;
         /**
         * Creates a Renderer.
         *
@@ -462,10 +512,14 @@ declare module Plottable {
         public metadata(metadata: IMetadata): Renderer;
         public data(data: any[]): Renderer;
         public render(): Renderer;
+        public colorAccessor(a: IAccessor): Renderer;
+        public _paint(): void;
         public anchor(element: D3.Selection): Renderer;
     }
     class XYRenderer extends Renderer {
         public dataSelection: D3.UpdateSelection;
+        private static defaultXAccessor;
+        private static defaultYAccessor;
         public xScale: QuantitiveScale;
         public yScale: QuantitiveScale;
         public xAccessor: IAccessor;
@@ -489,6 +543,7 @@ declare module Plottable {
         * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
         */
         public invertXYSelectionArea(pixelArea: SelectionArea): SelectionArea;
+        private getDataFilterFunction(dataArea);
         /**
         * Gets the data in a selected area.
         *
@@ -503,8 +558,11 @@ declare module Plottable {
         * @returns {number[]} An array of the indices of datapoints in the selected area.
         */
         public getDataIndicesFromArea(dataArea: SelectionArea): number[];
+        private rescale();
     }
     class LineRenderer extends XYRenderer {
+        private path;
+        private line;
         /**
         * Creates a LineRenderer.
         *
@@ -517,6 +575,7 @@ declare module Plottable {
         */
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
         public anchor(element: D3.Selection): LineRenderer;
+        public _paint(): void;
     }
     class CircleRenderer extends XYRenderer {
         public size: number;
@@ -532,8 +591,10 @@ declare module Plottable {
         * @param {number} [size] The radius of the circles, in pixels.
         */
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size?: number);
+        public _paint(): void;
     }
     class BarRenderer extends XYRenderer {
+        private static defaultDxAccessor;
         public barPaddingPx: number;
         public dxAccessor: IAccessor;
         /**
@@ -548,10 +609,20 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
+        public _paint(): void;
     }
 }
 declare module Plottable {
     class Table extends Component {
+        private rowPadding;
+        private colPadding;
+        private rows;
+        private rowMinimums;
+        private colMinimums;
+        private rowWeights;
+        private colWeights;
+        private nRows;
+        private nCols;
         /**
         * Creates a Table.
         *
@@ -603,10 +674,16 @@ declare module Plottable {
         public colMinimum(newVal: number): Table;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+        private padTableToSize(nRows, nCols);
+        private static calcComponentWeights(setWeights, componentGroups, fixityAccessor);
+        private static calcProportionalSpace(weights, freeSpace);
+        private static fixedSpace(componentGroup, fixityAccessor);
     }
 }
 declare module Plottable {
     class ScaleDomainCoordinator {
+        private rescaleInProgress;
+        private scales;
         /**
         * Creates a ScaleDomainCoordinator.
         *
@@ -619,6 +696,10 @@ declare module Plottable {
 }
 declare module Plottable {
     class Legend extends Component {
+        private static SUBELEMENT_CLASS;
+        private static MARGIN;
+        private colorScale;
+        private maxWidth;
         /**
         * Creates a Legend.
         *
@@ -635,6 +716,7 @@ declare module Plottable {
         public scale(scale: ColorScale): Legend;
         public rowMinimum(): number;
         public rowMinimum(newVal: number): Legend;
+        private measureTextHeight();
         public render(): Legend;
     }
 }
@@ -643,6 +725,9 @@ declare module Plottable {
         static yWidth: number;
         static xHeight: number;
         public axisElement: D3.Selection;
+        private d3Axis;
+        private axisScale;
+        private tickPositioning;
         /**
         * Creates an Axis.
         *
@@ -654,6 +739,8 @@ declare module Plottable {
         constructor(axisScale: Scale, orientation: string, formatter?: any);
         public anchor(element: D3.Selection): Axis;
         public render(): Axis;
+        public _hideCutOffTickLabels(): Axis;
+        private rescale();
         public scale(): Scale;
         public scale(newScale: Scale): Axis;
         /**
@@ -726,6 +813,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class ComponentGroup extends Component {
+        private components;
         /**
         * Creates a ComponentGroup.
         *

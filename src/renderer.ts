@@ -8,6 +8,7 @@ module Plottable {
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
+    private static defaultColorAccessor = (d: any) => "";
 
     public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only
@@ -36,6 +37,7 @@ module Plottable {
       if (dataset != null) {
         this.dataset(dataset);
       }
+      this.colorAccessor(Renderer.defaultColorAccessor);
     }
 
     /**
