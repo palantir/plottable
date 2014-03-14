@@ -8,7 +8,7 @@ module Plottable {
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
-    private static defaultColorAccessor = (d: any) => "";
+    private static defaultColorAccessor = (d: any) => "steelblue";
 
     public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only
@@ -235,6 +235,7 @@ module Plottable {
       this.dataSelection = this.path.classed("line", true)
         .datum(this._data);
       this.path.attr("d", this.line);
+      // Since we can only set one stroke for the full line, call colorAccessor on first datum with index 0
       this.path.attr("stroke", this._colorAccessor(this._data[0], 0, this._metadata));
     }
   }

@@ -21,8 +21,7 @@ module TSCDemo {
       var r = Math.floor(d.x * 1000 % 255)
       var g = Math.floor(d.y * 1000 % 255)
       var b = r + g % 255;
-      var c = d3.rgb(r,g,b);
-      return c.toString();
+      return d3.rgb(r,g,b).toString();
     }
 
     renderAreaD1.colorAccessor(colorAccessor);

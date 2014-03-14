@@ -1159,7 +1159,7 @@ var Plottable;
             return this;
         };
         Renderer.defaultColorAccessor = function (d) {
-            return "";
+            return "steelblue";
         };
         return Renderer;
     })(Plottable.Component);
@@ -1316,6 +1316,8 @@ var Plottable;
             });
             this.dataSelection = this.path.classed("line", true).datum(this._data);
             this.path.attr("d", this.line);
+
+            // Since we can only set one stroke for the full line, call colorAccessor on first datum with index 0
             this.path.attr("stroke", this._colorAccessor(this._data[0], 0, this._metadata));
         };
         return LineRenderer;
