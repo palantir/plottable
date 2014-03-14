@@ -3,8 +3,14 @@
     <title>Axes Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../plottable.css">
     <style>
+      .plottable .bounding-box {
+        stroke: none;
+      }
       .plottable .axis text {
         /*font-size: 12px;*/
+      }
+      .plottable .axis path {
+        /*stroke: none;*/
       }
     </style>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -14,6 +20,10 @@
     <script>
       window.onload = function() {
         var dataseries = makeRandomData(20);
+
+        dataseries.data.forEach(function (datapoint){
+          // datapoint.x = datapoint.x * 2000;
+        });
 
         var svg = d3.select("#axis-test");
         svg.attr("width", 640).attr("height", 480);
@@ -46,12 +56,13 @@
 
         var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
 
-        var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale).registerWithComponent();
         var basicTable = new Plottable.Table([[null, xAxisTable2, null],
                                               [yAxisTable, renderAreaD1, yAxisTable2],
                                               [null, xAxisTable, null]]);
-
-        basicTable.anchor(svg).computeLayout().render();
+        basicTable.anchor(svg);
+        basicTable.computeLayout().render();
+        var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
+        pzi.registerWithComponent();
       }
     </script>
   </head>

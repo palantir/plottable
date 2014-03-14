@@ -140,10 +140,9 @@ var Plottable;
             }
             if (element.node().nodeName === "svg") {
                 // svg node gets the "plottable" CSS class
-                element.classed("plottable", true);
+                this.rootSVG = element;
+                this.rootSVG.classed("plottable", true);
                 this.element = element.append("g");
-                this.element.attr("width", element.attr("width"));
-                this.element.attr("height", element.attr("height"));
                 this.isTopLevelComponent = true;
             } else {
                 this.element = element;
@@ -190,11 +189,11 @@ var Plottable;
                 if (this.element == null) {
                     throw new Error("anchor must be called before computeLayout");
                 } else if (this.isTopLevelComponent) {
-                    // we are the root node, height and width have already been set
+                    // we are the root node, retrieve height/width from root SVG
                     xOrigin = 0;
                     yOrigin = 0;
-                    availableWidth = parseFloat(this.element.attr("width"));
-                    availableHeight = parseFloat(this.element.attr("height"));
+                    availableWidth = parseFloat(this.rootSVG.attr("width"));
+                    availableHeight = parseFloat(this.rootSVG.attr("height"));
                 } else {
                     throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
                 }

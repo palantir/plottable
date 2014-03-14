@@ -36,12 +36,20 @@ describe("Component behavior", () => {
   });
 
   describe("computeLayout", () => {
-    it("computeLayout defaults intelligently", () => {
+    it("computeLayout defaults and updates intelligently", () => {
       c.anchor(svg).computeLayout();
       assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
+
+      svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
+      c.computeLayout();
+      assert.equal(c.availableWidth, 2*SVG_WIDTH, "computeLayout updated width to new svg width");
+      assert.equal(c.availableHeight, 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
+      assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
+      assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
+
       svg.remove();
     });
 
