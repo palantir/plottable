@@ -21,7 +21,7 @@ module.exports = function(grunt) {
     ts: {
       dev: {
         src: ["src/*.ts", "typings/**/*.d.ts"],
-        out: "plottable.js",
+        out: "build/plottable.js",
         // watch: "src",
         options: {
           target: 'es5',
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
         }
       },
       test: {
-        src: ["test/*.ts", "typings/**/*.d.ts"],
+        src: ["test/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
         out: "build/tests.js",
         // watch: "test",
         options: {
@@ -65,7 +65,7 @@ module.exports = function(grunt) {
         livereload: true
       },
       "rebuild": {
-        "tasks": ["compile"],
+        "tasks": ["dev-compile"],
         "files": ["src/*.ts"]
       },
       "tests": {
@@ -102,6 +102,24 @@ module.exports = function(grunt) {
         replacement: "",
         path: "plottable.d.ts"
       },
+    },
+    copy: {
+      dist: {
+        files: [
+          {src: "build/plottable.js", dest:"plottable.js"},
+          {src: "build/plottable.d.ts", dest:"plottable.d.ts"}
+        ]
+      }
+    },
+    gitcommit: {
+      task: {
+        options: {
+          message: "Update plottable.js and plottable.d.ts"
+        },
+        files: {
+          src: ['plottable.js', 'plottable.d.ts']
+        }
+      }
     }
   });
 
@@ -109,15 +127,19 @@ module.exports = function(grunt) {
 
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("default", "launch");
-  grunt.registerTask("compile", [
+  grunt.registerTask("dev-compile", [
                                   "ts:dev",
-                                  "concat:license",
                                   "ts:test",
                                   "ts:examples",
-                                  "tslint",
+                                  "tslint"]);
+
+  grunt.registerTask("dist-compile", [
+                                  "dev-compile",
+                                  "copy:dist",
+                                  "concat:license",
                                   "sed:private_definitions",
                                   "sed:protected_definitions"]);
-  grunt.registerTask("build" , ["compile", "watch"]);
-  grunt.registerTask("launch", ["connect", "build"]);
-  grunt.registerTask("test", ["compile", "blanket_mocha"]);
+
+  grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
 };
