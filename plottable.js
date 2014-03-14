@@ -1105,6 +1105,7 @@ var Plottable;
             if (dataset != null) {
                 this.dataset(dataset);
             }
+            this.colorAccessor(Renderer.defaultColorAccessor);
         }
         /**
         * Sets a new dataset on the Renderer.
@@ -1141,6 +1142,13 @@ var Plottable;
             return this;
         };
 
+        Renderer.prototype.colorAccessor = function (a) {
+            this._colorAccessor = a;
+            this._requireRerender = true;
+            this._rerenderUpdateSelection = true;
+            return this;
+        };
+
         Renderer.prototype._paint = function () {
             // no-op
         };
@@ -1149,6 +1157,9 @@ var Plottable;
             _super.prototype.anchor.call(this, element);
             this.renderArea = this.content.append("g").classed("render-area", true);
             return this;
+        };
+        Renderer.defaultColorAccessor = function (d) {
+            return "steelblue";
         };
         return Renderer;
     })(Plottable.Component);
@@ -1305,6 +1316,9 @@ var Plottable;
             });
             this.dataSelection = this.path.classed("line", true).datum(this._data);
             this.path.attr("d", this.line);
+
+            // Since we can only set one stroke for the full line, call colorAccessor on first datum with index 0
+            this.path.attr("stroke", this._colorAccessor(this._data[0], 0, this._metadata));
         };
         return LineRenderer;
     })(XYRenderer);
@@ -1338,7 +1352,9 @@ var Plottable;
                 return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
             }).attr("cy", function (d, i) {
                 return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
-            }).attr("r", this.size);
+            }).attr("r", this.size).attr("fill", function (d, i) {
+                return _this._colorAccessor(d, i, _this._metadata);
+            });
             this.dataSelection.exit().remove();
         };
         return CircleRenderer;
@@ -1415,7 +1431,11 @@ var Plottable;
                 return maxScaledY - scaledY;
             };
 
-            this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction);
+            var colorFunction = function (d, i) {
+                return _this._colorAccessor(d, i, _this._metadata);
+            };
+
+            this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", colorFunction);
             this.dataSelection.exit().remove();
         };
         BarRenderer.defaultDxAccessor = function (d) {

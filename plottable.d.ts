@@ -462,6 +462,7 @@ declare module Plottable {
         public metadata(metadata: IMetadata): Renderer;
         public data(data: any[]): Renderer;
         public render(): Renderer;
+        public colorAccessor(a: IAccessor): Renderer;
         public anchor(element: D3.Selection): Renderer;
     }
     class XYRenderer extends Renderer {

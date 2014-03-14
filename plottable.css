@@ -40,15 +40,6 @@
   stroke-width: 1.5px;
   vector-effect: non-scaling-stroke;
 }
-.plottable .random-data {
-  stroke: steelblue;
-}
-.plottable circle {
-  fill: steelblue;
-}
-.plottable .bar-renderer .render-area rect {
-  fill: steelblue;
-}
 
 .plottable .table-rect {
   fill: none;

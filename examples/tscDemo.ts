@@ -17,6 +17,14 @@ module TSCDemo {
 
 
     var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+    var colorAccessor = (d) => {
+      var r = Math.floor(d.x * 1000 % 255)
+      var g = Math.floor(d.y * 1000 % 255)
+      var b = r + g % 255;
+      return d3.rgb(r,g,b).toString();
+    }
+
+    renderAreaD1.colorAccessor(colorAccessor);
     var basicTable = new Plottable.Table().addComponent(1, 0, yAxis)
                                           .addComponent(1, 2, yAxis2)
                                           .addComponent(1, 1, renderAreaD1)

@@ -111,7 +111,9 @@ describe("Renderers", () => {
         yScale = new Plottable.LinearScale();
         var xAccessor = (d) => d.foo;
         var yAccessor = (d) => d.bar;
+        var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
         lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
+        lineRenderer.colorAccessor(colorAccessor);
         lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
       });
@@ -122,7 +124,8 @@ describe("Renderers", () => {
 
       it("the line renderer drew an appropriate line", () => {
         var path = renderArea.select("path");
-        assert.equal(path.attr("d"), "M0,500L500,0");
+        assert.equal(path.attr("d"), "M0,500L500,0", "path-d is correct");
+        assert.equal(path.attr("stroke"), "#000000", "path-stroke is correct");
         verifier.end();
       });
 
@@ -158,8 +161,9 @@ describe("Renderers", () => {
       var pixelAreaPart = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
       var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
       var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
-
+      var colorAccessor = (d, i, m) => d3.rgb(d.x, d.y ,i).toString();
       var circlesInArea;
+
       function getCircleRendererVerifier() {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
         // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
@@ -180,6 +184,7 @@ describe("Renderers", () => {
             circlesInArea++;
             assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
             assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+            assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
           };
         };
       };
@@ -193,6 +198,7 @@ describe("Renderers", () => {
         xScale = new Plottable.LinearScale();
         yScale = new Plottable.LinearScale();
         circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
+        circleRenderer.colorAccessor(colorAccessor);
         circleRenderer.renderTo(svg);
       });
 
