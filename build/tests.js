@@ -54,7 +54,7 @@ function makeLinearSeries(n) {
         return { x: x, y: x };
     }
     var data = d3.range(n).map(makePoint);
-    return { data: data, seriesName: "linear-series" };
+    return { data: data, metadata: { cssClass: "linear-series" } };
 }
 
 function makeQuadraticSeries(n) {
@@ -62,7 +62,7 @@ function makeQuadraticSeries(n) {
         return { x: x, y: x * x };
     }
     var data = d3.range(n).map(makeQuadraticPoint);
-    return { data: data, seriesName: "quadratic-series" };
+    return { data: data, metadata: { cssClass: "quadratic-series" } };
 }
 
 var MultiTestVerifier = (function () {
@@ -79,11 +79,17 @@ var MultiTestVerifier = (function () {
     };
     return MultiTestVerifier;
 })();
+///<reference path="../typings/chai/chai-assert.d.ts" />
+///<reference path="../typings/mocha/mocha.d.ts" />
+///<reference path="../typings/d3/d3.d.ts" />
+///<reference path="../typings/jquery/jquery.d.ts" />
+///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
+///<reference path="testUtils.ts" />
+///<reference path="../build/plottable.d.ts" />
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
 describe("Axes", function () {
-    // TODO: Rewrite these tests when the Axis class gets refactored
     it("Renders ticks", function () {
         var svg = generateSVG(500, 100);
         var xScale = new Plottable.LinearScale();
@@ -93,6 +99,80 @@ describe("Axes", function () {
         axis.renderTo(svg);
         var ticks = svg.selectAll(".tick");
         assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
+        svg.remove();
+    });
+
+    it("XAxis positions tick labels correctly", function () {
+        var svg = generateSVG(500, 100);
+        var xScale = new Plottable.LinearScale();
+        xScale.domain([0, 10]);
+        xScale.range([0, 500]);
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        xAxis.renderTo(svg);
+        var tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
+        var tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
+        for (var i = 0; i < tickMarks.length; i++) {
+            var markRect = tickMarks[i].getBoundingClientRect();
+            var labelRect = tickLabels[i].getBoundingClientRect();
+            assert.isTrue((labelRect.left <= markRect.left && markRect.right <= labelRect.right), "tick label position defaults to centered");
+        }
+
+        xAxis.tickLabelPosition("left");
+        xAxis.render();
+        tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
+        tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
+        for (i = 0; i < tickMarks.length; i++) {
+            markRect = tickMarks[i].getBoundingClientRect();
+            labelRect = tickLabels[i].getBoundingClientRect();
+            assert.operator(labelRect.right, "<=", markRect.left, "tick label is to the left of the mark");
+        }
+
+        xAxis.tickLabelPosition("right");
+        xAxis.render();
+        tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
+        tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
+        for (i = 0; i < tickMarks.length; i++) {
+            markRect = tickMarks[i].getBoundingClientRect();
+            labelRect = tickLabels[i].getBoundingClientRect();
+            assert.operator(markRect.right, "<=", labelRect.left, "tick label is to the right of the mark");
+        }
+        svg.remove();
+    });
+
+    it("YAxis positions tick labels correctly", function () {
+        var svg = generateSVG(100, 500);
+        var yScale = new Plottable.LinearScale();
+        yScale.domain([0, 10]);
+        yScale.range([500, 0]);
+        var yAxis = new Plottable.YAxis(yScale, "left");
+        yAxis.renderTo(svg);
+        var tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
+        var tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
+        for (var i = 0; i < tickMarks.length; i++) {
+            var markRect = tickMarks[i].getBoundingClientRect();
+            var labelRect = tickLabels[i].getBoundingClientRect();
+            assert.isTrue((labelRect.top <= markRect.top && markRect.bottom <= labelRect.bottom), "tick label position defaults to middle");
+        }
+
+        yAxis.tickLabelPosition("top");
+        yAxis.render();
+        tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
+        tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
+        for (i = 0; i < tickMarks.length; i++) {
+            markRect = tickMarks[i].getBoundingClientRect();
+            labelRect = tickLabels[i].getBoundingClientRect();
+            assert.operator(labelRect.bottom, "<=", markRect.top, "tick label above the mark");
+        }
+
+        yAxis.tickLabelPosition("bottom");
+        yAxis.render();
+        tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
+        tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
+        for (i = 0; i < tickMarks.length; i++) {
+            markRect = tickMarks[i].getBoundingClientRect();
+            labelRect = tickLabels[i].getBoundingClientRect();
+            assert.operator(markRect.bottom, "<=", labelRect.top, "tick label is below the mark");
+        }
         svg.remove();
     });
 });
@@ -233,12 +313,20 @@ describe("Component behavior", function () {
     });
 
     describe("computeLayout", function () {
-        it("computeLayout defaults intelligently", function () {
+        it("computeLayout defaults and updates intelligently", function () {
             c.anchor(svg).computeLayout();
             assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
+
+            svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
+            c.computeLayout();
+            assert.equal(c.availableWidth, 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
+            assert.equal(c.availableHeight, 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
+            assert.equal(c.xOrigin, 0, "xOrigin is still 0");
+            assert.equal(c.yOrigin, 0, "yOrigin is still 0");
+
             svg.remove();
         });
 
@@ -455,6 +543,8 @@ describe("Component behavior", function () {
         assert.isTrue(c.classed("CSS-POSTANCHOR"));
         c.classed("CSS-POSTANCHOR", false);
         assert.isFalse(c.classed("CSS-POSTANCHOR"));
+        assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
+        assert.equal(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
         svg.remove();
     });
 });
@@ -687,7 +777,7 @@ describe("Interactions", function () {
                 return { x: x, y: y };
             };
             var data = [dp(0, 0), dp(20, 10), dp(40, 40)];
-            var dataset = { seriesName: "foo", data: data };
+            var dataset = { metadata: { cssClass: "foo" }, data: data };
             var xScale = new Plottable.LinearScale();
             var yScale = new Plottable.LinearScale();
             var circleRenderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
@@ -1002,23 +1092,89 @@ describe("Renderers", function () {
 
         it("Base renderer functionality works", function () {
             var svg = generateSVG(400, 300);
-            var d1 = { data: ["foo"], seriesName: "bar" };
+            var d1 = { data: ["foo"], metadata: { cssClass: "bar" } };
             var r = new Plottable.Renderer(d1);
             r.anchor(svg).computeLayout();
             var renderArea = r.content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
-            assert.isTrue(renderArea.classed("bar"), "the render area is classed w/ dataset.seriesName");
-            assert.deepEqual(r.dataset, d1, "the dataset is set properly");
-            var d2 = { data: ["bar"], seriesName: "boo" };
-            r.data(d2);
-            assert.isFalse(renderArea.classed("bar"), "the renderArea is no longer classed bar");
-            assert.isTrue(renderArea.classed("boo"), "the renderArea is now classed boo");
-            assert.deepEqual(r.dataset, d2, "the dataset was replaced properly");
+            assert.isTrue(r.element.classed("bar"), "the element is classed w/ metadata.cssClass");
+            assert.deepEqual(r._data, d1.data, "the data is set properly");
+            assert.deepEqual(r._metadata, d1.metadata, "the metadata is set properly");
+            var d2 = { data: ["bar"], metadata: { cssClass: "boo" } };
+            r.dataset(d2);
+            assert.isFalse(r.element.classed("bar"), "the element is no longer classed bar");
+            assert.isTrue(r.element.classed("boo"), "the element is now classed boo");
+            assert.deepEqual(r._data, d2.data, "the data is set properly");
+            assert.deepEqual(r._metadata, d2.metadata, "the metadata is set properly");
+            svg.remove();
+        });
+
+        it("rerenderUpdateSelection and requireRerender flags updated appropriately", function () {
+            var r = new Plottable.Renderer();
+            var svg = generateSVG();
+            r.renderTo(svg);
+            assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update");
+            assert.isFalse(r._requireRerender, "dont require rerender");
+            var metadata = {};
+            r.metadata(metadata);
+            assert.isTrue(r._rerenderUpdateSelection, "rerenderingUpdate req after metadata set");
+            assert.isTrue(r._requireRerender, "rerender required when metadata set");
+
+            r.renderTo(svg);
+            assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update after render");
+            assert.isFalse(r._requireRerender, "dont require rerender after render");
+
+            var data = [];
+            r.data(data);
+            assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update after setting data");
+            assert.isTrue(r._requireRerender, "rerender required when data set");
             svg.remove();
         });
     });
 
     describe("XYRenderer functionality", function () {
+        it("the accessors properly access data, index, and metadata", function () {
+            var svg = generateSVG(400, 400);
+            var xScale = new Plottable.LinearScale();
+            var yScale = new Plottable.LinearScale();
+            var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+            var metadata = { foo: 10, bar: 20 };
+            var xAccessor = function (d, i, m) {
+                return d.x + i * m.foo;
+            };
+            var yAccessor = function (d, i, m) {
+                return m.bar;
+            };
+            var dataset = { data: data, metadata: metadata };
+            var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor);
+            xScale.domain([0, 400]);
+            yScale.domain([400, 0]);
+            renderer.renderTo(svg);
+            var circles = renderer.renderArea.selectAll("circle");
+            var c1 = d3.select(circles[0][0]);
+            var c2 = d3.select(circles[0][1]);
+            assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
+            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
+            assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
+            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct");
+
+            data = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
+            renderer.data(data).renderTo(svg);
+            assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
+            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
+            assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
+            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
+
+            metadata = { foo: 0, bar: 0 };
+            renderer.metadata(metadata).renderTo(svg);
+            assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
+            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
+            assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
+            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+
+            svg.remove();
+        });
+
         describe("Basic LineRenderer functionality, with custom accessors", function () {
             // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
             // draws properly for the LineRenderer
@@ -1026,7 +1182,7 @@ describe("Renderers", function () {
             var xScale;
             var yScale;
             var lineRenderer;
-            var simpleDataset = { seriesName: "simpleDataset", data: [{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }] };
+            var simpleDataset = { metadata: { cssClass: "simpleDataset" }, data: [{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }] };
             var renderArea;
             var verifier = new MultiTestVerifier();
 
@@ -1040,7 +1196,11 @@ describe("Renderers", function () {
                 var yAccessor = function (d) {
                     return d.bar;
                 };
+                var colorAccessor = function (d, i, m) {
+                    return d3.rgb(d.foo, d.bar, i).toString();
+                };
                 lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
+                lineRenderer.colorAccessor(colorAccessor);
                 lineRenderer.renderTo(svg);
                 renderArea = lineRenderer.renderArea;
             });
@@ -1051,7 +1211,8 @@ describe("Renderers", function () {
 
             it("the line renderer drew an appropriate line", function () {
                 var path = renderArea.select("path");
-                assert.equal(path.attr("d"), "M0,500L500,0");
+                assert.equal(path.attr("d"), "M0,500L500,0", "path-d is correct");
+                assert.equal(path.attr("stroke"), "#000000", "path-stroke is correct");
                 verifier.end();
             });
 
@@ -1090,8 +1251,11 @@ describe("Renderers", function () {
             var pixelAreaPart = { xMin: 200, xMax: 600, yMin: 100, yMax: 200 };
             var dataAreaFull = { xMin: 0, xMax: 9, yMin: 81, yMax: 0 };
             var dataAreaPart = { xMin: 3, xMax: 9, yMin: 54, yMax: 27 };
-
+            var colorAccessor = function (d, i, m) {
+                return d3.rgb(d.x, d.y, i).toString();
+            };
             var circlesInArea;
+
             function getCircleRendererVerifier() {
                 // creates a function that verifies that circles are drawn properly after accounting for svg transform
                 // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
@@ -1112,6 +1276,7 @@ describe("Renderers", function () {
                         circlesInArea++;
                         assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
                         assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+                        assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
                     }
                     ;
                 };
@@ -1127,6 +1292,7 @@ describe("Renderers", function () {
                 xScale = new Plottable.LinearScale();
                 yScale = new Plottable.LinearScale();
                 circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
+                circleRenderer.colorAccessor(colorAccessor);
                 circleRenderer.renderTo(svg);
             });
 
@@ -1248,7 +1414,7 @@ describe("Renderers", function () {
             // Choosing data with a negative x value is significant, since there is
             // a potential failure mode involving the xDomain with an initial
             // point below 0
-            var dataset = { seriesName: "sampleBarData", data: [d0, d1] };
+            var dataset = { metadata: { cssClass: "sampleBarData" }, data: [d0, d1] };
 
             before(function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -1437,6 +1603,16 @@ describe("Tables", function () {
         assert.throws(function () {
             return t.addComponent(0, 2, c2);
         }, Error, "component already exists");
+    });
+
+    it("addComponent works even if a component is added with a high column and low row index", function () {
+        // Solves #180, a weird bug
+        var t = new Plottable.Table();
+        var svg = generateSVG();
+        t.addComponent(1, 0, new Plottable.Component());
+        t.addComponent(0, 2, new Plottable.Component());
+        t.renderTo(svg); //would throw an error without the fix (tested);
+        svg.remove();
     });
 
     it("tables with insufficient space throw Insufficient Space", function () {
