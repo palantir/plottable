@@ -5,7 +5,7 @@ function makeChartWithLabels() {
     var yMean = 0;
     var yStdDev = 1;
     var dataseries = {
-        seriesName: "normal-data",
+        metadata: {cssClass: "normal-data"},
         data: makeNormallyDistributedData(100, xMean, xStdDev, yMean, yStdDev)
     };
 
