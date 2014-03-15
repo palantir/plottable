@@ -14,23 +14,85 @@ describe("Renderers", () => {
 
     it("Base renderer functionality works", () => {
       var svg = generateSVG(400, 300);
-      var d1 = {data: ["foo"], seriesName: "bar"};
+      var d1 = {data: ["foo"], metadata: {cssClass: "bar"}};
       var r = new Plottable.Renderer(d1);
       r.anchor(svg).computeLayout();
       var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
-      assert.isTrue(renderArea.classed("bar"), "the render area is classed w/ dataset.seriesName");
-      assert.deepEqual(r.dataset, d1, "the dataset is set properly");
-      var d2 = {data: ["bar"], seriesName: "boo"};
-      r.data(d2);
-      assert.isFalse(renderArea.classed("bar"), "the renderArea is no longer classed bar");
-      assert.isTrue(renderArea.classed("boo"), "the renderArea is now classed boo");
-      assert.deepEqual(r.dataset, d2, "the dataset was replaced properly");
+      assert.isTrue(r.element.classed("bar"), "the element is classed w/ metadata.cssClass");
+      assert.deepEqual(r._data, d1.data, "the data is set properly");
+      assert.deepEqual(r._metadata,  d1.metadata,  "the metadata is set properly");
+      var d2 = {data: ["bar"], metadata: {cssClass: "boo"}};
+      r.dataset(d2);
+      assert.isFalse(r.element.classed("bar"), "the element is no longer classed bar");
+      assert.isTrue (r.element.classed("boo"), "the element is now classed boo");
+      assert.deepEqual(r._data, d2.data, "the data is set properly");
+      assert.deepEqual(r._metadata, d2.metadata, "the metadata is set properly");
+      svg.remove();
+    });
+
+    it("rerenderUpdateSelection and requireRerender flags updated appropriately", () => {
+      var r = new Plottable.Renderer();
+      var svg = generateSVG();
+      r.renderTo(svg);
+      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update");
+      assert.isFalse(r._requireRerender, "dont require rerender");
+      var metadata = {};
+      r.metadata(metadata);
+      assert.isTrue(r._rerenderUpdateSelection, "rerenderingUpdate req after metadata set");
+      assert.isTrue(r._requireRerender, "rerender required when metadata set");
+
+      r.renderTo(svg);
+      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update after render");
+      assert.isFalse(r._requireRerender, "dont require rerender after render");
+
+      var data = [];
+      r.data(data);
+      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update after setting data");
+      assert.isTrue(r._requireRerender, "rerender required when data set");
       svg.remove();
     });
   });
 
   describe("XYRenderer functionality", () => {
+
+    it("the accessors properly access data, index, and metadata", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.LinearScale();
+      var yScale = new Plottable.LinearScale();
+      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      var metadata = {foo: 10, bar: 20};
+      var xAccessor = (d, i?, m?) => d.x + i * m.foo;
+      var yAccessor = (d, i?, m?) => m.bar;
+      var dataset = {data: data, metadata: metadata};
+      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor);
+      xScale.domain([0, 400]);
+      yScale.domain([400, 0]);
+      renderer.renderTo(svg);
+      var circles = renderer.renderArea.selectAll("circle");
+      var c1 = d3.select(circles[0][0]);
+      var c2 = d3.select(circles[0][1]);
+      assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
+      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
+      assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
+      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct");
+
+      data = [{x: 2, y:2}, {x:4, y:4}];
+      renderer.data(data).renderTo(svg);
+      assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
+      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
+      assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
+      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
+
+      metadata = {foo: 0, bar: 0};
+      renderer.metadata(metadata).renderTo(svg);
+      assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
+      assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
+      assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
+      assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+
+      svg.remove();
+    });
 
     describe("Basic LineRenderer functionality, with custom accessors", () => {
       // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
@@ -39,7 +101,7 @@ describe("Renderers", () => {
       var xScale;
       var yScale;
       var lineRenderer;
-      var simpleDataset = {seriesName: "simpleDataset", data: [{foo: 0, bar:0}, {foo:1, bar:1}]};
+      var simpleDataset = {metadata: {cssClass: "simpleDataset"}, data: [{foo: 0, bar:0}, {foo:1, bar:1}]};
       var renderArea;
       var verifier = new MultiTestVerifier();
 
@@ -49,7 +111,9 @@ describe("Renderers", () => {
         yScale = new Plottable.LinearScale();
         var xAccessor = (d) => d.foo;
         var yAccessor = (d) => d.bar;
+        var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
         lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
+        lineRenderer.colorAccessor(colorAccessor);
         lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
       });
@@ -60,7 +124,8 @@ describe("Renderers", () => {
 
       it("the line renderer drew an appropriate line", () => {
         var path = renderArea.select("path");
-        assert.equal(path.attr("d"), "M0,500L500,0");
+        assert.equal(path.attr("d"), "M0,500L500,0", "path-d is correct");
+        assert.equal(path.attr("stroke"), "#000000", "path-stroke is correct");
         verifier.end();
       });
 
@@ -96,8 +161,9 @@ describe("Renderers", () => {
       var pixelAreaPart = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
       var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
       var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
-
+      var colorAccessor = (d, i, m) => d3.rgb(d.x, d.y ,i).toString();
       var circlesInArea;
+
       function getCircleRendererVerifier() {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
         // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
@@ -118,6 +184,7 @@ describe("Renderers", () => {
             circlesInArea++;
             assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
             assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+            assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
           };
         };
       };
@@ -131,6 +198,7 @@ describe("Renderers", () => {
         xScale = new Plottable.LinearScale();
         yScale = new Plottable.LinearScale();
         circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
+        circleRenderer.colorAccessor(colorAccessor);
         circleRenderer.renderTo(svg);
       });
 
@@ -248,7 +316,7 @@ describe("Renderers", () => {
       // Choosing data with a negative x value is significant, since there is
       // a potential failure mode involving the xDomain with an initial
       // point below 0
-      var dataset = {seriesName: "sampleBarData", data: [d0, d1]};
+      var dataset = {metadata: {cssClass: "sampleBarData"}, data: [d0, d1]};
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);

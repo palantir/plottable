@@ -2,8 +2,6 @@
 
 module Plottable {
   export class Label extends Component {
-    private static CSS_CLASS = "label";
-
     private textElement: D3.Selection;
     private text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private orientation: string;
@@ -19,7 +17,7 @@ module Plottable {
      */
     constructor(text = "", orientation = "horizontal") {
       super();
-      this.classed(Label.CSS_CLASS, true);
+      this.classed("label", true);
       this.setText(text);
       if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
         this.orientation = orientation;
@@ -106,18 +104,16 @@ module Plottable {
   }
 
   export class TitleLabel extends Label {
-    private static CSS_CLASS = "title-label";
     constructor(text?: string, orientation?: string) {
       super(text, orientation);
-      this.classed(TitleLabel.CSS_CLASS, true);
+      this.classed("title-label", true);
     }
   }
 
   export class AxisLabel extends Label {
-    private static CSS_CLASS = "axis-label";
     constructor(text?: string, orientation?: string) {
       super(text, orientation);
-      this.classed(AxisLabel.CSS_CLASS, true);
+      this.classed("axis-label", true);
     }
   }
 }

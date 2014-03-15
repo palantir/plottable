@@ -1,8 +1,17 @@
 module Plottable {
   export interface IDataset {
     data: any[];
-    seriesName: string;
+    metadata: IMetadata;
   }
+
+  export interface IMetadata {
+    cssClass?: string;
+    color?: string;
+  }
+
+  export interface IAccessor {
+    (datum: any, index?: number, metadata?: any): any;
+  };
 
   export interface SelectionArea {
     xMin: number;
@@ -15,7 +24,6 @@ module Plottable {
     pixel: SelectionArea;
     data: SelectionArea;
   }
-
 
   export interface IBroadcasterCallback {
     (broadcaster: IBroadcaster, ...args: any[]): any;

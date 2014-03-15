@@ -17,6 +17,7 @@ module Demo {
   basicTable.render();
   var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
   pzi.registerWithComponent();
+
   // make a table with four nested tables
   var svg2 = d3.select("#svg2");
 

@@ -2,7 +2,6 @@
 
 module Plottable {
   export class Legend extends Component {
-    private static CSS_CLASS = "legend";
     private static SUBELEMENT_CLASS = "legend-row";
     private static MARGIN = 5;
 
@@ -17,7 +16,7 @@ module Plottable {
      */
     constructor(colorScale?: ColorScale) {
       super();
-      this.classed(Legend.CSS_CLASS, true);
+      this.classed("legend", true);
       this.colMinimum(120); // the default width
       this.colorScale = colorScale;
       this.xAlign("RIGHT").yAlign("TOP");

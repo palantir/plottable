@@ -18,6 +18,7 @@ module Plottable {
     private rowMinimumVal = 0;
     private colMinimumVal = 0;
 
+    private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
 
     public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
@@ -43,10 +44,9 @@ module Plottable {
       }
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
-        element.classed("plottable", true);
+        this.rootSVG = element;
+        this.rootSVG.classed("plottable", true);
         this.element = element.append("g");
-        this.element.attr("width", element.attr("width"));
-        this.element.attr("height", element.attr("height"));
         this.isTopLevelComponent = true;
       } else {
         this.element = element;
@@ -89,11 +89,11 @@ module Plottable {
         if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
         } else if (this.isTopLevelComponent) {
-          // we are the root node, height and width have already been set
+          // we are the root node, retrieve height/width from root SVG
           xOrigin = 0;
           yOrigin = 0;
-          availableWidth  = parseFloat(this.element.attr("width"));
-          availableHeight = parseFloat(this.element.attr("height"));
+          availableWidth  = parseFloat(this.rootSVG.attr("width"));
+          availableHeight = parseFloat(this.rootSVG.attr("height"));
         } else {
           throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }
@@ -257,12 +257,17 @@ module Plottable {
     public classed(cssClass: string, addClass: boolean): Component;
     public classed(cssClass: string, addClass?:boolean): any {
       if (addClass == null) {
-        if (this.element == null) {
+        if (cssClass == null) {
+          return false;
+        } else if (this.element == null) {
           return (this.cssClasses.indexOf(cssClass) !== -1);
         } else {
           return this.element.classed(cssClass);
         }
       } else {
+        if (cssClass == null) {
+          return this;
+        }
         if (this.element == null) {
           var classIndex = this.cssClasses.indexOf(cssClass);
           if (addClass && classIndex === -1) {

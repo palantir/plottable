@@ -2,14 +2,12 @@
 
 module Plottable {
   export class Axis extends Component {
-    private static CSS_CLASS = "axis";
-
     public static yWidth = 50;
     public static xHeight = 30;
     public axisElement: D3.Selection;
     private d3Axis: D3.Svg.Axis;
     private axisScale: Scale;
-    private isXAligned: boolean;
+    private tickPositioning = "center";
 
     /**
      * Creates an Axis.
@@ -22,10 +20,10 @@ module Plottable {
     constructor(axisScale: Scale, orientation: string, formatter?: any) {
       super();
       this.axisScale = axisScale;
+      orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
-      this.classed(Axis.CSS_CLASS, true);
+      this.classed("axis", true);
       this.clipPathEnabled = true;
-      this.isXAligned = this.orient() === "bottom" || this.orient() === "top";
       if (formatter == null) {
         formatter = d3.format(".3s");
       }
@@ -35,7 +33,7 @@ module Plottable {
 
     public anchor(element: D3.Selection) {
       super.anchor(element);
-      this.axisElement = this.content.append("g").classed("axis", true); // TODO: remove extraneous sub-element
+      this.axisElement = this.content.append("g").classed("axis", true);
       return this;
     }
 
@@ -67,10 +65,32 @@ module Plottable {
       }
 
       this.axisElement.call(this.d3Axis);
-      var bbox = (<any> this.axisElement.node()).getBBox();
-      if (bbox.height > this.availableHeight || bbox.width > this.availableWidth) {
-        this.axisElement.classed("error", true);
+
+      this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
+
+      return this;
+    }
+
+    public _hideCutOffTickLabels() {
+      var availableWidth = this.availableWidth;
+      var availableHeight = this.availableHeight;
+      var tickLabels = this.axisElement.selectAll(".tick").select("text");
+
+      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+      function boxIsInside(inner: ClientRect, outer: ClientRect) {
+        return (outer.left <= inner.left &&
+                inner.right <= outer.right &&
+                outer.top <= inner.top &&
+                inner.bottom <= outer.bottom);
       }
+
+      tickLabels.each(function (d: any){
+        if (!boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+          d3.select(this).style("visibility", "hidden");
+        }
+      });
+
       return this;
     }
 
@@ -87,6 +107,24 @@ module Plottable {
       } else {
         this.axisScale = newScale;
         this.d3Axis.scale(newScale._d3Scale);
+        return this;
+      }
+    }
+
+    /**
+     * Sets or gets the tick label position relative to the tick marks.
+     * The exact consequences of particular tick label positionings depends on the subclass implementation.
+     *
+     * @param {string} [position] The relative position of the tick label.
+     * @returns {string|Axis} The current tick label position, or the calling Axis.
+     */
+    public tickLabelPosition(): string;
+    public tickLabelPosition(position: string): Axis;
+    public tickLabelPosition(position?: string): any {
+      if (position == null) {
+        return this.tickPositioning;
+      } else {
+        this.tickPositioning = position;
         return this;
       }
     }
@@ -172,7 +210,6 @@ module Plottable {
       }
     }
 
-
     public tickFormat(): (value: any) => string;
     public tickFormat(formatter: (value: any) => string): Axis;
     public tickFormat(formatter?: (value: any) => string): any {
@@ -191,13 +228,70 @@ module Plottable {
      *
      * @constructor
      * @param {Scale} scale The Scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     * @param {string} orientation The orientation of the Axis (top/bottom)
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
+      var orientationLC = orientation.toLowerCase();
+      if (orientationLC !== "top" && orientationLC !== "bottom") {
+        throw new Error(orientation + " is not a valid orientation for XAxis");
+      }
       super(scale, orientation, formatter);
       super.rowMinimum(Axis.xHeight);
       this.fixedWidthVal = false;
+      this.tickLabelPosition("center");
+    }
+
+    public anchor(element: D3.Selection): XAxis {
+      super.anchor(element);
+      this.axisElement.classed("x-axis", true);
+      return this;
+    }
+
+    /**
+     * Sets or gets the tick label position relative to the tick marks.
+     *
+     * @param {string} [position] The relative position of the tick label (left/center/right).
+     * @returns {string|XAxis} The current tick label position, or the calling XAxis.
+     */
+    public tickLabelPosition(): string;
+    public tickLabelPosition(position: string): XAxis;
+    public tickLabelPosition(position?: string): any {
+      if (position == null) {
+        return super.tickLabelPosition();
+      } else {
+        var positionLC = position.toLowerCase();
+        if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
+          if (positionLC !== "center") {
+            this.tickSize(12); // longer than default tick size
+          }
+          return super.tickLabelPosition(positionLC);
+        } else {
+          throw new Error(position + " is not a valid tick label position for XAxis");
+        }
+      }
+    }
+
+    public render() {
+      super.render();
+      if (this.tickLabelPosition() !== "center") {
+        var tickTextLabels = this.axisElement.selectAll("text");
+        tickTextLabels.attr("y", "0px");
+
+        if (this.orient() === "bottom") {
+          tickTextLabels.attr("dy", "1em");
+        } else {
+          tickTextLabels.attr("dy", "-0.25em");
+        }
+
+        if (this.tickLabelPosition() === "right") {
+          tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
+        } else if (this.tickLabelPosition() === "left") {
+          tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
+        }
+      }
+      this._hideCutOffTickLabels();
+      return this;
     }
   }
 
@@ -207,13 +301,70 @@ module Plottable {
      *
      * @constructor
      * @param {Scale} scale The Scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     * @param {string} orientation The orientation of the Axis (left/right)
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
+      var orientationLC = orientation.toLowerCase();
+      if (orientationLC !== "left" && orientationLC !== "right") {
+        throw new Error(orientation + " is not a valid orientation for YAxis");
+      }
       super(scale, orientation, formatter);
       super.colMinimum(Axis.yWidth);
       this.fixedHeightVal = false;
+      this.tickLabelPosition("MIDDLE");
+    }
+
+    public anchor(element: D3.Selection): YAxis {
+      super.anchor(element);
+      this.axisElement.classed("y-axis", true);
+      return this;
+    }
+
+    /**
+     * Sets or gets the tick label position relative to the tick marks.
+     *
+     * @param {string} [position] The relative position of the tick label (top/middle/bottom).
+     * @returns {string|YAxis} The current tick label position, or the calling YAxis.
+     */
+    public tickLabelPosition(): string;
+    public tickLabelPosition(position: string): YAxis;
+    public tickLabelPosition(position?: string): any {
+      if (position == null) {
+        return super.tickLabelPosition();
+      } else {
+        var positionLC = position.toLowerCase();
+        if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
+          if (positionLC !== "middle") {
+            this.tickSize(30); // longer than default tick size
+          }
+          return super.tickLabelPosition(positionLC);
+        } else {
+          throw new Error(position + " is not a valid tick label position for YAxis");
+        }
+      }
+    }
+
+    public render() {
+      super.render();
+      if (this.tickLabelPosition() !== "middle") {
+        var tickTextLabels = this.axisElement.selectAll("text");
+        tickTextLabels.attr("x", "0px");
+
+        if (this.orient() === "left") {
+          tickTextLabels.attr("dx", "-0.25em");
+        } else {
+          tickTextLabels.attr("dx", "0.25em");
+        }
+
+        if (this.tickLabelPosition() === "top") {
+          tickTextLabels.attr("dy", "-0.3em");
+        } else if (this.tickLabelPosition() === "bottom") {
+          tickTextLabels.attr("dy", "1em");
+        }
+      }
+      this._hideCutOffTickLabels();
+      return this;
     }
   }
 }

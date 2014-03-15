@@ -12,7 +12,8 @@ function makeChartWithAreaInteraction() {
     var basicTable = new Plottable.Table([[yAxis, renderAreaD1],
                                           [null, xAxis]]);
 
-    var areaInteraction = new Plottable.AreaInteraction(renderAreaD1); // attach a new AreaInteraction to the render area
+    var areaInteraction = new Plottable.AreaInteraction(renderAreaD1);
+    areaInteraction.registerWithComponent(); // attach a the AreaInteraction to the render area
     var lastSelection = null; // initially, nothing is selected
     var selectPoints = function(pixelArea) {
         if (lastSelection != null) {

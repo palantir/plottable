@@ -16,4 +16,3 @@ Plottable.js is being developed by Palantir Technologies. It's developed in Type
 Setup Instructions:
 
     npm install
-    bower install
