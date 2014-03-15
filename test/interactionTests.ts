@@ -38,8 +38,11 @@ describe("Interactions", () => {
 
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
-      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
-      renderer.renderTo(svg);
+      var renderer = new Plottable.CircleRenderer()
+                          .xScale(xScale)
+                          .yScale(yScale);
+      renderer.dataset(dataset);
+      renderer.autorangeData().renderTo(svg);
 
       var xDomainBefore = xScale.domain();
       var yDomainBefore = yScale.domain();
@@ -97,8 +100,12 @@ describe("Interactions", () => {
       dataset = makeLinearSeries(10);
       xScale = new Plottable.LinearScale();
       yScale = new Plottable.LinearScale();
-      renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
-      renderer.renderTo(svg);
+      renderer = new Plottable.CircleRenderer()
+                              .xScale(xScale)
+                              .yScale(yScale);
+
+      renderer.dataset(dataset);
+      renderer.autorangeData().renderTo(svg);
       interaction = new Plottable.AreaInteraction(renderer);
       interaction.registerWithComponent();
     });
@@ -159,7 +166,10 @@ describe("Interactions", () => {
       var svgHeight = 400;
       var svg = generateSVG(svgWidth, svgHeight);
       var dataset = makeLinearSeries(11);
-      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
+      var renderer = new Plottable.CircleRenderer();
+      renderer.xScale(xScale).yScale(yScale);
+      renderer.dataset(dataset);
+      renderer.autorangeData();
       renderer.renderTo(svg);
 
       var xDomainBefore = xScale.domain();
@@ -207,7 +217,9 @@ describe("Interactions", () => {
       var dataset = {metadata: {cssClass: "foo"}, data: data};
       var xScale = new Plottable.LinearScale();
       var yScale = new Plottable.LinearScale();
-      var circleRenderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
+      var circleRenderer = new Plottable.CircleRenderer();
+      circleRenderer.dataset(dataset);
+      circleRenderer.xScale(xScale).yScale(yScale).autorangeData();
       var crosshairs = new Plottable.CrosshairsInteraction(circleRenderer);
       crosshairs.registerWithComponent();
       circleRenderer.renderTo(svg);

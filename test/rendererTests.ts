@@ -65,7 +65,10 @@ describe("Renderers", () => {
       var xAccessor = (d, i?, m?) => d.x + i * m.foo;
       var yAccessor = (d, i?, m?) => m.bar;
       var dataset = {data: data, metadata: metadata};
-      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor);
+      var renderer = new Plottable.CircleRenderer();
+      renderer.xScale(xScale).yScale(yScale).xAccessor(xAccessor).yAccessor(yAccessor);
+      renderer.dataset(dataset);
+      renderer.autorangeData();
       xScale.domain([0, 400]);
       yScale.domain([400, 0]);
       renderer.renderTo(svg);
@@ -112,7 +115,10 @@ describe("Renderers", () => {
         var xAccessor = (d) => d.foo;
         var yAccessor = (d) => d.bar;
         var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
-        lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
+        lineRenderer = new Plottable.LineRenderer();
+        lineRenderer.xScale(xScale).yScale(yScale).xAccessor(xAccessor).yAccessor(yAccessor);
+        lineRenderer.dataset(simpleDataset);
+        lineRenderer.autorangeData();
         lineRenderer.colorAccessor(colorAccessor);
         lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
@@ -197,8 +203,9 @@ describe("Renderers", () => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.LinearScale();
         yScale = new Plottable.LinearScale();
-        circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
-        circleRenderer.colorAccessor(colorAccessor);
+        circleRenderer = new Plottable.CircleRenderer();
+        circleRenderer.dataset(quadraticDataset);
+        circleRenderer.xScale(xScale).yScale(yScale).autorangeData().colorAccessor(colorAccessor);
         circleRenderer.renderTo(svg);
       });
 
@@ -322,7 +329,9 @@ describe("Renderers", () => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.LinearScale();
         yScale = new Plottable.LinearScale();
-        barRenderer = new Plottable.BarRenderer(dataset, xScale, yScale);
+        barRenderer = new Plottable.BarRenderer();
+        barRenderer.dataset(dataset);
+        barRenderer.xScale(xScale).yScale(yScale).autorangeData();
         barRenderer.anchor(svg).computeLayout();
       });
 

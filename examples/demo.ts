@@ -10,7 +10,9 @@ module Demo {
   var xAxis = new Plottable.XAxis(xScale, "bottom");
   var yAxis = new Plottable.YAxis(yScale, "right");
   var data = makeRandomData(30);
-  var renderAreaD1 = new Plottable.CircleRenderer(data, xScale, yScale);
+  var renderAreaD1 = new Plottable.CircleRenderer();
+  renderAreaD1.dataset(data);
+  renderAreaD1.xScale(xScale).yScale(yScale).autorangeData();
   var basicTable = new Plottable.Table([[renderAreaD1, yAxis], [xAxis, null]])
   basicTable.anchor(svg1);
   basicTable.computeLayout();
@@ -27,7 +29,9 @@ module Demo {
     var xAxis = new Plottable.XAxis(xScale, "bottom");
     var yAxis = new Plottable.YAxis(yScale, "right");
     var data = makeRandomData(30);
-    var renderArea = new Plottable.LineRenderer(data, xScale, yScale);
+    var renderArea = new Plottable.LineRenderer().xScale(xScale).yScale(yScale)
+                                                 .dataset(data)
+                                                 .autorangeData();
     var rootTable = new Plottable.Table([[renderArea, yAxis], [xAxis, null]])
 
     return rootTable;
@@ -52,7 +56,11 @@ module Demo {
     var rightAxesTable = new Plottable.Table([rightAxes]);
     var xAxis = new Plottable.XAxis(xScale, "bottom");
     var data = makeRandomData(30);
-    var renderArea = new Plottable.LineRenderer(data, xScale, yScale);
+    var renderArea = new Plottable.LineRenderer()
+                                                 .xScale(xScale)
+                                                 .yScale(yScale)
+                                                 .dataset(data)
+                                                 .autorangeData();
     var rootTable = new Plottable.Table([[renderArea, rightAxesTable], [xAxis, null]])
     return rootTable;
 
@@ -74,7 +82,11 @@ module Demo {
     var rightAxes = [new Plottable.YAxis(yScale1, "right"), new Plottable.YAxis(yScale1, "right")];
     var rightAxesTable = new Plottable.Table([rightAxes]);
     var data1 = makeRandomData(30, .0005);
-    var renderer1 = new Plottable.LineRenderer(data1, xScale1, yScale1);
+    var renderer1 = new Plottable.LineRenderer()
+                            .dataset(data1)
+                            .xScale(xScale1)
+                            .yScale(yScale1)
+                            .autorangeData();
     var row1: Plottable.Component[] = [leftAxesTable, renderer1, rightAxesTable];
     var yScale2 = new Plottable.LinearScale();
     var leftAxis = new Plottable.YAxis(yScale2, "left").xAlign("RIGHT");
