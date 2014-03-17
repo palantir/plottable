@@ -16,12 +16,6 @@ module Plottable {
       this.components = components;
     }
 
-    /**
-     * Adds a Component to the ComponentGroup.
-     *
-     * @param {Component} c The Component to add.
-     * @returns {ComponentGroup} The calling ComponentGroup.
-     */
     public _addComponentToGroup(c: Component, prepend = false): ComponentGroup {
       if (prepend) {
         this.components.unshift(c);
