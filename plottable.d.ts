@@ -185,6 +185,18 @@ declare module Plottable {
         * @return {boolean} Whether the component has a fixed height.
         */
         public isFixedHeight(): boolean;
+        /**
+        * Merges this Component with another Component, returning a ComponentGroup.
+        * There are four cases:
+        * Component + Component: Returns a ComponentGroup with both components inside it.
+        * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+        * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+        * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
+        *
+        * @param {Component} c The component to merge in.
+        * @return {ComponentGroup}
+        */
+        public merge(c: Component): ComponentGroup;
     }
 }
 declare module Plottable {
@@ -736,18 +748,26 @@ declare module Plottable {
         * @param {Component[]} [components] The Components in the ComponentGroup.
         */
         constructor(components?: Component[]);
-        /**
-        * Adds a Component to the ComponentGroup.
-        *
-        * @param {Component} c The Component to add.
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        public addComponent(c: Component): ComponentGroup;
+        public merge(c: Component): ComponentGroup;
         public anchor(element: D3.Selection): ComponentGroup;
         public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
         public render(): ComponentGroup;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+    }
+}
+declare module Plottable {
+    class Gridlines extends Component {
+        /**
+        * Creates a set of Gridlines.
+        * @constructor
+        *
+        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+        */
+        constructor(xScale: QuantitiveScale, yScale: QuantitiveScale);
+        public anchor(element: D3.Selection): Gridlines;
+        public render(): Gridlines;
     }
 }
 declare module Plottable {

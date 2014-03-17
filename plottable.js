@@ -416,6 +416,29 @@ var Plottable;
         Component.prototype.isFixedHeight = function () {
             return this.fixedHeightVal;
         };
+
+        /**
+        * Merges this Component with another Component, returning a ComponentGroup.
+        * There are four cases:
+        * Component + Component: Returns a ComponentGroup with both components inside it.
+        * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+        * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+        * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
+        *
+        * @param {Component} c The component to merge in.
+        * @return {ComponentGroup}
+        */
+        Component.prototype.merge = function (c) {
+            var cg;
+            if (Plottable.ComponentGroup.prototype.isPrototypeOf(c)) {
+                cg = c;
+                cg._addComponentToGroup(this, true);
+                return cg;
+            } else {
+                cg = new Plottable.ComponentGroup([this, c]);
+                return cg;
+            }
+        };
         Component.clipPathId = 0;
         return Component;
     })();
@@ -502,6 +525,7 @@ var Plottable;
         */
         function QuantitiveScale(scale) {
             _super.call(this, scale);
+            this.lastRequestedTickCount = 10;
         }
         /**
         * Retrieves the domain value corresponding to a supplied range value.
@@ -575,7 +599,10 @@ var Plottable;
         * @returns {any[]} The generated ticks.
         */
         QuantitiveScale.prototype.ticks = function (count) {
-            return this._d3Scale.ticks(count);
+            if (count != null) {
+                this.lastRequestedTickCount = count;
+            }
+            return this._d3Scale.ticks(this.lastRequestedTickCount);
         };
 
         /**
@@ -2200,18 +2227,27 @@ var Plottable;
             this.classed("component-group", true);
             this.components = components;
         }
-        /**
-        * Adds a Component to the ComponentGroup.
-        *
-        * @param {Component} c The Component to add.
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        ComponentGroup.prototype.addComponent = function (c) {
-            this.components.push(c);
+        ComponentGroup.prototype._addComponentToGroup = function (c, prepend) {
+            if (typeof prepend === "undefined") { prepend = false; }
+            if (prepend) {
+                this.components.unshift(c);
+            } else {
+                this.components.push(c);
+            }
             if (this.element != null) {
                 c.anchor(this.content.append("g"));
             }
             return this;
+        };
+
+        ComponentGroup.prototype.merge = function (c) {
+            if (ComponentGroup.prototype.isPrototypeOf(c)) {
+                var cg = new ComponentGroup([this, c]);
+                return cg;
+            } else {
+                this._addComponentToGroup(c);
+                return this;
+            }
         };
 
         ComponentGroup.prototype.anchor = function (element) {
@@ -2254,6 +2290,80 @@ var Plottable;
         return ComponentGroup;
     })(Plottable.Component);
     Plottable.ComponentGroup = ComponentGroup;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Gridlines = (function (_super) {
+        __extends(Gridlines, _super);
+        /**
+        * Creates a set of Gridlines.
+        * @constructor
+        *
+        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+        */
+        function Gridlines(xScale, yScale) {
+            var _this = this;
+            _super.call(this);
+            this.classed("gridlines", true);
+            this.xScale = xScale;
+            this.yScale = yScale;
+            if (this.xScale != null) {
+                this.xScale.registerListener(function () {
+                    return _this.redrawXLines();
+                });
+            }
+            if (this.yScale != null) {
+                this.yScale.registerListener(function () {
+                    return _this.redrawYLines();
+                });
+            }
+        }
+        Gridlines.prototype.anchor = function (element) {
+            _super.prototype.anchor.call(this, element);
+            this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
+            this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
+            return this;
+        };
+
+        Gridlines.prototype.render = function () {
+            _super.prototype.render.call(this);
+            this.redrawXLines();
+            this.redrawYLines();
+            return this;
+        };
+
+        Gridlines.prototype.redrawXLines = function () {
+            var _this = this;
+            if (this.xScale != null) {
+                var xTicks = this.xScale.ticks();
+                var getScaledXValue = function (tickVal) {
+                    return _this.xScale.scale(tickVal);
+                };
+                var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
+                xLines.enter().append("line");
+                xLines.attr("x1", getScaledXValue).attr("y1", 0).attr("x2", getScaledXValue).attr("y2", this.availableHeight);
+                xLines.exit().remove();
+            }
+        };
+
+        Gridlines.prototype.redrawYLines = function () {
+            var _this = this;
+            if (this.yScale != null) {
+                var yTicks = this.yScale.ticks();
+                var getScaledYValue = function (tickVal) {
+                    return _this.yScale.scale(tickVal);
+                };
+                var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
+                yLines.enter().append("line");
+                yLines.attr("x1", 0).attr("y1", getScaledYValue).attr("x2", this.availableWidth).attr("y2", getScaledYValue);
+                yLines.exit().remove();
+            }
+        };
+        return Gridlines;
+    })(Plottable.Component);
+    Plottable.Gridlines = Gridlines;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
