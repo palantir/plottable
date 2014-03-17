@@ -335,5 +335,28 @@ module Plottable {
     public isFixedHeight(): boolean {
       return this.fixedHeightVal;
     }
+
+    /**
+     * Merges this Component with another Component, returning a ComponentGroup.
+     * There are four cases:
+     * Component + Component: Returns a ComponentGroup with both components inside it.
+     * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+     * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+     * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
+     *
+     * @param {Component} c The component to merge in.
+     * @return {ComponentGroup}
+     */
+    public merge(c: Component): ComponentGroup {
+      var cg: ComponentGroup;
+      if (ComponentGroup.prototype.isPrototypeOf(c)) {
+        cg = (<ComponentGroup> c);
+        cg._addComponentToGroup(this, true);
+        return cg;
+      } else {
+        cg = new ComponentGroup([this, c]);
+        return cg;
+      }
+    }
   }
 }

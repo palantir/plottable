@@ -16,18 +16,26 @@ module Plottable {
       this.components = components;
     }
 
-    /**
-     * Adds a Component to the ComponentGroup.
-     *
-     * @param {Component} c The Component to add.
-     * @returns {ComponentGroup} The calling ComponentGroup.
-     */
-    public addComponent(c: Component): ComponentGroup {
-      this.components.push(c);
+    public _addComponentToGroup(c: Component, prepend = false): ComponentGroup {
+      if (prepend) {
+        this.components.unshift(c);
+      } else {
+        this.components.push(c);
+      }
       if (this.element != null) {
         c.anchor(this.content.append("g"));
       }
       return this;
+    }
+
+    public merge(c: Component): ComponentGroup {
+      if (ComponentGroup.prototype.isPrototypeOf(c)) {
+        var cg = new ComponentGroup([this, c]);
+        return cg;
+      } else {
+        this._addComponentToGroup(c);
+        return this;
+      }
     }
 
     public anchor(element: D3.Selection): ComponentGroup {
