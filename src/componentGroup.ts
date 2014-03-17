@@ -23,10 +23,10 @@ module Plottable {
      * @returns {ComponentGroup} The calling ComponentGroup.
      */
     public _addComponentToGroup(c: Component, prepend = false): ComponentGroup {
-      if (!prepend) {
-        this.components.push(c);
-      } else {
+      if (prepend) {
         this.components.unshift(c);
+      } else {
+        this.components.push(c);
       }
       if (this.element != null) {
         c.anchor(this.content.append("g"));
