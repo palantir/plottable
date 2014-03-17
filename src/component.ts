@@ -335,5 +335,17 @@ module Plottable {
     public isFixedHeight(): boolean {
       return this.fixedHeightVal;
     }
+
+    public merge(c: Component): ComponentGroup {
+      var cg: ComponentGroup;
+      if (ComponentGroup.prototype.isPrototypeOf(c)) {
+        cg = (<ComponentGroup> c);
+        cg._addComponentToGroup(this, true);
+        return cg;
+      } else {
+        cg = new ComponentGroup([this, c]);
+        return cg;
+      }
+    }
   }
 }

@@ -31,7 +31,7 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.ComponentGroup([c1]);
     var svg = generateSVG(400, 400);
-    cg.addComponent(c2).anchor(svg);
+    cg._addComponentToGroup(c2).anchor(svg);
     (<any> c1).addBox("test-box1");
     (<any> c2).addBox("test-box2");
     cg.computeLayout().render();
@@ -39,7 +39,7 @@ describe("ComponentGroups", () => {
     var t2 = svg.select(".test-box2");
     assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
     assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
-    cg.addComponent(c3);
+    cg._addComponentToGroup(c3);
     (<any> c3).addBox("test-box3");
     cg.computeLayout().render();
     var t3 = svg.select(".test-box3");
@@ -56,7 +56,7 @@ describe("ComponentGroups", () => {
     c2.fixedHeightVal = false;
     c2.fixedWidthVal  = false;
 
-    cg.addComponent(c1).addComponent(c2);
+    cg._addComponentToGroup(c1)._addComponentToGroup(c2);
     assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
     assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
 
@@ -79,7 +79,7 @@ describe("ComponentGroups", () => {
     var c2 = new Plottable.Component();
     c2.fixedHeightVal = false;
     c2.fixedWidthVal  = false;
-    cg.addComponent(c1).addComponent(c2);
+    cg._addComponentToGroup(c1)._addComponentToGroup(c2);
 
     var svg = generateSVG();
     cg.anchor(svg);
@@ -104,7 +104,7 @@ describe("ComponentGroups", () => {
       var c4 = new Plottable.Component();
 
     it("Component.merge works as expected C->C", () => {
-        var cg: Plottable.ComponentGroup = c.merge(c2);
+        var cg: Plottable.ComponentGroup = c1.merge(c2);
         var innerComponents: Plottable.Component[] = (<any> cg).components;
         assert.lengthOf(innerComponents, 2, "There are two components");
         assert.equal(innerComponents[0], c1, "first component correct");
@@ -112,7 +112,7 @@ describe("ComponentGroups", () => {
       });
 
       it("Component.merge works as expected C->CG", () => {
-        var cg = new ComponentGroup([c2,c3,c4]);
+        var cg = new Plottable.ComponentGroup([c2,c3,c4]);
         var cg2 = c1.merge(cg);
         assert.equal(cg, cg2, "c.merge(cg) returns cg");
         var components: Plottable.Component[] = (<any> cg).components;
@@ -122,8 +122,8 @@ describe("ComponentGroups", () => {
       });
 
       it("Component.merge works as expected CG->C", () => {
-        var cg = new ComponentGroup([c1,c2,c3]);
-        var cg2 = cg.merge(c1);
+        var cg = new Plottable.ComponentGroup([c1,c2,c3]);
+        var cg2 = cg.merge(c4);
         assert.equal(cg, cg2, "cg.merge(c) returns cg");
         var components: Plottable.Component[] = (<any> cg).components;
         assert.lengthOf(components, 4, "there are four components");
@@ -132,15 +132,15 @@ describe("ComponentGroups", () => {
         });
 
       it("Component.merge works as expected CG->CG", () => {
-        var cg1 = new ComponentGroup([c1,c2]);
-        var cg2 = new ComponentGroup([c3,c4]);
+        var cg1 = new Plottable.ComponentGroup([c1,c2]);
+        var cg2 = new Plottable.ComponentGroup([c3,c4]);
         var cg = cg1.merge(cg2);
         assert.notEqual(cg, cg1, "merged != cg1");
         assert.notEqual(cg, cg2, "merged != cg2");
         var components: Plottable.Component[] = (<any> cg).components;
         assert.lengthOf(components, 2, "there are two inner components");
         assert.equal(components[0], cg1, "cg1 nested inside");
-        assert.equal(components[0], cg2, "cg2 nested inside");
+        assert.equal(components[1], cg2, "cg2 nested inside");
       });
     });
 });
