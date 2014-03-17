@@ -78,6 +78,7 @@ module Plottable {
 
   export class QuantitiveScale extends Scale {
     public _d3Scale: D3.Scale.QuantitiveScale;
+    private lastRequestedTickCount = 10;
 
     /**
      * Creates a new QuantitiveScale.
@@ -176,7 +177,10 @@ module Plottable {
      * @returns {any[]} The generated ticks.
      */
     public ticks(count?: number) {
-      return this._d3Scale.ticks(count);
+      if (count != null) {
+        this.lastRequestedTickCount = count;
+      }
+      return this._d3Scale.ticks(this.lastRequestedTickCount);
     }
 
     /**

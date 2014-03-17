@@ -65,6 +65,9 @@
   stroke: black;
 }
 
+.plottable .gridlines line {
+  stroke: #999;
+}
 
 /*
 .error {
