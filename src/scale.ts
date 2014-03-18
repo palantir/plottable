@@ -264,6 +264,7 @@ module Plottable {
         case null:
         case undefined:
           scale = d3.scale.ordinal();
+          break;
         default:
           throw new Error("Unsupported ColorScale type");
       }
