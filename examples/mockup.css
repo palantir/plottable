@@ -26,5 +26,11 @@
 }
 
 .plottable .gridlines line {
-  stroke-dasharray: 2,2; stroke-width: 2
+  stroke-dasharray: 2, 2
+}
+
+.plottable .legend {
+  font-family: sans-serif;
+  fill: #979797;
+  font-size: 10pt;
 }
