@@ -24,3 +24,7 @@
 .plottable .y-axis path {
   stroke: none;
 }
+
+.plottable .gridlines line {
+  stroke-dasharray: 2,2; stroke-width: 2
+}
