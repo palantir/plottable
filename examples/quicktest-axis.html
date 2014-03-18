@@ -59,8 +59,7 @@
         var basicTable = new Plottable.Table([[null, xAxisTable2, null],
                                               [yAxisTable, renderAreaD1, yAxisTable2],
                                               [null, xAxisTable, null]]);
-        basicTable.anchor(svg);
-        basicTable.computeLayout().render();
+        basicTable.renderTo(svg);
         var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
         pzi.registerWithComponent();
       }
