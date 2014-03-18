@@ -11,6 +11,7 @@
 /// <reference path="circleRenderer.ts" />
 /// <reference path="lineRenderer.ts" />
 /// <reference path="barRenderer.ts" />
+/// <reference path="squareRenderer.ts" />
 /// <reference path="table.ts" />
 /// <reference path="coordinator.ts" />
 /// <reference path="legend.ts" />
