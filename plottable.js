@@ -1,5 +1,5 @@
 /*!
-Plottable v0.4.0 (https://github.com/palantir/plottable)
+Plottable v0.5.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -116,15 +116,15 @@ var Plottable;
             this.interactionsToRegister = [];
             this.boxes = [];
             this.clipPathEnabled = false;
-            this.fixedWidthVal = true;
-            this.fixedHeightVal = true;
-            this.rowMinimumVal = 0;
-            this.colMinimumVal = 0;
+            this._fixedWidth = true;
+            this._fixedHeight = true;
+            this._rowMinimum = 0;
+            this._colMinimum = 0;
             this.isTopLevelComponent = false;
-            this.xOffsetVal = 0;
-            this.yOffsetVal = 0;
-            this.xAlignProportion = 0;
-            this.yAlignProportion = 0;
+            this._xOffset = 0;
+            this._yOffset = 0;
+            this._xAlignProportion = 0;
+            this._yAlignProportion = 0;
             this.cssClasses = ["component"];
         }
         /**
@@ -205,16 +205,16 @@ var Plottable;
 
             if (this.colMinimum() !== 0 && this.isFixedWidth()) {
                 // The component has free space, so it makes sense to think about how to position or offset it
-                xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
-                xPosition += this.xOffsetVal;
+                xPosition += (availableWidth - this.colMinimum()) * this._xAlignProportion;
+                xPosition += this._xOffset;
 
                 // Decrease size so hitbox / bounding box and children are sized correctly
                 availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
             }
 
             if (this.rowMinimum() !== 0 && this.isFixedHeight()) {
-                yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-                yPosition += this.yOffsetVal;
+                yPosition += (availableHeight - this.rowMinimum()) * this._yAlignProportion;
+                yPosition += this._yOffset;
                 availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
             }
 
@@ -253,11 +253,11 @@ var Plottable;
         */
         Component.prototype.xAlign = function (alignment) {
             if (alignment === "LEFT") {
-                this.xAlignProportion = 0;
+                this._xAlignProportion = 0;
             } else if (alignment === "CENTER") {
-                this.xAlignProportion = 0.5;
+                this._xAlignProportion = 0.5;
             } else if (alignment === "RIGHT") {
-                this.xAlignProportion = 1;
+                this._xAlignProportion = 1;
             } else {
                 throw new Error("Unsupported alignment");
             }
@@ -272,11 +272,11 @@ var Plottable;
         */
         Component.prototype.yAlign = function (alignment) {
             if (alignment === "TOP") {
-                this.yAlignProportion = 0;
+                this._yAlignProportion = 0;
             } else if (alignment === "CENTER") {
-                this.yAlignProportion = 0.5;
+                this._yAlignProportion = 0.5;
             } else if (alignment === "BOTTOM") {
-                this.yAlignProportion = 1;
+                this._yAlignProportion = 1;
             } else {
                 throw new Error("Unsupported alignment");
             }
@@ -290,7 +290,7 @@ var Plottable;
         * @returns {Component} The calling Component.
         */
         Component.prototype.xOffset = function (offset) {
-            this.xOffsetVal = offset;
+            this._xOffset = offset;
             return this;
         };
 
@@ -301,7 +301,7 @@ var Plottable;
         * @returns {Component} The calling Component.
         */
         Component.prototype.yOffset = function (offset) {
-            this.yOffsetVal = offset;
+            this._yOffset = offset;
             return this;
         };
 
@@ -381,19 +381,19 @@ var Plottable;
 
         Component.prototype.rowMinimum = function (newVal) {
             if (newVal != null) {
-                this.rowMinimumVal = newVal;
+                this._rowMinimum = newVal;
                 return this;
             } else {
-                return this.rowMinimumVal;
+                return this._rowMinimum;
             }
         };
 
         Component.prototype.colMinimum = function (newVal) {
             if (newVal != null) {
-                this.colMinimumVal = newVal;
+                this._colMinimum = newVal;
                 return this;
             } else {
-                return this.colMinimumVal;
+                return this._colMinimum;
             }
         };
 
@@ -404,7 +404,7 @@ var Plottable;
         * @return {boolean} Whether the component has a fixed width.
         */
         Component.prototype.isFixedWidth = function () {
-            return this.fixedWidthVal;
+            return this._fixedWidth;
         };
 
         /**
@@ -414,7 +414,7 @@ var Plottable;
         * @return {boolean} Whether the component has a fixed height.
         */
         Component.prototype.isFixedHeight = function () {
-            return this.fixedHeightVal;
+            return this._fixedHeight;
         };
 
         /**
@@ -999,9 +999,9 @@ var Plottable;
             if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
                 this.orientation = orientation;
                 if (orientation === "horizontal") {
-                    this.fixedWidthVal = false;
+                    this._fixedWidth = false;
                 } else {
-                    this.fixedHeightVal = false;
+                    this._fixedHeight = false;
                 }
             } else {
                 throw new Error(orientation + " is not a valid orientation for LabelComponent");
@@ -1059,10 +1059,10 @@ var Plottable;
 
             if (this.orientation === "horizontal") {
                 this.truncateTextAndRemeasure(this.availableWidth);
-                xShift = (this.availableWidth - this.textLength) * this.xAlignProportion;
+                xShift = (this.availableWidth - this.textLength) * this._xAlignProportion;
             } else {
                 this.truncateTextAndRemeasure(this.availableHeight);
-                xShift = (this.availableHeight - this.textLength) * this.yAlignProportion;
+                xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
 
                 if (this.orientation === "vertical-right") {
                     this.textElement.attr("transform", "rotate(90)");
@@ -1125,8 +1125,8 @@ var Plottable;
             // to recompute attributes on the entire update selection.
             this._requireRerender = false;
             this.clipPathEnabled = true;
-            this.fixedWidthVal = false;
-            this.fixedHeightVal = false;
+            this._fixedWidth = false;
+            this._fixedHeight = false;
             this.classed("renderer", true);
             if (dataset != null) {
                 this.dataset(dataset);
@@ -2092,7 +2092,7 @@ var Plottable;
             }
             _super.call(this, scale, orientation, formatter);
             _super.prototype.rowMinimum.call(this, Axis.xHeight);
-            this.fixedWidthVal = false;
+            this._fixedWidth = false;
             this.tickLabelPosition("center");
         }
         XAxis.prototype._anchor = function (element) {
@@ -2160,7 +2160,7 @@ var Plottable;
             }
             _super.call(this, scale, orientation, formatter);
             _super.prototype.colMinimum.call(this, Axis.yWidth);
-            this.fixedHeightVal = false;
+            this._fixedHeight = false;
             this.tickLabelPosition("MIDDLE");
         }
         YAxis.prototype._anchor = function (element) {
