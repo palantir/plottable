@@ -278,7 +278,7 @@ module Plottable {
     }
 
     public mousemove(x: number, y: number) {
-      var domainX = this.renderer.xScale.invert(x);
+      var domainX = this.renderer.xScale().invert(x);
       var data = this.renderer._data;
       var dataIndex = OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
       dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
@@ -286,8 +286,8 @@ module Plottable {
 
       var dataX = this.renderer.xAccessor(dataPoint);
       var dataY = this.renderer.yAccessor(dataPoint);
-      var pixelX = this.renderer.xScale.scale(dataX);
-      var pixelY = this.renderer.yScale.scale(dataY);
+      var pixelX = this.renderer.xScale().scale(dataX);
+      var pixelY = this.renderer.yScale().scale(dataY);
       this.circle.attr("cx", pixelX).attr("cy", pixelY);
 
       var width = this.renderer.availableWidth;
