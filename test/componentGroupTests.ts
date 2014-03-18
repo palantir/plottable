@@ -50,23 +50,23 @@ describe("ComponentGroups", () => {
   it("component fixity is computed appropriately", () => {
     var cg = new Plottable.ComponentGroup();
     var c1 = new Plottable.Component();
-    c1.fixedHeightVal = false;
-    c1.fixedWidthVal  = false;
+    c1._fixedHeight = false;
+    c1._fixedWidth  = false;
     var c2 = new Plottable.Component();
-    c2.fixedHeightVal = false;
-    c2.fixedWidthVal  = false;
+    c2._fixedHeight = false;
+    c2._fixedWidth  = false;
 
     cg.merge(c1).merge(c2);
     assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
     assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
 
-    c1.fixedHeightVal = true;
-    c1.fixedWidthVal = true;
+    c1._fixedHeight = true;
+    c1._fixedWidth = true;
 
     assert.isFalse(cg.isFixedHeight(), "height not fixed when one component unfixed");
     assert.isFalse(cg.isFixedWidth(), "width not fixed when one component unfixed");
 
-    c2.fixedHeightVal = true;
+    c2._fixedHeight = true;
     assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
     assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
   });
@@ -74,11 +74,11 @@ describe("ComponentGroups", () => {
   it("componentGroup subcomponents have xOffset, yOffset of 0", () => {
     var cg = new Plottable.ComponentGroup();
     var c1 = new Plottable.Component();
-    c1.fixedHeightVal = false;
-    c1.fixedWidthVal  = false;
+    c1._fixedHeight = false;
+    c1._fixedWidth  = false;
     var c2 = new Plottable.Component();
-    c2.fixedHeightVal = false;
-    c2.fixedWidthVal  = false;
+    c2._fixedHeight = false;
+    c2._fixedWidth  = false;
     cg.merge(c1).merge(c2);
 
     var svg = generateSVG();
