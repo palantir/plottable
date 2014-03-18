@@ -21,7 +21,7 @@ module Plottable {
       this.componentToListenTo = componentToListenTo;
     }
 
-    public anchor(hitBox: D3.Selection) {
+    public _anchor(hitBox: D3.Selection) {
       this.hitBox = hitBox;
     }
 
@@ -63,8 +63,8 @@ module Plottable {
       this.zoom.on("zoom", () => this.rerenderZoomed());
     }
 
-    public anchor(hitBox: D3.Selection) {
-      super.anchor(hitBox);
+    public _anchor(hitBox: D3.Selection) {
+      super._anchor(hitBox);
       this.zoom(hitBox);
     }
 
@@ -165,8 +165,8 @@ module Plottable {
       return this;
     }
 
-    public anchor(hitBox: D3.Selection): AreaInteraction {
-      super.anchor(hitBox);
+    public _anchor(hitBox: D3.Selection): AreaInteraction {
+      super._anchor(hitBox);
       var cname = AreaInteraction.CLASS_DRAG_BOX;
       var background = this.componentToListenTo.backgroundContainer;
       this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
@@ -241,8 +241,8 @@ module Plottable {
       super(componentToListenTo);
     }
 
-    public anchor(hitBox: D3.Selection) {
-      super.anchor(hitBox);
+    public _anchor(hitBox: D3.Selection) {
+      super._anchor(hitBox);
       hitBox.on("mousemove", () => {
         var xy = d3.mouse(hitBox.node());
         var x = xy[0];
@@ -268,8 +268,8 @@ module Plottable {
       this.renderer = renderer;
     }
 
-    public anchor(hitBox: D3.Selection) {
-      super.anchor(hitBox);
+    public _anchor(hitBox: D3.Selection) {
+      super._anchor(hitBox);
       var container = this.renderer.foregroundContainer.append("g").classed("crosshairs", true);
       this.circle = container.append("circle").classed("centerpoint", true);
       this.xLine = container.append("path").classed("x-line", true);

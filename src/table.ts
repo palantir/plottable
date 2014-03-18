@@ -60,19 +60,19 @@ module Plottable {
       return this;
     }
 
-    public anchor(element: D3.Selection) {
-      super.anchor(element);
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
       // recursively anchor children
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
-          component.anchor(this.content.append("g"));
+          component._anchor(this.content.append("g"));
         });
       });
       return this;
     }
 
-    public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
 
       // calculate the amount of free space by recursive col-/row- Minimum() calls
       var freeWidth = this.availableWidth - this.colMinimum();
@@ -97,7 +97,7 @@ module Plottable {
         var childXOffset = 0;
         row.forEach((component: Component, colIndex: number) => {
           // recursively compute layout
-          component.computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+          component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
           childXOffset += colWidths[colIndex] + this.colPadding;
         });
         childYOffset += rowHeights[rowIndex] + this.rowPadding;
@@ -105,11 +105,11 @@ module Plottable {
       return this;
     }
 
-    public render() {
+    public _render() {
       // recursively render children
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
-          component.render();
+          component._render();
         });
       });
       return this;

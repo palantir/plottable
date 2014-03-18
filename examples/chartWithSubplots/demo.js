@@ -18,7 +18,7 @@ function makeChartWithSubplots() {
     var basicTable = new Plottable.Table([[yAxis1, renderAreaD1, null],
                                           [null,   renderAreaD2, yAxis2],
                                           [null,   xAxis,        null]]);
-    basicTable.anchor(svg).computeLayout().render();
+    basicTable.renderTo(svg);
 };
 
 window.onload = makeChartWithSubplots;

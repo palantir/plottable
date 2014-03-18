@@ -16,7 +16,7 @@ describe("Renderers", () => {
       var svg = generateSVG(400, 300);
       var d1 = {data: ["foo"], metadata: {cssClass: "bar"}};
       var r = new Plottable.Renderer(d1);
-      r.anchor(svg).computeLayout();
+      r._anchor(svg)._computeLayout();
       var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       assert.isTrue(r.element.classed("bar"), "the element is classed w/ metadata.cssClass");
@@ -130,7 +130,7 @@ describe("Renderers", () => {
       });
 
       it("rendering is idempotent", () => {
-        lineRenderer.render();
+        lineRenderer._render();
         var path = renderArea.select("path");
         assert.equal(path.attr("d"), "M0,500L500,0");
         verifier.end();
@@ -213,7 +213,7 @@ describe("Renderers", () => {
       });
 
       it("rendering is idempotent", () => {
-        circleRenderer.render().render();
+        circleRenderer._render()._render();
         circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         verifier.end();
@@ -323,7 +323,7 @@ describe("Renderers", () => {
         xScale = new Plottable.LinearScale();
         yScale = new Plottable.LinearScale();
         barRenderer = new Plottable.BarRenderer(dataset, xScale, yScale);
-        barRenderer.anchor(svg).computeLayout();
+        barRenderer._anchor(svg)._computeLayout();
       });
 
       beforeEach(() => {
@@ -332,7 +332,7 @@ describe("Renderers", () => {
 
       it("bars were rendered correctly with padding disabled", () => {
         barRenderer.barPaddingPx = 0;
-        barRenderer.render();
+        barRenderer._render();
         var renderArea = barRenderer.renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
@@ -348,7 +348,7 @@ describe("Renderers", () => {
 
       it("bars were rendered correctly with padding enabled", () => {
         barRenderer.barPaddingPx = 1;
-        barRenderer.render();
+        barRenderer._render();
         var renderArea = barRenderer.renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);

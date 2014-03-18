@@ -26,7 +26,7 @@ function makeChartWithAreaInteraction() {
     };
     areaInteraction.callback(selectPoints); // add selectPoints as a callback when a selection is made
 
-    basicTable.anchor(svg).computeLayout().render();
+    basicTable.renderTo(svg);
 };
 
 window.onload = makeChartWithAreaInteraction;

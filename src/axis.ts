@@ -31,13 +31,13 @@ module Plottable {
       this.axisScale.registerListener(() => this.rescale());
     }
 
-    public anchor(element: D3.Selection) {
-      super.anchor(element);
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
       this.axisElement = this.content.append("g").classed("axis", true);
       return this;
     }
 
-    public render() {
+    public _render() {
       if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
       if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
       var domain = this.d3Axis.scale().domain();
@@ -95,7 +95,7 @@ module Plottable {
     }
 
     private rescale() {
-      return (this.element != null) ? this.render() : null;
+      return (this.element != null) ? this._render() : null;
       // short circuit, we don't care about perf.
     }
 
@@ -242,8 +242,8 @@ module Plottable {
       this.tickLabelPosition("center");
     }
 
-    public anchor(element: D3.Selection): XAxis {
-      super.anchor(element);
+    public _anchor(element: D3.Selection): XAxis {
+      super._anchor(element);
       this.axisElement.classed("x-axis", true);
       return this;
     }
@@ -272,8 +272,8 @@ module Plottable {
       }
     }
 
-    public render() {
-      super.render();
+    public _render() {
+      super._render();
       if (this.tickLabelPosition() !== "center") {
         var tickTextLabels = this.axisElement.selectAll("text");
         tickTextLabels.attr("y", "0px");
@@ -315,8 +315,8 @@ module Plottable {
       this.tickLabelPosition("MIDDLE");
     }
 
-    public anchor(element: D3.Selection): YAxis {
-      super.anchor(element);
+    public _anchor(element: D3.Selection): YAxis {
+      super._anchor(element);
       this.axisElement.classed("y-axis", true);
       return this;
     }
@@ -345,8 +345,8 @@ module Plottable {
       }
     }
 
-    public render() {
-      super.render();
+    public _render() {
+      super._render();
       if (this.tickLabelPosition() !== "middle") {
         var tickTextLabels = this.axisElement.selectAll("text");
         tickTextLabels.attr("x", "0px");

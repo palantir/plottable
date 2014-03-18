@@ -31,6 +31,6 @@ module TSCDemo {
                                           .addComponent(2, 1, xAxis)
                                           .addComponent(0, 1, xAxis2);
 
-    basicTable.anchor(svg).computeLayout().render();
+    basicTable._anchor(svg)._computeLayout()._render();
 
 }

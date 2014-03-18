@@ -23,7 +23,7 @@ module Plottable {
         this.components.push(c);
       }
       if (this.element != null) {
-        c.anchor(this.content.append("g"));
+        c._anchor(this.content.append("g"));
       }
       return this;
     }
@@ -38,26 +38,26 @@ module Plottable {
       }
     }
 
-    public anchor(element: D3.Selection): ComponentGroup {
-      super.anchor(element);
-      this.components.forEach((c) => c.anchor(this.content.append("g")));
+    public _anchor(element: D3.Selection): ComponentGroup {
+      super._anchor(element);
+      this.components.forEach((c) => c._anchor(this.content.append("g")));
       return this;
     }
 
-    public computeLayout(xOrigin?: number,
+    public _computeLayout(xOrigin?: number,
                          yOrigin?: number,
                   availableWidth?: number,
                  availableHeight?: number): ComponentGroup {
-      super.computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
+      super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       this.components.forEach((c) => {
-        c.computeLayout(0, 0, this.availableWidth, this.availableHeight);
+        c._computeLayout(0, 0, this.availableWidth, this.availableHeight);
       });
       return this;
     }
 
-    public render() {
-      super.render();
-      this.components.forEach((c) => c.render());
+    public _render() {
+      super._render();
+      this.components.forEach((c) => c._render());
       return this;
     }
 

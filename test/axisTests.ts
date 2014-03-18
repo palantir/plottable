@@ -32,7 +32,7 @@ describe("Axes", () => {
     }
 
     xAxis.tickLabelPosition("left");
-    xAxis.render();
+    xAxis._render();
     tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
     for (i=0; i< tickMarks.length; i++) {
@@ -42,7 +42,7 @@ describe("Axes", () => {
     }
 
     xAxis.tickLabelPosition("right");
-    xAxis.render();
+    xAxis._render();
     tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
     for (i=0; i< tickMarks.length; i++) {
@@ -70,7 +70,7 @@ describe("Axes", () => {
     }
 
     yAxis.tickLabelPosition("top");
-    yAxis.render();
+    yAxis._render();
     tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
     for (i=0; i< tickMarks.length; i++) {
@@ -80,7 +80,7 @@ describe("Axes", () => {
     }
 
     yAxis.tickLabelPosition("bottom");
-    yAxis.render();
+    yAxis._render();
     tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
     for (i=0; i< tickMarks.length; i++) {

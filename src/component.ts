@@ -38,7 +38,7 @@ module Plottable {
      * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
      * @returns {Component} The calling component.
      */
-    public anchor(element: D3.Selection) {
+    public _anchor(element: D3.Selection) {
       if (element.node().childNodes.length > 0) {
         throw new Error("Can't anchor to a non-empty element");
       }
@@ -84,7 +84,7 @@ module Plottable {
      * @param {number} availableHeight
      * @returns {Component} The calling Component.
      */
-    public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
+    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
         if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
@@ -95,7 +95,7 @@ module Plottable {
           availableWidth  = parseFloat(this.rootSVG.attr("width"));
           availableHeight = parseFloat(this.rootSVG.attr("height"));
         } else {
-          throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+          throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
       }
       this.xOrigin = xOrigin;
@@ -129,16 +129,16 @@ module Plottable {
      *
      * @returns {Component} The calling Component.
      */
-    public render() {
+    public _render() {
       return this;
     }
 
     public renderTo(element: D3.Selection): Component {
-      // When called on top-level-component, a shortcut for component.anchor(svg).computeLayout().render()
+      // When called on top-level-component, a shortcut for component._anchor(svg)._computeLayout()._render()
       if (this.element == null) {
-        this.anchor(element);
+        this._anchor(element);
       }
-      this.computeLayout().render();
+      this._computeLayout()._render();
       return this;
     }
     /**
@@ -239,7 +239,7 @@ module Plottable {
             this.hitBox = this.addBox("hit-box");
             this.hitBox.style("fill", "#ffffff").style("opacity", 0); // We need to set these so Chrome will register events
         }
-        interaction.anchor(this.hitBox);
+        interaction._anchor(this.hitBox);
       } else {
         this.interactionsToRegister.push(interaction);
       }

@@ -18,11 +18,11 @@ describe("Gridlines", () => {
                                           .addComponent(0, 1, gridlines)
                                           .addComponent(1, 1, xAxis);
 
-    basicTable.anchor(svg);
-    basicTable.computeLayout();
+    basicTable._anchor(svg);
+    basicTable._computeLayout();
     xScale.range([0, xAxis.availableWidth]); // manually set range since we don't have a renderer
     yScale.range([yAxis.availableHeight, 0]);
-    basicTable.render();
+    basicTable._render();
 
     var xAxisTickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     var xGridlines = gridlines.element.select(".x-gridlines").selectAll("line")[0];
