@@ -140,10 +140,10 @@ describe("Component behavior", () => {
   it("component defaults are as expected", () => {
     assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
     assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
-    assert.equal((<any> c).xAlignProportion, 0, "xAlignProportion defaults to 0");
-    assert.equal((<any> c).yAlignProportion, 0, "yAlignProportion defaults to 0");
-    assert.equal((<any> c).xOffsetVal, 0, "xOffset defaults to 0");
-    assert.equal((<any> c).yOffsetVal, 0, "yOffset defaults to 0");
+    assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
+    assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+    assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
+    assert.equal((<any> c)._yOffset, 0, "yOffset defaults to 0");
     svg.remove();
   });
 

@@ -238,7 +238,7 @@ module Plottable {
       }
       super(scale, orientation, formatter);
       super.rowMinimum(Axis.xHeight);
-      this.fixedWidthVal = false;
+      this._fixedWidth = false;
       this.tickLabelPosition("center");
     }
 
@@ -311,7 +311,7 @@ module Plottable {
       }
       super(scale, orientation, formatter);
       super.colMinimum(Axis.yWidth);
-      this.fixedHeightVal = false;
+      this._fixedHeight = false;
       this.tickLabelPosition("MIDDLE");
     }
 

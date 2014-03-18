@@ -22,9 +22,9 @@ module Plottable {
       if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
         this.orientation = orientation;
         if (orientation === "horizontal") {
-          this.fixedWidthVal = false;
+          this._fixedWidth = false;
         } else {
-          this.fixedHeightVal = false;
+          this._fixedHeight = false;
         }
       } else {
         throw new Error(orientation + " is not a valid orientation for LabelComponent");
@@ -83,10 +83,10 @@ module Plottable {
 
       if (this.orientation === "horizontal") {
         this.truncateTextAndRemeasure(this.availableWidth);
-        xShift = (this.availableWidth  - this.textLength) * this.xAlignProportion;
+        xShift = (this.availableWidth  - this.textLength) * this._xAlignProportion;
       } else {
         this.truncateTextAndRemeasure(this.availableHeight);
-        xShift = (this.availableHeight - this.textLength) * this.yAlignProportion;
+        xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
 
         if (this.orientation === "vertical-right") {
           this.textElement.attr("transform", "rotate(90)");

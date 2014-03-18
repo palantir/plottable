@@ -107,8 +107,8 @@ describe("Tables", () => {
     var components = tableAndcomponents.components;
     // force the components to have non-fixed layout; eg. as if they were renderers
     components.forEach((c) => {
-      c.fixedWidthVal = false;
-      c.fixedHeightVal = false;
+      c._fixedWidth = false;
+      c._fixedHeight = false;
     });
 
     var svg = generateSVG();
@@ -134,8 +134,8 @@ describe("Tables", () => {
     var components = tableAndcomponents.components;
     // force the components to have non-fixed layout; eg. as if they were renderers
     components.forEach((c) => {
-      c.fixedWidthVal = false;
-      c.fixedHeightVal = false;
+      c._fixedWidth = false;
+      c._fixedHeight = false;
     });
 
     table.padding(5,5);
@@ -172,8 +172,8 @@ describe("Tables", () => {
     components[7].rowMinimum(30);
     components[3].colMinimum(50);
     components[5].colMinimum(50);
-    components[4].fixedWidthVal = false;
-    components[4].fixedHeightVal = false;
+    components[4]._fixedWidth = false;
+    components[4]._fixedHeight = false;
     // finally the center 'plot' object has a weight
 
     table.renderTo(svg);
@@ -208,11 +208,11 @@ describe("Tables", () => {
     var components = tableAndcomponents.components;
     assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
     assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
-    components[0].fixedWidthVal = false;
+    components[0]._fixedWidth = false;
     assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
     assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
-    components[8].fixedHeightVal = false;
-    components[0].fixedWidthVal = true;
+    components[8]._fixedHeight = false;
+    components[0]._fixedWidth = true;
     assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
     assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
