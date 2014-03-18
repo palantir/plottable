@@ -299,6 +299,13 @@ declare module Plottable {
         * @returns {(n: number) => string} A formatting function.
         */
         public tickFormat(count: number, format?: string): (n: number) => string;
+        /**
+        * Pads out the domain of the scale by a specified ratio.
+        *
+        * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
+        * @returns {QuantitiveScale} The calling QuantitiveScale.
+        */
+        public padDomain(padProportion?: number): QuantitiveScale;
     }
     class LinearScale extends QuantitiveScale {
         /**
@@ -514,7 +521,6 @@ declare module Plottable {
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
     }
     class CircleRenderer extends XYRenderer {
-        public size: number;
         /**
         * Creates a CircleRenderer.
         *
@@ -524,9 +530,9 @@ declare module Plottable {
         * @param {QuantitiveScale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        * @param {number} [size] The radius of the circles, in pixels.
+        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size?: number);
+        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor);
     }
     class BarRenderer extends XYRenderer {
         public barPaddingPx: number;

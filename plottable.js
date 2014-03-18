@@ -1,5 +1,5 @@
 /*!
-Plottable v0.5.0 (https://github.com/palantir/plottable)
+Plottable v0.5.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -614,6 +614,21 @@ var Plottable;
         */
         QuantitiveScale.prototype.tickFormat = function (count, format) {
             return this._d3Scale.tickFormat(count, format);
+        };
+
+        /**
+        * Pads out the domain of the scale by a specified ratio.
+        *
+        * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
+        * @returns {QuantitiveScale} The calling QuantitiveScale.
+        */
+        QuantitiveScale.prototype.padDomain = function (padProportion) {
+            if (typeof padProportion === "undefined") { padProportion = 0.05; }
+            var currentDomain = this.domain();
+            var extent = currentDomain[1] - currentDomain[0];
+            var newDomain = [currentDomain[0] - padProportion / 2 * extent, currentDomain[1] + padProportion / 2 * extent];
+            this.domain(newDomain);
+            return this;
         };
         return QuantitiveScale;
     })(Scale);
@@ -1361,13 +1376,12 @@ var Plottable;
         * @param {QuantitiveScale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        * @param {number} [size] The radius of the circles, in pixels.
+        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, size) {
-            if (typeof size === "undefined") { size = 3; }
+        function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, rAccessor) {
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
             this.classed("circle-renderer", true);
-            this.size = size;
         }
         CircleRenderer.prototype._paint = function () {
             var _this = this;
@@ -1378,10 +1392,13 @@ var Plottable;
                 return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
             }).attr("cy", function (d, i) {
                 return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
-            }).attr("r", this.size).attr("fill", function (d, i) {
+            }).attr("r", this.rAccessor).attr("fill", function (d, i) {
                 return _this._colorAccessor(d, i, _this._metadata);
             });
             this.dataSelection.exit().remove();
+        };
+        CircleRenderer.defaultRAccessor = function (d) {
+            return 3;
         };
         return CircleRenderer;
     })(XYRenderer);
@@ -1885,7 +1902,6 @@ var Plottable;
             orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
             this.classed("axis", true);
-            this.clipPathEnabled = true;
             if (formatter == null) {
                 formatter = d3.format(".3s");
             }
