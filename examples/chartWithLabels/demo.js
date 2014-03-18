@@ -26,7 +26,7 @@ function makeChartWithLabels() {
     var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
     var basicTable = new Plottable.Table([[yAxisTable, renderAreaD1],
                                           [null, xAxisTable]]);
-    basicTable.anchor(svg).computeLayout().render();
+    basicTable.renderTo(svg);
 };
 
 window.onload = makeChartWithLabels;

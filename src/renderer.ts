@@ -68,7 +68,7 @@ module Plottable {
       return this;
     }
 
-    public render(): Renderer {
+    public _render(): Renderer {
       this._paint();
       this._requireRerender = false;
       this._rerenderUpdateSelection = false;
@@ -86,8 +86,8 @@ module Plottable {
       // no-op
     }
 
-    public anchor(element: D3.Selection) {
-      super.anchor(element);
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
       this.renderArea = this.content.append("g").classed("render-area", true);
       return this;
     }
@@ -136,8 +136,8 @@ module Plottable {
       this.yScale.registerListener(() => this.rescale());
     }
 
-    public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight? :number) {
-      super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight? :number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.xScale.range([0, this.availableWidth]);
       this.yScale.range([this.availableHeight, 0]);
       return this;
@@ -197,7 +197,7 @@ module Plottable {
 
     private rescale() {
       if (this.element != null) {
-        this.render();
+        this._render();
       }
     }
   }
@@ -221,8 +221,8 @@ module Plottable {
       this.classed("line-renderer", true);
     }
 
-    public anchor(element: D3.Selection) {
-      super.anchor(element);
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
       this.path = this.renderArea.append("path");
       return this;
     }

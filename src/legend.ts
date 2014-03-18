@@ -53,8 +53,8 @@ module Plottable {
       return textHeight;
     }
 
-    public render(): Legend {
-      super.render();
+    public _render(): Legend {
+      super._render();
       var domain = this.colorScale.domain();
       var textHeight = this.measureTextHeight();
       var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;

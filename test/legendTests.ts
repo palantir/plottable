@@ -31,7 +31,7 @@ describe("Legends", () => {
   });
 
   it("legend domain can be updated after initialization, and rowMinimum updates as well", () => {
-    legend.anchor(svg);
+    legend._anchor(svg);
     legend.scale(color);
     assert.equal(legend.rowMinimum(), 0, "there is no rowMinimum while the domain is empty");
     color.domain(["foo", "bar"]);
@@ -72,7 +72,7 @@ describe("Legends", () => {
     legend.renderTo(svg);
     var numRows = legend.content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows initially");
-    legend.render();
+    legend._render();
     numRows = legend.content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 legend rows after second render");
     svg.remove();
@@ -83,7 +83,7 @@ describe("Legends", () => {
     legend.renderTo(svg);
     var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
     color.domain(newDomain);
-    legend.computeLayout().render();
+    legend._computeLayout()._render();
     legend.content.selectAll(".legend-row").each(function(d, i) {
       assert.equal(d, newDomain[i], "the data was set properly");
       var text = d3.select(this).select("text").text();

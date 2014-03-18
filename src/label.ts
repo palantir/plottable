@@ -32,8 +32,8 @@ module Plottable {
       this.xAlign("CENTER").yAlign("CENTER"); // the defaults
     }
 
-    public anchor(element: D3.Selection) {
-      super.anchor(element);
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
       this.textElement = this.content.append("text");
       this.setText(this.text);
       return this;
@@ -71,8 +71,8 @@ module Plottable {
       this.measureAndSetTextSize();
     }
 
-    public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
 
       this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
       var bbox = Utils.getBBox(this.textElement);

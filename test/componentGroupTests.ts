@@ -10,11 +10,11 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.ComponentGroup([c1, c2, c3]);
     var svg = generateSVG(400, 400);
-    cg.anchor(svg);
+    cg._anchor(svg);
     (<any> c1).addBox("test-box1");
     (<any> c2).addBox("test-box2");
     (<any> c3).addBox("test-box3");
-    cg.computeLayout().render();
+    cg._computeLayout()._render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     var t3 = svg.select(".test-box3");
@@ -31,17 +31,17 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.ComponentGroup([c1]);
     var svg = generateSVG(400, 400);
-    cg.merge(c2).anchor(svg);
+    cg.merge(c2)._anchor(svg);
     (<any> c1).addBox("test-box1");
     (<any> c2).addBox("test-box2");
-    cg.computeLayout().render();
+    cg._computeLayout()._render();
     var t1 = svg.select(".test-box1");
     var t2 = svg.select(".test-box2");
     assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
     assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
     cg.merge(c3);
     (<any> c3).addBox("test-box3");
-    cg.computeLayout().render();
+    cg._computeLayout()._render();
     var t3 = svg.select(".test-box3");
     assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
     svg.remove();
@@ -82,8 +82,8 @@ describe("ComponentGroups", () => {
     cg.merge(c1).merge(c2);
 
     var svg = generateSVG();
-    cg.anchor(svg);
-    cg.computeLayout(50, 50, 350, 350);
+    cg._anchor(svg);
+    cg._computeLayout(50, 50, 350, 350);
 
     var cgTranslate = d3.transform(cg.element.attr("transform")).translate;
     var c1Translate = d3.transform(c1.element.attr("transform")).translate;

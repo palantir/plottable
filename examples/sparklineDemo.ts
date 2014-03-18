@@ -30,7 +30,7 @@ module SparklineDemo {
   // var areaInteraction = new Plottable.AreaInteraction(renderer);
 
   var svg = d3.select("#table");
-  chart.anchor(svg);
-  chart.computeLayout();
-  chart.render();
+  chart._anchor(svg);
+  chart._computeLayout();
+  chart._render();
 }
