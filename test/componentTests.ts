@@ -23,28 +23,28 @@ describe("Component behavior", () => {
 
   describe("anchor", () => {
     it("anchoring works as expected", () => {
-      c.anchor(svg);
+      c._anchor(svg);
       assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the svg");
       svg.remove();
     });
 
     it("you cannot anchor to non-empty elements", () => {
       svg.append("rect");
-      assert.throws(() => c.anchor(svg), Error);
+      assert.throws(() => c._anchor(svg), Error);
       svg.remove();
     });
   });
 
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
-      c.anchor(svg).computeLayout();
+      c._anchor(svg)._computeLayout();
       assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
       svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
-      c.computeLayout();
+      c._computeLayout();
       assert.equal(c.availableWidth, 2*SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c.availableHeight, 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
@@ -55,13 +55,13 @@ describe("Component behavior", () => {
 
     it("computeLayout will not default when attached to non-root node", () => {
       var g = svg.append("g");
-      c.anchor(g);
-      assert.throws(() => c.computeLayout(), "null arguments");
+      c._anchor(g);
+      assert.throws(() => c._computeLayout(), "null arguments");
       svg.remove();
     });
 
     it("computeLayout throws an error when called on un-anchored component", () => {
-      assert.throws(() => c.computeLayout(), Error, "anchor must be called before computeLayout");
+      assert.throws(() => c._computeLayout(), Error, "anchor must be called before computeLayout");
       svg.remove();
     });
 
@@ -71,7 +71,7 @@ describe("Component behavior", () => {
       var yOff = 20;
       var width = 100;
       var height = 200;
-      c.anchor(g).computeLayout(xOff, yOff, width, height);
+      c._anchor(g)._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate(c.element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
       assert.equal(c.availableWidth, width, "the width set properly");
@@ -96,41 +96,41 @@ describe("Component behavior", () => {
 
   it("fixed-width component will align to the right spot", () => {
     c.rowMinimum(100).colMinimum(100);
-    c.anchor(svg);
-    c.computeLayout();
+    c._anchor(svg);
+    c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
     c.xAlign("CENTER").yAlign("CENTER");
-    c.computeLayout();
+    c._computeLayout();
     assertComponentXY(c, 150, 100, "center component aligns correctly");
 
     c.xAlign("RIGHT").yAlign("BOTTOM");
-    c.computeLayout();
+    c._computeLayout();
     assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
     svg.remove();
   });
 
   it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
       c.rowMinimum(100).colMinimum(100);
-      c.anchor(svg);
+      c._anchor(svg);
       c.xOffset(20).yOffset(20);
-      c.computeLayout();
+      c._computeLayout();
       assertComponentXY(c, 20, 20, "top-left component offsets correctly");
 
       c.xAlign("CENTER").yAlign("CENTER");
-      c.computeLayout();
+      c._computeLayout();
       assertComponentXY(c, 170, 120, "center component offsets correctly");
 
       c.xAlign("RIGHT").yAlign("BOTTOM");
-      c.computeLayout();
+      c._computeLayout();
       assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
 
       c.xOffset(0).yOffset(0);
-      c.computeLayout();
+      c._computeLayout();
       assertComponentXY(c, 300, 200, "bottom-right component offset resets");
 
       c.xOffset(-20).yOffset(-30);
-      c.computeLayout();
+      c._computeLayout();
       assertComponentXY(c, 280, 170, "negative offsets work properly");
 
       svg.remove();
@@ -159,7 +159,7 @@ describe("Component behavior", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
     var expectedClipPathID: number = (<any> Plottable.Component).clipPathId;
-    c.anchor(svg).computeLayout(0, 0, 100, 100).render();
+    c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
     assert.equal((<any> Plottable.Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
     var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
     assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
@@ -197,20 +197,20 @@ describe("Component behavior", () => {
       assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
     }
 
-    c.anchor(svg);
+    c._anchor(svg);
     assert.isUndefined((<any> c).hitBox, "no hitBox was created when there were no registered interactions");
     svg.remove();
     svg = generateSVG();
 
     c = new Plottable.Component();
     var i = new Plottable.Interaction(c).registerWithComponent();
-    c.anchor(svg);
+    c._anchor(svg);
     verifyHitbox(c);
     svg.remove();
     svg = generateSVG();
 
     c = new Plottable.Component();
-    c.anchor(svg);
+    c._anchor(svg);
     i = new Plottable.Interaction(c).registerWithComponent();
     verifyHitbox(c);
     svg.remove();
@@ -219,8 +219,8 @@ describe("Component behavior", () => {
   it("interaction registration works properly", () => {
     var hitBox1: Element = null;
     var hitBox2: Element = null;
-    var interaction1: any = {anchor: (hb) => hitBox1 = hb.node()};
-    var interaction2: any = {anchor: (hb) => hitBox2 = hb.node()};
+    var interaction1: any = {_anchor: (hb) => hitBox1 = hb.node()};
+    var interaction2: any = {_anchor: (hb) => hitBox2 = hb.node()};
     c.registerInteraction(interaction1);
     c.renderTo(svg);
     c.registerInteraction(interaction2);
@@ -245,7 +245,7 @@ describe("Component behavior", () => {
     c.classed("CSS-PREANCHOR-REMOVE", false);
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
 
-    c.anchor(svg);
+    c._anchor(svg);
     assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
     assert.isFalse(c.classed("CSS-POSTANCHOR"));

@@ -96,8 +96,8 @@ describe("Tables", () => {
     var svg = generateSVG(200, 200);
     var c = new Plottable.Component().rowMinimum(300).colMinimum(300);
     var t = new Plottable.Table().addComponent(0, 0, c);
-    t.anchor(svg);
-    assert.throws(() => t.computeLayout(), Error, "Insufficient Space");
+    t._anchor(svg);
+    assert.throws(() => t._computeLayout(), Error, "Insufficient Space");
     svg.remove();
   });
 

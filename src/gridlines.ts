@@ -27,15 +27,15 @@ module Plottable {
       }
     }
 
-    public anchor(element: D3.Selection): Gridlines {
-      super.anchor(element);
+    public _anchor(element: D3.Selection): Gridlines {
+      super._anchor(element);
       this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
       this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
       return this;
     }
 
-    public render(): Gridlines {
-      super.render();
+    public _render(): Gridlines {
+      super._render();
       this.redrawXLines();
       this.redrawYLines();
       return this;
