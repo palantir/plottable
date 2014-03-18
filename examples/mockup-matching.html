@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <title>Mockup Matching</title>
+    <link rel="stylesheet" type="text/css" href="../plottable.css">
+    <link rel="stylesheet" type="text/css" href="mockup.css">
+    <style>
+      .plottable .height-weight-data circle {
+        fill: #7E74B3;
+        opacity: 0.75;
+      }
+    </style>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../build/plottable.js"></script>
+    <script src="../build/exampleUtil.js"></script>
+
+    <script>
+      function generateHeightWeightData(n) {
+        var data = [];
+        var height, weight, age;
+        var heightGen = d3.random.normal(180, 2.5);
+        var weightGen = d3.random.normal(170, 30);
+        for (var i=0; i<n; i++) {
+          data.push({
+            age: Math.random() * 50 + 20,
+            height: heightGen(),
+            weight: weightGen()
+          });
+        }
+        return {data: data, metadata: {cssClass: "height-weight-data"}};
+      }
+
+      window.onload = function() {
+        var dataseries = generateHeightWeightData(50);
+
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom").tickSize(6, 0);
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "right").tickLabelPosition("bottom").tickSize(50);
+
+        var xAccessor = function(d) {
+          return d.age;
+        };
+        var yAccessor = function(d) {
+          return d.height;
+        };
+        var rAccessor = function(d) {
+          return d.weight / 40;
+        };
+
+        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale, xAccessor, yAccessor, rAccessor);
+        var chartTable = new Plottable.Table([[yAxis, renderAreaD1],
+                                              [null, xAxis]]);
+
+        var svg = d3.select("#mockup-matching");
+        svg.attr("width", 800).attr("height", 320);
+        chartTable.renderTo(svg);
+        xScale.padDomain().nice();
+        yScale.padDomain().nice();
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="mockup-matching"></svg>
+  </body>
+
+</html>

@@ -1,0 +1,26 @@
+.plottable .bounding-box {
+  stroke: none;
+}
+
+.plottable .axis line {
+  stroke: #979797;
+  stroke-width: 2px;
+}
+
+.plottable .axis text {
+  font-size: 12pt;
+  fill: #979797;
+}
+
+.plottable .x-axis line {
+  stroke: none;
+}
+
+.plottable .x-axis path {
+  stroke-width: 2px;
+  stroke: #979797;
+}
+
+.plottable .y-axis path {
+  stroke: none;
+}

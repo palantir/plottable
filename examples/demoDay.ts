@@ -11,10 +11,10 @@ module DemoDay {
     s.xAxis = new Plottable.XAxis(s.xScale, "bottom");
     var xAxisTable = new Plottable.Table([[s.xAxis], [new Plottable.AxisLabel("x")]]);
 
-    s.renderer = new Plottable.CircleRenderer(data, s.xScale, s.yScale, null, null, 1.5);
+    s.renderer = new Plottable.CircleRenderer(data, s.xScale, s.yScale, null, null, (d) => 1.5);
     s.xSpark = new Plottable.LinearScale();
     s.ySpark = new Plottable.LinearScale();
-    s.sparkline = new Plottable.CircleRenderer(data, s.xSpark, s.ySpark, null, null, 0.5);
+    s.sparkline = new Plottable.CircleRenderer(data, s.xSpark, s.ySpark, null, null, (d) => 0.5);
     var r1 = [leftAxisTable, s.renderer];
     var r2 = [null, xAxisTable];
     var r3 = [null, s.sparkline];

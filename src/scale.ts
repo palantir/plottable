@@ -193,6 +193,20 @@ module Plottable {
     public tickFormat(count: number, format?: string): (n: number) => string {
       return this._d3Scale.tickFormat(count, format);
     }
+
+    /**
+     * Pads out the domain of the scale by a specified ratio.
+     *
+     * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
+     * @returns {QuantitiveScale} The calling QuantitiveScale.
+     */
+    public padDomain(padProportion = 0.05): QuantitiveScale {
+      var currentDomain = this.domain();
+      var extent = currentDomain[1]-currentDomain[0];
+      var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1] + padProportion/2 * extent];
+      this.domain(newDomain);
+      return this;
+    }
   }
 
   export class LinearScale extends QuantitiveScale {

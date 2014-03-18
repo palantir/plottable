@@ -23,7 +23,6 @@ module Plottable {
       orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
       this.classed("axis", true);
-      this.clipPathEnabled = true;
       if (formatter == null) {
         formatter = d3.format(".3s");
       }

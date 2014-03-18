@@ -31,6 +31,10 @@ describe("Scales", () => {
     callbackWasCalled = false;
     scale.nice();
     assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
+
+    callbackWasCalled = false;
+    scale.padDomain(0.2);
+    assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
 
   it("QuantitiveScale.widenDomain() functions correctly", () => {

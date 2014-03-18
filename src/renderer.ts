@@ -241,7 +241,8 @@ module Plottable {
   }
 
   export class CircleRenderer extends XYRenderer {
-    public size: number;
+    private rAccessor: IAccessor;
+    private static defaultRAccessor = (d: any) => 3;
 
     /**
      * Creates a CircleRenderer.
@@ -252,13 +253,13 @@ module Plottable {
      * @param {QuantitiveScale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-     * @param {number} [size] The radius of the circles, in pixels.
+     * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
      */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale,
-                xAccessor?: IAccessor, yAccessor?: IAccessor, size=3) {
+                xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
+      this.rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
       this.classed("circle-renderer", true);
-      this.size = size;
     }
 
     public _paint() {
@@ -267,7 +268,7 @@ module Plottable {
       this.dataSelection.enter().append("circle");
       this.dataSelection.attr("cx", (d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
                         .attr("cy", (d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)))
-                        .attr("r", this.size)
+                        .attr("r", this.rAccessor)
                         .attr("fill", (d: any, i: number) => this._colorAccessor(d, i, this._metadata));
       this.dataSelection.exit().remove();
     }
