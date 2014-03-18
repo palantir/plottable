@@ -108,8 +108,8 @@ var DemoDay;
             chart.c.yBins = yBins;
             histogram.renderer1.dataset({ metadata: { cssClass: "xBins" }, data: xBins });
             histogram.renderer2.dataset({ metadata: { cssClass: "yBins" }, data: yBins });
-            histogram.renderer1.render();
-            histogram.renderer2.render();
+            histogram.renderer1._render();
+            histogram.renderer2._render();
         };
 
         var firstCallback = function (area) {
@@ -158,7 +158,7 @@ var DemoDay;
     coordinator(chartSH, dataset);
 
     var svg = d3.select("#table");
-    chartSH.table.anchor(svg);
-    chartSH.table.computeLayout();
-    chartSH.table.render();
+    chartSH.table._anchor(svg);
+    chartSH.table._computeLayout();
+    chartSH.table._render();
 })(DemoDay || (DemoDay = {}));

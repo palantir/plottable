@@ -11,9 +11,9 @@ var Demo;
     var data = makeRandomData(30);
     var renderAreaD1 = new Plottable.CircleRenderer(data, xScale, yScale);
     var basicTable = new Plottable.Table([[renderAreaD1, yAxis], [xAxis, null]]);
-    basicTable.anchor(svg1);
-    basicTable.computeLayout();
-    basicTable.render();
+    basicTable._anchor(svg1);
+    basicTable._computeLayout();
+    basicTable._render();
     var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
     pzi.registerWithComponent();
 
@@ -39,9 +39,9 @@ var Demo;
     var metaTable = new Plottable.Table([[t1, t2], [t3, t4]]);
     metaTable.padding(5, 5);
     svg2.attr("width", 800).attr("height", 600);
-    metaTable.anchor(svg2);
-    metaTable.computeLayout();
-    metaTable.render();
+    metaTable._anchor(svg2);
+    metaTable._computeLayout();
+    metaTable._render();
 
     // make a chart with two axes
     function makeMultiAxisChart() {
@@ -59,9 +59,9 @@ var Demo;
     var svg3 = d3.select("#svg3");
     var multiaxischart = makeMultiAxisChart();
     svg3.attr("width", 400).attr("height", 400);
-    multiaxischart.anchor(svg3);
-    multiaxischart.computeLayout();
-    multiaxischart.render();
+    multiaxischart._anchor(svg3);
+    multiaxischart._computeLayout();
+    multiaxischart._render();
 
     // make a table with 2 charts and sparkline
     function makeSparklineMultichart() {
@@ -105,12 +105,12 @@ var Demo;
     var svg4 = d3.select("#svg4");
     var multichart = makeSparklineMultichart();
     svg4.attr("width", 800).attr("height", 600);
-    multichart.anchor(svg4);
-    multichart.computeLayout();
-    multichart.render();
+    multichart._anchor(svg4);
+    multichart._computeLayout();
+    multichart._render();
 
     // svg4.selectAll("g").remove()
-    // multichart.render(svg4, 800, 600);
+    // multichart._render(svg4, 800, 600);
     // function makeChartWithGivenNumAxes(left=1, right=0, top=0, bottom=1){
     //   var xScale = new Plottable.LinearScale();
     //   var yScale = new Plottable.LinearScale();
@@ -138,9 +138,9 @@ var Demo;
     var basicTable = new Plottable.Table([[yAxisLeftTable, renderArea, yAxisRightTable], [null, xAxis, null]]);
     var title = new Plottable.TitleLabel("bpIqd");
     var outerTable = new Plottable.Table([[title], [basicTable]]);
-    outerTable.anchor(svg5);
-    outerTable.computeLayout();
-    outerTable.render();
+    outerTable._anchor(svg5);
+    outerTable._computeLayout();
+    outerTable._render();
 
     // bar renderer test
     var svg6 = d3.select("#svg6");
@@ -156,7 +156,7 @@ var Demo;
 
     var BarRenderArea = new Plottable.BarRenderer(bucketData, xScale, yScale);
     var basicTable = new Plottable.Table([[yAxis, BarRenderArea], [null, xAxis]]);
-    basicTable.anchor(svg6);
-    basicTable.computeLayout();
-    basicTable.render();
+    basicTable._anchor(svg6);
+    basicTable._computeLayout();
+    basicTable._render();
 })(Demo || (Demo = {}));

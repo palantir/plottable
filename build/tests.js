@@ -118,7 +118,7 @@ describe("Axes", function () {
         }
 
         xAxis.tickLabelPosition("left");
-        xAxis.render();
+        xAxis._render();
         tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
         tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
         for (i = 0; i < tickMarks.length; i++) {
@@ -128,7 +128,7 @@ describe("Axes", function () {
         }
 
         xAxis.tickLabelPosition("right");
-        xAxis.render();
+        xAxis._render();
         tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
         tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
         for (i = 0; i < tickMarks.length; i++) {
@@ -155,7 +155,7 @@ describe("Axes", function () {
         }
 
         yAxis.tickLabelPosition("top");
-        yAxis.render();
+        yAxis._render();
         tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
         tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
         for (i = 0; i < tickMarks.length; i++) {
@@ -165,7 +165,7 @@ describe("Axes", function () {
         }
 
         yAxis.tickLabelPosition("bottom");
-        yAxis.render();
+        yAxis._render();
         tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
         tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
         for (i = 0; i < tickMarks.length; i++) {
@@ -187,11 +187,11 @@ describe("ComponentGroups", function () {
 
         var cg = new Plottable.ComponentGroup([c1, c2, c3]);
         var svg = generateSVG(400, 400);
-        cg.anchor(svg);
+        cg._anchor(svg);
         c1.addBox("test-box1");
         c2.addBox("test-box2");
         c3.addBox("test-box3");
-        cg.computeLayout().render();
+        cg._computeLayout()._render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         var t3 = svg.select(".test-box3");
@@ -208,17 +208,17 @@ describe("ComponentGroups", function () {
 
         var cg = new Plottable.ComponentGroup([c1]);
         var svg = generateSVG(400, 400);
-        cg.addComponent(c2).anchor(svg);
+        cg.merge(c2)._anchor(svg);
         c1.addBox("test-box1");
         c2.addBox("test-box2");
-        cg.computeLayout().render();
+        cg._computeLayout()._render();
         var t1 = svg.select(".test-box1");
         var t2 = svg.select(".test-box2");
         assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
         assertWidthHeight(t2, 20, 20, "rect2 sized correctly");
-        cg.addComponent(c3);
+        cg.merge(c3);
         c3.addBox("test-box3");
-        cg.computeLayout().render();
+        cg._computeLayout()._render();
         var t3 = svg.select(".test-box3");
         assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
         svg.remove();
@@ -227,23 +227,23 @@ describe("ComponentGroups", function () {
     it("component fixity is computed appropriately", function () {
         var cg = new Plottable.ComponentGroup();
         var c1 = new Plottable.Component();
-        c1.fixedHeightVal = false;
-        c1.fixedWidthVal = false;
+        c1._fixedHeight = false;
+        c1._fixedWidth = false;
         var c2 = new Plottable.Component();
-        c2.fixedHeightVal = false;
-        c2.fixedWidthVal = false;
+        c2._fixedHeight = false;
+        c2._fixedWidth = false;
 
-        cg.addComponent(c1).addComponent(c2);
+        cg.merge(c1).merge(c2);
         assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
         assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
 
-        c1.fixedHeightVal = true;
-        c1.fixedWidthVal = true;
+        c1._fixedHeight = true;
+        c1._fixedWidth = true;
 
         assert.isFalse(cg.isFixedHeight(), "height not fixed when one component unfixed");
         assert.isFalse(cg.isFixedWidth(), "width not fixed when one component unfixed");
 
-        c2.fixedHeightVal = true;
+        c2._fixedHeight = true;
         assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
         assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
     });
@@ -251,16 +251,16 @@ describe("ComponentGroups", function () {
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
         var cg = new Plottable.ComponentGroup();
         var c1 = new Plottable.Component();
-        c1.fixedHeightVal = false;
-        c1.fixedWidthVal = false;
+        c1._fixedHeight = false;
+        c1._fixedWidth = false;
         var c2 = new Plottable.Component();
-        c2.fixedHeightVal = false;
-        c2.fixedWidthVal = false;
-        cg.addComponent(c1).addComponent(c2);
+        c2._fixedHeight = false;
+        c2._fixedWidth = false;
+        cg.merge(c1).merge(c2);
 
         var svg = generateSVG();
-        cg.anchor(svg);
-        cg.computeLayout(50, 50, 350, 350);
+        cg._anchor(svg);
+        cg._computeLayout(50, 50, 350, 350);
 
         var cgTranslate = d3.transform(cg.element.attr("transform")).translate;
         var c1Translate = d3.transform(c1.element.attr("transform")).translate;
@@ -272,6 +272,53 @@ describe("ComponentGroups", function () {
         assert.equal(c2Translate[0], 0, "componentGroup has 0 xOffset");
         assert.equal(c2Translate[1], 0, "componentGroup has 0 yOffset");
         svg.remove();
+    });
+
+    describe("Component.merge works as expected", function () {
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        var c4 = new Plottable.Component();
+
+        it("Component.merge works as expected (Component.merge Component)", function () {
+            var cg = c1.merge(c2);
+            var innerComponents = cg.components;
+            assert.lengthOf(innerComponents, 2, "There are two components");
+            assert.equal(innerComponents[0], c1, "first component correct");
+            assert.equal(innerComponents[1], c2, "second component correct");
+        });
+
+        it("Component.merge works as expected (Component.merge ComponentGroup)", function () {
+            var cg = new Plottable.ComponentGroup([c2, c3, c4]);
+            var cg2 = c1.merge(cg);
+            assert.equal(cg, cg2, "c.merge(cg) returns cg");
+            var components = cg.components;
+            assert.lengthOf(components, 4, "four components");
+            assert.equal(components[0], c1, "first component in front");
+            assert.equal(components[1], c2, "second component is second");
+        });
+
+        it("Component.merge works as expected (ComponentGroup.merge Component)", function () {
+            var cg = new Plottable.ComponentGroup([c1, c2, c3]);
+            var cg2 = cg.merge(c4);
+            assert.equal(cg, cg2, "cg.merge(c) returns cg");
+            var components = cg.components;
+            assert.lengthOf(components, 4, "there are four components");
+            assert.equal(components[0], c1, "first is first");
+            assert.equal(components[3], c4, "fourth is fourth");
+        });
+
+        it("Component.merge works as expected (ComponentGroup.merge ComponentGroup)", function () {
+            var cg1 = new Plottable.ComponentGroup([c1, c2]);
+            var cg2 = new Plottable.ComponentGroup([c3, c4]);
+            var cg = cg1.merge(cg2);
+            assert.notEqual(cg, cg1, "merged != cg1");
+            assert.notEqual(cg, cg2, "merged != cg2");
+            var components = cg.components;
+            assert.lengthOf(components, 2, "there are two inner components");
+            assert.equal(components[0], cg1, "cg1 nested inside");
+            assert.equal(components[1], cg2, "cg2 nested inside");
+        });
     });
 });
 ///<reference path="testReference.ts" />
@@ -298,7 +345,7 @@ describe("Component behavior", function () {
 
     describe("anchor", function () {
         it("anchoring works as expected", function () {
-            c.anchor(svg);
+            c._anchor(svg);
             assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the svg");
             svg.remove();
         });
@@ -306,7 +353,7 @@ describe("Component behavior", function () {
         it("you cannot anchor to non-empty elements", function () {
             svg.append("rect");
             assert.throws(function () {
-                return c.anchor(svg);
+                return c._anchor(svg);
             }, Error);
             svg.remove();
         });
@@ -314,14 +361,14 @@ describe("Component behavior", function () {
 
     describe("computeLayout", function () {
         it("computeLayout defaults and updates intelligently", function () {
-            c.anchor(svg).computeLayout();
+            c._anchor(svg)._computeLayout();
             assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
 
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
-            c.computeLayout();
+            c._computeLayout();
             assert.equal(c.availableWidth, 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
             assert.equal(c.availableHeight, 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
@@ -332,16 +379,16 @@ describe("Component behavior", function () {
 
         it("computeLayout will not default when attached to non-root node", function () {
             var g = svg.append("g");
-            c.anchor(g);
+            c._anchor(g);
             assert.throws(function () {
-                return c.computeLayout();
+                return c._computeLayout();
             }, "null arguments");
             svg.remove();
         });
 
         it("computeLayout throws an error when called on un-anchored component", function () {
             assert.throws(function () {
-                return c.computeLayout();
+                return c._computeLayout();
             }, Error, "anchor must be called before computeLayout");
             svg.remove();
         });
@@ -352,7 +399,7 @@ describe("Component behavior", function () {
             var yOff = 20;
             var width = 100;
             var height = 200;
-            c.anchor(g).computeLayout(xOff, yOff, width, height);
+            c._anchor(g)._computeLayout(xOff, yOff, width, height);
             var translate = getTranslate(c.element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
             assert.equal(c.availableWidth, width, "the width set properly");
@@ -377,41 +424,41 @@ describe("Component behavior", function () {
 
     it("fixed-width component will align to the right spot", function () {
         c.rowMinimum(100).colMinimum(100);
-        c.anchor(svg);
-        c.computeLayout();
+        c._anchor(svg);
+        c._computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
         c.xAlign("CENTER").yAlign("CENTER");
-        c.computeLayout();
+        c._computeLayout();
         assertComponentXY(c, 150, 100, "center component aligns correctly");
 
         c.xAlign("RIGHT").yAlign("BOTTOM");
-        c.computeLayout();
+        c._computeLayout();
         assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
         svg.remove();
     });
 
     it("components can be offset relative to their alignment, and throw errors if there is insufficient space", function () {
         c.rowMinimum(100).colMinimum(100);
-        c.anchor(svg);
+        c._anchor(svg);
         c.xOffset(20).yOffset(20);
-        c.computeLayout();
+        c._computeLayout();
         assertComponentXY(c, 20, 20, "top-left component offsets correctly");
 
         c.xAlign("CENTER").yAlign("CENTER");
-        c.computeLayout();
+        c._computeLayout();
         assertComponentXY(c, 170, 120, "center component offsets correctly");
 
         c.xAlign("RIGHT").yAlign("BOTTOM");
-        c.computeLayout();
+        c._computeLayout();
         assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
 
         c.xOffset(0).yOffset(0);
-        c.computeLayout();
+        c._computeLayout();
         assertComponentXY(c, 300, 200, "bottom-right component offset resets");
 
         c.xOffset(-20).yOffset(-30);
-        c.computeLayout();
+        c._computeLayout();
         assertComponentXY(c, 280, 170, "negative offsets work properly");
 
         svg.remove();
@@ -420,10 +467,10 @@ describe("Component behavior", function () {
     it("component defaults are as expected", function () {
         assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
         assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
-        assert.equal(c.xAlignProportion, 0, "xAlignProportion defaults to 0");
-        assert.equal(c.yAlignProportion, 0, "yAlignProportion defaults to 0");
-        assert.equal(c.xOffsetVal, 0, "xOffset defaults to 0");
-        assert.equal(c.yOffsetVal, 0, "yOffset defaults to 0");
+        assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
+        assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
+        assert.equal(c._xOffset, 0, "xOffset defaults to 0");
+        assert.equal(c._yOffset, 0, "yOffset defaults to 0");
         svg.remove();
     });
 
@@ -439,7 +486,7 @@ describe("Component behavior", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
         var expectedClipPathID = Plottable.Component.clipPathId;
-        c.anchor(svg).computeLayout(0, 0, 100, 100).render();
+        c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
         assert.equal(Plottable.Component.clipPathId, expectedClipPathID + 1, "clipPathId incremented");
         var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
         assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
@@ -479,20 +526,20 @@ describe("Component behavior", function () {
             assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
         }
 
-        c.anchor(svg);
+        c._anchor(svg);
         assert.isUndefined(c.hitBox, "no hitBox was created when there were no registered interactions");
         svg.remove();
         svg = generateSVG();
 
         c = new Plottable.Component();
         var i = new Plottable.Interaction(c).registerWithComponent();
-        c.anchor(svg);
+        c._anchor(svg);
         verifyHitbox(c);
         svg.remove();
         svg = generateSVG();
 
         c = new Plottable.Component();
-        c.anchor(svg);
+        c._anchor(svg);
         i = new Plottable.Interaction(c).registerWithComponent();
         verifyHitbox(c);
         svg.remove();
@@ -501,10 +548,10 @@ describe("Component behavior", function () {
     it("interaction registration works properly", function () {
         var hitBox1 = null;
         var hitBox2 = null;
-        var interaction1 = { anchor: function (hb) {
+        var interaction1 = { _anchor: function (hb) {
                 return hitBox1 = hb.node();
             } };
-        var interaction2 = { anchor: function (hb) {
+        var interaction2 = { _anchor: function (hb) {
                 return hitBox2 = hb.node();
             } };
         c.registerInteraction(interaction1);
@@ -535,7 +582,7 @@ describe("Component behavior", function () {
         c.classed("CSS-PREANCHOR-REMOVE", false);
         assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
 
-        c.anchor(svg);
+        c._anchor(svg);
         assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
         assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
         assert.isFalse(c.classed("CSS-POSTANCHOR"));
@@ -568,6 +615,50 @@ describe("Coordinators", function () {
             assert.deepEqual(s1.domain(), s2.domain());
             assert.deepEqual(s1.domain(), s3.domain());
         });
+    });
+});
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("Gridlines", function () {
+    it("Gridlines and axis tick marks align", function () {
+        var svg = generateSVG(640, 480);
+        var xScale = new Plottable.LinearScale();
+        xScale.domain([0, 10]); // manually set domain since we won't have a renderer
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.LinearScale();
+        yScale.domain([0, 10]);
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var basicTable = new Plottable.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
+
+        basicTable._anchor(svg);
+        basicTable._computeLayout();
+        xScale.range([0, xAxis.availableWidth]); // manually set range since we don't have a renderer
+        yScale.range([yAxis.availableHeight, 0]);
+        basicTable._render();
+
+        var xAxisTickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
+        var xGridlines = gridlines.element.select(".x-gridlines").selectAll("line")[0];
+        assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
+        for (var i = 0; i < xAxisTickMarks.length; i++) {
+            var xTickMarkRect = xAxisTickMarks[i].getBoundingClientRect();
+            var xGridlineRect = xGridlines[i].getBoundingClientRect();
+            assert.equal(xTickMarkRect.left, xGridlineRect.left, "x tick and gridline align");
+        }
+
+        var yAxisTickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
+        var yGridlines = gridlines.element.select(".y-gridlines").selectAll("line")[0];
+        assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
+        for (var j = 0; j < yAxisTickMarks.length; j++) {
+            var yTickMarkRect = yAxisTickMarks[j].getBoundingClientRect();
+            var yGridlineRect = yGridlines[j].getBoundingClientRect();
+            assert.equal(yTickMarkRect.top, yGridlineRect.top, "y tick and gridline align");
+        }
+
+        svg.remove();
     });
 });
 ///<reference path="testReference.ts" />
@@ -821,8 +912,8 @@ describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.TitleLabel("A CHART TITLE");
-        label.anchor(svg);
-        label.computeLayout();
+        label._anchor(svg);
+        label._computeLayout();
 
         var content = label.content;
         assert.isTrue(label.element.classed("label"), "title element has label css class");
@@ -840,11 +931,11 @@ describe("Labels", function () {
     it("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
-        label.anchor(svg);
+        label._anchor(svg);
         var content = label.content;
         var text = content.select("text");
-        label.computeLayout();
-        label.render();
+        label._computeLayout();
+        label._render();
         var textBBox = Plottable.Utils.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
         assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
@@ -855,11 +946,11 @@ describe("Labels", function () {
     it("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
-        label.anchor(svg);
+        label._anchor(svg);
         var content = label.content;
         var text = content.select("text");
-        label.computeLayout();
-        label.render();
+        label._computeLayout();
+        label._render();
         var textBBox = Plottable.Utils.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
         assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
@@ -870,7 +961,7 @@ describe("Labels", function () {
     it("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.TitleLabel();
-        label.anchor(svg);
+        label._anchor(svg);
         var textEl = label.content.select("text");
         assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
         assert.equal(label.rowMinimum(), 0, "rowMin is 0 for empty string");
@@ -884,11 +975,11 @@ describe("Labels", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
         var label = new Plottable.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label.anchor(svg);
+        label._anchor(svg);
         var content = label.content;
         var text = content.select("text");
-        label.computeLayout();
-        label.render();
+        label._computeLayout();
+        label._render();
         var bbox = Plottable.Utils.getBBox(text);
         assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
@@ -942,7 +1033,7 @@ describe("Legends", function () {
     });
 
     it("legend domain can be updated after initialization, and rowMinimum updates as well", function () {
-        legend.anchor(svg);
+        legend._anchor(svg);
         legend.scale(color);
         assert.equal(legend.rowMinimum(), 0, "there is no rowMinimum while the domain is empty");
         color.domain(["foo", "bar"]);
@@ -983,7 +1074,7 @@ describe("Legends", function () {
         legend.renderTo(svg);
         var numRows = legend.content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows initially");
-        legend.render();
+        legend._render();
         numRows = legend.content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 legend rows after second render");
         svg.remove();
@@ -994,7 +1085,7 @@ describe("Legends", function () {
         legend.renderTo(svg);
         var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
         color.domain(newDomain);
-        legend.computeLayout().render();
+        legend._computeLayout()._render();
         legend.content.selectAll(".legend-row").each(function (d, i) {
             assert.equal(d, newDomain[i], "the data was set properly");
             var text = d3.select(this).select("text").text();
@@ -1094,7 +1185,7 @@ describe("Renderers", function () {
             var svg = generateSVG(400, 300);
             var d1 = { data: ["foo"], metadata: { cssClass: "bar" } };
             var r = new Plottable.Renderer(d1);
-            r.anchor(svg).computeLayout();
+            r._anchor(svg)._computeLayout();
             var renderArea = r.content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
             assert.isTrue(r.element.classed("bar"), "the element is classed w/ metadata.cssClass");
@@ -1217,7 +1308,7 @@ describe("Renderers", function () {
             });
 
             it("rendering is idempotent", function () {
-                lineRenderer.render();
+                lineRenderer._render();
                 var path = renderArea.select("path");
                 assert.equal(path.attr("d"), "M0,500L500,0");
                 verifier.end();
@@ -1307,7 +1398,7 @@ describe("Renderers", function () {
             });
 
             it("rendering is idempotent", function () {
-                circleRenderer.render().render();
+                circleRenderer._render()._render();
                 circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
                 assert.equal(circlesInArea, 10, "10 circles were drawn");
                 verifier.end();
@@ -1421,7 +1512,7 @@ describe("Renderers", function () {
                 xScale = new Plottable.LinearScale();
                 yScale = new Plottable.LinearScale();
                 barRenderer = new Plottable.BarRenderer(dataset, xScale, yScale);
-                barRenderer.anchor(svg).computeLayout();
+                barRenderer._anchor(svg)._computeLayout();
             });
 
             beforeEach(function () {
@@ -1430,7 +1521,7 @@ describe("Renderers", function () {
 
             it("bars were rendered correctly with padding disabled", function () {
                 barRenderer.barPaddingPx = 0;
-                barRenderer.render();
+                barRenderer._render();
                 var renderArea = barRenderer.renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
@@ -1446,7 +1537,7 @@ describe("Renderers", function () {
 
             it("bars were rendered correctly with padding enabled", function () {
                 barRenderer.barPaddingPx = 1;
-                barRenderer.render();
+                barRenderer._render();
                 var renderArea = barRenderer.renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
@@ -1619,9 +1710,9 @@ describe("Tables", function () {
         var svg = generateSVG(200, 200);
         var c = new Plottable.Component().rowMinimum(300).colMinimum(300);
         var t = new Plottable.Table().addComponent(0, 0, c);
-        t.anchor(svg);
+        t._anchor(svg);
         assert.throws(function () {
-            return t.computeLayout();
+            return t._computeLayout();
         }, Error, "Insufficient Space");
         svg.remove();
     });
@@ -1633,8 +1724,8 @@ describe("Tables", function () {
 
         // force the components to have non-fixed layout; eg. as if they were renderers
         components.forEach(function (c) {
-            c.fixedWidthVal = false;
-            c.fixedHeightVal = false;
+            c._fixedWidth = false;
+            c._fixedHeight = false;
         });
 
         var svg = generateSVG();
@@ -1667,8 +1758,8 @@ describe("Tables", function () {
 
         // force the components to have non-fixed layout; eg. as if they were renderers
         components.forEach(function (c) {
-            c.fixedWidthVal = false;
-            c.fixedHeightVal = false;
+            c._fixedWidth = false;
+            c._fixedHeight = false;
         });
 
         table.padding(5, 5);
@@ -1715,8 +1806,8 @@ describe("Tables", function () {
         components[7].rowMinimum(30);
         components[3].colMinimum(50);
         components[5].colMinimum(50);
-        components[4].fixedWidthVal = false;
-        components[4].fixedHeightVal = false;
+        components[4]._fixedWidth = false;
+        components[4]._fixedHeight = false;
 
         // finally the center 'plot' object has a weight
         table.renderTo(svg);
@@ -1763,11 +1854,11 @@ describe("Tables", function () {
         var components = tableAndcomponents.components;
         assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
         assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
-        components[0].fixedWidthVal = false;
+        components[0]._fixedWidth = false;
         assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
         assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
-        components[8].fixedHeightVal = false;
-        components[0].fixedWidthVal = true;
+        components[8]._fixedHeight = false;
+        components[0]._fixedWidth = true;
         assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
         assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });

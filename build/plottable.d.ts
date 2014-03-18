@@ -82,20 +82,20 @@ declare module Plottable {
         public backgroundContainer: D3.Selection;
         public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
-        public fixedWidthVal: boolean;
-        public fixedHeightVal: boolean;
-        private rowMinimumVal;
-        private colMinimumVal;
+        public _fixedWidth: boolean;
+        public _fixedHeight: boolean;
+        private _rowMinimum;
+        private _colMinimum;
         private rootSVG;
         private isTopLevelComponent;
         public availableWidth: number;
         public availableHeight: number;
         public xOrigin: number;
         public yOrigin: number;
-        private xOffsetVal;
-        private yOffsetVal;
-        public xAlignProportion: number;
-        public yAlignProportion: number;
+        private _xOffset;
+        private _yOffset;
+        public _xAlignProportion: number;
+        public _yAlignProportion: number;
         private cssClasses;
         /**
         * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
@@ -103,7 +103,7 @@ declare module Plottable {
         * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
         * @returns {Component} The calling component.
         */
-        public anchor(element: D3.Selection): Component;
+        public _anchor(element: D3.Selection): Component;
         /**
         * Computes the size, position, and alignment from the specified values.
         * If no parameters are supplied and the component is a root node,
@@ -115,13 +115,13 @@ declare module Plottable {
         * @param {number} availableHeight
         * @returns {Component} The calling Component.
         */
-        public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Component;
+        public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Component;
         /**
         * Renders the component.
         *
         * @returns {Component} The calling Component.
         */
-        public render(): Component;
+        public _render(): Component;
         public renderTo(element: D3.Selection): Component;
         /**
         * Sets the x alignment of the Component.
@@ -199,6 +199,18 @@ declare module Plottable {
         * @return {boolean} Whether the component has a fixed height.
         */
         public isFixedHeight(): boolean;
+        /**
+        * Merges this Component with another Component, returning a ComponentGroup.
+        * There are four cases:
+        * Component + Component: Returns a ComponentGroup with both components inside it.
+        * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
+        * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
+        * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with two ComponentGroups inside it.
+        *
+        * @param {Component} c The component to merge in.
+        * @return {ComponentGroup}
+        */
+        public merge(c: Component): ComponentGroup;
     }
 }
 declare module Plottable {
@@ -246,6 +258,7 @@ declare module Plottable {
     }
     class QuantitiveScale extends Scale {
         public _d3Scale: D3.Scale.QuantitiveScale;
+        private lastRequestedTickCount;
         /**
         * Creates a new QuantitiveScale.
         * @constructor
@@ -346,7 +359,7 @@ declare module Plottable {
         * @param {Component} componentToListenTo The component to listen for interactions on.
         */
         constructor(componentToListenTo: Component);
-        public anchor(hitBox: D3.Selection): void;
+        public _anchor(hitBox: D3.Selection): void;
         /**
         * Registers the Interaction on the Component it's listening to.
         * This needs to be called to activate the interaction.
@@ -370,7 +383,7 @@ declare module Plottable {
         * @param {QuantitiveScale} yScale The Y scale to update on panning/zooming.
         */
         constructor(componentToListenTo: Component, xScale: QuantitiveScale, yScale: QuantitiveScale);
-        public anchor(hitBox: D3.Selection): void;
+        public _anchor(hitBox: D3.Selection): void;
         private rerenderZoomed();
     }
     class AreaInteraction extends Interaction {
@@ -405,7 +418,7 @@ declare module Plottable {
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
         public clearBox(): AreaInteraction;
-        public anchor(hitBox: D3.Selection): AreaInteraction;
+        public _anchor(hitBox: D3.Selection): AreaInteraction;
     }
     class ZoomCallbackGenerator {
         private xScaleMappings;
@@ -438,7 +451,7 @@ declare module Plottable {
     }
     class MousemoveInteraction extends Interaction {
         constructor(componentToListenTo: Component);
-        public anchor(hitBox: D3.Selection): void;
+        public _anchor(hitBox: D3.Selection): void;
         public mousemove(x: number, y: number): void;
     }
     class CrosshairsInteraction extends MousemoveInteraction {
@@ -447,7 +460,7 @@ declare module Plottable {
         private xLine;
         private yLine;
         constructor(renderer: XYRenderer);
-        public anchor(hitBox: D3.Selection): void;
+        public _anchor(hitBox: D3.Selection): void;
         public mousemove(x: number, y: number): void;
     }
 }
@@ -466,7 +479,7 @@ declare module Plottable {
         * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
         */
         constructor(text?: string, orientation?: string);
-        public anchor(element: D3.Selection): Label;
+        public _anchor(element: D3.Selection): Label;
         /**
         * Sets the text on the Label.
         *
@@ -476,7 +489,7 @@ declare module Plottable {
         public setText(text: string): Label;
         private measureAndSetTextSize();
         private truncateTextAndRemeasure(availableLength);
-        public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
+        public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
     }
     class TitleLabel extends Label {
         constructor(text?: string, orientation?: string);
@@ -512,10 +525,10 @@ declare module Plottable {
         public dataset(dataset: IDataset): Renderer;
         public metadata(metadata: IMetadata): Renderer;
         public data(data: any[]): Renderer;
-        public render(): Renderer;
+        public _render(): Renderer;
         public colorAccessor(a: IAccessor): Renderer;
         public _paint(): void;
-        public anchor(element: D3.Selection): Renderer;
+        public _anchor(element: D3.Selection): Renderer;
     }
     class XYRenderer extends Renderer {
         public dataSelection: D3.UpdateSelection;
@@ -536,7 +549,7 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
-        public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): XYRenderer;
+        public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): XYRenderer;
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
         *
@@ -575,7 +588,7 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
-        public anchor(element: D3.Selection): LineRenderer;
+        public _anchor(element: D3.Selection): LineRenderer;
         public _paint(): void;
     }
     class CircleRenderer extends XYRenderer {
@@ -640,9 +653,9 @@ declare module Plottable {
         * @param {Component} component The Component to be added.
         */
         public addComponent(row: number, col: number, component: Component): Table;
-        public anchor(element: D3.Selection): Table;
-        public computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Table;
-        public render(): Table;
+        public _anchor(element: D3.Selection): Table;
+        public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Table;
+        public _render(): Table;
         /**
         * Sets the row and column padding on the Table.
         *
@@ -718,7 +731,7 @@ declare module Plottable {
         public rowMinimum(): number;
         public rowMinimum(newVal: number): Legend;
         private measureTextHeight();
-        public render(): Legend;
+        public _render(): Legend;
     }
 }
 declare module Plottable {
@@ -738,8 +751,8 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(axisScale: Scale, orientation: string, formatter?: any);
-        public anchor(element: D3.Selection): Axis;
-        public render(): Axis;
+        public _anchor(element: D3.Selection): Axis;
+        public _render(): Axis;
         public _hideCutOffTickLabels(): Axis;
         private rescale();
         public scale(): Scale;
@@ -781,7 +794,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
-        public anchor(element: D3.Selection): XAxis;
+        public _anchor(element: D3.Selection): XAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -790,7 +803,7 @@ declare module Plottable {
         */
         public tickLabelPosition(): string;
         public tickLabelPosition(position: string): XAxis;
-        public render(): XAxis;
+        public _render(): XAxis;
     }
     class YAxis extends Axis {
         /**
@@ -802,7 +815,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
-        public anchor(element: D3.Selection): YAxis;
+        public _anchor(element: D3.Selection): YAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -811,7 +824,7 @@ declare module Plottable {
         */
         public tickLabelPosition(): string;
         public tickLabelPosition(position: string): YAxis;
-        public render(): YAxis;
+        public _render(): YAxis;
     }
 }
 declare module Plottable {
@@ -824,18 +837,33 @@ declare module Plottable {
         * @param {Component[]} [components] The Components in the ComponentGroup.
         */
         constructor(components?: Component[]);
-        /**
-        * Adds a Component to the ComponentGroup.
-        *
-        * @param {Component} c The Component to add.
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        public addComponent(c: Component): ComponentGroup;
-        public anchor(element: D3.Selection): ComponentGroup;
-        public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
-        public render(): ComponentGroup;
+        public _addComponentToGroup(c: Component, prepend?: boolean): ComponentGroup;
+        public merge(c: Component): ComponentGroup;
+        public _anchor(element: D3.Selection): ComponentGroup;
+        public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
+        public _render(): ComponentGroup;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+    }
+}
+declare module Plottable {
+    class Gridlines extends Component {
+        private xScale;
+        private yScale;
+        private xLinesContainer;
+        private yLinesContainer;
+        /**
+        * Creates a set of Gridlines.
+        * @constructor
+        *
+        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+        */
+        constructor(xScale: QuantitiveScale, yScale: QuantitiveScale);
+        public _anchor(element: D3.Selection): Gridlines;
+        public _render(): Gridlines;
+        private redrawXLines();
+        private redrawYLines();
     }
 }
 declare module Plottable {

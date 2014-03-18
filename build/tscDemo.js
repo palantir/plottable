@@ -26,5 +26,5 @@ var TSCDemo;
     renderAreaD1.colorAccessor(colorAccessor);
     var basicTable = new Plottable.Table().addComponent(1, 0, yAxis).addComponent(1, 2, yAxis2).addComponent(1, 1, renderAreaD1).addComponent(2, 1, xAxis).addComponent(0, 1, xAxis2);
 
-    basicTable.anchor(svg).computeLayout().render();
+    basicTable._anchor(svg)._computeLayout()._render();
 })(TSCDemo || (TSCDemo = {}));
