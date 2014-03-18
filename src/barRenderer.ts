@@ -27,13 +27,6 @@ module Plottable {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
 
-      var yDomain = this.yScale.domain();
-      if (!Utils.inRange(0, yDomain[0], yDomain[1])) {
-        var newMin = 0;
-        var newMax = yDomain[1];
-        this.yScale.widenDomain([newMin, newMax]); // TODO: make this handle reversed scales
-      }
-
       this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
 
 
