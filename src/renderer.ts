@@ -31,8 +31,8 @@ module Plottable {
     constructor(dataset?: IDataset) {
       super();
       this.clipPathEnabled = true;
-      this.fixedWidthVal = false;
-      this.fixedHeightVal = false;
+      this._fixedWidth = false;
+      this._fixedHeight = false;
       this.classed("renderer", true);
       if (dataset != null) {
         this.dataset(dataset);

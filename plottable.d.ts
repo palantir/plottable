@@ -77,14 +77,14 @@ declare module Plottable {
         public backgroundContainer: D3.Selection;
         public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
-        public fixedWidthVal: boolean;
-        public fixedHeightVal: boolean;
+        public _fixedWidth: boolean;
+        public _fixedHeight: boolean;
         public availableWidth: number;
         public availableHeight: number;
         public xOrigin: number;
         public yOrigin: number;
-        public xAlignProportion: number;
-        public yAlignProportion: number;
+        public _xAlignProportion: number;
+        public _yAlignProportion: number;
         /**
         * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
         *

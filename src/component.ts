@@ -13,10 +13,10 @@ module Plottable {
     public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
 
-    public fixedWidthVal = true;
-    public fixedHeightVal = true;
-    private rowMinimumVal = 0;
-    private colMinimumVal = 0;
+    public _fixedWidth = true;
+    public _fixedHeight = true;
+    private _rowMinimum = 0;
+    private _colMinimum = 0;
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
@@ -25,10 +25,10 @@ module Plottable {
     public availableHeight: number;
     public xOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
     public yOrigin        : number;
-    private xOffsetVal = 0; // Offset from Origin, used for alignment and floating positioning
-    private yOffsetVal = 0;
-    public xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
-    public yAlignProportion = 0;
+    private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
+    private _yOffset = 0;
+    public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
+    public _yAlignProportion = 0;
 
     private cssClasses: string[] = ["component"];
 
@@ -105,15 +105,15 @@ module Plottable {
 
       if (this.colMinimum() !== 0 && this.isFixedWidth()) {
         // The component has free space, so it makes sense to think about how to position or offset it
-        xPosition += (availableWidth - this.colMinimum()) * this.xAlignProportion;
-        xPosition += this.xOffsetVal;
+        xPosition += (availableWidth - this.colMinimum()) * this._xAlignProportion;
+        xPosition += this._xOffset;
         // Decrease size so hitbox / bounding box and children are sized correctly
         availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
       }
 
       if (this.rowMinimum() !== 0 && this.isFixedHeight()) {
-        yPosition += (availableHeight - this.rowMinimum()) * this.yAlignProportion;
-        yPosition += this.yOffsetVal;
+        yPosition += (availableHeight - this.rowMinimum()) * this._yAlignProportion;
+        yPosition += this._yOffset;
         availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
       }
 
@@ -149,11 +149,11 @@ module Plottable {
      */
     public xAlign(alignment: string): Component {
       if (alignment === "LEFT") {
-        this.xAlignProportion = 0;
+        this._xAlignProportion = 0;
       } else if (alignment === "CENTER") {
-        this.xAlignProportion = 0.5;
+        this._xAlignProportion = 0.5;
       } else if (alignment === "RIGHT") {
-        this.xAlignProportion = 1;
+        this._xAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
       }
@@ -168,11 +168,11 @@ module Plottable {
      */
     public yAlign(alignment: string): Component {
       if (alignment === "TOP") {
-        this.yAlignProportion = 0;
+        this._yAlignProportion = 0;
       } else if (alignment === "CENTER") {
-        this.yAlignProportion = 0.5;
+        this._yAlignProportion = 0.5;
       } else if (alignment === "BOTTOM") {
-        this.yAlignProportion = 1;
+        this._yAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
       }
@@ -186,7 +186,7 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public xOffset(offset: number): Component {
-      this.xOffsetVal = offset;
+      this._xOffset = offset;
       return this;
     }
 
@@ -197,7 +197,7 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public yOffset(offset: number): Component {
-      this.yOffsetVal = offset;
+      this._yOffset = offset;
       return this;
     }
 
@@ -292,10 +292,10 @@ module Plottable {
     public rowMinimum(newVal: number): Component;
     public rowMinimum(newVal?: number): any {
       if (newVal != null) {
-        this.rowMinimumVal = newVal;
+        this._rowMinimum = newVal;
         return this;
       } else {
-        return this.rowMinimumVal;
+        return this._rowMinimum;
       }
     }
 
@@ -309,10 +309,10 @@ module Plottable {
     public colMinimum(newVal: number): Component;
     public colMinimum(newVal?: number): any {
       if (newVal != null) {
-        this.colMinimumVal = newVal;
+        this._colMinimum = newVal;
         return this;
       } else {
-        return this.colMinimumVal;
+        return this._colMinimum;
       }
     }
 
@@ -323,7 +323,7 @@ module Plottable {
      * @return {boolean} Whether the component has a fixed width.
      */
     public isFixedWidth(): boolean {
-      return this.fixedWidthVal;
+      return this._fixedWidth;
     }
 
     /**
@@ -333,7 +333,7 @@ module Plottable {
      * @return {boolean} Whether the component has a fixed height.
      */
     public isFixedHeight(): boolean {
-      return this.fixedHeightVal;
+      return this._fixedHeight;
     }
 
     /**
