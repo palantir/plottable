@@ -44,4 +44,11 @@ describe("Gridlines", () => {
 
     svg.remove();
   });
+
+  it("Unanchored Gridlines don't throw an error when scale updates", () => {
+    var xScale = new Plottable.LinearScale();
+    var gridlines = new Plottable.Gridlines(xScale, null);
+    xScale.domain([0, 1]);
+    // test passes if error is not thrown.
+  });
 });
