@@ -8,7 +8,7 @@ var dataset = {data: data, metadata: {cssClass: "transparent-square"}};
 
 var xAxis = new Plottable.XAxis(xScale, "bottom").tickSize(2,0);
 var yAxis = new Plottable.YAxis(yScale, "left").tickLabelPosition("bottom").tickSize(50);
-function rAccessor() {return 10;}
+function rAccessor() {return 5;}
 var r  = new Plottable.SquareRenderer(dataset, xScale, yScale, null, null, rAccessor);
 
 // var gl = new Plottable.Gridlines(null, yScale);
