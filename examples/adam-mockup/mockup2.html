@@ -7,6 +7,14 @@
       .plottable .height-weight-data circle {
         opacity: 0.75;
       }
+
+      .plottable .y-axis line {
+        stroke-width: 1;
+      }
+
+      .plottable .x-axis path {
+        stroke-width: 1;
+      }
     </style>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="../../build/plottable.js"></script>
@@ -40,6 +48,7 @@
         var xAccessor = function(d) {
           return d.age;
         };
+
         var yAccessor = function(d) {
           return d.height;
         };

@@ -39,7 +39,8 @@
         var xAxis = new Plottable.XAxis(xScale, "bottom").tickSize(6, 0);
 
         var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "right").tickLabelPosition("bottom").tickSize(50);
+        var yAxis = new Plottable.YAxis(yScale, "right");
+        yAxis.tickLabelPosition("bottom").tickSize(50);
 
         dataseries.data.sort(function(a,b) { return a.age - b.age; });
         dataseries.data.forEach(function(d, i){ d.index = i; });
@@ -60,8 +61,8 @@
                                               [null, xAxis]]);
         var svg = d3.select("#histo-purple");
         svg.attr("width", 800).attr("height", 320);
-        histoTable.renderTo(svg);
         xScale.padDomain();
+        histoTable.renderTo(svg);
         yScale.nice();
       }
     </script>

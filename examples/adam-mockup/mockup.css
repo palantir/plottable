@@ -1,5 +1,7 @@
 .plottable .bounding-box {
   stroke: none;
+  fill: pink;
+  opacity: 0;
 }
 
 .plottable .axis line {

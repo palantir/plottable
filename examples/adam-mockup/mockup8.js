@@ -46,3 +46,4 @@ var legend = new Plottable.Legend(cs);
 var outerTable = new Plottable.Table().addComponent(0,0,innerTable)
                                       .addComponent(0,1,legend);
 outerTable.renderTo(svg);
+yScale.nice();
