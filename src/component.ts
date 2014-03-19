@@ -103,17 +103,16 @@ module Plottable {
       var xPosition = this.xOrigin;
       var yPosition = this.yOrigin;
 
+      xPosition += (availableWidth - this.colMinimum()) * this._xAlignProportion;
+      xPosition += this._xOffset;
       if (this.colMinimum() !== 0 && this.isFixedWidth()) {
-        // The component has free space, so it makes sense to think about how to position or offset it
-        xPosition += (availableWidth - this.colMinimum()) * this._xAlignProportion;
-        xPosition += this._xOffset;
         // Decrease size so hitbox / bounding box and children are sized correctly
         availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
       }
 
+      yPosition += (availableHeight - this.rowMinimum()) * this._yAlignProportion;
+      yPosition += this._yOffset;
       if (this.rowMinimum() !== 0 && this.isFixedHeight()) {
-        yPosition += (availableHeight - this.rowMinimum()) * this._yAlignProportion;
-        yPosition += this._yOffset;
         availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
       }
 

@@ -42,7 +42,7 @@ r2.colorAccessor(colorAccessor);
 
 
 var innerTable = new Plottable.Table([[yAxis, cg], [null, xAxis]]);
-var legend = new Plottable.Legend(cs).yAlign("CENTER");
+var legend = new Plottable.Legend(cs).yAlign("CENTER").xOffset(0).yOffset(0);
 var outerTable = new Plottable.Table().addComponent(0,0,innerTable)
                                       .addComponent(0,1,legend);
 outerTable.renderTo(svg);
