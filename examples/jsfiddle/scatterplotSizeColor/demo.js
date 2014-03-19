@@ -1,21 +1,6 @@
-function generateHeightWeightData(n) {
-    var data = [];
-    var heightGen = d3.random.normal(180, 2.5);
-    var weightGen = d3.random.normal(170, 30);
-    for (var i=0; i<n; i++) {
-        data.push({
-            age: Math.random() * 50 + 20,
-            gender: Math.random() > 0.5 ? "female" : "male",
-            height: heightGen(),
-            weight: weightGen()
-        });
-    }
-    return {data: data, metadata: {cssClass: "height-weight-data"}};
-}
-
-var dataseries = generateHeightWeightData(50);
-
 function generateScatterplotSizeColor() {
+    var dataseries = generateHeightWeightData(50);
+
     var xScale = new Plottable.LinearScale();
     var xAxis = new Plottable.XAxis(xScale, "bottom").tickSize(6, 0);
 
