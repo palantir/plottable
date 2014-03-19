@@ -90,6 +90,18 @@ describe("Labels", () => {
     svg.remove();
   });
 
+  it("centered text in a table is positioned properly", () => {
+    var svg = generateSVG(400, 400);
+    var label = new Plottable.TitleLabel(".");
+    var t = new Plottable.Table().addComponent(0, 0, label);
+    t.renderTo(svg);
+    var textElement = svg.select("text");
+    var textX = parseFloat(textElement.attr("x"));
+    var eleTranslate  = d3.transform(label.element.attr("transform")).translate;
+    assert.closeTo(eleTranslate[0] + textX, 200, 10, "label is centered");
+    svg.remove();
+  });
+
   it("unsupported alignments and orientations are unsupported", () => {
     assert.throws(() => new Plottable.Label("foo", "bar"), Error, "not a valid orientation");
   });
