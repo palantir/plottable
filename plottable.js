@@ -203,18 +203,16 @@ var Plottable;
             var xPosition = this.xOrigin;
             var yPosition = this.yOrigin;
 
+            xPosition += (availableWidth - this.colMinimum()) * this._xAlignProportion;
+            xPosition += this._xOffset;
             if (this.colMinimum() !== 0 && this.isFixedWidth()) {
-                // The component has free space, so it makes sense to think about how to position or offset it
-                xPosition += (availableWidth - this.colMinimum()) * this._xAlignProportion;
-                xPosition += this._xOffset;
-
                 // Decrease size so hitbox / bounding box and children are sized correctly
                 availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
             }
 
+            yPosition += (availableHeight - this.rowMinimum()) * this._yAlignProportion;
+            yPosition += this._yOffset;
             if (this.rowMinimum() !== 0 && this.isFixedHeight()) {
-                yPosition += (availableHeight - this.rowMinimum()) * this._yAlignProportion;
-                yPosition += this._yOffset;
                 availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
             }
 
@@ -252,11 +250,12 @@ var Plottable;
         * @returns {Component} The calling Component.
         */
         Component.prototype.xAlign = function (alignment) {
-            if (alignment === "LEFT") {
+            alignment = alignment.toLowerCase();
+            if (alignment === "left") {
                 this._xAlignProportion = 0;
-            } else if (alignment === "CENTER") {
+            } else if (alignment === "center") {
                 this._xAlignProportion = 0.5;
-            } else if (alignment === "RIGHT") {
+            } else if (alignment === "right") {
                 this._xAlignProportion = 1;
             } else {
                 throw new Error("Unsupported alignment");
@@ -271,11 +270,12 @@ var Plottable;
         * @returns {Component} The calling Component.
         */
         Component.prototype.yAlign = function (alignment) {
-            if (alignment === "TOP") {
+            alignment = alignment.toLowerCase();
+            if (alignment === "top") {
                 this._yAlignProportion = 0;
-            } else if (alignment === "CENTER") {
+            } else if (alignment === "center") {
                 this._yAlignProportion = 0.5;
-            } else if (alignment === "BOTTOM") {
+            } else if (alignment === "bottom") {
                 this._yAlignProportion = 1;
             } else {
                 throw new Error("Unsupported alignment");
@@ -684,6 +684,7 @@ var Plottable;
                 case null:
                 case undefined:
                     scale = d3.scale.ordinal();
+                    break;
                 default:
                     throw new Error("Unsupported ColorScale type");
             }
@@ -1011,6 +1012,7 @@ var Plottable;
             _super.call(this);
             this.classed("label", true);
             this.setText(text);
+            orientation = orientation.toLowerCase();
             if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
                 this.orientation = orientation;
                 if (orientation === "horizontal") {
@@ -1064,7 +1066,10 @@ var Plottable;
 
         Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
             _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+            this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
 
+            // We need to undo translation on the original element, since that effects
+            // alignment, but we are going to do that manually on the text element.
             this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
             var bbox = Plottable.Utils.getBBox(this.textElement);
             this.textElement.attr("dy", -bbox.y);
@@ -1205,7 +1210,10 @@ var Plottable;
         return Renderer;
     })(Plottable.Component);
     Plottable.Renderer = Renderer;
-
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
     var XYRenderer = (function (_super) {
         __extends(XYRenderer, _super);
         /**
@@ -1322,9 +1330,56 @@ var Plottable;
             return d.y;
         };
         return XYRenderer;
-    })(Renderer);
+    })(Plottable.Renderer);
     Plottable.XYRenderer = XYRenderer;
-
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var CircleRenderer = (function (_super) {
+        __extends(CircleRenderer, _super);
+        /**
+        * Creates a CircleRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {QuantitiveScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
+        */
+        function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, rAccessor) {
+            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
+            this.classed("circle-renderer", true);
+        }
+        CircleRenderer.prototype._paint = function () {
+            var _this = this;
+            _super.prototype._paint.call(this);
+            this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
+            this.dataSelection.enter().append("circle");
+            this.dataSelection.attr("cx", function (d, i) {
+                return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
+            }).attr("cy", function (d, i) {
+                return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
+            }).attr("r", function (d, i) {
+                return _this.rAccessor(d, i, _this._metadata);
+            }).attr("fill", function (d, i) {
+                return _this._colorAccessor(d, i, _this._metadata);
+            });
+            this.dataSelection.exit().remove();
+        };
+        CircleRenderer.defaultRAccessor = function (d) {
+            return 3;
+        };
+        return CircleRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.CircleRenderer = CircleRenderer;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
     var LineRenderer = (function (_super) {
         __extends(LineRenderer, _super);
         /**
@@ -1362,48 +1417,12 @@ var Plottable;
             this.path.attr("stroke", this._colorAccessor(this._data[0], 0, this._metadata));
         };
         return LineRenderer;
-    })(XYRenderer);
+    })(Plottable.XYRenderer);
     Plottable.LineRenderer = LineRenderer;
-
-    var CircleRenderer = (function (_super) {
-        __extends(CircleRenderer, _super);
-        /**
-        * Creates a CircleRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {QuantitiveScale} xScale The x scale to use.
-        * @param {QuantitiveScale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
-        */
-        function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, rAccessor) {
-            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
-            this.classed("circle-renderer", true);
-        }
-        CircleRenderer.prototype._paint = function () {
-            var _this = this;
-            _super.prototype._paint.call(this);
-            this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
-            this.dataSelection.enter().append("circle");
-            this.dataSelection.attr("cx", function (d, i) {
-                return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
-            }).attr("cy", function (d, i) {
-                return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
-            }).attr("r", this.rAccessor).attr("fill", function (d, i) {
-                return _this._colorAccessor(d, i, _this._metadata);
-            });
-            this.dataSelection.exit().remove();
-        };
-        CircleRenderer.defaultRAccessor = function (d) {
-            return 3;
-        };
-        return CircleRenderer;
-    })(XYRenderer);
-    Plottable.CircleRenderer = CircleRenderer;
-
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
     var BarRenderer = (function (_super) {
         __extends(BarRenderer, _super);
         /**
@@ -1422,13 +1441,6 @@ var Plottable;
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
             this.barPaddingPx = 1;
             this.classed("bar-renderer", true);
-
-            var yDomain = this.yScale.domain();
-            if (!Plottable.Utils.inRange(0, yDomain[0], yDomain[1])) {
-                var newMin = 0;
-                var newMax = yDomain[1];
-                this.yScale.widenDomain([newMin, newMax]); // TODO: make this handle reversed scales
-            }
 
             this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
 
@@ -1485,8 +1497,58 @@ var Plottable;
             return d.dx;
         };
         return BarRenderer;
-    })(XYRenderer);
+    })(Plottable.XYRenderer);
     Plottable.BarRenderer = BarRenderer;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var SquareRenderer = (function (_super) {
+        __extends(SquareRenderer, _super);
+        /**
+        * Creates a SquareRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {QuantitiveScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
+        */
+        function SquareRenderer(dataset, xScale, yScale, xAccessor, yAccessor, rAccessor) {
+            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.rAccessor = (rAccessor != null) ? rAccessor : SquareRenderer.defaultRAccessor;
+            this.classed("square-renderer", true);
+        }
+        SquareRenderer.prototype._paint = function () {
+            var _this = this;
+            _super.prototype._paint.call(this);
+            var xFn = function (d, i) {
+                return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata)) - _this.rAccessor(d, i, _this._metadata);
+            };
+
+            var yFn = function (d, i) {
+                return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata)) - _this.rAccessor(d, i, _this._metadata);
+            };
+
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
+            this.dataSelection.enter().append("rect");
+            this.dataSelection.attr("x", xFn).attr("y", yFn).attr("width", function (d, i) {
+                return _this.rAccessor(d, i, _this._metadata);
+            }).attr("height", function (d, i) {
+                return _this.rAccessor(d, i, _this._metadata);
+            }).attr("fill", function (d, i) {
+                return _this._colorAccessor(d, i, _this._metadata);
+            });
+            this.dataSelection.exit().remove();
+        };
+        SquareRenderer.defaultRAccessor = function (d) {
+            return 3;
+        };
+        return SquareRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.SquareRenderer = SquareRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
 var Plottable;
@@ -1877,6 +1939,11 @@ var Plottable;
 /// <reference path="interaction.ts" />
 /// <reference path="label.ts" />
 /// <reference path="renderer.ts" />
+/// <reference path="xyRenderer.ts" />
+/// <reference path="circleRenderer.ts" />
+/// <reference path="lineRenderer.ts" />
+/// <reference path="barRenderer.ts" />
+/// <reference path="squareRenderer.ts" />
 /// <reference path="table.ts" />
 /// <reference path="coordinator.ts" />
 /// <reference path="legend.ts" />
@@ -2102,8 +2169,8 @@ var Plottable;
         */
         function XAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
-            var orientationLC = orientation.toLowerCase();
-            if (orientationLC !== "top" && orientationLC !== "bottom") {
+            var orientation = orientation.toLowerCase();
+            if (orientation !== "top" && orientation !== "bottom") {
                 throw new Error(orientation + " is not a valid orientation for XAxis");
             }
             _super.call(this, scale, orientation, formatter);
@@ -2170,8 +2237,8 @@ var Plottable;
         */
         function YAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
-            var orientationLC = orientation.toLowerCase();
-            if (orientationLC !== "left" && orientationLC !== "right") {
+            orientation = orientation.toLowerCase();
+            if (orientation !== "left" && orientation !== "right") {
                 throw new Error(orientation + " is not a valid orientation for YAxis");
             }
             _super.call(this, scale, orientation, formatter);
@@ -2352,7 +2419,7 @@ var Plottable;
 
         Gridlines.prototype.redrawXLines = function () {
             var _this = this;
-            if (this.xScale != null) {
+            if (this.xScale != null && this.element != null) {
                 var xTicks = this.xScale.ticks();
                 var getScaledXValue = function (tickVal) {
                     return _this.xScale.scale(tickVal);
@@ -2366,7 +2433,7 @@ var Plottable;
 
         Gridlines.prototype.redrawYLines = function () {
             var _this = this;
-            if (this.yScale != null) {
+            if (this.yScale != null && this.element != null) {
                 var yTicks = this.yScale.ticks();
                 var getScaledYValue = function (tickVal) {
                     return _this.yScale.scale(tickVal);
