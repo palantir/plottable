@@ -107,17 +107,19 @@ module.exports = function(grunt) {
       dist: {
         files: [
           {src: "build/plottable.js", dest:"plottable.js"},
-          {src: "build/plottable.d.ts", dest:"plottable.d.ts"}
+          {src: "build/plottable.d.ts", dest:"plottable.d.ts"},
+          {src: "build/tests.js", dest: "test/tests.js"},
+          {src: "build/exampleUtil.js", dest: "examples/exampleUtil.js"}
         ]
       }
     },
     gitcommit: {
       task: {
         options: {
-          message: "Update plottable.js and plottable.d.ts"
+          message: "Update plottable.js, plottable.d.ts, and other build artefacts"
         },
         files: {
-          src: ['plottable.js', 'plottable.d.ts']
+          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js']
         }
       }
     }
