@@ -1,0 +1,38 @@
+.plottable .bounding-box {
+  stroke: none;
+  fill: pink;
+  opacity: 0;
+}
+
+.plottable .axis line {
+  stroke: #979797;
+  stroke-width: 2px;
+}
+
+.plottable .axis text {
+  font-size: 12pt;
+  fill: #979797;
+}
+
+.plottable .x-axis line {
+  stroke: none;
+}
+
+.plottable .x-axis path {
+  stroke-width: 2px;
+  stroke: #979797;
+}
+
+.plottable .y-axis path {
+  stroke: none;
+}
+
+.plottable .gridlines line {
+  stroke-dasharray: 2, 2
+}
+
+.plottable .legend {
+  font-family: sans-serif;
+  fill: #979797;
+  font-size: 10pt;
+}

@@ -19,6 +19,7 @@ module Plottable {
       super();
       this.classed("label", true);
       this.setText(text);
+      orientation = orientation.toLowerCase();
       if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
         this.orientation = orientation;
         if (orientation === "horizontal") {
@@ -73,7 +74,9 @@ module Plottable {
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-
+      this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
+      // We need to undo translation on the original element, since that effects
+      // alignment, but we are going to do that manually on the text element.
       this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
       var bbox = Utils.getBBox(this.textElement);
       this.textElement.attr("dy", -bbox.y);

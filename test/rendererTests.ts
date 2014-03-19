@@ -324,6 +324,8 @@ describe("Renderers", () => {
         yScale = new Plottable.LinearScale();
         barRenderer = new Plottable.BarRenderer(dataset, xScale, yScale);
         barRenderer._anchor(svg)._computeLayout();
+        var currentYDomain = yScale.domain();
+        yScale.domain([0, currentYDomain[1]]);
       });
 
       beforeEach(() => {

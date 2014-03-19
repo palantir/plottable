@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <title>Mockup 5</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <link rel="stylesheet" type="text/css" href="mockup.css">
+    <style>
+      #histo-purple .x-axis text {
+        fill: none;
+      }
+
+      #histo-purple .bar-renderer .render-area rect {
+        fill: #7E74B3;
+      }
+    </style>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script>
+
+    <script>
+      function generateHeightWeightData(n) {
+        var data = [];
+        var heightGen = d3.random.normal(180, 2.5);
+        var weightGen = d3.random.normal(170, 30);
+        for (var i=0; i<n; i++) {
+          data.push({
+            age: Math.random() * 50 + 20,
+            gender: Math.random() > 0.5 ? "female" : "male",
+            height: heightGen(),
+            weight: weightGen()
+          });
+        }
+        return {data: data, metadata: {cssClass: "height-weight-data"}};
+      }
+
+      var dataseries = generateHeightWeightData(50);
+
+      window.onload = function() {
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom").tickSize(6, 0);
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "right");
+        yAxis.tickLabelPosition("bottom").tickSize(50);
+
+        dataseries.data.sort(function(a,b) { return a.age - b.age; });
+        dataseries.data.forEach(function(d, i){ d.index = i; });
+        var xAccessor = function(d, i) {
+          return d.index;
+        };
+        var dxAccessor = function(d) {
+          return 1;
+        };
+        var yAccessor = function(d) {
+          return d.height;
+        }
+
+        var bars = new Plottable.BarRenderer(dataseries, xScale, yScale, xAccessor, dxAccessor, yAccessor);
+        var gridlines = new Plottable.Gridlines(null, yScale);
+        var renderArea = gridlines.merge(bars);
+        var histoTable = new Plottable.Table([[yAxis, renderArea],
+                                              [null, xAxis]]);
+        var svg = d3.select("#histo-purple");
+        svg.attr("width", 800).attr("height", 320);
+        xScale.padDomain();
+        histoTable.renderTo(svg);
+        yScale.nice();
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="histo-purple"></svg>
+  </body>
+
+</html>

@@ -299,6 +299,13 @@ declare module Plottable {
         * @returns {(n: number) => string} A formatting function.
         */
         public tickFormat(count: number, format?: string): (n: number) => string;
+        /**
+        * Pads out the domain of the scale by a specified ratio.
+        *
+        * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
+        * @returns {QuantitiveScale} The calling QuantitiveScale.
+        */
+        public padDomain(padProportion?: number): QuantitiveScale;
     }
     class LinearScale extends QuantitiveScale {
         /**
@@ -514,7 +521,6 @@ declare module Plottable {
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
     }
     class CircleRenderer extends XYRenderer {
-        public size: number;
         /**
         * Creates a CircleRenderer.
         *
@@ -524,9 +530,9 @@ declare module Plottable {
         * @param {QuantitiveScale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        * @param {number} [size] The radius of the circles, in pixels.
+        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, size?: number);
+        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor);
     }
     class BarRenderer extends XYRenderer {
         public barPaddingPx: number;
@@ -720,29 +726,21 @@ declare module Plottable {
         * @param {Component[]} [components] The Components in the ComponentGroup.
         */
         constructor(components?: Component[]);
-<<<<<<< HEAD
-<<<<<<< HEAD
         public merge(c: Component): ComponentGroup;
-        public anchor(element: D3.Selection): ComponentGroup;
-        public computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
-        public render(): ComponentGroup;
-=======
-        /**
-        * Adds a Component to the ComponentGroup.
-        *
-        * @param {Component} c The Component to add.
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        public addComponent(c: Component): ComponentGroup;
-        public _anchor(element: D3.Selection): ComponentGroup;
-        public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): ComponentGroup;
-        public _render(): ComponentGroup;
->>>>>>> Make anchor, computeLayout, and render protected methods (via _convention)
-=======
-        public merge(c: Component): ComponentGroup;
->>>>>>> Update plottable.js and plottable.d.ts
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+    }
+}
+declare module Plottable {
+    class Gridlines extends Component {
+        /**
+        * Creates a set of Gridlines.
+        * @constructor
+        *
+        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+        */
+        constructor(xScale: QuantitiveScale, yScale: QuantitiveScale);
     }
 }
 declare module Plottable {

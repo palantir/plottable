@@ -42,7 +42,7 @@ module Plottable {
     }
 
     private redrawXLines() {
-      if (this.xScale != null) {
+      if (this.xScale != null && this.element != null) {
         var xTicks = this.xScale.ticks();
         var getScaledXValue = (tickVal: number) => this.xScale.scale(tickVal);
         var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
@@ -56,7 +56,7 @@ module Plottable {
     }
 
     private redrawYLines() {
-      if (this.yScale != null) {
+      if (this.yScale != null && this.element != null) {
         var yTicks = this.yScale.ticks();
         var getScaledYValue = (tickVal: number) => this.yScale.scale(tickVal);
         var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
