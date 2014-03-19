@@ -231,8 +231,8 @@ module Plottable {
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
-      var orientationLC = orientation.toLowerCase();
-      if (orientationLC !== "top" && orientationLC !== "bottom") {
+      var orientation = orientation.toLowerCase();
+      if (orientation !== "top" && orientation !== "bottom") {
         throw new Error(orientation + " is not a valid orientation for XAxis");
       }
       super(scale, orientation, formatter);
@@ -304,8 +304,8 @@ module Plottable {
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
-      var orientationLC = orientation.toLowerCase();
-      if (orientationLC !== "left" && orientationLC !== "right") {
+      orientation = orientation.toLowerCase();
+      if (orientation !== "left" && orientation !== "right") {
         throw new Error(orientation + " is not a valid orientation for YAxis");
       }
       super(scale, orientation, formatter);

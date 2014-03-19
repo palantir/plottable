@@ -19,6 +19,7 @@ module Plottable {
       super();
       this.classed("label", true);
       this.setText(text);
+      orientation = orientation.toLowerCase();
       if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
         this.orientation = orientation;
         if (orientation === "horizontal") {

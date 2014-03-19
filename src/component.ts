@@ -147,11 +147,12 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public xAlign(alignment: string): Component {
-      if (alignment === "LEFT") {
+      alignment = alignment.toLowerCase();
+      if (alignment === "left") {
         this._xAlignProportion = 0;
-      } else if (alignment === "CENTER") {
+      } else if (alignment === "center") {
         this._xAlignProportion = 0.5;
-      } else if (alignment === "RIGHT") {
+      } else if (alignment === "right") {
         this._xAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
@@ -166,11 +167,12 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public yAlign(alignment: string): Component {
-      if (alignment === "TOP") {
+      alignment = alignment.toLowerCase();
+      if (alignment === "top") {
         this._yAlignProportion = 0;
-      } else if (alignment === "CENTER") {
+      } else if (alignment === "center") {
         this._yAlignProportion = 0.5;
-      } else if (alignment === "BOTTOM") {
+      } else if (alignment === "bottom") {
         this._yAlignProportion = 1;
       } else {
         throw new Error("Unsupported alignment");
