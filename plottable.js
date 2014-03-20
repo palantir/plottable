@@ -557,6 +557,19 @@ var Plottable;
             return this;
         };
 
+        /**
+        * Expands the QuantitiveScale's domain to cover the data given.
+        * Passes an accessor through to the native d3 code.
+        * @param data The data to operate on.
+        * @param [accessor] The accessor to get values out of the data
+        * @returns {QuantitiveScale} The scale.
+        */
+        QuantitiveScale.prototype.widenDomainOnData = function (data, accessor) {
+            var extent = d3.extent(data, accessor);
+            this.widenDomain(extent);
+            return this;
+        };
+
         QuantitiveScale.prototype.interpolate = function (factory) {
             if (factory == null) {
                 return this._d3Scale.interpolate();
