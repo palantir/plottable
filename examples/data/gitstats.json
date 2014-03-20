@@ -1,9 +1,16 @@
-main
 [
   {
     "deletions": 0, 
+    "insertions": 4083, 
+    "name": "danmane", 
+    "changed": 1, 
+    "date": "Thu Mar 20 14:27:58 2014 -0700", 
+    "email": "danmane@gmail.com"
+  }, 
+  {
+    "deletions": 0, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Mar 19 18:07:49 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -11,7 +18,7 @@ main
   {
     "deletions": 5, 
     "insertions": 21, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Mar 19 17:57:00 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -19,7 +26,7 @@ main
   {
     "deletions": 2, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Mar 19 17:56:01 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -27,7 +34,7 @@ main
   {
     "deletions": 12, 
     "insertions": 27, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Mar 19 17:56:26 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -35,7 +42,7 @@ main
   {
     "deletions": 2, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Mar 19 17:56:01 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -43,7 +50,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Wed Mar 19 17:45:50 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -51,7 +58,7 @@ main
   {
     "deletions": 15, 
     "insertions": 74, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 7, 
     "date": "Wed Mar 19 17:40:24 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -59,7 +66,7 @@ main
   {
     "deletions": 0, 
     "insertions": 19, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Wed Mar 19 16:22:11 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -67,7 +74,7 @@ main
   {
     "deletions": 17, 
     "insertions": 24, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Wed Mar 19 16:00:49 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -75,7 +82,7 @@ main
   {
     "deletions": 0, 
     "insertions": 64, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Wed Mar 19 15:44:44 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -83,7 +90,7 @@ main
   {
     "deletions": 27, 
     "insertions": 27, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Mar 19 15:30:18 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -91,7 +98,7 @@ main
   {
     "deletions": 2, 
     "insertions": 37, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Mar 19 15:30:06 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -99,7 +106,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Mar 19 14:20:07 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -107,7 +114,7 @@ main
   {
     "deletions": 0, 
     "insertions": 5681, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 17, 
     "date": "Wed Mar 19 11:55:04 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -115,7 +122,7 @@ main
   {
     "deletions": 77, 
     "insertions": 2212, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Wed Mar 19 11:53:45 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -123,7 +130,7 @@ main
   {
     "deletions": 3, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Mar 19 11:53:22 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -131,7 +138,7 @@ main
   {
     "deletions": 259, 
     "insertions": 488, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 7, 
     "date": "Mon Mar 17 18:21:46 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -139,7 +146,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 17 18:20:24 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -147,7 +154,7 @@ main
   {
     "deletions": 39, 
     "insertions": 35, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Mar 17 18:18:44 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -155,7 +162,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 17 18:15:41 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -163,7 +170,7 @@ main
   {
     "deletions": 62, 
     "insertions": 62, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 8, 
     "date": "Mon Mar 17 18:11:27 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -171,7 +178,7 @@ main
   {
     "deletions": 2, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 17 18:04:20 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -179,7 +186,7 @@ main
   {
     "deletions": 91, 
     "insertions": 69, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Mar 17 18:00:54 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -187,7 +194,7 @@ main
   {
     "deletions": 183, 
     "insertions": 196, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 26, 
     "date": "Mon Mar 17 17:55:54 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -195,7 +202,7 @@ main
   {
     "deletions": 16, 
     "insertions": 146, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Mon Mar 17 16:35:43 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -203,7 +210,7 @@ main
   {
     "deletions": 14, 
     "insertions": 19, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 17 16:33:47 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -211,7 +218,7 @@ main
   {
     "deletions": 0, 
     "insertions": 47, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Mon Mar 17 16:22:36 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -219,7 +226,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 17 15:50:54 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -227,7 +234,7 @@ main
   {
     "deletions": 1, 
     "insertions": 125, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Mon Mar 17 15:48:14 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -235,7 +242,7 @@ main
   {
     "deletions": 13, 
     "insertions": 39, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 17 15:49:55 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -243,7 +250,7 @@ main
   {
     "deletions": 0, 
     "insertions": 47, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 17 15:39:47 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -251,7 +258,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 17 11:47:15 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -259,7 +266,7 @@ main
   {
     "deletions": 0, 
     "insertions": 25, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Mar 19 11:44:03 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -267,7 +274,7 @@ main
   {
     "deletions": 870, 
     "insertions": 900, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 61, 
     "date": "Wed Mar 19 11:18:34 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -275,7 +282,7 @@ main
   {
     "deletions": 2, 
     "insertions": 9, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Mar 18 18:27:25 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -283,7 +290,7 @@ main
   {
     "deletions": 10, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Mar 18 18:24:37 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -291,7 +298,7 @@ main
   {
     "deletions": 1, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Mar 18 18:03:25 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -299,7 +306,7 @@ main
   {
     "deletions": 6, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Mar 18 17:21:45 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -307,7 +314,7 @@ main
   {
     "deletions": 3, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Tue Mar 18 17:02:29 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -315,7 +322,7 @@ main
   {
     "deletions": 0, 
     "insertions": 2, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Tue Mar 18 17:30:28 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -323,7 +330,7 @@ main
   {
     "deletions": 2, 
     "insertions": 15, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Tue Mar 18 17:21:20 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -331,7 +338,7 @@ main
   {
     "deletions": 1, 
     "insertions": 46, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Mar 18 16:06:09 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -339,7 +346,7 @@ main
   {
     "deletions": 0, 
     "insertions": 40, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Mar 18 16:05:51 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -347,7 +354,7 @@ main
   {
     "deletions": 74, 
     "insertions": 140, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Tue Mar 18 15:47:18 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -355,7 +362,7 @@ main
   {
     "deletions": 271, 
     "insertions": 287, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Tue Mar 18 15:36:19 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -363,7 +370,7 @@ main
   {
     "deletions": 36, 
     "insertions": 99, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Tue Mar 18 15:20:46 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -371,7 +378,7 @@ main
   {
     "deletions": 1, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 18 15:18:39 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -379,7 +386,7 @@ main
   {
     "deletions": 0, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 18 14:56:21 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -387,7 +394,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 18 14:55:26 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -395,7 +402,7 @@ main
   {
     "deletions": 10, 
     "insertions": 32, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Tue Mar 18 14:07:47 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -403,7 +410,7 @@ main
   {
     "deletions": 8, 
     "insertions": 119, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 7, 
     "date": "Tue Mar 18 14:00:43 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -411,7 +418,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 17 18:20:24 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -419,7 +426,7 @@ main
   {
     "deletions": 39, 
     "insertions": 35, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Mar 17 18:18:44 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -427,7 +434,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 17 18:15:41 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -435,7 +442,7 @@ main
   {
     "deletions": 62, 
     "insertions": 62, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 8, 
     "date": "Mon Mar 17 18:11:27 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -443,7 +450,7 @@ main
   {
     "deletions": 2, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 17 18:04:20 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -451,7 +458,7 @@ main
   {
     "deletions": 107, 
     "insertions": 65, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Mar 17 18:00:54 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -459,7 +466,7 @@ main
   {
     "deletions": 186, 
     "insertions": 186, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 26, 
     "date": "Mon Mar 17 17:55:54 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -467,7 +474,7 @@ main
   {
     "deletions": 16, 
     "insertions": 146, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Mon Mar 17 16:35:43 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -475,7 +482,7 @@ main
   {
     "deletions": 14, 
     "insertions": 19, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 17 16:33:47 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -483,7 +490,7 @@ main
   {
     "deletions": 0, 
     "insertions": 47, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Mon Mar 17 16:22:36 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -491,7 +498,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 17 15:50:54 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -499,7 +506,7 @@ main
   {
     "deletions": 1, 
     "insertions": 125, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Mon Mar 17 15:48:14 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -507,7 +514,7 @@ main
   {
     "deletions": 13, 
     "insertions": 39, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 17 15:49:55 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -515,7 +522,7 @@ main
   {
     "deletions": 0, 
     "insertions": 47, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 17 15:39:47 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -523,7 +530,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 17 11:47:15 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -531,7 +538,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Fri Mar 14 17:14:35 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -539,7 +546,7 @@ main
   {
     "deletions": 1519, 
     "insertions": 3235, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 7, 
     "date": "Fri Mar 14 17:05:07 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -547,7 +554,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Fri Mar 14 15:38:03 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -555,7 +562,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Fri Mar 14 15:37:29 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -563,7 +570,7 @@ main
   {
     "deletions": 8, 
     "insertions": 26, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Fri Mar 14 15:30:15 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -571,7 +578,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Mar 14 15:32:11 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -579,7 +586,7 @@ main
   {
     "deletions": 0, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Mar 14 15:28:27 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -587,7 +594,7 @@ main
   {
     "deletions": 19, 
     "insertions": 43, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 11, 
     "date": "Fri Mar 14 15:11:56 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -595,7 +602,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Fri Mar 14 15:05:27 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -603,7 +610,7 @@ main
   {
     "deletions": 16, 
     "insertions": 35, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Fri Mar 14 14:47:00 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -611,7 +618,7 @@ main
   {
     "deletions": 0, 
     "insertions": 87, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Mar 14 13:34:42 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -619,7 +626,7 @@ main
   {
     "deletions": 28, 
     "insertions": 10, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Fri Mar 14 13:27:37 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -627,7 +634,7 @@ main
   {
     "deletions": 3, 
     "insertions": 137, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Fri Mar 14 13:21:13 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -635,7 +642,7 @@ main
   {
     "deletions": 0, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Mar 13 18:28:12 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -643,7 +650,7 @@ main
   {
     "deletions": 89, 
     "insertions": 22, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Thu Mar 13 18:17:07 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -651,7 +658,7 @@ main
   {
     "deletions": 26, 
     "insertions": 7, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Thu Mar 13 16:14:49 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -659,7 +666,7 @@ main
   {
     "deletions": 59, 
     "insertions": 84, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Thu Mar 13 15:26:10 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -667,7 +674,7 @@ main
   {
     "deletions": 120, 
     "insertions": 91, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 9, 
     "date": "Thu Mar 13 15:04:39 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -675,7 +682,7 @@ main
   {
     "deletions": 2, 
     "insertions": 17, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Mar 13 14:53:26 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -683,7 +690,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Thu Mar 13 14:49:43 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -691,7 +698,7 @@ main
   {
     "deletions": 18, 
     "insertions": 20, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Thu Mar 13 14:28:50 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -699,7 +706,7 @@ main
   {
     "deletions": 19, 
     "insertions": 35, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Wed Mar 12 20:04:26 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -707,7 +714,7 @@ main
   {
     "deletions": 0, 
     "insertions": 10, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Mar 12 20:03:06 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -715,7 +722,7 @@ main
   {
     "deletions": 4, 
     "insertions": 66, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Wed Mar 12 19:00:18 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -723,7 +730,7 @@ main
   {
     "deletions": 32, 
     "insertions": 194, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Wed Mar 12 17:10:47 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -731,7 +738,7 @@ main
   {
     "deletions": 16, 
     "insertions": 16, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Wed Mar 12 16:48:40 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -739,7 +746,7 @@ main
   {
     "deletions": 67, 
     "insertions": 85, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Wed Mar 12 16:45:47 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -747,7 +754,7 @@ main
   {
     "deletions": 94, 
     "insertions": 204, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Wed Mar 12 14:39:43 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -755,7 +762,7 @@ main
   {
     "deletions": 4, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Mar 12 12:07:03 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -763,7 +770,7 @@ main
   {
     "deletions": 55, 
     "insertions": 68, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 10, 
     "date": "Wed Mar 12 11:57:37 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -771,7 +778,7 @@ main
   {
     "deletions": 1, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Mar 12 11:25:31 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -779,7 +786,7 @@ main
   {
     "deletions": 20310, 
     "insertions": 20313, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 22, 
     "date": "Wed Mar 12 10:35:57 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -787,7 +794,7 @@ main
   {
     "deletions": 407, 
     "insertions": 1010, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 17, 
     "date": "Tue Mar 11 17:53:35 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -795,7 +802,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Mar 11 17:50:34 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -803,7 +810,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 11 17:49:45 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -811,7 +818,7 @@ main
   {
     "deletions": 23, 
     "insertions": 33, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Tue Mar 11 17:47:56 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -819,7 +826,7 @@ main
   {
     "deletions": 7, 
     "insertions": 263, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Tue Mar 11 17:33:54 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -827,7 +834,7 @@ main
   {
     "deletions": 0, 
     "insertions": 39, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 11 17:00:51 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -835,7 +842,7 @@ main
   {
     "deletions": 0, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 11 16:51:18 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -843,7 +850,7 @@ main
   {
     "deletions": 2, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Mar 11 16:13:42 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -851,7 +858,7 @@ main
   {
     "deletions": 0, 
     "insertions": 26, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 11 16:10:47 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -859,7 +866,7 @@ main
   {
     "deletions": 0, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 11 15:14:25 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -867,7 +874,7 @@ main
   {
     "deletions": 0, 
     "insertions": 20292, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 7, 
     "date": "Tue Mar 11 14:45:42 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -875,7 +882,7 @@ main
   {
     "deletions": 0, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Mar 11 14:01:56 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -883,7 +890,7 @@ main
   {
     "deletions": 56, 
     "insertions": 56, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Tue Mar 11 14:00:37 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -891,7 +898,7 @@ main
   {
     "deletions": 117, 
     "insertions": 116, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 3, 
     "date": "Tue Mar 11 16:59:44 2014 -0400", 
     "email": "aramaswamy@palantir.com"
@@ -899,7 +906,7 @@ main
   {
     "deletions": 48, 
     "insertions": 48, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Mar 11 13:58:46 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -907,7 +914,7 @@ main
   {
     "deletions": 21, 
     "insertions": 27, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Mar 11 13:50:19 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -915,7 +922,7 @@ main
   {
     "deletions": 8, 
     "insertions": 24, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 11 13:05:14 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -923,7 +930,7 @@ main
   {
     "deletions": 66, 
     "insertions": 250, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Mar 11 10:55:59 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -931,7 +938,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Tue Mar 11 13:14:59 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -939,7 +946,7 @@ main
   {
     "deletions": 5, 
     "insertions": 16, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Tue Mar 11 12:06:06 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -947,7 +954,7 @@ main
   {
     "deletions": 12, 
     "insertions": 4, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 2, 
     "date": "Tue Mar 11 13:53:50 2014 -0400", 
     "email": "aramaswamy@palantir.com"
@@ -955,7 +962,7 @@ main
   {
     "deletions": 84, 
     "insertions": 237, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Mon Mar 10 17:43:45 2014 -0700", 
     "email": "jlan@palantir.com"
@@ -963,7 +970,7 @@ main
   {
     "deletions": 27, 
     "insertions": 43, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 10 18:04:19 2014 -0700", 
     "email": "danmane@gmail.com"
@@ -971,7 +978,7 @@ main
   {
     "deletions": 4, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Fri Mar 7 18:04:19 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -979,7 +986,7 @@ main
   {
     "deletions": 1, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Mar 7 17:10:18 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -987,7 +994,7 @@ main
   {
     "deletions": 51, 
     "insertions": 58, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 16, 
     "date": "Fri Mar 7 17:05:08 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -995,7 +1002,7 @@ main
   {
     "deletions": 4, 
     "insertions": 4, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Fri Mar 7 16:48:08 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1003,7 +1010,7 @@ main
   {
     "deletions": 26, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 7, 
     "date": "Fri Mar 7 16:32:55 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1011,7 +1018,7 @@ main
   {
     "deletions": 1, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Mar 7 16:09:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1019,7 +1026,7 @@ main
   {
     "deletions": 14, 
     "insertions": 8, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Fri Mar 7 16:06:49 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1027,7 +1034,7 @@ main
   {
     "deletions": 0, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Mar 7 15:55:54 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1035,7 +1042,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Mar 7 15:52:55 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1043,7 +1050,7 @@ main
   {
     "deletions": 43, 
     "insertions": 56, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Fri Mar 7 15:37:48 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1051,7 +1058,7 @@ main
   {
     "deletions": 1, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Mar 7 15:14:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1059,7 +1066,7 @@ main
   {
     "deletions": 0, 
     "insertions": 40, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Mar 7 15:11:38 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1067,7 +1074,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "ashwinraman9@gmail.com", 
+    "name": "ashwinraman9", 
     "changed": 1, 
     "date": "Fri Mar 7 17:33:27 2014 -0500", 
     "email": "ashwinraman9@gmail.com"
@@ -1075,7 +1082,7 @@ main
   {
     "deletions": 89, 
     "insertions": 75, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Fri Mar 7 14:33:19 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1083,7 +1090,7 @@ main
   {
     "deletions": 70, 
     "insertions": 137, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 7, 
     "date": "Fri Mar 7 14:28:58 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1091,7 +1098,7 @@ main
   {
     "deletions": 4, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Mar 7 14:19:21 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1099,7 +1106,7 @@ main
   {
     "deletions": 2, 
     "insertions": 188, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Fri Mar 7 14:10:50 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1107,7 +1114,7 @@ main
   {
     "deletions": 0, 
     "insertions": 39, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Mar 7 12:25:07 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1115,7 +1122,7 @@ main
   {
     "deletions": 2, 
     "insertions": 5, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Fri Mar 7 12:12:30 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1123,7 +1130,7 @@ main
   {
     "deletions": 4, 
     "insertions": 4, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Fri Mar 7 12:07:20 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1131,7 +1138,7 @@ main
   {
     "deletions": 4, 
     "insertions": 4, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Fri Mar 7 12:03:30 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1139,7 +1146,7 @@ main
   {
     "deletions": 42, 
     "insertions": 38, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Fri Mar 7 12:01:10 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1147,7 +1154,7 @@ main
   {
     "deletions": 59823, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 152, 
     "date": "Fri Mar 7 11:39:22 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1155,7 +1162,7 @@ main
   {
     "deletions": 15, 
     "insertions": 3, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Fri Mar 7 11:31:24 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1163,7 +1170,7 @@ main
   {
     "deletions": 117, 
     "insertions": 125, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 14, 
     "date": "Thu Mar 6 17:12:24 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1171,7 +1178,7 @@ main
   {
     "deletions": 41, 
     "insertions": 16, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 10, 
     "date": "Thu Mar 6 14:17:20 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1179,7 +1186,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 1, 
     "date": "Thu Mar 6 16:01:44 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1187,7 +1194,7 @@ main
   {
     "deletions": 6, 
     "insertions": 101, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Thu Mar 6 12:01:06 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1195,7 +1202,7 @@ main
   {
     "deletions": 106, 
     "insertions": 42, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 7, 
     "date": "Thu Mar 6 11:47:28 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1203,7 +1210,7 @@ main
   {
     "deletions": 4, 
     "insertions": 146, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 13, 
     "date": "Thu Mar 6 11:40:09 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1211,7 +1218,7 @@ main
   {
     "deletions": 6, 
     "insertions": 22, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 5, 
     "date": "Thu Mar 6 12:42:02 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1219,7 +1226,7 @@ main
   {
     "deletions": 3678, 
     "insertions": 3767, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 31, 
     "date": "Thu Mar 6 12:05:01 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1227,7 +1234,7 @@ main
   {
     "deletions": 326, 
     "insertions": 336, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 9, 
     "date": "Wed Mar 5 20:26:02 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1235,7 +1242,7 @@ main
   {
     "deletions": 26, 
     "insertions": 60, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Wed Mar 5 16:13:15 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1243,7 +1250,7 @@ main
   {
     "deletions": 20, 
     "insertions": 265, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 11, 
     "date": "Wed Mar 5 14:43:52 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1251,7 +1258,7 @@ main
   {
     "deletions": 4, 
     "insertions": 4, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 4, 
     "date": "Wed Mar 5 17:58:59 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1259,7 +1266,7 @@ main
   {
     "deletions": 48, 
     "insertions": 60, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 6, 
     "date": "Wed Mar 5 17:50:20 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1267,7 +1274,7 @@ main
   {
     "deletions": 4, 
     "insertions": 4, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 4, 
     "date": "Wed Mar 5 17:13:41 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1275,7 +1282,7 @@ main
   {
     "deletions": 2, 
     "insertions": 7, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 1, 
     "date": "Wed Mar 5 15:52:45 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1283,7 +1290,7 @@ main
   {
     "deletions": 19, 
     "insertions": 369, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 7, 
     "date": "Tue Mar 4 17:11:34 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1291,7 +1298,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Mar 4 16:55:07 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1299,7 +1306,7 @@ main
   {
     "deletions": 1, 
     "insertions": 56, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Tue Mar 4 16:50:58 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1307,7 +1314,7 @@ main
   {
     "deletions": 79, 
     "insertions": 439, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Mon Mar 3 17:22:29 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1315,7 +1322,7 @@ main
   {
     "deletions": 5, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 17:46:07 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1323,7 +1330,7 @@ main
   {
     "deletions": 6, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Mon Mar 3 17:39:12 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1331,7 +1338,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "ashwinraman9@gmail.com", 
+    "name": "ashwinraman9", 
     "changed": 1, 
     "date": "Mon Mar 3 20:35:42 2014 -0500", 
     "email": "ashwinraman9@gmail.com"
@@ -1339,7 +1346,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Mar 3 17:35:13 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1347,7 +1354,7 @@ main
   {
     "deletions": 10, 
     "insertions": 78, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 3 17:31:35 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1355,7 +1362,7 @@ main
   {
     "deletions": 4, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 17:31:23 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1363,7 +1370,7 @@ main
   {
     "deletions": 0, 
     "insertions": 10, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 2, 
     "date": "Mon Mar 3 20:29:15 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1371,7 +1378,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 17:28:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1379,7 +1386,7 @@ main
   {
     "deletions": 133, 
     "insertions": 152, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Mar 3 17:27:14 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1387,7 +1394,7 @@ main
   {
     "deletions": 16, 
     "insertions": 16, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 3 17:23:08 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1395,7 +1402,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 17:13:37 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1403,7 +1410,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 17:13:37 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1411,7 +1418,7 @@ main
   {
     "deletions": 0, 
     "insertions": 3, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 1, 
     "date": "Mon Mar 3 20:02:28 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -1419,7 +1426,7 @@ main
   {
     "deletions": 1, 
     "insertions": 6276, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Mon Mar 3 16:57:04 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1427,7 +1434,7 @@ main
   {
     "deletions": 1, 
     "insertions": 6276, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Mon Mar 3 16:57:04 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1435,7 +1442,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 16:51:58 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1443,7 +1450,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 16:51:58 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1451,7 +1458,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 16:44:36 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1459,7 +1466,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 16:44:36 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1467,7 +1474,7 @@ main
   {
     "deletions": 6, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Mar 3 16:38:38 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1475,7 +1482,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 16:29:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1483,7 +1490,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "ashwinraman9@gmail.com", 
+    "name": "ashwinraman9", 
     "changed": 1, 
     "date": "Mon Mar 3 19:14:21 2014 -0500", 
     "email": "ashwinraman9@gmail.com"
@@ -1491,7 +1498,7 @@ main
   {
     "deletions": 0, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 16:10:45 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1499,7 +1506,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "ashwinraman9@gmail.com", 
+    "name": "ashwinraman9", 
     "changed": 1, 
     "date": "Mon Mar 3 19:10:17 2014 -0500", 
     "email": "ashwinraman9@gmail.com"
@@ -1507,7 +1514,7 @@ main
   {
     "deletions": 0, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Mar 3 16:03:20 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1515,7 +1522,7 @@ main
   {
     "deletions": 4, 
     "insertions": 12, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Mar 3 16:00:49 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1523,7 +1530,7 @@ main
   {
     "deletions": 19, 
     "insertions": 18, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Mar 3 14:45:28 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1531,7 +1538,7 @@ main
   {
     "deletions": 124, 
     "insertions": 119, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 13, 
     "date": "Mon Mar 3 14:26:45 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1539,7 +1546,7 @@ main
   {
     "deletions": 0, 
     "insertions": 10, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Feb 28 18:05:48 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1547,7 +1554,7 @@ main
   {
     "deletions": 17, 
     "insertions": 17, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 7, 
     "date": "Fri Feb 28 18:01:06 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1555,7 +1562,7 @@ main
   {
     "deletions": 38, 
     "insertions": 78, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Feb 28 17:58:45 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1563,7 +1570,7 @@ main
   {
     "deletions": 2, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Feb 28 16:53:02 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1571,7 +1578,7 @@ main
   {
     "deletions": 92, 
     "insertions": 266, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Feb 28 16:45:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1579,7 +1586,7 @@ main
   {
     "deletions": 5, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Feb 28 16:44:29 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1587,7 +1594,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Feb 28 16:29:39 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1595,7 +1602,7 @@ main
   {
     "deletions": 13, 
     "insertions": 14, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Feb 28 16:24:23 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1603,7 +1610,7 @@ main
   {
     "deletions": 4, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Feb 28 16:21:44 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1611,7 +1618,7 @@ main
   {
     "deletions": 24, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Feb 28 16:11:31 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1619,7 +1626,7 @@ main
   {
     "deletions": 23, 
     "insertions": 107, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Fri Feb 28 16:04:18 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1627,7 +1634,7 @@ main
   {
     "deletions": 0, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 27 14:12:42 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1635,7 +1642,7 @@ main
   {
     "deletions": 14, 
     "insertions": 47, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Thu Feb 27 13:52:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1643,7 +1650,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 27 13:52:23 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1651,7 +1658,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 27 12:03:30 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1659,7 +1666,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 26 17:25:13 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1667,7 +1674,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 26 17:20:12 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1675,7 +1682,7 @@ main
   {
     "deletions": 18, 
     "insertions": 19, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 26 16:43:28 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1683,7 +1690,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 26 16:37:35 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1691,7 +1698,7 @@ main
   {
     "deletions": 1, 
     "insertions": 136, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Wed Feb 26 16:36:27 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1699,7 +1706,7 @@ main
   {
     "deletions": 0, 
     "insertions": 31, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Feb 26 14:20:02 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1707,7 +1714,7 @@ main
   {
     "deletions": 0, 
     "insertions": 34, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 26 11:06:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1715,7 +1722,7 @@ main
   {
     "deletions": 25, 
     "insertions": 55, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Wed Feb 26 10:49:42 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1723,7 +1730,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 26 10:45:53 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1731,7 +1738,7 @@ main
   {
     "deletions": 0, 
     "insertions": 22, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 25 11:58:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1739,7 +1746,7 @@ main
   {
     "deletions": 3, 
     "insertions": 14, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 25 11:54:03 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1747,7 +1754,7 @@ main
   {
     "deletions": 19, 
     "insertions": 2, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Tue Feb 25 15:14:15 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1755,7 +1762,7 @@ main
   {
     "deletions": 6, 
     "insertions": 196, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Tue Feb 25 14:57:45 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1763,7 +1770,7 @@ main
   {
     "deletions": 0, 
     "insertions": 22, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 25 11:58:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1771,7 +1778,7 @@ main
   {
     "deletions": 3, 
     "insertions": 14, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 25 11:54:03 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1779,7 +1786,7 @@ main
   {
     "deletions": 3, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 24 23:56:12 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1787,7 +1794,7 @@ main
   {
     "deletions": 6, 
     "insertions": 18, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Mon Feb 24 17:45:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1795,7 +1802,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Mon Feb 24 17:16:47 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1803,7 +1810,7 @@ main
   {
     "deletions": 62, 
     "insertions": 62, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Mon Feb 24 17:15:18 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1811,7 +1818,7 @@ main
   {
     "deletions": 18, 
     "insertions": 18, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Feb 24 17:12:28 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1819,7 +1826,7 @@ main
   {
     "deletions": 0, 
     "insertions": 27, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 24 17:04:39 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1827,7 +1834,7 @@ main
   {
     "deletions": 16, 
     "insertions": 20, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Mon Feb 24 17:02:00 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1835,7 +1842,7 @@ main
   {
     "deletions": 5, 
     "insertions": 62, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 10, 
     "date": "Mon Feb 24 16:53:26 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1843,7 +1850,7 @@ main
   {
     "deletions": 67, 
     "insertions": 59, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Mon Feb 24 16:42:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1851,7 +1858,7 @@ main
   {
     "deletions": 8, 
     "insertions": 41, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Mon Feb 24 13:18:11 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1859,7 +1866,7 @@ main
   {
     "deletions": 2, 
     "insertions": 6, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Mon Feb 24 13:10:08 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1867,7 +1874,7 @@ main
   {
     "deletions": 2, 
     "insertions": 48, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Mon Feb 24 13:05:09 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1875,7 +1882,7 @@ main
   {
     "deletions": 5, 
     "insertions": 8, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Mon Feb 24 12:51:03 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1883,7 +1890,7 @@ main
   {
     "deletions": 8, 
     "insertions": 43, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Mon Feb 24 12:47:48 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1891,7 +1898,7 @@ main
   {
     "deletions": 20, 
     "insertions": 20, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Feb 24 12:37:39 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1899,7 +1906,7 @@ main
   {
     "deletions": 2, 
     "insertions": 3, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Mon Feb 24 12:14:54 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1907,7 +1914,7 @@ main
   {
     "deletions": 4, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Feb 24 12:12:01 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1915,7 +1922,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 24 12:10:05 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1923,7 +1930,7 @@ main
   {
     "deletions": 2, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 24 12:02:59 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1931,7 +1938,7 @@ main
   {
     "deletions": 12, 
     "insertions": 8, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Fri Feb 21 18:03:28 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1939,7 +1946,7 @@ main
   {
     "deletions": 22, 
     "insertions": 55, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Fri Feb 21 18:03:18 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -1947,7 +1954,7 @@ main
   {
     "deletions": 19, 
     "insertions": 24, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Fri Feb 21 17:18:07 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1955,7 +1962,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Fri Feb 21 17:07:56 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1963,7 +1970,7 @@ main
   {
     "deletions": 5, 
     "insertions": 2, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Fri Feb 21 16:58:07 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1971,7 +1978,7 @@ main
   {
     "deletions": 11, 
     "insertions": 11, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Fri Feb 21 16:37:00 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1979,7 +1986,7 @@ main
   {
     "deletions": 0, 
     "insertions": 4, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Fri Feb 21 16:28:04 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1987,7 +1994,7 @@ main
   {
     "deletions": 0, 
     "insertions": 39, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Fri Feb 21 16:00:38 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -1995,7 +2002,7 @@ main
   {
     "deletions": 3, 
     "insertions": 69231, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 174, 
     "date": "Fri Feb 21 15:42:26 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2003,7 +2010,7 @@ main
   {
     "deletions": 0, 
     "insertions": 256, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Feb 21 15:34:34 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2011,7 +2018,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Feb 21 15:31:02 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2019,7 +2026,7 @@ main
   {
     "deletions": 13, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Feb 21 13:38:59 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2027,7 +2034,7 @@ main
   {
     "deletions": 0, 
     "insertions": 574, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 9, 
     "date": "Fri Feb 21 13:23:22 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2035,7 +2042,7 @@ main
   {
     "deletions": 44, 
     "insertions": 37, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Feb 21 13:12:22 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2043,7 +2050,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 20 17:56:53 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2051,7 +2058,7 @@ main
   {
     "deletions": 36, 
     "insertions": 38, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Thu Feb 20 17:49:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2059,7 +2066,7 @@ main
   {
     "deletions": 138, 
     "insertions": 116, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 7, 
     "date": "Thu Feb 20 17:25:41 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2067,7 +2074,7 @@ main
   {
     "deletions": 0, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 20 17:23:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2075,7 +2082,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 19 15:30:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2083,7 +2090,7 @@ main
   {
     "deletions": 2, 
     "insertions": 72, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Wed Feb 19 12:41:08 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2091,7 +2098,7 @@ main
   {
     "deletions": 0, 
     "insertions": 9, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Wed Feb 19 12:28:22 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2099,7 +2106,7 @@ main
   {
     "deletions": 0, 
     "insertions": 33, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Wed Feb 19 12:21:13 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2107,7 +2114,7 @@ main
   {
     "deletions": 31, 
     "insertions": 33, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Tue Feb 18 17:31:23 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2115,7 +2122,7 @@ main
   {
     "deletions": 31, 
     "insertions": 31, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Tue Feb 18 17:05:05 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2123,7 +2130,7 @@ main
   {
     "deletions": 11, 
     "insertions": 31, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 7, 
     "date": "Tue Feb 18 16:49:48 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2131,7 +2138,7 @@ main
   {
     "deletions": 3, 
     "insertions": 1107, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Tue Feb 18 12:25:26 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2139,7 +2146,7 @@ main
   {
     "deletions": 3, 
     "insertions": 20, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Mon Feb 17 11:01:52 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2147,7 +2154,7 @@ main
   {
     "deletions": 16, 
     "insertions": 89, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Fri Feb 14 14:01:49 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2155,7 +2162,7 @@ main
   {
     "deletions": 2, 
     "insertions": 27, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Thu Feb 13 12:23:57 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2163,7 +2170,7 @@ main
   {
     "deletions": 13, 
     "insertions": 138, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Wed Feb 12 18:50:01 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2171,7 +2178,7 @@ main
   {
     "deletions": 0, 
     "insertions": 22, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 13 12:48:32 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2179,7 +2186,7 @@ main
   {
     "deletions": 16, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Thu Feb 13 12:43:04 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2187,7 +2194,7 @@ main
   {
     "deletions": 0, 
     "insertions": 23, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 13 12:01:04 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2195,7 +2202,7 @@ main
   {
     "deletions": 3, 
     "insertions": 65, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 13 11:52:07 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2203,7 +2210,7 @@ main
   {
     "deletions": 6, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 13 11:50:17 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2211,7 +2218,7 @@ main
   {
     "deletions": 18, 
     "insertions": 36, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Feb 12 18:48:23 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2219,7 +2226,7 @@ main
   {
     "deletions": 6, 
     "insertions": 10, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Feb 12 18:42:07 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2227,7 +2234,7 @@ main
   {
     "deletions": 2, 
     "insertions": 43, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 18:40:08 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2235,7 +2242,7 @@ main
   {
     "deletions": 0, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 18:39:43 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2243,7 +2250,7 @@ main
   {
     "deletions": 4, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 17:54:11 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2251,7 +2258,7 @@ main
   {
     "deletions": 22, 
     "insertions": 35, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 17:51:09 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2259,7 +2266,7 @@ main
   {
     "deletions": 2, 
     "insertions": 20, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 16:35:20 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2267,7 +2274,7 @@ main
   {
     "deletions": 0, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 16:23:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2275,7 +2282,7 @@ main
   {
     "deletions": 6, 
     "insertions": 74, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 16:16:44 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2283,7 +2290,7 @@ main
   {
     "deletions": 0, 
     "insertions": 34, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 14:37:06 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2291,7 +2298,7 @@ main
   {
     "deletions": 7, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Wed Feb 12 13:58:07 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2299,7 +2306,7 @@ main
   {
     "deletions": 7, 
     "insertions": 14, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Wed Feb 12 13:41:03 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2307,7 +2314,7 @@ main
   {
     "deletions": 63, 
     "insertions": 61, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Wed Feb 12 13:20:51 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2315,7 +2322,7 @@ main
   {
     "deletions": 29, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Wed Feb 12 11:15:05 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2323,7 +2330,7 @@ main
   {
     "deletions": 4, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 12 11:03:27 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2331,7 +2338,7 @@ main
   {
     "deletions": 37, 
     "insertions": 34, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Wed Feb 12 10:43:23 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2339,7 +2346,7 @@ main
   {
     "deletions": 11, 
     "insertions": 5453, 
-    "name": "aramaswamy@palantir.com", 
+    "name": "aramaswamy", 
     "changed": 2, 
     "date": "Tue Feb 11 20:42:02 2014 -0500", 
     "email": "aramaswamy@palantir.com"
@@ -2347,7 +2354,7 @@ main
   {
     "deletions": 54, 
     "insertions": 130, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Tue Feb 11 14:19:11 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2355,7 +2362,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 17:47:06 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2363,7 +2370,7 @@ main
   {
     "deletions": 26, 
     "insertions": 101, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 17:43:10 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2371,7 +2378,7 @@ main
   {
     "deletions": 8, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 11 17:42:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2379,7 +2386,7 @@ main
   {
     "deletions": 8, 
     "insertions": 40, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 11 16:28:05 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2387,7 +2394,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 15:41:12 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2395,7 +2402,7 @@ main
   {
     "deletions": 1, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 15:41:02 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2403,7 +2410,7 @@ main
   {
     "deletions": 25, 
     "insertions": 46, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 15:22:34 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2411,7 +2418,7 @@ main
   {
     "deletions": 13, 
     "insertions": 49, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 14:11:35 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2419,7 +2426,7 @@ main
   {
     "deletions": 11, 
     "insertions": 11, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 11 14:04:45 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2427,7 +2434,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 14:04:29 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2435,7 +2442,7 @@ main
   {
     "deletions": 22, 
     "insertions": 102, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 13:54:44 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2443,7 +2450,7 @@ main
   {
     "deletions": 7, 
     "insertions": 7, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Tue Feb 11 13:12:19 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2451,7 +2458,7 @@ main
   {
     "deletions": 10, 
     "insertions": 9, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 11 13:11:00 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2459,7 +2466,7 @@ main
   {
     "deletions": 20, 
     "insertions": 34, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Tue Feb 11 11:51:54 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2467,7 +2474,7 @@ main
   {
     "deletions": 5, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 11:15:38 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2475,7 +2482,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 11:09:11 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2483,7 +2490,7 @@ main
   {
     "deletions": 0, 
     "insertions": 19, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 11 10:56:09 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2491,7 +2498,7 @@ main
   {
     "deletions": 10, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 11 10:55:22 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2499,7 +2506,7 @@ main
   {
     "deletions": 13, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 17:31:00 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2507,7 +2514,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 17:15:49 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2515,7 +2522,7 @@ main
   {
     "deletions": 2, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 17:10:51 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2523,7 +2530,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Mon Feb 10 16:14:46 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2531,7 +2538,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Mon Feb 10 16:08:30 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2539,7 +2546,7 @@ main
   {
     "deletions": 34, 
     "insertions": 81, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 4, 
     "date": "Mon Feb 10 16:03:33 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2547,7 +2554,7 @@ main
   {
     "deletions": 1, 
     "insertions": 10, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Feb 10 15:51:56 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2555,7 +2562,7 @@ main
   {
     "deletions": 2, 
     "insertions": 19, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Feb 10 15:46:20 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2563,7 +2570,7 @@ main
   {
     "deletions": 13, 
     "insertions": 21, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Mon Feb 10 15:30:50 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2571,7 +2578,7 @@ main
   {
     "deletions": 4, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 15:25:23 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2579,7 +2586,7 @@ main
   {
     "deletions": 0, 
     "insertions": 106, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 15:14:25 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2587,7 +2594,7 @@ main
   {
     "deletions": 3, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 15:12:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2595,7 +2602,7 @@ main
   {
     "deletions": 8, 
     "insertions": 8, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Mon Feb 10 14:37:21 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2603,7 +2610,7 @@ main
   {
     "deletions": 8, 
     "insertions": 8, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Mon Feb 10 11:59:47 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2611,7 +2618,7 @@ main
   {
     "deletions": 6, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 11:09:27 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2619,7 +2626,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 10:54:56 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2627,7 +2634,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 10 10:54:56 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2635,7 +2642,7 @@ main
   {
     "deletions": 3, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Feb 7 18:23:06 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2643,7 +2650,7 @@ main
   {
     "deletions": 304, 
     "insertions": 314, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Fri Feb 7 18:20:58 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2651,7 +2658,7 @@ main
   {
     "deletions": 3, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Feb 7 18:11:01 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2659,7 +2666,7 @@ main
   {
     "deletions": 78, 
     "insertions": 79, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Fri Feb 7 17:52:44 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2667,7 +2674,7 @@ main
   {
     "deletions": 80, 
     "insertions": 48, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Fri Feb 7 15:12:54 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2675,7 +2682,7 @@ main
   {
     "deletions": 33, 
     "insertions": 25, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Feb 7 14:34:26 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2683,7 +2690,7 @@ main
   {
     "deletions": 8, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Fri Feb 7 14:15:06 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2691,7 +2698,7 @@ main
   {
     "deletions": 2, 
     "insertions": 12, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Feb 7 14:13:14 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2699,7 +2706,7 @@ main
   {
     "deletions": 5, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Feb 7 14:12:57 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2707,7 +2714,7 @@ main
   {
     "deletions": 1, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Fri Feb 7 13:48:40 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2715,7 +2722,7 @@ main
   {
     "deletions": 7, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Feb 7 13:45:54 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2723,7 +2730,7 @@ main
   {
     "deletions": 60, 
     "insertions": 111, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 11, 
     "date": "Fri Feb 7 13:37:58 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2731,7 +2738,7 @@ main
   {
     "deletions": 70, 
     "insertions": 78, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 7, 
     "date": "Fri Feb 7 12:40:02 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2739,7 +2746,7 @@ main
   {
     "deletions": 9, 
     "insertions": 12, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Fri Feb 7 12:00:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2747,7 +2754,7 @@ main
   {
     "deletions": 5, 
     "insertions": 3, 
-    "name": "derekcicerone@gmail.com", 
+    "name": "derekcicerone", 
     "changed": 1, 
     "date": "Fri Feb 7 14:22:34 2014 -0500", 
     "email": "derekcicerone@gmail.com"
@@ -2755,7 +2762,7 @@ main
   {
     "deletions": 82, 
     "insertions": 8, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Thu Feb 6 17:30:29 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2763,7 +2770,7 @@ main
   {
     "deletions": 202, 
     "insertions": 21, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 6 17:32:17 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2771,7 +2778,7 @@ main
   {
     "deletions": 0, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 6 16:01:48 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2779,7 +2786,7 @@ main
   {
     "deletions": 18, 
     "insertions": 28, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Thu Feb 6 16:00:28 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2787,7 +2794,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Thu Feb 6 14:11:08 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2795,7 +2802,7 @@ main
   {
     "deletions": 4, 
     "insertions": 2, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Thu Feb 6 13:45:37 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2803,7 +2810,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "ashwinraman9@gmail.com", 
+    "name": "ashwinraman9", 
     "changed": 1, 
     "date": "Thu Feb 6 15:08:41 2014 -0500", 
     "email": "ashwinraman9@gmail.com"
@@ -2811,7 +2818,7 @@ main
   {
     "deletions": 0, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 6 11:58:37 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2819,7 +2826,7 @@ main
   {
     "deletions": 2, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 6 10:58:23 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2827,7 +2834,7 @@ main
   {
     "deletions": 2, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Feb 6 01:05:01 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2835,7 +2842,7 @@ main
   {
     "deletions": 1, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 21:55:06 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2843,7 +2850,7 @@ main
   {
     "deletions": 2, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 20:24:32 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2851,7 +2858,7 @@ main
   {
     "deletions": 9, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Wed Feb 5 20:19:50 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2859,7 +2866,7 @@ main
   {
     "deletions": 14, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 10, 
     "date": "Wed Feb 5 20:13:37 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2867,7 +2874,7 @@ main
   {
     "deletions": 2, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 20:03:47 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2875,7 +2882,7 @@ main
   {
     "deletions": 3, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 20:00:10 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2883,7 +2890,7 @@ main
   {
     "deletions": 23, 
     "insertions": 23, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 19:59:59 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2891,7 +2898,7 @@ main
   {
     "deletions": 0, 
     "insertions": 18, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Feb 5 19:42:09 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2899,7 +2906,7 @@ main
   {
     "deletions": 18, 
     "insertions": 32, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 8, 
     "date": "Wed Feb 5 19:26:45 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2907,7 +2914,7 @@ main
   {
     "deletions": 2, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 18:04:24 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2915,7 +2922,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 17:44:47 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2923,7 +2930,7 @@ main
   {
     "deletions": 7, 
     "insertions": 8, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Wed Feb 5 17:27:02 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -2931,7 +2938,7 @@ main
   {
     "deletions": 57, 
     "insertions": 33, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 15, 
     "date": "Wed Feb 5 17:00:20 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2939,7 +2946,7 @@ main
   {
     "deletions": 2206, 
     "insertions": 2207, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 59, 
     "date": "Wed Feb 5 14:18:05 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2947,7 +2954,7 @@ main
   {
     "deletions": 2, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 14:17:29 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2955,7 +2962,7 @@ main
   {
     "deletions": 358, 
     "insertions": 41, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 24, 
     "date": "Wed Feb 5 14:03:25 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2963,7 +2970,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 13:41:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2971,7 +2978,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 13:27:36 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2979,7 +2986,7 @@ main
   {
     "deletions": 20, 
     "insertions": 328, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Wed Feb 5 13:25:57 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2987,7 +2994,7 @@ main
   {
     "deletions": 3, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 13:21:45 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -2995,7 +3002,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 13:20:21 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3003,7 +3010,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Feb 5 12:48:09 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3011,7 +3018,7 @@ main
   {
     "deletions": 2207, 
     "insertions": 2206, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 59, 
     "date": "Wed Feb 5 12:08:38 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3019,7 +3026,7 @@ main
   {
     "deletions": 46, 
     "insertions": 60, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Tue Feb 4 15:29:29 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3027,7 +3034,7 @@ main
   {
     "deletions": 7, 
     "insertions": 4, 
-    "name": "derekcicerone@gmail.com", 
+    "name": "derekcicerone", 
     "changed": 1, 
     "date": "Tue Feb 4 16:49:21 2014 -0500", 
     "email": "derekcicerone@gmail.com"
@@ -3035,7 +3042,7 @@ main
   {
     "deletions": 0, 
     "insertions": 29, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Tue Feb 4 13:01:01 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3043,7 +3050,7 @@ main
   {
     "deletions": 1, 
     "insertions": 51, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Tue Feb 4 12:59:39 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3051,7 +3058,7 @@ main
   {
     "deletions": 4, 
     "insertions": 8, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Tue Feb 4 12:59:12 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3059,7 +3066,7 @@ main
   {
     "deletions": 2, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 4 12:45:36 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3067,7 +3074,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 4 12:38:32 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3075,7 +3082,7 @@ main
   {
     "deletions": 9, 
     "insertions": 36, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Tue Feb 4 12:34:57 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3083,7 +3090,7 @@ main
   {
     "deletions": 6, 
     "insertions": 12, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 4 12:32:07 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3091,7 +3098,7 @@ main
   {
     "deletions": 1, 
     "insertions": 9, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 4 12:22:24 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3099,7 +3106,7 @@ main
   {
     "deletions": 8, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 4 12:17:22 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3107,7 +3114,7 @@ main
   {
     "deletions": 16, 
     "insertions": 35, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 4 12:11:27 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3115,7 +3122,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 4 11:54:14 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3123,7 +3130,7 @@ main
   {
     "deletions": 11, 
     "insertions": 22, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Feb 4 11:52:42 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3131,7 +3138,7 @@ main
   {
     "deletions": 4, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 4 11:35:26 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3139,7 +3146,7 @@ main
   {
     "deletions": 10, 
     "insertions": 14, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Tue Feb 4 11:52:19 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3147,7 +3154,7 @@ main
   {
     "deletions": 6, 
     "insertions": 1, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Tue Feb 4 11:33:07 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3155,7 +3162,7 @@ main
   {
     "deletions": 4, 
     "insertions": 22, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 4 11:31:43 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3163,7 +3170,7 @@ main
   {
     "deletions": 1, 
     "insertions": 26, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Feb 4 11:20:30 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3171,7 +3178,7 @@ main
   {
     "deletions": 9, 
     "insertions": 26, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Tue Feb 4 11:09:57 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3179,7 +3186,7 @@ main
   {
     "deletions": 7, 
     "insertions": 47, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Feb 4 11:06:03 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3187,7 +3194,7 @@ main
   {
     "deletions": 2, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 3 18:22:17 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3195,7 +3202,7 @@ main
   {
     "deletions": 0, 
     "insertions": 86, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Feb 3 18:17:28 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3203,7 +3210,7 @@ main
   {
     "deletions": 5, 
     "insertions": 89, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Mon Feb 3 17:20:43 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3211,7 +3218,7 @@ main
   {
     "deletions": 6, 
     "insertions": 20, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Feb 3 17:28:39 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3219,7 +3226,7 @@ main
   {
     "deletions": 5, 
     "insertions": 89, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Mon Feb 3 17:20:43 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3227,7 +3234,7 @@ main
   {
     "deletions": 3, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Feb 3 14:57:03 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3235,7 +3242,7 @@ main
   {
     "deletions": 5, 
     "insertions": 9, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 3 13:44:08 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3243,7 +3250,7 @@ main
   {
     "deletions": 2, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Feb 3 12:37:56 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3251,7 +3258,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 3 12:05:05 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3259,7 +3266,7 @@ main
   {
     "deletions": 8, 
     "insertions": 8, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Feb 3 12:04:09 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3267,7 +3274,7 @@ main
   {
     "deletions": 0, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 3 12:02:17 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3275,7 +3282,7 @@ main
   {
     "deletions": 0, 
     "insertions": 27, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Feb 3 11:14:24 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3283,7 +3290,7 @@ main
   {
     "deletions": 2, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Sun Feb 2 00:29:43 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3291,7 +3298,7 @@ main
   {
     "deletions": 0, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Sun Feb 2 00:27:10 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3299,7 +3306,7 @@ main
   {
     "deletions": 2, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Sun Feb 2 00:26:09 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3307,7 +3314,7 @@ main
   {
     "deletions": 9, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Sat Feb 1 15:17:40 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3315,7 +3322,7 @@ main
   {
     "deletions": 0, 
     "insertions": 34, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Sat Feb 1 15:15:21 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3323,7 +3330,7 @@ main
   {
     "deletions": 12, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Sat Feb 1 15:13:15 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3331,7 +3338,7 @@ main
   {
     "deletions": 6, 
     "insertions": 14, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Sat Feb 1 01:18:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3339,7 +3346,7 @@ main
   {
     "deletions": 0, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Sat Feb 1 00:59:42 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3347,7 +3354,7 @@ main
   {
     "deletions": 186, 
     "insertions": 260, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 9, 
     "date": "Sat Feb 1 00:51:12 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3355,7 +3362,7 @@ main
   {
     "deletions": 22, 
     "insertions": 78, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Sat Feb 1 00:14:34 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3363,7 +3370,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Jan 31 16:34:21 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3371,7 +3378,7 @@ main
   {
     "deletions": 17, 
     "insertions": 80, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Fri Jan 31 20:12:35 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3379,7 +3386,7 @@ main
   {
     "deletions": 12, 
     "insertions": 14, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 1, 
     "date": "Fri Jan 31 17:16:34 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3387,7 +3394,7 @@ main
   {
     "deletions": 9, 
     "insertions": 62, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 5, 
     "date": "Fri Jan 31 16:35:35 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3395,7 +3402,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Jan 31 16:34:21 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3403,7 +3410,7 @@ main
   {
     "deletions": 6, 
     "insertions": 18, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Fri Jan 31 16:29:05 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3411,7 +3418,7 @@ main
   {
     "deletions": 1, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Jan 31 16:08:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3419,7 +3426,7 @@ main
   {
     "deletions": 21, 
     "insertions": 35, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Fri Jan 31 15:36:36 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3427,7 +3434,7 @@ main
   {
     "deletions": 3, 
     "insertions": 124, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Thu Jan 30 16:16:58 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3435,7 +3442,7 @@ main
   {
     "deletions": 27, 
     "insertions": 79, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Fri Jan 31 15:31:11 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3443,7 +3450,7 @@ main
   {
     "deletions": 11, 
     "insertions": 11, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Fri Jan 31 11:49:13 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3451,7 +3458,7 @@ main
   {
     "deletions": 12, 
     "insertions": 9, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Thu Jan 30 18:23:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3459,7 +3466,7 @@ main
   {
     "deletions": 6, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 30 18:17:26 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3467,7 +3474,7 @@ main
   {
     "deletions": 6, 
     "insertions": 41, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Thu Jan 30 18:06:14 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3475,7 +3482,7 @@ main
   {
     "deletions": 0, 
     "insertions": 31, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Thu Jan 30 17:25:04 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3483,7 +3490,7 @@ main
   {
     "deletions": 6, 
     "insertions": 41, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Thu Jan 30 16:47:01 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3491,7 +3498,7 @@ main
   {
     "deletions": 0, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 30 15:21:43 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3499,7 +3506,7 @@ main
   {
     "deletions": 0, 
     "insertions": 9, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 30 15:21:30 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3507,7 +3514,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 30 15:18:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3515,7 +3522,7 @@ main
   {
     "deletions": 6, 
     "insertions": 47, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Thu Jan 30 15:18:37 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3523,7 +3530,7 @@ main
   {
     "deletions": 0, 
     "insertions": 34, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Thu Jan 30 15:18:06 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3531,7 +3538,7 @@ main
   {
     "deletions": 15, 
     "insertions": 19, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 30 14:27:47 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3539,7 +3546,7 @@ main
   {
     "deletions": 2, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Thu Jan 30 14:27:15 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3547,7 +3554,7 @@ main
   {
     "deletions": 17, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 30 13:06:22 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3555,7 +3562,7 @@ main
   {
     "deletions": 0, 
     "insertions": 11, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Jan 29 19:53:47 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3563,7 +3570,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Jan 29 19:50:44 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3571,7 +3578,7 @@ main
   {
     "deletions": 16, 
     "insertions": 23, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Wed Jan 29 19:45:18 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3579,7 +3586,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Jan 29 19:38:33 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3587,7 +3594,7 @@ main
   {
     "deletions": 61, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Jan 29 19:37:50 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3595,7 +3602,7 @@ main
   {
     "deletions": 3, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Jan 29 19:29:25 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3603,7 +3610,7 @@ main
   {
     "deletions": 9, 
     "insertions": 36, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Jan 29 19:28:24 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3611,7 +3618,7 @@ main
   {
     "deletions": 11, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Wed Jan 29 19:15:19 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3619,7 +3626,7 @@ main
   {
     "deletions": 14, 
     "insertions": 9, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Jan 29 19:00:56 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3627,7 +3634,7 @@ main
   {
     "deletions": 12, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Wed Jan 29 18:56:05 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3635,7 +3642,7 @@ main
   {
     "deletions": 108, 
     "insertions": 180, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Wed Jan 29 17:55:40 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3643,7 +3650,7 @@ main
   {
     "deletions": 10, 
     "insertions": 43, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Wed Jan 29 17:51:54 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3651,7 +3658,7 @@ main
   {
     "deletions": 6, 
     "insertions": 20, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Wed Jan 29 15:35:14 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3659,7 +3666,7 @@ main
   {
     "deletions": 25, 
     "insertions": 5, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Tue Jan 28 17:03:21 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3667,7 +3674,7 @@ main
   {
     "deletions": 19, 
     "insertions": 23, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Jan 28 16:58:27 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3675,7 +3682,7 @@ main
   {
     "deletions": 6, 
     "insertions": 5, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 2, 
     "date": "Tue Jan 28 16:53:06 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3683,7 +3690,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Jan 28 16:43:55 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3691,7 +3698,7 @@ main
   {
     "deletions": 15, 
     "insertions": 21, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Jan 28 16:40:35 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3699,7 +3706,7 @@ main
   {
     "deletions": 24, 
     "insertions": 76, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Tue Jan 28 15:07:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3707,7 +3714,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Jan 28 14:25:38 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3715,7 +3722,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Jan 28 14:25:26 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3723,7 +3730,7 @@ main
   {
     "deletions": 12, 
     "insertions": 60, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Jan 28 14:17:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3731,7 +3738,7 @@ main
   {
     "deletions": 0, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Tue Jan 28 13:55:15 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3739,7 +3746,7 @@ main
   {
     "deletions": 91, 
     "insertions": 91, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 7, 
     "date": "Tue Jan 28 13:51:59 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3747,7 +3754,7 @@ main
   {
     "deletions": 0, 
     "insertions": 28, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Jan 28 13:51:23 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3755,7 +3762,7 @@ main
   {
     "deletions": 3, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Jan 28 13:37:10 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3763,7 +3770,7 @@ main
   {
     "deletions": 1, 
     "insertions": 81, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Tue Jan 28 13:30:00 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3771,7 +3778,7 @@ main
   {
     "deletions": 23, 
     "insertions": 23, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Jan 28 11:48:40 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3779,7 +3786,7 @@ main
   {
     "deletions": 96, 
     "insertions": 106, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 6, 
     "date": "Tue Jan 28 13:27:15 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3787,7 +3794,7 @@ main
   {
     "deletions": 10, 
     "insertions": 32, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 7, 
     "date": "Tue Jan 28 11:27:34 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3795,7 +3802,7 @@ main
   {
     "deletions": 0, 
     "insertions": 10, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Tue Jan 28 11:06:39 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3803,7 +3810,7 @@ main
   {
     "deletions": 8, 
     "insertions": 10, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 20:42:52 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3811,7 +3818,7 @@ main
   {
     "deletions": 8, 
     "insertions": 14, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 18:24:36 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3819,7 +3826,7 @@ main
   {
     "deletions": 12, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Jan 27 17:58:39 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3827,7 +3834,7 @@ main
   {
     "deletions": 9, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Jan 27 17:16:24 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3835,7 +3842,7 @@ main
   {
     "deletions": 3, 
     "insertions": 43, 
-    "name": "jlan@palantir.com", 
+    "name": "jlan", 
     "changed": 3, 
     "date": "Mon Jan 27 17:09:52 2014 -0800", 
     "email": "jlan@palantir.com"
@@ -3843,7 +3850,7 @@ main
   {
     "deletions": 2, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Mon Jan 27 17:08:34 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3851,7 +3858,7 @@ main
   {
     "deletions": 7, 
     "insertions": 101, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Jan 27 16:52:25 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3859,7 +3866,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 15:03:56 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3867,7 +3874,7 @@ main
   {
     "deletions": 11, 
     "insertions": 34, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Mon Jan 27 15:03:37 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3875,7 +3882,7 @@ main
   {
     "deletions": 5, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Mon Jan 27 14:27:08 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3883,7 +3890,7 @@ main
   {
     "deletions": 1, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 14:24:44 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3891,7 +3898,7 @@ main
   {
     "deletions": 2, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 14:24:22 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3899,7 +3906,7 @@ main
   {
     "deletions": 0, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 14:23:51 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3907,7 +3914,7 @@ main
   {
     "deletions": 1, 
     "insertions": 6, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 3, 
     "date": "Mon Jan 27 14:14:54 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3915,7 +3922,7 @@ main
   {
     "deletions": 2, 
     "insertions": 7, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 6, 
     "date": "Mon Jan 27 13:55:26 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3923,7 +3930,7 @@ main
   {
     "deletions": 0, 
     "insertions": 1, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 13:53:16 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3931,7 +3938,7 @@ main
   {
     "deletions": 11, 
     "insertions": 15, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Mon Jan 27 13:49:32 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3939,7 +3946,7 @@ main
   {
     "deletions": 1, 
     "insertions": 2, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Jan 27 13:10:15 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3947,7 +3954,7 @@ main
   {
     "deletions": 4, 
     "insertions": 18, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 12:58:48 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3955,7 +3962,7 @@ main
   {
     "deletions": 0, 
     "insertions": 35, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 12:18:05 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3963,7 +3970,7 @@ main
   {
     "deletions": 17, 
     "insertions": 66, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 5, 
     "date": "Mon Jan 27 12:17:45 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3971,7 +3978,7 @@ main
   {
     "deletions": 15, 
     "insertions": 22, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Mon Jan 27 11:36:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3979,7 +3986,7 @@ main
   {
     "deletions": 1, 
     "insertions": 4, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 11:15:37 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3987,7 +3994,7 @@ main
   {
     "deletions": 0, 
     "insertions": 10, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 11:14:15 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -3995,7 +4002,7 @@ main
   {
     "deletions": 0, 
     "insertions": 155, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Mon Jan 27 11:13:32 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4003,7 +4010,7 @@ main
   {
     "deletions": 0, 
     "insertions": 178, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Jan 27 11:07:28 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4011,7 +4018,7 @@ main
   {
     "deletions": 11, 
     "insertions": 13, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Mon Jan 27 11:02:23 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4019,7 +4026,7 @@ main
   {
     "deletions": 15, 
     "insertions": 58, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 4, 
     "date": "Mon Jan 27 10:54:25 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4027,7 +4034,7 @@ main
   {
     "deletions": 43, 
     "insertions": 11, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 2, 
     "date": "Mon Jan 27 10:15:59 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4035,7 +4042,7 @@ main
   {
     "deletions": 1, 
     "insertions": 32, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 23 18:00:46 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4043,7 +4050,7 @@ main
   {
     "deletions": 24, 
     "insertions": 39, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 23 17:09:21 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4051,7 +4058,7 @@ main
   {
     "deletions": 0, 
     "insertions": 56, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Thu Jan 23 15:55:08 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4059,7 +4066,7 @@ main
   {
     "deletions": 0, 
     "insertions": 3, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 1, 
     "date": "Wed Jan 22 14:20:30 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4067,7 +4074,7 @@ main
   {
     "deletions": 0, 
     "insertions": 824, 
-    "name": "danmane@gmail.com", 
+    "name": "danmane", 
     "changed": 11, 
     "date": "Wed Jan 22 14:20:11 2014 -0800", 
     "email": "danmane@gmail.com"
@@ -4075,7 +4082,7 @@ main
   {
     "deletions": 0, 
     "insertions": 204, 
-    "name": "derekcicerone@gmail.com", 
+    "name": "derekcicerone", 
     "changed": 2, 
     "date": "Wed Jan 22 11:29:19 2014 -0800", 
     "email": "derekcicerone@gmail.com"
