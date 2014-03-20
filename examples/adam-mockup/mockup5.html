@@ -4,11 +4,11 @@
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <link rel="stylesheet" type="text/css" href="mockup.css">
     <style>
-      #histo-purple .x-axis text {
+      .plottable .no-tick-labels .tick text {
         fill: none;
       }
 
-      #histo-purple .bar-renderer .render-area rect {
+      .plottable .height-weight-data .render-area rect {
         fill: #7E74B3;
       }
     </style>
@@ -17,41 +17,48 @@
     <script src="../../build/exampleUtil.js"></script>
 
     <script>
-      function generateHeightWeightData(n) {
-        var data = [];
-        var heightGen = d3.random.normal(180, 2.5);
-        var weightGen = d3.random.normal(170, 30);
-        for (var i=0; i<n; i++) {
-          data.push({
-            age: Math.random() * 50 + 20,
-            gender: Math.random() > 0.5 ? "female" : "male",
-            height: heightGen(),
-            weight: weightGen()
-          });
-        }
-        return {data: data, metadata: {cssClass: "height-weight-data"}};
-      }
-
-      var dataseries = generateHeightWeightData(50);
-
       window.onload = function() {
+        var dataseries = generateHeightWeightData(100);
+
         var xScale = new Plottable.LinearScale();
         var xAxis = new Plottable.XAxis(xScale, "bottom").tickSize(6, 0);
+        xAxis.classed("no-tick-labels", true);
 
         var yScale = new Plottable.LinearScale();
         var yAxis = new Plottable.YAxis(yScale, "right");
         yAxis.tickLabelPosition("bottom").tickSize(50);
 
+        dataseries.data.forEach(function(d, i){ d.age = Math.round(d.age); });
         dataseries.data.sort(function(a,b) { return a.age - b.age; });
-        dataseries.data.forEach(function(d, i){ d.index = i; });
+        var ageGroupedData = [];
+        var lastSeenAge = dataseries.data[0].age;
+        var lastGroup = [];
+        dataseries.data.forEach(function(d) {
+          if (d.age === lastSeenAge) {
+            lastGroup.push(d);
+          } else {
+            ageGroupedData.push({
+              age: lastSeenAge,
+              people: lastGroup
+            });
+            lastSeenAge = d.age
+            lastGroup = [d];
+          }
+        });
+        dataseries.data = ageGroupedData;
+
         var xAccessor = function(d, i) {
-          return d.index;
+          return d.age;
         };
         var dxAccessor = function(d) {
           return 1;
         };
         var yAccessor = function(d) {
-          return d.height;
+          if (d.people.length === 0) return 0;
+          // get the average height
+          var totalHeight = 0;
+          d.people.forEach(function(p) { totalHeight += p.height; });
+          return totalHeight / d.people.length;
         }
 
         var bars = new Plottable.BarRenderer(dataseries, xScale, yScale, xAccessor, dxAccessor, yAccessor);

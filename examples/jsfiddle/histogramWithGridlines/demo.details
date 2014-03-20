@@ -1,0 +1,7 @@
+---
+name: Plottable.js Histogram with Gridlines Demo
+description: Creates a histogram with gridlines and no tick labels on the x-axis.
+authors:
+  - Justin Lan
+normalize_css: no
+...
