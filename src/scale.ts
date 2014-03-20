@@ -119,6 +119,19 @@ module Plottable {
     }
 
     /**
+     * Expands the QuantitiveScale's domain to cover the data given.
+     * Passes an accessor through to the native d3 code.
+     * @param data The data to operate on.
+     * @param [accessor] The accessor to get values out of the data
+     * @returns {QuantitiveScale} The scale.
+     */
+    public widenDomainOnData(data: any[], accessor?: IAccessor) {
+      var extent = d3.extent(data, accessor);
+      this.widenDomain(extent);
+      return this;
+    }
+
+    /**
      * Sets or gets the QuantitiveScale's output interpolator
      *
      * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
