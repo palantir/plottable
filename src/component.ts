@@ -92,8 +92,9 @@ module Plottable {
           // we are the root node, retrieve height/width from root SVG
           xOrigin = 0;
           yOrigin = 0;
-          availableWidth  = parseFloat(this.rootSVG.attr("width"));
-          availableHeight = parseFloat(this.rootSVG.attr("height"));
+          var rootNode = this.rootSVG.node();
+          availableWidth  = rootNode.clientWidth;
+          availableHeight = rootNode.clientHeight;
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
