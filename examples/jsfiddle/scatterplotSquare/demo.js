@@ -15,6 +15,7 @@ function makeScatterplotSquare() {
                                             null, null, rAccessor);
 
     var svg = d3.select("#scatterplot-square");
+    svg.attr("width", 800).attr("height", 320);
     var innerTable = new Plottable.Table([[yAxis, r],
                                           [null, xAxis]]);
     innerTable.renderTo(svg);
