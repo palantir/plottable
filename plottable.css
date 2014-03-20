@@ -9,16 +9,16 @@
 }
 
 .plottable .label text {
-  font-family: Helvetica;
+  font-family: sans-serif;
 }
 
 .plottable .axis-label text {
   font-size: 18pt;
-  font-style: italic;
 }
 
 .plottable .title-label text {
   font-size: 36pt;
+
 }
 
 .plottable .text-label-vertical {
@@ -44,7 +44,7 @@
 }
 
 .plottable .axis text {
-  font-size: 12pt;
+  font-size: 10pt;
   fill: #979797;
   font-family: sans-serif;
 }
