@@ -6,6 +6,10 @@
     fill: none;
 }
 
+.plottable .x-axis line {
+    stroke: none;
+}
+
 .plottable .height-weight-data .render-area rect {
     fill: #7E74B3;
 }
