@@ -192,8 +192,9 @@ var Plottable;
                     // we are the root node, retrieve height/width from root SVG
                     xOrigin = 0;
                     yOrigin = 0;
-                    availableWidth = parseFloat(this.rootSVG.attr("width"));
-                    availableHeight = parseFloat(this.rootSVG.attr("height"));
+                    var rootNode = this.rootSVG.node();
+                    availableWidth = rootNode.clientWidth;
+                    availableHeight = rootNode.clientHeight;
                 } else {
                     throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                 }
@@ -1964,6 +1965,7 @@ var Plottable;
         function Axis(axisScale, orientation, formatter) {
             var _this = this;
             _super.call(this);
+            this._showEndTickLabels = false;
             this.tickPositioning = "center";
             this.axisScale = axisScale;
             orientation = orientation.toLowerCase();
@@ -2022,6 +2024,14 @@ var Plottable;
 
             this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
 
+            return this;
+        };
+
+        Axis.prototype.showEndTickLabels = function (show) {
+            if (show == null) {
+                return this._showEndTickLabels;
+            }
+            this._showEndTickLabels = show;
             return this;
         };
 
@@ -2218,7 +2228,9 @@ var Plottable;
                     tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
                 }
             }
-            this._hideCutOffTickLabels();
+            if (!this.showEndTickLabels()) {
+                this._hideCutOffTickLabels();
+            }
             return this;
         };
         return XAxis;
@@ -2244,7 +2256,7 @@ var Plottable;
             _super.call(this, scale, orientation, formatter);
             _super.prototype.colMinimum.call(this, Axis.yWidth);
             this._fixedHeight = false;
-            this.tickLabelPosition("MIDDLE");
+            this.tickLabelPosition("middle");
         }
         YAxis.prototype._anchor = function (element) {
             _super.prototype._anchor.call(this, element);
@@ -2286,7 +2298,9 @@ var Plottable;
                     tickTextLabels.attr("dy", "1em");
                 }
             }
-            this._hideCutOffTickLabels();
+            if (!this.showEndTickLabels()) {
+                this._hideCutOffTickLabels();
+            }
             return this;
         };
         return YAxis;

@@ -1,0 +1,7 @@
+---
+name: Plottable.js SquareRenderer demo
+description: Creates a scatterplot that uses squares for datapoints.
+authors:
+  - Justin Lan
+normalize_css: no
+...

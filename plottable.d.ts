@@ -673,6 +673,8 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(axisScale: Scale, orientation: string, formatter?: any);
+        public showEndTickLabels(): boolean;
+        public showEndTickLabels(show: boolean): Axis;
         public scale(): Scale;
         public scale(newScale: Scale): Axis;
         /**
