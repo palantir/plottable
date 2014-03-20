@@ -1,5 +1,11 @@
+.
+
 .plottable div {
   display: inline;
+}
+
+.plottable .bounding-box {
+  fill: none;
 }
 
 .plottable .label text {
@@ -21,17 +27,25 @@
 
 .plottable .axis path,
 .plottable .axis line {
-  fill: none;
-  stroke: #000;
+  stroke: #979797;
+  stroke-width: 2px;
   shape-rendering: crispEdges;
 }
 
-.plottable .axis path {
+.plottable .x-axis path {
   fill: none;
-  stroke: black;
+  stroke-width: 2px;
+  stroke: #979797;
+}
+
+.plottable .y-axis path {
+  stroke: none;
+  fill: none;
 }
 
 .plottable .axis text {
+  font-size: 12pt;
+  fill: #979797;
   font: 10px sans-serif;
 }
 
@@ -67,29 +81,7 @@
 
 .plottable .gridlines line {
   stroke: #999;
-}
-
-/*
-.error {
-  fill: pink;
-}
-*/
-
-.plottable .bounding-box {
-  fill: none;
-  stroke: black;
-}
-
-.plottable .table-container .bounding-box {
-  stroke: blue;
-}
-
-.plottable .renderer-container .bounding-box {
-  stroke: red;
-}
-
-.plottable .axis-container .bounding-box {
-  stroke: green;
+  stroke-dasharray: 2, 2;
 }
 
 
@@ -102,4 +94,12 @@
 .plottable .selected-point {
   fill: orange;
   stroke: none;
+}
+
+
+
+.plottable .legend {
+  font-family: sans-serif;
+  fill: #979797;
+  font-size: 10pt;
 }
