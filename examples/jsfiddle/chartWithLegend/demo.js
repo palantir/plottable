@@ -1,5 +1,5 @@
 
-function makeDateData(nPoints, randomFactor, cssClass) {
+function makeDateData(start, end, nPoints, randomFactor, cssClass) {
     var out = [];
     var delta = end.getTime() - start.getTime();
     for (var i=0; i<nPoints; i++) {
@@ -27,8 +27,8 @@ window.onload = function() {
                              .tickLabelPosition("bottom")
                              .tickSize(50);
 
-    var data1 = makeDateData(24, 1, "USA");
-    var data2 = makeDateData(24, 2, "Canada");
+    var data1 = makeDateData(start, end, 24, 1, "USA");
+    var data2 = makeDateData(start, end, 24, 2, "Canada");
 
     var renderer1 = new Plottable.LineRenderer(data1, xScale, yScale);
     var renderer2 = new Plottable.LineRenderer(data2, xScale, yScale);
