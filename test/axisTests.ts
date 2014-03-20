@@ -76,7 +76,8 @@ describe("Axes", () => {
     for (i=0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
-      assert.operator(labelRect.bottom, "<=", markRect.top, "tick label above the mark");
+      assert.operator(labelRect.bottom, "<=", markRect.top + 1,
+        "tick label above the mark"); // +1 for off-by-one on some browsers
     }
 
     yAxis.tickLabelPosition("bottom");

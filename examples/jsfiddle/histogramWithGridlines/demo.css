@@ -2,8 +2,14 @@
 <link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css">
 <style type="text/css">
 /*-- Add custom styles after this line --*/
-.transparent-square .render-area rect {
-  fill: none;
-  stroke: #2FA9E7;
-  opacity: 0.7;
+.plottable .no-tick-labels .tick text {
+    fill: none;
+}
+
+.plottable .x-axis line {
+    stroke: none;
+}
+
+.plottable .height-weight-data .render-area rect {
+    fill: #7E74B3;
 }
