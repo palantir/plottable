@@ -67,3 +67,22 @@ function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue 
     metadata: {cssClass: "random-buckets"}
   };
 }
+
+function generateHeightWeightData(n: number) {
+    var data = [];
+    var heightGen = d3.random.normal(180, 2.5);
+    var weightGen = d3.random.normal(170, 30);
+    for (var i=0; i<n; i++) {
+        data.push({
+            age: Math.random() * 50 + 20,
+            gender: Math.random() > 0.5 ? "female" : "male",
+            height: heightGen(),
+            weight: weightGen()
+        });
+    }
+
+    return {
+      data: data,
+      metadata: {cssClass: "height-weight-data"}
+    };
+}

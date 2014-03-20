@@ -1,0 +1,7 @@
+---
+name: Plottable.js Size/Color Scatterplot Demo
+description: Creates a scatterplot that demonstrates size and color accessors.
+authors:
+  - Justin Lan
+normalize_css: no
+...
