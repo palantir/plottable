@@ -7,6 +7,7 @@ module Plottable {
     public axisElement: D3.Selection;
     private d3Axis: D3.Svg.Axis;
     private axisScale: Scale;
+    private _showEndTickLabels = false;
     private tickPositioning = "center";
 
     /**
@@ -67,6 +68,16 @@ module Plottable {
 
       this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
 
+      return this;
+    }
+
+    public showEndTickLabels(): boolean;
+    public showEndTickLabels(show: boolean): Axis;
+    public showEndTickLabels(show?: boolean): any {
+      if (show == null) {
+        return this._showEndTickLabels;
+      }
+      this._showEndTickLabels = show;
       return this;
     }
 
@@ -289,7 +300,9 @@ module Plottable {
           tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
         }
       }
-      this._hideCutOffTickLabels();
+      if (!this.showEndTickLabels()) {
+        this._hideCutOffTickLabels();
+      }
       return this;
     }
   }
@@ -311,7 +324,7 @@ module Plottable {
       super(scale, orientation, formatter);
       super.colMinimum(Axis.yWidth);
       this._fixedHeight = false;
-      this.tickLabelPosition("MIDDLE");
+      this.tickLabelPosition("middle");
     }
 
     public _anchor(element: D3.Selection): YAxis {
@@ -362,7 +375,9 @@ module Plottable {
           tickTextLabels.attr("dy", "1em");
         }
       }
-      this._hideCutOffTickLabels();
+      if (!this.showEndTickLabels()) {
+        this._hideCutOffTickLabels();
+      }
       return this;
     }
   }

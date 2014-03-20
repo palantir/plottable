@@ -46,7 +46,7 @@
 .plottable .axis text {
   font-size: 12pt;
   fill: #979797;
-  font: 10px sans-serif;
+  font-family: sans-serif;
 }
 
 .plottable .line {

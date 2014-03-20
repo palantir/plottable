@@ -1,0 +1,5 @@
+</style>
+<link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css">
+<style type="text/css">
+/*-- Add custom styles after this line --*/
+.transparent-square rect {fill: none; stroke: #2FA9E7; opacity: 0.7}
