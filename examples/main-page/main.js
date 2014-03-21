@@ -1,5 +1,5 @@
 window.onload = function() {
-  d3.json("../examples/data/gitstats.json", function(data) {
+  d3.json("examples/data/gitstats.json", function(data) {
     data.forEach(function(d) {
       d.date = new Date(d.date);
       d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
