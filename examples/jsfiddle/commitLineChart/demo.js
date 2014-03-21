@@ -34,14 +34,14 @@ function lineChart(svg, dataset) {
 
 
 function loadChart() {
-  d3.json("http://palantir.github.io/plottable/examples/data/gitstats.json", function(data) {
+  d3.json("http://rawgithub.com/palantir/plottable/examples/data/gitstats.json", function(data) {
     data.forEach(function(d) {
       d.date = new Date(d.date);
       d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
     });
     var dataset = {data: data, metadata: {}};
   var svg = d3.select("svg");
-  scatterFull(svg, dataset);
+  lineChart(svg, dataset);
   });
 }
 window.onload = loadChart;
