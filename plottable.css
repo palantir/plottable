@@ -60,6 +60,11 @@
   vector-effect: non-scaling-stroke;
 }
 
+.plottable .line-renderer .line {
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
 .plottable .table-rect {
   fill: none;
   stroke: royalblue;
@@ -101,7 +106,6 @@
   fill: orange;
   stroke: none;
 }
-
 
 
 .plottable .legend text {
