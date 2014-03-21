@@ -7,6 +7,7 @@ module Plottable {
 
     private colorScale: ColorScale;
     private maxWidth: number;
+    private legendBox: D3.Selection;
 
     /**
      * Creates a Legend.
@@ -21,6 +22,12 @@ module Plottable {
       this.colorScale = colorScale;
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
+    }
+
+    public _anchor(element: D3.Selection): Legend {
+      super._anchor(element);
+      this.legendBox = this.content.append("rect").classed("legend-box", true);
+      return this;
     }
 
     /**
@@ -55,6 +62,7 @@ module Plottable {
 
     public _render(): Legend {
       super._render();
+      this.legendBox.attr("height", this.rowMinimum()).attr("width", this.colMinimum()); //HACKHACK #223
       var domain = this.colorScale.domain();
       var textHeight = this.measureTextHeight();
       var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
