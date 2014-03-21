@@ -1,5 +1,5 @@
 
-function commitChart(svg, data) {
+function commitChart(svg, dataset) {
 
   // First, define some scales
   var xScale = new Plottable.QuantitiveScale(d3.time.scale())
@@ -10,13 +10,12 @@ function commitChart(svg, data) {
 
   var rScale = new Plottable.QuantitiveScale(d3.scale.log())
               .range([2, 12])
-              .widenDomainOnData(data, linesAddedAccessor);
+              .widenDomainOnData(dataset.data, linesAddedAccessor);
 
   var colorScale = new Plottable.ColorScale()
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
-  var dataset = {data: data, metadata: {}};
 
   // Define the accessors - this is the logic for how data is rendered
   function hourAccessor(d) {

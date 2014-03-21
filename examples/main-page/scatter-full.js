@@ -1,5 +1,5 @@
 
-function scatterFull(svg, data) {
+function scatterFull(svg, dataset) {
 
   // First, define some scales
   var xScale = new Plottable.QuantitiveScale(d3.scale.log());
@@ -13,9 +13,6 @@ function scatterFull(svg, data) {
   var colorScale = new Plottable.ColorScale()
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
-
-  var dataset = {data: data, metadata: {}};
-
 
   function colorAccessor(d) { return colorScale.scale(d.name); }
   function x(d) { return d.deletions > 0 ? d.deletions : 1; }

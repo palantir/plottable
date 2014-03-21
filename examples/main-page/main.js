@@ -4,17 +4,19 @@ window.onload = function() {
       d.date = new Date(d.date);
       d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
     });
+    var dataset = {data: data, metadata: {}};
+
     var commitSVG = d3.select("#intro-chart");
     sizeSVG(commitSVG);
-    commitChart(commitSVG, data);
+    commitChart(commitSVG, dataset);
 
     var scatterFullSVG = d3.select("#scatter-full");
     sizeSVG(scatterFullSVG);
-    scatterFull(scatterFullSVG, data);
+    scatterFull(scatterFullSVG, dataset);
 
-    var scatter1SVG = d3.select("#scatter-1");
-    sizeSVG(scatter1SVG);
-    scatter1(scatter1SVG, data);
+    var lineSVG = d3.select("#line-chart");
+    sizeSVG(lineSVG);
+    lineChart(lineSVG, dataset);
   });
 }
 
