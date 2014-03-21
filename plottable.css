@@ -98,8 +98,12 @@
 
 
 
-.plottable .legend {
+.plottable .legend text {
   font-family: sans-serif;
   fill: #979797;
-  font-size: 10pt;
+  font-size: 14pt;
+}
+
+.plottable .legend .legend-box {
+  fill: #EFEFEF;
 }
