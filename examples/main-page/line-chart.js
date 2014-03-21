@@ -30,4 +30,5 @@ function lineChart(svg, dataset) {
   var full  = new Plottable.Table([[title], [table]]);
   full.renderTo(svg);
   var ci = new Plottable.CrosshairsInteraction(renderer).registerWithComponent();
+  var pzi = new Plottable.PanZoomInteraction(renderer, xScale, yScale).registerWithComponent();
 }

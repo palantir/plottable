@@ -8,7 +8,7 @@ module Plottable {
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
-    private static defaultColorAccessor = (d: any) => "steelblue";
+    private static defaultColorAccessor = (d: any) => "#1f77b4";
 
     public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only

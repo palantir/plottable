@@ -974,8 +974,15 @@ var Plottable;
     var CrosshairsInteraction = (function (_super) {
         __extends(CrosshairsInteraction, _super);
         function CrosshairsInteraction(renderer) {
+            var _this = this;
             _super.call(this, renderer);
             this.renderer = renderer;
+            renderer.xScale.registerListener(function () {
+                return _this.rescale();
+            });
+            renderer.yScale.registerListener(function () {
+                return _this.rescale();
+            });
         }
         CrosshairsInteraction.prototype._anchor = function (hitBox) {
             _super.prototype._anchor.call(this, hitBox);
@@ -987,6 +994,8 @@ var Plottable;
         };
 
         CrosshairsInteraction.prototype.mousemove = function (x, y) {
+            this.lastx = x;
+            this.lasty = y;
             var domainX = this.renderer.xScale.invert(x);
             var data = this.renderer._data;
             var dataIndex = Plottable.OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
@@ -1003,6 +1012,12 @@ var Plottable;
             var height = this.renderer.availableHeight;
             this.xLine.attr("d", "M 0 " + pixelY + " L " + width + " " + pixelY);
             this.yLine.attr("d", "M " + pixelX + " 0 L " + pixelX + " " + height);
+        };
+
+        CrosshairsInteraction.prototype.rescale = function () {
+            if (this.lastx != null) {
+                this.mousemove(this.lastx, this.lasty);
+            }
         };
         return CrosshairsInteraction;
     })(MousemoveInteraction);
@@ -1219,7 +1234,7 @@ var Plottable;
             return this;
         };
         Renderer.defaultColorAccessor = function (d) {
-            return "steelblue";
+            return "#1f77b4";
         };
         return Renderer;
     })(Plottable.Component);
