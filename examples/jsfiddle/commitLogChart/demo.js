@@ -52,7 +52,7 @@ function scatterFull(svg, dataset) {
 
 
 function loadChart() {
-  d3.json("http://rawgithub.com/palantir/plottable/examples/data/gitstats.json", function(data) {
+  d3.json("http://rawgithub.com/palantir/plottable/master/examples/data/gitstats.json", function(data) {
     data.forEach(function(d) {
       d.date = new Date(d.date);
       d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
