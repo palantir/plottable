@@ -30,18 +30,18 @@ function scatter2(svg, data) {
 
 
   var xAxis  = new Plottable.XAxis(xScale, "bottom");
-  var xLabel = new Plottable.AxisLabel("Date of Commit");
+  var xLabel = new Plottable.AxisLabel("# of Deletions");
   var xAxisT = new Plottable.Table([[xAxis], [xLabel]]);
 
   var yAxis  = new Plottable.YAxis(yScale, "left").showEndTickLabels(true);
-  var yLabel = new Plottable.AxisLabel("Commit Time", "vertical-left");
+  var yLabel = new Plottable.AxisLabel("# of Insertions", "vertical-left");
   var yAxisT = new Plottable.Table([[yLabel, yAxis]]);
 
   var table  = new Plottable.Table().addComponent(0, 0, yAxisT)
                                     .addComponent(0, 1, group)
                                     .addComponent(1, 1, xAxisT);
 
-  var title = new Plottable.TitleLabel("Commit History");
+  var title = new Plottable.TitleLabel("Commits by Size");
   var full  = new Plottable.Table([[title], [table]]);
   full.renderTo(svg);
 }
