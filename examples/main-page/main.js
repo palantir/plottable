@@ -19,7 +19,7 @@ function datachart(data) {
   var xScale = new Plottable.QuantitiveScale(d3.time.scale());
   xScale.domain([new Date(2013, 12, 1), new Date(2014, 3, 20)]);
   var yScale = new Plottable.LinearScale();
-  var rScale = new Plottable.QuantitiveScale(d3.scale.log()).range([3, width/60]);
+  var rScale = new Plottable.QuantitiveScale(d3.scale.log()).range([3, width/70]);
   rScale.widenDomainOnData(data, linesAddedAccessor);
   var colorScale = new Plottable.ColorScale()
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
@@ -86,6 +86,6 @@ function datachart(data) {
   var title = new Plottable.TitleLabel("Plottable.js Commit History");
   var full = new Plottable.Table([[title], [table]]);
   full.renderTo(svg);
-  xScale.domain([new Date(2014, 0, 20), new Date(2014, 2, 22)]).nice();
+  xScale.domain([new Date(2014, 0, 20), new Date(2014, 2, 23)]).nice();
   yScale.domain([8, 26]);
 }
