@@ -21,7 +21,7 @@
     <script src="lib/jquery.simulate/libs/jquery.simulate.js"></script>
     <script src="lib/jquery.simulate/src/jquery.simulate.ext.js"></script>
     <script src="blanket_mocha.js"></script>
-    <script src="build/plottable.js" data-cover></script>
+    <script src="plottable.js" data-cover></script>
   </head>
   <body>
     <div id="mocha"></div>
@@ -39,7 +39,7 @@
       }
     </script>
 
-    <script src="build/tests.js"></script>
+    <script src="test/tests.js"></script>
     <script>
         if (window.PHANTOMJS) {
             blanket.options("reporter", "node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
