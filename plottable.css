@@ -112,4 +112,5 @@
 
 .plottable .legend .legend-box {
   fill: white;
+  opacity: 0.7;
 }
