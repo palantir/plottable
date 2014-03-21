@@ -778,18 +778,6 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class Gridlines extends Component {
-        /**
-        * Creates a set of Gridlines.
-        * @constructor
-        *
-        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
-        */
-        constructor(xScale: QuantitiveScale, yScale: QuantitiveScale);
-    }
-}
-declare module Plottable {
     interface IDataset {
         data: any[];
         metadata: IMetadata;
