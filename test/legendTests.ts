@@ -13,7 +13,7 @@ describe("Legends", () => {
     legend = new Plottable.Legend(color);
   });
 
-  it("a basic legend renders", () => {
+  it.skip("a basic legend renders", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
     var legends = legend.content.selectAll(".legend-row");
@@ -78,7 +78,7 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it("re-rendering the legend with a new domain will do the right thing", () => {
+  it.skip("re-rendering the legend with a new domain will do the right thing", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
     var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
