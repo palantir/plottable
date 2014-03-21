@@ -2076,6 +2076,37 @@ var Plottable;
             return this;
         };
 
+        Axis.prototype._hideOverlappingTickLabels = function () {
+            var tickLabels = this.axisElement.selectAll(".tick").select("text");
+            var lastLabelClientRect;
+
+            function boxesOverlap(boxA, boxB) {
+                if (boxA.right < boxB.left) {
+                    return false;
+                }
+                if (boxA.left > boxB.right) {
+                    return false;
+                }
+                if (boxA.bottom < boxB.top) {
+                    return false;
+                }
+                if (boxA.top > boxB.bottom) {
+                    return false;
+                }
+                return true;
+            }
+
+            tickLabels.each(function (d) {
+                var clientRect = this.getBoundingClientRect();
+                if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+                    d3.select(this).style("visibility", "hidden");
+                } else {
+                    lastLabelClientRect = clientRect;
+                    d3.select(this).style("visibility", "visible");
+                }
+            });
+        };
+
         Axis.prototype.rescale = function () {
             return (this.element != null) ? this._render() : null;
             // short circuit, we don't care about perf.
@@ -2249,6 +2280,7 @@ var Plottable;
                     tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
                 }
             }
+            this._hideOverlappingTickLabels();
             if (!this.showEndTickLabels()) {
                 this._hideCutOffTickLabels();
             }
@@ -2319,6 +2351,7 @@ var Plottable;
                     tickTextLabels.attr("dy", "1em");
                 }
             }
+            this._hideOverlappingTickLabels();
             if (!this.showEndTickLabels()) {
                 this._hideCutOffTickLabels();
             }

@@ -4,10 +4,25 @@ window.onload = function() {
       d.date = new Date(d.date);
       d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
     });
-    var commitSvg = d3.select("#intro-chart");
-    var width = commitSvg.node().clientWidth;
-    var height = Math.min(width * 0.75, 600);
-    commitSvg.attr("height", height);
-    commitChart(commitSvg, data);
+    var dataset = {data: data, metadata: {}};
+
+    var commitSVG = d3.select("#intro-chart");
+    sizeSVG(commitSVG);
+    commitChart(commitSVG, dataset);
+
+    var scatterFullSVG = d3.select("#scatter-full");
+    sizeSVG(scatterFullSVG);
+    scatterFull(scatterFullSVG, dataset);
+
+    var lineSVG = d3.select("#line-chart");
+    sizeSVG(lineSVG);
+    lineChart(lineSVG, dataset);
   });
+}
+
+
+function sizeSVG(svg) {
+  var width = svg.node().clientWidth;
+  var height = Math.min(width*.75, 600);
+  svg.attr("height", height);
 }
