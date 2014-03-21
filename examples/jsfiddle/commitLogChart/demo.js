@@ -48,7 +48,7 @@ function scatterFull(svg, dataset) {
 
   xAxis._hideCutOffTickLabels();
   yAxis._hideCutOffTickLabels();
-};
+}
 
 
 function loadChart() {
@@ -60,5 +60,6 @@ function loadChart() {
     var dataset = {data: data, metadata: {}};
   var svg = d3.select("svg");
   scatterFull(svg, dataset);
-};
+  });
+}
 window.onload = loadChart;

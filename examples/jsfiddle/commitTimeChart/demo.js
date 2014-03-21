@@ -91,6 +91,7 @@ function loadChart() {
     var dataset = {data: data, metadata: {}};
   var svg = d3.select("svg");
   commitChart(svg, dataset);
+  });
 }
 
 window.onload = loadChart;
