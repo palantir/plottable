@@ -1234,7 +1234,7 @@ var Plottable;
             return this;
         };
         Renderer.defaultColorAccessor = function (d) {
-            return "steelblue";
+            return "#1f77b4";
         };
         return Renderer;
     })(Plottable.Component);
