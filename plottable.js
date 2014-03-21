@@ -1940,7 +1940,7 @@ var Plottable;
             });
             legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
             legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
-            legend.selectAll("circl").attr("fill", this.colorScale._d3Scale);
+            legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
             legend.selectAll("text").text(function (d, i) {
                 return Plottable.Utils.truncateTextToLength(d, availableWidth, d3.select(this));
             });
