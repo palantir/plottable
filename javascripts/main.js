@@ -4,6 +4,7 @@ window.onload = function() {
       d.date = new Date(d.date);
       d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
     });
+    data.reverse();
     datachart(data);
   });
 }
@@ -11,7 +12,7 @@ window.onload = function() {
 
 
 function datachart(data) {
-  var svg = d3.select("#svg1");
+  var svg = d3.select("#intro-chart");
   var width = svg.node().clientWidth;
   var height = width * 0.75;
   svg.attr("height", height);
@@ -20,11 +21,15 @@ function datachart(data) {
   var yScale = new Plottable.LinearScale();
   var rScale = new Plottable.QuantitiveScale(d3.scale.log()).range([3, width/60]);
   rScale.widenDomainOnData(data, linesAddedAccessor);
-  var colorScale = new Plottable.ColorScale("Category10");
+  var colorScale = new Plottable.ColorScale()
+                    .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
+                    .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
   function hourAccessor(d) {
     var date = d.date;
-    return date.getHours() + date.getMinutes() / 60;
+    var hour =  date.getHours() + date.getMinutes() / 60;
+    hour = hour < 5 ? hour + 24 : hour;
+    return hour;
   }
 
   function dateAccessor(d) {
@@ -47,37 +52,40 @@ function datachart(data) {
   var dataset = {data: data, metadata: {"cssClass": "foo"}};
   var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, dateAccessor, hourAccessor, rAccessor);
   renderer.colorAccessor(colorAccessor);
-  var dateFormatter = d3.time.format("%-m/%-d");
+  var dateFormatter = d3.time.format("%-m/%-d/%y");
   function hourFormatter(hour) {
     if (hour < 12) {
       return hour + "AM";
     } else if (hour === 12) {
       return "12PM";
+    } else if (hour < 24) {
+      return (hour - 12) + "PM";
+    } else if (hour == 24) {
+      return "12AM";
     } else {
-      return (hour - 12) + "PM"
+      return (hour - 24) + "AM";
     }
   }
-  var group = renderer.merge(new Plottable.Gridlines(xScale, yScale));
+  var legend = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(10);
+  var gridlines = new Plottable.Gridlines(xScale, yScale);
+  var group = gridlines.merge(renderer).merge(legend);
 
 
   var xAxis = new Plottable.XAxis(xScale, "bottom", dateFormatter);
   var xLabel = new Plottable.AxisLabel("Date of Commit");
   var xAxisT = new Plottable.Table([[xAxis], [xLabel]]);
 
-  var yAxis = new Plottable.YAxis(yScale, "left", hourFormatter);
+  var yAxis = new Plottable.YAxis(yScale, "left", hourFormatter).showEndTickLabels(true);
   var yLabel = new Plottable.AxisLabel("Commit Time", "vertical-left");
   var yAxisT = new Plottable.Table([[yLabel, yAxis]]);
   var table = new Plottable.Table().addComponent(0, 0, yAxisT)
                                    .addComponent(0, 1, group)
                                    .addComponent(1, 1, xAxisT);
 
-  var legend = new Plottable.Legend(colorScale);
   var outer = new Plottable.Table([[table, legend]]);
   var title = new Plottable.TitleLabel("Plottable.js Commit History");
-  var full = new Plottable.Table([[title], [outer]]);
+  var full = new Plottable.Table([[title], [table]]);
   full.renderTo(svg);
-  // pzi = new Plottable.PanZoomInteraction(group, xScale, yScale).registerWithComponent();
-// xScale.padDomain();
-  xScale.domain([new Date(2014, 0, 18), new Date(2014, 2, 25)]);
-  yScale.domain([8, 21]);
+  xScale.domain([new Date(2014, 0, 20), new Date(2014, 2, 22)]).nice();
+  yScale.domain([8, 26]);
 }
