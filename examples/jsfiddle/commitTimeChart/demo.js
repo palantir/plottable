@@ -80,7 +80,7 @@ function commitChart(svg, dataset) {
   var title = new Plottable.TitleLabel("Commit History");
   var full  = new Plottable.Table([[title], [table]]);
   full.renderTo(svg);
-};
+}
 
 function loadChart() {
   d3.json("http://palantir.github.io/plottable/examples/data/gitstats.json", function(data) {
@@ -91,6 +91,6 @@ function loadChart() {
     var dataset = {data: data, metadata: {}};
   var svg = d3.select("svg");
   commitChart(svg, dataset);
-};
+}
 
 window.onload = loadChart;
