@@ -23,7 +23,7 @@ module Plottable {
         this.components.push(c);
       }
       if (this.element != null) {
-        c._anchor(this.content.append("g"));
+        c._anchor(this.content.insert("g", "g"));
       }
       return this;
     }
@@ -40,7 +40,7 @@ module Plottable {
 
     public _anchor(element: D3.Selection): ComponentGroup {
       super._anchor(element);
-      this.components.forEach((c) => c._anchor(this.content.append("g")));
+      this.components.forEach((c) => c._anchor(this.content.insert("g", "g")));
       return this;
     }
 
