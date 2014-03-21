@@ -48,4 +48,7 @@ function scatterFull(svg, data) {
   var title = new Plottable.TitleLabel("Commits by Size");
   var full  = new Plottable.Table([[title], [table]]);
   full.renderTo(svg);
+
+  xAxis._hideCutOffTickLabels();
+  yAxis._hideCutOffTickLabels();
 }
