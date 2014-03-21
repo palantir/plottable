@@ -1931,15 +1931,16 @@ var Plottable;
             var domain = this.colorScale.domain();
             var textHeight = this.measureTextHeight();
             var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
+            var r = textHeight - Legend.MARGIN * 2 - 2;
 
             this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
             var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
             var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
                 return "translate(0," + i * textHeight + ")";
             });
-            legendEnter.append("rect").attr("x", Legend.MARGIN).attr("y", Legend.MARGIN).attr("width", textHeight - Legend.MARGIN * 2).attr("height", textHeight - Legend.MARGIN * 2);
+            legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
             legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
-            legend.selectAll("rect").attr("fill", this.colorScale._d3Scale);
+            legend.selectAll("circl").attr("fill", this.colorScale._d3Scale);
             legend.selectAll("text").text(function (d, i) {
                 return Plottable.Utils.truncateTextToLength(d, availableWidth, d3.select(this));
             });
