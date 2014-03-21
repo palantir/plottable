@@ -426,6 +426,7 @@ declare module Plottable {
     class CrosshairsInteraction extends MousemoveInteraction {
         constructor(renderer: XYRenderer);
         public mousemove(x: number, y: number): void;
+        public rescale(): void;
     }
 }
 declare module Plottable {
