@@ -262,10 +262,14 @@ module Plottable {
     private circle: D3.Selection;
     private xLine: D3.Selection;
     private yLine: D3.Selection;
+    private lastx: number;
+    private lasty: number;
 
     constructor(renderer: XYRenderer) {
       super(renderer);
       this.renderer = renderer;
+      renderer.xScale.registerListener(() => this.rescale());
+      renderer.yScale.registerListener(() => this.rescale());
     }
 
     public _anchor(hitBox: D3.Selection) {
@@ -278,6 +282,8 @@ module Plottable {
     }
 
     public mousemove(x: number, y: number) {
+      this.lastx = x;
+      this.lasty = y;
       var domainX = this.renderer.xScale.invert(x);
       var data = this.renderer._data;
       var dataIndex = OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
@@ -294,6 +300,12 @@ module Plottable {
       var height = this.renderer.availableHeight;
       this.xLine.attr("d", "M 0 " + pixelY + " L " + width + " " + pixelY);
       this.yLine.attr("d", "M " + pixelX + " 0 L " + pixelX + " " + height);
+    }
+
+    public rescale() {
+      if (this.lastx != null) {
+        this.mousemove(this.lastx, this.lasty);
+      }
     }
   }
 }
