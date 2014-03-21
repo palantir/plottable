@@ -1,5 +1,5 @@
 
-function scatter2(svg, data) {
+function scatterFull(svg, data) {
 
   // First, define some scales
   var xScale = new Plottable.QuantitiveScale(d3.scale.log());
@@ -20,11 +20,15 @@ function scatter2(svg, data) {
   function colorAccessor(d) { return colorScale.scale(d.name); }
   function x(d) { return d.deletions > 0 ? d.deletions : 1; }
   function y(d) { return d.insertions > 0 ? d.insertions : 1; }
-
-  var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, x, y)
+  function r(d) { return 5;}
+  var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, x, y, r)
                  .colorAccessor(colorAccessor);
+  renderer.clipPathEnabled = false;
 
-  var legend    = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(10);
+  xScale.nice();
+  yScale.nice();
+
+  var legend    = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(100);
   var gridlines = new Plottable.Gridlines(xScale, yScale);
   var group     = gridlines.merge(renderer).merge(legend);
 

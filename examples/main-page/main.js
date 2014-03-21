@@ -8,9 +8,13 @@ window.onload = function() {
     sizeSVG(commitSVG);
     commitChart(commitSVG, data);
 
-    var scatter2SVG = d3.select("#scatter2");
-    sizeSVG(scatter2SVG);
-    scatter2(scatter2SVG, data);
+    var scatterFullSVG = d3.select("#scatter-full");
+    sizeSVG(scatterFullSVG);
+    scatterFull(scatterFullSVG, data);
+
+    var scatter1SVG = d3.select("#scatter-1");
+    sizeSVG(scatter1SVG);
+    scatter1(scatter1SVG, data);
   });
 }
 
