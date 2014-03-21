@@ -14,7 +14,7 @@ window.onload = function() {
 function datachart(data) {
   var svg = d3.select("#intro-chart");
   var width = svg.node().clientWidth;
-  var height = width * 0.75;
+  var height = Math.min(width * 0.75, 600);
   svg.attr("height", height);
   var xScale = new Plottable.QuantitiveScale(d3.time.scale());
   xScale.domain([new Date(2013, 12, 1), new Date(2014, 3, 20)]);
@@ -83,7 +83,7 @@ function datachart(data) {
                                    .addComponent(1, 1, xAxisT);
 
   var outer = new Plottable.Table([[table, legend]]);
-  var title = new Plottable.TitleLabel("Plottable.js Commit History");
+  var title = new Plottable.TitleLabel("Commit History");
   var full = new Plottable.Table([[title], [table]]);
   full.renderTo(svg);
   xScale.domain([new Date(2014, 0, 20), new Date(2014, 2, 23)]).nice();
