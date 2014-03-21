@@ -1891,6 +1891,12 @@ var Plottable;
             this.xAlign("RIGHT").yAlign("TOP");
             this.xOffset(5).yOffset(5);
         }
+        Legend.prototype._anchor = function (element) {
+            _super.prototype._anchor.call(this, element);
+            this.legendBox = this.content.append("rect").classed("legend-box", true);
+            return this;
+        };
+
         /**
         * Assigns a new ColorScale to the Legend.
         *
@@ -1921,6 +1927,7 @@ var Plottable;
 
         Legend.prototype._render = function () {
             _super.prototype._render.call(this);
+            this.legendBox.attr("height", this.rowMinimum()).attr("width", this.colMinimum()); //HACKHACK #223
             var domain = this.colorScale.domain();
             var textHeight = this.measureTextHeight();
             var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
