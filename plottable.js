@@ -2401,7 +2401,7 @@ var Plottable;
                 this.components.push(c);
             }
             if (this.element != null) {
-                c._anchor(this.content.append("g"));
+                c._anchor(this.content.insert("g", "g"));
             }
             return this;
         };
@@ -2420,7 +2420,7 @@ var Plottable;
             var _this = this;
             _super.prototype._anchor.call(this, element);
             this.components.forEach(function (c) {
-                return c._anchor(_this.content.append("g"));
+                return c._anchor(_this.content.insert("g", "g"));
             });
             return this;
         };
