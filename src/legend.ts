@@ -80,7 +80,7 @@ module Plottable {
       legendEnter.append("text")
           .attr("x", textHeight)
           .attr("y", Legend.MARGIN + textHeight / 2);
-      legend.selectAll("circl").attr("fill", this.colorScale._d3Scale);
+      legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
             .text(function(d: any, i: number) {return Utils.truncateTextToLength(d, availableWidth, d3.select(this));});
       return this;
