@@ -23,6 +23,16 @@ window.onload = function() {
 
 function sizeSVG(svg) {
   var width = svg.node().clientWidth;
+  if (width === 0) { // Firefox bug #874811
+    var widthAttr = svg.attr("width");
+    if (widthAttr.indexOf('%') !== -1) { // percentage
+      var parentWidth = svg.node().parentNode.clientWidth;
+      width = parentWidth * parseFloat(widthAttr) / 100;
+    } else {
+      width = parseFloat(widthAttr);
+    }
+  }
+  svg.attr("width", width);
   var height = Math.min(width*.75, 600);
   svg.attr("height", height);
 }
