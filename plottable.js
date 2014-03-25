@@ -76,6 +76,30 @@ var Plottable;
             return height;
         }
         Utils.getTextHeight = getTextHeight;
+
+        function getSVGPixelWidth(svg) {
+            var width = svg.node().clientWidth;
+
+            if (width === 0) {
+                var widthAttr = svg.attr("width");
+
+                if (widthAttr.indexOf("%") !== -1) {
+                    var ancestorNode = svg.node().parentNode;
+                    while (ancestorNode != null && ancestorNode.clientWidth === 0) {
+                        ancestorNode = ancestorNode.parentNode;
+                    }
+                    if (ancestorNode == null) {
+                        throw new Error("Could not compute width of element");
+                    }
+                    width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
+                } else {
+                    width = parseFloat(widthAttr);
+                }
+            }
+
+            return width;
+        }
+        Utils.getSVGPixelWidth = getSVGPixelWidth;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -192,9 +216,8 @@ var Plottable;
                     // we are the root node, retrieve height/width from root SVG
                     xOrigin = 0;
                     yOrigin = 0;
-                    var rootNode = this.rootSVG.node();
-                    availableWidth = rootNode.clientWidth;
-                    availableHeight = rootNode.clientHeight;
+                    availableWidth = parseFloat(this.rootSVG.attr("width"));
+                    availableHeight = parseFloat(this.rootSVG.attr("height"));
                 } else {
                     throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                 }
