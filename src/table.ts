@@ -25,8 +25,6 @@ module Plottable {
     constructor(rows: Component[][] = []) {
       super();
       this.classed("table", true);
-      var cleanOutNulls = (c: Component) => c == null ? new Component() : c;
-      rows = rows.map((row: Component[]) => row.map(cleanOutNulls));
       this.rows = rows;
       this.nRows = rows.length;
       this.nCols = rows.length > 0 ? d3.max(rows, (r) => r.length) : 0;
@@ -50,9 +48,8 @@ module Plottable {
       this.nCols = Math.max(col, this.nCols);
       this.padTableToSize(this.nRows + 1, this.nCols + 1);
 
-      var currentComponent = <any> this.rows[row][col];
-      if (currentComponent.constructor.name !== "Component") {
-        // The base component is only used as a placeholder component
+      var currentComponent = this.rows[row][col];
+      if (currentComponent != null) {
         throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
       }
 
@@ -65,7 +62,9 @@ module Plottable {
       // recursively anchor children
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
-          component._anchor(this.content.append("g"));
+          if (component != null) {
+            component._anchor(this.content.append("g"));
+          }
         });
       });
       return this;
@@ -82,8 +81,8 @@ module Plottable {
       }
 
       var cols = d3.transpose(this.rows);
-      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => c.isFixedHeight());
-      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => c.isFixedWidth());
+      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
+      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c.isFixedWidth());
       // distribute remaining height to rows
       var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
       var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
@@ -97,7 +96,9 @@ module Plottable {
         var childXOffset = 0;
         row.forEach((component: Component, colIndex: number) => {
           // recursively compute layout
-          component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+          if (component != null) {
+            component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+          }
           childXOffset += colWidths[colIndex] + this.colPadding;
         });
         childYOffset += rowHeights[rowIndex] + this.rowPadding;
@@ -109,7 +110,9 @@ module Plottable {
       // recursively render children
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
-          component._render();
+          if (component != null) {
+            component._render();
+          }
         });
       });
       return this;
@@ -160,7 +163,7 @@ module Plottable {
       if (newVal != null) {
         throw new Error("Row minimum cannot be directly set on Table");
       } else {
-        this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => r.rowMinimum()));
+        this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => (r == null) ? 0 : r.rowMinimum()));
         return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
       }
     }
@@ -172,18 +175,18 @@ module Plottable {
         throw new Error("Col minimum cannot be directly set on Table");
       } else {
         var cols = d3.transpose(this.rows);
-        this.colMinimums = cols.map((col: Component[]) => d3.max(col, (r: Component) => r.colMinimum()));
+        this.colMinimums = cols.map((col: Component[]) => d3.max(col, (c: Component) => (c == null) ? 0 : c.colMinimum()));
         return d3.sum(this.colMinimums) + this.colPadding * (cols.length - 1);
       }
     }
 
     public isFixedWidth(): boolean {
       var cols = d3.transpose(this.rows);
-      return Table.fixedSpace(cols, (c: Component) => c.isFixedWidth());
+      return Table.fixedSpace(cols, (c: Component) => (c == null) || c.isFixedWidth());
     }
 
     public isFixedHeight(): boolean {
-      return Table.fixedSpace(this.rows, (c: Component) => c.isFixedHeight());
+      return Table.fixedSpace(this.rows, (c: Component) => (c == null) || c.isFixedHeight());
     }
 
     private padTableToSize(nRows: number, nCols: number) {
@@ -194,7 +197,8 @@ module Plottable {
         }
         for (var j=0; j<nCols; j++) {
           if (this.rows[i][j] === undefined) {
-            this.rows[i][j] = new Component();
+            // this.rows[i][j] = new Component();
+            this.rows[i][j] = null;
           }
         }
       }

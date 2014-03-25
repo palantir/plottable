@@ -30,7 +30,7 @@ describe("Gridlines", () => {
     for (var i=0; i<xAxisTickMarks.length; i++) {
       var xTickMarkRect = xAxisTickMarks[i].getBoundingClientRect();
       var xGridlineRect = xGridlines[i].getBoundingClientRect();
-      assert.equal(xTickMarkRect.left, xGridlineRect.left, "x tick and gridline align");
+      assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
     }
 
     var yAxisTickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
@@ -39,7 +39,7 @@ describe("Gridlines", () => {
     for (var j=0; j<yAxisTickMarks.length; j++) {
       var yTickMarkRect = yAxisTickMarks[j].getBoundingClientRect();
       var yGridlineRect = yGridlines[j].getBoundingClientRect();
-      assert.equal(yTickMarkRect.top, yGridlineRect.top, "y tick and gridline align");
+      assert.closeTo(yTickMarkRect.top, yGridlineRect.top, 1, "y tick and gridline align");
     }
 
     svg.remove();

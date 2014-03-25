@@ -88,15 +88,15 @@ module Plottable {
 
       var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
-      function boxIsInside(inner: ClientRect, outer: ClientRect) {
-        return (outer.left <= inner.left &&
-                inner.right <= outer.right &&
-                outer.top <= inner.top &&
-                inner.bottom <= outer.bottom);
-      }
+      var isInsideBBox = (tickBox: ClientRect) => {
+        return (boundingBox.left <= tickBox.left &&
+                boundingBox.top <= tickBox.top &&
+                tickBox.right <= boundingBox.left + this.availableWidth &&
+                tickBox.bottom <= boundingBox.top + this.availableHeight);
+      };
 
       tickLabels.each(function (d: any){
-        if (!boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+        if (!isInsideBBox(this.getBoundingClientRect())) {
           d3.select(this).style("visibility", "hidden");
         }
       });

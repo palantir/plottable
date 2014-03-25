@@ -1,15 +1,16 @@
 <html>
   <head>
     <title>Gridlines Quicktest</title>
-    <link rel="stylesheet" type="text/css" href="../plottable.css">
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script>
     <style>
-      .plottable .bounding-box {
-        /*stroke: none;*/
+      .plottable .axis line {
+/*        stroke: black;
+        opacity: 1;*/
       }
     </style>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="../build/plottable.js"></script>
-    <script src="../build/exampleUtil.js"></script>
 
     <script>
       window.onload = function() {
@@ -31,10 +32,8 @@
         var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
                                               .addComponent(0, 1, renderGroup)
                                               .addComponent(1, 1, xAxis);
-        basicTable.anchor(svg);
-        basicTable.computeLayout().render();
-        var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
-        pzi.registerWithComponent();
+        basicTable._anchor(svg);
+        basicTable._computeLayout()._render();
       }
     </script>
   </head>
