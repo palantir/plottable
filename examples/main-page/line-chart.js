@@ -15,7 +15,7 @@ function lineChart(svg, dataset) {
 
   var renderer = new Plottable.LineRenderer(dataset, xScale, yScale, x, y);
   var gridlines = new Plottable.Gridlines(xScale, yScale);
-  var group = gridlines.merge(renderer);
+  var group = renderer.merge(gridlines);
 
   var dateFormatter = d3.time.format("%-m/%-d/%y");
   var xAxis  = new Plottable.XAxis(xScale, "bottom", dateFormatter);

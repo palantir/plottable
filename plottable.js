@@ -76,6 +76,30 @@ var Plottable;
             return height;
         }
         Utils.getTextHeight = getTextHeight;
+
+        function getSVGPixelWidth(svg) {
+            var width = svg.node().clientWidth;
+
+            if (width === 0) {
+                var widthAttr = svg.attr("width");
+
+                if (widthAttr.indexOf("%") !== -1) {
+                    var ancestorNode = svg.node().parentNode;
+                    while (ancestorNode != null && ancestorNode.clientWidth === 0) {
+                        ancestorNode = ancestorNode.parentNode;
+                    }
+                    if (ancestorNode == null) {
+                        throw new Error("Could not compute width of element");
+                    }
+                    width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
+                } else {
+                    width = parseFloat(widthAttr);
+                }
+            }
+
+            return width;
+        }
+        Utils.getSVGPixelWidth = getSVGPixelWidth;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -192,9 +216,8 @@ var Plottable;
                     // we are the root node, retrieve height/width from root SVG
                     xOrigin = 0;
                     yOrigin = 0;
-                    var rootNode = this.rootSVG.node();
-                    availableWidth = rootNode.clientWidth;
-                    availableHeight = rootNode.clientHeight;
+                    availableWidth = parseFloat(this.rootSVG.attr("width"));
+                    availableHeight = parseFloat(this.rootSVG.attr("height"));
                 } else {
                     throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                 }
@@ -1597,12 +1620,6 @@ var Plottable;
             this.rowPadding = 0;
             this.colPadding = 0;
             this.classed("table", true);
-            var cleanOutNulls = function (c) {
-                return c == null ? new Plottable.Component() : c;
-            };
-            rows = rows.map(function (row) {
-                return row.map(cleanOutNulls);
-            });
             this.rows = rows;
             this.nRows = rows.length;
             this.nCols = rows.length > 0 ? d3.max(rows, function (r) {
@@ -1632,7 +1649,7 @@ var Plottable;
             this.padTableToSize(this.nRows + 1, this.nCols + 1);
 
             var currentComponent = this.rows[row][col];
-            if (currentComponent.constructor.name !== "Component") {
+            if (currentComponent != null) {
                 throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
             }
 
@@ -1647,7 +1664,9 @@ var Plottable;
             // recursively anchor children
             this.rows.forEach(function (row, rowIndex) {
                 row.forEach(function (component, colIndex) {
-                    component._anchor(_this.content.append("g"));
+                    if (component != null) {
+                        component._anchor(_this.content.append("g"));
+                    }
                 });
             });
             return this;
@@ -1666,10 +1685,10 @@ var Plottable;
 
             var cols = d3.transpose(this.rows);
             var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, function (c) {
-                return c.isFixedHeight();
+                return (c == null) || c.isFixedHeight();
             });
             var colWeights = Table.calcComponentWeights(this.colWeights, cols, function (c) {
-                return c.isFixedWidth();
+                return (c == null) || c.isFixedWidth();
             });
 
             // distribute remaining height to rows
@@ -1687,7 +1706,9 @@ var Plottable;
                 var childXOffset = 0;
                 row.forEach(function (component, colIndex) {
                     // recursively compute layout
-                    component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+                    if (component != null) {
+                        component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+                    }
                     childXOffset += colWidths[colIndex] + _this.colPadding;
                 });
                 childYOffset += rowHeights[rowIndex] + _this.rowPadding;
@@ -1699,7 +1720,9 @@ var Plottable;
             // recursively render children
             this.rows.forEach(function (row, rowIndex) {
                 row.forEach(function (component, colIndex) {
-                    component._render();
+                    if (component != null) {
+                        component._render();
+                    }
                 });
             });
             return this;
@@ -1750,7 +1773,7 @@ var Plottable;
             } else {
                 this.rowMinimums = this.rows.map(function (row) {
                     return d3.max(row, function (r) {
-                        return r.rowMinimum();
+                        return (r == null) ? 0 : r.rowMinimum();
                     });
                 });
                 return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
@@ -1763,8 +1786,8 @@ var Plottable;
             } else {
                 var cols = d3.transpose(this.rows);
                 this.colMinimums = cols.map(function (col) {
-                    return d3.max(col, function (r) {
-                        return r.colMinimum();
+                    return d3.max(col, function (c) {
+                        return (c == null) ? 0 : c.colMinimum();
                     });
                 });
                 return d3.sum(this.colMinimums) + this.colPadding * (cols.length - 1);
@@ -1774,13 +1797,13 @@ var Plottable;
         Table.prototype.isFixedWidth = function () {
             var cols = d3.transpose(this.rows);
             return Table.fixedSpace(cols, function (c) {
-                return c.isFixedWidth();
+                return (c == null) || c.isFixedWidth();
             });
         };
 
         Table.prototype.isFixedHeight = function () {
             return Table.fixedSpace(this.rows, function (c) {
-                return c.isFixedHeight();
+                return (c == null) || c.isFixedHeight();
             });
         };
 
@@ -1792,7 +1815,8 @@ var Plottable;
                 }
                 for (var j = 0; j < nCols; j++) {
                     if (this.rows[i][j] === undefined) {
-                        this.rows[i][j] = new Plottable.Component();
+                        // this.rows[i][j] = new Component();
+                        this.rows[i][j] = null;
                     }
                 }
             }
@@ -2072,18 +2096,19 @@ var Plottable;
         };
 
         Axis.prototype._hideCutOffTickLabels = function () {
+            var _this = this;
             var availableWidth = this.availableWidth;
             var availableHeight = this.availableHeight;
             var tickLabels = this.axisElement.selectAll(".tick").select("text");
 
             var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
-            function boxIsInside(inner, outer) {
-                return (outer.left <= inner.left && inner.right <= outer.right && outer.top <= inner.top && inner.bottom <= outer.bottom);
-            }
+            var isInsideBBox = function (tickBox) {
+                return (boundingBox.left <= tickBox.left && boundingBox.top <= tickBox.top && tickBox.right <= boundingBox.left + _this.availableWidth && tickBox.bottom <= boundingBox.top + _this.availableHeight);
+            };
 
             tickLabels.each(function (d) {
-                if (!boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+                if (!isInsideBBox(this.getBoundingClientRect())) {
                     d3.select(this).style("visibility", "hidden");
                 }
             });
@@ -2401,7 +2426,7 @@ var Plottable;
                 this.components.push(c);
             }
             if (this.element != null) {
-                c._anchor(this.content.append("g"));
+                c._anchor(this.content.insert("g", "g"));
             }
             return this;
         };
@@ -2420,7 +2445,7 @@ var Plottable;
             var _this = this;
             _super.prototype._anchor.call(this, element);
             this.components.forEach(function (c) {
-                return c._anchor(_this.content.append("g"));
+                return c._anchor(_this.content.insert("g", "g"));
             });
             return this;
         };

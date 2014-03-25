@@ -33,7 +33,7 @@ describe("Tables", () => {
     var firstComponent = row[0];
     assert.lengthOf(rows, 1, "there is one row");
     assert.lengthOf(row, 1, "the row has one element");
-    assert.isTrue(firstComponent.constructor.name === "Component", "the row only has a null component");
+    assert.isNull(firstComponent, "the row only has a null component");
 
     (<any> t).padTableToSize(5,2);
     assert.lengthOf(rows, 5, "there are five rows");
@@ -46,7 +46,6 @@ describe("Tables", () => {
     var row1 = [null, c0];
     var row2 = [new Plottable.Component(), null];
     var table = new Plottable.Table([row1, row2]);
-    assert.isTrue((<any> table).rows[0][0].constructor.name === "Component", "the first element was turned into a null component");
     assert.equal((<any> table).rows[0][1], c0, "the component is in the right spot");
     var c1 = new Plottable.Component();
     table.addComponent(2, 2, c1);
@@ -65,19 +64,16 @@ describe("Tables", () => {
     assert.lengthOf(rows[1], 2, "two cols in second row");
     assert.equal(rows[0][0], c1, "first component added correctly");
     assert.equal(rows[1][1], c2, "second component added correctly");
-    assert.isTrue(rows[0][1].constructor.name === "Component", "added a null component to 0,1");
-    assert.isTrue(rows[1][0].constructor.name === "Component", "added a null component to 1,0");
+    assert.isNull(rows[0][1], "component at (0, 1) is null");
+    assert.isNull(rows[1][0], "component at (1, 0) is null");
   });
 
-  it("base components are overwritten by the addComponent constructor, and other components are not", () => {
-    var c0 = new Plottable.Component();
+  it("can't add a component where one already exists", () => {
     var c1 = new Plottable.Table();
     var c2 = new Plottable.Table();
     var t = new Plottable.Table();
-    t.addComponent(0, 0, c0);
     t.addComponent(0, 2, c1);
     t.addComponent(0, 0, c2);
-    assert.equal((<any> t).rows[0][0], c2, "the baseComponent was overwritten by the table");
     assert.throws(() => t.addComponent(0, 2, c2), Error, "component already exists");
   });
 

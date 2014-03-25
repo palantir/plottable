@@ -26,6 +26,7 @@ declare module Plottable {
         * @return {number} The height of the text element, in pixels.
         */
         function getTextHeight(textElement: D3.Selection): number;
+        function getSVGPixelWidth(svg: D3.Selection): number;
     }
 }
 declare module Plottable {

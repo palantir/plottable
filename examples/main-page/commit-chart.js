@@ -62,7 +62,7 @@ function commitChart(svg, dataset) {
 
   var legend    = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(10);
   var gridlines = new Plottable.Gridlines(xScale, yScale);
-  var group     = gridlines.merge(renderer).merge(legend);
+  var group     = legend.merge(renderer).merge(gridlines);
 
 
   var xAxis  = new Plottable.XAxis(xScale, "bottom", dateFormatter);

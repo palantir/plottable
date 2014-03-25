@@ -66,5 +66,29 @@ module Plottable {
       textElement.text(originalText);
       return height;
     }
+
+    export function getSVGPixelWidth(svg: D3.Selection) {
+      var width = svg.node().clientWidth;
+
+      if (width === 0) { // Firefox bug #874811
+        var widthAttr = svg.attr("width");
+
+        if (widthAttr.indexOf("%") !== -1) { // percentage
+          var ancestorNode = <Element> svg.node().parentNode;
+          while (ancestorNode != null && ancestorNode.clientWidth === 0) {
+            ancestorNode = <Element> ancestorNode.parentNode;
+          }
+          if (ancestorNode == null) {
+            throw new Error("Could not compute width of element");
+          }
+          width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
+        } else {
+          width = parseFloat(widthAttr);
+        }
+      }
+
+      return width;
+    }
+
   }
 }
