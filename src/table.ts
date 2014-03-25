@@ -197,7 +197,6 @@ module Plottable {
         }
         for (var j=0; j<nCols; j++) {
           if (this.rows[i][j] === undefined) {
-            // this.rows[i][j] = new Component();
             this.rows[i][j] = null;
           }
         }
