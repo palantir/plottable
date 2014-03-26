@@ -16,15 +16,6 @@ function commitChart(svg, dataset) {
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
-
-  // Define the accessors - this is the logic for how data is rendered
-  function hourAccessor(d) {
-    var date = d.date;
-    var hour =  date.getHours() + date.getMinutes() / 60;
-    hour = hour < 5 ? hour + 24 : hour;
-    return hour;
-  }
-
   function dateAccessor(d) {
     return d.date;
   }
@@ -43,19 +34,6 @@ function commitChart(svg, dataset) {
   }
 
   var dateFormatter = d3.time.format("%-m/%-d/%y");
-  function hourFormatter(hour) {
-    if (hour < 12) {
-      return hour + "AM";
-    } else if (hour === 12) {
-      return "12PM";
-    } else if (hour < 24) {
-      return (hour - 12) + "PM";
-    } else if (hour == 24) {
-      return "12AM";
-    } else {
-      return (hour - 24) + "AM";
-    }
-  }
 
   var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, dateAccessor, hourAccessor, radiusAccessor)
                  .colorAccessor(colorAccessor);
