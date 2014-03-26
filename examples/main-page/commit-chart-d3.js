@@ -10,6 +10,11 @@ function commitChartD3(svg, data) {
   var renderAreaHeight = svgHeight - TITLE_HEIGHT - xAxisHeight - xLabelHeight;
   var renderAreaWidth  = svgWidth  - yAxisWidth - yLabelWidth;
 
+  function linesAddedAccessor(d) {
+    var added = d.insertions - d.deletions;
+    return added > 0 ? added : 1;
+  }
+
   var xScale = new d3.time.scale()
         .domain([new Date(2014, 0, 20), new Date(2014, 2, 23)])
         .range([0, renderAreaWidth])
