@@ -2,8 +2,8 @@
 
 module Plottable {
   export class CircleRenderer extends XYRenderer {
-    private rAccessor: IAccessor;
-    private static defaultRAccessor = (d: any) => 3;
+    private rAccessor: any;
+    private static defaultRAccessor = 3;
 
     /**
      * Creates a CircleRenderer.
@@ -17,7 +17,7 @@ module Plottable {
      * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
      */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale,
-                xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor) {
+                xAccessor?: any, yAccessor?: any, rAccessor?: any) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
       this.classed("circle-renderer", true);
@@ -25,12 +25,16 @@ module Plottable {
 
     public _paint() {
       super._paint();
+      var cx = (d: any, i: number) => this.xScale.scale(this._getAppliedAccessor(this._xAccessor)(d, i));
+      var cy = (d: any, i: number) => this.yScale.scale(this._getAppliedAccessor(this._yAccessor)(d, i));
+      var r  = this._getAppliedAccessor(this.rAccessor);
+      var color = this._getAppliedAccessor(this._colorAccessor);
       this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
       this.dataSelection.enter().append("circle");
-      this.dataSelection.attr("cx", (d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
-                        .attr("cy", (d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)))
-                        .attr("r", (d: any, i: number) => this.rAccessor(d, i, this._metadata))
-                        .attr("fill", (d: any, i: number) => this._colorAccessor(d, i, this._metadata));
+      this.dataSelection.attr("cx", cx)
+                        .attr("cy", cy)
+                        .attr("r", r)
+                        .attr("fill", color);
       this.dataSelection.exit().remove();
     }
   }

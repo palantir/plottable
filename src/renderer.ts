@@ -91,5 +91,15 @@ module Plottable {
       this.renderArea = this.content.append("g").classed("render-area", true);
       return this;
     }
+
+    public _getAppliedAccessor(accessor: any): (d: any, i: number) => any {
+      if (typeof(accessor) === "function") {
+        return (d: any, i: number) => accessor(d, i, this._metadata);
+      } else if (typeof(accessor) === "string") {
+        return (d: any, i: number) => d[accessor];
+      } else {
+        return (d: any, i: number) => accessor;
+      }
+    }
   }
 }

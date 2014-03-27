@@ -25,19 +25,23 @@ module Plottable {
 
     public _paint() {
       super._paint();
+      var xA = this._getAppliedAccessor(this._xAccessor);
+      var yA = this._getAppliedAccessor(this._yAccessor);
+      var rA = this._getAppliedAccessor(this.rAccessor);
+      var cA = this._getAppliedAccessor(this._colorAccessor);
       var xFn = (d: any, i: number) =>
-        this.xScale.scale(this.xAccessor(d, i, this._metadata)) - this.rAccessor(d, i, this._metadata);
+        this.xScale.scale(xA(d, i)) - rA(d, i);
 
       var yFn = (d: any, i: number) =>
-        this.yScale.scale(this.yAccessor(d, i, this._metadata)) - this.rAccessor(d, i, this._metadata);
+        this.yScale.scale(yA(d, i)) - rA(d, i);
 
       this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
       this.dataSelection.enter().append("rect");
       this.dataSelection.attr("x", xFn)
                         .attr("y", yFn)
-                        .attr("width",  (d: any, i: number) => this.rAccessor(d, i, this._metadata))
-                        .attr("height", (d: any, i: number) => this.rAccessor(d, i, this._metadata))
-                        .attr("fill", (d: any, i: number) => this._colorAccessor(d, i, this._metadata));
+                        .attr("width",  rA)
+                        .attr("height", rA)
+                        .attr("fill", cA);
       this.dataSelection.exit().remove();
     }
   }
