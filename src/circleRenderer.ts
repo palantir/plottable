@@ -2,7 +2,7 @@
 
 module Plottable {
   export class CircleRenderer extends XYRenderer {
-    private rAccessor: any;
+    private _rAccessor: any;
     private static defaultRAccessor = 3;
 
     /**
@@ -19,15 +19,22 @@ module Plottable {
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: any, yAccessor?: any, rAccessor?: any) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this.rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
+      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
       this.classed("circle-renderer", true);
+    }
+
+    public rAccessor(a: any) {
+      this._rAccessor = a;
+      this._requireRerender = true;
+      this._rerenderUpdateSelection = true;
+      return this;
     }
 
     public _paint() {
       super._paint();
       var cx = (d: any, i: number) => this.xScale.scale(this._getAppliedAccessor(this._xAccessor)(d, i));
       var cy = (d: any, i: number) => this.yScale.scale(this._getAppliedAccessor(this._yAccessor)(d, i));
-      var r  = this._getAppliedAccessor(this.rAccessor);
+      var r  = this._getAppliedAccessor(this._rAccessor);
       var color = this._getAppliedAccessor(this._colorAccessor);
       this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
       this.dataSelection.enter().append("circle");

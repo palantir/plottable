@@ -13,7 +13,6 @@ function commitChart(svg, dataset) {
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
-  function dateAccessor(d) { return d.date; }
   function radiusAccessor(d) { return rScale.scale(linesAddedAccessor(d)); }
   function colorAccessor(d) { return colorScale.scale(d.name); }
 
@@ -23,8 +22,9 @@ function commitChart(svg, dataset) {
   }
 
 
-  var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, dateAccessor, hourAccessor, radiusAccessor)
-                 .colorAccessor(colorAccessor);
+  var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale)
+                 .xAccessor("date").yAccessor(hourAccessor)
+                 .rAccessor(radiusAccessor).colorAccessor(colorAccessor);
 
   var legend    = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(10);
   var gridlines = new Plottable.Gridlines(xScale, yScale);

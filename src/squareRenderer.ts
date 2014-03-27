@@ -2,8 +2,8 @@
 
 module Plottable {
   export class SquareRenderer extends XYRenderer {
-    private rAccessor: IAccessor;
-    private static defaultRAccessor = (d: any) => 3;
+    private _rAccessor: any;
+    private static defaultRAccessor = 3;
 
     /**
      * Creates a SquareRenderer.
@@ -19,15 +19,23 @@ module Plottable {
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this.rAccessor = (rAccessor != null) ? rAccessor : SquareRenderer.defaultRAccessor;
+      this._rAccessor = (rAccessor != null) ? rAccessor : SquareRenderer.defaultRAccessor;
       this.classed("square-renderer", true);
+    }
+
+
+    public rAccessor(a: any) {
+      this._rAccessor = a;
+      this._requireRerender = true;
+      this._rerenderUpdateSelection = true;
+      return this;
     }
 
     public _paint() {
       super._paint();
       var xA = this._getAppliedAccessor(this._xAccessor);
       var yA = this._getAppliedAccessor(this._yAccessor);
-      var rA = this._getAppliedAccessor(this.rAccessor);
+      var rA = this._getAppliedAccessor(this._rAccessor);
       var cA = this._getAppliedAccessor(this._colorAccessor);
       var xFn = (d: any, i: number) =>
         this.xScale.scale(xA(d, i)) - rA(d, i);
