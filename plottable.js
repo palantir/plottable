@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
 Plottable v0.7.0 (https://github.com/palantir/plottable)
+=======
+Plottable v0.6.0 (https://github.com/palantir/plottable)
+>>>>>>> Update plottable.js, plottable.d.ts, and other build artefacts
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1356,11 +1360,19 @@ var Plottable;
             var _this = this;
             _super.call(this, dataset);
             this.autorangeDataOnLayout = true;
+<<<<<<< HEAD
             this.classed("category-renderer", true);
+=======
+            this.classed("xy-renderer", true);
+
+            this._xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
+            this._yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
+>>>>>>> Update plottable.js, plottable.d.ts, and other build artefacts
 
             this.xScale = xScale;
             this.yScale = yScale;
 
+<<<<<<< HEAD
             this._xAccessor = (xAccessor != null) ? xAccessor : "x"; // default
             this._yAccessor = (yAccessor != null) ? yAccessor : "y"; // default
 
@@ -1434,6 +1446,8 @@ var Plottable;
             this.xScale = xScale;
             this.yScale = yScale;
 
+=======
+>>>>>>> Update plottable.js, plottable.d.ts, and other build artefacts
             this.xScale.registerListener(function () {
                 return _this.rescale();
             });
@@ -1467,7 +1481,10 @@ var Plottable;
 
         XYRenderer.prototype.autorange = function () {
             var _this = this;
+<<<<<<< HEAD
             _super.prototype.autorange.call(this);
+=======
+>>>>>>> Update plottable.js, plottable.d.ts, and other build artefacts
             var data = this._data;
             var xA = function (d) {
                 return _this._getAppliedAccessor(_this._xAccessor)(d, null);
@@ -2271,6 +2288,7 @@ var Plottable;
     })(Plottable.Table);
     Plottable.StandardChart = StandardChart;
 })(Plottable || (Plottable = {}));
+<<<<<<< HEAD
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -2343,6 +2361,8 @@ var Plottable;
     })(Plottable.CategoryRenderer);
     Plottable.CategoryBarRenderer = CategoryBarRenderer;
 })(Plottable || (Plottable = {}));
+=======
+>>>>>>> Update plottable.js, plottable.d.ts, and other build artefacts
 /// <reference path="utils.ts" />
 /// <reference path="osUtils.ts" />
 /// <reference path="component.ts" />
@@ -2362,7 +2382,10 @@ var Plottable;
 /// <reference path="coordinator.ts" />
 /// <reference path="legend.ts" />
 /// <reference path="chart.ts" />
+<<<<<<< HEAD
 /// <reference path="categoryBarRenderer.ts" />
+=======
+>>>>>>> Update plottable.js, plottable.d.ts, and other build artefacts
 //grunt-end
 ///<reference path="reference.ts" />
 var Plottable;
