@@ -135,12 +135,13 @@ describe("ComponentGroups", () => {
         var cg1 = new Plottable.ComponentGroup([c1,c2]);
         var cg2 = new Plottable.ComponentGroup([c3,c4]);
         var cg = cg1.merge(cg2);
-        assert.notEqual(cg, cg1, "merged != cg1");
+        assert.equal(cg, cg1, "merged == cg1");
         assert.notEqual(cg, cg2, "merged != cg2");
         var components: Plottable.Component[] = (<any> cg).components;
-        assert.lengthOf(components, 2, "there are two inner components");
-        assert.equal(components[0], cg1, "cg1 nested inside");
-        assert.equal(components[1], cg2, "cg2 nested inside");
+        assert.lengthOf(components, 3, "there are three inner components");
+        assert.equal(components[0], c1, "components are inside");
+        assert.equal(components[1], c2, "components are inside");
+        assert.equal(components[2], cg2, "componentGroup2 inside componentGroup1");
       });
     });
 });
