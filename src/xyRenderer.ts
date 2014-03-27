@@ -9,7 +9,7 @@ module Plottable {
     public yScale: QuantitiveScale;
     public _xAccessor: any;
     public _yAccessor: any;
-    public autorangeDataOnAnchor = true;
+    public autorangeDataOnLayout = true;
 
     /**
      * Creates an XYRenderer.
@@ -53,6 +53,9 @@ module Plottable {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.xScale.range([0, this.availableWidth]);
       this.yScale.range([this.availableHeight, 0]);
+      if (this.autorangeDataOnLayout) {
+        this.autorange();
+      }
       return this;
     }
 
@@ -84,9 +87,11 @@ module Plottable {
     }
 
     private getDataFilterFunction(dataArea: SelectionArea): (d: any, i: number) => boolean {
+      var xA = this._getAppliedAccessor(this._xAccessor);
+      var yA = this._getAppliedAccessor(this._yAccessor);
       var filterFunction = (d: any, i: number) => {
-        var x = this._xAccessor(d, i, this._metadata);
-        var y = this._yAccessor(d, i, this._metadata);
+        var x: number = xA(d, i);
+        var y: number = yA(d, i);
         return Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Utils.inRange(y, dataArea.yMin, dataArea.yMax);
       };
       return filterFunction;
@@ -126,12 +131,5 @@ module Plottable {
       }
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
-      if (this.autorangeDataOnAnchor) {
-        this.autorange();
-      }
-      return this;
-    }
   }
 }

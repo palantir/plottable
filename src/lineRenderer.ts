@@ -22,7 +22,7 @@ module Plottable {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this.path = this.renderArea.append("path");
+      this.path = this.renderArea.append("path").classed("line", true);
       return this;
     }
 
@@ -34,11 +34,8 @@ module Plottable {
       this.line = d3.svg.line()
             .x((d: any, i: number) => this.xScale.scale(xA(d, i)))
             .y((d: any, i: number) => this.yScale.scale(yA(d, i)));
-      this.dataSelection = this.path.classed("line", true)
-        .datum(this._data);
-      this.path.attr("d", this.line);
-      // Since we can only set one stroke for the full line, call colorAccessor on first datum with index 0
-      this.path.attr("stroke", cA);
+      this.dataSelection = this.path.datum(this._data);
+      this.path.attr("d", this.line).attr("stroke", cA);
     }
   }
 }

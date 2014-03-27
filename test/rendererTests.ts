@@ -66,6 +66,7 @@ describe("Renderers", () => {
       var yAccessor = (d, i?, m?) => m.bar;
       var dataset = {data: data, metadata: metadata};
       var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor);
+      renderer.autorangeDataOnLayout = false;
       xScale.domain([0, 400]);
       yScale.domain([400, 0]);
       renderer.renderTo(svg);
@@ -75,21 +76,21 @@ describe("Renderers", () => {
       assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
       assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
       assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
-      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct");
+      assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
 
       data = [{x: 2, y:2}, {x:4, y:4}];
       renderer.data(data).renderTo(svg);
       assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
       assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
       assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
-      assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
+      assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
 
       metadata = {foo: 0, bar: 0};
       renderer.metadata(metadata).renderTo(svg);
       assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
       assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
       assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
-      assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+      assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
 
       svg.remove();
     });

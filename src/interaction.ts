@@ -286,12 +286,14 @@ module Plottable {
       this.lasty = y;
       var domainX = this.renderer.xScale.invert(x);
       var data = this.renderer._data;
-      var dataIndex = OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
+      var xA = this.renderer._getAppliedAccessor(this.renderer._xAccessor);
+      var yA = this.renderer._getAppliedAccessor(this.renderer._yAccessor);
+      var dataIndex = OSUtils.sortedIndex(domainX, data, xA);
       dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
       var dataPoint = data[dataIndex];
 
-      var dataX = this.renderer.xAccessor(dataPoint);
-      var dataY = this.renderer.yAccessor(dataPoint);
+      var dataX = xA(dataPoint, dataIndex);
+      var dataY = yA(dataPoint, dataIndex);
       var pixelX = this.renderer.xScale.scale(dataX);
       var pixelY = this.renderer.yScale.scale(dataY);
       this.circle.attr("cx", pixelX).attr("cy", pixelY);
