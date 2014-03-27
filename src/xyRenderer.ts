@@ -22,7 +22,7 @@ module Plottable {
      */
     constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
       super(dataset);
-      this.classed("xy-renderer");
+      this.classed("xy-renderer", true);
 
       this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
       this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
