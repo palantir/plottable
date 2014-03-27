@@ -3,12 +3,13 @@
 module Plottable {
   export class XYRenderer extends Renderer {
     public dataSelection: D3.UpdateSelection;
-    private static defaultXAccessor = (d: any) => d.x;
-    private static defaultYAccessor = (d: any) => d.y;
+    private static defaultXAccessor = "x";
+    private static defaultYAccessor = "y";
     public xScale: QuantitiveScale;
     public yScale: QuantitiveScale;
-    public xAccessor: IAccessor;
-    public yAccessor: IAccessor;
+    public _xAccessor: any;
+    public _yAccessor: any;
+    public autorangeDataOnAnchor = true;
 
     /**
      * Creates an XYRenderer.
@@ -24,30 +25,46 @@ module Plottable {
       super(dataset);
       this.classed("xy-renderer", true);
 
-      this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
-      this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
+      this._xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
+      this._yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
 
       this.xScale = xScale;
       this.yScale = yScale;
 
-      var data = dataset.data;
-
-      var appliedXAccessor = (d: any) => this.xAccessor(d, null, this._metadata);
-      var xDomain = d3.extent(data, appliedXAccessor);
-      this.xScale.widenDomain(xDomain);
-
-      var appliedYAccessor = (d: any) => this.yAccessor(d, null, this._metadata);
-      var yDomain = d3.extent(data, appliedYAccessor);
-      this.yScale.widenDomain(yDomain);
-
       this.xScale.registerListener(() => this.rescale());
       this.yScale.registerListener(() => this.rescale());
+    }
+
+    public xAccessor(accessor: any) {
+      this._xAccessor = accessor;
+      this._requireRerender = true;
+      this._rerenderUpdateSelection = true;
+      return this;
+    }
+
+    public yAccessor(accessor: any) {
+      this._yAccessor = accessor;
+      this._requireRerender = true;
+      this._rerenderUpdateSelection = true;
+      return this;
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight? :number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.xScale.range([0, this.availableWidth]);
       this.yScale.range([this.availableHeight, 0]);
+      return this;
+    }
+
+    public autorange() {
+      var data = this._data;
+      var xA = (d: any) => this._getAppliedAccessor(this._xAccessor)(d, null);
+      var xDomain: number[] = d3.extent(data, xA);
+      this.xScale.widenDomain(xDomain);
+
+      var yA = (d: any) => this._getAppliedAccessor(this._yAccessor)(d, null);
+      var yDomain: number[] = d3.extent(data, yA);
+      this.yScale.widenDomain(yDomain);
       return this;
     }
 
@@ -68,8 +85,8 @@ module Plottable {
 
     private getDataFilterFunction(dataArea: SelectionArea): (d: any, i: number) => boolean {
       var filterFunction = (d: any, i: number) => {
-        var x = this.xAccessor(d, i, this._metadata);
-        var y = this.yAccessor(d, i, this._metadata);
+        var x = this._xAccessor(d, i, this._metadata);
+        var y = this._yAccessor(d, i, this._metadata);
         return Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Utils.inRange(y, dataArea.yMin, dataArea.yMax);
       };
       return filterFunction;
@@ -107,6 +124,14 @@ module Plottable {
       if (this.element != null) {
         this._render();
       }
+    }
+
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+      if (this.autorangeDataOnAnchor) {
+        this.autorange();
+      }
+      return this;
     }
   }
 }

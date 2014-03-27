@@ -2,10 +2,10 @@
 
 module Plottable {
   export class BarRenderer extends XYRenderer {
-    private static defaultDxAccessor = (d: any) => d.dx;
+    private static defaultDxAccessor = "dx";
     public barPaddingPx = 1;
 
-    public dxAccessor: IAccessor;
+    public dxAccessor: any;
 
     /**
      * Creates a BarRenderer.
@@ -28,11 +28,16 @@ module Plottable {
       this.classed("bar-renderer", true);
 
       this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
+    }
 
-
-      var x2Accessor = (d: any) => this.xAccessor(d, null, this._metadata) + this.dxAccessor(d, null, this._metadata);
-      var x2Extent = d3.extent(dataset.data, x2Accessor);
+    public autorange() {
+      super.autorange();
+      var xA  = this._getAppliedAccessor(this._xAccessor);
+      var dxA = this._getAppliedAccessor(this.dxAccessor);
+      var x2Accessor = (d: any) => xA(d, null) + dxA(d, null);
+      var x2Extent: number[] = d3.extent(this._data, x2Accessor);
       this.xScale.widenDomain(x2Extent);
+      return this;
     }
 
     public _paint() {
@@ -45,33 +50,30 @@ module Plottable {
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");
 
+      var xA = this._getAppliedAccessor(this._xAccessor);
       var xFunction = (d: any, i: number) => {
-        var x = this.xAccessor(d, i, this._metadata);
+        var x = xA(d, i);
         var scaledX = this.xScale.scale(x);
         return scaledX + this.barPaddingPx;
       };
 
+      var yA = this._getAppliedAccessor(this._yAccessor);
       var yFunction = (d: any, i: number) => {
-        var y = this.yAccessor(d, i, this._metadata);
+        var y = yA(d, i);
         var scaledY = this.yScale.scale(y);
         return scaledY;
       };
 
+      var dxA = this._getAppliedAccessor(this.dxAccessor);
       var widthFunction = (d: any, i: number) => {
-        var dx = this.dxAccessor(d, i, this._metadata);
+        var dx = dxA(d, i);
         var scaledDx = this.xScale.scale(dx);
         var scaledOffset = this.xScale.scale(0);
         return scaledDx - scaledOffset - 2 * this.barPaddingPx;
       };
 
       var heightFunction = (d: any, i: number) => {
-        var y = this.yAccessor(d, i, this._metadata);
-        var scaledY = this.yScale.scale(y);
-        return maxScaledY - scaledY;
-      };
-
-      var colorFunction = (d: any, i: number) => {
-        return this._colorAccessor(d, i, this._metadata);
+        return maxScaledY - yFunction(d, i);
       };
 
       this.dataSelection
@@ -79,7 +81,7 @@ module Plottable {
             .attr("y", yFunction)
             .attr("width", widthFunction)
             .attr("height", heightFunction)
-            .attr("fill", colorFunction);
+            .attr("fill", this._getAppliedAccessor(this._colorAccessor));
       this.dataSelection.exit().remove();
     }
   }

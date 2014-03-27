@@ -28,14 +28,17 @@ module Plottable {
 
     public _paint() {
       super._paint();
+      var xA = this._getAppliedAccessor(this._xAccessor);
+      var yA = this._getAppliedAccessor(this._yAccessor);
+      var cA = this._getAppliedAccessor(this._colorAccessor);
       this.line = d3.svg.line()
-            .x((d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
-            .y((d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)));
+            .x((d: any, i: number) => this.xScale.scale(xA(d, i)))
+            .y((d: any, i: number) => this.yScale.scale(yA(d, i)));
       this.dataSelection = this.path.classed("line", true)
         .datum(this._data);
       this.path.attr("d", this.line);
       // Since we can only set one stroke for the full line, call colorAccessor on first datum with index 0
-      this.path.attr("stroke", this._colorAccessor(this._data[0], 0, this._metadata));
+      this.path.attr("stroke", cA);
     }
   }
 }
