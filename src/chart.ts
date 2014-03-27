@@ -61,7 +61,12 @@ module Plottable {
     public yLabel(y?: any): any {
       if (y != null) {
         if (this._yLabel != null) {
-          throw new Error("yLabel already assigned!");
+          if (typeof(y) === "string") {
+            this._yLabel.setText(y);
+            return this;
+          } else {
+            throw new Error("yLabel already assigned!");
+          }
         }
         if (typeof(y) === "string") {
           y = new AxisLabel(y, "vertical-left");
@@ -80,7 +85,12 @@ module Plottable {
     public xLabel(x?: any): any {
       if (x != null) {
         if (this._xLabel != null) {
-          throw new Error("xLabel already assigned!");
+          if (typeof(x) === "string") {
+            this._xLabel.setText(x);
+            return this;
+          } else {
+            throw new Error("xLabel already assigned!");
+          }
         }
         if (typeof(x) === "string") {
           x = new AxisLabel(x, "horizontal");
@@ -99,7 +109,12 @@ module Plottable {
     public titleLabel(x?: any): any {
       if (x != null) {
         if (this._titleLabel != null) {
-          throw new Error("titleLabel already assigned!");
+          if (typeof(x) === "string") {
+            this._titleLabel.setText(x);
+            return this;
+          } else {
+            throw new Error("titleLabel already assigned!");
+          }
         }
         if (typeof(x) === "string") {
           x = new TitleLabel(x, "horizontal");
