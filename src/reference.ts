@@ -15,4 +15,5 @@
 /// <reference path="table.ts" />
 /// <reference path="coordinator.ts" />
 /// <reference path="legend.ts" />
+/// <reference path="chart.ts" />
 //grunt-end
