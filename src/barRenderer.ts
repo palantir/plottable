@@ -45,23 +45,23 @@ module Plottable {
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");
 
+      var widthFunction = (d: any, i: number) => {
+        var dx = this.dxAccessor(d, i, this._metadata);
+        var scaledDx = this.xScale.scale(dx);
+        var scaledOffset = this.xScale.scale(0);
+        return scaledDx - scaledOffset - 2 * this.barPaddingPx;
+      };
+
       var xFunction = (d: any, i: number) => {
         var x = this.xAccessor(d, i, this._metadata);
         var scaledX = this.xScale.scale(x);
-        return scaledX + this.barPaddingPx;
+        return scaledX - widthFunction(d, i)/2;
       };
 
       var yFunction = (d: any, i: number) => {
         var y = this.yAccessor(d, i, this._metadata);
         var scaledY = this.yScale.scale(y);
         return scaledY;
-      };
-
-      var widthFunction = (d: any, i: number) => {
-        var dx = this.dxAccessor(d, i, this._metadata);
-        var scaledDx = this.xScale.scale(dx);
-        var scaledOffset = this.xScale.scale(0);
-        return scaledDx - scaledOffset - 2 * this.barPaddingPx;
       };
 
       var heightFunction = (d: any, i: number) => {

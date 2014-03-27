@@ -12,7 +12,7 @@ describe("Scales", () => {
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-    assert.notDeepEqual((<any> scale).broadcasterCallbacks, (<any> scaleCopy).broadcasterCallbacks,
+    assert.notDeepEqual((<any> scale)._broadcasterCallbacks, (<any> scaleCopy)._broadcasterCallbacks,
                               "Registered callbacks are not copied over");
   });
 
@@ -52,5 +52,16 @@ describe("Scales", () => {
     var scale = new Plottable.LinearScale();
     var domain = scale.domain();
     assert.deepEqual(domain, [Infinity, -Infinity]);
+  });
+
+  it("Ordinal Scales can map both numeric and string values, but not other types", () => {
+    var scale = new Plottable.OrdinalScale();
+    var domainValues = ["A", "B"];
+    scale.domain(domainValues);
+    var scaledValues = domainValues.map((v: string) => scale.scale(v));
+    assert.operator(scaledValues[0], "<", scaledValues[1], "'A' is mapped before 'B'");
+    assert.equal(scale.scale(0), 0, "Numeric values map to themselves");
+    assert.throws(() => scale.scale(null), Error, "Unsupported");
+    assert.throws(() => scale.scale(true), Error, "Unsupported");
   });
 });

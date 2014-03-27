@@ -33,12 +33,10 @@ module Plottable {
       var data = dataset.data;
 
       var appliedXAccessor = (d: any) => this.xAccessor(d, null, this._metadata);
-      var xDomain = d3.extent(data, appliedXAccessor);
-      this.xScale.widenDomain(xDomain);
+      this.xScale.widenDomainOnData(data, appliedXAccessor);
 
       var appliedYAccessor = (d: any) => this.yAccessor(d, null, this._metadata);
-      var yDomain = d3.extent(data, appliedYAccessor);
-      this.yScale.widenDomain(yDomain);
+      this.yScale.widenDomainOnData(data, appliedYAccessor);
 
       this.xScale.registerListener(() => this.rescale());
       this.yScale.registerListener(() => this.rescale());

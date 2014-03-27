@@ -3,7 +3,7 @@
 module Plottable {
   export class Scale implements IBroadcaster {
     public _d3Scale: D3.Scale.Scale;
-    private broadcasterCallbacks: IBroadcasterCallback[] = [];
+    public _broadcasterCallbacks: IBroadcasterCallback[] = [];
 
     /**
      * Creates a new Scale.
@@ -36,9 +36,13 @@ module Plottable {
         return this._d3Scale.domain();
       } else {
         this._d3Scale.domain(values);
-        this.broadcasterCallbacks.forEach((b) => b(this));
+        this._broadcasterCallbacks.forEach((b) => b(this));
         return this;
       }
+    }
+
+    public widenDomain(newDomain: any[]): Scale {
+      return this;
     }
 
     /**
@@ -71,7 +75,64 @@ module Plottable {
      * @returns {Scale} The Calling Scale.
      */
     public registerListener(callback: IBroadcasterCallback) {
-      this.broadcasterCallbacks.push(callback);
+      this._broadcasterCallbacks.push(callback);
+      return this;
+    }
+  }
+
+  export class OrdinalScale extends Scale {
+    public _d3Scale: D3.Scale.OrdinalScale;
+    private _range = [0, 1];
+
+    /**
+     * Creates a new OrdinalScale. Domain and Range are set later.
+     * @constructor
+     */
+    constructor() {
+      super(d3.scale.ordinal());
+    }
+
+    public scale(value: any) {
+      if (typeof value === "string") {
+        return this._d3Scale(value);
+      } else if (typeof value === "number") { // numeric values get mapped 1:1
+        return value;
+      } else {
+        throw new Error("Unsupported input value to OrdinalScale");
+      }
+    }
+
+    public domain(): any[];
+    public domain(values: any[]): Scale;
+    public domain(values?: any[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        this._broadcasterCallbacks.forEach((b) => b(this));
+        this._d3Scale.rangePoints(this.range(), 1);
+        return this;
+      }
+    }
+
+    public range(): any[];
+    public range(values: any[]): Scale;
+    public range(values?: any[]): any {
+      if (values == null) {
+        return this._range;
+      } else {
+        this._range = values;
+        this._d3Scale.rangePoints(values, 1);
+        return this;
+      }
+    }
+
+    public widenDomain(newDomain: any[]): Scale {
+      return this; // no-op because widening doesn't make sense on OrdinalScales
+    }
+
+    public widenDomainOnData(data: any[], accessor?: IAccessor) {
+      this.domain(data.map(accessor));
       return this;
     }
   }
@@ -108,7 +169,7 @@ module Plottable {
 
     /**
      * Expands the QuantitiveScale's domain to cover the new region.
-     * @param {number} newDomain The additional domain to be covered by the QuantitiveScale.
+     * @param {number[]} newDomain The additional domain to be covered by the QuantitiveScale.
      * @returns {QuantitiveScale} The scale.
      */
     public widenDomain(newDomain: number[]) {

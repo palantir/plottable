@@ -310,13 +310,24 @@ describe("Renderers", () => {
       var barRenderer: Plottable.BarRenderer;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
+      var SCALING = 100; // sets domain to specific values
       var verifier = new MultiTestVerifier();
-      var d0 = {x: -2, dx: 1, y: 1};
-      var d1 = {x: 0, dx: 4, y: 4};
       // Choosing data with a negative x value is significant, since there is
       // a potential failure mode involving the xDomain with an initial
       // point below 0
-      var dataset = {metadata: {cssClass: "sampleBarData"}, data: [d0, d1]};
+      var d0 = {x: -2, dx: 1, y: 1};
+      var d1 = {x: 0, dx: 2, y: 4};
+      var dataset = {
+        metadata: {cssClass: "sampleBarData"},
+        data: [d0, d1]
+      };
+
+      var xShift = SVG_WIDTH/2;
+
+      // deals with numbers like 39.999999999999 by rounding them.
+      function unfloat(n: string) {
+        return Math.round(parseFloat(n));
+      }
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -324,8 +335,8 @@ describe("Renderers", () => {
         yScale = new Plottable.LinearScale();
         barRenderer = new Plottable.BarRenderer(dataset, xScale, yScale);
         barRenderer._anchor(svg)._computeLayout();
-        var currentYDomain = yScale.domain();
-        yScale.domain([0, currentYDomain[1]]);
+        xScale.domain([-SVG_WIDTH/SCALING/2, SVG_WIDTH/SCALING/2]);
+        yScale.domain([0, SVG_HEIGHT/SCALING]);
       });
 
       beforeEach(() => {
@@ -339,28 +350,29 @@ describe("Renderers", () => {
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "400", "bar1 width is correct");
-        assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "400", "bar1 height is correct");
-        assert.equal(bar0.attr("x"), "0", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "200", "bar1 x is correct");
+        assert.equal(unfloat(bar0.attr("width")), d0.dx*SCALING, "bar0 width is correct");
+        assert.equal(unfloat(bar1.attr("width")), d1.dx*SCALING, "bar1 width is correct");
+        assert.equal(unfloat(bar0.attr("height")), d0.y*SCALING, "bar0 height is correct");
+        assert.equal(unfloat(bar1.attr("height")), d1.y*SCALING, "bar1 height is correct");
+        assert.equal(unfloat(bar0.attr("x")), (d0.x - d0.dx/2)*SCALING + xShift, "bar0 x is correct");
+        assert.equal(unfloat(bar1.attr("x")), (d1.x - d1.dx/2)*SCALING + xShift, "bar1 x is correct");
         verifier.end();
       });
 
       it("bars were rendered correctly with padding enabled", () => {
-        barRenderer.barPaddingPx = 1;
+        var paddingValue = 1;
+        barRenderer.barPaddingPx = paddingValue;
         barRenderer._render();
         var renderArea = barRenderer.renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("width"), "98", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "398", "bar1 width is correct");
-        assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "400", "bar1 height is correct");
-        assert.equal(bar0.attr("x"), "1", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "201", "bar1 x is correct");
+        assert.equal(unfloat(bar0.attr("width")), d0.dx*SCALING - 2*paddingValue, "bar0 width is correct");
+        assert.equal(unfloat(bar1.attr("width")), d1.dx*SCALING - 2*paddingValue, "bar1 width is correct");
+        assert.equal(unfloat(bar0.attr("height")), d0.y*SCALING, "bar0 height is correct");
+        assert.equal(unfloat(bar1.attr("height")), d1.y*SCALING, "bar1 height is correct");
+        assert.equal(unfloat(bar0.attr("x")), (d0.x - d0.dx/2)*SCALING + paddingValue + xShift, "bar0 x is correct");
+        assert.equal(unfloat(bar1.attr("x")), (d1.x - d1.dx/2)*SCALING + paddingValue + xShift, "bar1 x is correct");
         verifier.end();
       });
 
