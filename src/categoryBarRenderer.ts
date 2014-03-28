@@ -2,7 +2,7 @@
 
 module Plottable {
   export class CategoryBarRenderer extends CategoryRenderer {
-    private _barWidth = 10;
+    private _widthAccessor: any;
 
     /**
      * Creates a CategoryBarRenderer.
@@ -12,37 +12,31 @@ module Plottable {
      * @param {OrdinalScale} xScale The x scale to use.
      * @param {QuantitiveScale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-     * @param {number} [barWidth] The width of each bar, in pixels.
+     * @param {IAccessor} [widthAccessor] A function for extracting the width position of each bar, in pixels, from the data.
      * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
      */
     constructor(dataset: IDataset,
             xScale: OrdinalScale,
             yScale: QuantitiveScale,
             xAccessor?: IAccessor,
-            barWidth?: number,
+            widthAccessor?: IAccessor,
             yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
-      if (barWidth != null) {
-        this._barWidth = barWidth;
-      }
+      this._widthAccessor = (widthAccessor != null) ? widthAccessor : 10; // default width is 10px
     }
 
     /**
-     * Retrieves the current bar width, or sets a new bar width.
+     * Sets the width accessor.
      *
-     * @param {number} [value] The new value for the bar width, in pixels.
-     * @returns {number|CategoryBarRenderer} The current bar width, or the calling CategoryBarRenderer.
+     * @param {any} accessor The new width accessor.
+     * @returns {CategoryBarRenderer} The calling CategoryBarRenderer.
      */
-    public barWidth(): number;
-    public barWidth(value: number): CategoryBarRenderer;
-    public barWidth(value?: number): any {
-      if (value == null) {
-        return this._barWidth;
-      } else {
-        this._barWidth = value;
-        return this;
-      }
+    public widthAccessor(accessor: any) {
+      this._widthAccessor = accessor;
+      this._requireRerender = true;
+      this._rerenderUpdateSelection = true;
+      return this;
     }
 
     public _paint() {
@@ -55,11 +49,13 @@ module Plottable {
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");
 
+      var widthFunction = this._getAppliedAccessor(this._widthAccessor);
+
       var xA = this._getAppliedAccessor(this._xAccessor);
       var xFunction = (d: any, i: number) => {
         var x = xA(d, i);
         var scaledX = this.xScale.scale(x);
-        return scaledX - this._barWidth/2;
+        return scaledX - widthFunction(d, i)/2;
       };
 
       var yA = this._getAppliedAccessor(this._yAccessor);
@@ -76,7 +72,7 @@ module Plottable {
       this.dataSelection
             .attr("x", xFunction)
             .attr("y", yFunction)
-            .attr("width", this._barWidth)
+            .attr("width", widthFunction)
             .attr("height", heightFunction)
             .attr("fill", this._getAppliedAccessor(this._colorAccessor));
       this.dataSelection.exit().remove();
