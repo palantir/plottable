@@ -86,6 +86,11 @@ module Plottable {
       // no-op
     }
 
+    public autorange() {
+      // no-op
+      return this;
+    }
+
     public _anchor(element: D3.Selection) {
       super._anchor(element);
       this.renderArea = this.content.append("g").classed("render-area", true);

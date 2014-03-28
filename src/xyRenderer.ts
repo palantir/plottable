@@ -60,6 +60,7 @@ module Plottable {
     }
 
     public autorange() {
+      super.autorange();
       var data = this._data;
       var xA = (d: any) => this._getAppliedAccessor(this._xAccessor)(d, null);
       var xDomain: number[] = d3.extent(data, xA);

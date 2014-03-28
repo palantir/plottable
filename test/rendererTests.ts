@@ -369,5 +369,56 @@ describe("Renderers", () => {
         if (verifier.passed) {svg.remove();};
       });
     });
+
+    describe("Category Bar Renderer", () => {
+      var verifier = new MultiTestVerifier();
+      var svg: D3.Selection;
+      var dataset: Plottable.IDataset;
+      var xScale: Plottable.OrdinalScale;
+      var yScale: Plottable.LinearScale;
+      var renderer: Plottable.CategoryBarRenderer;
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
+
+      before(() => {
+        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.OrdinalScale();
+        yScale = new Plottable.LinearScale();
+        dataset = {
+          data: [
+            {x: "A", y: 1},
+            {x: "B", y: 2}
+          ],
+          metadata: {cssClass: "letters"}
+        };
+
+        renderer = new Plottable.CategoryBarRenderer(dataset, xScale, yScale);
+        renderer._anchor(svg);
+        renderer._computeLayout();
+      });
+
+      beforeEach(() => {
+        verifier.start();
+      });
+
+      it("renders correctly", () => {
+        yScale.domain([0, 4]);
+        var renderArea = renderer.renderArea;
+        var bars = renderArea.selectAll("rect");
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+        assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
+        assert.equal(bar1.attr("height"), "200", "bar1 height is correct");
+        assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+        verifier.end();
+      });
+
+      after(() => {
+        if (verifier.passed) {svg.remove();};
+      });
+    });
   });
 });

@@ -3,10 +3,11 @@
 module Plottable {
   export class Scale implements IBroadcaster {
     public _d3Scale: D3.Scale.Scale;
-    private broadcasterCallbacks: IBroadcasterCallback[] = [];
+    public _broadcasterCallbacks: IBroadcasterCallback[] = [];
 
     /**
      * Creates a new Scale.
+     *
      * @constructor
      * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
@@ -26,6 +27,7 @@ module Plottable {
 
     /**
      * Retrieves the current domain, or sets the Scale's domain to the specified values.
+     *
      * @param {any[]} [values] The new value for the domain.
      * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
      */
@@ -36,13 +38,14 @@ module Plottable {
         return this._d3Scale.domain();
       } else {
         this._d3Scale.domain(values);
-        this.broadcasterCallbacks.forEach((b) => b(this));
+        this._broadcasterCallbacks.forEach((b) => b(this));
         return this;
       }
     }
 
     /**
      * Retrieves the current range, or sets the Scale's range to the specified values.
+     *
      * @param {any[]} [values] The new value for the range.
      * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
      */
@@ -59,6 +62,7 @@ module Plottable {
 
     /**
      * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+     *
      * @returns {Scale} A copy of the calling Scale.
      */
     public copy(): Scale {
@@ -67,12 +71,59 @@ module Plottable {
 
     /**
      * Registers a callback to be called when the scale's domain is changed.
+     *
      * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
      * @returns {Scale} The Calling Scale.
      */
     public registerListener(callback: IBroadcasterCallback) {
-      this.broadcasterCallbacks.push(callback);
+      this._broadcasterCallbacks.push(callback);
       return this;
+    }
+  }
+
+  export class OrdinalScale extends Scale {
+    public _d3Scale: D3.Scale.OrdinalScale;
+    private END_PADDING = 0.5; // as a proportion of the spacing between domain values
+    private _range = [0, 1];
+
+    /**
+     * Creates a new OrdinalScale. Domain and Range are set later.
+     *
+     * @constructor
+     */
+    constructor() {
+      super(d3.scale.ordinal());
+    }
+
+    public domain(): any[];
+    public domain(values: any[]): Scale;
+    public domain(values?: any[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        this._broadcasterCallbacks.forEach((b) => b(this));
+        this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING); // d3 scale takes total padding
+        return this;
+      }
+    }
+
+    /**
+     * Returns the range of pixels spanned by the scale, or sets the range.
+     *
+     * @param {number[]} [values] The pixel range to set on the scale.
+     * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
+     */
+    public range(): any[];
+    public range(values: number[]): Scale;
+    public range(values?: number[]): any {
+      if (values == null) {
+        return this._range;
+      } else {
+        this._range = values;
+        this._d3Scale.rangePoints(values, 2*this.END_PADDING); // d3 scale takes total padding
+        return this;
+      }
     }
   }
 
@@ -82,6 +133,7 @@ module Plottable {
 
     /**
      * Creates a new QuantitiveScale.
+     *
      * @constructor
      * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
      */
@@ -91,6 +143,7 @@ module Plottable {
 
     /**
      * Retrieves the domain value corresponding to a supplied range value.
+     *
      * @param {number} value: A value from the Scale's range.
      * @returns {number} The domain value corresponding to the supplied range value.
      */
@@ -100,6 +153,7 @@ module Plottable {
 
     /**
      * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
+     *
      * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
      */
     public copy(): QuantitiveScale {
@@ -108,7 +162,8 @@ module Plottable {
 
     /**
      * Expands the QuantitiveScale's domain to cover the new region.
-     * @param {number} newDomain The additional domain to be covered by the QuantitiveScale.
+     *
+     * @param {number[]} newDomain The additional domain to be covered by the QuantitiveScale.
      * @returns {QuantitiveScale} The scale.
      */
     public widenDomain(newDomain: number[]) {
@@ -121,6 +176,7 @@ module Plottable {
     /**
      * Expands the QuantitiveScale's domain to cover the data given.
      * Passes an accessor through to the native d3 code.
+     *
      * @param data The data to operate on.
      * @param [accessor] The accessor to get values out of the data
      * @returns {QuantitiveScale} The scale.
@@ -186,6 +242,7 @@ module Plottable {
 
     /**
      * Generates tick values.
+     *
      * @param {number} [count] The number of ticks to generate.
      * @returns {any[]} The generated ticks.
      */
@@ -226,6 +283,7 @@ module Plottable {
 
     /**
      * Creates a new LinearScale.
+     *
      * @constructor
      * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the LinearScale. If not supplied, uses a default scale.
      */
@@ -238,6 +296,7 @@ module Plottable {
 
     /**
      * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
+     *
      * @returns {LinearScale} A copy of the calling LinearScale.
      */
     public copy(): LinearScale {
@@ -248,6 +307,7 @@ module Plottable {
   export class ColorScale extends Scale {
     /**
      * Creates a ColorScale.
+     *
      * @constructor
      * @param {string} [scaleType] the type of color scale to create (Category10/Category20/Category20b/Category20c)
      */
