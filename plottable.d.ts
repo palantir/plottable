@@ -197,6 +197,7 @@ declare module Plottable {
     class Scale implements IBroadcaster {
         /**
         * Creates a new Scale.
+        *
         * @constructor
         * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
         */
@@ -210,6 +211,7 @@ declare module Plottable {
         public scale(value: any): any;
         /**
         * Retrieves the current domain, or sets the Scale's domain to the specified values.
+        *
         * @param {any[]} [values] The new value for the domain.
         * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
         */
@@ -217,6 +219,7 @@ declare module Plottable {
         public domain(values: any[]): Scale;
         /**
         * Retrieves the current range, or sets the Scale's range to the specified values.
+        *
         * @param {any[]} [values] The new value for the range.
         * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
         */
@@ -224,43 +227,68 @@ declare module Plottable {
         public range(values: any[]): Scale;
         /**
         * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+        *
         * @returns {Scale} A copy of the calling Scale.
         */
         public copy(): Scale;
         /**
         * Registers a callback to be called when the scale's domain is changed.
+        *
         * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
         * @returns {Scale} The Calling Scale.
         */
         public registerListener(callback: IBroadcasterCallback): Scale;
     }
+    class OrdinalScale extends Scale {
+        /**
+        * Creates a new OrdinalScale. Domain and Range are set later.
+        *
+        * @constructor
+        */
+        constructor();
+        public domain(): any[];
+        public domain(values: any[]): Scale;
+        /**
+        * Returns the range of pixels spanned by the scale, or sets the range.
+        *
+        * @param {number[]} [values] The pixel range to set on the scale.
+        * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
+        */
+        public range(): any[];
+        public range(values: number[]): Scale;
+    }
     class QuantitiveScale extends Scale {
         /**
         * Creates a new QuantitiveScale.
+        *
         * @constructor
         * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
         */
         constructor(scale: D3.Scale.QuantitiveScale);
         /**
         * Retrieves the domain value corresponding to a supplied range value.
+        *
         * @param {number} value: A value from the Scale's range.
         * @returns {number} The domain value corresponding to the supplied range value.
         */
         public invert(value: number): number;
         /**
         * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
+        *
         * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
         */
         public copy(): QuantitiveScale;
         /**
         * Expands the QuantitiveScale's domain to cover the new region.
-        * @param {number} newDomain The additional domain to be covered by the QuantitiveScale.
+        *
+        * @param {number[]} newDomain The additional domain to be covered by the QuantitiveScale.
         * @returns {QuantitiveScale} The scale.
         */
         public widenDomain(newDomain: number[]): QuantitiveScale;
         /**
         * Expands the QuantitiveScale's domain to cover the data given.
         * Passes an accessor through to the native d3 code.
+        *
         * @param data The data to operate on.
         * @param [accessor] The accessor to get values out of the data
         * @returns {QuantitiveScale} The scale.
@@ -296,6 +324,7 @@ declare module Plottable {
         public nice(count?: number): QuantitiveScale;
         /**
         * Generates tick values.
+        *
         * @param {number} [count] The number of ticks to generate.
         * @returns {any[]} The generated ticks.
         */
@@ -319,6 +348,7 @@ declare module Plottable {
     class LinearScale extends QuantitiveScale {
         /**
         * Creates a new LinearScale.
+        *
         * @constructor
         * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the LinearScale. If not supplied, uses a default scale.
         */
@@ -326,6 +356,7 @@ declare module Plottable {
         constructor(scale: D3.Scale.LinearScale);
         /**
         * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
+        *
         * @returns {LinearScale} A copy of the calling LinearScale.
         */
         public copy(): LinearScale;
@@ -333,6 +364,7 @@ declare module Plottable {
     class ColorScale extends Scale {
         /**
         * Creates a ColorScale.
+        *
         * @constructor
         * @param {string} [scaleType] the type of color scale to create (Category10/Category20/Category20b/Category20c)
         */
@@ -477,6 +509,27 @@ declare module Plottable {
         public metadata(metadata: IMetadata): Renderer;
         public data(data: any[]): Renderer;
         public colorAccessor(a: IAccessor): Renderer;
+        public autorange(): Renderer;
+    }
+}
+declare module Plottable {
+    class CategoryRenderer extends Renderer {
+        public dataSelection: D3.UpdateSelection;
+        public xScale: OrdinalScale;
+        public yScale: QuantitiveScale;
+        public autorangeDataOnLayout: boolean;
+        /**
+        * Creates a CategoryRenderer with an Ordinal x scale and Quantitive y scale.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {OrdinalScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+        */
+        constructor(dataset: IDataset, xScale: OrdinalScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        public autorange(): CategoryRenderer;
     }
 }
 declare module Plottable {
@@ -484,8 +537,7 @@ declare module Plottable {
         public dataSelection: D3.UpdateSelection;
         public xScale: QuantitiveScale;
         public yScale: QuantitiveScale;
-        public xAccessor: IAccessor;
-        public yAccessor: IAccessor;
+        public autorangeDataOnLayout: boolean;
         /**
         * Creates an XYRenderer.
         *
@@ -497,6 +549,9 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        public xAccessor(accessor: any): XYRenderer;
+        public yAccessor(accessor: any): XYRenderer;
+        public autorange(): XYRenderer;
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
         *
@@ -533,7 +588,8 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor);
+        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: any, yAccessor?: any, rAccessor?: any);
+        public rAccessor(a: any): CircleRenderer;
     }
 }
 declare module Plottable {
@@ -554,7 +610,7 @@ declare module Plottable {
 declare module Plottable {
     class BarRenderer extends XYRenderer {
         public barPaddingPx: number;
-        public dxAccessor: IAccessor;
+        public dxAccessor: any;
         /**
         * Creates a BarRenderer.
         *
@@ -567,6 +623,7 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
+        public autorange(): BarRenderer;
     }
 }
 declare module Plottable {
@@ -583,6 +640,7 @@ declare module Plottable {
         * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
         constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor);
+        public rAccessor(a: any): SquareRenderer;
     }
 }
 declare module Plottable {
@@ -667,6 +725,48 @@ declare module Plottable {
         public scale(scale: ColorScale): Legend;
         public rowMinimum(): number;
         public rowMinimum(newVal: number): Legend;
+    }
+}
+declare module Plottable {
+    class StandardChart extends Table {
+        constructor();
+        public yAxis(y: YAxis): StandardChart;
+        public yAxis(): YAxis;
+        public xAxis(x: XAxis): StandardChart;
+        public xAxis(): XAxis;
+        public yLabel(y: AxisLabel): StandardChart;
+        public yLabel(y: string): StandardChart;
+        public yLabel(): AxisLabel;
+        public xLabel(x: AxisLabel): StandardChart;
+        public xLabel(x: string): StandardChart;
+        public xLabel(): AxisLabel;
+        public titleLabel(x: TitleLabel): StandardChart;
+        public titleLabel(x: string): StandardChart;
+        public titleLabel(): TitleLabel;
+        public addCenterComponent(c: Component): StandardChart;
+    }
+}
+declare module Plottable {
+    class CategoryBarRenderer extends CategoryRenderer {
+        /**
+        * Creates a CategoryBarRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {OrdinalScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
+        * @param {IAccessor} [widthAccessor] A function for extracting the width position of each bar, in pixels, from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
+        */
+        constructor(dataset: IDataset, xScale: OrdinalScale, yScale: QuantitiveScale, xAccessor?: IAccessor, widthAccessor?: IAccessor, yAccessor?: IAccessor);
+        /**
+        * Sets the width accessor.
+        *
+        * @param {any} accessor The new width accessor.
+        * @returns {CategoryBarRenderer} The calling CategoryBarRenderer.
+        */
+        public widthAccessor(accessor: any): CategoryBarRenderer;
     }
 }
 declare module Plottable {

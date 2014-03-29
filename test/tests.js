@@ -312,12 +312,13 @@ describe("ComponentGroups", function () {
             var cg1 = new Plottable.ComponentGroup([c1, c2]);
             var cg2 = new Plottable.ComponentGroup([c3, c4]);
             var cg = cg1.merge(cg2);
-            assert.notEqual(cg, cg1, "merged != cg1");
+            assert.equal(cg, cg1, "merged == cg1");
             assert.notEqual(cg, cg2, "merged != cg2");
             var components = cg.components;
-            assert.lengthOf(components, 2, "there are two inner components");
-            assert.equal(components[0], cg1, "cg1 nested inside");
-            assert.equal(components[1], cg2, "cg2 nested inside");
+            assert.lengthOf(components, 3, "there are three inner components");
+            assert.equal(components[0], c1, "components are inside");
+            assert.equal(components[1], c2, "components are inside");
+            assert.equal(components[2], cg2, "componentGroup2 inside componentGroup1");
         });
     });
 });
@@ -1257,6 +1258,7 @@ describe("Renderers", function () {
             };
             var dataset = { data: data, metadata: metadata };
             var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor);
+            renderer.autorangeDataOnLayout = false;
             xScale.domain([0, 400]);
             yScale.domain([400, 0]);
             renderer.renderTo(svg);
@@ -1266,21 +1268,21 @@ describe("Renderers", function () {
             assert.closeTo(parseFloat(c1.attr("cx")), 0, 0.01, "first circle cx is correct");
             assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct");
             assert.closeTo(parseFloat(c2.attr("cx")), 11, 0.01, "second circle cx is correct");
-            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct");
+            assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
 
             data = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
             renderer.data(data).renderTo(svg);
             assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
             assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
             assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
-            assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
+            assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
 
             metadata = { foo: 0, bar: 0 };
             renderer.metadata(metadata).renderTo(svg);
             assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
             assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
             assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
-            assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
+            assert.closeTo(parseFloat(c2.attr("cy")), 0, 0.01, "second circle cy is correct after metadata change");
 
             svg.remove();
         });
@@ -1579,6 +1581,60 @@ describe("Renderers", function () {
                 ;
             });
         });
+
+        describe("Category Bar Renderer", function () {
+            var verifier = new MultiTestVerifier();
+            var svg;
+            var dataset;
+            var xScale;
+            var yScale;
+            var renderer;
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+
+            before(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                xScale = new Plottable.OrdinalScale();
+                yScale = new Plottable.LinearScale();
+                dataset = {
+                    data: [
+                        { x: "A", y: 1 },
+                        { x: "B", y: 2 }
+                    ],
+                    metadata: { cssClass: "letters" }
+                };
+
+                renderer = new Plottable.CategoryBarRenderer(dataset, xScale, yScale);
+                renderer._anchor(svg);
+                renderer._computeLayout();
+            });
+
+            beforeEach(function () {
+                verifier.start();
+            });
+
+            it("renders correctly", function () {
+                yScale.domain([0, 4]);
+                var renderArea = renderer.renderArea;
+                var bars = renderArea.selectAll("rect");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+                assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
+                assert.equal(bar1.attr("height"), "200", "bar1 height is correct");
+                assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
+                assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+                verifier.end();
+            });
+
+            after(function () {
+                if (verifier.passed) {
+                    svg.remove();
+                }
+                ;
+            });
+        });
     });
 });
 ///<reference path="testReference.ts" />
@@ -1594,7 +1650,7 @@ describe("Scales", function () {
         var scaleCopy = scale.copy();
         assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
         assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-        assert.notDeepEqual(scale.broadcasterCallbacks, scaleCopy.broadcasterCallbacks, "Registered callbacks are not copied over");
+        assert.notDeepEqual(scale._broadcasterCallbacks, scaleCopy._broadcasterCallbacks, "Registered callbacks are not copied over");
     });
 
     it("Scale alerts listeners when its domain is updated", function () {
