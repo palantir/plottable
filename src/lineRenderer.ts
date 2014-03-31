@@ -1,7 +1,7 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
-  export class LineRenderer extends XYRenderer {
+  export class LineRenderer extends NumericXYRenderer {
     private path: D3.Selection;
     private line: D3.Svg.Line;
 

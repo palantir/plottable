@@ -79,6 +79,19 @@ module Plottable {
       this._broadcasterCallbacks.push(callback);
       return this;
     }
+
+    /**
+     * Expands the Scale's domain to cover the data given.
+     * Passes an accessor through to the native d3 code.
+     *
+     * @param data The data to operate on.
+     * @param [accessor] The accessor to get values out of the data
+     * @returns {Scale} The Scale.
+     */
+    public widenDomainOnData(data: any[], accessor?: IAccessor): Scale {
+      // no-op; implementation is sublcass-dependent
+      return this;
+    }
   }
 
   export class OrdinalScale extends Scale {
@@ -124,6 +137,11 @@ module Plottable {
         this._d3Scale.rangePoints(values, 2*this.END_PADDING); // d3 scale takes total padding
         return this;
       }
+    }
+
+    public widenDomainOnData(data: any[], accessor?: IAccessor): OrdinalScale {
+      this.domain(data.map(accessor));
+      return this;
     }
   }
 
@@ -178,7 +196,7 @@ module Plottable {
      * Passes an accessor through to the native d3 code.
      *
      * @param data The data to operate on.
-     * @param [accessor] The accessor to get values out of the data
+     * @param [accessor] The accessor to get values out of the data.
      * @returns {QuantitiveScale} The scale.
      */
     public widenDomainOnData(data: any[], accessor?: IAccessor) {

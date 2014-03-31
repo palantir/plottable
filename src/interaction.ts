@@ -293,7 +293,7 @@ module Plottable {
 
 
   export class CrosshairsInteraction extends MousemoveInteraction {
-    private renderer: XYRenderer;
+    private renderer: NumericXYRenderer;
 
     private circle: D3.Selection;
     private xLine: D3.Selection;
@@ -301,7 +301,7 @@ module Plottable {
     private lastx: number;
     private lasty: number;
 
-    constructor(renderer: XYRenderer) {
+    constructor(renderer: NumericXYRenderer) {
       super(renderer);
       this.renderer = renderer;
       renderer.xScale.registerListener(() => this.rescale());

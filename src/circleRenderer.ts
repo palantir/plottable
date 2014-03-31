@@ -1,7 +1,7 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
-  export class CircleRenderer extends XYRenderer {
+  export class CircleRenderer extends NumericXYRenderer {
     private _rAccessor: any;
     private static defaultRAccessor = 3;
 
