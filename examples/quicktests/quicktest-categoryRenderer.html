@@ -6,6 +6,10 @@
       .plottable .bounding-box {
         stroke: none;
       }
+
+      .plottable .bar-renderer .selected {
+        fill: pink;
+      }
     </style>
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../build/plottable.js"></script>
@@ -38,6 +42,21 @@
                                                 .addComponent(0, 1, renderAreaD1)
                                                 .addComponent(1, 1, xAxis);
           basicTable.renderTo(svg);
+
+          var clickInteraction = new Plottable.ClickInteraction(renderAreaD1);
+          var clickCallback = function(x, y) {
+            renderAreaD1.deselectAll();
+            var bar = renderAreaD1.selectBar(x, y);
+            if (bar != null) {
+              var alertString = bar.data()[0].name + " says: "
+              for (var i=0; i<bar.data()[0].age; i++) {
+                alertString += "meow ";
+              }
+              alert(alertString);
+            }
+          };
+          clickInteraction.callback(clickCallback);
+          clickInteraction.registerWithComponent();
       };
 
       window.onload = function() { makeCatXAxisChart(); }
