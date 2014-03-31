@@ -4,6 +4,7 @@ function commitDashboard(dataset) {
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
+  function colorAccessor(d) { return colorScale.scale(d.name); }
   function commitChart(svg) {
     var xScale = new Plottable.QuantitiveScale(d3.time.scale())
                 .domain([new Date(2014, 0, 20), new Date(2014, 2, 23)]).nice();
@@ -17,10 +18,9 @@ function commitDashboard(dataset) {
 
 
     function radiusAccessor(d) { return rScale.scale(linesAddedAccessor(d)); }
-    function colorAccessor(d) { return colorScale.scale(d.name); }
 
     function linesAddedAccessor(d) {
-      var added = d.insertions - d.deletions;
+      var added = d.insertions + d.deletions;
       return added > 0 ? added : 1;
     }
 
@@ -45,35 +45,37 @@ function commitDashboard(dataset) {
     return chart;
   }
 
-  function computeCommitsByPerson(data) {
+  function aggregateByKey(data, keyString, valString) {
     var i = 0;
-    var person2index = {};
-    var outData = [];
+    var key2index = {};
+    var out = [];
     data.forEach(function(d) {
-      if (person2index[d.name] != null) {
-        var key = person2index[d.name];
-        outData[key].count++;
-      } else {
-        outData[i] = {name: d.name, count: 1};
-        person2index[d.name] = i++;
+      var thisKey = d[keyString];
+      if (key2index[thisKey] == null) {
+        key2index[thisKey] = i;
+        out[i] = {count: 0};
+        out[i][keyString] = thisKey;
+        i++;
       }
+      var val = valString != null ? d[valString] : 1;
+      out[key2index[thisKey]].count += val;
     });
-    return outData;
+    return out;
   }
 
-  function commitsByPerson(svg) {
+  function catChart(dataset) {
     var xScale = new Plottable.OrdinalScale();
-    var xAxis  = new Plottable.XAxis(xScale, "bottom");
+    var xAxis  = new Plottable.XAxis(xScale, "bottom", function(d) {return d});
     var yScale = new Plottable.LinearScale();
     var yAxis  = new Plottable.YAxis(yScale, "left").showEndTickLabels(true);
-    var commitData = computeCommitsByPerson(dataset.data);
-    var commitDataset = {data: commitData, metadata: {}};
-    var renderer  = new Plottable.CategoryBarRenderer(commitDataset, xScale, yScale, "name", 50, "count");
-    var gridlines = new Plottable.Gridlines(xScale, yScale);
+    var renderer  = new Plottable.CategoryBarRenderer(commitDataset, xScale, yScale, "name", 50, "count")
+                          .colorAccessor(colorAccessor);
+
+    var gridlines = new Plottable.Gridlines(null, yScale);
     var center = renderer.merge(gridlines);
     var chart  = new Plottable.StandardChart().addCenterComponent(center)
-                    .xAxis(xAxis).yAxis(yAxis).titleLabel("# of Commits by Contributor");
-    chart.renderTo(svg);
+                    .xAxis(xAxis).yAxis(yAxis);
+    chart.yScale = yScale; // HACK HACK
     return chart;
   }
 
@@ -82,7 +84,12 @@ function commitDashboard(dataset) {
   commitChart(s1);
   var s2 = d3.select("#commits-by-person");
   sizeSVG(s2);
-  commitsByPerson(s2);
+  var commitData = aggregateByKey(dataset.data, "name");
+  var commitDataset = {data: commitData, metadata: {}};
+  var commitCatChart = catChart(commitDataset)
+                          .titleLabel("# of Commits by Contributor")
+                          .renderTo(s2);
+  commitCatChart.yScale.nice();
 }
 
 function sizeSVG(svg) {
