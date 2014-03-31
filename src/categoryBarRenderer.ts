@@ -1,7 +1,7 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
-  export class CategoryBarRenderer extends CategoryRenderer {
+  export class CategoryBarRenderer extends CategoryXYRenderer {
     private _widthAccessor: any;
 
     /**
@@ -45,8 +45,6 @@ module Plottable {
       var maxScaledY = Math.max(yRange[0], yRange[1]);
 
       this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
-      var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
-      var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");
 
       var widthFunction = this._getAppliedAccessor(this._widthAccessor);

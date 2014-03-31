@@ -1,7 +1,7 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
-  export class BarRenderer extends XYRenderer {
+  export class BarRenderer extends NumericXYRenderer {
     private static defaultDxAccessor = "dx";
     public barPaddingPx = 1;
 
