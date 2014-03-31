@@ -747,7 +747,6 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-<<<<<<< HEAD
     class CategoryBarRenderer extends CategoryRenderer {
         /**
         * Creates a CategoryBarRenderer.
@@ -771,8 +770,6 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-=======
->>>>>>> Update plottable.js, plottable.d.ts, and other build artefacts
     class Axis extends Component {
         static yWidth: number;
         static xHeight: number;
