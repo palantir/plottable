@@ -539,6 +539,19 @@ var Plottable;
             this._broadcasterCallbacks.push(callback);
             return this;
         };
+
+        /**
+        * Expands the Scale's domain to cover the data given.
+        * Passes an accessor through to the native d3 code.
+        *
+        * @param data The data to operate on.
+        * @param [accessor] The accessor to get values out of the data
+        * @returns {Scale} The Scale.
+        */
+        Scale.prototype.widenDomainOnData = function (data, accessor) {
+            // no-op; implementation is sublcass-dependent
+            return this;
+        };
         return Scale;
     })();
     Plottable.Scale = Scale;
@@ -577,6 +590,11 @@ var Plottable;
                 this._d3Scale.rangePoints(values, 2 * this.END_PADDING); // d3 scale takes total padding
                 return this;
             }
+        };
+
+        OrdinalScale.prototype.widenDomainOnData = function (data, accessor) {
+            this.domain(data.map(accessor));
+            return this;
         };
         return OrdinalScale;
     })(Scale);
@@ -631,7 +649,7 @@ var Plottable;
         * Passes an accessor through to the native d3 code.
         *
         * @param data The data to operate on.
-        * @param [accessor] The accessor to get values out of the data
+        * @param [accessor] The accessor to get values out of the data.
         * @returns {QuantitiveScale} The scale.
         */
         QuantitiveScale.prototype.widenDomainOnData = function (data, accessor) {
@@ -1044,6 +1062,41 @@ var Plottable;
     })(Interaction);
     Plottable.MousemoveInteraction = MousemoveInteraction;
 
+    var ClickInteraction = (function (_super) {
+        __extends(ClickInteraction, _super);
+        /**
+        * Creates a ClickInteraction.
+        *
+        * @constructor
+        * @param {Component} componentToListenTo The component to listen for clicks on.
+        */
+        function ClickInteraction(componentToListenTo) {
+            _super.call(this, componentToListenTo);
+        }
+        ClickInteraction.prototype._anchor = function (hitBox) {
+            var _this = this;
+            _super.prototype._anchor.call(this, hitBox);
+            hitBox.on("click", function () {
+                var xy = d3.mouse(hitBox.node());
+                var x = xy[0];
+                var y = xy[1];
+                _this._callback(x, y);
+            });
+        };
+
+        /**
+        * Sets an callback to be called when a click is received.
+        *
+        * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
+        */
+        ClickInteraction.prototype.callback = function (cb) {
+            this._callback = cb;
+            return this;
+        };
+        return ClickInteraction;
+    })(Interaction);
+    Plottable.ClickInteraction = ClickInteraction;
+
     var CrosshairsInteraction = (function (_super) {
         __extends(CrosshairsInteraction, _super);
         function CrosshairsInteraction(renderer) {
@@ -1340,76 +1393,6 @@ var Plottable;
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var CategoryRenderer = (function (_super) {
-        __extends(CategoryRenderer, _super);
-        /**
-        * Creates a CategoryRenderer with an Ordinal x scale and Quantitive y scale.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {OrdinalScale} xScale The x scale to use.
-        * @param {QuantitiveScale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        */
-        function CategoryRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
-            var _this = this;
-            _super.call(this, dataset);
-            this.autorangeDataOnLayout = true;
-            this.classed("category-renderer", true);
-
-            this.xScale = xScale;
-            this.yScale = yScale;
-
-            this._xAccessor = (xAccessor != null) ? xAccessor : "x"; // default
-            this._yAccessor = (yAccessor != null) ? yAccessor : "y"; // default
-
-            this.xScale.registerListener(function () {
-                return _this.rescale();
-            });
-            this.yScale.registerListener(function () {
-                return _this.rescale();
-            });
-        }
-        CategoryRenderer.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-            _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-            this.xScale.range([0, this.availableWidth]);
-            this.yScale.range([this.availableHeight, 0]);
-            if (this.autorangeDataOnLayout) {
-                this.autorange();
-            }
-            return this;
-        };
-
-        CategoryRenderer.prototype.autorange = function () {
-            var _this = this;
-            _super.prototype.autorange.call(this);
-            var data = this._data;
-            var xA = function (d) {
-                return _this._getAppliedAccessor(_this._xAccessor)(d, null);
-            };
-            this.xScale.domain(data.map(xA));
-
-            var yA = function (d) {
-                return _this._getAppliedAccessor(_this._yAccessor)(d, null);
-            };
-            var yDomain = d3.extent(data, yA);
-            this.yScale.widenDomain(yDomain);
-            return this;
-        };
-
-        CategoryRenderer.prototype.rescale = function () {
-            if (this.element != null) {
-                this._render();
-            }
-        };
-        return CategoryRenderer;
-    })(Plottable.Renderer);
-    Plottable.CategoryRenderer = CategoryRenderer;
-})(Plottable || (Plottable = {}));
-///<reference path="reference.ts" />
-var Plottable;
-(function (Plottable) {
     var XYRenderer = (function (_super) {
         __extends(XYRenderer, _super);
         /**
@@ -1417,8 +1400,8 @@ var Plottable;
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
-        * @param {QuantitiveScale} xScale The x scale to use.
-        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
@@ -1428,8 +1411,8 @@ var Plottable;
             this.autorangeDataOnLayout = true;
             this.classed("xy-renderer", true);
 
-            this._xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
-            this._yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
+            this._xAccessor = (xAccessor != null) ? xAccessor : "x"; // default
+            this._yAccessor = (yAccessor != null) ? yAccessor : "y"; // default
 
             this.xScale = xScale;
             this.yScale = yScale;
@@ -1465,6 +1448,10 @@ var Plottable;
             return this;
         };
 
+        /**
+        * Autoranges the scales over the data.
+        * Actual behavior is dependent on the scales.
+        */
         XYRenderer.prototype.autorange = function () {
             var _this = this;
             _super.prototype.autorange.call(this);
@@ -1472,24 +1459,51 @@ var Plottable;
             var xA = function (d) {
                 return _this._getAppliedAccessor(_this._xAccessor)(d, null);
             };
-            var xDomain = d3.extent(data, xA);
-            this.xScale.widenDomain(xDomain);
+            this.xScale.widenDomainOnData(data, xA);
 
             var yA = function (d) {
                 return _this._getAppliedAccessor(_this._yAccessor)(d, null);
             };
-            var yDomain = d3.extent(data, yA);
-            this.yScale.widenDomain(yDomain);
+            this.yScale.widenDomainOnData(data, yA);
             return this;
         };
 
+        XYRenderer.prototype.rescale = function () {
+            if (this.element != null) {
+                this._render();
+            }
+        };
+        return XYRenderer;
+    })(Plottable.Renderer);
+    Plottable.XYRenderer = XYRenderer;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var NumericXYRenderer = (function (_super) {
+        __extends(NumericXYRenderer, _super);
+        /**
+        * Creates an NumericXYRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {QuantitiveScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+        */
+        function NumericXYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
+            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.autorangeDataOnLayout = true;
+            this.classed("numeric-xy-renderer", true);
+        }
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
         *
         * @param {SelectionArea} pixelArea The selected area, in pixels.
         * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
         */
-        XYRenderer.prototype.invertXYSelectionArea = function (pixelArea) {
+        NumericXYRenderer.prototype.invertXYSelectionArea = function (pixelArea) {
             var xMin = this.xScale.invert(pixelArea.xMin);
             var xMax = this.xScale.invert(pixelArea.xMax);
             var yMin = this.yScale.invert(pixelArea.yMin);
@@ -1498,7 +1512,7 @@ var Plottable;
             return dataArea;
         };
 
-        XYRenderer.prototype.getDataFilterFunction = function (dataArea) {
+        NumericXYRenderer.prototype.getDataFilterFunction = function (dataArea) {
             var xA = this._getAppliedAccessor(this._xAccessor);
             var yA = this._getAppliedAccessor(this._yAccessor);
             var filterFunction = function (d, i) {
@@ -1515,7 +1529,7 @@ var Plottable;
         * @param {SelectionArea} dataArea The selected area.
         * @returns {D3.UpdateSelection} The data in the selected area.
         */
-        XYRenderer.prototype.getSelectionFromArea = function (dataArea) {
+        NumericXYRenderer.prototype.getSelectionFromArea = function (dataArea) {
             var filterFunction = this.getDataFilterFunction(dataArea);
             return this.dataSelection.filter(filterFunction);
         };
@@ -1526,7 +1540,7 @@ var Plottable;
         * @param {SelectionArea} dataArea The selected area.
         * @returns {number[]} An array of the indices of datapoints in the selected area.
         */
-        XYRenderer.prototype.getDataIndicesFromArea = function (dataArea) {
+        NumericXYRenderer.prototype.getDataIndicesFromArea = function (dataArea) {
             var filterFunction = this.getDataFilterFunction(dataArea);
             var results = [];
             this._data.forEach(function (d, i) {
@@ -1536,17 +1550,9 @@ var Plottable;
             });
             return results;
         };
-
-        XYRenderer.prototype.rescale = function () {
-            if (this.element != null) {
-                this._render();
-            }
-        };
-        XYRenderer.defaultXAccessor = "x";
-        XYRenderer.defaultYAccessor = "y";
-        return XYRenderer;
-    })(Plottable.Renderer);
-    Plottable.XYRenderer = XYRenderer;
+        return NumericXYRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.NumericXYRenderer = NumericXYRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
 var Plottable;
@@ -1594,7 +1600,7 @@ var Plottable;
         };
         CircleRenderer.defaultRAccessor = 3;
         return CircleRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.NumericXYRenderer);
     Plottable.CircleRenderer = CircleRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -1637,7 +1643,7 @@ var Plottable;
             this.path.attr("d", this.line).attr("stroke", cA);
         };
         return LineRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.NumericXYRenderer);
     Plottable.LineRenderer = LineRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -1717,7 +1723,7 @@ var Plottable;
         };
         BarRenderer.defaultDxAccessor = "dx";
         return BarRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.NumericXYRenderer);
     Plottable.BarRenderer = BarRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -1770,7 +1776,7 @@ var Plottable;
         };
         SquareRenderer.defaultRAccessor = 3;
         return SquareRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.NumericXYRenderer);
     Plottable.SquareRenderer = SquareRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -2274,6 +2280,29 @@ var Plottable;
 ///<reference path="reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var CategoryXYRenderer = (function (_super) {
+        __extends(CategoryXYRenderer, _super);
+        /**
+        * Creates a CategoryXYRenderer with an Ordinal x scale and Quantitive y scale.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {OrdinalScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+        */
+        function CategoryXYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
+            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.classed("category-renderer", true);
+        }
+        return CategoryXYRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.CategoryXYRenderer = CategoryXYRenderer;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
     var CategoryBarRenderer = (function (_super) {
         __extends(CategoryBarRenderer, _super);
         /**
@@ -2312,8 +2341,6 @@ var Plottable;
             var maxScaledY = Math.max(yRange[0], yRange[1]);
 
             this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
-            var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
-            var xrr = this.xScale.range()[1] - this.xScale.range()[0];
             this.dataSelection.enter().append("rect");
 
             var widthFunction = this._getAppliedAccessor(this._widthAccessor);
@@ -2339,8 +2366,41 @@ var Plottable;
             this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", this._getAppliedAccessor(this._colorAccessor));
             this.dataSelection.exit().remove();
         };
+
+        /**
+        * Selects the bar under the given pixel position.
+        *
+        * @param {number} x The pixel x position.
+        * @param {number} y The pixel y position.
+        * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
+        * @return {D3.Selection} The selected bar, or null if no bar was selected.
+        */
+        CategoryBarRenderer.prototype.selectBar = function (x, y, select) {
+            if (typeof select === "undefined") { select = true; }
+            var selectedBar = null;
+
+            this.dataSelection.each(function (d) {
+                var bbox = this.getBBox();
+                if (bbox.x <= x && x <= bbox.x + bbox.width && bbox.y <= y && y <= bbox.y + bbox.height) {
+                    selectedBar = d3.select(this);
+                }
+            });
+
+            if (selectedBar != null) {
+                selectedBar.classed("selected", select);
+            }
+
+            return selectedBar;
+        };
+
+        /**
+        * Deselects all bars.
+        */
+        CategoryBarRenderer.prototype.deselectAll = function () {
+            this.dataSelection.classed("selected", false);
+        };
         return CategoryBarRenderer;
-    })(Plottable.CategoryRenderer);
+    })(Plottable.CategoryXYRenderer);
     Plottable.CategoryBarRenderer = CategoryBarRenderer;
 })(Plottable || (Plottable = {}));
 /// <reference path="utils.ts" />
@@ -2352,8 +2412,8 @@ var Plottable;
 /// <reference path="interaction.ts" />
 /// <reference path="label.ts" />
 /// <reference path="renderer.ts" />
-/// <reference path="categoryRenderer.ts" />
 /// <reference path="xyRenderer.ts" />
+/// <reference path="numericXYRenderer.ts" />
 /// <reference path="circleRenderer.ts" />
 /// <reference path="lineRenderer.ts" />
 /// <reference path="barRenderer.ts" />
@@ -2362,6 +2422,7 @@ var Plottable;
 /// <reference path="coordinator.ts" />
 /// <reference path="legend.ts" />
 /// <reference path="chart.ts" />
+/// <reference path="categoryXYRenderer.ts" />
 /// <reference path="categoryBarRenderer.ts" />
 //grunt-end
 ///<reference path="reference.ts" />
