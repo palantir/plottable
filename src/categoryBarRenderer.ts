@@ -77,5 +77,38 @@ module Plottable {
             .attr("fill", this._getAppliedAccessor(this._colorAccessor));
       this.dataSelection.exit().remove();
     }
+
+    /**
+     * Selects the bar under the given pixel position.
+     *
+     * @param {number} x The pixel x position.
+     * @param {number} y The pixel y position.
+     * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
+     * @return {D3.Selection} The selected bar, or null if no bar was selected.
+     */
+    public selectBar(x: number, y: number, select = true): D3.Selection {
+      var selectedBar: D3.Selection = null;
+
+      this.dataSelection.each(function(d: any) {
+        var bbox = this.getBBox();
+        if (bbox.x <= x && x <= bbox.x + bbox.width &&
+            bbox.y <= y && y <= bbox.y + bbox.height) {
+          selectedBar = d3.select(this);
+        }
+      });
+
+      if (selectedBar != null) {
+        selectedBar.classed("selected", select);
+      }
+
+      return selectedBar;
+    }
+
+    /**
+     * Deselects all bars.
+     */
+    public deselectAll() {
+      this.dataSelection.classed("selected", false);
+    }
   }
 }
