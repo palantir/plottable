@@ -44,13 +44,13 @@ module Plottable {
       super._paint();
       var yRange = this.yScale.range();
       var maxScaledY = Math.max(yRange[0], yRange[1]);
+      var xA = this._getAppliedAccessor(this._xAccessor);
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._data, xA);
       this.dataSelection.enter().append("rect");
 
       var widthFunction = this._getAppliedAccessor(this._widthAccessor);
 
-      var xA = this._getAppliedAccessor(this._xAccessor);
       var xFunction = (d: any, i: number) => {
         var x = xA(d, i);
         var scaledX = this.xScale.scale(x);
@@ -68,7 +68,11 @@ module Plottable {
         return maxScaledY - yFunction(d, i);
       };
 
-      (this._animate ? this.dataSelection.transition() : this.dataSelection)
+      var updateSelection: any = this.dataSelection;
+      if (this._animate) {
+        updateSelection = updateSelection.transition();
+      }
+      updateSelection
             .attr("x", xFunction)
             .attr("y", yFunction)
             .attr("width", widthFunction)
