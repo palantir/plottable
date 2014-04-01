@@ -23,6 +23,7 @@ module Plottable {
             yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
+      this._animate = true;
       this._widthAccessor = (widthAccessor != null) ? widthAccessor : 10; // default width is 10px
     }
 
@@ -67,7 +68,7 @@ module Plottable {
         return maxScaledY - yFunction(d, i);
       };
 
-      this.dataSelection
+      (this._animate ? this.dataSelection.transition() : this.dataSelection)
             .attr("x", xFunction)
             .attr("y", yFunction)
             .attr("width", widthFunction)

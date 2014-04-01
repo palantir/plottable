@@ -8,6 +8,7 @@ module Plottable {
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
+    public _animate = false;
     private static defaultColorAccessor = (d: any) => "#1f77b4";
 
     public _rerenderUpdateSelection = false;
