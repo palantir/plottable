@@ -41,7 +41,11 @@ function commitDashboard(dataset) {
                     .xAxis(xAxis).yAxis(yAxis)
                     .xLabel("Date of Commit").yLabel("Commit Time")
                     .titleLabel("Commit History");
+
+    var ai = new Plottable.AreaInteraction(group).registerWithComponent();
     chart.renderTo(svg);
+    chart.ai = ai;
+    chart.renderer = renderer;
     return chart;
   }
 
@@ -64,7 +68,9 @@ function commitDashboard(dataset) {
   }
 
   function catChart(dataset) {
-    var xScale = new Plottable.OrdinalScale();
+    var xScale = new Plottable.OrdinalScale()
+            .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"]);
+
     var xAxis  = new Plottable.XAxis(xScale, "bottom", function(d) {return d});
     var yScale = new Plottable.LinearScale();
     var yAxis  = new Plottable.YAxis(yScale, "left").showEndTickLabels(true);
@@ -76,20 +82,22 @@ function commitDashboard(dataset) {
     var chart  = new Plottable.StandardChart().addCenterComponent(center)
                     .xAxis(xAxis).yAxis(yAxis);
     chart.yScale = yScale; // HACK HACK
+    chart.data = renderer.data.bind(renderer);
+    chart.renderer = renderer;
     return chart;
   }
 
   var s1 = d3.select("#commit-chart");
   sizeSVG(s1);
-  commitChart(s1);
+  var commitChart = commitChart(s1);
   var s2 = d3.select("#commits-by-person");
   sizeSVG(s2);
   var commitData = aggregateByKey(dataset.data, "name");
   var commitDataset = {data: commitData, metadata: {}};
-  var commitCatChart = catChart(commitDataset)
+  var cdChart = catChart(commitDataset)
                           .titleLabel("# of Commits by Contributor")
                           .renderTo(s2);
-  commitCatChart.yScale.domain([0, 400]);
+  cdChart.yScale.domain([0, 400]);
 
   var s3 = d3.select("#lines-changed-contributor");
   sizeSVG(s3);
@@ -97,6 +105,25 @@ function commitDashboard(dataset) {
   var lcDataset = {data: linesChangedData, metadata: {}};
   var lcChart = catChart(lcDataset).titleLabel("# Lines Changed by Contributor").renderTo(s3);
   lcChart.yScale.nice();
+
+
+  function interactionCallback(pixelArea) {
+    var renderer = commitChart.renderer;
+    var dataArea = renderer.invertXYSelectionArea(pixelArea);
+    var selection = renderer.getSelectionFromArea(dataArea);
+    var data = selection.data();
+    var commitData = aggregateByKey(data, "name");
+    cdChart.data(commitData);
+    var lcData = aggregateByKey(data, "name", linesAddedAccessor);
+    lcChart.data(lcData);
+    lcChart.yScale.domain([0, 0]);
+    cdChart.yScale.domain([0, 0]);
+    lcChart.renderer.autorange().yScale.nice();
+    cdChart.renderer.autorange().yScale.nice();
+    lcChart._render();
+    cdChart._render();
+  }
+  commitChart.ai.callback(interactionCallback);
 }
 
 function sizeSVG(svg) {
