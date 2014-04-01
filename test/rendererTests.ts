@@ -393,6 +393,7 @@ describe("Renderers", () => {
         };
 
         renderer = new Plottable.CategoryBarRenderer(dataset, xScale, yScale);
+        renderer._animate = false;
         renderer._anchor(svg);
         renderer._computeLayout();
       });
