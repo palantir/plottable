@@ -140,7 +140,27 @@ module Plottable {
     }
 
     public widenDomainOnData(data: any[], accessor?: IAccessor): OrdinalScale {
-      this.domain(data.map(accessor));
+      var changed = false;
+      var newDomain = this.domain();
+      var a: (d: any, i: number) => any;
+      if (accessor == null) {
+        a = (d, i) => d;
+      } else if (typeof(accessor) === "string") {
+        a = (d, i) => d[accessor];
+      } else if (typeof(accessor) === "function") {
+        a = accessor;
+      } else {
+        a = (d, i) => accessor;
+      }
+      data.map(a).forEach((d) => {
+        if (newDomain.indexOf(d) === -1) {
+          newDomain.push(d);
+          changed = true;
+        }
+      });
+      if (changed) {
+        this.domain(newDomain);
+      }
       return this;
     }
   }
