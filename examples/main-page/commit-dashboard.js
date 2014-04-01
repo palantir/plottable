@@ -5,6 +5,10 @@ function commitDashboard(dataset) {
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
   function colorAccessor(d) { return colorScale.scale(d.name); }
+  function linesAddedAccessor(d) {
+    var added = d.insertions + d.deletions;
+    return added > 0 ? added : 1;
+  }
   function commitChart(svg) {
     var xScale = new Plottable.QuantitiveScale(d3.time.scale())
                 .domain([new Date(2014, 0, 20), new Date(2014, 2, 23)]).nice();
@@ -19,10 +23,6 @@ function commitDashboard(dataset) {
 
     function radiusAccessor(d) { return rScale.scale(linesAddedAccessor(d)); }
 
-    function linesAddedAccessor(d) {
-      var added = d.insertions + d.deletions;
-      return added > 0 ? added : 1;
-    }
 
 
     var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale)
@@ -45,7 +45,7 @@ function commitDashboard(dataset) {
     return chart;
   }
 
-  function aggregateByKey(data, keyString, valString) {
+  function aggregateByKey(data, keyString, valF) {
     var i = 0;
     var key2index = {};
     var out = [];
@@ -57,7 +57,7 @@ function commitDashboard(dataset) {
         out[i][keyString] = thisKey;
         i++;
       }
-      var val = valString != null ? d[valString] : 1;
+      var val = valF != null ? (typeof(valF) === "string" ? d[valF] : valF(d)) : 1;
       out[key2index[thisKey]].count += val;
     });
     return out;
@@ -68,7 +68,7 @@ function commitDashboard(dataset) {
     var xAxis  = new Plottable.XAxis(xScale, "bottom", function(d) {return d});
     var yScale = new Plottable.LinearScale();
     var yAxis  = new Plottable.YAxis(yScale, "left").showEndTickLabels(true);
-    var renderer  = new Plottable.CategoryBarRenderer(commitDataset, xScale, yScale, "name", 50, "count")
+    var renderer  = new Plottable.CategoryBarRenderer(dataset, xScale, yScale, "name", 50, "count")
                           .colorAccessor(colorAccessor);
 
     var gridlines = new Plottable.Gridlines(null, yScale);
@@ -89,7 +89,14 @@ function commitDashboard(dataset) {
   var commitCatChart = catChart(commitDataset)
                           .titleLabel("# of Commits by Contributor")
                           .renderTo(s2);
-  commitCatChart.yScale.nice();
+  commitCatChart.yScale.domain([0, 400]);
+
+  var s3 = d3.select("#lines-changed-contributor");
+  sizeSVG(s3);
+  var linesChangedData = aggregateByKey(dataset.data, "name", linesAddedAccessor);
+  var lcDataset = {data: linesChangedData, metadata: {}};
+  var lcChart = catChart(lcDataset).titleLabel("# Lines Changed by Contributor").renderTo(s3);
+  lcChart.yScale.nice();
 }
 
 function sizeSVG(svg) {
