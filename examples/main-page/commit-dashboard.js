@@ -48,12 +48,7 @@ function commitDashboard(dataset) {
   var commitDataset = { data: commits, metadata: {} };
 
   function linesAddedAccessor(d) {
-    var changes = d.byExtension.filter(function(e) {
-      var ext = e.extension;
-      return ext === "ts" || ext === "html" || ext === "css";
-    });
     var total = 0;
-    // changes.forEach(function(c) {
     d.changes.forEach(function(c) {
       total += c.additions - c.deletions;
     });
@@ -72,6 +67,7 @@ function commitDashboard(dataset) {
     var xAxis = new Plottable.XAxis(xScale, "bottom", dateFormatter);
     var yAxis = new Plottable.YAxis(yScale, "left");
     var timeChart = new Plottable.StandardChart().xAxis(xAxis).yAxis(yAxis);
+    timeChart.addCenterComponent(new Plottable.Gridlines(xScale, yScale));
 
     chosenDirectories.forEach(function(dir) {
       var tsDataset = {
@@ -122,6 +118,16 @@ function commitDashboard(dataset) {
     chart.ai = ai;
     chart.renderer = renderer;
     return chart;
+  }
+
+  function commitsScatterAndTSC() {
+    var timeScale = new Plottable.QuantitiveScale(d3.time.scale())
+            .domain([startDate, endDate]).nice();
+    var scatterYScale = new Plottable.LinearScale().domain([8, 26]);
+    var rScale = new Plottable.QuantitiveScale(d3.scale.log())
+            .range([2, 12])
+            .widenDomainOnData(dataset.data.commits, linesAddedAccessor);
+    function radiusAccessor(d) { return rScale.scale(linesAddedAccessor(d)); }
   }
 
   function aggregateByKey(data, keyString, valF) {
@@ -227,71 +233,40 @@ function commitDashboard(dataset) {
   sizeSVG(s1);
   var commitChart = commitChart(s1);
 
-  var contributorData = aggregateByKey(dataset.data.commits, "name");
-  var contributorDatset = {data: contributorData, metadata: {}};
-  var cdChart = catChart(contributorDatset)
-                  .titleLabel("# of Commits by Contributor");
-  cdChart.classed("sidebar-chart", true).padding(5, 0);
-
-  var linesChangedData = aggregateByKey(dataset.data.commits, "name", linesAddedAccessor);
-
-  var lcDataset = {data: linesChangedData, metadata: {}};
-  var lcChart = catChart(lcDataset)
-                  .titleLabel("# Lines Changed by Contributor");
-  lcChart.classed("sidebar-chart", true).padding(5, 0);
-
+  var extensionChart = extensionCatChart();
   var directoryChart = directoryCatChart();
+
   var linesOverTimeChart = extensionsTSC();
 
-  var clickBar = new Plottable.ClickInteraction(lcChart.renderer);
-  var lastSelected = null;
-  var clickCallback = function(x, y) {
-    lcChart.renderer.deselectAll();
-    var bar = lcChart.renderer.selectBar(x, y);
-    if (bar != null && bar.data()[0].name != lastSelected) {
-      var name = bar.data()[0].name;
-      var newData = commitDataset.data.filter(function(d) { return d.name === name; });
+  var extensionClick = new Plottable.ClickInteraction(extensionChart.renderer);
+  var lastExtension = null;
+  var extensionClickCallback = function(x, y) {
+    extensionChart.renderer.deselectAll();
+    var bar = extensionChart.renderer.selectBar(x, y);
+    if (bar != null && bar.data()[0].extension != lastExtension) {
+      var extension = bar.data()[0].extension;
+      var extensionFilter = function(commit) {
+        return commit.byExtension.map(function(e) { return e.extension; }).indexOf(extension) !== -1;
+      };
+      var newData = dataset.data.commits.filter(extensionFilter);
       commitChart.renderer.data(newData);
-      lastSelected = name;
+      lastExtension = extension;
     } else {
-      commitChart.renderer.data(commitDataset.data);
-      lastSelected = null;
-      lcChart.renderer.deselectAll();
+      commitChart.renderer.data(dataset.data.commits);
+      lastExtension = null;
+      extensionChart.renderer.deselectAll();
     }
     commitChart.renderer._render();
   };
-  clickBar.callback(clickCallback);
-  clickBar.registerWithComponent();
+  extensionClick.callback(extensionClickCallback);
+  extensionClick.registerWithComponent();
 
-  var extensionChart = extensionCatChart();
 
   var sideBarCharts = new Plottable.Table([[extensionChart], [directoryChart]]).padding(10, 0);
   var mainCharts = new Plottable.Table([[commitChart], [linesOverTimeChart]]);
   var masterTable = new Plottable.Table([[mainCharts, sideBarCharts]]);
   masterTable.colWeight(0, 2);
   masterTable.renderTo(s1);
-
-  cdChart.yScale.domain([0, 500]);
-  lcChart.yScale.nice();
-
-
-  function interactionCallback(pixelArea) {
-    var renderer = commitChart.renderer;
-    var dataArea = renderer.invertXYSelectionArea(pixelArea);
-    var selection = renderer.getSelectionFromArea(dataArea);
-    var data = selection.data();
-    var commitData = aggregateByKey(data, "name");
-    cdChart.data(commitData);
-    var lcData = aggregateByKey(data, "name", linesAddedAccessor);
-    lcChart.data(lcData);
-    lcChart.yScale.domain([0, 0]);
-    cdChart.yScale.domain([0, 0]);
-    lcChart.renderer.autorange().yScale.nice();
-    cdChart.renderer.autorange().yScale.nice();
-    lcChart._render();
-    cdChart._render();
-  }
-  // commitChart.ai.callback(interactionCallback);
 }
 
 function sizeSVG(svg) {
