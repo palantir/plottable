@@ -4,8 +4,7 @@ function commitDashboard(dataset) {
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
-  var extensionColorScale = new Plottable.ColorScale("20c")
-                    .domain(["ts", "d.ts", "js", "html", "css", "other"]);
+
 
 
   function makeColorAccessor(s, k) { return function(d) {return s.scale(d[k]);}}
@@ -140,8 +139,6 @@ function commitDashboard(dataset) {
     var directoryColorScale = new Plottable.ColorScale("20c")
                       .domain(chosenDirectories);
 
-    var xScale = new Plottable.OrdinalScale()
-                  .domain(chosenDirectories);
 
     function filterFn(d) {return chosenDirectories.indexOf(d.directory) !== -1;}
     function xformFn(d) {
@@ -153,6 +150,8 @@ function commitDashboard(dataset) {
 
     var directoryData = dataset.data.directory.map(xformFn).filter(filterFn);
     var directoryDataset = {data: directoryData, metadata: {}};
+
+    var xScale = new Plottable.OrdinalScale().domain(chosenDirectories);
     var xAxis  = new Plottable.XAxis(xScale, "bottom", function(d) {return d});
     var yScale = new Plottable.LinearScale();
     var yAxis  = new Plottable.YAxis(yScale, "left").showEndTickLabels(true);
@@ -167,8 +166,43 @@ function commitDashboard(dataset) {
     yScale.domain([0, 30000]);
     chart.data = renderer.data.bind(renderer);
     chart.renderer = renderer;
-    return chart;
+    return chart.classed("sidebar-chart", true).padding(5, 0);
+  }
 
+  function extensionCatChart() {
+    var chosenExtensions = ["ts", "d.ts", "js", "html", "css", "other"];
+    var extensionColorScale = new Plottable.ColorScale("20b")
+                      .domain(chosenExtensions);
+    var otherExtension = {extension: "other", deletions: 0, additions: 0, lines: 0};
+    var extensionData = dataset.data.extension;
+    extensionData.forEach(function(d) {
+      if (chosenExtensions.indexOf(d.extension) === -1) {
+        otherExtension.deletions += d.deletions;
+        otherExtension.additions += d.additions;
+        otherExtension.lines += d.lines;
+      }
+    });
+    extensionData = extensionData.filter(function(d) {
+      return chosenExtensions.indexOf(d.extension) !== -1});
+    extensionData.push(otherExtension);
+    var extensionDataset = {data: extensionData, metadata: {}};
+
+    var xScale = new Plottable.OrdinalScale().domain(chosenExtensions);
+    var xAxis  = new Plottable.XAxis(xScale, "bottom", function(d) {return d});
+    var yScale = new Plottable.LinearScale();
+    var yAxis  = new Plottable.YAxis(yScale, "left").showEndTickLabels(true);
+    var renderer  = new Plottable.CategoryBarRenderer(extensionDataset, xScale, yScale, "extension", 50, "lines")
+                          .colorAccessor(makeColorAccessor(extensionColorScale, "extension"));
+
+    var gridlines = new Plottable.Gridlines(null, yScale);
+    var center = renderer.merge(gridlines);
+    var chart  = new Plottable.StandardChart().addCenterComponent(center)
+                    .xAxis(xAxis).yAxis(yAxis);
+    chart.yScale = yScale; // HACK HACK
+    yScale.domain([0, 30000]);
+    chart.data = renderer.data.bind(renderer);
+    chart.renderer = renderer;
+    return chart.classed("sidebar-chart", true).padding(5, 0);
   }
 
   function catChart(dataset) {
@@ -208,7 +242,7 @@ function commitDashboard(dataset) {
                   .titleLabel("# Lines Changed by Contributor");
   lcChart.classed("sidebar-chart", true).padding(5, 0);
 
-  var directoryChart = directoryCatChart().classed("sidebar-chart", true).padding(5, 0);
+  var directoryChart = directoryCatChart();
   var linesOverTimeChart = extensionsTSC();
 
   var clickBar = new Plottable.ClickInteraction(lcChart.renderer);
@@ -231,7 +265,9 @@ function commitDashboard(dataset) {
   clickBar.callback(clickCallback);
   clickBar.registerWithComponent();
 
-  var sideBarCharts = new Plottable.Table([[cdChart], [directoryChart]]).padding(10, 0);
+  var extensionChart = extensionCatChart();
+
+  var sideBarCharts = new Plottable.Table([[extensionChart], [directoryChart]]).padding(10, 0);
   var mainCharts = new Plottable.Table([[commitChart], [linesOverTimeChart]]);
   var masterTable = new Plottable.Table([[mainCharts, sideBarCharts]]);
   masterTable.colWeight(0, 2);
