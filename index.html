@@ -21,15 +21,26 @@
     <script>
       window.onload = function() {
         d3.json("examples/data/gitstats2.json", function(data) {
-          var commits = data.commits;
-          commits.forEach(function(d) {
+          data.commits.forEach(function(d) {
             d.date = new Date(d.date);
             d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
           });
-          var commitDataset = {data: data, metadata: {}};
+          var dataset = {data: data, metadata: {}};
 
-          commitDashboard(commitDataset);
+          // commits = commits.filter(function(c) {
+          //   var changedTS = false;
+          //   c.byExtension.forEach(function(e) {
+          //     if (e.extension === "ts") {
+          //       changedTS = true;
+          //     }
+          //   });
+          //   return changedTS;
+          // });
 
+
+          commitDashboard(dataset);
+
+          var commitDataset = {data: data.commits, metadata: {}};
           var svg = d3.select("#commit-chart");
           sizeSVG(svg);
           commitChart(svg, commitDataset);

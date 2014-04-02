@@ -10,7 +10,12 @@
   font-size: 8pt;
 }
 
+/*.plottable .bar-renderer rect:not(.selected) {
+  opacity: 0.6;
+}*/
+
 .plottable .bar-renderer .selected {
   stroke-width: 2px;
   stroke: black;
+  /*opacity: 1;*/
 }
