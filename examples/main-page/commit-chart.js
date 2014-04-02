@@ -17,8 +17,11 @@ function commitChart(svg, dataset) {
   function colorAccessor(d) { return colorScale.scale(d.name); }
 
   function linesAddedAccessor(d) {
-    var added = d.insertions - d.deletions;
-    return added > 0 ? added : 1;
+    var total = 0;
+    d.changes.forEach(function(c) {
+      total += c.additions - c.deletions;
+    });
+    return total > 0 ? total : 1;
   }
 
 

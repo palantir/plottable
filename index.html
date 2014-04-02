@@ -20,18 +20,20 @@
 
     <script>
       window.onload = function() {
-        d3.json("examples/data/gitstats.json", function(data) {
-          data.forEach(function(d) {
+        d3.json("examples/data/gitstats2.json", function(data) {
+          var commits = data.commits;
+
+          commits.forEach(function(d) {
             d.date = new Date(d.date);
             d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
           });
-          var dataset = {data: data, metadata: {}};
+          var commitDataset = {data: commits, metadata: {}};
 
-          commitDashboard(dataset);
+          commitDashboard(commitDataset);
 
           var svg = d3.select("#commit-chart");
           sizeSVG(svg);
-          commitChart(svg, dataset);
+          commitChart(svg, commitDataset);
         });
       }
     </script>
