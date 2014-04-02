@@ -22,12 +22,11 @@
       window.onload = function() {
         d3.json("examples/data/gitstats2.json", function(data) {
           var commits = data.commits;
-
           commits.forEach(function(d) {
             d.date = new Date(d.date);
             d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
           });
-          var commitDataset = {data: commits, metadata: {}};
+          var commitDataset = {data: data, metadata: {}};
 
           commitDashboard(commitDataset);
 
