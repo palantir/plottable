@@ -26,7 +26,7 @@ function makeCommitDataManager(data) {
     }
 
     processedCommits = [];
-    directoryTimeSeries = {"/": [], "lib": [], "examples": [], "typings": [], "test": []};
+    directoryTimeSeries = {"/": [], "src": [], "lib": [], "examples": [], "typings": [], "test": []};
     linesByContributor = {"danmane": 0, "jlan": 0, "aramaswamy": 0, "derekcicerone": 0};
     linesByDirectory = {"/": 0, "lib": 0, "examples": 0, "typings": 0, "test": 0};
 
@@ -46,7 +46,7 @@ function makeCommitDataManager(data) {
         directoryTimeSeries[d].push([date, linesByDirectory[d]]);
       });
 
-      var directoriesToIterateOver = isDirectoryFilter ? [selector] : directories;
+      var directoriesToIterateOver = isDirectorySelector ? [selector] : directories;
       var lines = 0;
       directoriesToIterateOver.forEach(function(d) {
         l = c.byDirectory[d];
@@ -54,7 +54,7 @@ function makeCommitDataManager(data) {
         lines += l;
       });
       processedCommits.push({name: c.name, date: date, lines: lines});
-      linesByContributor[name] += lc;
+      linesByContributor[c.name] += lines;
     });
 
 

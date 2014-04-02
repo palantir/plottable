@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" media="screen" href="examples/main-page/mainpage-plottable.css">
     <link href="plottable.css" type="text/css" rel="stylesheet" />
     <script src="examples/main-page/commit-dashboard.js"></script>
+    <script src="examples/main-page/commit-dashboard-data-manager.js"></script>
     <script src="lib/d3/d3.min.js"></script>
     <script src="build/plottable.js"></script>
     <script src="examples/exampleUtil.js"></script>
@@ -21,12 +22,13 @@
     <script>
       window.onload = function() {
         d3.json("examples/data/gitstats2.json", function(data) {
-          data.commits.forEach(function(d) {
+          data.forEach(function(d) {
             d.date = new Date(d.date);
             d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
           });
           var dataset = {data: data, metadata: {}};
-
+          var dataManager = makeCommitDataManager(data);
+          // results = dataManager();
           commitDashboard(dataset);
 
           var commitDataset = {data: data.commits, metadata: {}};
