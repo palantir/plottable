@@ -4,6 +4,7 @@
 /// <reference path="scale.ts" />
 //grunt-start
 /// <reference path="axis.ts" />
+/// <reference path="keyEventListener.ts" />
 /// <reference path="interaction.ts" />
 /// <reference path="label.ts" />
 /// <reference path="renderer.ts" />
