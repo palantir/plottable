@@ -4,9 +4,6 @@ function commitDashboard(dataset) {
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
-
-
-
   function makeColorAccessor(s, k) { return function(d) {return s.scale(d[k]);}}
   var colorAccessor = makeColorAccessor(contributorColorScale, "name");
 
@@ -14,7 +11,7 @@ function commitDashboard(dataset) {
 
   var chosenDirectories = ["/", "lib", "src", "examples", "typings", "test"];
 
-  var directoryColorScale = new Plottable.ColorScale("20c")
+  var directoryColorScale = new Plottable.ColorScale("20")
                     .domain(chosenDirectories);
 
   function filterChosenDirectories(d) {return chosenDirectories.indexOf(d.directory) !== -1;}
@@ -25,7 +22,7 @@ function commitDashboard(dataset) {
     return d;
   }
 
-  directoryTimeSeries = {};
+  var directoryTimeSeries = {};
   var directoryTotalLines = {};
   chosenDirectories.forEach(function(d) {
     directoryTimeSeries[d] = [];
@@ -34,18 +31,20 @@ function commitDashboard(dataset) {
 
   commits.forEach(function(c) {
     var commitTime = c.date;
+
     c.byDirectory.forEach(function(d) {
       dir = (d.directory === "") ? "/" : d.directory;
       if (chosenDirectories.indexOf(dir) !== -1) {
         directoryTotalLines[dir] += d.lines;
-        directoryTimeSeries[dir].push({
-          date: commitTime,
-          lines: directoryTotalLines[dir]
-        });
       }
     });
+    chosenDirectories.forEach(function(d) {
+      directoryTimeSeries[d].push({
+        date: commitTime,
+        lines: directoryTotalLines[d]
+      });
+    });
   });
-
   var commitDataset = { data: commits, metadata: {} };
 
   function linesAddedAccessor(d) {
