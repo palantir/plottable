@@ -593,7 +593,33 @@ var Plottable;
         };
 
         OrdinalScale.prototype.widenDomainOnData = function (data, accessor) {
-            this.domain(data.map(accessor));
+            var changed = false;
+            var newDomain = this.domain();
+            var a;
+            if (accessor == null) {
+                a = function (d, i) {
+                    return d;
+                };
+            } else if (typeof (accessor) === "string") {
+                a = function (d, i) {
+                    return d[accessor];
+                };
+            } else if (typeof (accessor) === "function") {
+                a = accessor;
+            } else {
+                a = function (d, i) {
+                    return accessor;
+                };
+            }
+            data.map(a).forEach(function (d) {
+                if (newDomain.indexOf(d) === -1) {
+                    newDomain.push(d);
+                    changed = true;
+                }
+            });
+            if (changed) {
+                this.domain(newDomain);
+            }
             return this;
         };
         return OrdinalScale;
@@ -798,6 +824,47 @@ var Plottable;
         return ColorScale;
     })(Scale);
     Plottable.ColorScale = ColorScale;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var KeyEventListener = (function () {
+        function KeyEventListener() {
+        }
+        KeyEventListener.initialize = function () {
+            if (KeyEventListener.initialized) {
+                return;
+            }
+            d3.select(document).on("keydown", KeyEventListener.processEvent);
+            KeyEventListener.initialized = true;
+        };
+
+        KeyEventListener.addCallback = function (keyCode, cb) {
+            if (!KeyEventListener.initialized) {
+                KeyEventListener.initialize();
+            }
+
+            if (KeyEventListener.callbacks[keyCode] == null) {
+                KeyEventListener.callbacks[keyCode] = [];
+            }
+
+            KeyEventListener.callbacks[keyCode].push(cb);
+        };
+
+        KeyEventListener.processEvent = function () {
+            if (KeyEventListener.callbacks[d3.event.keyCode] == null) {
+                return;
+            }
+
+            KeyEventListener.callbacks[d3.event.keyCode].forEach(function (cb) {
+                cb(d3.event);
+            });
+        };
+        KeyEventListener.initialized = false;
+        KeyEventListener.callbacks = [];
+        return KeyEventListener;
+    })();
+    Plottable.KeyEventListener = KeyEventListener;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
 var Plottable;
@@ -1096,6 +1163,50 @@ var Plottable;
         return ClickInteraction;
     })(Interaction);
     Plottable.ClickInteraction = ClickInteraction;
+
+    var KeyInteraction = (function (_super) {
+        __extends(KeyInteraction, _super);
+        /**
+        * Creates a KeyInteraction.
+        *
+        * @constructor
+        * @param {Component} componentToListenTo The component to listen for keypresses on.
+        * @param {number} keyCode The key code to listen for.
+        */
+        function KeyInteraction(componentToListenTo, keyCode) {
+            _super.call(this, componentToListenTo);
+            this.activated = false;
+            this.keyCode = keyCode;
+        }
+        KeyInteraction.prototype._anchor = function (hitBox) {
+            var _this = this;
+            _super.prototype._anchor.call(this, hitBox);
+            hitBox.on("mouseover", function () {
+                _this.activated = true;
+            });
+            hitBox.on("mouseout", function () {
+                _this.activated = false;
+            });
+
+            Plottable.KeyEventListener.addCallback(this.keyCode, function (e) {
+                if (_this.activated && _this._callback != null) {
+                    _this._callback();
+                }
+            });
+        };
+
+        /**
+        * Sets an callback to be called when the designated key is pressed.
+        *
+        * @param {() => any} cb: Callback to be called.
+        */
+        KeyInteraction.prototype.callback = function (cb) {
+            this._callback = cb;
+            return this;
+        };
+        return KeyInteraction;
+    })(Interaction);
+    Plottable.KeyInteraction = KeyInteraction;
 
     var CrosshairsInteraction = (function (_super) {
         __extends(CrosshairsInteraction, _super);
@@ -2409,6 +2520,7 @@ var Plottable;
 /// <reference path="scale.ts" />
 //grunt-start
 /// <reference path="axis.ts" />
+/// <reference path="keyEventListener.ts" />
 /// <reference path="interaction.ts" />
 /// <reference path="label.ts" />
 /// <reference path="renderer.ts" />

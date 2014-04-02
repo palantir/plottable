@@ -382,6 +382,15 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    interface IKeyEventListenerCallback {
+        (e: D3.Event): any;
+    }
+    class KeyEventListener {
+        static initialize(): void;
+        static addCallback(keyCode: number, cb: IKeyEventListenerCallback): void;
+    }
+}
+declare module Plottable {
     class Interaction {
         public hitBox: D3.Selection;
         public componentToListenTo: Component;
@@ -480,6 +489,22 @@ declare module Plottable {
         * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
         */
         public callback(cb: (x: number, y: number) => any): ClickInteraction;
+    }
+    class KeyInteraction extends Interaction {
+        /**
+        * Creates a KeyInteraction.
+        *
+        * @constructor
+        * @param {Component} componentToListenTo The component to listen for keypresses on.
+        * @param {number} keyCode The key code to listen for.
+        */
+        constructor(componentToListenTo: Component, keyCode: number);
+        /**
+        * Sets an callback to be called when the designated key is pressed.
+        *
+        * @param {() => any} cb: Callback to be called.
+        */
+        public callback(cb: () => any): KeyInteraction;
     }
     class CrosshairsInteraction extends MousemoveInteraction {
         constructor(renderer: NumericXYRenderer);
