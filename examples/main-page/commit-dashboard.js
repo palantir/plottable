@@ -9,6 +9,7 @@ function commitDashboard(dataset) {
     var added = d.insertions + d.deletions;
     return added > 0 ? added : 1;
   }
+
   function commitChart(svg) {
     var xScale = new Plottable.QuantitiveScale(d3.time.scale())
                 .domain([new Date(2014, 0, 20), new Date(2014, 2, 23)]).nice();
@@ -22,8 +23,6 @@ function commitDashboard(dataset) {
 
 
     function radiusAccessor(d) { return rScale.scale(linesAddedAccessor(d)); }
-
-
 
     var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale)
                    .xAccessor("date").yAccessor(hourAccessor)
@@ -43,7 +42,6 @@ function commitDashboard(dataset) {
                     .titleLabel("Commit History");
 
     var ai = new Plottable.AreaInteraction(group).registerWithComponent();
-    chart.renderTo(svg);
     chart.ai = ai;
     chart.renderer = renderer;
     return chart;
@@ -87,25 +85,49 @@ function commitDashboard(dataset) {
     return chart;
   }
 
-  var s1 = d3.select("#commit-chart");
+  var s1 = d3.select("#interactive-demo");
   sizeSVG(s1);
   var commitChart = commitChart(s1);
-  var s2 = d3.select("#commits-by-person");
-  sizeSVG(s2);
+
   var commitData = aggregateByKey(dataset.data, "name");
   var commitDataset = {data: commitData, metadata: {}};
   var cdChart = catChart(commitDataset)
-                          .titleLabel("# of Commits by Contributor")
-                          .renderTo(s2);
-  cdChart.yScale.domain([0, 400]);
+                  .titleLabel("# of Commits by Contributor");
+  cdChart.classed("sidebar-chart", true).padding(5, 0);
 
-  var s3 = d3.select("#lines-changed-contributor");
-  sizeSVG(s3);
   var linesChangedData = aggregateByKey(dataset.data, "name", linesAddedAccessor);
   var lcDataset = {data: linesChangedData, metadata: {}};
-  var lcChart = catChart(lcDataset).titleLabel("# Lines Changed by Contributor").renderTo(s3);
-  lcChart.yScale.nice();
+  var lcChart = catChart(lcDataset)
+                  .titleLabel("# Lines Changed by Contributor");
+  lcChart.classed("sidebar-chart", true).padding(5, 0);
 
+  var clickBar = new Plottable.ClickInteraction(lcChart.renderer);
+  var lastSelected = null;
+  var clickCallback = function(x, y) {
+    lcChart.renderer.deselectAll();
+    var bar = lcChart.renderer.selectBar(x, y);
+    if (bar != null && bar.data()[0].name != lastSelected) {
+      var name = bar.data()[0].name;
+      var newData = dataset.data.filter(function(d) { return d.name === name; });
+      commitChart.renderer.data(newData);
+      lastSelected = name;
+    } else {
+      commitChart.renderer.data(dataset.data);
+      lastSelected = null;
+      lcChart.renderer.deselectAll();
+    }
+    commitChart.renderer._render();
+  };
+  clickBar.callback(clickCallback);
+  clickBar.registerWithComponent();
+
+  var sideBarCharts = new Plottable.Table([[cdChart], [lcChart]]).padding(10, 0);
+  var masterTable = new Plottable.Table([[commitChart, sideBarCharts]]);
+  masterTable.colWeight(0, 2);
+  masterTable.renderTo(s1);
+
+  cdChart.yScale.domain([0, 400]);
+  lcChart.yScale.nice();
 
   function interactionCallback(pixelArea) {
     var renderer = commitChart.renderer;
@@ -123,7 +145,7 @@ function commitDashboard(dataset) {
     lcChart._render();
     cdChart._render();
   }
-  commitChart.ai.callback(interactionCallback);
+  // commitChart.ai.callback(interactionCallback);
 }
 
 function sizeSVG(svg) {
@@ -131,15 +153,4 @@ function sizeSVG(svg) {
   svg.attr("width", width);
   var height = Math.min(width*.75, 600);
   svg.attr("height", height);
-}
-
-window.onload = function() {
-  d3.json("examples/data/gitstats.json", function(data) {
-    data.forEach(function(d) {
-      d.date = new Date(d.date);
-      d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
-    });
-    var dataset = {data: data, metadata: {}};
-    commitDashboard(dataset);
-  });
 }

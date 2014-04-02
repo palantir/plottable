@@ -16,6 +16,26 @@
 
     <script src="/examples/main-page/commit-chart-shared.js"></script>
 
+    <script src="/examples/main-page/commit-chart.js"></script>
+
+    <script>
+      window.onload = function() {
+        d3.json("examples/data/gitstats.json", function(data) {
+          data.forEach(function(d) {
+            d.date = new Date(d.date);
+            d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
+          });
+          var dataset = {data: data, metadata: {}};
+
+          commitDashboard(dataset);
+
+          var svg = d3.select("#commit-chart");
+          sizeSVG(svg);
+          commitChart(svg, dataset);
+        });
+      }
+    </script>
+
     <title>Plottable</title>
   </head>
 
@@ -35,9 +55,17 @@
         <h3>
 
 <pre>
+  <svg id="interactive-demo" width="95%"></svg>
+</pre>
+
+<svg height="200px" width="100px"></svg>
+
+<pre>
   <svg id="commit-chart" width="95%"></svg>
 </pre>
 <a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/master/examples/jsfiddle/commitTimeChart"><h5>(Click here to open the chart on JSFiddle!)</h5></a>
+
+<!--
 <svg height="200px" width="100px"></svg>
 <pre>
   <svg id="commits-by-person" width="95%"></svg>
@@ -50,7 +78,7 @@
 </pre>
 <a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/master/examples/jsfiddle/commitLineChart"><h5>(Click here to open the chart on JSFiddle!)</h5></a>
 <svg height="200px" width="100px"></svg>
-
+-->
       </section>
     </div>
 
