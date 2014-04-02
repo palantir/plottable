@@ -27,17 +27,6 @@
           });
           var dataset = {data: data, metadata: {}};
 
-          // commits = commits.filter(function(c) {
-          //   var changedTS = false;
-          //   c.byExtension.forEach(function(e) {
-          //     if (e.extension === "ts") {
-          //       changedTS = true;
-          //     }
-          //   });
-          //   return changedTS;
-          // });
-
-
           commitDashboard(dataset);
 
           var commitDataset = {data: data.commits, metadata: {}};

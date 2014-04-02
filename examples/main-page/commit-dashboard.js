@@ -12,24 +12,37 @@ function commitDashboard(dataset) {
 
   var commits = dataset.data.commits.sort(function(ca, cb) { return ca.date - cb.date });
 
-  var extensions = dataset.data.extension.map(function(e) { return e.extension; });
-  var extensionColorScale = new Plottable.ColorScale("Category20").domain(extensions);
-  var extensionTimeSeries = {};
-  var totalLines = {};
-  extensions.forEach(function(e) {
-    extensionTimeSeries[e] = [];
-    totalLines[e] = 0;
+  var chosenDirectories = ["/", "lib", "src", "examples", "typings", "test"];
+
+  var directoryColorScale = new Plottable.ColorScale("20c")
+                    .domain(chosenDirectories);
+
+  function filterChosenDirectories(d) {return chosenDirectories.indexOf(d.directory) !== -1;}
+  function labelRootDirectory(d) {
+    if (d.directory === "") {
+      d.directory = "/";
+    }
+    return d;
+  }
+
+  directoryTimeSeries = {};
+  var directoryTotalLines = {};
+  chosenDirectories.forEach(function(d) {
+    directoryTimeSeries[d] = [];
+    directoryTotalLines[d] = 0;
   });
 
   commits.forEach(function(c) {
     var commitTime = c.date;
-
-    c.byExtension.forEach(function(e) {
-      totalLines[e.extension] += e.lines;
-      extensionTimeSeries[e.extension].push({
-        date: commitTime,
-        lines: totalLines[e.extension]
-      });
+    c.byDirectory.forEach(function(d) {
+      dir = (d.directory === "") ? "/" : d.directory;
+      if (chosenDirectories.indexOf(dir) !== -1) {
+        directoryTotalLines[dir] += d.lines;
+        directoryTimeSeries[dir].push({
+          date: commitTime,
+          lines: directoryTotalLines[dir]
+        });
+      }
     });
   });
 
@@ -61,20 +74,17 @@ function commitDashboard(dataset) {
     var yAxis = new Plottable.YAxis(yScale, "left");
     var timeChart = new Plottable.StandardChart().xAxis(xAxis).yAxis(yAxis);
 
-    // var tsDataset = { data: extensionTimeSeries["ts"], metadata:{} };
-    // var renderer = new Plottable.LineRenderer(tsDataset, xScale, yScale).xAccessor("date").yAccessor("lines");
-    extensions.forEach(function(e) {
+    chosenDirectories.forEach(function(dir) {
       var tsDataset = {
-        data: extensionTimeSeries[e],
+        data: directoryTimeSeries[dir],
         metadata: {}
       };
       var renderer = new Plottable.LineRenderer(tsDataset, xScale, yScale)
                             .xAccessor("date")
                             .yAccessor("lines")
-                            // .colorAccessor(extensionColorScale.scale(e));
+                            .colorAccessor(function(d) { return directoryColorScale.scale(dir); });
       timeChart.addCenterComponent(renderer);
     });
-    // timeChart.addCenterComponent(renderer);
     return timeChart;
   }
 
@@ -134,21 +144,10 @@ function commitDashboard(dataset) {
   }
 
   function directoryCatChart() {
-    var chosenDirectories = ["/", "lib", "src", "examples", "typings", "test"];
+    var xScale = new Plottable.OrdinalScale()
+                  .domain(chosenDirectories);
 
-    var directoryColorScale = new Plottable.ColorScale("20c")
-                      .domain(chosenDirectories);
-
-
-    function filterFn(d) {return chosenDirectories.indexOf(d.directory) !== -1;}
-    function xformFn(d) {
-      if (d.directory === "") {
-        d.directory = "/";
-      }
-      return d;
-    }
-
-    var directoryData = dataset.data.directory.map(xformFn).filter(filterFn);
+    var directoryData = dataset.data.directory.map(labelRootDirectory).filter(filterChosenDirectories);
     var directoryDataset = {data: directoryData, metadata: {}};
 
     var xScale = new Plottable.OrdinalScale().domain(chosenDirectories);
@@ -229,9 +228,9 @@ function commitDashboard(dataset) {
   sizeSVG(s1);
   var commitChart = commitChart(s1);
 
-  var commitData = aggregateByKey(dataset.data.commits, "name");
-  var commitDataset = {data: commitData, metadata: {}};
-  var cdChart = catChart(commitDataset)
+  var contributorData = aggregateByKey(dataset.data.commits, "name");
+  var contributorDatset = {data: contributorData, metadata: {}};
+  var cdChart = catChart(contributorDatset)
                   .titleLabel("# of Commits by Contributor");
   cdChart.classed("sidebar-chart", true).padding(5, 0);
 
