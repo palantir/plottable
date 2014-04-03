@@ -178,10 +178,13 @@ function commitDashboard(dataManager, svg) {
     directoryBarYScale.domain([0, 0]);
     directoryBarRenderer.autorange();
 
+    timeScale.domain([startDate, endDate]).nice();
+    tscPanZoom.resetZoom();
     dashboardTable._render();
   }
-  // var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderers["/"], timeScale, tscYScale);
-  // tscPanZoom.registerWithComponent();
+  var dummyScale = new Plottable.LinearScale();
+  var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderArea, timeScale, dummyScale);
+  tscPanZoom.registerWithComponent();
   var contributorClick = new Plottable.ClickInteraction(contributorBarRenderer);
   var lastContributor = null;
   var contributorClickCallback = function(x, y) {

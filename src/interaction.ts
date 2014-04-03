@@ -63,6 +63,15 @@ module Plottable {
       this.zoom.on("zoom", () => this.rerenderZoomed());
     }
 
+    public resetZoom() {
+      // HACKHACK #254
+      this.zoom = d3.behavior.zoom();
+      this.zoom.x(this.xScale._d3Scale);
+      this.zoom.y(this.yScale._d3Scale);
+      this.zoom.on("zoom", () => this.rerenderZoomed());
+      this.zoom(this.hitBox);
+    }
+
     public _anchor(hitBox: D3.Selection) {
       super._anchor(hitBox);
       this.zoom(hitBox);
