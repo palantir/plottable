@@ -5,6 +5,8 @@ function commitDashboard(dataManager, svg) {
    * +----+-------------+---------+------+
    * | y1 | Scatterplot | Legend1 | bar1 |
    * +----+-------------+---------+------+
+   * |    |  time axis  |         |      |
+   * +----+-------------+---------+------+
    * | y2 |  Timeseries | Legend2 | bar2 |
    * +----+-------------+---------+------+
    * |    |  time axis  |         |      |
@@ -159,6 +161,10 @@ function commitDashboard(dataManager, svg) {
   resetDomains();
 
   // ----- Interactions -----
+  var dummyScale = new Plottable.LinearScale();
+  var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderArea, timeScale, dummyScale);
+  tscPanZoom.registerWithComponent();
+
   function updateData(filter) {
     var newData = dataManager(filter);
 
@@ -182,9 +188,7 @@ function commitDashboard(dataManager, svg) {
     tscPanZoom.resetZoom();
     dashboardTable._render();
   }
-  var dummyScale = new Plottable.LinearScale();
-  var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderArea, timeScale, dummyScale);
-  tscPanZoom.registerWithComponent();
+
   var contributorClick = new Plottable.ClickInteraction(contributorBarRenderer);
   var lastContributor = null;
   var contributorClickCallback = function(x, y) {
