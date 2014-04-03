@@ -10,6 +10,9 @@
   font-size: 8pt;
 }
 
+.plottable .legend-label text {
+  font-size: 20pt;
+}
 /*.plottable .bar-renderer rect:not(.selected) {
   opacity: 0.6;
 }*/
