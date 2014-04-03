@@ -64,11 +64,8 @@ function commitDashboard(dataManager, svg) {
 
   var tscRenderArea = new Plottable.Gridlines(timeScale, tscYScale);
   var tscRenderers = {};
-  var maxLines = 0;
   dataManager.directories.forEach(function(dir) {
     var timeSeries = directoryTimeSeries[dir];
-    var lastValue = timeSeries[timeSeries.length-1][1];
-    maxLines = Math.max(lastValue, maxLines);
     var directoryDataset = {
       data: timeSeries,
       metadata: {}
@@ -113,7 +110,7 @@ function commitDashboard(dataManager, svg) {
                                                                  contributorBarYScale);
   contributorBarRenderer.widthAccessor(40);
   contributorBarRenderer.colorAccessor(function(d) { return contributorColorScale.scale(d.name); });
-  contributorBarRenderer.xAccessor("name").yAccessor("lines");
+  contributorBarRenderer.xAccessor("name").yAccessor(linesAddedAccessor);
   var contributorGridlines = new Plottable.Gridlines(null, contributorBarYScale);
   var contributorBarChart = new Plottable.Table([
     [contributorBarRenderer.merge(contributorGridlines), contributorBarYAxis],
@@ -132,19 +129,13 @@ function commitDashboard(dataManager, svg) {
                                                                directoryBarYScale);
   directoryBarRenderer.widthAccessor(40);
   directoryBarRenderer.colorAccessor(function(d) { return directoryColorScale.scale(d.directory); });
-  directoryBarRenderer.xAccessor("directory").yAccessor("lines");
+  directoryBarRenderer.xAccessor("directory").yAccessor(linesAddedAccessor);
   var directoryGridlines = new Plottable.Gridlines(null, directoryBarYScale);
   var directoryBarChart = new Plottable.Table([
     [directoryBarRenderer.merge(directoryGridlines), directoryBarYAxis],
     [directoryBarXAxis, null]
   ]);
   // ----- /Bar2 -----
-
-  // ----- Interactions -----
-  // var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderers["/"], timeScale, tscYScale);
-  // tscPanZoom.registerWithComponent();
-
-  // ----- /Interactions -----
 
   // ---- Assemble! -----
   var dashboardTable = new Plottable.Table([
@@ -153,7 +144,7 @@ function commitDashboard(dataManager, svg) {
     [tscYAxis,     tscRenderArea,     directoryLegendTable,   directoryBarChart  ],
     [null,         tscDateAxis,       null,                   null               ]
   ]);
-  dashboardTable.padding(10, 10);
+  dashboardTable.padding(0, 10);
   dashboardTable.colWeight(1, 3);
   dashboardTable.colWeight(2, 0);
   dashboardTable.renderTo(svg);
@@ -166,4 +157,43 @@ function commitDashboard(dataManager, svg) {
   }
 
   resetDomains();
+
+  // ----- Interactions -----
+  function updateData(filter) {
+    var newData = dataManager(filter);
+
+    scatterRenderer.data(newData.commits);
+
+    dataManager.directories.forEach(function(dir) {
+      var timeSeries = newData.directoryTimeSeries[dir];
+      var directoryDataset = {
+        data: timeSeries,
+        metadata: {}
+      };
+      tscRenderers[dir].data(directoryDataset);
+    });
+
+    contributorBarRenderer.data(newData.linesByContributor);
+
+    directoryBarRenderer.data(newData.linesByDirectory);
+  }
+  // var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderers["/"], timeScale, tscYScale);
+  // tscPanZoom.registerWithComponent();
+  var contributorClick = new Plottable.ClickInteraction(contributorBarRenderer);
+  var lastContributor = null;
+  var contributorClickCallback = function(x, y) {
+    contributorBarRenderer.deselectAll();
+    var bar = contributorBarRenderer.selectBar(x, y);
+    if (bar != null && bar.data()[0].name != lastContributor) {
+      lastContributor = bar.data()[0].name;
+    } else {
+      lastContributor = null;
+      contributorBarRenderer.deselectAll();
+    }
+    updateData(lastContributor);
+    dashboardTable._render();
+  };
+  contributorClick.callback(contributorClickCallback).registerWithComponent();
+
+  // ----- /Interactions -----
 }
