@@ -15,7 +15,7 @@ module Plottable {
      * @param {IAccessor} [widthAccessor] A function for extracting the width position of each bar, in pixels, from the data.
      * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
      */
-    constructor(dataset: IDataset,
+    constructor(dataset: any,
             xScale: OrdinalScale,
             yScale: QuantitiveScale,
             xAccessor?: IAccessor,

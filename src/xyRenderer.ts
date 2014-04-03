@@ -19,7 +19,7 @@ module Plottable {
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      */
-    constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+    constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
       super(dataset);
       this.classed("xy-renderer", true);
 

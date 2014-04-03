@@ -16,7 +16,7 @@ module Plottable {
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
      */
-    constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale,
+    constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: any, yAccessor?: any, rAccessor?: any) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;

@@ -18,7 +18,7 @@ module Plottable {
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      */
-    constructor(dataset: IDataset,
+    constructor(dataset: any,
                 xScale: OrdinalScale,
                 yScale: QuantitiveScale,
                 xAccessor?: IAccessor,

@@ -29,14 +29,21 @@ module Plottable {
      * @constructor
      * @param {IDataset} [dataset] The dataset associated with the Renderer.
      */
-    constructor(dataset?: IDataset) {
+    constructor(dataset?: any) {
       super();
       this.clipPathEnabled = true;
       this._fixedWidth = false;
       this._fixedHeight = false;
       this.classed("renderer", true);
       if (dataset != null) {
-        this.dataset(dataset);
+        if (dataset.data == null) {
+          this.data(dataset);
+        } else {
+          this.data(dataset.data);
+          if (dataset.metadata != null) {
+            this.metadata(dataset.metadata);
+          }
+        }
       }
       this.colorAccessor(Renderer.defaultColorAccessor);
     }

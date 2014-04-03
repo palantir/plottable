@@ -18,7 +18,7 @@ module Plottable {
      * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
      * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
      */
-    constructor(dataset: IDataset,
+    constructor(dataset: any,
                 xScale: QuantitiveScale,
                 yScale: QuantitiveScale,
                 xAccessor?: IAccessor,
