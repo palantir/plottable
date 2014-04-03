@@ -28,7 +28,7 @@ function makeCommitDataManager(data) {
     processedCommits = [];
     directoryTimeSeries = {"/": [], "src": [], "lib": [], "examples": [], "typings": [], "test": []};
     linesByContributorObj = {"danmane": 0, "jlan": 0, "aramaswamy": 0, "derekcicerone": 0};
-    linesByDirectoryObj = {"/": 0, "lib": 0, "examples": 0, "typings": 0, "test": 0};
+    linesByDirectoryObj = {"/": 0, "src": 0, "lib": 0, "examples": 0, "typings": 0, "test": 0};
 
     data.forEach(function(c) {
       var date = c.date;
