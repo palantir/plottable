@@ -20,6 +20,14 @@
     <script src="/examples/main-page/commit-chart.js"></script>
 
     <script>
+      function sizeSVG(svg) {
+        var width = Plottable.Utils.getSVGPixelWidth(svg);
+        svg.attr("width", width);
+        var height = Math.min(width*.75, 600);
+        svg.attr("height", height);
+        return svg;
+      }
+
       window.onload = function() {
         d3.json("examples/data/gitstats2.json", function(data) {
           data.forEach(function(d) {
@@ -29,12 +37,13 @@
           var dataset = {data: data, metadata: {}};
           var dataManager = makeCommitDataManager(data);
           // results = dataManager();
-          commitDashboard(dataset);
+          var interactiveSVG = sizeSVG(d3.select("#interactive-demo"));
+          commitDashboard(dataManager, interactiveSVG);
 
-          var commitDataset = {data: data.commits, metadata: {}};
-          var svg = d3.select("#commit-chart");
-          sizeSVG(svg);
-          commitChart(svg, commitDataset);
+          // var commitDataset = {data: data.commits, metadata: {}};
+          // var svg = d3.select("#commit-chart");
+          // sizeSVG(svg);
+          // commitChart(svg, commitDataset);
         });
       }
     </script>
