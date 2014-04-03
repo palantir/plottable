@@ -423,6 +423,7 @@ declare module Plottable {
         * @param {QuantitiveScale} yScale The Y scale to update on panning/zooming.
         */
         constructor(componentToListenTo: Component, xScale: QuantitiveScale, yScale: QuantitiveScale);
+        public resetZoom(): void;
     }
     class AreaInteraction extends Interaction {
         /**
@@ -548,7 +549,7 @@ declare module Plottable {
         * @constructor
         * @param {IDataset} [dataset] The dataset associated with the Renderer.
         */
-        constructor(dataset?: IDataset);
+        constructor(dataset?: any);
         /**
         * Sets a new dataset on the Renderer.
         *
@@ -578,7 +579,7 @@ declare module Plottable {
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: IDataset, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor);
         public xAccessor(accessor: any): XYRenderer;
         public yAccessor(accessor: any): XYRenderer;
         /**
@@ -604,7 +605,7 @@ declare module Plottable {
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
         *
@@ -641,7 +642,7 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: any, yAccessor?: any, rAccessor?: any);
+        constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: any, yAccessor?: any, rAccessor?: any);
         public rAccessor(a: any): CircleRenderer;
     }
 }
@@ -657,7 +658,7 @@ declare module Plottable {
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
     }
 }
 declare module Plottable {
@@ -675,7 +676,7 @@ declare module Plottable {
         * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
-        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
         public autorange(): BarRenderer;
     }
 }
@@ -692,7 +693,7 @@ declare module Plottable {
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor);
+        constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor);
         public rAccessor(a: any): SquareRenderer;
     }
 }
@@ -814,7 +815,7 @@ declare module Plottable {
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: IDataset, xScale: OrdinalScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: OrdinalScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor);
     }
 }
 declare module Plottable {
@@ -830,7 +831,7 @@ declare module Plottable {
         * @param {IAccessor} [widthAccessor] A function for extracting the width position of each bar, in pixels, from the data.
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
-        constructor(dataset: IDataset, xScale: OrdinalScale, yScale: QuantitiveScale, xAccessor?: IAccessor, widthAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: OrdinalScale, yScale: QuantitiveScale, xAccessor?: IAccessor, widthAccessor?: IAccessor, yAccessor?: IAccessor);
         /**
         * Sets the width accessor.
         *

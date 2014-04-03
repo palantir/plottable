@@ -1647,8 +1647,8 @@ describe("Renderers", function () {
                 };
 
                 renderer = new Plottable.CategoryBarRenderer(dataset, xScale, yScale);
-                renderer._anchor(svg);
-                renderer._computeLayout();
+                renderer._animate = false;
+                renderer.renderTo(svg);
             });
 
             beforeEach(function () {

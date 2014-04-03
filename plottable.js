@@ -917,6 +917,18 @@ var Plottable;
                 return _this.rerenderZoomed();
             });
         }
+        PanZoomInteraction.prototype.resetZoom = function () {
+            var _this = this;
+            // HACKHACK #254
+            this.zoom = d3.behavior.zoom();
+            this.zoom.x(this.xScale._d3Scale);
+            this.zoom.y(this.yScale._d3Scale);
+            this.zoom.on("zoom", function () {
+                return _this.rerenderZoomed();
+            });
+            this.zoom(this.hitBox);
+        };
+
         PanZoomInteraction.prototype._anchor = function (hitBox) {
             _super.prototype._anchor.call(this, hitBox);
             this.zoom(hitBox);
@@ -1405,6 +1417,8 @@ var Plottable;
         */
         function Renderer(dataset) {
             _super.call(this);
+            this._animate = false;
+            this._hasRendered = false;
             this._rerenderUpdateSelection = false;
             // A perf-efficient manner of rendering would be to calculate attributes only
             // on new nodes, and assume that old nodes (ie the update selection) can
@@ -1417,7 +1431,14 @@ var Plottable;
             this._fixedHeight = false;
             this.classed("renderer", true);
             if (dataset != null) {
-                this.dataset(dataset);
+                if (dataset.data == null) {
+                    this.data(dataset);
+                } else {
+                    this.data(dataset.data);
+                    if (dataset.metadata != null) {
+                        this.metadata(dataset.metadata);
+                    }
+                }
             }
             this.colorAccessor(Renderer.defaultColorAccessor);
         }
@@ -1450,6 +1471,7 @@ var Plottable;
         };
 
         Renderer.prototype._render = function () {
+            this._hasRendered = true;
             this._paint();
             this._requireRerender = false;
             this._rerenderUpdateSelection = false;
@@ -1550,6 +1572,7 @@ var Plottable;
         };
 
         XYRenderer.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+            this._hasRendered = false;
             _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
             this.xScale.range([0, this.availableWidth]);
             this.yScale.range([this.availableHeight, 0]);
@@ -1580,7 +1603,7 @@ var Plottable;
         };
 
         XYRenderer.prototype.rescale = function () {
-            if (this.element != null) {
+            if (this.element != null && this._hasRendered) {
                 this._render();
             }
         };
@@ -2430,6 +2453,7 @@ var Plottable;
         function CategoryBarRenderer(dataset, xScale, yScale, xAccessor, widthAccessor, yAccessor) {
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
             this.classed("bar-renderer", true);
+            this._animate = true;
             this._widthAccessor = (widthAccessor != null) ? widthAccessor : 10; // default width is 10px
         }
         /**
@@ -2450,13 +2474,13 @@ var Plottable;
             _super.prototype._paint.call(this);
             var yRange = this.yScale.range();
             var maxScaledY = Math.max(yRange[0], yRange[1]);
+            var xA = this._getAppliedAccessor(this._xAccessor);
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._data, xA);
             this.dataSelection.enter().append("rect");
 
             var widthFunction = this._getAppliedAccessor(this._widthAccessor);
 
-            var xA = this._getAppliedAccessor(this._xAccessor);
             var xFunction = function (d, i) {
                 var x = xA(d, i);
                 var scaledX = _this.xScale.scale(x);
@@ -2474,7 +2498,11 @@ var Plottable;
                 return maxScaledY - yFunction(d, i);
             };
 
-            this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", this._getAppliedAccessor(this._colorAccessor));
+            var updateSelection = this.dataSelection;
+            if (this._animate) {
+                updateSelection = updateSelection.transition();
+            }
+            updateSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", this._getAppliedAccessor(this._colorAccessor));
             this.dataSelection.exit().remove();
         };
 
