@@ -156,6 +156,15 @@ p img {
   border: none;
 }
 
+.outer-block {
+  background-color: #CCC;
+  padding: 20px;
+}
+.background-block {
+  padding: 10px;
+  background-color: #fff;
+}
+
 pre, code {
   width: 100%;
   color: #222;
