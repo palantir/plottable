@@ -239,4 +239,45 @@ describe("Interactions", () => {
       svg.remove();
     });
   });
+
+  describe("KeyInteraction", () => {
+    it("Triggers the callback only when the Component is moused over and appropriate key is pressed", () => {
+      var svg = generateSVG(400, 400);
+      // svg.attr("id", "key-interaction-test");
+      var component = new Plottable.Component();
+      component.renderTo(svg);
+
+      var code = 65; // "a" key
+      var ki = new Plottable.KeyInteraction(component, code);
+
+      var callbackCalled = false;
+      var callback = () => {
+        callbackCalled = true;
+      };
+
+      ki.callback(callback);
+      ki.registerWithComponent();
+
+      var $hitbox = $((<any> component).hitBox.node());
+
+      $hitbox.simulate("keydown", { keyCode: code });
+      assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (before mouseover)");
+
+      $hitbox.simulate("mouseover");
+
+      $hitbox.simulate("keydown", { keyCode: code });
+      assert.isTrue(callbackCalled, "callback gets called if the appropriate key is pressed while the component has mouse focus");
+
+      callbackCalled = false;
+      $hitbox.simulate("keydown", { keyCode: (code + 1) });
+      assert.isFalse(callbackCalled, "callback is not called if the wrong key is pressed");
+
+      $hitbox.simulate("mouseout");
+
+      $hitbox.simulate("keydown", { keyCode: code });
+      assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (after mouseout)");
+
+      svg.remove();
+    });
+  });
 });

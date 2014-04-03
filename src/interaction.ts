@@ -63,6 +63,15 @@ module Plottable {
       this.zoom.on("zoom", () => this.rerenderZoomed());
     }
 
+    public resetZoom() {
+      // HACKHACK #254
+      this.zoom = d3.behavior.zoom();
+      this.zoom.x(this.xScale._d3Scale);
+      this.zoom.y(this.yScale._d3Scale);
+      this.zoom.on("zoom", () => this.rerenderZoomed());
+      this.zoom(this.hitBox);
+    }
+
     public _anchor(hitBox: D3.Selection) {
       super._anchor(hitBox);
       this.zoom(hitBox);
@@ -256,8 +265,88 @@ module Plottable {
     }
   }
 
+
+  export class ClickInteraction extends Interaction {
+    private _callback: (x: number, y:number) => any;
+
+    /**
+     * Creates a ClickInteraction.
+     *
+     * @constructor
+     * @param {Component} componentToListenTo The component to listen for clicks on.
+     */
+    constructor(componentToListenTo: Component) {
+      super(componentToListenTo);
+    }
+
+    public _anchor(hitBox: D3.Selection) {
+      super._anchor(hitBox);
+      hitBox.on("click", () => {
+        var xy = d3.mouse(hitBox.node());
+        var x = xy[0];
+        var y = xy[1];
+        this._callback(x, y);
+      });
+    }
+
+    /**
+     * Sets an callback to be called when a click is received.
+     *
+     * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
+     */
+    public callback(cb: (x: number, y: number) => any): ClickInteraction {
+      this._callback = cb;
+      return this;
+    }
+  }
+
+  export class KeyInteraction extends Interaction {
+    private _callback: () => any;
+    private activated = false;
+    private keyCode: number;
+
+    /**
+     * Creates a KeyInteraction.
+     *
+     * @constructor
+     * @param {Component} componentToListenTo The component to listen for keypresses on.
+     * @param {number} keyCode The key code to listen for.
+     */
+    constructor(componentToListenTo: Component, keyCode: number) {
+      super(componentToListenTo);
+      this.keyCode = keyCode;
+    }
+
+    public _anchor(hitBox: D3.Selection) {
+      super._anchor(hitBox);
+      hitBox.on("mouseover", () => {
+        this.activated = true;
+      });
+      hitBox.on("mouseout", () => {
+        this.activated = false;
+      });
+
+      Plottable.KeyEventListener.addCallback(this.keyCode, (e: D3.Event) => {
+        if (this.activated && this._callback != null) {
+          this._callback();
+        }
+      });
+    }
+
+    /**
+     * Sets an callback to be called when the designated key is pressed.
+     *
+     * @param {() => any} cb: Callback to be called.
+     */
+    public callback(cb: () => any): KeyInteraction {
+      this._callback = cb;
+      return this;
+    }
+  }
+
+
   export class CrosshairsInteraction extends MousemoveInteraction {
-    private renderer: XYRenderer;
+    private renderer: NumericXYRenderer;
 
     private circle: D3.Selection;
     private xLine: D3.Selection;
@@ -265,7 +354,7 @@ module Plottable {
     private lastx: number;
     private lasty: number;
 
-    constructor(renderer: XYRenderer) {
+    constructor(renderer: NumericXYRenderer) {
       super(renderer);
       this.renderer = renderer;
       renderer.xScale.registerListener(() => this.rescale());
@@ -286,12 +375,14 @@ module Plottable {
       this.lasty = y;
       var domainX = this.renderer.xScale.invert(x);
       var data = this.renderer._data;
-      var dataIndex = OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
+      var xA = this.renderer._getAppliedAccessor(this.renderer._xAccessor);
+      var yA = this.renderer._getAppliedAccessor(this.renderer._yAccessor);
+      var dataIndex = OSUtils.sortedIndex(domainX, data, xA);
       dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
       var dataPoint = data[dataIndex];
 
-      var dataX = this.renderer.xAccessor(dataPoint);
-      var dataY = this.renderer.yAccessor(dataPoint);
+      var dataX = xA(dataPoint, dataIndex);
+      var dataY = yA(dataPoint, dataIndex);
       var pixelX = this.renderer.xScale.scale(dataX);
       var pixelY = this.renderer.yScale.scale(dataY);
       this.circle.attr("cx", pixelX).attr("cy", pixelY);

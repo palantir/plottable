@@ -1,5 +1,5 @@
 /*!
-Plottable v0.5.1 (https://github.com/palantir/plottable)
+Plottable v0.7.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -480,11 +480,12 @@ var Plottable;
     var Scale = (function () {
         /**
         * Creates a new Scale.
+        *
         * @constructor
         * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
         */
         function Scale(scale) {
-            this.broadcasterCallbacks = [];
+            this._broadcasterCallbacks = [];
             this._d3Scale = scale;
         }
         /**
@@ -503,7 +504,7 @@ var Plottable;
                 return this._d3Scale.domain();
             } else {
                 this._d3Scale.domain(values);
-                this.broadcasterCallbacks.forEach(function (b) {
+                this._broadcasterCallbacks.forEach(function (b) {
                     return b(_this);
                 });
                 return this;
@@ -521,6 +522,7 @@ var Plottable;
 
         /**
         * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+        *
         * @returns {Scale} A copy of the calling Scale.
         */
         Scale.prototype.copy = function () {
@@ -529,21 +531,106 @@ var Plottable;
 
         /**
         * Registers a callback to be called when the scale's domain is changed.
+        *
         * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
         * @returns {Scale} The Calling Scale.
         */
         Scale.prototype.registerListener = function (callback) {
-            this.broadcasterCallbacks.push(callback);
+            this._broadcasterCallbacks.push(callback);
+            return this;
+        };
+
+        /**
+        * Expands the Scale's domain to cover the data given.
+        * Passes an accessor through to the native d3 code.
+        *
+        * @param data The data to operate on.
+        * @param [accessor] The accessor to get values out of the data
+        * @returns {Scale} The Scale.
+        */
+        Scale.prototype.widenDomainOnData = function (data, accessor) {
+            // no-op; implementation is sublcass-dependent
             return this;
         };
         return Scale;
     })();
     Plottable.Scale = Scale;
 
+    var OrdinalScale = (function (_super) {
+        __extends(OrdinalScale, _super);
+        /**
+        * Creates a new OrdinalScale. Domain and Range are set later.
+        *
+        * @constructor
+        */
+        function OrdinalScale() {
+            _super.call(this, d3.scale.ordinal());
+            this.END_PADDING = 0.5;
+            this._range = [0, 1];
+        }
+        OrdinalScale.prototype.domain = function (values) {
+            var _this = this;
+            if (values == null) {
+                return this._d3Scale.domain();
+            } else {
+                this._d3Scale.domain(values);
+                this._broadcasterCallbacks.forEach(function (b) {
+                    return b(_this);
+                });
+                this._d3Scale.rangePoints(this.range(), 2 * this.END_PADDING); // d3 scale takes total padding
+                return this;
+            }
+        };
+
+        OrdinalScale.prototype.range = function (values) {
+            if (values == null) {
+                return this._range;
+            } else {
+                this._range = values;
+                this._d3Scale.rangePoints(values, 2 * this.END_PADDING); // d3 scale takes total padding
+                return this;
+            }
+        };
+
+        OrdinalScale.prototype.widenDomainOnData = function (data, accessor) {
+            var changed = false;
+            var newDomain = this.domain();
+            var a;
+            if (accessor == null) {
+                a = function (d, i) {
+                    return d;
+                };
+            } else if (typeof (accessor) === "string") {
+                a = function (d, i) {
+                    return d[accessor];
+                };
+            } else if (typeof (accessor) === "function") {
+                a = accessor;
+            } else {
+                a = function (d, i) {
+                    return accessor;
+                };
+            }
+            data.map(a).forEach(function (d) {
+                if (newDomain.indexOf(d) === -1) {
+                    newDomain.push(d);
+                    changed = true;
+                }
+            });
+            if (changed) {
+                this.domain(newDomain);
+            }
+            return this;
+        };
+        return OrdinalScale;
+    })(Scale);
+    Plottable.OrdinalScale = OrdinalScale;
+
     var QuantitiveScale = (function (_super) {
         __extends(QuantitiveScale, _super);
         /**
         * Creates a new QuantitiveScale.
+        *
         * @constructor
         * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
         */
@@ -553,6 +640,7 @@ var Plottable;
         }
         /**
         * Retrieves the domain value corresponding to a supplied range value.
+        *
         * @param {number} value: A value from the Scale's range.
         * @returns {number} The domain value corresponding to the supplied range value.
         */
@@ -562,6 +650,7 @@ var Plottable;
 
         /**
         * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
+        *
         * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
         */
         QuantitiveScale.prototype.copy = function () {
@@ -570,7 +659,8 @@ var Plottable;
 
         /**
         * Expands the QuantitiveScale's domain to cover the new region.
-        * @param {number} newDomain The additional domain to be covered by the QuantitiveScale.
+        *
+        * @param {number[]} newDomain The additional domain to be covered by the QuantitiveScale.
         * @returns {QuantitiveScale} The scale.
         */
         QuantitiveScale.prototype.widenDomain = function (newDomain) {
@@ -583,8 +673,9 @@ var Plottable;
         /**
         * Expands the QuantitiveScale's domain to cover the data given.
         * Passes an accessor through to the native d3 code.
+        *
         * @param data The data to operate on.
-        * @param [accessor] The accessor to get values out of the data
+        * @param [accessor] The accessor to get values out of the data.
         * @returns {QuantitiveScale} The scale.
         */
         QuantitiveScale.prototype.widenDomainOnData = function (data, accessor) {
@@ -632,6 +723,7 @@ var Plottable;
 
         /**
         * Generates tick values.
+        *
         * @param {number} [count] The number of ticks to generate.
         * @returns {any[]} The generated ticks.
         */
@@ -679,6 +771,7 @@ var Plottable;
         }
         /**
         * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
+        *
         * @returns {LinearScale} A copy of the calling LinearScale.
         */
         LinearScale.prototype.copy = function () {
@@ -692,6 +785,7 @@ var Plottable;
         __extends(ColorScale, _super);
         /**
         * Creates a ColorScale.
+        *
         * @constructor
         * @param {string} [scaleType] the type of color scale to create (Category10/Category20/Category20b/Category20c)
         */
@@ -730,6 +824,47 @@ var Plottable;
         return ColorScale;
     })(Scale);
     Plottable.ColorScale = ColorScale;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var KeyEventListener = (function () {
+        function KeyEventListener() {
+        }
+        KeyEventListener.initialize = function () {
+            if (KeyEventListener.initialized) {
+                return;
+            }
+            d3.select(document).on("keydown", KeyEventListener.processEvent);
+            KeyEventListener.initialized = true;
+        };
+
+        KeyEventListener.addCallback = function (keyCode, cb) {
+            if (!KeyEventListener.initialized) {
+                KeyEventListener.initialize();
+            }
+
+            if (KeyEventListener.callbacks[keyCode] == null) {
+                KeyEventListener.callbacks[keyCode] = [];
+            }
+
+            KeyEventListener.callbacks[keyCode].push(cb);
+        };
+
+        KeyEventListener.processEvent = function () {
+            if (KeyEventListener.callbacks[d3.event.keyCode] == null) {
+                return;
+            }
+
+            KeyEventListener.callbacks[d3.event.keyCode].forEach(function (cb) {
+                cb(d3.event);
+            });
+        };
+        KeyEventListener.initialized = false;
+        KeyEventListener.callbacks = [];
+        return KeyEventListener;
+    })();
+    Plottable.KeyEventListener = KeyEventListener;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
 var Plottable;
@@ -782,6 +917,18 @@ var Plottable;
                 return _this.rerenderZoomed();
             });
         }
+        PanZoomInteraction.prototype.resetZoom = function () {
+            var _this = this;
+            // HACKHACK #254
+            this.zoom = d3.behavior.zoom();
+            this.zoom.x(this.xScale._d3Scale);
+            this.zoom.y(this.yScale._d3Scale);
+            this.zoom.on("zoom", function () {
+                return _this.rerenderZoomed();
+            });
+            this.zoom(this.hitBox);
+        };
+
         PanZoomInteraction.prototype._anchor = function (hitBox) {
             _super.prototype._anchor.call(this, hitBox);
             this.zoom(hitBox);
@@ -994,6 +1141,85 @@ var Plottable;
     })(Interaction);
     Plottable.MousemoveInteraction = MousemoveInteraction;
 
+    var ClickInteraction = (function (_super) {
+        __extends(ClickInteraction, _super);
+        /**
+        * Creates a ClickInteraction.
+        *
+        * @constructor
+        * @param {Component} componentToListenTo The component to listen for clicks on.
+        */
+        function ClickInteraction(componentToListenTo) {
+            _super.call(this, componentToListenTo);
+        }
+        ClickInteraction.prototype._anchor = function (hitBox) {
+            var _this = this;
+            _super.prototype._anchor.call(this, hitBox);
+            hitBox.on("click", function () {
+                var xy = d3.mouse(hitBox.node());
+                var x = xy[0];
+                var y = xy[1];
+                _this._callback(x, y);
+            });
+        };
+
+        /**
+        * Sets an callback to be called when a click is received.
+        *
+        * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
+        */
+        ClickInteraction.prototype.callback = function (cb) {
+            this._callback = cb;
+            return this;
+        };
+        return ClickInteraction;
+    })(Interaction);
+    Plottable.ClickInteraction = ClickInteraction;
+
+    var KeyInteraction = (function (_super) {
+        __extends(KeyInteraction, _super);
+        /**
+        * Creates a KeyInteraction.
+        *
+        * @constructor
+        * @param {Component} componentToListenTo The component to listen for keypresses on.
+        * @param {number} keyCode The key code to listen for.
+        */
+        function KeyInteraction(componentToListenTo, keyCode) {
+            _super.call(this, componentToListenTo);
+            this.activated = false;
+            this.keyCode = keyCode;
+        }
+        KeyInteraction.prototype._anchor = function (hitBox) {
+            var _this = this;
+            _super.prototype._anchor.call(this, hitBox);
+            hitBox.on("mouseover", function () {
+                _this.activated = true;
+            });
+            hitBox.on("mouseout", function () {
+                _this.activated = false;
+            });
+
+            Plottable.KeyEventListener.addCallback(this.keyCode, function (e) {
+                if (_this.activated && _this._callback != null) {
+                    _this._callback();
+                }
+            });
+        };
+
+        /**
+        * Sets an callback to be called when the designated key is pressed.
+        *
+        * @param {() => any} cb: Callback to be called.
+        */
+        KeyInteraction.prototype.callback = function (cb) {
+            this._callback = cb;
+            return this;
+        };
+        return KeyInteraction;
+    })(Interaction);
+    Plottable.KeyInteraction = KeyInteraction;
+
     var CrosshairsInteraction = (function (_super) {
         __extends(CrosshairsInteraction, _super);
         function CrosshairsInteraction(renderer) {
@@ -1021,12 +1247,14 @@ var Plottable;
             this.lasty = y;
             var domainX = this.renderer.xScale.invert(x);
             var data = this.renderer._data;
-            var dataIndex = Plottable.OSUtils.sortedIndex(domainX, data, this.renderer.xAccessor);
+            var xA = this.renderer._getAppliedAccessor(this.renderer._xAccessor);
+            var yA = this.renderer._getAppliedAccessor(this.renderer._yAccessor);
+            var dataIndex = Plottable.OSUtils.sortedIndex(domainX, data, xA);
             dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
             var dataPoint = data[dataIndex];
 
-            var dataX = this.renderer.xAccessor(dataPoint);
-            var dataY = this.renderer.yAccessor(dataPoint);
+            var dataX = xA(dataPoint, dataIndex);
+            var dataY = yA(dataPoint, dataIndex);
             var pixelX = this.renderer.xScale.scale(dataX);
             var pixelY = this.renderer.yScale.scale(dataY);
             this.circle.attr("cx", pixelX).attr("cy", pixelY);
@@ -1189,6 +1417,8 @@ var Plottable;
         */
         function Renderer(dataset) {
             _super.call(this);
+            this._animate = false;
+            this._hasRendered = false;
             this._rerenderUpdateSelection = false;
             // A perf-efficient manner of rendering would be to calculate attributes only
             // on new nodes, and assume that old nodes (ie the update selection) can
@@ -1201,7 +1431,14 @@ var Plottable;
             this._fixedHeight = false;
             this.classed("renderer", true);
             if (dataset != null) {
-                this.dataset(dataset);
+                if (dataset.data == null) {
+                    this.data(dataset);
+                } else {
+                    this.data(dataset.data);
+                    if (dataset.metadata != null) {
+                        this.metadata(dataset.metadata);
+                    }
+                }
             }
             this.colorAccessor(Renderer.defaultColorAccessor);
         }
@@ -1234,6 +1471,7 @@ var Plottable;
         };
 
         Renderer.prototype._render = function () {
+            this._hasRendered = true;
             this._paint();
             this._requireRerender = false;
             this._rerenderUpdateSelection = false;
@@ -1251,10 +1489,32 @@ var Plottable;
             // no-op
         };
 
+        Renderer.prototype.autorange = function () {
+            // no-op
+            return this;
+        };
+
         Renderer.prototype._anchor = function (element) {
             _super.prototype._anchor.call(this, element);
             this.renderArea = this.content.append("g").classed("render-area", true);
             return this;
+        };
+
+        Renderer.prototype._getAppliedAccessor = function (accessor) {
+            var _this = this;
+            if (typeof (accessor) === "function") {
+                return function (d, i) {
+                    return accessor(d, i, _this._metadata);
+                };
+            } else if (typeof (accessor) === "string") {
+                return function (d, i) {
+                    return d[accessor];
+                };
+            } else {
+                return function (d, i) {
+                    return accessor;
+                };
+            }
         };
         Renderer.defaultColorAccessor = function (d) {
             return "#1f77b4";
@@ -1273,35 +1533,22 @@ var Plottable;
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
-        * @param {QuantitiveScale} xScale The x scale to use.
-        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
         * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
         * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
         function XYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
             var _this = this;
             _super.call(this, dataset);
-            this.classed("xy-renderer");
+            this.autorangeDataOnLayout = true;
+            this.classed("xy-renderer", true);
 
-            this.xAccessor = (xAccessor != null) ? xAccessor : XYRenderer.defaultXAccessor;
-            this.yAccessor = (yAccessor != null) ? yAccessor : XYRenderer.defaultYAccessor;
+            this._xAccessor = (xAccessor != null) ? xAccessor : "x"; // default
+            this._yAccessor = (yAccessor != null) ? yAccessor : "y"; // default
 
             this.xScale = xScale;
             this.yScale = yScale;
-
-            var data = dataset.data;
-
-            var appliedXAccessor = function (d) {
-                return _this.xAccessor(d, null, _this._metadata);
-            };
-            var xDomain = d3.extent(data, appliedXAccessor);
-            this.xScale.widenDomain(xDomain);
-
-            var appliedYAccessor = function (d) {
-                return _this.yAccessor(d, null, _this._metadata);
-            };
-            var yDomain = d3.extent(data, appliedYAccessor);
-            this.yScale.widenDomain(yDomain);
 
             this.xScale.registerListener(function () {
                 return _this.rescale();
@@ -1310,20 +1557,87 @@ var Plottable;
                 return _this.rescale();
             });
         }
-        XYRenderer.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-            _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-            this.xScale.range([0, this.availableWidth]);
-            this.yScale.range([this.availableHeight, 0]);
+        XYRenderer.prototype.xAccessor = function (accessor) {
+            this._xAccessor = accessor;
+            this._requireRerender = true;
+            this._rerenderUpdateSelection = true;
             return this;
         };
 
+        XYRenderer.prototype.yAccessor = function (accessor) {
+            this._yAccessor = accessor;
+            this._requireRerender = true;
+            this._rerenderUpdateSelection = true;
+            return this;
+        };
+
+        XYRenderer.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+            this._hasRendered = false;
+            _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+            this.xScale.range([0, this.availableWidth]);
+            this.yScale.range([this.availableHeight, 0]);
+            if (this.autorangeDataOnLayout) {
+                this.autorange();
+            }
+            return this;
+        };
+
+        /**
+        * Autoranges the scales over the data.
+        * Actual behavior is dependent on the scales.
+        */
+        XYRenderer.prototype.autorange = function () {
+            var _this = this;
+            _super.prototype.autorange.call(this);
+            var data = this._data;
+            var xA = function (d) {
+                return _this._getAppliedAccessor(_this._xAccessor)(d, null);
+            };
+            this.xScale.widenDomainOnData(data, xA);
+
+            var yA = function (d) {
+                return _this._getAppliedAccessor(_this._yAccessor)(d, null);
+            };
+            this.yScale.widenDomainOnData(data, yA);
+            return this;
+        };
+
+        XYRenderer.prototype.rescale = function () {
+            if (this.element != null && this._hasRendered) {
+                this._render();
+            }
+        };
+        return XYRenderer;
+    })(Plottable.Renderer);
+    Plottable.XYRenderer = XYRenderer;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var NumericXYRenderer = (function (_super) {
+        __extends(NumericXYRenderer, _super);
+        /**
+        * Creates an NumericXYRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {QuantitiveScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+        */
+        function NumericXYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
+            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.autorangeDataOnLayout = true;
+            this.classed("numeric-xy-renderer", true);
+        }
         /**
         * Converts a SelectionArea with pixel ranges to one with data ranges.
         *
         * @param {SelectionArea} pixelArea The selected area, in pixels.
         * @returns {SelectionArea} The corresponding selected area in the domains of the scales.
         */
-        XYRenderer.prototype.invertXYSelectionArea = function (pixelArea) {
+        NumericXYRenderer.prototype.invertXYSelectionArea = function (pixelArea) {
             var xMin = this.xScale.invert(pixelArea.xMin);
             var xMax = this.xScale.invert(pixelArea.xMax);
             var yMin = this.yScale.invert(pixelArea.yMin);
@@ -1332,11 +1646,12 @@ var Plottable;
             return dataArea;
         };
 
-        XYRenderer.prototype.getDataFilterFunction = function (dataArea) {
-            var _this = this;
+        NumericXYRenderer.prototype.getDataFilterFunction = function (dataArea) {
+            var xA = this._getAppliedAccessor(this._xAccessor);
+            var yA = this._getAppliedAccessor(this._yAccessor);
             var filterFunction = function (d, i) {
-                var x = _this.xAccessor(d, i, _this._metadata);
-                var y = _this.yAccessor(d, i, _this._metadata);
+                var x = xA(d, i);
+                var y = yA(d, i);
                 return Plottable.Utils.inRange(x, dataArea.xMin, dataArea.xMax) && Plottable.Utils.inRange(y, dataArea.yMin, dataArea.yMax);
             };
             return filterFunction;
@@ -1348,7 +1663,7 @@ var Plottable;
         * @param {SelectionArea} dataArea The selected area.
         * @returns {D3.UpdateSelection} The data in the selected area.
         */
-        XYRenderer.prototype.getSelectionFromArea = function (dataArea) {
+        NumericXYRenderer.prototype.getSelectionFromArea = function (dataArea) {
             var filterFunction = this.getDataFilterFunction(dataArea);
             return this.dataSelection.filter(filterFunction);
         };
@@ -1359,7 +1674,7 @@ var Plottable;
         * @param {SelectionArea} dataArea The selected area.
         * @returns {number[]} An array of the indices of datapoints in the selected area.
         */
-        XYRenderer.prototype.getDataIndicesFromArea = function (dataArea) {
+        NumericXYRenderer.prototype.getDataIndicesFromArea = function (dataArea) {
             var filterFunction = this.getDataFilterFunction(dataArea);
             var results = [];
             this._data.forEach(function (d, i) {
@@ -1369,21 +1684,9 @@ var Plottable;
             });
             return results;
         };
-
-        XYRenderer.prototype.rescale = function () {
-            if (this.element != null) {
-                this._render();
-            }
-        };
-        XYRenderer.defaultXAccessor = function (d) {
-            return d.x;
-        };
-        XYRenderer.defaultYAccessor = function (d) {
-            return d.y;
-        };
-        return XYRenderer;
-    })(Plottable.Renderer);
-    Plottable.XYRenderer = XYRenderer;
+        return NumericXYRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.NumericXYRenderer = NumericXYRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
 var Plottable;
@@ -1403,30 +1706,35 @@ var Plottable;
         */
         function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, rAccessor) {
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
+            this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
             this.classed("circle-renderer", true);
         }
+        CircleRenderer.prototype.rAccessor = function (a) {
+            this._rAccessor = a;
+            this._requireRerender = true;
+            this._rerenderUpdateSelection = true;
+            return this;
+        };
+
         CircleRenderer.prototype._paint = function () {
             var _this = this;
             _super.prototype._paint.call(this);
+            var cx = function (d, i) {
+                return _this.xScale.scale(_this._getAppliedAccessor(_this._xAccessor)(d, i));
+            };
+            var cy = function (d, i) {
+                return _this.yScale.scale(_this._getAppliedAccessor(_this._yAccessor)(d, i));
+            };
+            var r = this._getAppliedAccessor(this._rAccessor);
+            var color = this._getAppliedAccessor(this._colorAccessor);
             this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
             this.dataSelection.enter().append("circle");
-            this.dataSelection.attr("cx", function (d, i) {
-                return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
-            }).attr("cy", function (d, i) {
-                return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
-            }).attr("r", function (d, i) {
-                return _this.rAccessor(d, i, _this._metadata);
-            }).attr("fill", function (d, i) {
-                return _this._colorAccessor(d, i, _this._metadata);
-            });
+            this.dataSelection.attr("cx", cx).attr("cy", cy).attr("r", r).attr("fill", color);
             this.dataSelection.exit().remove();
         };
-        CircleRenderer.defaultRAccessor = function (d) {
-            return 3;
-        };
+        CircleRenderer.defaultRAccessor = 3;
         return CircleRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.NumericXYRenderer);
     Plottable.CircleRenderer = CircleRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -1450,26 +1758,26 @@ var Plottable;
         }
         LineRenderer.prototype._anchor = function (element) {
             _super.prototype._anchor.call(this, element);
-            this.path = this.renderArea.append("path");
+            this.path = this.renderArea.append("path").classed("line", true);
             return this;
         };
 
         LineRenderer.prototype._paint = function () {
             var _this = this;
             _super.prototype._paint.call(this);
+            var xA = this._getAppliedAccessor(this._xAccessor);
+            var yA = this._getAppliedAccessor(this._yAccessor);
+            var cA = this._getAppliedAccessor(this._colorAccessor);
             this.line = d3.svg.line().x(function (d, i) {
-                return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata));
+                return _this.xScale.scale(xA(d, i));
             }).y(function (d, i) {
-                return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata));
+                return _this.yScale.scale(yA(d, i));
             });
-            this.dataSelection = this.path.classed("line", true).datum(this._data);
-            this.path.attr("d", this.line);
-
-            // Since we can only set one stroke for the full line, call colorAccessor on first datum with index 0
-            this.path.attr("stroke", this._colorAccessor(this._data[0], 0, this._metadata));
+            this.dataSelection = this.path.datum(this._data);
+            this.path.attr("d", this.line).attr("stroke", cA);
         };
         return LineRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.NumericXYRenderer);
     Plottable.LineRenderer = LineRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -1489,19 +1797,24 @@ var Plottable;
         * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
         */
         function BarRenderer(dataset, xScale, yScale, xAccessor, dxAccessor, yAccessor) {
-            var _this = this;
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
             this.barPaddingPx = 1;
             this.classed("bar-renderer", true);
 
             this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
-
-            var x2Accessor = function (d) {
-                return _this.xAccessor(d, null, _this._metadata) + _this.dxAccessor(d, null, _this._metadata);
-            };
-            var x2Extent = d3.extent(dataset.data, x2Accessor);
-            this.xScale.widenDomain(x2Extent);
         }
+        BarRenderer.prototype.autorange = function () {
+            _super.prototype.autorange.call(this);
+            var xA = this._getAppliedAccessor(this._xAccessor);
+            var dxA = this._getAppliedAccessor(this.dxAccessor);
+            var x2Accessor = function (d) {
+                return xA(d, null) + dxA(d, null);
+            };
+            var x2Extent = d3.extent(this._data, x2Accessor);
+            this.xScale.widenDomain(x2Extent);
+            return this;
+        };
+
         BarRenderer.prototype._paint = function () {
             var _this = this;
             _super.prototype._paint.call(this);
@@ -1513,43 +1826,38 @@ var Plottable;
             var xrr = this.xScale.range()[1] - this.xScale.range()[0];
             this.dataSelection.enter().append("rect");
 
+            var xA = this._getAppliedAccessor(this._xAccessor);
             var xFunction = function (d, i) {
-                var x = _this.xAccessor(d, i, _this._metadata);
+                var x = xA(d, i);
                 var scaledX = _this.xScale.scale(x);
                 return scaledX + _this.barPaddingPx;
             };
 
+            var yA = this._getAppliedAccessor(this._yAccessor);
             var yFunction = function (d, i) {
-                var y = _this.yAccessor(d, i, _this._metadata);
+                var y = yA(d, i);
                 var scaledY = _this.yScale.scale(y);
                 return scaledY;
             };
 
+            var dxA = this._getAppliedAccessor(this.dxAccessor);
             var widthFunction = function (d, i) {
-                var dx = _this.dxAccessor(d, i, _this._metadata);
+                var dx = dxA(d, i);
                 var scaledDx = _this.xScale.scale(dx);
                 var scaledOffset = _this.xScale.scale(0);
                 return scaledDx - scaledOffset - 2 * _this.barPaddingPx;
             };
 
             var heightFunction = function (d, i) {
-                var y = _this.yAccessor(d, i, _this._metadata);
-                var scaledY = _this.yScale.scale(y);
-                return maxScaledY - scaledY;
+                return maxScaledY - yFunction(d, i);
             };
 
-            var colorFunction = function (d, i) {
-                return _this._colorAccessor(d, i, _this._metadata);
-            };
-
-            this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", colorFunction);
+            this.dataSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", this._getAppliedAccessor(this._colorAccessor));
             this.dataSelection.exit().remove();
         };
-        BarRenderer.defaultDxAccessor = function (d) {
-            return d.dx;
-        };
+        BarRenderer.defaultDxAccessor = "dx";
         return BarRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.NumericXYRenderer);
     Plottable.BarRenderer = BarRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -1570,36 +1878,39 @@ var Plottable;
         */
         function SquareRenderer(dataset, xScale, yScale, xAccessor, yAccessor, rAccessor) {
             _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.rAccessor = (rAccessor != null) ? rAccessor : SquareRenderer.defaultRAccessor;
+            this._rAccessor = (rAccessor != null) ? rAccessor : SquareRenderer.defaultRAccessor;
             this.classed("square-renderer", true);
         }
+        SquareRenderer.prototype.rAccessor = function (a) {
+            this._rAccessor = a;
+            this._requireRerender = true;
+            this._rerenderUpdateSelection = true;
+            return this;
+        };
+
         SquareRenderer.prototype._paint = function () {
             var _this = this;
             _super.prototype._paint.call(this);
+            var xA = this._getAppliedAccessor(this._xAccessor);
+            var yA = this._getAppliedAccessor(this._yAccessor);
+            var rA = this._getAppliedAccessor(this._rAccessor);
+            var cA = this._getAppliedAccessor(this._colorAccessor);
             var xFn = function (d, i) {
-                return _this.xScale.scale(_this.xAccessor(d, i, _this._metadata)) - _this.rAccessor(d, i, _this._metadata);
+                return _this.xScale.scale(xA(d, i)) - rA(d, i);
             };
 
             var yFn = function (d, i) {
-                return _this.yScale.scale(_this.yAccessor(d, i, _this._metadata)) - _this.rAccessor(d, i, _this._metadata);
+                return _this.yScale.scale(yA(d, i)) - rA(d, i);
             };
 
             this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
             this.dataSelection.enter().append("rect");
-            this.dataSelection.attr("x", xFn).attr("y", yFn).attr("width", function (d, i) {
-                return _this.rAccessor(d, i, _this._metadata);
-            }).attr("height", function (d, i) {
-                return _this.rAccessor(d, i, _this._metadata);
-            }).attr("fill", function (d, i) {
-                return _this._colorAccessor(d, i, _this._metadata);
-            });
+            this.dataSelection.attr("x", xFn).attr("y", yFn).attr("width", rA).attr("height", rA).attr("fill", cA);
             this.dataSelection.exit().remove();
         };
-        SquareRenderer.defaultRAccessor = function (d) {
-            return 3;
-        };
+        SquareRenderer.defaultRAccessor = 3;
         return SquareRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.NumericXYRenderer);
     Plottable.SquareRenderer = SquareRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -1815,7 +2126,6 @@ var Plottable;
                 }
                 for (var j = 0; j < nCols; j++) {
                     if (this.rows[i][j] === undefined) {
-                        // this.rows[i][j] = new Component();
                         this.rows[i][j] = null;
                     }
                 }
@@ -1991,16 +2301,259 @@ var Plottable;
     })(Plottable.Component);
     Plottable.Legend = Legend;
 })(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var StandardChart = (function (_super) {
+        __extends(StandardChart, _super);
+        function StandardChart() {
+            _super.call(this);
+            this.xTable = new Plottable.Table();
+            this.yTable = new Plottable.Table();
+            this.centerComponent = new Plottable.ComponentGroup();
+            this.xyTable = new Plottable.Table().addComponent(0, 0, this.yTable).addComponent(1, 1, this.xTable).addComponent(0, 1, this.centerComponent);
+            this.addComponent(1, 0, this.xyTable);
+        }
+        StandardChart.prototype.yAxis = function (y) {
+            if (y != null) {
+                if (this._yAxis != null) {
+                    throw new Error("yAxis already assigned!");
+                }
+                this._yAxis = y;
+                this.yTable.addComponent(0, 1, this._yAxis);
+                return this;
+            } else {
+                return this._yAxis;
+            }
+        };
+
+        StandardChart.prototype.xAxis = function (x) {
+            if (x != null) {
+                if (this._xAxis != null) {
+                    throw new Error("xAxis already assigned!");
+                }
+                this._xAxis = x;
+                this.xTable.addComponent(0, 0, this._xAxis);
+                return this;
+            } else {
+                return this._xAxis;
+            }
+        };
+
+        StandardChart.prototype.yLabel = function (y) {
+            if (y != null) {
+                if (this._yLabel != null) {
+                    if (typeof (y) === "string") {
+                        this._yLabel.setText(y);
+                        return this;
+                    } else {
+                        throw new Error("yLabel already assigned!");
+                    }
+                }
+                if (typeof (y) === "string") {
+                    y = new Plottable.AxisLabel(y, "vertical-left");
+                }
+                this._yLabel = y;
+                this.yTable.addComponent(0, 0, this._yLabel);
+                return this;
+            } else {
+                return this._yLabel;
+            }
+        };
+
+        StandardChart.prototype.xLabel = function (x) {
+            if (x != null) {
+                if (this._xLabel != null) {
+                    if (typeof (x) === "string") {
+                        this._xLabel.setText(x);
+                        return this;
+                    } else {
+                        throw new Error("xLabel already assigned!");
+                    }
+                }
+                if (typeof (x) === "string") {
+                    x = new Plottable.AxisLabel(x, "horizontal");
+                }
+                this._xLabel = x;
+                this.xTable.addComponent(1, 0, this._xLabel);
+                return this;
+            } else {
+                return this._xLabel;
+            }
+        };
+
+        StandardChart.prototype.titleLabel = function (x) {
+            if (x != null) {
+                if (this._titleLabel != null) {
+                    if (typeof (x) === "string") {
+                        this._titleLabel.setText(x);
+                        return this;
+                    } else {
+                        throw new Error("titleLabel already assigned!");
+                    }
+                }
+                if (typeof (x) === "string") {
+                    x = new Plottable.TitleLabel(x, "horizontal");
+                }
+                this._titleLabel = x;
+                this.addComponent(0, 0, this._titleLabel);
+                return this;
+            } else {
+                return this._titleLabel;
+            }
+        };
+
+        StandardChart.prototype.addCenterComponent = function (c) {
+            this.centerComponent.merge(c);
+            return this;
+        };
+        return StandardChart;
+    })(Plottable.Table);
+    Plottable.StandardChart = StandardChart;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var CategoryXYRenderer = (function (_super) {
+        __extends(CategoryXYRenderer, _super);
+        /**
+        * Creates a CategoryXYRenderer with an Ordinal x scale and Quantitive y scale.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {OrdinalScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
+        */
+        function CategoryXYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
+            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.classed("category-renderer", true);
+        }
+        return CategoryXYRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.CategoryXYRenderer = CategoryXYRenderer;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var CategoryBarRenderer = (function (_super) {
+        __extends(CategoryBarRenderer, _super);
+        /**
+        * Creates a CategoryBarRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {OrdinalScale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
+        * @param {IAccessor} [widthAccessor] A function for extracting the width position of each bar, in pixels, from the data.
+        * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
+        */
+        function CategoryBarRenderer(dataset, xScale, yScale, xAccessor, widthAccessor, yAccessor) {
+            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.classed("bar-renderer", true);
+            this._animate = true;
+            this._widthAccessor = (widthAccessor != null) ? widthAccessor : 10; // default width is 10px
+        }
+        /**
+        * Sets the width accessor.
+        *
+        * @param {any} accessor The new width accessor.
+        * @returns {CategoryBarRenderer} The calling CategoryBarRenderer.
+        */
+        CategoryBarRenderer.prototype.widthAccessor = function (accessor) {
+            this._widthAccessor = accessor;
+            this._requireRerender = true;
+            this._rerenderUpdateSelection = true;
+            return this;
+        };
+
+        CategoryBarRenderer.prototype._paint = function () {
+            var _this = this;
+            _super.prototype._paint.call(this);
+            var yRange = this.yScale.range();
+            var maxScaledY = Math.max(yRange[0], yRange[1]);
+            var xA = this._getAppliedAccessor(this._xAccessor);
+
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._data, xA);
+            this.dataSelection.enter().append("rect");
+
+            var widthFunction = this._getAppliedAccessor(this._widthAccessor);
+
+            var xFunction = function (d, i) {
+                var x = xA(d, i);
+                var scaledX = _this.xScale.scale(x);
+                return scaledX - widthFunction(d, i) / 2;
+            };
+
+            var yA = this._getAppliedAccessor(this._yAccessor);
+            var yFunction = function (d, i) {
+                var y = yA(d, i);
+                var scaledY = _this.yScale.scale(y);
+                return scaledY;
+            };
+
+            var heightFunction = function (d, i) {
+                return maxScaledY - yFunction(d, i);
+            };
+
+            var updateSelection = this.dataSelection;
+            if (this._animate) {
+                updateSelection = updateSelection.transition();
+            }
+            updateSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", this._getAppliedAccessor(this._colorAccessor));
+            this.dataSelection.exit().remove();
+        };
+
+        /**
+        * Selects the bar under the given pixel position.
+        *
+        * @param {number} x The pixel x position.
+        * @param {number} y The pixel y position.
+        * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
+        * @return {D3.Selection} The selected bar, or null if no bar was selected.
+        */
+        CategoryBarRenderer.prototype.selectBar = function (x, y, select) {
+            if (typeof select === "undefined") { select = true; }
+            var selectedBar = null;
+
+            this.dataSelection.each(function (d) {
+                var bbox = this.getBBox();
+                if (bbox.x <= x && x <= bbox.x + bbox.width && bbox.y <= y && y <= bbox.y + bbox.height) {
+                    selectedBar = d3.select(this);
+                }
+            });
+
+            if (selectedBar != null) {
+                selectedBar.classed("selected", select);
+            }
+
+            return selectedBar;
+        };
+
+        /**
+        * Deselects all bars.
+        */
+        CategoryBarRenderer.prototype.deselectAll = function () {
+            this.dataSelection.classed("selected", false);
+        };
+        return CategoryBarRenderer;
+    })(Plottable.CategoryXYRenderer);
+    Plottable.CategoryBarRenderer = CategoryBarRenderer;
+})(Plottable || (Plottable = {}));
 /// <reference path="utils.ts" />
 /// <reference path="osUtils.ts" />
 /// <reference path="component.ts" />
 /// <reference path="scale.ts" />
 //grunt-start
 /// <reference path="axis.ts" />
+/// <reference path="keyEventListener.ts" />
 /// <reference path="interaction.ts" />
 /// <reference path="label.ts" />
 /// <reference path="renderer.ts" />
 /// <reference path="xyRenderer.ts" />
+/// <reference path="numericXYRenderer.ts" />
 /// <reference path="circleRenderer.ts" />
 /// <reference path="lineRenderer.ts" />
 /// <reference path="barRenderer.ts" />
@@ -2008,6 +2561,9 @@ var Plottable;
 /// <reference path="table.ts" />
 /// <reference path="coordinator.ts" />
 /// <reference path="legend.ts" />
+/// <reference path="chart.ts" />
+/// <reference path="categoryXYRenderer.ts" />
+/// <reference path="categoryBarRenderer.ts" />
 //grunt-end
 ///<reference path="reference.ts" />
 var Plottable;
@@ -2432,13 +2988,8 @@ var Plottable;
         };
 
         ComponentGroup.prototype.merge = function (c) {
-            if (ComponentGroup.prototype.isPrototypeOf(c)) {
-                var cg = new ComponentGroup([this, c]);
-                return cg;
-            } else {
-                this._addComponentToGroup(c);
-                return this;
-            }
+            this._addComponentToGroup(c);
+            return this;
         };
 
         ComponentGroup.prototype._anchor = function (element) {

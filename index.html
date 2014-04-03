@@ -9,14 +9,45 @@
     <link rel="stylesheet" type="text/css" media="screen" href="examples/main-page/stylesheet.css">
     <link rel="stylesheet" type="text/css" media="screen" href="examples/main-page/mainpage-plottable.css">
     <link href="plottable.css" type="text/css" rel="stylesheet" />
-    <script src="examples/main-page/main.js"></script>
+    <script src="examples/main-page/commit-dashboard.js"></script>
+    <script src="examples/main-page/commit-dashboard-data-manager.js"></script>
     <script src="lib/d3/d3.min.js"></script>
     <script src="plottable.js"></script>
     <script src="examples/exampleUtil.js"></script>
 
-    <script src="examples/main-page/commit-chart.js"></script>
-    <script src="examples/main-page/scatter-full.js"></script>
-    <script src="examples/main-page/line-chart.js"></script>
+    <script src="/examples/main-page/commit-chart-shared.js"></script>
+
+    <script src="/examples/main-page/commit-chart.js"></script>
+
+    <script>
+      function sizeSVG(svg) {
+        var width = Plottable.Utils.getSVGPixelWidth(svg);
+        svg.attr("width", width);
+        var height = Math.min(width*.75, 1000);
+        svg.attr("height", height);
+        return svg;
+      }
+
+      window.onload = function() {
+        d3.json("examples/data/gitstats2.json", function(data) {
+          data.forEach(function(d) {
+            d.date = new Date(d.date);
+            d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
+          });
+          data.sort(function(a,b) {return a.date - b.date});
+          var dataset = {data: data, metadata: {}};
+          var dataManager = makeCommitDataManager(data);
+          // results = dataManager();
+          var interactiveSVG = sizeSVG(d3.select("#interactive-demo"));
+          commitDashboard(dataManager, interactiveSVG);
+
+          // var commitDataset = {data: data.commits, metadata: {}};
+          // var svg = d3.select("#commit-chart");
+          // sizeSVG(svg);
+          // commitChart(svg, commitDataset);
+        });
+      }
+    </script>
 
     <title>Plottable</title>
   </head>
@@ -32,29 +63,17 @@
         </header>
     </div>
     <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
+<!--     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h3>
-
-<pre>
-  <svg id="intro-chart" width="95%"></svg>
-</pre>
-<a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/master/examples/jsfiddle/commitTimeChart"><h5>(Click here to open the chart on JSFiddle!)</h5></a>
-<svg height="200px" width="100px"></svg>
-<pre>
-  <svg id="scatter-full" width="95%"></svg>
-</pre>
-<a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/master/examples/jsfiddle/commitLogChart"><h5>(Click here to open the chart on JSFiddle!)</h5></a>
-<svg height="200px" width="100px"></svg>
-
-<pre>
-  <svg id="line-chart" width="95%"></svg>
-</pre>
-<a href="http://jsfiddle.net/gh/get/library/pure/palantir/plottable/tree/master/examples/jsfiddle/commitLineChart"><h5>(Click here to open the chart on JSFiddle!)</h5></a>
-<svg height="200px" width="100px"></svg>
-
+        <h3> -->
+        <div class="outer-block">
+        <div class="background-block">
+            <svg id="interactive-demo" width="95%"></svg>
+        </div>
+      </div>
+<!--         </h3>
       </section>
-    </div>
+    </div> -->
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">

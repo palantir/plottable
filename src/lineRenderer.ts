@@ -1,7 +1,7 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
-  export class LineRenderer extends XYRenderer {
+  export class LineRenderer extends NumericXYRenderer {
     private path: D3.Selection;
     private line: D3.Svg.Line;
 
@@ -15,27 +15,27 @@ module Plottable {
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      */
-    constructor(dataset: IDataset, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+    constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("line-renderer", true);
     }
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this.path = this.renderArea.append("path");
+      this.path = this.renderArea.append("path").classed("line", true);
       return this;
     }
 
     public _paint() {
       super._paint();
+      var xA = this._getAppliedAccessor(this._xAccessor);
+      var yA = this._getAppliedAccessor(this._yAccessor);
+      var cA = this._getAppliedAccessor(this._colorAccessor);
       this.line = d3.svg.line()
-            .x((d: any, i: number) => this.xScale.scale(this.xAccessor(d, i, this._metadata)))
-            .y((d: any, i: number) => this.yScale.scale(this.yAccessor(d, i, this._metadata)));
-      this.dataSelection = this.path.classed("line", true)
-        .datum(this._data);
-      this.path.attr("d", this.line);
-      // Since we can only set one stroke for the full line, call colorAccessor on first datum with index 0
-      this.path.attr("stroke", this._colorAccessor(this._data[0], 0, this._metadata));
+            .x((d: any, i: number) => this.xScale.scale(xA(d, i)))
+            .y((d: any, i: number) => this.yScale.scale(yA(d, i)));
+      this.dataSelection = this.path.datum(this._data);
+      this.path.attr("d", this.line).attr("stroke", cA);
     }
   }
 }

@@ -156,6 +156,15 @@ p img {
   border: none;
 }
 
+.outer-block {
+  background-color: #CCC;
+  padding: 20px;
+}
+.background-block {
+  padding: 10px;
+  background-color: #fff;
+}
+
 pre, code {
   width: 100%;
   color: #222;
@@ -263,7 +272,7 @@ Full-Width Styles
 
 .inner {
   position: relative;
-  max-width: 1200px;
+  max-width: 1800px;
   padding: 20px 10px;
   margin: 0 auto;
 }

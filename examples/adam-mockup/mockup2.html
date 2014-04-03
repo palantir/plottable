@@ -63,9 +63,9 @@
 
         var svg = d3.select("#mockup-2");
         svg.attr("width", 800).attr("height", 320);
+        chartTable.renderTo(svg);
         xScale.padDomain().nice();
         yScale.padDomain().nice();
-        chartTable.renderTo(svg);
       }
     </script>
   </head>

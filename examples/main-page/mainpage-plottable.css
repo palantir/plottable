@@ -1,3 +1,28 @@
 .plottable circle {
   opacity: 0.6;
 }
+
+.plottable .sidebar-chart .title-label text {
+  font-size: 12pt;
+}
+
+.plottable .sidebar-chart .axis .x-axis .tick text {
+  font-size: 8pt;
+}
+
+.plottable .legend-label text {
+  font-size: 20pt;
+}
+/*.plottable .bar-renderer rect:not(.selected) {
+  opacity: 0.6;
+}*/
+
+.plottable .no-tick-labels .x-axis text {
+  fill: none;
+}
+
+.plottable .bar-renderer .selected {
+  stroke-width: 2px;
+  stroke: black;
+  /*opacity: 1;*/
+}

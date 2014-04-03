@@ -29,13 +29,8 @@ module Plottable {
     }
 
     public merge(c: Component): ComponentGroup {
-      if (ComponentGroup.prototype.isPrototypeOf(c)) {
-        var cg = new ComponentGroup([this, c]);
-        return cg;
-      } else {
-        this._addComponentToGroup(c);
-        return this;
-      }
+      this._addComponentToGroup(c);
+      return this;
     }
 
     public _anchor(element: D3.Selection): ComponentGroup {

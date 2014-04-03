@@ -8,6 +8,8 @@ module Plottable {
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
+    public _animate = false;
+    public _hasRendered = false;
     private static defaultColorAccessor = (d: any) => "#1f77b4";
 
     public _rerenderUpdateSelection = false;
@@ -28,14 +30,21 @@ module Plottable {
      * @constructor
      * @param {IDataset} [dataset] The dataset associated with the Renderer.
      */
-    constructor(dataset?: IDataset) {
+    constructor(dataset?: any) {
       super();
       this.clipPathEnabled = true;
       this._fixedWidth = false;
       this._fixedHeight = false;
       this.classed("renderer", true);
       if (dataset != null) {
-        this.dataset(dataset);
+        if (dataset.data == null) {
+          this.data(dataset);
+        } else {
+          this.data(dataset.data);
+          if (dataset.metadata != null) {
+            this.metadata(dataset.metadata);
+          }
+        }
       }
       this.colorAccessor(Renderer.defaultColorAccessor);
     }
@@ -69,6 +78,7 @@ module Plottable {
     }
 
     public _render(): Renderer {
+      this._hasRendered = true;
       this._paint();
       this._requireRerender = false;
       this._rerenderUpdateSelection = false;
@@ -86,10 +96,25 @@ module Plottable {
       // no-op
     }
 
+    public autorange() {
+      // no-op
+      return this;
+    }
+
     public _anchor(element: D3.Selection) {
       super._anchor(element);
       this.renderArea = this.content.append("g").classed("render-area", true);
       return this;
+    }
+
+    public _getAppliedAccessor(accessor: any): (d: any, i: number) => any {
+      if (typeof(accessor) === "function") {
+        return (d: any, i: number) => accessor(d, i, this._metadata);
+      } else if (typeof(accessor) === "string") {
+        return (d: any, i: number) => d[accessor];
+      } else {
+        return (d: any, i: number) => accessor;
+      }
     }
   }
 }
