@@ -186,6 +186,7 @@ function commitDashboard(dataManager, svg) {
   var lastContributor = null;
   var contributorClickCallback = function(x, y) {
     contributorBarRenderer.deselectAll();
+    directoryBarRenderer.deselectAll();
     var bar = contributorBarRenderer.selectBar(x, y);
     if (bar != null && bar.data()[0].name != lastContributor) {
       lastContributor = bar.data()[0].name;
@@ -201,6 +202,7 @@ function commitDashboard(dataManager, svg) {
   var lastDirectory = null;
   var directoryClickCallback = function(x, y) {
     directoryBarRenderer.deselectAll();
+    contributorBarRenderer.deselectAll();
     var bar = directoryBarRenderer.selectBar(x, y);
     if (bar != null && bar.data()[0].directory != lastDirectory) {
       lastDirectory = bar.data()[0].directory;
