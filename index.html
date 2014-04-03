@@ -23,7 +23,7 @@
       function sizeSVG(svg) {
         var width = Plottable.Utils.getSVGPixelWidth(svg);
         svg.attr("width", width);
-        var height = Math.min(width*.75, 600);
+        var height = Math.min(width*.75, 1000);
         svg.attr("height", height);
         return svg;
       }
