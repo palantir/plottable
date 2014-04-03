@@ -27,23 +27,23 @@ function makeCommitDataManager(data) {
 
     processedCommits = [];
     directoryTimeSeries = {"/": [], "src": [], "lib": [], "examples": [], "typings": [], "test": []};
-    linesByContributor = {"danmane": 0, "jlan": 0, "aramaswamy": 0, "derekcicerone": 0};
-    linesByDirectory = {"/": 0, "lib": 0, "examples": 0, "typings": 0, "test": 0};
+    linesByContributorObj = {"danmane": 0, "jlan": 0, "aramaswamy": 0, "derekcicerone": 0};
+    linesByDirectoryObj = {"/": 0, "lib": 0, "examples": 0, "typings": 0, "test": 0};
 
     data.forEach(function(c) {
       var date = c.date;
       directories.forEach(function(d) {
-        directoryTimeSeries[d].push([new Date(date - 1), linesByDirectory[d]]);
+        directoryTimeSeries[d].push([new Date(date - 1), linesByDirectoryObj[d]]);
       });
       if (personFilter(c)) {
         directories.forEach(function(d) {
           if (c.byDirectory[d] != null) {
-            linesByDirectory[d] += c.byDirectory[d].lines;
+            linesByDirectoryObj[d] += c.byDirectory[d].lines;
           }
         });
       }
       directories.forEach(function(d) {
-        directoryTimeSeries[d].push([date, linesByDirectory[d]]);
+        directoryTimeSeries[d].push([date, linesByDirectoryObj[d]]);
       });
 
       var directoriesToIterateOver = isDirectorySelector ? [selector] : directories;
@@ -54,11 +54,17 @@ function makeCommitDataManager(data) {
         lines += l;
       });
       processedCommits.push({name: c.name, date: date, lines: lines});
-      linesByContributor[c.name] += lines;
+      linesByContributorObj[c.name] += lines;
     });
 
-
-
+    var linesByDirectory = [];
+    var linesByContributor = [];
+    directories.forEach(function(d) {
+      linesByDirectory.push({directory: d, lines: linesByDirectoryObj[d]})
+    });
+    contributors.forEach(function(d) {
+      linesByContributor.push({name: d, lines: linesByContributorObj[d]})
+    });
 
     return {"commits": processedCommits, "linesByContributor": linesByContributor, "directoryTimeSeries": directoryTimeSeries, "linesByDirectory": linesByDirectory}
   }
