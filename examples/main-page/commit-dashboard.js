@@ -164,18 +164,21 @@ function commitDashboard(dataManager, svg) {
 
     scatterRenderer.data(newData.commits);
 
+    tscYScale.domain([0, 0]);
     dataManager.directories.forEach(function(dir) {
-      var timeSeries = newData.directoryTimeSeries[dir];
-      var directoryDataset = {
-        data: timeSeries,
-        metadata: {}
-      };
-      tscRenderers[dir].data(directoryDataset);
+      tscRenderers[dir].data(newData.directoryTimeSeries[dir]);
+      tscRenderers[dir].autorange();
     });
 
     contributorBarRenderer.data(newData.linesByContributor);
+    contributorBarYScale.domain([0, 0]);
+    contributorBarRenderer.autorange();
 
     directoryBarRenderer.data(newData.linesByDirectory);
+    directoryBarYScale.domain([0, 0]);
+    directoryBarRenderer.autorange();
+
+    dashboardTable._render();
   }
   // var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderers["/"], timeScale, tscYScale);
   // tscPanZoom.registerWithComponent();
@@ -191,9 +194,22 @@ function commitDashboard(dataManager, svg) {
       contributorBarRenderer.deselectAll();
     }
     updateData(lastContributor);
-    dashboardTable._render();
   };
   contributorClick.callback(contributorClickCallback).registerWithComponent();
 
+  var directoryClick = new Plottable.ClickInteraction(directoryBarRenderer);
+  var lastDirectory = null;
+  var directoryClickCallback = function(x, y) {
+    directoryBarRenderer.deselectAll();
+    var bar = directoryBarRenderer.selectBar(x, y);
+    if (bar != null && bar.data()[0].directory != lastDirectory) {
+      lastDirectory = bar.data()[0].directory;
+    } else {
+      lastDirectory = null;
+      directoryBarRenderer.deselectAll();
+    }
+    updateData(lastDirectory);
+  };
+  directoryClick.callback(directoryClickCallback).registerWithComponent();
   // ----- /Interactions -----
 }
