@@ -34,6 +34,7 @@
             d.date = new Date(d.date);
             d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
           });
+          data.sort(function(a,b) {return a.date - b.date});
           var dataset = {data: data, metadata: {}};
           var dataManager = makeCommitDataManager(data);
           // results = dataManager();
