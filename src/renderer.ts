@@ -9,6 +9,7 @@ module Plottable {
     public scales: Scale[];
     public _colorAccessor: IAccessor;
     public _animate = false;
+    public _hasRendered = false;
     private static defaultColorAccessor = (d: any) => "#1f77b4";
 
     public _rerenderUpdateSelection = false;
@@ -77,6 +78,7 @@ module Plottable {
     }
 
     public _render(): Renderer {
+      this._hasRendered = true;
       this._paint();
       this._requireRerender = false;
       this._rerenderUpdateSelection = false;
