@@ -53,7 +53,9 @@ function makeCommitDataManager(data) {
         l = (l == null) ? 0 : l.lines;
         lines += l;
       });
-      processedCommits.push({name: c.name, date: date, lines: lines});
+      if (personFilter(c) && lines > 0) {
+        processedCommits.push({name: c.name, date: date, lines: lines});
+      }
       linesByContributorObj[c.name] += lines;
     });
 
