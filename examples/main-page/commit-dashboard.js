@@ -104,8 +104,10 @@ function commitDashboard(dataManager, svg) {
 
   // ----- Bar1: Lines changed by contributor -----
   var contributorBarYScale = new Plottable.LinearScale();
-  var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right")
+  var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right");
   var contributorBarXScale = new Plottable.OrdinalScale().domain(dataManager.contributors);
+  var contributorBarXAxis = new Plottable.XAxis(contributorBarXScale, "bottom", function(d) { return d});
+  contributorBarXAxis.classed("no-tick-labels", true).rowMinimum(5);
   var contributorBarRenderer = new Plottable.CategoryBarRenderer(linesByContributor,
                                                                  contributorBarXScale,
                                                                  contributorBarYScale);
@@ -114,14 +116,17 @@ function commitDashboard(dataManager, svg) {
   contributorBarRenderer.xAccessor("name").yAccessor("lines");
   var contributorGridlines = new Plottable.Gridlines(null, contributorBarYScale);
   var contributorBarChart = new Plottable.Table([
-    [contributorBarRenderer.merge(contributorGridlines), contributorBarYAxis]
+    [contributorBarRenderer.merge(contributorGridlines), contributorBarYAxis],
+    [contributorBarXAxis, null]
   ]);
   // ----- /Bar1 -----
 
   // ----- Bar2: Lines by directory -----
   var directoryBarYScale = new Plottable.LinearScale();
-  var directoryBarYAxis = new Plottable.YAxis(directoryBarYScale, "right")
+  var directoryBarYAxis = new Plottable.YAxis(directoryBarYScale, "right");
   var directoryBarXScale = new Plottable.OrdinalScale().domain(dataManager.directories);
+  var directoryBarXAxis = new Plottable.XAxis(directoryBarXScale, "bottom", function(d) { return d});
+  directoryBarXAxis.classed("no-tick-labels", true).rowMinimum(5);
   var directoryBarRenderer = new Plottable.CategoryBarRenderer(linesByDirectory,
                                                                directoryBarXScale,
                                                                directoryBarYScale);
@@ -130,11 +135,15 @@ function commitDashboard(dataManager, svg) {
   directoryBarRenderer.xAccessor("directory").yAccessor("lines");
   var directoryGridlines = new Plottable.Gridlines(null, directoryBarYScale);
   var directoryBarChart = new Plottable.Table([
-    [directoryBarRenderer.merge(directoryGridlines), directoryBarYAxis]
+    [directoryBarRenderer.merge(directoryGridlines), directoryBarYAxis],
+    [directoryBarXAxis, null]
   ]);
   // ----- /Bar2 -----
 
   // ----- Interactions -----
+  // var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderers["/"], timeScale, tscYScale);
+  // tscPanZoom.registerWithComponent();
+
   // ----- /Interactions -----
 
   // ---- Assemble! -----
@@ -152,6 +161,8 @@ function commitDashboard(dataManager, svg) {
   function resetDomains() {
     timeScale.domain([startDate, endDate]).nice();
     tscYScale.domain([0, 30000]);
+    contributorBarYScale.domain([0, 55000]);
+    directoryBarYScale.domain([0, 30000]);
   }
 
   resetDomains();

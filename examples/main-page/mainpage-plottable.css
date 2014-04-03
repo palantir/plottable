@@ -17,6 +17,10 @@
   opacity: 0.6;
 }*/
 
+.plottable .no-tick-labels .x-axis text {
+  fill: none;
+}
+
 .plottable .bar-renderer .selected {
   stroke-width: 2px;
   stroke: black;
