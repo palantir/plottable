@@ -16,47 +16,57 @@
     <script src="../../build/exampleUtil.js"></script>
 
     <script>
-      var dataseries = {
-        data: [
+      var data = [
           { name: "Spot", age: 8 },
           { name: "Poptart", age: 1 },
           { name: "Budoka", age: 3 },
           { name: "Sugar", age: 14 }
-        ],
-        metadata: { cssClass: "cats" }
-      }
+        ];
+
+      // var data2 = [
+      //   { name: "Spot", age: 8 },
+      //   { name: "Poptart", age: 1 },
+      //   { name: "Budoka", age: 3 }
+      // ];
 
       function makeCatXAxisChart() {
-          var svg = d3.select("#meow");
-          svg.attr("width", 480).attr("height", 320);
-
           var xScale = new Plottable.OrdinalScale();
-          var xAxis = new Plottable.XAxis(xScale, "bottom", function(d) { return d} );
+          var xAxis = new Plottable.XAxis(xScale, "bottom", function(d) { return d; } );
 
           var yScale = new Plottable.LinearScale();
-          var yAxis = new Plottable.YAxis(yScale, "left").showEndTickLabels(true);
+          var yAxis = new Plottable.YAxis(yScale, "left");
+          // yAxis.showEndTickLabels(true);
 
-          var renderAreaD1 = new Plottable.CategoryBarRenderer(dataseries, xScale, yScale, "name", 50, "age");
-          yScale.widenDomain([0, yScale.domain()[1]+1]);
+          var barRenderer = new Plottable.CategoryBarRenderer(data, xScale, yScale);
+          barRenderer.xAccessor("name");
+          barRenderer.widthAccessor(50);
+          barRenderer.yAccessor("age");
+
           var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
-                                                .addComponent(0, 1, renderAreaD1)
+                                                .addComponent(0, 1, barRenderer)
                                                 .addComponent(1, 1, xAxis);
+
+          var svg = d3.select("#meow");
+          svg.attr("width", 480).attr("height", 320);
           basicTable.renderTo(svg);
 
-          var clickInteraction = new Plottable.ClickInteraction(renderAreaD1);
-          var clickCallback = function(x, y) {
-            renderAreaD1.deselectAll();
-            var bar = renderAreaD1.selectBar(x, y);
-            if (bar != null) {
-              var alertString = bar.data()[0].name + " says: "
-              for (var i=0; i<bar.data()[0].age; i++) {
-                alertString += "meow ";
-              }
-              alert(alertString);
-            }
-          };
-          clickInteraction.callback(clickCallback);
-          clickInteraction.registerWithComponent();
+          // barRenderer.data(data2); // update data
+          // barRenderer._render();
+
+          // var clickInteraction = new Plottable.ClickInteraction(barRenderer);
+          // var clickCallback = function(x, y) {
+          //   barRenderer.deselectAll();
+          //   var bar = barRenderer.selectBar(x, y);
+          //   if (bar != null) {
+          //     var alertString = bar.data()[0].name + " says: "
+          //     for (var i=0; i<bar.data()[0].age; i++) {
+          //       alertString += "meow ";
+          //     }
+          //     alert(alertString);
+          //   }
+          // };
+          // clickInteraction.callback(clickCallback);
+          // clickInteraction.registerWithComponent();
       };
 
       window.onload = function() { makeCatXAxisChart(); }

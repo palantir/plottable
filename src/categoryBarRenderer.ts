@@ -81,6 +81,16 @@ module Plottable {
       this.dataSelection.exit().remove();
     }
 
+    public autorange() {
+      super.autorange();
+      var yDomain = this.yScale.domain();
+      if (yDomain[1] < 0 || yDomain[0] > 0) { // domain does not include 0
+        var newDomain = [Math.min(0, yDomain[0]), Math.max(0, yDomain[1])];
+        this.yScale.domain(newDomain);
+      }
+      return this;
+    }
+
     /**
      * Selects the bar under the given pixel position.
      *
