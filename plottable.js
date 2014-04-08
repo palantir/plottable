@@ -2506,6 +2506,16 @@ var Plottable;
             this.dataSelection.exit().remove();
         };
 
+        CategoryBarRenderer.prototype.autorange = function () {
+            _super.prototype.autorange.call(this);
+            var yDomain = this.yScale.domain();
+            if (yDomain[1] < 0 || yDomain[0] > 0) {
+                var newDomain = [Math.min(0, yDomain[0]), Math.max(0, yDomain[1])];
+                this.yScale.domain(newDomain);
+            }
+            return this;
+        };
+
         /**
         * Selects the bar under the given pixel position.
         *

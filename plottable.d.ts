@@ -839,6 +839,7 @@ declare module Plottable {
         * @returns {CategoryBarRenderer} The calling CategoryBarRenderer.
         */
         public widthAccessor(accessor: any): CategoryBarRenderer;
+        public autorange(): CategoryBarRenderer;
         /**
         * Selects the bar under the given pixel position.
         *
