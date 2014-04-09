@@ -3,8 +3,8 @@
   <head>
     <meta name="google" value="notranslate">
     <title>Plottable.js Tests</title>
-    <link rel="stylesheet" href="lib/mocha/mocha.css">
-    <link href="plottable.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" href="../bower_components/mocha/mocha.css">
+    <link href="../plottable.css" type="text/css" rel="stylesheet" />
     <style>
       svg {
         border: 2px solid blue;
@@ -14,14 +14,14 @@
       }
     </style>
 
-    <script src="lib/d3/d3.min.js"></script>
-    <script src="lib/chai/chai.js"></script>
-    <script src="lib/mocha/mocha.js"></script>
-    <script src="lib/jQuery/dist/jquery.js"></script>
-    <script src="lib/jquery.simulate/libs/jquery.simulate.js"></script>
-    <script src="lib/jquery.simulate/src/jquery.simulate.ext.js"></script>
-    <script src="blanket_mocha.js"></script>
-    <script src="build/plottable.js" data-cover></script>
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../bower_components/chai/chai.js"></script>
+    <script src="../bower_components/mocha/mocha.js"></script>
+    <script src="../bower_components/jQuery/dist/jquery.js"></script>
+    <script src="../bower_components/jquery.simulate/libs/jquery.simulate.js"></script>
+    <script src="../bower_components/jquery.simulate/src/jquery.simulate.ext.js"></script>
+    <script src="../blanket_mocha.js"></script>
+    <script src="../build/plottable.js" data-cover></script>
   </head>
   <body>
     <div id="mocha"></div>
@@ -39,10 +39,10 @@
       }
     </script>
 
-    <script src="build/tests.js"></script>
+    <script src="../build/tests.js"></script>
     <script>
         if (window.PHANTOMJS) {
-            blanket.options("reporter", "node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
+            blanket.options("reporter", "../node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
         }
     </script>
   </body>
