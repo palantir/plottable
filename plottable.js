@@ -216,8 +216,8 @@ var Plottable;
                     // we are the root node, retrieve height/width from root SVG
                     xOrigin = 0;
                     yOrigin = 0;
-                    availableWidth = parseFloat(this.rootSVG.attr("width"));
-                    availableHeight = parseFloat(this.rootSVG.attr("height"));
+                    availableWidth = this.rootSVG.node().offsetWidth;
+                    availableHeight = this.rootSVG.node().offsetHeight;
                 } else {
                     throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                 }
@@ -565,8 +565,10 @@ var Plottable;
         */
         function OrdinalScale() {
             _super.call(this, d3.scale.ordinal());
-            this.END_PADDING = 0.5;
+            this.INNER_PADDING = 0.3;
+            this.OUTER_PADDING = 0.5;
             this._range = [0, 1];
+            this._rangeType = "points";
         }
         OrdinalScale.prototype.domain = function (values) {
             var _this = this;
@@ -577,7 +579,7 @@ var Plottable;
                 this._broadcasterCallbacks.forEach(function (b) {
                     return b(_this);
                 });
-                this._d3Scale.rangePoints(this.range(), 2 * this.END_PADDING); // d3 scale takes total padding
+                this.range(this.range());
                 return this;
             }
         };
@@ -587,7 +589,31 @@ var Plottable;
                 return this._range;
             } else {
                 this._range = values;
-                this._d3Scale.rangePoints(values, 2 * this.END_PADDING); // d3 scale takes total padding
+                if (this._rangeType === "points") {
+                    this._d3Scale.rangePoints(values, 2 * this.OUTER_PADDING); // d3 scale takes total padding
+                } else if (this._rangeType === "bands") {
+                    this._d3Scale.rangeBands(values, this.INNER_PADDING, this.OUTER_PADDING);
+                }
+                return this;
+            }
+        };
+
+        OrdinalScale.prototype.rangeBand = function () {
+            if (this._rangeType === "bands") {
+                return this._d3Scale.rangeBand();
+            } else {
+                return 0;
+            }
+        };
+
+        OrdinalScale.prototype.rangeType = function (rangeType) {
+            if (rangeType == null) {
+                return this._rangeType;
+            } else {
+                if (!(rangeType === "points" || rangeType === "bands")) {
+                    throw new Error("Unsupported range type: " + rangeType);
+                }
+                this._rangeType = rangeType;
                 return this;
             }
         };

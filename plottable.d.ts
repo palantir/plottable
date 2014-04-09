@@ -256,7 +256,7 @@ declare module Plottable {
         */
         constructor();
         public domain(): any[];
-        public domain(values: any[]): Scale;
+        public domain(values: any[]): OrdinalScale;
         /**
         * Returns the range of pixels spanned by the scale, or sets the range.
         *
@@ -264,7 +264,16 @@ declare module Plottable {
         * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
         */
         public range(): any[];
-        public range(values: number[]): Scale;
+        public range(values: number[]): OrdinalScale;
+        public rangeBand(): number;
+        /**
+        * Returns the range type, or sets the range type.
+        *
+        * @param {string} [rangeType] Either "points" or "bands" indicating the d3 method used to generate range bounds.
+        * @returns {string|OrdinalScale} The current range type, or the calling OrdinalScale.
+        */
+        public rangeType(): string;
+        public rangeType(rangeType: string): OrdinalScale;
         public widenDomainOnData(data: any[], accessor?: IAccessor): OrdinalScale;
     }
     class QuantitiveScale extends Scale {
