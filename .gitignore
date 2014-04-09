@@ -2,3 +2,9 @@
 *.tmp.txt
 build/*
 node_modules
+
+# Emacs
+.#*
+
+# vim
+*.swp
