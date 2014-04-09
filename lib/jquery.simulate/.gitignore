@@ -1,0 +1,4 @@
+.*
+dist
+!.gitignore
+!.jshintrc

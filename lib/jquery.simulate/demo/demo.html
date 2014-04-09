@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>jquery-simulate-ext Demo</title>
+	<link rel="stylesheet" href="jquery-ui-1.8.22.custom.css" />
+	<script type="text/javascript" src="../libs/jquery-1.10.2.js"></script>
+	<script type="text/javascript" src="jquery-ui-1.8.22.custom.min.js"></script>
+	<script type="text/javascript" src="raphael-min.js"></script>
+	<script type="text/javascript" src="raphael.sketchpad.js"></script>
+	<script type="text/javascript" src="../libs/bililiteRange.js"></script>
+	<script type="text/javascript" src="../libs/jquery.simulate.js"></script>
+	<script type="text/javascript" src="../src/jquery.simulate.ext.js"></script>
+	<script type="text/javascript" src="../src/jquery.simulate.drag-n-drop.js"></script>
+	<script type="text/javascript" src="../src/jquery.simulate.key-sequence.js"></script>
+	<script type="text/javascript" src="../src/jquery.simulate.key-combo.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			eventLog = $('#eventLog'); // Global variable
+			eventLog.indentation = "";
+			eventLog.incIndentation = function() {
+				eventLog.indentation += "    ";
+			}
+			eventLog.decIndentation = function() {
+				if (eventLog.indentation.length <= 4)
+					eventLog.indentation = "";
+				else
+					eventLog.indentation = eventLog.indentation.substr(-4);
+			}
+			eventLog.append = function(str, indent) {
+				if (indent === true || indent === undefined)
+					eventLog.val(eventLog.val()+eventLog.indentation+str+"\n");
+				else
+					eventLog.val(eventLog.val()+str+"\n");
+			}
+			logMouseMove = false; // Global variable
+			
+			
+			$('#slider').slider();
+			
+			$('#slider').bind('slidechange', function(event, ui) {
+				$('#currentSliderValue').val(ui.value);
+			});
+			
+			function logMouseMoveEvent(event) {
+				if (logMouseMove) {
+					var indentLength = 10-event.type.length;
+					var indent = "";
+					for (var i=0; i < indentLength; i+=1) {
+						indent += " ";
+					}
+					eventLog.append(event.type+indent+"(x: "+event.pageX+", y: "+event.pageY+")");
+				}
+			}
+			
+			function logButtonEvent(event) {
+				var indentLength = 10-event.type.length;
+				var indent = "";
+				for (var i=0; i < indentLength; i+=1) {
+					indent += " ";
+				}
+				var modifiers = ['shift', 'alt', 'ctrl', 'meta'];
+				var activeMods = []
+				for (var mod in modifiers) {
+					if (event[modifiers[mod]+"Key"]) {
+						activeMods.push(modifiers[mod]);
+					}
+				}
+				var activeModStr = "";
+				if (activeMods.length > 0) {
+					activeModStr = ", modifiers: " + activeMods.join("+");
+				}
+
+				eventLog.append(event.type+indent+"(which: "+event.which/*+", target: "+event.target+", keyCode: "+event.keyCode+", charCode: "+event.charCode*/+activeModStr+")");
+			}
+			
+			$(document).bind({
+				'keyup keydown keypress mousedown mouseup click': logButtonEvent,
+				'mousemove': logMouseMoveEvent
+			});
+			$(document).bind('mousemove', function(event) {
+				$('#mousePos').text("("+event.pageX+","+event.pageY+")");
+			});
+			
+			$('#clear-log').click(function() {
+				$('#eventLog').val("");
+			});
+			
+			$('#drag-interpolation-type').change(function() {
+				var unit;
+				switch ($(this).val()) {
+					case "stepCount": unit = "steps"; break;
+					case "stepWidth": unit = "pixels"; break;
+					default: unit = ""; break;
+				}
+				$('#drag-interpolation-unit').text(unit);
+			}).change();
+			
+			var sketchpad = Raphael.sketchpad("drawing-area", {
+				height: 400,
+				width: "100%",
+				editing: true
+			});
+			
+			sketchpad.pen().width(1);
+			$('#clear-area').click(function() {
+				sketchpad.clear();
+			});
+			
+			initDemo();
+		});
+	</script>
+	<style type="text/css">
+		body {
+			font-family: sans-serif;
+		}
+		
+		h5 {
+			font-size: 14px;
+			margin-bottom: 0.5em;
+		}
+		
+		.container {
+			width: 90%;
+			margin: 1em;
+			margin-top: 0.5em;
+			border-radius: 6px;
+			border: 1px solid black;
+			padding: 1em;
+		}
+		
+		.container input[type="text"] {
+			width: 100%;
+		}
+		
+		.container-left {
+			float: left;
+		}
+		
+		.container-right {
+			float: right;
+			margin-right: 10%;
+			/* border: 1px solid black; */
+		}
+		
+		.container-right-fixed {
+			width: 40%;
+			position: fixed;
+			left: 55%;
+		}
+		
+		.simulate-buttons {
+			margin: 0.5em;
+		}
+		
+		#slider {
+			margin: 1em;
+		}
+		
+		#currentSliderValue {
+			width: 5em;
+			text-align: right;
+		}
+		
+		#eventLog {
+			height: 35em;
+			width: 100%;
+		}
+		
+		#textInput {
+			background-color: #EEEEEE;
+			width: 100%;
+			height: 4em;
+		}
+		
+		#drawing-area {
+			background-color: #EEEEEE;
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<div class="container-left">
+		<div class="container">
+			<textarea id="textInput"></textarea>
+			<div class="simulate-buttons">
+				<h4>Key-Combo Simulation:</h4>
+				<button id="combo-shifta">Key Combo "Shift+a"</button>
+				<button id="combo-Ad">Key Combo "A+d"</button>
+			</div>
+			<div class="simulate-buttons">
+				Custom Combo:<input id="customCombo" type="text" value="ctrl+alt+f"/><button id="combo-custom">Execute custom combo</button>
+			</div>
+			<div class="simulate-buttons" style="margin-top: 2em;">
+				<h4>Key-Sequence Simulation:</h4>
+				<button id="sequence-asdf">Key Sequence "asdf"</button>
+				<button id="sequence-foobar">Key Sequence "fooob{leftarrow}{backspace}{rightarrow}ar"</button>
+			</div>
+			<div class="simulate-buttons">
+				Delay: <input id="sequence-delay" type="number" min="0"> ms
+			</div>
+			<div class="simulate-buttons">
+				Custom Sequence:<input id="customSequence" type="text" value="test me!"/><button id="sequence-custom">Execute custom sequence</button>
+			</div>
+		</div>
+		<div class="container">
+			<h4>Drag'n'Drop Simulation:</h4>
+			<div class="container container-right" style="width: 11em; padding: 0.5em;">
+				<b>Note:</b><br/>Avoid moving the mouse during interpolated drag'n'drop simulations.
+			</div>
+			<div class="simulate-buttons" style="margin-bottom: 2em;">
+				<h5>Interpolation:</h5>
+				<select id="drag-interpolation-type">
+					<option value="stepCount">Step Count</option>
+					<option value="stepWidth">Step Width</option>
+				</select>: <input id="drag-interpolation" type="number" min="0"> <span id="drag-interpolation-unit"></span><br/>
+				<select id="drag-delay-type">
+					<option value="stepDelay">Step Delay</option>
+					<option value="duration">Duration</option>
+				</select>: <input id="drag-delay" type="number" min="0" /> ms<br/>
+				Shaky: <input id="drag-shaky" type="text" style="width: 10em;" /> pixels
+			</div>
+			<div class="container">
+				<h4>Slider:</h4>
+				<div id="slider"></div>
+				<div>Current slider value: <input id="currentSliderValue" type="text" value="0" readonly="readonly" /></div>
+				<div class="simulate-buttons">
+					<p>Press 'd' to simulate a drop while dragging.</p>
+					<button id="drag-50r">Drag 50px right</button>
+					<button id="dnd-50l">Drag'n'Drop 50px left</button>
+					<button id="dnd-50r">Drag'n'Drop 50px right</button>
+				</div>
+				<div class="simulate-buttons">
+					<button id="drag-350r">Drag 350px right</button>
+					<button id="dnd-350l">Drag'n'Drop 350px left</button>
+					<button id="dnd-350r">Drag'n'Drop 350px right</button>
+				</div>
+			</div>
+			<div class="container">
+				<h4>Drawing:</h4>
+				<button id="clear-area" style="float: right; margin-bottom: 0.5em;">Clear Area</button>
+				<div style="clear: both;"></div>
+				<div id="drawing-area"></div>
+				<div class="simulate-buttons">
+					<button id="drawing-dnd-100r">Draw 100px right</button>
+					<button id="drawing-dnd-100u">Draw 100px up</button>
+					<button id="drawing-dnd-100bl">Draw 100px bottom-left</button>
+				</div>
+				<div class="simulate-buttons">
+					dx: <input id="drawing-dx" type="number" />, dy: <input id="drawing-dy" type="number" /><button id="drawing-custom">Execute custom draw</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container container-right-fixed">
+		<div style="margin-bottom: 0.5em;">
+			Event Log:
+			<button id="clear-log" style="float: right; margin-bottom: 0.5em;">Clear Log</button>
+			<div style="clear: both;"></div>
+			<textarea id="eventLog" readonly="readonly"></textarea><br/>
+			<small><b>Note:</b> mousemove events are logged only during drag simulation to avoid spamming</small>
+		</div>
+		<div>
+		MouseMove Position: <span id="mousePos"></span>
+		</div>
+	</div>
+	<script type="text/javascript">
+	function simulateWrapper(target, type, options) {
+		
+		switch (type) {
+		case "key-sequence":
+			options.delay = $('#sequence-delay').val();
+			break;
+		case "drag":
+		case "drag-n-drop":
+			logMouseMove = true;
+			var interpolationType = $('#drag-interpolation-type').val(),
+				delayType = $('#drag-delay-type').val();
+			var shakyValue = $('#drag-shaky').val();
+			options.interpolation = {
+				shaky: (shakyValue.toLowerCase() === "true")? true : parseInt(shakyValue)
+			};
+			options.interpolation[interpolationType] = $('#drag-interpolation').val();
+			options.interpolation[delayType] = $('#drag-delay').val();
+			break;
+		}
+	
+		eventLog.append("####### Simulating "+type+" #######");
+		eventLog.incIndentation();
+		
+		function simulationEnd() {
+			logMouseMove = false;
+			eventLog.decIndentation();
+			eventLog.append("################################");
+		}
+		
+		switch (type) {
+		case "key-sequence":
+			
+			$(document).one("simulate-keySequence", simulationEnd);
+			break;
+		case "drag":
+			$(document).one("simulate-drag", simulationEnd);
+			break;
+		case "drag-n-drop":
+		case "drop":
+			$(document).one("simulate-drop", simulationEnd);
+			break;
+		}
+
+		$(target).simulate(type, options);
+		
+		if (type === "key-combo") {
+			simulationEnd();
+		}
+	}
+	
+	
+	function initDemo() {
+		// Bind 'd' to simulate a drop
+		$(document).bind('keyup', function(event) {
+			if (event.which === 68) {
+				eventLog.append("'d' pressed!");
+				simulateWrapper(handle, 'drop');
+			}
+		});
+	
+		$('#combo-shifta').bind('click', function() {
+			simulateWrapper('#textInput', 'key-combo', {combo: "shift+a"});
+		});
+		$('#combo-Ad').bind('click', function() {
+			simulateWrapper('#textInput', 'key-combo', {combo: "A+d"});
+		});
+		$('#combo-custom').bind('click', function() {
+			var combo = $('#customCombo').val();
+			simulateWrapper('#textInput', 'key-combo', {combo: combo});
+		});
+		$('#sequence-asdf').bind('click', function() {
+			simulateWrapper('#textInput', 'key-sequence', {sequence: "asdf"});
+		});
+		$('#sequence-foobar').bind('click', function() {
+			simulateWrapper('#textInput', 'key-sequence', {sequence: "fooob{leftarrow}{backspace}{rightarrow}ar"});
+		});
+		$('#sequence-custom').bind('click', function() {
+			var sequence = $('#customSequence').val();
+			simulateWrapper('#textInput', 'key-sequence', {sequence: sequence});
+		});
+	
+		var handle = $('#slider .ui-slider-handle');
+		$('#drag-50r').bind('click', function() {
+			simulateWrapper(handle, 'drag', {dx: 50});
+		});
+		$('#dnd-50l').bind('click', function() {
+			simulateWrapper(handle, 'drag-n-drop', {dx: -50});
+		});
+		$('#dnd-50r').bind('click', function() {
+			simulateWrapper(handle, 'drag-n-drop', {dx: 50});
+		});
+		$('#drag-350r').bind('click', function() {
+			simulateWrapper(handle, 'drag', {dx: 350});
+		});
+		$('#dnd-350l').bind('click', function() {
+			simulateWrapper(handle, 'drag-n-drop', {dx: -350});
+		});
+		$('#dnd-350r').bind('click', function() {
+			simulateWrapper(handle, 'drag-n-drop', {dx: 350});
+		});
+		
+		var drawingArea = $('#drawing-area');
+		$('#drawing-dnd-100r').bind('click', function() {
+			simulateWrapper(drawingArea, 'drag-n-drop', {dx: 100});
+		});
+		$('#drawing-dnd-100u').bind('click', function() {
+			simulateWrapper(drawingArea, 'drag-n-drop', {dy: -100});
+		});
+		$('#drawing-dnd-100bl').bind('click', function() {
+			simulateWrapper(drawingArea, 'drag-n-drop', {dx: -71, dy: 71});
+		});
+		$('#drawing-custom').bind('click', function() {
+			var dx = parseInt($('#drawing-dx').val()),
+				dy = parseInt($('#drawing-dy').val());
+			simulateWrapper(drawingArea, 'drag-n-drop', {dx: dx, dy: dy});
+		});
+		
+	}
+	</script>
+</body>
+</html>
