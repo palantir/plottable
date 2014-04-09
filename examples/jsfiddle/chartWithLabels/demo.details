@@ -1,7 +1,0 @@
----
-name: Plottable.js Chart with Axis Labels
-description: Creates a chart with an x-axis, y-axis, and axis labels. Demonstrates nesting tables.
-authors:
-  - Justin Lan
-normalize_css: no
-...
