@@ -83,9 +83,9 @@ module Plottable {
 
       // Note: d3's classed definition doesn't accept the object signature
       var classAccessor = this._getAppliedAccessor(this._classAccessor);
-      updateSelection.each((d: any, i: number): any => {
-        var classes: string = classAccessor(d,i);
-        if (classes instanceof string) {          
+      updateSelection.each(function(d: any, i: number): any { // no double arrow because we need the element from "this"
+        var classes: any = classAccessor(d,i);
+        if (classes instanceof String) {
           d3.select(this).classed(classes, true);
         } else if (classes instanceof Object) {
           d3.select(this).classed(classes);
