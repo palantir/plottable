@@ -81,7 +81,6 @@ module Plottable {
 
       var updateSelection: any = this.dataSelection;
 
-      // Note: d3's classed definition doesn't accept the object signature
       var classAccessor = this._getAppliedAccessor(this._classAccessor);
       updateSelection.each(function(d: any, i: number): any { // no double arrow because we need the element from "this"
         var classes: any = classAccessor(d,i);
