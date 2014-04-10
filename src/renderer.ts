@@ -8,6 +8,7 @@ module Plottable {
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
+    public _classAccessor: IAccessor;
     public _animate = false;
     public _hasRendered = false;
     private static defaultColorAccessor = (d: any) => "#1f77b4";
@@ -85,8 +86,15 @@ module Plottable {
       return this;
     }
 
-    public colorAccessor(a: IAccessor): Renderer {
-      this._colorAccessor = a;
+    public classAccessor(accessor: IAccessor) {
+      this._classAccessor = accessor;
+      this._requireRerender = true;
+      this._rerenderUpdateSelection = true;
+      return this;
+    }
+
+    public colorAccessor(accessor: IAccessor): Renderer {
+      this._colorAccessor = accessor;
       this._requireRerender = true;
       this._rerenderUpdateSelection = true;
       return this;

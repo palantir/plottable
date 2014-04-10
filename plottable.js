@@ -26,6 +26,26 @@ var Plottable;
         }
         Utils.getBBox = getBBox;
 
+        function _getParsedStyleValue(style, prop) {
+            var value = style.getPropertyValue(prop);
+            if (value == null) {
+                return 0;
+            }
+            return parseFloat(value);
+        }
+
+        function getElementWidth(elem) {
+            var style = window.getComputedStyle(elem);
+            return _getParsedStyleValue(style, "width") + _getParsedStyleValue(style, "padding-left") + _getParsedStyleValue(style, "padding-right") + _getParsedStyleValue(style, "border-left-width") + _getParsedStyleValue(style, "border-right-width");
+        }
+        Utils.getElementWidth = getElementWidth;
+
+        function getElementHeight(elem) {
+            var style = window.getComputedStyle(elem);
+            return _getParsedStyleValue(style, "height") + _getParsedStyleValue(style, "padding-top") + _getParsedStyleValue(style, "padding-bottom") + _getParsedStyleValue(style, "border-top-width") + _getParsedStyleValue(style, "border-bottom-width");
+        }
+        Utils.getElementHeight = getElementHeight;
+
         /**
         * Truncates a text string to a max length, given the element in which to draw the text
         *
@@ -166,6 +186,9 @@ var Plottable;
                 // svg node gets the "plottable" CSS class
                 this.rootSVG = element;
                 this.rootSVG.classed("plottable", true);
+
+                // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
+                this.rootSVG.style("overflow", "visible");
                 this.element = element.append("g");
                 this.isTopLevelComponent = true;
             } else {
@@ -216,8 +239,10 @@ var Plottable;
                     // we are the root node, retrieve height/width from root SVG
                     xOrigin = 0;
                     yOrigin = 0;
-                    availableWidth = this.rootSVG.node().offsetWidth;
-                    availableHeight = this.rootSVG.node().offsetHeight;
+
+                    var elem = this.rootSVG.node().parentNode;
+                    availableWidth = Plottable.Utils.getElementWidth(elem);
+                    availableHeight = Plottable.Utils.getElementHeight(elem);
                 } else {
                     throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                 }
@@ -1504,8 +1529,15 @@ var Plottable;
             return this;
         };
 
-        Renderer.prototype.colorAccessor = function (a) {
-            this._colorAccessor = a;
+        Renderer.prototype.classAccessor = function (accessor) {
+            this._classAccessor = accessor;
+            this._requireRerender = true;
+            this._rerenderUpdateSelection = true;
+            return this;
+        };
+
+        Renderer.prototype.colorAccessor = function (accessor) {
+            this._colorAccessor = accessor;
             this._requireRerender = true;
             this._rerenderUpdateSelection = true;
             return this;
@@ -2481,6 +2513,7 @@ var Plottable;
             this.classed("bar-renderer", true);
             this._animate = true;
             this._widthAccessor = (widthAccessor != null) ? widthAccessor : 10; // default width is 10px
+            this.clipPathEnabled = false;
         }
         /**
         * Sets the width accessor.
@@ -2505,12 +2538,25 @@ var Plottable;
             this.dataSelection = this.renderArea.selectAll("rect").data(this._data, xA);
             this.dataSelection.enter().append("rect");
 
-            var widthFunction = this._getAppliedAccessor(this._widthAccessor);
+            var rangeType = this.xScale.rangeType();
+
+            var widthFunction;
+            if (rangeType === "points") {
+                widthFunction = this._getAppliedAccessor(this._widthAccessor);
+            } else {
+                widthFunction = function (d, i) {
+                    return _this.xScale.rangeBand();
+                };
+            }
 
             var xFunction = function (d, i) {
                 var x = xA(d, i);
                 var scaledX = _this.xScale.scale(x);
-                return scaledX - widthFunction(d, i) / 2;
+                if (rangeType === "points") {
+                    return scaledX - widthFunction(d, i) / 2;
+                } else {
+                    return scaledX;
+                }
             };
 
             var yA = this._getAppliedAccessor(this._yAccessor);
@@ -2525,10 +2571,22 @@ var Plottable;
             };
 
             var updateSelection = this.dataSelection;
+
+            // Note: d3's classed definition doesn't accept the object signature
+            var classAccessor = this._getAppliedAccessor(this._classAccessor);
+            updateSelection.each(function (d, i) {
+                var classes = classAccessor(d, i);
+                if (classes != null) {
+                    d3.select(this).classed(classes, true);
+                }
+            });
+
             if (this._animate) {
                 updateSelection = updateSelection.transition();
             }
+
             updateSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", this._getAppliedAccessor(this._colorAccessor));
+
             this.dataSelection.exit().remove();
         };
 

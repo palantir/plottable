@@ -10,6 +10,8 @@ declare module Plottable {
         * @returns {SVGRed} The bounding box.
         */
         function getBBox(element: D3.Selection): SVGRect;
+        function getElementWidth(elem: HTMLScriptElement): number;
+        function getElementHeight(elem: HTMLScriptElement): number;
         /**
         * Truncates a text string to a max length, given the element in which to draw the text
         *
@@ -568,7 +570,8 @@ declare module Plottable {
         public dataset(dataset: IDataset): Renderer;
         public metadata(metadata: IMetadata): Renderer;
         public data(data: any[]): Renderer;
-        public colorAccessor(a: IAccessor): Renderer;
+        public classAccessor(accessor: IAccessor): Renderer;
+        public colorAccessor(accessor: IAccessor): Renderer;
         public autorange(): Renderer;
     }
 }

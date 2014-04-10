@@ -25,6 +25,7 @@ module Plottable {
       this.classed("bar-renderer", true);
       this._animate = true;
       this._widthAccessor = (widthAccessor != null) ? widthAccessor : 10; // default width is 10px
+      this.clipPathEnabled = false;
     }
 
     /**
@@ -80,15 +81,27 @@ module Plottable {
       };
 
       var updateSelection: any = this.dataSelection;
+
+      // Note: d3's classed definition doesn't accept the object signature
+      var classAccessor = this._getAppliedAccessor(this._classAccessor);
+      updateSelection.each(function(d:any, i:number):any{
+        var classes:string = classAccessor(d,i);
+        if (classes != null) {
+          d3.select(this).classed(classes, true);
+        }
+      });
+
       if (this._animate) {
         updateSelection = updateSelection.transition();
       }
+
       updateSelection
             .attr("x", xFunction)
             .attr("y", yFunction)
             .attr("width", widthFunction)
             .attr("height", heightFunction)
             .attr("fill", this._getAppliedAccessor(this._colorAccessor));
+
       this.dataSelection.exit().remove();
     }
 
