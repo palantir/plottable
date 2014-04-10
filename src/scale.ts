@@ -96,8 +96,10 @@ module Plottable {
 
   export class OrdinalScale extends Scale {
     public _d3Scale: D3.Scale.OrdinalScale;
-    private END_PADDING = 0.5; // as a proportion of the spacing between domain values
-    private _range = [0, 1];
+    private INNER_PADDING = 0.3; // as a proportion of the spacing between domain 
+    private OUTER_PADDING = 0.5;
+    private _range        = [0, 1];
+    private _rangeType    = "points";
 
     /**
      * Creates a new OrdinalScale. Domain and Range are set later.
@@ -109,14 +111,14 @@ module Plottable {
     }
 
     public domain(): any[];
-    public domain(values: any[]): Scale;
+    public domain(values: any[]): OrdinalScale;
     public domain(values?: any[]): any {
       if (values == null) {
         return this._d3Scale.domain();
       } else {
         this._d3Scale.domain(values);
         this._broadcasterCallbacks.forEach((b) => b(this));
-        this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING); // d3 scale takes total padding
+        this.range(this.range());
         return this;
       }
     }
@@ -128,13 +130,45 @@ module Plottable {
      * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
      */
     public range(): any[];
-    public range(values: number[]): Scale;
+    public range(values: number[]): OrdinalScale;
     public range(values?: number[]): any {
       if (values == null) {
         return this._range;
       } else {
         this._range = values;
-        this._d3Scale.rangePoints(values, 2*this.END_PADDING); // d3 scale takes total padding
+        if (this._rangeType === "points"){
+          this._d3Scale.rangePoints(values, 2*this.OUTER_PADDING); // d3 scale takes total padding
+        } else if (this._rangeType === "bands") {
+          this._d3Scale.rangeBands(values, this.INNER_PADDING, this.OUTER_PADDING);
+        }
+        return this;
+      }
+    }
+
+    public rangeBand() : number {
+      if (this._rangeType === "bands") {
+        return this._d3Scale.rangeBand();
+      } else {
+        return 0;
+      }
+    }
+
+    /**
+     * Returns the range type, or sets the range type.
+     *
+     * @param {string} [rangeType] Either "points" or "bands" indicating the d3 method used to generate range bounds.
+     * @returns {string|OrdinalScale} The current range type, or the calling OrdinalScale.
+     */
+    public rangeType() : string;
+    public rangeType(rangeType: string) : OrdinalScale;
+    public rangeType(rangeType?: string) : any {
+      if (rangeType == null){
+        return this._rangeType;
+      } else {
+        if(!(rangeType === "points" || rangeType === "bands")){
+          throw new Error("Unsupported range type: " + rangeType);
+        }
+        this._rangeType = rangeType;
         return this;
       }
     }

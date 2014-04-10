@@ -10,6 +10,8 @@ declare module Plottable {
         * @returns {SVGRed} The bounding box.
         */
         function getBBox(element: D3.Selection): SVGRect;
+        function getElementWidth(elem: HTMLScriptElement): number;
+        function getElementHeight(elem: HTMLScriptElement): number;
         /**
         * Truncates a text string to a max length, given the element in which to draw the text
         *
@@ -256,7 +258,7 @@ declare module Plottable {
         */
         constructor();
         public domain(): any[];
-        public domain(values: any[]): Scale;
+        public domain(values: any[]): OrdinalScale;
         /**
         * Returns the range of pixels spanned by the scale, or sets the range.
         *
@@ -264,7 +266,16 @@ declare module Plottable {
         * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
         */
         public range(): any[];
-        public range(values: number[]): Scale;
+        public range(values: number[]): OrdinalScale;
+        public rangeBand(): number;
+        /**
+        * Returns the range type, or sets the range type.
+        *
+        * @param {string} [rangeType] Either "points" or "bands" indicating the d3 method used to generate range bounds.
+        * @returns {string|OrdinalScale} The current range type, or the calling OrdinalScale.
+        */
+        public rangeType(): string;
+        public rangeType(rangeType: string): OrdinalScale;
         public widenDomainOnData(data: any[], accessor?: IAccessor): OrdinalScale;
     }
     class QuantitiveScale extends Scale {
@@ -559,7 +570,8 @@ declare module Plottable {
         public dataset(dataset: IDataset): Renderer;
         public metadata(metadata: IMetadata): Renderer;
         public data(data: any[]): Renderer;
-        public colorAccessor(a: IAccessor): Renderer;
+        public classAccessor(accessor: IAccessor): Renderer;
+        public colorAccessor(accessor: IAccessor): Renderer;
         public autorange(): Renderer;
     }
 }
