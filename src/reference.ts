@@ -1,7 +1,11 @@
 /// <reference path="utils.ts" />
 /// <reference path="osUtils.ts" />
 /// <reference path="component.ts" />
-/// <reference path="scale.ts" />
+/// <reference path="scales/scale.ts" />
+/// <reference path="scales/quantitiveScale.ts" />
+/// <reference path="scales/linearScale.ts" />
+/// <reference path="scales/ordinalScale.ts" />
+/// <reference path="scales/colorScale.ts" />
 //grunt-start
 /// <reference path="axis.ts" />
 /// <reference path="keyEventListener.ts" />
