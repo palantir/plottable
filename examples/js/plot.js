@@ -18,7 +18,6 @@ function scatterPlot(svg, data) {
     function dateAccessor(d) { return new Date(d.date); }
     function hourAccessor(d) { return dateAccessor(d).getHours(); }
 
-
     function hourFormatter(h) { return h + ':00'; }
 
     var renderer = new Plottable.CircleRenderer(data, xScale, yScale)
