@@ -145,6 +145,12 @@ module Plottable {
       }
     }
 
+    /**
+     * If the rangetype is "bands" this returns the size of the range band.
+     * Otherwise it returns 0.
+     *
+     * @returns {number} The pixel width or height of a range band.
+     */
     public rangeBand() : number {
       if (this._rangeType === "bands") {
         return this._d3Scale.rangeBand();
@@ -156,7 +162,7 @@ module Plottable {
     /**
      * Returns the range type, or sets the range type.
      *
-     * @param {string} [rangeType] Either "points" or "bands" indicating the d3 method used to generate range bounds.
+     * @param {string} [rangeType] The type of range bound generator to use (points/bands).
      * @returns {string|OrdinalScale} The current range type, or the calling OrdinalScale.
      */
     public rangeType() : string;

@@ -25,7 +25,6 @@ module Plottable {
       this.classed("bar-renderer", true);
       this._animate = true;
       this._widthAccessor = (widthAccessor != null) ? widthAccessor : 10; // default width is 10px
-      this.clipPathEnabled = false;
     }
 
     /**
@@ -56,7 +55,7 @@ module Plottable {
       if (rangeType === "points"){
         widthFunction = this._getAppliedAccessor(this._widthAccessor);
       } else {
-        widthFunction = (d:any, i: number) => {return this.xScale.rangeBand();};
+        widthFunction = (d:any, i: number) => this.xScale.rangeBand();
       }
 
       var xFunction = (d: any, i: number) => {
@@ -84,10 +83,12 @@ module Plottable {
 
       // Note: d3's classed definition doesn't accept the object signature
       var classAccessor = this._getAppliedAccessor(this._classAccessor);
-      updateSelection.each(function(d:any, i:number):any{
-        var classes:string = classAccessor(d,i);
-        if (classes != null) {
+      updateSelection.each((d: any, i: number): any => {
+        var classes: string = classAccessor(d,i);
+        if (classes instanceof string) {          
           d3.select(this).classed(classes, true);
+        } else if (classes instanceof Object) {
+          d3.select(this).classed(classes);
         }
       });
 
