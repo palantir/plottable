@@ -20,7 +20,7 @@ module.exports = function(grunt) {
     },
     ts: {
       dev: {
-        src: ["src/*.ts", "typings/**/*.d.ts"],
+        src: ["src/**/*.ts", "typings/**/*.d.ts"],
         out: "build/plottable.js",
         // watch: "src",
         options: {

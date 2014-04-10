@@ -2498,11 +2498,11 @@ var Plottable;
                 return maxScaledY - yFunction(d, i);
             };
 
-            var updateSelection = this.dataSelection;
+            var updateSelection = this.dataSelection.attr("fill", this._getAppliedAccessor(this._colorAccessor));
             if (this._animate) {
                 updateSelection = updateSelection.transition();
             }
-            updateSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction).attr("fill", this._getAppliedAccessor(this._colorAccessor));
+            updateSelection.attr("x", xFunction).attr("y", yFunction).attr("width", widthFunction).attr("height", heightFunction);
             this.dataSelection.exit().remove();
         };
 

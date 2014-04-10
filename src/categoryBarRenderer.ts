@@ -68,7 +68,8 @@ module Plottable {
         return maxScaledY - yFunction(d, i);
       };
 
-      var updateSelection: any = this.dataSelection;
+      var updateSelection: any = this.dataSelection
+            .attr("fill", this._getAppliedAccessor(this._colorAccessor));
       if (this._animate) {
         updateSelection = updateSelection.transition();
       }
@@ -76,8 +77,7 @@ module Plottable {
             .attr("x", xFunction)
             .attr("y", yFunction)
             .attr("width", widthFunction)
-            .attr("height", heightFunction)
-            .attr("fill", this._getAppliedAccessor(this._colorAccessor));
+            .attr("height", heightFunction);
       this.dataSelection.exit().remove();
     }
 
