@@ -38,17 +38,17 @@ module Plottable {
     public projector(attrToSet: string, accessor: any, scale?: Scale) {
       super.projector(attrToSet, accessor, scale);
       if (attrToSet === "x") {
-        this.xAccessor = this._projectors["x"].accessor;
+        this._xAccessor = this._projectors["x"].accessor;
         if (scale != null) {
-          this.xScale = this.projectors["x"].scale;
+          this.xScale = this._projectors["x"].scale;
           this.xScale.registerListener(() => this.rescale());
           // TODO - unregister the old listener.
         }
       }
       if (attrToSet === "y") {
-        this.yAccessor = this._projectors["y"].accessor;
+        this._yAccessor = this._projectors["y"].accessor;
         if (scale != null) {
-          this.yScale = this.projectors["y"].scale;
+          this.yScale = this._projectors["y"].scale;
           this.yScale.registerListener(() => this.rescale());
         }
       }

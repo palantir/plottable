@@ -33,23 +33,16 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      var xA = this._getAppliedAccessor(this._xAccessor);
-      var yA = this._getAppliedAccessor(this._yAccessor);
-      var rA = this._getAppliedAccessor(this._rAccessor);
-      var cA = this._getAppliedAccessor(this._colorAccessor);
-      var xFn = (d: any, i: number) =>
+      var attrHash = this._generateAttrHash();
+/*      var xFn = (d: any, i: number) =>
         this.xScale.scale(xA(d, i)) - rA(d, i);
 
       var yFn = (d: any, i: number) =>
-        this.yScale.scale(yA(d, i)) - rA(d, i);
+        this.yScale.scale(yA(d, i)) - rA(d, i);*/
 
       this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this.dataSelection.enter().append("rect");
-      this.dataSelection.attr("x", xFn)
-                        .attr("y", yFn)
-                        .attr("width",  rA)
-                        .attr("height", rA)
-                        .attr("fill", cA);
+      this.dataSelection.attr(attrHash);
       this.dataSelection.exit().remove();
     }
   }

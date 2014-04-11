@@ -17,7 +17,7 @@ module Plottable {
     constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: any, yAccessor?: any, rAccessor?: any) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
+/*      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;*/
       this.classed("circle-renderer", true);
     }
 
@@ -30,12 +30,14 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
-      this.dataSelection.enter().append("circle");
-      this.dataSelection.attr("cx", cx)
-                        .attr("cy", cy)
-                        .attr("r", r)
-                        .attr("fill", color);
+      var attrHash = this._generateAttrHash();
+      attrHash["cx"] = attrHash["x"];
+      attrHash["cy"] = attrHash["y"];
+      delete attrHash["x"];
+      delete attrHash["y"];
+
+      this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
+      this.dataSelection.enter().append("circle").attr(attrHash);
       this.dataSelection.exit().remove();
     }
   }

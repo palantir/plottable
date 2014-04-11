@@ -16,7 +16,7 @@ module Plottable {
     public _animate = false;
     public _hasRendered = false;
     private static defaultColorAccessor = (d: any) => "#1f77b4";
-    public _projectors: [attrToSet: string]: _IProjector = {};
+    public _projectors: { [attrToSet: string]: _IProjector; } = {};
 
     public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only
@@ -89,10 +89,10 @@ module Plottable {
       return this;
     }
 
-    public _generateAttrHash(): [attrToSet: string]: IAppliedAccessor {
-      var h = {};
+    public _generateAttrHash(): { [attrToSet: string]: IAppliedAccessor; } {
+      var h: { [attrName: string]: IAppliedAccessor; } = {};
       d3.keys(this._projectors).forEach((a) => {
-        var projector = this.projectors[a];
+        var projector = this._projectors[a];
         var accessor = this._getAppliedAccessor(projector.accessor);
         var scale = projector.scale;
         var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
