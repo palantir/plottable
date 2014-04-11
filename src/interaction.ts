@@ -374,7 +374,7 @@ module Plottable {
       this.lastx = x;
       this.lasty = y;
       var domainX = this.renderer.xScale.invert(x);
-      var data = this.renderer._data;
+      var data = this.renderer.dataSource().data();
       var xA = this.renderer._getAppliedAccessor(this.renderer._xAccessor);
       var yA = this.renderer._getAppliedAccessor(this.renderer._yAccessor);
       var dataIndex = OSUtils.sortedIndex(domainX, data, xA);

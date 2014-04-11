@@ -46,7 +46,7 @@ module Plottable {
       var maxScaledY = Math.max(yRange[0], yRange[1]);
       var xA = this._getAppliedAccessor(this._xAccessor);
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._data, xA);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
       this.dataSelection.enter().append("rect");
 
       var widthFunction = this._getAppliedAccessor(this._widthAccessor);

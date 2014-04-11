@@ -70,7 +70,7 @@ module Plottable {
     public getDataIndicesFromArea(dataArea: SelectionArea): number[] {
       var filterFunction = this.getDataFilterFunction(dataArea);
       var results: number[] = [];
-      this._data.forEach((d, i) => {
+      this._dataSource.data().forEach((d, i) => {
         if (filterFunction(d, i)) {
           results.push(i);
         }

@@ -13,7 +13,7 @@ module Plottable {
      * Creates an XYRenderer.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
+     * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
@@ -64,7 +64,7 @@ module Plottable {
      */
     public autorange() {
       super.autorange();
-      var data = this._data;
+      var data = this._dataSource.data();
       var xA = (d: any) => this._getAppliedAccessor(this._xAccessor)(d, null);
       this.xScale.widenDomainOnData(data, xA);
 

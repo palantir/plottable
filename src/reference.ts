@@ -6,6 +6,7 @@
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
+/// <reference path="dataSource.ts" />
 //grunt-start
 /// <reference path="axis.ts" />
 /// <reference path="keyEventListener.ts" />

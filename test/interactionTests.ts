@@ -81,7 +81,7 @@ describe("Interactions", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
-    var dataset: Plottable.IDataset;
+    var dataset: Plottable.DataSource;
     var xScale: Plottable.QuantitiveScale;
     var yScale: Plottable.QuantitiveScale;
     var renderer: Plottable.XYRenderer;
@@ -94,7 +94,7 @@ describe("Interactions", () => {
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
-      dataset = makeLinearSeries(10);
+      dataset = new Plottable.DataSource(makeLinearSeries(10));
       xScale = new Plottable.LinearScale();
       yScale = new Plottable.LinearScale();
       renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
@@ -204,10 +204,9 @@ describe("Interactions", () => {
       var svg = generateSVG(400, 400);
       var dp = (x, y) => { return {x: x, y: y}; };
       var data = [dp(0, 0), dp(20, 10), dp(40, 40)];
-      var dataset = {metadata: {cssClass: "foo"}, data: data};
       var xScale = new Plottable.LinearScale();
       var yScale = new Plottable.LinearScale();
-      var circleRenderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
+      var circleRenderer = new Plottable.CircleRenderer(data, xScale, yScale);
       var crosshairs = new Plottable.CrosshairsInteraction(circleRenderer);
       crosshairs.registerWithComponent();
       circleRenderer.renderTo(svg);
