@@ -7,7 +7,6 @@ module Plottable {
     public yScale: Scale;
     public _xAccessor: any;
     public _yAccessor: any;
-    public autorangeDataOnLayout = true;
 
     /**
      * Creates an XYRenderer.
@@ -29,21 +28,30 @@ module Plottable {
       this.xScale = xScale;
       this.yScale = yScale;
 
+      this.projector("x", this._xAccessor, this.xScale);
+      this.projector("y", this._yAccessor, this.yScale);
+
       this.xScale.registerListener(() => this.rescale());
       this.yScale.registerListener(() => this.rescale());
     }
 
-    public xAccessor(accessor: any) {
-      this._xAccessor = accessor;
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
-      return this;
-    }
-
-    public yAccessor(accessor: any) {
-      this._yAccessor = accessor;
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
+    public projector(attrToSet: string, accessor: any, scale?: Scale) {
+      super.projector(attrToSet, accessor, scale);
+      if (attrToSet === "x") {
+        this.xAccessor = this._projectors["x"].accessor;
+        if (scale != null) {
+          this.xScale = this.projectors["x"].scale;
+          this.xScale.registerListener(() => this.rescale());
+          // TODO - unregister the old listener.
+        }
+      }
+      if (attrToSet === "y") {
+        this.yAccessor = this._projectors["y"].accessor;
+        if (scale != null) {
+          this.yScale = this.projectors["y"].scale;
+          this.yScale.registerListener(() => this.rescale());
+        }
+      }
       return this;
     }
 
@@ -52,24 +60,6 @@ module Plottable {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.xScale.range([0, this.availableWidth]);
       this.yScale.range([this.availableHeight, 0]);
-      if (this.autorangeDataOnLayout) {
-        this.autorange();
-      }
-      return this;
-    }
-
-    /**
-     * Autoranges the scales over the data.
-     * Actual behavior is dependent on the scales.
-     */
-    public autorange() {
-      super.autorange();
-      var data = this._dataSource.data();
-      var xA = (d: any) => this._getAppliedAccessor(this._xAccessor)(d, null);
-      this.xScale.widenDomainOnData(data, xA);
-
-      var yA = (d: any) => this._getAppliedAccessor(this._yAccessor)(d, null);
-      this.yScale.widenDomainOnData(data, yA);
       return this;
     }
 

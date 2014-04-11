@@ -13,6 +13,10 @@ module Plottable {
     (datum: any, index?: number, metadata?: any): any;
   };
 
+  export interface IAppliedAccessor {
+    (datum: any, index: number) : any;
+  }
+
   export interface SelectionArea {
     xMin: number;
     xMax: number;
