@@ -16,13 +16,12 @@ module Plottable {
     }
 
     public domain(): any[];
-    public domain(values: any[]): Scale;
+    public domain(values: any[]): OrdinalScale;
     public domain(values?: any[]): any {
       if (values == null) {
         return this._d3Scale.domain();
       } else {
-        this._d3Scale.domain(values);
-        this._broadcasterCallbacks.forEach((b) => b(this));
+        super.domain(values);
         this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING); // d3 scale takes total padding
         return this;
       }
