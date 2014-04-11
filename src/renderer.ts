@@ -77,8 +77,8 @@ module Plottable {
     }
 
     public projector(attrToSet: string, accessor: any, scale?: Scale) {
-      accessor = Utils.accessorize(accessor);
-      var p = {accessor: accessor, scale: scale};
+      var activatedAccessor = Utils.accessorize(accessor);
+      var p = {accessor: activatedAccessor, scale: scale};
       this._projectors[attrToSet] = p;
       if (scale != null) {
         var rendererIDAttr = this._componentID + attrToSet;

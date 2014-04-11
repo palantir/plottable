@@ -179,7 +179,7 @@ describe("Renderers", () => {
         xScale = new Plottable.LinearScale();
         yScale = new Plottable.LinearScale();
         circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
-        circleRenderer.colorAccessor(colorAccessor);
+        circleRenderer.projector("fill", colorAccessor);
         circleRenderer.renderTo(svg);
       });
 

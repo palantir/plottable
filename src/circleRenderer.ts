@@ -19,9 +19,11 @@ module Plottable {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
 /*      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;*/
       this.classed("circle-renderer", true);
+      this.projector("r", 3);
+      this.projector("fill", "#00ffaa");
     }
 
-    public projector(attrToSet: string, accessor: IAccessor, scale?: Scale) {
+    public projector(attrToSet: string, accessor: any, scale?: Scale) {
       attrToSet = attrToSet === "cx" ? "x" : attrToSet;
       attrToSet = attrToSet === "cy" ? "y" : attrToSet;
       super.projector(attrToSet, accessor, scale);
@@ -36,7 +38,7 @@ module Plottable {
       delete attrHash["x"];
       delete attrHash["y"];
 
-      this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
+      this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
       this.dataSelection.enter().append("circle").attr(attrHash);
       this.dataSelection.exit().remove();
     }

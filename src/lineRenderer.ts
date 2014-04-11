@@ -33,7 +33,7 @@ module Plottable {
       this.line = d3.svg.line()
             .x((d: any, i: number) => this.xScale.scale(xA(d, i)))
             .y((d: any, i: number) => this.yScale.scale(yA(d, i)));
-      this.dataSelection = this.path.datum(this._data);
+      this.dataSelection = this.path.datum(this._dataSource.data());
       this.path.attr("d", this.line);
     }
   }
