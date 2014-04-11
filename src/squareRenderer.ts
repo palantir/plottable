@@ -43,7 +43,7 @@ module Plottable {
       var yFn = (d: any, i: number) =>
         this.yScale.scale(yA(d, i)) - rA(d, i);
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this.dataSelection.enter().append("rect");
       this.dataSelection.attr("x", xFn)
                         .attr("y", yFn)

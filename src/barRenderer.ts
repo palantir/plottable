@@ -35,7 +35,7 @@ module Plottable {
       var xA  = this._getAppliedAccessor(this._xAccessor);
       var dxA = this._getAppliedAccessor(this.dxAccessor);
       var x2Accessor = (d: any) => xA(d, null) + dxA(d, null);
-      var x2Extent: number[] = d3.extent(this._data, x2Accessor);
+      var x2Extent: number[] = d3.extent(this._dataSource.data(), x2Accessor);
       this.xScale.widenDomain(x2Extent);
       return this;
     }
@@ -45,7 +45,7 @@ module Plottable {
       var yRange = this.yScale.range();
       var maxScaledY = Math.max(yRange[0], yRange[1]);
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._data);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       var xdr = this.xScale.domain()[1] - this.xScale.domain()[0];
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");

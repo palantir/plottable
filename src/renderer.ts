@@ -2,8 +2,8 @@
 
 module Plottable {
   export class Renderer extends Component {
-    public _data: any[];
-    public _metadata: IMetadata;
+    public _dataSource: DataSource;
+
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
@@ -28,53 +28,48 @@ module Plottable {
      * Creates a Renderer.
      *
      * @constructor
-     * @param {IDataset} [dataset] The dataset associated with the Renderer.
+     * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
      */
+    constructor();
+    constructor(dataset: any[]);
+    constructor(dataset: DataSource);
     constructor(dataset?: any) {
       super();
       this.clipPathEnabled = true;
       this._fixedWidth = false;
       this._fixedHeight = false;
       this.classed("renderer", true);
+
       if (dataset != null) {
-        if (dataset.data == null) {
-          this.data(dataset);
+        if (typeof dataset.data === "function") { // DataSource
+          this._dataSource = <DataSource> dataset;
         } else {
-          this.data(dataset.data);
-          if (dataset.metadata != null) {
-            this.metadata(dataset.metadata);
-          }
+          this._dataSource = new DataSource(dataset);
         }
+        this._dataSource.registerListener(() => this._render());
       }
+
       this.colorAccessor(Renderer.defaultColorAccessor);
     }
 
     /**
-     * Sets a new dataset on the Renderer.
+     * Retrieves the current DataSource, or sets a DataSource if the Renderer doesn't yet have one.
      *
-     * @param {IDataset} dataset The new dataset to be associated with the Renderer.
-     * @returns {Renderer} The calling Renderer.
+     * @param {DataSource} [source] The DataSource the Renderer should use, if it doesn't yet have one.
+     * @return {DataSource|Renderer} The current DataSource or the calling Renderer.
      */
-    public dataset(dataset: IDataset): Renderer {
-      this.data(dataset.data);
-      this.metadata(dataset.metadata);
-      return this;
-    }
-
-    public metadata(metadata: IMetadata): Renderer {
-      var oldCSSClass = this._metadata != null ? this._metadata.cssClass : null;
-      this.classed(oldCSSClass, false);
-      this._metadata = metadata;
-      this.classed(this._metadata.cssClass, true);
-      this._rerenderUpdateSelection = true;
-      this._requireRerender = true;
-      return this;
-    }
-
-    public data(data: any[]): Renderer {
-      this._data = data;
-      this._requireRerender = true;
-      return this;
+    public dataSource(): DataSource;
+    public dataSource(source: DataSource): Renderer;
+    public dataSource(source?: DataSource): any {
+      if (source == null) {
+        return this._dataSource;
+      } else if (this._dataSource == null) {
+        this._dataSource = source;
+        this._dataSource.registerListener(() => this._render());
+        return this;
+      } else {
+        throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
+      }
     }
 
     public _render(): Renderer {
@@ -109,7 +104,7 @@ module Plottable {
 
     public _getAppliedAccessor(accessor: any): (d: any, i: number) => any {
       if (typeof(accessor) === "function") {
-        return (d: any, i: number) => accessor(d, i, this._metadata);
+        return (d: any, i: number) => accessor(d, i, this._dataSource.metadata());
       } else if (typeof(accessor) === "string") {
         return (d: any, i: number) => d[accessor];
       } else {
