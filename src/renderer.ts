@@ -46,18 +46,16 @@ module Plottable {
         } else {
           this._dataSource = new DataSource(dataset);
         }
-        this._dataSource.registerListener(() => {
-          this._render();
-        });
+        this._dataSource.registerListener(() => this._render());
       }
 
       this.colorAccessor(Renderer.defaultColorAccessor);
     }
 
     /**
-     * Retrieves the current DataSource, or sets a DataSource if the renderer doesn't yet have one.
+     * Retrieves the current DataSource, or sets a DataSource if the Renderer doesn't yet have one.
      *
-     * @param {DataSource} [source] The DataSource the renderer should use, if it doesn't yet have one.
+     * @param {DataSource} [source] The DataSource the Renderer should use, if it doesn't yet have one.
      * @return {DataSource|Renderer} The current DataSource or the calling Renderer.
      */
     public dataSource(): DataSource;
@@ -67,9 +65,7 @@ module Plottable {
         return this._dataSource;
       } else if (this._dataSource == null) {
         this._dataSource = source;
-        this._dataSource.registerListener(() => {
-          this._render();
-        });
+        this._dataSource.registerListener(() => this._render());
         return this;
       } else {
         throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
