@@ -158,14 +158,22 @@ describe("Component behavior", () => {
   it("clipPath works as expected", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
-    var expectedClipPathID: number = (<any> Plottable.Component).clipPathId;
+    var expectedClipPathID = c._componentID;
     c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
-    assert.equal((<any> Plottable.Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
     var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
     assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
     var clipRect = (<any> c).boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
     assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
+    svg.remove();
+  });
+
+  it("componentID works as expected", () => {
+    var expectedID = (<any> Plottable.Component).nextComponentID;
+    var c1 = new Plottable.Component();
+    assert.equal(c1._componentID, expectedID, "component id on next component was as expected");
+    var c2 = new Plottable.Component();
+    assert.equal(c2._componentID, expectedID+1, "future components increment appropriately");
     svg.remove();
   });
 
