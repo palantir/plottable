@@ -47,10 +47,4 @@ describe("Scales", () => {
     scale.widenDomain([0, 1]);
     assert.deepEqual(scale.domain(), [-1, 2], "Domain does not get shrink if \"widened\" to a smaller value");
   });
-
-  it("Linear Scales default to a domain of [Infinity, -Infinity]", () => {
-    var scale = new Plottable.LinearScale();
-    var domain = scale.domain();
-    assert.deepEqual(domain, [Infinity, -Infinity]);
-  });
 });

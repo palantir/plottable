@@ -28,13 +28,14 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      var xA = this._getAppliedAccessor(this._xAccessor);
-      var yA = this._getAppliedAccessor(this._yAccessor);
+      var attrHash = this._generateAttrHash();
       this.line = d3.svg.line()
-            .x((d: any, i: number) => this.xScale.scale(xA(d, i)))
-            .y((d: any, i: number) => this.yScale.scale(yA(d, i)));
+            .x(attrHash["x"])
+            .y(attrHash["y"]);
       this.dataSelection = this.path.datum(this._dataSource.data());
-      this.path.attr("d", this.line);
+      delete attrHash["x"];
+      delete attrHash["y"];
+      this.path.attr("d", this.line).attr(attrHash);
     }
   }
 }

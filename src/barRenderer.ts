@@ -2,7 +2,6 @@
 
 module Plottable {
   export class BarRenderer extends NumericXYRenderer {
-    private static defaultDxAccessor = "dx";
     public barPaddingPx = 1;
 
     public dxAccessor: any;
@@ -26,8 +25,7 @@ module Plottable {
                 yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
-
-      this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
+      this.projector("dx", "dx");
     }
 
     public autorange() {
@@ -50,38 +48,24 @@ module Plottable {
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");
 
-      var xA = this._getAppliedAccessor(this._xAccessor);
-      var xFunction = (d: any, i: number) => {
-        var x = xA(d, i);
-        var scaledX = this.xScale.scale(x);
-        return scaledX + this.barPaddingPx;
-      };
+      var attrHash = this._generateAttrHash();
 
-      var yA = this._getAppliedAccessor(this._yAccessor);
-      var yFunction = (d: any, i: number) => {
-        var y = yA(d, i);
-        var scaledY = this.yScale.scale(y);
-        return scaledY;
-      };
+      var xF = attrHash["x"];
+      attrHash["x"] = (d: any, i: number) => xF(d, i) + this.barPaddingPx;
 
-      var dxA = this._getAppliedAccessor(this.dxAccessor);
-      var widthFunction = (d: any, i: number) => {
+      var dxA = this._getAppliedAccessor(this._projectors["dx"].accessor);
+      attrHash["width"] = (d: any, i: number) => {
         var dx = dxA(d, i);
         var scaledDx = this.xScale.scale(dx);
         var scaledOffset = this.xScale.scale(0);
         return scaledDx - scaledOffset - 2 * this.barPaddingPx;
       };
 
-      var heightFunction = (d: any, i: number) => {
-        return maxScaledY - yFunction(d, i);
+      attrHash["height"] = (d: any, i: number) => {
+        return maxScaledY - attrHash["y"](d, i);
       };
 
-      this.dataSelection
-            .attr("x", xFunction)
-            .attr("y", yFunction)
-            .attr("width", widthFunction)
-            .attr("height", heightFunction)
-            .attr("fill", this._getAppliedAccessor(this._colorAccessor));
+      this.dataSelection.attr(attrHash);
       this.dataSelection.exit().remove();
     }
   }

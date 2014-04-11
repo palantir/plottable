@@ -19,26 +19,18 @@ module Plottable {
     constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this._rAccessor = (rAccessor != null) ? rAccessor : SquareRenderer.defaultRAccessor;
+      this.projector("r", 3);
       this.classed("square-renderer", true);
-    }
-
-
-    public rAccessor(a: any) {
-      this._rAccessor = a;
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
-      return this;
     }
 
     public _paint() {
       super._paint();
       var attrHash = this._generateAttrHash();
-/*      var xFn = (d: any, i: number) =>
-        this.xScale.scale(xA(d, i)) - rA(d, i);
-
-      var yFn = (d: any, i: number) =>
-        this.yScale.scale(yA(d, i)) - rA(d, i);*/
+      var xF = attrHash["x"];
+      var yF = attrHash["y"];
+      var rF = attrHash["r"];
+      attrHash["x"] = (d: any, i: number) => xF(d, i) - rF(d, i);
+      attrHash["y"] = (d: any, i: number) => yF(d, i) - rF(d, i);
 
       this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this.dataSelection.enter().append("rect");

@@ -18,21 +18,12 @@ module Plottable {
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      */
-    constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+    constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor: any = "x", yAccessor: any = "y") {
       super(dataset);
       this.classed("xy-renderer", true);
 
-      this._xAccessor = (xAccessor != null) ? xAccessor : "x"; // default
-      this._yAccessor = (yAccessor != null) ? yAccessor : "y"; // default
-
-      this.xScale = xScale;
-      this.yScale = yScale;
-
-      this.projector("x", this._xAccessor, this.xScale);
-      this.projector("y", this._yAccessor, this.yScale);
-
-      this.xScale.registerListener(() => this.rescale());
-      this.yScale.registerListener(() => this.rescale());
+      this.projector("x", xAccessor, xScale);
+      this.projector("y", yAccessor, yScale);
     }
 
     public projector(attrToSet: string, accessor: any, scale?: Scale) {

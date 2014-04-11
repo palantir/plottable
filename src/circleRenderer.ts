@@ -39,7 +39,8 @@ module Plottable {
       delete attrHash["y"];
 
       this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
-      this.dataSelection.enter().append("circle").attr(attrHash);
+      this.dataSelection.enter().append("circle");
+      this.dataSelection.attr(attrHash);
       this.dataSelection.exit().remove();
     }
   }

@@ -33,8 +33,8 @@ describe("Interactions", () => {
     it("Pans properly", () => {
       // The only difference between pan and zoom is internal to d3
       // Simulating zoom events is painful, so panning will suffice here
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
+      var xScale = new Plottable.LinearScale().domain([0, 11]);
+      var yScale = new Plottable.LinearScale().domain([11, 0]);
 
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
@@ -70,8 +70,8 @@ describe("Interactions", () => {
       var expectedXDragChange = -dragDistancePixelX * getSlope(xScale);
       var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
 
-      assert.equal(xDomainAfter[0]-xDomainBefore[0], expectedXDragChange, "x domain changed by the correct amount");
-      assert.equal(yDomainAfter[0]-yDomainBefore[0], expectedYDragChange, "y domain changed by the correct amount");
+      assert.closeTo(xDomainAfter[0]-xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
+      assert.closeTo(yDomainAfter[0]-yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
 
       svg.remove();
     });
@@ -152,8 +152,8 @@ describe("Interactions", () => {
 
   describe("BrushZoomInteraction", () => {
     it("Zooms in correctly on drag", () =>{
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
+      var xScale = new Plottable.LinearScale().domain([0, 10]);
+      var yScale = new Plottable.LinearScale().domain([0, 10]);
 
       var svgWidth  = 400;
       var svgHeight = 400;
@@ -204,8 +204,8 @@ describe("Interactions", () => {
       var svg = generateSVG(400, 400);
       var dp = (x, y) => { return {x: x, y: y}; };
       var data = [dp(0, 0), dp(20, 10), dp(40, 40)];
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
+      var xScale = new Plottable.LinearScale().domain([0, 40]);
+      var yScale = new Plottable.LinearScale().domain([0, 40]);
       var circleRenderer = new Plottable.CircleRenderer(data, xScale, yScale);
       var crosshairs = new Plottable.CrosshairsInteraction(circleRenderer);
       crosshairs.registerWithComponent();
