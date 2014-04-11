@@ -12,50 +12,30 @@ describe("Renderers", () => {
       assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
     });
 
-    it("Base renderer functionality works", () => {
+    it("Base Renderer functionality works", () => {
       var svg = generateSVG(400, 300);
-      var d1 = {data: ["foo"], metadata: {cssClass: "bar"}};
+      var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
       var r = new Plottable.Renderer(d1);
       r._anchor(svg)._computeLayout();
       var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
-      assert.isTrue(r.element.classed("bar"), "the element is classed w/ metadata.cssClass");
-      assert.deepEqual(r._data, d1.data, "the data is set properly");
-      assert.deepEqual(r._metadata,  d1.metadata,  "the metadata is set properly");
-      var d2 = {data: ["bar"], metadata: {cssClass: "boo"}};
-      r.dataset(d2);
-      assert.isFalse(r.element.classed("bar"), "the element is no longer classed bar");
-      assert.isTrue (r.element.classed("boo"), "the element is now classed boo");
-      assert.deepEqual(r._data, d2.data, "the data is set properly");
-      assert.deepEqual(r._metadata, d2.metadata, "the metadata is set properly");
+
+      var d2 = new Plottable.DataSource(["bar"], {cssClass: "boo"});
+      assert.throws(() => r.dataSource(d2), Error);
+
       svg.remove();
     });
 
-    it("rerenderUpdateSelection and requireRerender flags updated appropriately", () => {
-      var r = new Plottable.Renderer();
-      var svg = generateSVG();
-      r.renderTo(svg);
-      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update");
-      assert.isFalse(r._requireRerender, "dont require rerender");
-      var metadata = {};
-      r.metadata(metadata);
-      assert.isTrue(r._rerenderUpdateSelection, "rerenderingUpdate req after metadata set");
-      assert.isTrue(r._requireRerender, "rerender required when metadata set");
-
-      r.renderTo(svg);
-      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update after render");
-      assert.isFalse(r._requireRerender, "dont require rerender after render");
-
-      var data = [];
-      r.data(data);
-      assert.isFalse(r._rerenderUpdateSelection, "don't need to rerender update after setting data");
-      assert.isTrue(r._requireRerender, "rerender required when data set");
-      svg.remove();
+    it("Renderer automatically generates a DataSource if only data is provided", () => {
+      var data = ["foo", "bar"];
+      var r = new Plottable.Renderer(data);
+      var dataSource = r.dataSource();
+      assert.isNotNull(dataSource, "A DataSource was automatically generated");
+      assert.deepEqual(dataSource.data(), data, "The generated DataSource has the correct data");
     });
   });
 
   describe("XYRenderer functionality", () => {
-
     it("the accessors properly access data, index, and metadata", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.LinearScale();
@@ -64,8 +44,8 @@ describe("Renderers", () => {
       var metadata = {foo: 10, bar: 20};
       var xAccessor = (d, i?, m?) => d.x + i * m.foo;
       var yAccessor = (d, i?, m?) => m.bar;
-      var dataset = {data: data, metadata: metadata};
-      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor);
+      var dataSource = new Plottable.DataSource(data, metadata);
+      var renderer = new Plottable.CircleRenderer(dataSource, xScale, yScale, xAccessor, yAccessor);
       renderer.autorangeDataOnLayout = false;
       xScale.domain([0, 400]);
       yScale.domain([400, 0]);
@@ -79,14 +59,14 @@ describe("Renderers", () => {
       assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct");
 
       data = [{x: 2, y:2}, {x:4, y:4}];
-      renderer.data(data).renderTo(svg);
+      dataSource.data(data);
       assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after data change");
       assert.closeTo(parseFloat(c1.attr("cy")), 20, 0.01, "first circle cy is correct after data change");
       assert.closeTo(parseFloat(c2.attr("cx")), 14, 0.01, "second circle cx is correct after data change");
       assert.closeTo(parseFloat(c2.attr("cy")), 20, 0.01, "second circle cy is correct after data change");
 
       metadata = {foo: 0, bar: 0};
-      renderer.metadata(metadata).renderTo(svg);
+      dataSource.metadata(metadata);
       assert.closeTo(parseFloat(c1.attr("cx")), 2, 0.01, "first circle cx is correct after metadata change");
       assert.closeTo(parseFloat(c1.attr("cy")), 0, 0.01, "first circle cy is correct after metadata change");
       assert.closeTo(parseFloat(c2.attr("cx")), 4, 0.01, "second circle cx is correct after metadata change");
@@ -102,7 +82,7 @@ describe("Renderers", () => {
       var xScale;
       var yScale;
       var lineRenderer;
-      var simpleDataset = {metadata: {cssClass: "simpleDataset"}, data: [{foo: 0, bar:0}, {foo:1, bar:1}]};
+      var simpleDataset = new Plottable.DataSource([{foo: 0, bar:0}, {foo:1, bar:1}]);
       var renderArea;
       var verifier = new MultiTestVerifier();
 
@@ -317,7 +297,7 @@ describe("Renderers", () => {
       // Choosing data with a negative x value is significant, since there is
       // a potential failure mode involving the xDomain with an initial
       // point below 0
-      var dataset = {metadata: {cssClass: "sampleBarData"}, data: [d0, d1]};
+      var dataset = new Plottable.DataSource([d0, d1]);
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -373,7 +353,7 @@ describe("Renderers", () => {
     describe("Category Bar Renderer", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
-      var dataset: Plottable.IDataset;
+      var dataset: Plottable.DataSource;
       var xScale: Plottable.OrdinalScale;
       var yScale: Plottable.LinearScale;
       var renderer: Plottable.CategoryBarRenderer;
@@ -384,13 +364,11 @@ describe("Renderers", () => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.OrdinalScale();
         yScale = new Plottable.LinearScale();
-        dataset = {
-          data: [
-            {x: "A", y: 1},
-            {x: "B", y: 2}
-          ],
-          metadata: {cssClass: "letters"}
-        };
+        var data = [
+          {x: "A", y: 1},
+          {x: "B", y: 2}
+        ];
+        dataset = new Plottable.DataSource(data);
 
         renderer = new Plottable.CategoryBarRenderer(dataset, xScale, yScale);
         renderer._animate = false;

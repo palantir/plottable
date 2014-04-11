@@ -36,7 +36,7 @@ module Plottable {
       var cy = (d: any, i: number) => this.yScale.scale(this._getAppliedAccessor(this._yAccessor)(d, i));
       var r  = this._getAppliedAccessor(this._rAccessor);
       var color = this._getAppliedAccessor(this._colorAccessor);
-      this.dataSelection = this.renderArea.selectAll("circle").data(this._data);
+      this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
       this.dataSelection.enter().append("circle");
       this.dataSelection.attr("cx", cx)
                         .attr("cy", cy)

@@ -49,20 +49,19 @@ function assertWidthHeight(el: D3.Selection, widthExpected, heightExpected, mess
   assert.equal(height, heightExpected, "height: " + message);
 }
 
-function makeLinearSeries(n: number): Plottable.IDataset {
+
+function makeLinearSeries(n: number): {x: number; y:number;}[] {
   function makePoint(x: number) {
     return {x: x, y: x};
   }
-  var data = d3.range(n).map(makePoint);
-  return {data: data, metadata: {cssClass: "linear-series"}};
+  return d3.range(n).map(makePoint);
 }
 
-function makeQuadraticSeries(n: number): Plottable.IDataset {
+function makeQuadraticSeries(n: number): {x: number; y:number;}[] {
   function makeQuadraticPoint(x: number) {
     return {x: x, y: x*x};
   }
-  var data = d3.range(n).map(makeQuadraticPoint);
-  return {data: data, metadata: {cssClass: "quadratic-series"}};
+  return d3.range(n).map(makeQuadraticPoint);
 }
 
 class MultiTestVerifier {
