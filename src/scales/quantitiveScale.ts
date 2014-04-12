@@ -47,6 +47,12 @@ module Plottable {
       return this;
     }
 
+    public domain(): any[];
+    public domain(values: any[]): QuantitiveScale;
+    public domain(values?: any[]): any {
+      return super.domain(values); // need to override type sig to enable method chaining :/
+    }
+
     /**
      * Expands the QuantitiveScale's domain to cover the data given.
      * Passes an accessor through to the native d3 code.

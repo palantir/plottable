@@ -80,7 +80,7 @@ module.exports = function(grunt) {
     blanket_mocha: {
       all: ['test/tests.html'],
       options: {
-        threshold: 85
+        threshold: 80
       }
     },
     connect: {

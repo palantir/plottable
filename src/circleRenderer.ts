@@ -2,8 +2,6 @@
 
 module Plottable {
   export class CircleRenderer extends NumericXYRenderer {
-    private _rAccessor: any;
-    private static defaultRAccessor = 3;
 
     /**
      * Creates a CircleRenderer.
@@ -19,29 +17,30 @@ module Plottable {
     constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: any, yAccessor?: any, rAccessor?: any) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
+/*      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;*/
       this.classed("circle-renderer", true);
+      this.project("r", 3);
+      this.project("fill", "#00ffaa");
     }
 
-    public rAccessor(a: any) {
-      this._rAccessor = a;
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
+    public project(attrToSet: string, accessor: any, scale?: Scale) {
+      attrToSet = attrToSet === "cx" ? "x" : attrToSet;
+      attrToSet = attrToSet === "cy" ? "y" : attrToSet;
+      super.project(attrToSet, accessor, scale);
       return this;
     }
 
     public _paint() {
       super._paint();
-      var cx = (d: any, i: number) => this.xScale.scale(this._getAppliedAccessor(this._xAccessor)(d, i));
-      var cy = (d: any, i: number) => this.yScale.scale(this._getAppliedAccessor(this._yAccessor)(d, i));
-      var r  = this._getAppliedAccessor(this._rAccessor);
-      var color = this._getAppliedAccessor(this._colorAccessor);
+      var attrToProjector = this._generateAttrToProjector();
+      attrToProjector["cx"] = attrToProjector["x"];
+      attrToProjector["cy"] = attrToProjector["y"];
+      delete attrToProjector["x"];
+      delete attrToProjector["y"];
+
       this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
       this.dataSelection.enter().append("circle");
-      this.dataSelection.attr("cx", cx)
-                        .attr("cy", cy)
-                        .attr("r", r)
-                        .attr("fill", color);
+      this.dataSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
     }
   }

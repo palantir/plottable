@@ -1,6 +1,11 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
+  export interface _IProjector {
+    accessor: IAccessor;
+    scale?: Scale;
+  }
+
   export class Renderer extends Component {
     public _dataSource: DataSource;
 
@@ -11,6 +16,7 @@ module Plottable {
     public _animate = false;
     public _hasRendered = false;
     private static defaultColorAccessor = (d: any) => "#1f77b4";
+    public _projectors: { [attrToSet: string]: _IProjector; } = {};
 
     public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only
@@ -48,8 +54,6 @@ module Plottable {
         }
         this._dataSource.registerListener(() => this._render());
       }
-
-      this.colorAccessor(Renderer.defaultColorAccessor);
     }
 
     /**
@@ -72,18 +76,36 @@ module Plottable {
       }
     }
 
+    public project(attrToSet: string, accessor: any, scale?: Scale) {
+      var activatedAccessor = Utils.accessorize(accessor);
+      var p = {accessor: activatedAccessor, scale: scale};
+      this._projectors[attrToSet] = p;
+      if (scale != null) {
+        var rendererIDAttr = this._componentID + attrToSet;
+/*        scale._registerPerspective(rendererIDAttr, this.data(), accessor);*/
+      }
+      this._requireRerender = true;
+      this._rerenderUpdateSelection = true;
+      return this;
+    }
+
+    public _generateAttrToProjector(): { [attrToSet: string]: IAppliedAccessor; } {
+      var h: { [attrName: string]: IAppliedAccessor; } = {};
+      d3.keys(this._projectors).forEach((a) => {
+        var projector = this._projectors[a];
+        var accessor = this._getAppliedAccessor(projector.accessor);
+        var scale = projector.scale;
+        var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
+        h[a] = fn;
+      });
+      return h;
+    }
+
     public _render(): Renderer {
       this._hasRendered = true;
       this._paint();
       this._requireRerender = false;
       this._rerenderUpdateSelection = false;
-      return this;
-    }
-
-    public colorAccessor(a: IAccessor): Renderer {
-      this._colorAccessor = a;
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
       return this;
     }
 
@@ -102,9 +124,10 @@ module Plottable {
       return this;
     }
 
-    public _getAppliedAccessor(accessor: any): (d: any, i: number) => any {
+    public _getAppliedAccessor(accessor: IAccessor): IAppliedAccessor {
       if (typeof(accessor) === "function") {
-        return (d: any, i: number) => accessor(d, i, this._dataSource.metadata());
+        var metadata = this._dataSource != null ? this._dataSource.metadata() : null;
+        return (d: any, i: number) => accessor(d, i, metadata);
       } else if (typeof(accessor) === "string") {
         return (d: any, i: number) => d[accessor];
       } else {

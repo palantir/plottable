@@ -33,6 +33,15 @@ describe("Renderers", () => {
       assert.isNotNull(dataSource, "A DataSource was automatically generated");
       assert.deepEqual(dataSource.data(), data, "The generated DataSource has the correct data");
     });
+
+    it("Renderer.project works as intended", () => {
+      var r = new Plottable.Renderer();
+      var s = new Plottable.LinearScale().domain([0, 1]).range([0, 10]);
+      r.project("attr", "a", s);
+      var attrToProjector = r._generateAttrToProjector();
+      var projector = attrToProjector["attr"];
+      assert.equal(projector({"a": 0.5}, 0), 5, "projector works as intended");
+    });
   });
 
   describe("XYRenderer functionality", () => {
@@ -94,7 +103,7 @@ describe("Renderers", () => {
         var yAccessor = (d) => d.bar;
         var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
         lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
-        lineRenderer.colorAccessor(colorAccessor);
+        lineRenderer.project("stroke", colorAccessor);
         lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
       });
@@ -176,16 +185,14 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.LinearScale();
-        yScale = new Plottable.LinearScale();
+        xScale = new Plottable.LinearScale().domain([0, 9]);
+        yScale = new Plottable.LinearScale().domain([0, 81]);
         circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
-        circleRenderer.colorAccessor(colorAccessor);
+        circleRenderer.project("fill", colorAccessor);
         circleRenderer.renderTo(svg);
       });
 
       it("setup is handled properly", () => {
-        assert.deepEqual(xScale.domain(), [0, 9],  "xScale domain was set by the renderer");
-        assert.deepEqual(yScale.domain(), [0, 81], "yScale domain was set by the renderer");
         assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
         circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
@@ -301,12 +308,10 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.LinearScale();
-        yScale = new Plottable.LinearScale();
+        xScale = new Plottable.LinearScale().domain([-2, 4]);
+        yScale = new Plottable.LinearScale().domain([0, 4]);
         barRenderer = new Plottable.BarRenderer(dataset, xScale, yScale);
         barRenderer._anchor(svg)._computeLayout();
-        var currentYDomain = yScale.domain();
-        yScale.domain([0, currentYDomain[1]]);
       });
 
       beforeEach(() => {
@@ -362,7 +367,7 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.OrdinalScale();
+        xScale = new Plottable.OrdinalScale().domain(["A", "B"]);
         yScale = new Plottable.LinearScale();
         var data = [
           {x: "A", y: 1},

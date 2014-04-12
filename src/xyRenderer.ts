@@ -7,7 +7,6 @@ module Plottable {
     public yScale: Scale;
     public _xAccessor: any;
     public _yAccessor: any;
-    public autorangeDataOnLayout = true;
 
     /**
      * Creates an XYRenderer.
@@ -19,31 +18,31 @@ module Plottable {
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      */
-    constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+    constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor: any = "x", yAccessor: any = "y") {
       super(dataset);
       this.classed("xy-renderer", true);
 
-      this._xAccessor = (xAccessor != null) ? xAccessor : "x"; // default
-      this._yAccessor = (yAccessor != null) ? yAccessor : "y"; // default
-
-      this.xScale = xScale;
-      this.yScale = yScale;
-
-      this.xScale.registerListener(() => this.rescale());
-      this.yScale.registerListener(() => this.rescale());
+      this.project("x", xAccessor, xScale);
+      this.project("y", yAccessor, yScale);
     }
 
-    public xAccessor(accessor: any) {
-      this._xAccessor = accessor;
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
-      return this;
-    }
-
-    public yAccessor(accessor: any) {
-      this._yAccessor = accessor;
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
+    public project(attrToSet: string, accessor: any, scale?: Scale) {
+      super.project(attrToSet, accessor, scale);
+      if (attrToSet === "x") {
+        this._xAccessor = this._projectors["x"].accessor;
+        if (scale != null) {
+          this.xScale = this._projectors["x"].scale;
+          this.xScale.registerListener(() => this.rescale());
+          // TODO - unregister the old listener.
+        }
+      }
+      if (attrToSet === "y") {
+        this._yAccessor = this._projectors["y"].accessor;
+        if (scale != null) {
+          this.yScale = this._projectors["y"].scale;
+          this.yScale.registerListener(() => this.rescale());
+        }
+      }
       return this;
     }
 
@@ -52,24 +51,6 @@ module Plottable {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.xScale.range([0, this.availableWidth]);
       this.yScale.range([this.availableHeight, 0]);
-      if (this.autorangeDataOnLayout) {
-        this.autorange();
-      }
-      return this;
-    }
-
-    /**
-     * Autoranges the scales over the data.
-     * Actual behavior is dependent on the scales.
-     */
-    public autorange() {
-      super.autorange();
-      var data = this._dataSource.data();
-      var xA = (d: any) => this._getAppliedAccessor(this._xAccessor)(d, null);
-      this.xScale.widenDomainOnData(data, xA);
-
-      var yA = (d: any) => this._getAppliedAccessor(this._yAccessor)(d, null);
-      this.yScale.widenDomainOnData(data, yA);
       return this;
     }
 

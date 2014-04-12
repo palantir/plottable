@@ -60,4 +60,25 @@ describe("Utils", () => {
     assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
     svg.remove();
   });
+
+  it("accessorize works properly", () => {
+    var datum = {"foo": 2, "bar": 3, "key": 4};
+
+    var f = (d: any, i: number, m: any) => d + i;
+    var a1 = Plottable.Utils.accessorize(f);
+    assert.equal(f, a1, "function passes through accessorize unchanged");
+
+    var a2 = Plottable.Utils.accessorize("key");
+    assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
+
+    var a3 = Plottable.Utils.accessorize("#aaaa");
+    assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
+
+    var a4 = Plottable.Utils.accessorize(33);
+    assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
+
+    var a5 = Plottable.Utils.accessorize(datum);
+    assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
+
+  });
 });

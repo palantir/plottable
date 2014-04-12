@@ -90,5 +90,15 @@ module Plottable {
       return width;
     }
 
+    export function accessorize(accessor: any): IAccessor {
+      if (typeof(accessor) === "function") {
+        return (<IAccessor> accessor);
+      } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
+        return (d: any, i: number, s: any) => d[accessor];
+      } else {
+        return (d: any, i: number, s: any) => accessor;
+      };
+    }
+
   }
 }
