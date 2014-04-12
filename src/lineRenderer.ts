@@ -28,7 +28,7 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      var attrToProjector = this._generateattrToProjector();
+      var attrToProjector = this._generateAttrToProjector();
       this.line = d3.svg.line()
             .x(attrToProjector["x"])
             .y(attrToProjector["y"]);

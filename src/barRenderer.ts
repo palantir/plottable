@@ -48,7 +48,7 @@ module Plottable {
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");
 
-      var attrToProjector = this._generateattrToProjector();
+      var attrToProjector = this._generateAttrToProjector();
 
       var xF = attrToProjector["x"];
       attrToProjector["x"] = (d: any, i: number) => xF(d, i) + this.barPaddingPx;

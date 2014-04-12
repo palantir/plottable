@@ -32,7 +32,7 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      var attrToProjector = this._generateattrToProjector();
+      var attrToProjector = this._generateAttrToProjector();
       attrToProjector["cx"] = attrToProjector["x"];
       attrToProjector["cy"] = attrToProjector["y"];
       delete attrToProjector["x"];

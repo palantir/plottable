@@ -34,7 +34,7 @@ module Plottable {
       this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
       this.dataSelection.enter().append("rect");
 
-      var attrToProjector = this._generateattrToProjector();
+      var attrToProjector = this._generateAttrToProjector();
 
       var xF = attrToProjector["x"];
       attrToProjector["x"] = (d: any, i: number) => xF(d, i) - attrToProjector["width"](d, i) / 2;

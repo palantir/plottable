@@ -25,7 +25,7 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      var attrToProjector = this._generateattrToProjector();
+      var attrToProjector = this._generateAttrToProjector();
       var xF = attrToProjector["x"];
       var yF = attrToProjector["y"];
       var rF = attrToProjector["r"];

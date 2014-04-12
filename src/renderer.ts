@@ -89,7 +89,7 @@ module Plottable {
       return this;
     }
 
-    public _generateattrToProjector(): { [attrToSet: string]: IAppliedAccessor; } {
+    public _generateAttrToProjector(): { [attrToSet: string]: IAppliedAccessor; } {
       var h: { [attrName: string]: IAppliedAccessor; } = {};
       d3.keys(this._projectors).forEach((a) => {
         var projector = this._projectors[a];
@@ -126,7 +126,8 @@ module Plottable {
 
     public _getAppliedAccessor(accessor: IAccessor): IAppliedAccessor {
       if (typeof(accessor) === "function") {
-        return (d: any, i: number) => accessor(d, i, this._dataSource.metadata());
+        var metadata = this._dataSource != null ? this._dataSource.metadata() : null;
+        return (d: any, i: number) => accessor(d, i, metadata);
       } else if (typeof(accessor) === "string") {
         return (d: any, i: number) => d[accessor];
       } else {
