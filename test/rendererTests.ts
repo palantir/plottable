@@ -33,6 +33,15 @@ describe("Renderers", () => {
       assert.isNotNull(dataSource, "A DataSource was automatically generated");
       assert.deepEqual(dataSource.data(), data, "The generated DataSource has the correct data");
     });
+
+    it("Renderer.project works as intended", () => {
+      var r = new Plottable.Renderer();
+      var s = new Plottable.LinearScale().domain([0, 1]).range([0, 10]);
+      r.project("attr", "a", s);
+      var attrToProjector = r._generateAttrToProjector();
+      var projector = attrToProjector["attr"];
+      assert.equal(projector({"a": 0.5}, 0), 5, "projector works as intended");
+    });
   });
 
   describe("XYRenderer functionality", () => {
