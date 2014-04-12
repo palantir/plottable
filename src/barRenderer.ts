@@ -25,7 +25,7 @@ module Plottable {
                 yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
-      this.projector("dx", "dx");
+      this.project("dx", "dx");
     }
 
     public autorange() {
@@ -48,24 +48,24 @@ module Plottable {
       var xrr = this.xScale.range()[1] - this.xScale.range()[0];
       this.dataSelection.enter().append("rect");
 
-      var attrHash = this._generateAttrHash();
+      var attrToProjector = this._generateattrToProjector();
 
-      var xF = attrHash["x"];
-      attrHash["x"] = (d: any, i: number) => xF(d, i) + this.barPaddingPx;
+      var xF = attrToProjector["x"];
+      attrToProjector["x"] = (d: any, i: number) => xF(d, i) + this.barPaddingPx;
 
       var dxA = this._getAppliedAccessor(this._projectors["dx"].accessor);
-      attrHash["width"] = (d: any, i: number) => {
+      attrToProjector["width"] = (d: any, i: number) => {
         var dx = dxA(d, i);
         var scaledDx = this.xScale.scale(dx);
         var scaledOffset = this.xScale.scale(0);
         return scaledDx - scaledOffset - 2 * this.barPaddingPx;
       };
 
-      attrHash["height"] = (d: any, i: number) => {
-        return maxScaledY - attrHash["y"](d, i);
+      attrToProjector["height"] = (d: any, i: number) => {
+        return maxScaledY - attrToProjector["y"](d, i);
       };
 
-      this.dataSelection.attr(attrHash);
+      this.dataSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
     }
   }

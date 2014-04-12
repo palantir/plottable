@@ -76,7 +76,7 @@ module Plottable {
       }
     }
 
-    public projector(attrToSet: string, accessor: any, scale?: Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Scale) {
       var activatedAccessor = Utils.accessorize(accessor);
       var p = {accessor: activatedAccessor, scale: scale};
       this._projectors[attrToSet] = p;
@@ -89,7 +89,7 @@ module Plottable {
       return this;
     }
 
-    public _generateAttrHash(): { [attrToSet: string]: IAppliedAccessor; } {
+    public _generateattrToProjector(): { [attrToSet: string]: IAppliedAccessor; } {
       var h: { [attrName: string]: IAppliedAccessor; } = {};
       d3.keys(this._projectors).forEach((a) => {
         var projector = this._projectors[a];

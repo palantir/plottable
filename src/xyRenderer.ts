@@ -22,12 +22,12 @@ module Plottable {
       super(dataset);
       this.classed("xy-renderer", true);
 
-      this.projector("x", xAccessor, xScale);
-      this.projector("y", yAccessor, yScale);
+      this.project("x", xAccessor, xScale);
+      this.project("y", yAccessor, yScale);
     }
 
-    public projector(attrToSet: string, accessor: any, scale?: Scale) {
-      super.projector(attrToSet, accessor, scale);
+    public project(attrToSet: string, accessor: any, scale?: Scale) {
+      super.project(attrToSet, accessor, scale);
       if (attrToSet === "x") {
         this._xAccessor = this._projectors["x"].accessor;
         if (scale != null) {

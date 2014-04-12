@@ -94,7 +94,7 @@ describe("Renderers", () => {
         var yAccessor = (d) => d.bar;
         var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
         lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor);
-        lineRenderer.projector("stroke", colorAccessor);
+        lineRenderer.project("stroke", colorAccessor);
         lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
       });
@@ -179,7 +179,7 @@ describe("Renderers", () => {
         xScale = new Plottable.LinearScale().domain([0, 9]);
         yScale = new Plottable.LinearScale().domain([0, 81]);
         circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
-        circleRenderer.projector("fill", colorAccessor);
+        circleRenderer.project("fill", colorAccessor);
         circleRenderer.renderTo(svg);
       });
 

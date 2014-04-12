@@ -19,28 +19,28 @@ module Plottable {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
 /*      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;*/
       this.classed("circle-renderer", true);
-      this.projector("r", 3);
-      this.projector("fill", "#00ffaa");
+      this.project("r", 3);
+      this.project("fill", "#00ffaa");
     }
 
-    public projector(attrToSet: string, accessor: any, scale?: Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Scale) {
       attrToSet = attrToSet === "cx" ? "x" : attrToSet;
       attrToSet = attrToSet === "cy" ? "y" : attrToSet;
-      super.projector(attrToSet, accessor, scale);
+      super.project(attrToSet, accessor, scale);
       return this;
     }
 
     public _paint() {
       super._paint();
-      var attrHash = this._generateAttrHash();
-      attrHash["cx"] = attrHash["x"];
-      attrHash["cy"] = attrHash["y"];
-      delete attrHash["x"];
-      delete attrHash["y"];
+      var attrToProjector = this._generateattrToProjector();
+      attrToProjector["cx"] = attrToProjector["x"];
+      attrToProjector["cy"] = attrToProjector["y"];
+      delete attrToProjector["x"];
+      delete attrToProjector["y"];
 
       this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
       this.dataSelection.enter().append("circle");
-      this.dataSelection.attr(attrHash);
+      this.dataSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
     }
   }

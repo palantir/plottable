@@ -22,7 +22,7 @@ module Plottable {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
       this._animate = true;
-      this.projector("width", 10);
+      this.project("width", 10);
     }
 
     public _paint() {
@@ -34,21 +34,21 @@ module Plottable {
       this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
       this.dataSelection.enter().append("rect");
 
-      var attrHash = this._generateAttrHash();
+      var attrToProjector = this._generateattrToProjector();
 
-      var xF = attrHash["x"];
-      attrHash["x"] = (d: any, i: number) => xF(d, i) - attrHash["width"](d, i) / 2;
+      var xF = attrToProjector["x"];
+      attrToProjector["x"] = (d: any, i: number) => xF(d, i) - attrToProjector["width"](d, i) / 2;
 
       var heightFunction = (d: any, i: number) => {
-        return maxScaledY - attrHash["y"](d, i);
+        return maxScaledY - attrToProjector["y"](d, i);
       };
-      attrHash["height"] = heightFunction;
+      attrToProjector["height"] = heightFunction;
 
       var updateSelection: any = this.dataSelection;
       if (this._animate) {
         updateSelection = updateSelection.transition();
       }
-      updateSelection.attr(attrHash);
+      updateSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
     }
 
