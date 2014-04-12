@@ -78,7 +78,7 @@ module.exports = function(grunt) {
       }
     },
     blanket_mocha: {
-      all: ['test/tests.html'],
+      all: ['test/coverage.html'],
       options: {
         threshold: 80
       }
@@ -147,4 +147,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
+  grunt.registerTask("bm", ["blanket_mocha"]);
 };
