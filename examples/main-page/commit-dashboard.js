@@ -50,10 +50,10 @@ function commitDashboard(dataManager, svg) {
   function radiusAccessor(d) { return rScale.scale(linesAddedAccessor(d)); }
 
   var scatterRenderer = new Plottable.CircleRenderer(commits, timeScale, scatterYScale)
-               .xAccessor("date")
-               .yAccessor(hourAccessor)
-               .rAccessor(radiusAccessor)
-               .colorAccessor(function(d) { return contributorColorScale.scale(d.name); });
+               .project("x", "date")
+               .project("y", hourAccessor)
+               .project("r", linesAddedAccessor, rScale)
+               .project("fill", "name", contributorColorScale);
 
   var scatterGridlines = new Plottable.Gridlines(timeScale, scatterYScale);
   var scatterRenderArea = scatterGridlines.merge(scatterRenderer);
@@ -73,9 +73,9 @@ function commitDashboard(dataManager, svg) {
       metadata: {}
     };
     var lineRenderer = new Plottable.LineRenderer(directoryDataset, timeScale, tscYScale);
-    lineRenderer.xAccessor(function(d) { return d[0]; })
-                .yAccessor(function(d) { return d[1]; })
-                .colorAccessor(function(d) { return directoryColorScale.scale(dir); });
+    lineRenderer.project("x", function(d) { return d[0]; })
+                .project("y", function(d) { return d[1]; })
+                .project("fill", dir, directoryColorScale);
     lineRenderer.classed(dir, true);
     tscRenderers[dir] = lineRenderer;
     tscRenderArea = tscRenderArea.merge(lineRenderer);
@@ -102,17 +102,17 @@ function commitDashboard(dataManager, svg) {
   // ----- /Legends -----
 
   // ----- Bar1: Lines changed by contributor -----
-  var contributorBarYScale = new Plottable.LinearScale();
-  var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right");
   var contributorBarXScale = new Plottable.OrdinalScale().domain(dataManager.contributors);
+  var contributorBarYScale = new Plottable.LinearScale();
   var contributorBarXAxis = new Plottable.XAxis(contributorBarXScale, "bottom", function(d) { return d});
+  var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right");
   contributorBarXAxis.classed("no-tick-labels", true).rowMinimum(5);
   var contributorBarRenderer = new Plottable.CategoryBarRenderer(linesByContributor,
                                                                  contributorBarXScale,
                                                                  contributorBarYScale);
-  contributorBarRenderer.widthAccessor(40);
-  contributorBarRenderer.colorAccessor(function(d) { return contributorColorScale.scale(d.name); });
-  contributorBarRenderer.xAccessor("name").yAccessor(linesAddedAccessor);
+  contributorBarRenderer.project("width", 40)
+                        .project("fill", "name", contributorColorScale)
+                        .project("x", "name").project("y", linesAddedAccessor);
   var contributorGridlines = new Plottable.Gridlines(null, contributorBarYScale);
   var contributorBarChart = new Plottable.Table([
     [contributorBarRenderer.merge(contributorGridlines), contributorBarYAxis],
@@ -129,9 +129,10 @@ function commitDashboard(dataManager, svg) {
   var directoryBarRenderer = new Plottable.CategoryBarRenderer(linesByDirectory,
                                                                directoryBarXScale,
                                                                directoryBarYScale);
-  directoryBarRenderer.widthAccessor(40);
-  directoryBarRenderer.colorAccessor(function(d) { return directoryColorScale.scale(d.directory); });
-  directoryBarRenderer.xAccessor("directory").yAccessor(linesAddedAccessor);
+  directoryBarRenderer.project("width", 40)
+                      .project("fill", "directory", directoryColorScale)
+                      .project("x", "directory")
+                      .project("y", linesAddedAccessor);
   var directoryGridlines = new Plottable.Gridlines(null, directoryBarYScale);
   var directoryBarChart = new Plottable.Table([
     [directoryBarRenderer.merge(directoryGridlines), directoryBarYAxis],
