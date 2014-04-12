@@ -52,7 +52,7 @@ module Plottable {
         } else {
           this._dataSource = new DataSource(dataset);
         }
-        this._dataSource.registerListener(() => this._render());
+        this._dataSource.registerListener(this, () => this._render());
       }
     }
 
@@ -69,7 +69,7 @@ module Plottable {
         return this._dataSource;
       } else if (this._dataSource == null) {
         this._dataSource = source;
-        this._dataSource.registerListener(() => this._render());
+        this._dataSource.registerListener(this, () => this._render());
         return this;
       } else {
         throw new Error("Can't set a new DataSource on the Renderer if it already has one.");

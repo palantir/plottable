@@ -1,8 +1,7 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
-  export class DataSource implements IBroadcaster {
-    public _broadcasterCallbacks: IBroadcasterCallback[] = [];
+  export class DataSource extends Broadcaster {
     private _data: any[];
     private _metadata: any;
 
@@ -14,6 +13,7 @@ module Plottable {
      * @param {any} metadata An object containing additional information.
      */
     constructor(data: any[] = [], metadata: any = {}) {
+      super();
       this._data = data;
       this._metadata = metadata;
     }
@@ -31,7 +31,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this._broadcasterCallbacks.forEach((b) => b(this));
+        this._broadcast();
         return this;
       }
     }
@@ -49,20 +49,9 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this._broadcasterCallbacks.forEach((b) => b(this));
+        this._broadcast();
         return this;
       }
-    }
-
-    /**
-     * Registers a callback to be called when the scale's domain is changed.
-     *
-     * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-     * @returns {Scale} The Calling Scale.
-     */
-    public registerListener(callback: IBroadcasterCallback) {
-      this._broadcasterCallbacks.push(callback);
-      return this;
     }
   }
 }
