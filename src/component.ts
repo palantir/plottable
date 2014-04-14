@@ -1,9 +1,7 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
-  export class Component {
-    private static nextComponentID = 0;
-    public _componentID = Component.nextComponentID++;
+  export class Component extends PlottableObject {
     public element: D3.Selection;
     public content: D3.Selection;
     private hitBox: D3.Selection;
@@ -219,9 +217,9 @@ module Plottable {
 
     private generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
-      this.element.attr("clip-path", "url(#clipPath" + this._componentID + ")");
+      this.element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
       var clipPathParent = this.boxContainer.append("clipPath")
-                                      .attr("id", "clipPath" + this._componentID);
+                                      .attr("id", "clipPath" + this._plottableID);
       this.addBox("clip-rect", clipPathParent);
     }
 

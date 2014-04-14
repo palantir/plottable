@@ -1,5 +1,6 @@
 /// <reference path="utils.ts" />
 /// <reference path="osUtils.ts" />
+/// <reference path="plottableObject.ts" />
 /// <reference path="broadcaster.ts" />
 /// <reference path="component.ts" />
 /// <reference path="scales/scale.ts" />
