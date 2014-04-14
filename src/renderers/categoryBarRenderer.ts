@@ -36,8 +36,14 @@ module Plottable {
 
       var attrToProjector = this._generateAttrToProjector();
 
-      var xF = attrToProjector["x"];
-      attrToProjector["x"] = (d: any, i: number) => xF(d, i) - attrToProjector["width"](d, i) / 2;
+      var rangeType = this.xScale.rangeType();
+      if (rangeType === "points"){
+        var xF = attrToProjector["x"];
+        var widthF = attrToProjector["width"];
+        attrToProjector["x"] = (d: any, i: number) => xF(d, i) - widthF(d, i) / 2;
+      } else {
+        attrToProjector["width"] = (d: any, i: number) => this.xScale.rangeBand();
+      }
 
       var heightFunction = (d: any, i: number) => {
         return maxScaledY - attrToProjector["y"](d, i);
