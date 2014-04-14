@@ -91,4 +91,36 @@ describe("Axes", () => {
     }
     svg.remove();
   });
+
+  it("render relative dates", () => {
+    var svg = generateSVG(500, 100);
+    var startDate = new Date(2000, 0, 1);
+    var endDate = new Date(2001, 0, 1);
+    var timeScale = new Plottable.QuantitiveScale(d3.scale.linear());
+    timeScale.domain([startDate, endDate]);
+    timeScale.nice();
+    var xAxis = new Plottable.XAxis(timeScale, "bottom");
+
+    Plottable.AxisUtils.setRelativeDateAxis(xAxis);
+    xAxis.renderTo(svg);
+    var tickLabels = $(".tick").children("text");
+    assert.equal(tickLabels.first().text(), "0");
+    assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 365);
+    svg.remove();
+
+    svg = generateSVG(100, 500);
+    endDate = new Date(2010, 0, 1);
+    timeScale.domain([startDate, endDate]);
+    var yAxis = new Plottable.YAxis(timeScale, "left");
+    var oneYear = 365 * Plottable.Utils.ONE_DAY;
+    var baseDate = new Date(1990, 0, 1);
+
+    Plottable.AxisUtils.setRelativeDateAxis(yAxis, oneYear, "y", baseDate.valueOf());
+    yAxis.renderTo(svg);
+    tickLabels = $(".tick").children("text");
+    assert.equal(tickLabels.text().slice(-1), "y");
+    assert.isTrue(parseInt(tickLabels.first().text(), 10) <= 10);
+    assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 20);
+    svg.remove();
+  });
 });

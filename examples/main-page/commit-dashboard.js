@@ -62,7 +62,8 @@ function commitDashboard(dataManager, svg) {
   // ---- Timeseries -----
   var tscYScale = new Plottable.LinearScale();
   var tscYAxis = new Plottable.YAxis(tscYScale, "left");
-  var tscDateAxis = new Plottable.XAxis(timeScale, "bottom", dateFormatter);
+  var tscDateAxis = new Plottable.XAxis(timeScale, "bottom");
+  Plottable.AxisUtils.setRelativeDateAxis(tscDateAxis, Plottable.Utils.ONE_DAY, "d");
 
   var tscRenderArea = new Plottable.Gridlines(timeScale, tscYScale);
   var tscRenderers = {};
