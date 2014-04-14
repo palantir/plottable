@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Plottable.js</title>
+    <link rel="stylesheet" type="text/css" href="/plottable.css">
+
+    <script type="text/javascript" src="/bower_components/d3/d3.js"></script>
+    <script type="text/javascript" src="/build/plottable.js"></script>
+    <script type="text/javascript" src="/examples/js/plot.js"></script>
+  </head>
+
+  <body>
+    <svg id="scatter-plot" width="500" height="500"></svg>
+
+    <script type="text/javascript">
+      d3.json("/examples/data/gitstats.json", function(data) {
+          scatterPlot(document.getElementById('scatter-plot'), data);
+      });
+    </script>
+  </body>
+</html>

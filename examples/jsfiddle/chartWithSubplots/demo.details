@@ -1,7 +1,0 @@
----
-name: Plottable.js Chart with Subplots Demo
-description: Creates a chart with two subplots, y-axes on both sides, and a shared x-axis.
-authors:
-  - Justin Lan
-normalize_css: no
-...
