@@ -22,9 +22,13 @@ module Plottable {
         return this._d3Scale.domain();
       } else {
         super.domain(values);
-        this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING); // d3 scale takes total padding
+        //this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING); // d3 scale takes total padding
         return this;
       }
+    }
+
+    public domainUnits(): number {
+      return this._d3Scale.domain().length;
     }
 
     /**
@@ -40,7 +44,8 @@ module Plottable {
         return this._range;
       } else {
         this._range = values;
-        this._d3Scale.rangePoints(values, 2*this.END_PADDING); // d3 scale takes total padding
+        this._d3Scale.range(values);
+        //this._d3Scale.rangePoints(values, 2*this.END_PADDING); // d3 scale takes total padding
         return this;
       }
     }

@@ -44,6 +44,18 @@ module Plottable {
     }
 
     /**
+     * Determines the number of units in the domain. In most scales, this will
+     * simply be the max - min of the domain. However, for ordinal scales,
+     * this is the length of the domain array.
+     *
+     * @returns {number} the number of units in the domain.
+     */
+    public domainUnits(): number {
+        var domain: any[] = this._d3Scale.domain();
+        return domain[1] - domain[0];
+    }
+
+    /**
      * Retrieves the current range, or sets the Scale's range to the specified values.
      *
      * @param {any[]} [values] The new value for the range.

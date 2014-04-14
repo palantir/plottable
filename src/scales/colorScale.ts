@@ -40,5 +40,9 @@ module Plottable {
       }
       super(scale);
     }
+
+    public domainUnits(): number {
+      return this._d3Scale.domain().length;
+    }
   }
 }
