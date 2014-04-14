@@ -49,12 +49,23 @@ module Plottable {
       this.dataSelection = this.renderArea.selectAll("rect").data(this._data, xA);
       this.dataSelection.enter().append("rect");
 
-      var widthFunction = this._getAppliedAccessor(this._widthAccessor);
+      var rangeType = this.xScale.rangeType();
+
+      var widthFunction: (d:any, i: number) => number;
+      if (rangeType === "points"){
+        widthFunction = this._getAppliedAccessor(this._widthAccessor);
+      } else {
+        widthFunction = (d:any, i: number) => this.xScale.rangeBand();
+      }
 
       var xFunction = (d: any, i: number) => {
         var x = xA(d, i);
         var scaledX = this.xScale.scale(x);
-        return scaledX - widthFunction(d, i)/2;
+        if (rangeType === "points") {
+          return scaledX - widthFunction(d, i)/2;
+        } else {
+          return scaledX;
+        }
       };
 
       var yA = this._getAppliedAccessor(this._yAccessor);
@@ -70,9 +81,11 @@ module Plottable {
 
       var updateSelection: any = this.dataSelection
             .attr("fill", this._getAppliedAccessor(this._colorAccessor));
+
       if (this._animate) {
         updateSelection = updateSelection.transition();
       }
+
       updateSelection
             .attr("x", xFunction)
             .attr("y", yFunction)
