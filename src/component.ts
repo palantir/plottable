@@ -95,7 +95,7 @@ module Plottable {
           xOrigin = 0;
           yOrigin = 0;
 
-          var elem:HTMLScriptElement = (<HTMLScriptElement>this.rootSVG.node().parentNode);
+          var elem:HTMLScriptElement = (<HTMLScriptElement>this.rootSVG.node());
           availableWidth  = Utils.getElementWidth(elem);
           availableHeight = Utils.getElementHeight(elem);
         } else {
