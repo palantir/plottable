@@ -60,4 +60,27 @@ describe("Utils", () => {
     assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
     svg.remove();
   });
+
+  it("can get a plain element's size", () => {
+    var parent = getSVGParent();
+    parent.style("width", "300px");
+    parent.style("height", "200px");
+    var parentElem = parent[0][0];
+
+    var width = Plottable.Utils.getElementWidth(parentElem);
+    assert.equal(width, 300, "measured width matches set width");
+    var height = Plottable.Utils.getElementHeight(parentElem);
+    assert.equal(height, 200, "measured height matches set height");
+  });
+
+  it("can get the svg's size", () => {
+    var svg = generateSVG(450, 120);
+    var svgElem = svg[0][0];
+
+    var width = Plottable.Utils.getElementWidth(svgElem);
+    assert.equal(width, 450, "measured width matches set width");
+    var height = Plottable.Utils.getElementHeight(svgElem);
+    assert.equal(height, 120, "measured height matches set height");
+  });
 });
+
