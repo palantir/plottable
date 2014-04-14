@@ -5,7 +5,7 @@ module Plottable {
     l: any;
     c: IBroadcasterCallback;
   }
-  export class Broadcaster {
+  export class Broadcaster extends PlottableObject {
     private listenerCallbacks: IListenerCallbackPair[] = [];
 
     /**

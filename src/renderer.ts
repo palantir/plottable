@@ -81,7 +81,7 @@ module Plottable {
       var p = {accessor: activatedAccessor, scale: scale};
       this._projectors[attrToSet] = p;
       if (scale != null) {
-        var rendererIDAttr = this._componentID + attrToSet;
+        var rendererIDAttr = this._plottableID + attrToSet;
 /*        scale._registerPerspective(rendererIDAttr, this.data(), accessor);*/
       }
       this._requireRerender = true;
