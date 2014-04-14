@@ -357,8 +357,8 @@ module Plottable {
     constructor(renderer: NumericXYRenderer) {
       super(renderer);
       this.renderer = renderer;
-      renderer.xScale.registerListener(() => this.rescale());
-      renderer.yScale.registerListener(() => this.rescale());
+      renderer.xScale.registerListener(this, () => this.rescale());
+      renderer.yScale.registerListener(this, () => this.rescale());
     }
 
     public _anchor(hitBox: D3.Selection) {

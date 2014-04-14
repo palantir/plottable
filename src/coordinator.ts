@@ -17,7 +17,7 @@ module Plottable {
      */
     constructor(scales: Scale[]) {
       this.scales = scales;
-      this.scales.forEach((s) => s.registerListener((sx: Scale) => this.rescale(sx)));
+      this.scales.forEach((s) => s.registerListener(this, (sx: Scale) => this.rescale(sx)));
     }
 
     public rescale(scale: Scale) {

@@ -32,7 +32,7 @@ module Plottable {
         this._xAccessor = this._projectors["x"].accessor;
         if (scale != null) {
           this.xScale = this._projectors["x"].scale;
-          this.xScale.registerListener(() => this.rescale());
+          this.xScale.registerListener(this, () => this.rescale());
           // TODO - unregister the old listener.
         }
       }
@@ -40,7 +40,7 @@ module Plottable {
         this._yAccessor = this._projectors["y"].accessor;
         if (scale != null) {
           this.yScale = this._projectors["y"].scale;
-          this.yScale.registerListener(() => this.rescale());
+          this.yScale.registerListener(this, () => this.rescale());
         }
       }
       return this;

@@ -1,9 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class Scale implements IBroadcaster {
+  export class Scale extends Broadcaster {
     public _d3Scale: D3.Scale.Scale;
-    public _broadcasterCallbacks: IBroadcasterCallback[] = [];
 
     /**
      * Creates a new Scale.
@@ -12,6 +11,7 @@ module Plottable {
      * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
     constructor(scale: D3.Scale.Scale) {
+      super();
       this._d3Scale = scale;
     }
 
@@ -38,7 +38,7 @@ module Plottable {
         return this._d3Scale.domain();
       } else {
         this._d3Scale.domain(values);
-        this._broadcasterCallbacks.forEach((b) => b(this));
+        this._broadcast();
         return this;
       }
     }
@@ -67,17 +67,6 @@ module Plottable {
      */
     public copy(): Scale {
       return new Scale(this._d3Scale.copy());
-    }
-
-    /**
-     * Registers a callback to be called when the scale's domain is changed.
-     *
-     * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-     * @returns {Scale} The Calling Scale.
-     */
-    public registerListener(callback: IBroadcasterCallback) {
-      this._broadcasterCallbacks.push(callback);
-      return this;
     }
 
     /**

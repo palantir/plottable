@@ -30,10 +30,6 @@ module Plottable {
   }
 
   export interface IBroadcasterCallback {
-    (broadcaster: IBroadcaster, ...args: any[]): any;
-  }
-
-  export interface IBroadcaster {
-    registerListener: (cb: IBroadcasterCallback) => IBroadcaster;
+    (broadcaster: Broadcaster, ...args: any[]): any;
   }
 }
