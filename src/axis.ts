@@ -255,6 +255,21 @@ module Plottable {
     }
   }
 
+  export class RelativeDateAxis extends Axis {
+    constructor(scale: Scale, orientation: string, increment: number = Utils.ONE_DAY, units: string = "d") {
+      var domain = scale.domain();
+      var baseTime = d3.min(domain);
+      var formatter = (d: Date) => {
+        var relativeDate = Math.round((d.getTime() - baseTime) / increment);
+        return relativeDate.toString() + units;
+      };
+      super(scale, orientation, formatter);
+      super.rowMinimum(Axis.xHeight);
+      this._fixedWidth = false;
+      this.tickLabelPosition("center");
+    }
+  }
+
   export class XAxis extends Axis {
     /**
      * Creates an XAxis (a horizontal Axis).
