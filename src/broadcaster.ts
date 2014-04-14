@@ -9,9 +9,11 @@ module Plottable {
     private listenerCallbacks: IListenerCallbackPair[] = [];
 
     /**
-     * Registers a callback to be called when the broadcast method is called.
+     * Registers a callback to be called when the broadcast method is called. Also takes a listener which
+     * is used to support deregistering the same callback later, by passing in the same listener.
+     * If there is already a callback associated with that listener, then the callback will be replaced.
      *
-     * @param listener The listener associated with the callback. Must support equality testing.
+     * @param listener The listener associated with the callback.
      * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
      * @returns {Broadcaster} this object
      */
@@ -37,11 +39,10 @@ module Plottable {
       return this;
     }
 
-
     /**
      * Registers deregister the callback associated with a listener.
      *
-     * @param listener The listener to deregister. Must support equality testing.
+     * @param listener The listener to deregister.
      * @returns {Broadcaster} this object
      */
     public deregisterListener(listener: any) {
