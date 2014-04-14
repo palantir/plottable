@@ -7,6 +7,7 @@ module Plottable {
     private INNER_PADDING = 0.3;
     private OUTER_PADDING = 0.5;
     private _range = [0, 1];
+    private _rangeType: string = "points";
 
     /**
      * Creates a new OrdinalScale. Domain and Range are set later.
@@ -24,6 +25,7 @@ module Plottable {
         return this._d3Scale.domain();
       } else {
         super.domain(values);
+        this.range(this.range()); // update range
         return this;
       }
     }
