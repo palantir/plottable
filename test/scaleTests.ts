@@ -36,4 +36,21 @@ describe("Scales", () => {
     scale.padDomain(0.2);
     assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
+
+  it("scale autorange works as expected with single dataSource", () => {
+    var data = [1,2,3,4];
+    var dataSource = new Plottable.DataSource(data);
+    var scale = new Plottable.LinearScale();
+    var identity = (x) => x;
+    assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate is false by default");
+    scale._addPerspective("1x", dataSource, identity);
+    assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate set to false after adding perspective");
+    scale.autorangeDomain();
+    assert.isTrue((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate is true after autoranging");
+    assert.deepEqual(scale.domain(), [1,4], "scale domain was autoranged properly");
+    dataSource.data([1,2,39,4]);
+    assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate set to false after modifying data");
+    scale.autorangeDomain();
+    assert.deepEqual(scale.domain(), [1,39], "scale domain was autoranged properly");
+  });
 });
