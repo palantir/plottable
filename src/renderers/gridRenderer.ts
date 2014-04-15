@@ -3,6 +3,8 @@
 module Plottable {
   export class GridRenderer extends XYRenderer {
     public colorScale: ColorScale;
+    public xScale: OrdinalScale;
+    public yScale: OrdinalScale;
 
     /**
      * Creates a GridRenderer.
@@ -16,8 +18,8 @@ module Plottable {
      * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
      */
     constructor(dataset: any,
-                xScale: Scale,
-                yScale: Scale,
+                xScale: OrdinalScale,
+                yScale: OrdinalScale,
                 colorScale: ColorScale,
                 xAccessor?: IAccessor,
                 yAccessor?: IAccessor,
@@ -28,6 +30,9 @@ module Plottable {
       this.colorScale = colorScale;
       this.xScale     = xScale;
       this.yScale     = yScale;
+
+      this.xScale.rangeType("bands", 0, 0);
+      this.yScale.rangeType("bands", 0, 0);
 
       this.project("x", xAccessor, xScale);
       this.project("y", yAccessor, yScale);
@@ -65,25 +70,16 @@ module Plottable {
       this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this.dataSelection.enter().append("rect");
 
-      // switch to different type
-      var xr    = this.yScale.range();
-      var xStep = Math.abs(xr[1] - xr[0]) / this.xScale.domainUnits();
-
+      var xStep = this.xScale.rangeBand();
       var yr    = this.yScale.range();
-      var yStep = Math.abs(yr[1] - yr[0]) / this.yScale.domainUnits();
-      var yMax  = Math.max(yr[0], yr[1]);
-
-
-      console.log(xr, yr, this.yScale._d3Scale("Sleep"));
+      var yStep = this.yScale.rangeBand();
+      var yMax  = Math.max(yr[0], yr[1]) - yStep;
 
       var attrToProjector = this._generateAttrToProjector();
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
       var yAttr = attrToProjector["y"];
-      attrToProjector["y"] = (d: any, i: number) => {
-        console.log(d);
-        return yMax - yAttr(d,i);
-      }
+      attrToProjector["y"] = (d: any, i: number) => yMax - yAttr(d,i);
 
       this.dataSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();

@@ -3,11 +3,12 @@
 module Plottable {
   export class OrdinalScale extends Scale {
     public _d3Scale: D3.Scale.OrdinalScale;
-    // Padding as a proportion of the spacing between domain values
-    private INNER_PADDING = 0.3;
-    private OUTER_PADDING = 0.5;
     private _range = [0, 1];
     private _rangeType: string = "points";
+
+    // Padding as a proportion of the spacing between domain values
+    private _innerPadding: number = 0.3;
+    private _outerPadding: number = 0.5;
 
     /**
      * Creates a new OrdinalScale. Domain and Range are set later.
@@ -30,10 +31,6 @@ module Plottable {
       }
     }
 
-    public domainUnits(): number {
-      return this._d3Scale.domain().length;
-    }
-
     /**
      * Returns the range of pixels spanned by the scale, or sets the range.
      *
@@ -48,9 +45,9 @@ module Plottable {
       } else {
         this._range = values;
         if (this._rangeType === "points"){
-          this._d3Scale.rangePoints(values, 2*this.OUTER_PADDING); // d3 scale takes total padding
+          this._d3Scale.rangePoints(values, 2*this._outerPadding); // d3 scale takes total padding
         } else if (this._rangeType === "bands") {
-          this._d3Scale.rangeBands(values, this.INNER_PADDING, this.OUTER_PADDING);
+          this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
         }
         return this;
       }
@@ -76,8 +73,8 @@ module Plottable {
      * @returns {string|OrdinalScale} The current range type, or the calling OrdinalScale.
      */
     public rangeType() : string;
-    public rangeType(rangeType: string) : OrdinalScale;
-    public rangeType(rangeType?: string) : any {
+    public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : OrdinalScale;
+    public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
       if (rangeType == null){
         return this._rangeType;
       } else {
@@ -85,6 +82,8 @@ module Plottable {
           throw new Error("Unsupported range type: " + rangeType);
         }
         this._rangeType = rangeType;
+        if(outerPadding != null) this._outerPadding = outerPadding;
+        if(innerPadding != null) this._innerPadding = innerPadding;
         return this;
       }
     }

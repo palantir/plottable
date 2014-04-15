@@ -8,34 +8,39 @@
         height : 320px;
         background-color: #EEE;
       }
-
-      /*
-      .plottable .bounding-box {
-        stroke: none;
-      }
-      */
     </style>
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../build/plottable.js"></script>
     <script src="../../build/exampleUtil.js"></script>
 
     <script>
-      var data = [
+      function randomData() {
+        var data = [];
+        ["Work", "Food", "Sex", "Sleep"].forEach(function(category) {
+          ["May-01", "May-02", "May-03", "May-04", "May-05"].forEach(function(day){
+            data.push({category:category, day:day, awesomeness:Math.random()});
+          });
+        });
+        return data;
+      }
+
+      function staticData() {
+        return [
           { category: "Work",  day : "May-01", awesomeness: 2 },
+          { category: "Work",  day : "May-02", awesomeness: 3.5 },
           { category: "Food",  day : "May-01", awesomeness: 9 },
-          { category: "Sex",   day : "May-03", awesomeness: 10 },
+          { category: "Sex",   day : "May-03", awesomeness: 16 },
           { category: "Sleep", day : "May-05", awesomeness: 8 }
         ];
+      }
 
-      function makeChart() {
-          var xScale = new Plottable.OrdinalScale();
-          var xAxis = new Plottable.XAxis(xScale, "bottom");
+      function makeChart(data) {
+          var xScale     = new Plottable.OrdinalScale();
+          var yScale     = new Plottable.OrdinalScale();
+          var colorScale = new Plottable.ColorScale("reds");
 
-          var yScale = new Plottable.OrdinalScale();
-          var yAxis = new Plottable.YAxis(yScale, "right");
-
-          var colorScale = new Plottable.ColorScale("10");
-
+          var xAxis        = new Plottable.XAxis(xScale, "bottom");
+          var yAxis        = new Plottable.YAxis(yScale, "right");
           var gridRenderer = new Plottable.GridRenderer(data,
             xScale, yScale, colorScale,
             "day", "category", "awesomeness");
@@ -47,7 +52,7 @@
             .renderTo(d3.select("#life"));
       };
 
-      window.onload = function() { makeChart(); }
+      window.onload = function() { makeChart(randomData()); }
     </script>
   </head>
 
