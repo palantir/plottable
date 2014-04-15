@@ -24,17 +24,12 @@ module Plottable {
 
     public autorangeDomain() {
       super.autorangeDomain();
-      var extent = this._getCombinedExtent();
       if (this._autoPad) {
-        var extentRange = extent[1]-extent[0];
-        var padProportion = 0.05;
-        extent = [extent[0] - padProportion/2 * extentRange, extent[1] + padProportion/2 * extentRange];
+        this.padDomain();
       }
-      this._d3Scale.domain(extent);
       if (this._autoNice) {
-          this._d3Scale.nice();
+        this.nice();
       }
-      this._broadcast();
       return this;
     }
 

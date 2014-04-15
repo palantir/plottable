@@ -24,25 +24,14 @@ module Plottable {
       return Utils.uniq(concatenatedExtents);
     }
 
-    public autorangeDomain() {
-      super.autorangeDomain();
-      var extent = this._getCombinedExtent();
-      this._d3Scale(extent);
-      this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING);
-      this._broadcast();
-      return this;
-    }
-
     public domain(): any[];
     public domain(values: any[]): OrdinalScale;
     public domain(values?: any[]): any {
-      if (values == null) {
-        return super.domain(values);
-      } else {
-        super.domain(values);
+      var result = super.domain(values);
+      if (values != null) {
         this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING); // d3 scale takes total padding
-        return this;
       }
+      return result;
     }
 
     /**

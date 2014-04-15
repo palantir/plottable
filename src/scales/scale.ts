@@ -36,6 +36,7 @@ module Plottable {
 
     public autorangeDomain() {
         this.isAutorangeUpToDate = true;
+        this.domain(this._getCombinedExtent());
         return this;
     }
 
