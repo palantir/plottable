@@ -16,3 +16,14 @@ Plottable.js is being developed by Palantir Technologies. It's developed in Type
 Setup Instructions:
 
     npm install
+    (if new to nodejs:)
+    sudo npm install grunt -g
+    sudo npm install grunt-cli -g
+
+=========
+Contributing Instructions:
+- Write your code
+- Add tests for new functionality
+- Run `grunt test` and verify it completes with no warnings or failures
+- Submit a pull request.
+- You do not need to update the top-level plottable.js or plottable.d.ts files - we will update these automatically
