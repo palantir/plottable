@@ -80,10 +80,9 @@ module Plottable {
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {
       var rendererIDAttr = this._plottableID + attrToSet;
-
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
-      if (scale == null && existingScale != null) {
+      if (scale == null) {
         scale = existingScale;
       }
       if (existingScale != null) {
@@ -122,11 +121,6 @@ module Plottable {
 
     public _paint() {
       // no-op
-    }
-
-    public autorange() {
-      // no-op
-      return this;
     }
 
     public _anchor(element: D3.Selection) {

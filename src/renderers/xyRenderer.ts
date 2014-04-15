@@ -28,6 +28,8 @@ module Plottable {
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {
       super.project(attrToSet, accessor, scale);
+      // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
+      // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x") {
         this._xAccessor = this._projectors["x"].accessor;
         this.xScale = this._projectors["x"].scale;

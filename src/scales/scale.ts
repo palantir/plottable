@@ -41,11 +41,10 @@ module Plottable {
     }
 
     public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: IAccessor) {
-      if (this.rendererID2Perspective[rendererIDAttr] != null) { // this renderer is changing
+      if (this.rendererID2Perspective[rendererIDAttr] != null) {
         this._removePerspective(rendererIDAttr);
       }
-      var p = {dataSource: dataSource, accessor: accessor};
-      this.rendererID2Perspective[rendererIDAttr] = p;
+      this.rendererID2Perspective[rendererIDAttr] = {dataSource: dataSource, accessor: accessor};
       var dataSourceID = dataSource._plottableID;
       var currentRefCount = this.dataSourceID2ReferenceCount[dataSourceID];
       if (currentRefCount == null) {
