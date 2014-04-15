@@ -1,10 +1,14 @@
 ///<reference path="reference.ts" />
 
 module Plottable {
+  interface ICachedExtent {
+    accessor: IAccessor;
+    extent: any[];
+  }
   export class DataSource extends Broadcaster {
     private _data: any[];
     private _metadata: any;
-
+    private accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
     /**
      * Creates a new DataSource.
      *
@@ -16,6 +20,7 @@ module Plottable {
       super();
       this._data = data;
       this._metadata = metadata;
+      this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
     }
 
     /**
@@ -31,6 +36,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
+        this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
         this._broadcast();
         return this;
       }
@@ -49,8 +55,28 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
+        this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
         this._broadcast();
         return this;
+      }
+    }
+
+    public _getExtent(accessor: IAccessor): any[] {
+      var cachedExtent = this.accessor2cachedExtent.get(accessor);
+      if (cachedExtent === undefined) {
+        cachedExtent = this.computeExtent(accessor);
+        this.accessor2cachedExtent.set(accessor, cachedExtent);
+      }
+      return cachedExtent;
+    }
+
+    private computeExtent(accessor: IAccessor): any[] {
+      var appliedAccessor = Utils.applyAccessor(accessor, this);
+      var mappedData = this._data.map(appliedAccessor);
+      if (typeof(appliedAccessor(this._data[0], 0)) === "string") {
+        return Utils.uniq(mappedData);
+      } else {
+        return d3.extent(mappedData);
       }
     }
   }
