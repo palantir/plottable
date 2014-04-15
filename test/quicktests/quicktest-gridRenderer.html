@@ -38,7 +38,7 @@
       function makeChart(selector, colors, data) {
           var xScale       = new Plottable.OrdinalScale();
           var yScale       = new Plottable.OrdinalScale();
-          var colorScale   = new Plottable.ColorScale(colors);
+          var colorScale   = new Plottable.InterpolatedColorScale(colors);
 
           var identity     = function(d){return d;};
           var xAxis        = new Plottable.XAxis(xScale, "bottom", identity);

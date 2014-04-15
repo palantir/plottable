@@ -2,7 +2,7 @@
 
 module Plottable {
   export class GridRenderer extends XYRenderer {
-    public colorScale: ColorScale;
+    public colorScale: Scale;
     public xScale: OrdinalScale;
     public yScale: OrdinalScale;
 
@@ -26,7 +26,7 @@ module Plottable {
     constructor(dataset: any,
                 xScale: OrdinalScale,
                 yScale: OrdinalScale,
-                colorScale: ColorScale,
+                colorScale: Scale,
                 xAccessor?: any,
                 yAccessor?: any,
                 valueAccessor?: any) {
