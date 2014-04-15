@@ -13,9 +13,15 @@ module Plottable {
      * @param {IDataset} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {ColorScale} colorScale The color scale to use for each grid cell.
-     * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-     * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
+     * @param {ColorScale} colorScale The color scale to use for each grid
+     *     cell.
+     * @param {IAccessor} [xAccessor] A function for extracting the x position
+     *     of each grid cell from the data.
+     * @param {IAccessor} [yAccessor] A function for extracting the y position
+     *     of each grid cell from the data.
+     * @param {IAccessor} [valueAccessor] A function for extracting value of
+     *     each grid cell from the data. This value will be pass through the
+     *     color scale to determine the color of the cell.
      */
     constructor(dataset: any,
                 xScale: OrdinalScale,
@@ -31,6 +37,7 @@ module Plottable {
       this.xScale     = xScale;
       this.yScale     = yScale;
 
+      // The x and y scales should render in bands with no padding
       this.xScale.rangeType("bands", 0, 0);
       this.yScale.rangeType("bands", 0, 0);
 
@@ -39,6 +46,9 @@ module Plottable {
       this.project("fill", valueAccessor, colorScale);
     }
 
+    /**
+     * This project method may be removed once other changes are available.
+     */
     public project(attrToSet: string, accessor: any, scale?: Scale): GridRenderer {
       var activatedAccessor = Utils.accessorize(accessor);
       var p = {accessor: activatedAccessor, scale: scale};

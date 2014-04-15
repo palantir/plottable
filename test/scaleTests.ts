@@ -80,4 +80,46 @@ describe("Scales", () => {
     });
   });
 
+  describe("Color Scales", () => {
+    it("accepts categorical string types", () => {
+      var scale = new Plottable.ColorScale("10");
+      scale.domain([0,1,2]);
+      assert.equal("#1f77b4", scale.scale(0));
+      assert.equal("#2ca02c", scale.scale(1));
+      assert.equal("#ff7f0e", scale.scale(2));
+    });
+
+    it("linearly interpolates colors in L*a*b color space", () => {
+      var scale = new Plottable.ColorScale("reds");
+      scale.domain([0, 1]);
+      assert.equal("#b10026", scale.scale(1));
+      assert.equal("#d9151f", scale.scale(0.9));
+    });
+
+    it("accepts array types with color hex values", () => {
+      var scale = new Plottable.ColorScale(["#000", "#FFF"]);
+      scale.domain([0, 16]);
+      assert.equal("#000000", scale.scale(0));
+      assert.equal("#ffffff", scale.scale(16));
+      assert.equal("#777777", scale.scale(8));
+    });
+
+    it("accepts array types with color names", () => {
+      var scale = new Plottable.ColorScale(["black", "white"]);
+      scale.domain([0, 16]);
+      assert.equal("#000000", scale.scale(0));
+      assert.equal("#ffffff", scale.scale(16));
+      assert.equal("#777777", scale.scale(8));
+    });
+
+    it("overflow scale values clamp to range", () => {
+      var scale = new Plottable.ColorScale(["black", "white"]);
+      scale.domain([0, 16]);
+      assert.equal("#000000", scale.scale(0));
+      assert.equal("#ffffff", scale.scale(16));
+      assert.equal("#000000", scale.scale(-100));
+      assert.equal("#ffffff", scale.scale(100));
+    });
+  });
+
 });

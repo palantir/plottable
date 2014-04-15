@@ -19,6 +19,12 @@ module Plottable {
       super(d3.scale.ordinal());
     }
 
+    /**
+     * Retrieves the current domain, or sets the Scale's domain to the specified values.
+     *
+     * @param {any[]} [values] The new values for the domain. This array may contain more than 2 values.
+     * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+     */
     public domain(): any[];
     public domain(values: any[]): OrdinalScale;
     public domain(values?: any[]): any {

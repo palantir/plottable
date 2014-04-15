@@ -4,14 +4,15 @@
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <style>
       svg {
-        width  : 480px;
-        height : 320px;
         background-color: #EEE;
+      }
+
+      svg text {
+        font-size: 14pt !important;
       }
     </style>
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../build/plottable.js"></script>
-    <script src="../../build/exampleUtil.js"></script>
 
     <script>
       function randomData() {
@@ -34,28 +35,40 @@
         ];
       }
 
-      function makeChart(data) {
-          var xScale     = new Plottable.OrdinalScale();
-          var yScale     = new Plottable.OrdinalScale();
-          var colorScale = new Plottable.ColorScale("reds");
+      function makeChart(selector, colors, data) {
+          var xScale       = new Plottable.OrdinalScale();
+          var yScale       = new Plottable.OrdinalScale();
+          var colorScale   = new Plottable.ColorScale(colors);
 
-          var xAxis        = new Plottable.XAxis(xScale, "bottom");
-          var yAxis        = new Plottable.YAxis(yScale, "right");
+          var identity     = function(d){return d;};
+          var xAxis        = new Plottable.XAxis(xScale, "bottom", identity);
+          var yAxis        = new Plottable.YAxis(yScale, "right", identity);
           var gridRenderer = new Plottable.GridRenderer(data,
             xScale, yScale, colorScale,
             "day", "category", "awesomeness");
+
+          xAxis.rowMinimum(40);
+          yAxis.colMinimum(80);
 
           new Plottable.Table()
             .addComponent(0, 1, yAxis)
             .addComponent(0, 0, gridRenderer)
             .addComponent(1, 0, xAxis)
-            .renderTo(d3.select("#life"));
+            .renderTo(d3.select(selector));
       };
 
-      window.onload = function() { makeChart(randomData()); }
+      window.onload = function() {
+        makeChart("#life0", "reds", randomData());
+        makeChart("#life1", "blues", randomData());
+        makeChart("#life2", ["dodgerblue", "white", "lime"], randomData());
+      };
     </script>
   </head>
 
-  <body><svg id="life" width="480" height="320"></svg></body>
+  <body>
+    <div><svg id="life0" width="600" height="300"></svg></div>
+    <div><svg id="life1" width="600" height="300"></svg></div>
+    <div><svg id="life2" width="600" height="300"></svg></div>
+  </body>
 
 </html>
