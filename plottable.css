@@ -33,6 +33,13 @@
   shape-rendering: crispEdges;
 }
 
+.plottable .axis path,
+.plottable .axis area {
+  stroke: #979797;
+  stroke-width: 2px;
+  shape-rendering: crispEdges;
+}
+
 .plottable .axis .tick line {
   opacity: 0;
 }
@@ -55,7 +62,7 @@
 }
 
 .plottable .line {
-  fill: none;
+  fill: pink;
   stroke-width: 1.5px;
   vector-effect: non-scaling-stroke;
 }
@@ -63,6 +70,33 @@
 .plottable .line-renderer .line {
   stroke-width: 2px;
   vector-effect: non-scaling-stroke;
+}
+
+.plottable .area-renderer .line {
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.plottable .area {
+  fill: pink;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+.plottable .line-renderer .area {
+  fill: pink;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.plottable .area-renderer .area {
+  fill: pink;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.plottable .area path {
+  fill: pink;
 }
 
 .plottable .table-rect {
