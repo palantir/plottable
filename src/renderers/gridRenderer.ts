@@ -15,21 +15,21 @@ module Plottable {
      * @param {Scale} yScale The y scale to use.
      * @param {ColorScale} colorScale The color scale to use for each grid
      *     cell.
-     * @param {IAccessor} [xAccessor] A function for extracting the x position
-     *     of each grid cell from the data.
-     * @param {IAccessor} [yAccessor] A function for extracting the y position
-     *     of each grid cell from the data.
-     * @param {IAccessor} [valueAccessor] A function for extracting value of
-     *     each grid cell from the data. This value will be pass through the
-     *     color scale to determine the color of the cell.
+     * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
+     *     the x position of each grid cell from the data.
+     * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
+     *     the y position of each grid cell from the data.
+     * @param {IAccessor|string|number} [valueAccessor] An accessor for
+     *     extracting value of each grid cell from the data. This value will
+     *     be pass through the color scale to determine the color of the cell.
      */
     constructor(dataset: any,
                 xScale: OrdinalScale,
                 yScale: OrdinalScale,
                 colorScale: ColorScale,
-                xAccessor?: IAccessor,
-                yAccessor?: IAccessor,
-                valueAccessor?: IAccessor) {
+                xAccessor?: any,
+                yAccessor?: any,
+                valueAccessor?: any) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("grid-renderer", true);
 
