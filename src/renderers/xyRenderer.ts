@@ -28,20 +28,19 @@ module Plottable {
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {
       super.project(attrToSet, accessor, scale);
+      // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
+      // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x") {
         this._xAccessor = this._projectors["x"].accessor;
-        if (scale != null) {
-          this.xScale = this._projectors["x"].scale;
-          this.xScale.registerListener(this, () => this.rescale());
-          // TODO - unregister the old listener.
-        }
+        this.xScale = this._projectors["x"].scale;
+        this.xScale._autoNice = true;
+        this.xScale._autoPad  = true;
       }
       if (attrToSet === "y") {
         this._yAccessor = this._projectors["y"].accessor;
-        if (scale != null) {
-          this.yScale = this._projectors["y"].scale;
-          this.yScale.registerListener(this, () => this.rescale());
-        }
+        this.yScale = this._projectors["y"].scale;
+        this.yScale._autoNice = true;
+        this.yScale._autoPad  = true;
       }
       return this;
     }

@@ -12,7 +12,7 @@ describe("Scales", () => {
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-    assert.notDeepEqual((<any> scale).listenerCallbacks, (<any> scaleCopy).listenerCallbacks,
+    assert.notDeepEqual((<any> scale).listener2Callback, (<any> scaleCopy).listener2Callback,
                               "Registered callbacks are not copied over");
   });
 
@@ -37,15 +37,21 @@ describe("Scales", () => {
     assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
 
-  it("QuantitiveScale.widenDomain() functions correctly", () => {
-    var scale = new Plottable.QuantitiveScale(d3.scale.linear());
-    assert.deepEqual(scale.domain(), [0, 1], "Initial domain is [0, 1]");
-    scale.widenDomain([1, 2]);
-    assert.deepEqual(scale.domain(), [0, 2], "Domain was wided to [0, 2]");
-    scale.widenDomain([-1, 1]);
-    assert.deepEqual(scale.domain(), [-1, 2], "Domain was wided to [-1, 2]");
-    scale.widenDomain([0, 1]);
-    assert.deepEqual(scale.domain(), [-1, 2], "Domain does not get shrink if \"widened\" to a smaller value");
+  it("scale autorange works as expected with single dataSource", () => {
+    var data = [1,2,3,4];
+    var dataSource = new Plottable.DataSource(data);
+    var scale = new Plottable.LinearScale();
+    var identity = (x) => x;
+    assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate is false by default");
+    scale._addPerspective("1x", dataSource, identity);
+    assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate set to false after adding perspective");
+    scale.autorangeDomain();
+    assert.isTrue((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate is true after autoranging");
+    assert.deepEqual(scale.domain(), [1,4], "scale domain was autoranged properly");
+    dataSource.data([1,2,39,4]);
+    assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate set to false after modifying data");
+    scale.autorangeDomain();
+    assert.deepEqual(scale.domain(), [1,39], "scale domain was autoranged properly");
   });
 
   describe("Ordinal Scales", () => {

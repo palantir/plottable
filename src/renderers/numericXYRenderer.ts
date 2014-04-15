@@ -40,8 +40,8 @@ module Plottable {
     }
 
     private getDataFilterFunction(dataArea: SelectionArea): (d: any, i: number) => boolean {
-      var xA = this._getAppliedAccessor(this._xAccessor);
-      var yA = this._getAppliedAccessor(this._yAccessor);
+      var xA = Utils.applyAccessor(this._xAccessor, this.dataSource());
+      var yA = Utils.applyAccessor(this._yAccessor, this.dataSource());
       var filterFunction = (d: any, i: number) => {
         var x: number = xA(d, i);
         var y: number = yA(d, i);
