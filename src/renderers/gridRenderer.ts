@@ -44,23 +44,13 @@ module Plottable {
       this.project("x", xAccessor, xScale);
       this.project("y", yAccessor, yScale);
       this.project("fill", valueAccessor, colorScale);
+
+      this.setScaleDomain(xAccessor, xScale, false);
+      this.setScaleDomain(yAccessor, yScale, false);
+      this.setScaleDomain(valueAccessor, colorScale, true);
     }
 
-    /**
-     * This project method may be removed once other changes are available.
-     */
-    public project(attrToSet: string, accessor: any, scale?: Scale): GridRenderer {
-      var activatedAccessor = Utils.accessorize(accessor);
-      var p = {accessor: activatedAccessor, scale: scale};
-      this._projectors[attrToSet] = p;
-
-      if(scale != null){
-        this.setScaleDomain(accessor, scale);
-      }
-      return this;
-    }
-
-    private setScaleDomain(accessor: IAccessor, scale: Scale): any {
+    private setScaleDomain(accessor: IAccessor, scale: Scale, extentOnly: boolean): any {
       // up-convert to accessor function
       var accessorFn: IAccessor = Utils.accessorize(accessor);
 
@@ -68,6 +58,7 @@ module Plottable {
       var data: any[]   = this._dataSource.data();
       var metadata: any = this._dataSource.metadata();
       var mapped: any[] = data.map((d: any, i: number) => accessorFn(d, i, metadata));
+      if (extentOnly) mapped = d3.extent(mapped);
 
       // update scale's domain
       scale.domain(mapped);
