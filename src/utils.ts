@@ -101,7 +101,8 @@ module Plottable {
     }
 
     export function applyAccessor(accessor: IAccessor, dataSource: DataSource) {
-      return (d: any, i: number) => accessor(d, i, dataSource.metadata());
+      var activatedAccessor = accessorize(accessor);
+      return (d: any, i: number) => activatedAccessor(d, i, dataSource.metadata());
     }
 
     export function uniq(strings: string[]): string[] {
