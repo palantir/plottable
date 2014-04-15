@@ -36,15 +36,4 @@ describe("Scales", () => {
     scale.padDomain(0.2);
     assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
-
-  it("QuantitiveScale.widenDomain() functions correctly", () => {
-    var scale = new Plottable.QuantitiveScale(d3.scale.linear());
-    assert.deepEqual(scale.domain(), [0, 1], "Initial domain is [0, 1]");
-    scale.widenDomain([1, 2]);
-    assert.deepEqual(scale.domain(), [0, 2], "Domain was wided to [0, 2]");
-    scale.widenDomain([-1, 1]);
-    assert.deepEqual(scale.domain(), [-1, 2], "Domain was wided to [-1, 2]");
-    scale.widenDomain([0, 1]);
-    assert.deepEqual(scale.domain(), [-1, 2], "Domain does not get shrink if \"widened\" to a smaller value");
-  });
 });

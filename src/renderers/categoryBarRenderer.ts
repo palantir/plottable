@@ -29,7 +29,7 @@ module Plottable {
       super._paint();
       var yRange = this.yScale.range();
       var maxScaledY = Math.max(yRange[0], yRange[1]);
-      var xA = this._getAppliedAccessor(this._xAccessor);
+      var xA = Utils.applyAccessor(this._xAccessor, this.dataSource());
 
       this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
       this.dataSelection.enter().append("rect");

@@ -53,6 +53,8 @@ module Plottable {
           this._dataSource = new DataSource(dataset);
         }
         this._dataSource.registerListener(this, () => this._render());
+      } else {
+        this._dataSource = new DataSource();
       }
     }
 
@@ -77,13 +79,22 @@ module Plottable {
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {
-      var activatedAccessor = Utils.accessorize(accessor);
-      var p = {accessor: activatedAccessor, scale: scale};
-      this._projectors[attrToSet] = p;
-      if (scale != null) {
-        var rendererIDAttr = this._plottableID + attrToSet;
-/*        scale._registerPerspective(rendererIDAttr, this.data(), accessor);*/
+      var rendererIDAttr = this._plottableID + attrToSet;
+
+      var currentProjection = this._projectors[attrToSet];
+      var existingScale = (currentProjection != null) ? currentProjection.scale : null;
+      if (scale == null && existingScale != null) {
+        scale = existingScale;
       }
+      if (existingScale != null) {
+        existingScale._removePerspective(rendererIDAttr);
+        existingScale.deregisterListener(this);
+      }
+      if (scale != null) {
+        scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
+        scale.registerListener(this, () => this._render());
+      }
+      this._projectors[attrToSet] = {accessor: accessor, scale: scale};
       this._requireRerender = true;
       this._rerenderUpdateSelection = true;
       return this;
@@ -93,7 +104,7 @@ module Plottable {
       var h: { [attrName: string]: IAppliedAccessor; } = {};
       d3.keys(this._projectors).forEach((a) => {
         var projector = this._projectors[a];
-        var accessor = this._getAppliedAccessor(projector.accessor);
+        var accessor = Utils.applyAccessor(projector.accessor, this.dataSource());
         var scale = projector.scale;
         var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
         h[a] = fn;
@@ -122,17 +133,6 @@ module Plottable {
       super._anchor(element);
       this.renderArea = this.content.append("g").classed("render-area", true);
       return this;
-    }
-
-    public _getAppliedAccessor(accessor: IAccessor): IAppliedAccessor {
-      if (typeof(accessor) === "function") {
-        var metadata = this._dataSource != null ? this._dataSource.metadata() : null;
-        return (d: any, i: number) => accessor(d, i, metadata);
-      } else if (typeof(accessor) === "string") {
-        return (d: any, i: number) => d[accessor];
-      } else {
-        return (d: any, i: number) => accessor;
-      }
     }
   }
 }

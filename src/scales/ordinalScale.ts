@@ -15,11 +15,29 @@ module Plottable {
       super(d3.scale.ordinal());
     }
 
+    public _getCombinedExtent(): any [] {
+      var extents = super._getCombinedExtent();
+      var concatenatedExtents: string[] = [];
+      extents.forEach((e) => {
+        concatenatedExtents = concatenatedExtents.concat(e);
+      });
+      return Utils.uniq(concatenatedExtents);
+    }
+
+    public autorangeDomain() {
+      super.autorangeDomain();
+      var extent = this._getCombinedExtent();
+      this._d3Scale(extent);
+      this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING);
+      this._broadcast();
+      return this;
+    }
+
     public domain(): any[];
     public domain(values: any[]): OrdinalScale;
     public domain(values?: any[]): any {
       if (values == null) {
-        return this._d3Scale.domain();
+        return super.domain(values);
       } else {
         super.domain(values);
         this._d3Scale.rangePoints(this.range(), 2*this.END_PADDING); // d3 scale takes total padding
@@ -43,31 +61,6 @@ module Plottable {
         this._d3Scale.rangePoints(values, 2*this.END_PADDING); // d3 scale takes total padding
         return this;
       }
-    }
-
-    public widenDomainOnData(data: any[], accessor?: IAccessor): OrdinalScale {
-      var changed = false;
-      var newDomain = this.domain();
-      var a: (d: any, i: number) => any;
-      if (accessor == null) {
-        a = (d, i) => d;
-      } else if (typeof(accessor) === "string") {
-        a = (d, i) => d[accessor];
-      } else if (typeof(accessor) === "function") {
-        a = accessor;
-      } else {
-        a = (d, i) => accessor;
-      }
-      data.map(a).forEach((d) => {
-        if (newDomain.indexOf(d) === -1) {
-          newDomain.push(d);
-          changed = true;
-        }
-      });
-      if (changed) {
-        this.domain(newDomain);
-      }
-      return this;
     }
   }
 }

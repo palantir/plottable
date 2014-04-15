@@ -45,8 +45,7 @@ function commitDashboard(dataManager, svg) {
   var scatterDateAxis = new Plottable.XAxis(timeScale, "bottom", dateFormatter);
 
   var rScale = new Plottable.QuantitiveScale(d3.scale.log())
-          .range([2, 12])
-          .widenDomainOnData(commits, linesAddedAccessor);
+          .range([2, 12]);
   function radiusAccessor(d) { return rScale.scale(linesAddedAccessor(d)); }
 
   var scatterRenderer = new Plottable.CircleRenderer(commits, timeScale, scatterYScale)
@@ -54,6 +53,7 @@ function commitDashboard(dataManager, svg) {
                .project("y", hourAccessor)
                .project("r", linesAddedAccessor, rScale)
                .project("fill", "name", contributorColorScale);
+  window.scatterRenderer = scatterRenderer;
 
   var scatterGridlines = new Plottable.Gridlines(timeScale, scatterYScale);
   var scatterRenderArea = scatterGridlines.merge(scatterRenderer);
@@ -68,17 +68,14 @@ function commitDashboard(dataManager, svg) {
   var tscRenderers = {};
   dataManager.directories.forEach(function(dir) {
     var timeSeries = directoryTimeSeries[dir];
-    var directoryDataset = {
-      data: timeSeries,
-      metadata: {}
-    };
-    var lineRenderer = new Plottable.LineRenderer(directoryDataset, timeScale, tscYScale);
+    var lineRenderer = new Plottable.LineRenderer(timeSeries, timeScale, tscYScale);
     lineRenderer.project("x", function(d) { return d[0]; })
                 .project("y", function(d) { return d[1]; })
-                .project("fill", dir, directoryColorScale);
+                .project("stroke", function() {return dir}, directoryColorScale);
     lineRenderer.classed(dir, true);
     tscRenderers[dir] = lineRenderer;
     tscRenderArea = tscRenderArea.merge(lineRenderer);
+    window.lineRenderer = lineRenderer;
   });
 
   var loadTSCData = function() {

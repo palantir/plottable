@@ -1,9 +1,18 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+  interface IPerspective {
+    dataSource: DataSource;
+    accessor: IAccessor;
+  }
   export class Scale extends Broadcaster {
     public _d3Scale: D3.Scale.Scale;
-
+    public _autoDomain = true;
+    private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
+    private dataSourceID2ReferenceCount: {[datasourceID: string]: number} = {};
+    private isAutorangeUpToDate = false;
+    public _autoNice = false;
+    public _autoPad  = false;
     /**
      * Creates a new Scale.
      *
@@ -15,6 +24,48 @@ module Plottable {
       this._d3Scale = scale;
     }
 
+    public _getCombinedExtent(): any[] {
+      var perspectives: IPerspective[] = d3.values(this.rendererID2Perspective);
+      var extents = perspectives.map((p) => {
+        var source = p.dataSource;
+        var accessor = p.accessor;
+        return source._getExtent(accessor);
+      });
+      return extents;
+    }
+
+    public autorangeDomain() {
+        this.isAutorangeUpToDate = true;
+        return this;
+    }
+
+    public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: IAccessor) {
+      if (this.rendererID2Perspective[rendererIDAttr] != null) { // this renderer is changing
+        this._removePerspective(rendererIDAttr);
+      }
+      var p = {dataSource: dataSource, accessor: accessor};
+      this.rendererID2Perspective[rendererIDAttr] = p;
+      var dataSourceID = dataSource._plottableID;
+      var currentRefCount = this.dataSourceID2ReferenceCount[dataSourceID] == null ? this.dataSourceID2ReferenceCount[dataSourceID] : 0;
+      if (currentRefCount === 0 ) {
+        dataSource.registerListener(this, () => this.isAutorangeUpToDate = false );
+      }
+      this.dataSourceID2ReferenceCount[dataSourceID] = currentRefCount + 1;
+      this.isAutorangeUpToDate = false;
+      return this;
+    }
+
+    public _removePerspective(rendererIDAttr: string) {
+      var dataSourceID = this.rendererID2Perspective[rendererIDAttr].dataSource._plottableID;
+      this.dataSourceID2ReferenceCount[dataSourceID]--;
+      if (this.dataSourceID2ReferenceCount[dataSourceID] === 0) {
+        this.rendererID2Perspective[rendererIDAttr].dataSource.deregisterListener(this);
+      }
+      delete this.rendererID2Perspective[rendererIDAttr];
+      this.isAutorangeUpToDate = false;
+      return this;
+    }
+
     /**
      * Returns the range value corresponding to a given domain value.
      *
@@ -22,6 +73,9 @@ module Plottable {
      * @returns {any} The range value corresponding to the supplied domain value.
      */
     public scale(value: any) {
+      if (!this.isAutorangeUpToDate && this._autoDomain) {
+        this.autorangeDomain();
+      }
       return this._d3Scale(value);
     }
 
@@ -35,8 +89,12 @@ module Plottable {
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
+        if (!this.isAutorangeUpToDate && this._autoDomain) {
+          this.autorangeDomain();
+        }
         return this._d3Scale.domain();
       } else {
+        this._autoDomain = false;
         this._d3Scale.domain(values);
         this._broadcast();
         return this;
@@ -67,19 +125,6 @@ module Plottable {
      */
     public copy(): Scale {
       return new Scale(this._d3Scale.copy());
-    }
-
-    /**
-     * Expands the Scale's domain to cover the data given.
-     * Passes an accessor through to the native d3 code.
-     *
-     * @param data The data to operate on.
-     * @param [accessor] The accessor to get values out of the data
-     * @returns {Scale} The Scale.
-     */
-    public widenDomainOnData(data: any[], accessor?: IAccessor): Scale {
-      // no-op; implementation is sublcass-dependent
-      return this;
     }
   }
 }

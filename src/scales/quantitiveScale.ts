@@ -15,6 +15,29 @@ module Plottable {
       super(scale);
     }
 
+    public _getCombinedExtent(): any [] {
+      var extents = super._getCombinedExtent();
+      var starts: number[] = extents.map((e) => e[0]);
+      var ends: number[] = extents.map((e) => e[1]);
+      return [d3.min(starts), d3.max(ends)];
+    }
+
+    public autorangeDomain() {
+      super.autorangeDomain();
+      var extent = this._getCombinedExtent();
+      if (this._autoPad) {
+        var extentRange = extent[1]-extent[0];
+        var padProportion = 0.05;
+        extent = [extent[0] - padProportion/2 * extentRange, extent[1] + padProportion/2 * extentRange];
+      }
+      this._d3Scale.domain(extent);
+      if (this._autoNice) {
+          this._d3Scale.nice();
+      }
+      this._broadcast();
+      return this;
+    }
+
     /**
      * Retrieves the domain value corresponding to a supplied range value.
      *
@@ -34,37 +57,10 @@ module Plottable {
       return new QuantitiveScale(this._d3Scale.copy());
     }
 
-    /**
-     * Expands the QuantitiveScale's domain to cover the new region.
-     *
-     * @param {number[]} newDomain The additional domain to be covered by the QuantitiveScale.
-     * @returns {QuantitiveScale} The scale.
-     */
-    public widenDomain(newDomain: number[]) {
-      var currentDomain = this.domain();
-      var wideDomain = [Math.min(newDomain[0], currentDomain[0]), Math.max(newDomain[1], currentDomain[1])];
-      this.domain(wideDomain);
-      return this;
-    }
-
     public domain(): any[];
     public domain(values: any[]): QuantitiveScale;
     public domain(values?: any[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
-    }
-
-    /**
-     * Expands the QuantitiveScale's domain to cover the data given.
-     * Passes an accessor through to the native d3 code.
-     *
-     * @param data The data to operate on.
-     * @param [accessor] The accessor to get values out of the data.
-     * @returns {QuantitiveScale} The scale.
-     */
-    public widenDomainOnData(data: any[], accessor?: IAccessor) {
-      var extent = d3.extent(data, accessor);
-      this.widenDomain(extent);
-      return this;
     }
 
     /**
