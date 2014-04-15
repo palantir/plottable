@@ -108,7 +108,7 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (OSUtils) {
-        
+
 
         function sortedIndex(val, arr, accessor) {
             var low = 0;
@@ -348,7 +348,7 @@ var Plottable;
 
         Component.prototype.generateClipPath = function () {
             // The clip path will prevent content from overflowing its component space.
-            var clipPathId = Component.clipPathId++;
+            var clipPathId = Component.CLIP_PATH_ID++;
             this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
             var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + clipPathId);
             this.addBox("clip-rect", clipPathParent);
@@ -463,7 +463,7 @@ var Plottable;
                 return cg;
             }
         };
-        Component.clipPathId = 0;
+        Component.CLIP_PATH_ID = 0;
         return Component;
     })();
     Plottable.Component = Component;

@@ -2,7 +2,7 @@
 
 module Plottable {
   export class Component {
-    private static clipPathId = 0; // Used for unique namespacing for the clipPaths
+    private static CLIP_PATH_ID = 0; // Used for unique namespacing for the clipPaths
     public element: D3.Selection;
     public content: D3.Selection;
     private hitBox: D3.Selection;
@@ -222,7 +222,7 @@ module Plottable {
 
     private generateClipPath() {
       // The clip path will prevent content from overflowing its component space.
-      var clipPathId = Component.clipPathId++;
+      var clipPathId = Component.CLIP_PATH_ID++;
       this.element.attr("clip-path", "url(#clipPath" + clipPathId + ")");
       var clipPathParent = this.boxContainer.append("clipPath")
                                       .attr("id", "clipPath" + clipPathId);

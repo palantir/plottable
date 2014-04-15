@@ -3,7 +3,7 @@
 module Plottable {
   export class CircleRenderer extends NumericXYRenderer {
     private _rAccessor: any;
-    private static defaultRAccessor = 3;
+    private static DEFAULT_R_ACCESSOR = 3;
 
     /**
      * Creates a CircleRenderer.
@@ -19,7 +19,7 @@ module Plottable {
     constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: any, yAccessor?: any, rAccessor?: any) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;
+      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.DEFAULT_R_ACCESSOR;
       this.classed("circle-renderer", true);
     }
 
