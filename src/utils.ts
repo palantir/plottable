@@ -2,6 +2,8 @@
 
 module Plottable {
   export module Utils {
+    export var ONE_DAY = 24 * 60 * 60 * 1000;
+
     /**
      * Checks if x is between a and b.
      */
