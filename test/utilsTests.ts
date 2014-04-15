@@ -109,4 +109,16 @@ describe("Utils", () => {
       var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
       assert.deepEqual(Plottable.Utils.uniq(strings), ["foo", "bar", "baz", "bam"]);
     });
+
+    it("IDCounter works as expected", () => {
+      var i = new Plottable.Utils.IDCounter();
+      assert.equal(i.get("f"), 0);
+      assert.equal(i.increment("f"), 1);
+      assert.equal(i.increment("g"), 1);
+      assert.equal(i.increment("f"), 2);
+      assert.equal(i.decrement("f"), 1);
+      assert.equal(i.get("f"), 1);
+      assert.equal(i.get("f"), 1);
+      assert.equal(i.decrement(2), -1);
+    });
 });
