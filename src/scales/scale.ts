@@ -47,7 +47,10 @@ module Plottable {
       var p = {dataSource: dataSource, accessor: accessor};
       this.rendererID2Perspective[rendererIDAttr] = p;
       var dataSourceID = dataSource._plottableID;
-      var currentRefCount = this.dataSourceID2ReferenceCount[dataSourceID] == null ? this.dataSourceID2ReferenceCount[dataSourceID] : 0;
+      var currentRefCount = this.dataSourceID2ReferenceCount[dataSourceID];
+      if (currentRefCount == null) {
+        currentRefCount = 0;
+      }
       if (currentRefCount === 0 ) {
         dataSource.registerListener(this, () => this.isAutorangeUpToDate = false );
       }

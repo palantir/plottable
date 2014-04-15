@@ -109,7 +109,6 @@ module Plottable {
       var seen: {[s: string]: boolean} = {};
       strings.forEach((s) => seen[s] = true);
       return d3.keys(seen);
-
     }
 
     /**
