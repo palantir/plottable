@@ -12,7 +12,7 @@ describe("Scales", () => {
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-    assert.notDeepEqual((<any> scale).listenerCallbacks, (<any> scaleCopy).listenerCallbacks,
+    assert.notDeepEqual((<any> scale).listener2Callback, (<any> scaleCopy).listener2Callback,
                               "Registered callbacks are not copied over");
   });
 
