@@ -33,14 +33,14 @@
           var xScale = new Plottable.OrdinalScale();
           var xAxis = new Plottable.XAxis(xScale, "bottom", function(d) { return d; } );
 
-          var yScale = new Plottable.LinearScale();
+          var yScale = new Plottable.LinearScale().domain([0, 15]);
           var yAxis = new Plottable.YAxis(yScale, "left");
           // yAxis.showEndTickLabels(true);
 
           var barRenderer = new Plottable.CategoryBarRenderer(data, xScale, yScale);
-          barRenderer.xAccessor("name");
-          barRenderer.widthAccessor(50);
-          barRenderer.yAccessor("age");
+          barRenderer.project("x", "name", xScale);
+          // barRenderer.widthAccessor(50);
+          barRenderer.project("y", "age", yScale);
 
           var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
                                                 .addComponent(0, 1, barRenderer)

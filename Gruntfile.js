@@ -66,7 +66,7 @@ module.exports = function(grunt) {
       },
       "rebuild": {
         "tasks": ["dev-compile"],
-        "files": ["src/*.ts"]
+        "files": ["src/**/*.ts"]
       },
       "tests": {
         "tasks": ["ts:test", "tslint"],

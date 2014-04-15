@@ -16,7 +16,6 @@
 /// <reference path="label.ts" />
 /// <reference path="renderers/renderer.ts" />
 /// <reference path="renderers/xyRenderer.ts" />
-/// <reference path="renderers/numericXYRenderer.ts" />
 /// <reference path="renderers/circleRenderer.ts" />
 /// <reference path="renderers/lineRenderer.ts" />
 /// <reference path="renderers/barRenderer.ts" />
