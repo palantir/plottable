@@ -2,7 +2,7 @@
 
 module Plottable {
   export class BarRenderer extends NumericXYRenderer {
-    private static defaultDxAccessor = "dx";
+    private static DEFAULT_DX_ACCESSOR = "dx";
     public barPaddingPx = 1;
 
     public dxAccessor: any;
@@ -27,7 +27,7 @@ module Plottable {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
 
-      this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.defaultDxAccessor;
+      this.dxAccessor = (dxAccessor != null) ? dxAccessor : BarRenderer.DEFAULT_DX_ACCESSOR;
     }
 
     public autorange() {

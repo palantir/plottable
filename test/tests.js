@@ -486,9 +486,9 @@ describe("Component behavior", function () {
     it("clipPath works as expected", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
-        var expectedClipPathID = Plottable.Component.clipPathId;
+        var expectedClipPathID = Plottable.Component.CLIP_PATH_ID;
         c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
-        assert.equal(Plottable.Component.clipPathId, expectedClipPathID + 1, "clipPathId incremented");
+        assert.equal(Plottable.Component.CLIP_PATH_ID, expectedClipPathID + 1, "clipPathId incremented");
         var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
         assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");

@@ -10,7 +10,7 @@ module Plottable {
     public _colorAccessor: IAccessor;
     public _animate = false;
     public _hasRendered = false;
-    private static defaultColorAccessor = (d: any) => "#1f77b4";
+    private static DEFAULT_COLOR_ACCESSOR = (d: any) => "#1f77b4";
 
     public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only
@@ -46,7 +46,7 @@ module Plottable {
           }
         }
       }
-      this.colorAccessor(Renderer.defaultColorAccessor);
+      this.colorAccessor(Renderer.DEFAULT_COLOR_ACCESSOR);
     }
 
     /**

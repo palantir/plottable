@@ -6,35 +6,35 @@ module Plottable {
   }
 
   export class KeyEventListener {
-    private static initialized = false;
-    private static callbacks: IKeyEventListenerCallback[][] = [];
+    private static INITIALIZED = false;
+    private static CALLBACKS: IKeyEventListenerCallback[][] = [];
 
     public static initialize() {
-      if (KeyEventListener.initialized) {
+      if (KeyEventListener.INITIALIZED) {
         return;
       }
       d3.select(document).on("keydown", KeyEventListener.processEvent);
-      KeyEventListener.initialized = true;
+      KeyEventListener.INITIALIZED = true;
     }
 
     public static addCallback(keyCode: number, cb: IKeyEventListenerCallback) {
-      if (!KeyEventListener.initialized) {
+      if (!KeyEventListener.INITIALIZED) {
         KeyEventListener.initialize();
       }
 
-      if (KeyEventListener.callbacks[keyCode] == null) {
-        KeyEventListener.callbacks[keyCode] = [];
+      if (KeyEventListener.CALLBACKS[keyCode] == null) {
+        KeyEventListener.CALLBACKS[keyCode] = [];
       }
 
-      KeyEventListener.callbacks[keyCode].push(cb);
+      KeyEventListener.CALLBACKS[keyCode].push(cb);
     }
 
     private static processEvent() {
-      if (KeyEventListener.callbacks[d3.event.keyCode] == null) {
+      if (KeyEventListener.CALLBACKS[d3.event.keyCode] == null) {
         return;
       }
 
-      KeyEventListener.callbacks[d3.event.keyCode].forEach((cb: IKeyEventListenerCallback) => {
+      KeyEventListener.CALLBACKS[d3.event.keyCode].forEach((cb: IKeyEventListenerCallback) => {
         cb(d3.event);
       });
     }
