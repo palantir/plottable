@@ -13,7 +13,7 @@ function lineChart(svg, dataset) {
   });
   function y(d) { return d.total; }
 
-  var renderer = new Plottable.LineRenderer(dataset, xScale, yScale, x, y);
+  var renderer = new Plottable.AreaRenderer(dataset, xScale, yScale, x, y);
   var gridlines = new Plottable.Gridlines(xScale, yScale);
   var group = renderer.merge(gridlines);
 
