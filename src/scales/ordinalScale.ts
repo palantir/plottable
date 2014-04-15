@@ -75,8 +75,15 @@ module Plottable {
     /**
      * Returns the range type, or sets the range type.
      *
-     * @param {string} [rangeType] Either "points" or "bands" indicating the d3 method used to generate range bounds.
-     * @returns {string|OrdinalScale} The current range type, or the calling OrdinalScale.
+     * @param {string} [rangeType] Either "points" or "bands" indicating the
+     *     d3 method used to generate range bounds.
+     * @param {number} [outerPadding] The padding outside the range,
+     *     proportional to the range step.
+     * @param {number} [innerPadding] The padding between bands in the range,
+     *     proportional to the range step. This parameter is only used in
+     *     "bands" type ranges.
+     * @returns {string|OrdinalScale} The current range type, or the calling
+     *     OrdinalScale.
      */
     public rangeType() : string;
     public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : OrdinalScale;
