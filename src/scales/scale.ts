@@ -35,14 +35,22 @@ module Plottable {
     }
 
     /**
-    * Modify the domain on the scale so that it includes the extent of all perspectives it depends on.
-    * Extent: The (min, max) pair for a QuantitiativeScale, all covered strings for an OrdinalScale.
-    * Perspective: A combination of a DataSource and an Accessor that represents a view in to the data.
+    * Modify the domain on the scale so that it includes the extent of all
+    * perspectives it depends on. Extent: The (min, max) pair for a
+    * QuantitiativeScale, all covered strings for an OrdinalScale.
+    * Perspective: A combination of a DataSource and an Accessor that
+    * represents a view in to the data.
     */
     public autorangeDomain() {
-        this.isAutorangeUpToDate = true;
-        this.domain(this._getCombinedExtent());
-        return this;
+      this.isAutorangeUpToDate = true;
+      this.domain(this._getCombinedExtent());
+      return this;
+    }
+
+    public _autoDomainIfNeeded() {
+      if (!this.isAutorangeUpToDate && this._autoDomain) {
+        this.autorangeDomain();
+      }
     }
 
     public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: IAccessor) {
@@ -79,9 +87,6 @@ module Plottable {
      * @returns {any} The range value corresponding to the supplied domain value.
      */
     public scale(value: any) {
-      if (!this.isAutorangeUpToDate && this._autoDomain) {
-        this.autorangeDomain();
-      }
       return this._d3Scale(value);
     }
 
@@ -98,9 +103,7 @@ module Plottable {
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
-        if (!this.isAutorangeUpToDate && this._autoDomain) {
-          this.autorangeDomain();
-        }
+        this._autoDomainIfNeeded();
         return this._d3Scale.domain();
       } else {
         this._autoDomain = false;
@@ -120,6 +123,7 @@ module Plottable {
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {
+        this._autoDomainIfNeeded();
         return this._d3Scale.range();
       } else {
         this._d3Scale.range(values);

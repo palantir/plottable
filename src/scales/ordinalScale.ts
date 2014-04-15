@@ -54,10 +54,11 @@ module Plottable {
     public range(values: number[]): OrdinalScale;
     public range(values?: number[]): any {
       if (values == null) {
+        this._autoDomainIfNeeded();
         return this._range;
       } else {
         this._range = values;
-        if (this._rangeType === "points"){
+        if (this._rangeType === "points") {
           this._d3Scale.rangePoints(values, 2*this._outerPadding); // d3 scale takes total padding
         } else if (this._rangeType === "bands") {
           this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
@@ -72,6 +73,7 @@ module Plottable {
      * @returns {number} The range band width or 0 if rangeType isn't "bands".
      */
     public rangeBand() : number {
+      this._autoDomainIfNeeded();
       if (this._rangeType === "bands") {
         return this._d3Scale.rangeBand();
       } else {
@@ -95,10 +97,10 @@ module Plottable {
     public rangeType() : string;
     public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : OrdinalScale;
     public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
-      if (rangeType == null){
+      if (rangeType == null) {
         return this._rangeType;
       } else {
-        if(!(rangeType === "points" || rangeType === "bands")){
+        if(!(rangeType === "points" || rangeType === "bands")) {
           throw new Error("Unsupported range type: " + rangeType);
         }
         this._rangeType = rangeType;

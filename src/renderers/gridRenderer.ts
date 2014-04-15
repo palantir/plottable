@@ -44,25 +44,6 @@ module Plottable {
       this.project("x", xAccessor, xScale);
       this.project("y", yAccessor, yScale);
       this.project("fill", valueAccessor, colorScale);
-
-      this.setScaleDomain(xAccessor, xScale, false);
-      this.setScaleDomain(yAccessor, yScale, false);
-      this.setScaleDomain(valueAccessor, colorScale, true);
-    }
-
-    private setScaleDomain(accessor: IAccessor, scale: Scale, extentOnly: boolean): any {
-      // up-convert to accessor function
-      var accessorFn: IAccessor = Utils.accessorize(accessor);
-
-      // map data with accessor
-      var data: any[]   = this._dataSource.data();
-      var metadata: any = this._dataSource.metadata();
-      var mapped: any[] = data.map((d: any, i: number) => accessorFn(d, i, metadata));
-      if (extentOnly) mapped = d3.extent(mapped);
-
-      // update scale's domain
-      scale.domain(mapped);
-      return this;
     }
 
     public _paint() {
