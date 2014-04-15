@@ -36,4 +36,18 @@ describe("DataSource", () => {
     ds.metadata(newMetadata);
     assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
   });
+
+  it("_getExtent works as expected", () => {
+    var data = [1,2,3,4,1];
+    var metadata = {foo: 11};
+    var dataSource = new Plottable.DataSource(data, metadata);
+    var a1 = (d: number, i: number, m: any) => d + i - 2;
+    assert.deepEqual(dataSource._getExtent(a1), [-1, 5], "extent for numerical data works properly");
+    var a2 = (d: number, i: number, m: any) => d + m.foo;
+    assert.deepEqual(dataSource._getExtent(a2), [12, 15], "extent uses metadata appropriately");
+    dataSource.metadata({foo: -1});
+    assert.deepEqual(dataSource._getExtent(a2), [0, 3], "metadata change is reflected in extent results");
+    var a3 = (d: number, i: number, m: any) => "_" + d;
+    assert.deepEqual(dataSource._getExtent(a3), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+  });
 });

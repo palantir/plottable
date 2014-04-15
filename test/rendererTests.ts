@@ -49,6 +49,8 @@ describe("Renderers", () => {
       var svg = generateSVG(400, 400);
       var xScale = new Plottable.LinearScale();
       var yScale = new Plottable.LinearScale();
+      xScale.domain([0, 400]);
+      yScale.domain([400, 0]);
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var metadata = {foo: 10, bar: 20};
       var xAccessor = (d, i?, m?) => d.x + i * m.foo;
@@ -56,8 +58,6 @@ describe("Renderers", () => {
       var dataSource = new Plottable.DataSource(data, metadata);
       var renderer = new Plottable.CircleRenderer(dataSource, xScale, yScale, xAccessor, yAccessor);
       renderer.autorangeDataOnLayout = false;
-      xScale.domain([0, 400]);
-      yScale.domain([400, 0]);
       renderer.renderTo(svg);
       var circles = renderer.renderArea.selectAll("circle");
       var c1 = d3.select(circles[0][0]);
@@ -97,8 +97,8 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(500, 500);
-        xScale = new Plottable.LinearScale();
-        yScale = new Plottable.LinearScale();
+        xScale = new Plottable.LinearScale().domain([0, 1]);
+        yScale = new Plottable.LinearScale().domain([0, 1]);
         var xAccessor = (d) => d.foo;
         var yAccessor = (d) => d.bar;
         var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();

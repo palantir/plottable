@@ -79,6 +79,46 @@ describe("Utils", () => {
 
     var a5 = Plottable.Utils.accessorize(datum);
     assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
-
   });
+
+  it("StrictEqualityAssociativeArray works as expected", () => {
+    var s = new Plottable.Utils.StrictEqualityAssociativeArray();
+    var o1 = {};
+    var o2 = {};
+    assert.isFalse(s.has(o1));
+    assert.isFalse(s.delete(o1));
+    assert.isUndefined(s.get(o1));
+    assert.isFalse(s.set(o1, "foo"));
+    assert.equal(s.get(o1), "foo");
+    assert.isTrue(s.set(o1, "bar"));
+    assert.equal(s.get(o1), "bar");
+    s.set(o2, "baz");
+    s.set(3, "bam");
+    s.set("3", "ball");
+    assert.equal(s.get(o1), "bar");
+    assert.equal(s.get(o2), "baz");
+    assert.equal(s.get(3), "bam");
+    assert.equal(s.get("3"), "ball");
+    assert.isTrue(s.delete(3));
+    assert.isUndefined(s.get(3));
+    assert.equal(s.get(o2), "baz");
+    assert.equal(s.get("3"), "ball");
+    });
+
+    it("uniq works as expected", () => {
+      var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
+      assert.deepEqual(Plottable.Utils.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+
+    it("IDCounter works as expected", () => {
+      var i = new Plottable.Utils.IDCounter();
+      assert.equal(i.get("f"), 0);
+      assert.equal(i.increment("f"), 1);
+      assert.equal(i.increment("g"), 1);
+      assert.equal(i.increment("f"), 2);
+      assert.equal(i.decrement("f"), 1);
+      assert.equal(i.get("f"), 1);
+      assert.equal(i.get("f"), 1);
+      assert.equal(i.decrement(2), -1);
+    });
 });

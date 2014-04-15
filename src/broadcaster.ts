@@ -6,7 +6,7 @@ module Plottable {
     c: IBroadcasterCallback;
   }
   export class Broadcaster extends PlottableObject {
-    private listenerCallbacks: IListenerCallbackPair[] = [];
+    private listener2Callback = new Utils.StrictEqualityAssociativeArray();
 
     /**
      * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -18,13 +18,7 @@ module Plottable {
      * @returns {Broadcaster} this object
      */
     public registerListener(listener: any, callback: IBroadcasterCallback) {
-      for (var i=0; i < this.listenerCallbacks.length; i++) {
-        if (this.listenerCallbacks[i].l === listener) {
-          this.listenerCallbacks[i].c = callback;
-          return this;
-        }
-      }
-      this.listenerCallbacks.push({l: listener, c: callback});
+      this.listener2Callback.set(listener, callback);
       return this;
     }
 
@@ -35,7 +29,7 @@ module Plottable {
      * @returns {Broadcaster} this object
      */
     public _broadcast(...args: any[]) {
-      this.listenerCallbacks.forEach((lc) => lc.c(this, args));
+      this.listener2Callback.values().forEach((callback) => callback(this, args));
       return this;
     }
 
@@ -46,13 +40,12 @@ module Plottable {
      * @returns {Broadcaster} this object
      */
     public deregisterListener(listener: any) {
-      for (var i=0; i < this.listenerCallbacks.length; i++) {
-        if (this.listenerCallbacks[i].l === listener) {
-          this.listenerCallbacks.splice(i, 1);
-          return this;
-        }
-      }
+      var listenerWasFound = this.listener2Callback.delete(listener);
+      if (listenerWasFound) {
+        return this;
+      } else {
       throw new Error("Attempted to deregister listener, but listener not found");
+      }
     }
   }
 }

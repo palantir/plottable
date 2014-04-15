@@ -28,16 +28,6 @@ module Plottable {
       this.project("dx", "dx");
     }
 
-    public autorange() {
-      super.autorange();
-      var xA  = this._getAppliedAccessor(this._xAccessor);
-      var dxA = this._getAppliedAccessor(this.dxAccessor);
-      var x2Accessor = (d: any) => xA(d, null) + dxA(d, null);
-      var x2Extent: number[] = d3.extent(this._dataSource.data(), x2Accessor);
-      this.xScale.widenDomain(x2Extent);
-      return this;
-    }
-
     public _paint() {
       super._paint();
       var yRange = this.yScale.range();
@@ -53,7 +43,7 @@ module Plottable {
       var xF = attrToProjector["x"];
       attrToProjector["x"] = (d: any, i: number) => xF(d, i) + this.barPaddingPx;
 
-      var dxA = this._getAppliedAccessor(this._projectors["dx"].accessor);
+      var dxA = Utils.applyAccessor(this._projectors["dx"].accessor, this.dataSource());
       attrToProjector["width"] = (d: any, i: number) => {
         var dx = dxA(d, i);
         var scaledDx = this.xScale.scale(dx);
