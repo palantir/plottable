@@ -135,10 +135,5 @@ module Plottable {
       }
       super(scale);
     }
-
-    public domain(values?: any[]): any {
-      if (values != null) values = d3.extent(values);
-      return super.domain(values); // need to override type sig to enable method chaining :/
-    }
   }
 }

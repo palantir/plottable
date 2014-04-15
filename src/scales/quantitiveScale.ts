@@ -50,7 +50,6 @@ module Plottable {
     public domain(): any[];
     public domain(values: any[]): QuantitiveScale;
     public domain(values?: any[]): any {
-      if (values != null) values = d3.extent(values);
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
 

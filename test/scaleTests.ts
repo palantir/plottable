@@ -48,12 +48,6 @@ describe("Scales", () => {
     assert.deepEqual(scale.domain(), [-1, 2], "Domain does not get shrink if \"widened\" to a smaller value");
   });
 
-  it("Linear Scales default to a domain of [Infinity, -Infinity]", () => {
-    var scale = new Plottable.LinearScale();
-    var domain = scale.domain();
-    assert.deepEqual(domain, [Infinity, -Infinity]);
-  });
-
   describe("Ordinal Scales", () => {
     it("defaults to \"points\" range type", () => {
       var scale = new Plottable.OrdinalScale();
@@ -81,12 +75,12 @@ describe("Scales", () => {
   });
 
   describe("Color Scales", () => {
-    it("accepts categorical string types", () => {
+    it("accepts categorical string types and ordinal domain", () => {
       var scale = new Plottable.ColorScale("10");
-      scale.domain([0,1,2]);
-      assert.equal("#1f77b4", scale.scale(0));
-      assert.equal("#2ca02c", scale.scale(1));
-      assert.equal("#ff7f0e", scale.scale(2));
+      scale.domain(["yes", "no", "maybe"]);
+      assert.equal("#1f77b4", scale.scale("yes"));
+      assert.equal("#ff7f0e", scale.scale("no"));
+      assert.equal("#2ca02c", scale.scale("maybe"));
     });
 
     it("linearly interpolates colors in L*a*b color space", () => {

@@ -60,7 +60,7 @@ module Plottable {
       return this;
     }
 
-    public setScaleDomain(accessor: IAccessor, scale: Scale): any {
+    private setScaleDomain(accessor: IAccessor, scale: Scale): any {
       // up-convert to accessor function
       var accessorFn: IAccessor = Utils.accessorize(accessor);
 

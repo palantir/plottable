@@ -30,8 +30,8 @@ module Plottable {
      *
      * @param {any[]} [values] The new value for the domain. This array may
      *     contain more than 2 values if the scale type allows it (e.g.
-     *     ordinal scales). Other scales such as quantitative scales will
-     *     convert the param to a 2-value extent array.
+     *     ordinal scales). Other scales such as quantitative scales accept
+     *     only a 2-value extent array.
      * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
      */
     public domain(): any[];
