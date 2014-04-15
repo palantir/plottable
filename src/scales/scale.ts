@@ -9,7 +9,7 @@ module Plottable {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomain = true;
     private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
-    private dataSourceID2ReferenceCount: {[datasourceID: string]: number} = {};
+    private dataSourceReferenceCounter = new Utils.IDCounter();
     private isAutorangeUpToDate = false;
     public _autoNice = false;
     public _autoPad  = false;
@@ -34,6 +34,11 @@ module Plottable {
       return extents;
     }
 
+    /**
+    * Modify the domain on the scale so that it includes the extent of all perspectives it depends on.
+    * Extent: The (min, max) pair for a QuantitiativeScale, all covered strings for an OrdinalScale.
+    * Perspective: A combination of a DataSource and an Accessor that represents a view in to the data.
+    */
     public autorangeDomain() {
         this.isAutorangeUpToDate = true;
         this.domain(this._getCombinedExtent());
@@ -45,25 +50,23 @@ module Plottable {
         this._removePerspective(rendererIDAttr);
       }
       this.rendererID2Perspective[rendererIDAttr] = {dataSource: dataSource, accessor: accessor};
+
       var dataSourceID = dataSource._plottableID;
-      var currentRefCount = this.dataSourceID2ReferenceCount[dataSourceID];
-      if (currentRefCount == null) {
-        currentRefCount = 0;
-      }
-      if (currentRefCount === 0 ) {
+      if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
         dataSource.registerListener(this, () => this.isAutorangeUpToDate = false );
       }
-      this.dataSourceID2ReferenceCount[dataSourceID] = currentRefCount + 1;
+
       this.isAutorangeUpToDate = false;
       return this;
     }
 
     public _removePerspective(rendererIDAttr: string) {
-      var dataSourceID = this.rendererID2Perspective[rendererIDAttr].dataSource._plottableID;
-      this.dataSourceID2ReferenceCount[dataSourceID]--;
-      if (this.dataSourceID2ReferenceCount[dataSourceID] === 0) {
-        this.rendererID2Perspective[rendererIDAttr].dataSource.deregisterListener(this);
+      var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
+      var dataSourceID = dataSource._plottableID;
+      if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
+        dataSource.deregisterListener(this);
       }
+
       delete this.rendererID2Perspective[rendererIDAttr];
       this.isAutorangeUpToDate = false;
       return this;
