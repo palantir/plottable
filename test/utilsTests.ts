@@ -104,4 +104,9 @@ describe("Utils", () => {
     assert.equal(s.get(o2), "baz");
     assert.equal(s.get("3"), "ball");
     });
+
+    it("uniq works as expected", () => {
+      var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
+      assert.deepEqual(Plottable.Utils.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
 });
