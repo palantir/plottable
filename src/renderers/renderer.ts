@@ -112,10 +112,12 @@ module Plottable {
     }
 
     public _render(): Renderer {
-      this._hasRendered = true;
-      this._paint();
-      this._requireRerender = false;
-      this._rerenderUpdateSelection = false;
+      if (this.element != null) {
+        this._hasRendered = true;
+        this._paint();
+        this._requireRerender = false;
+        this._rerenderUpdateSelection = false;
+      }
       return this;
     }
 
