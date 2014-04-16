@@ -87,6 +87,7 @@ module Plottable {
      * @returns {any} The range value corresponding to the supplied domain value.
      */
     public scale(value: any) {
+      this._autoDomainIfNeeded();
       return this._d3Scale(value);
     }
 

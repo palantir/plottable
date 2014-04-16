@@ -11,7 +11,7 @@ module Plottable {
      * @param {string} [scaleType] the type of color scale to create
      *     (Category10/Category20/Category20b/Category20c).
      */
-    constructor(scaleType?: any) {
+    constructor(scaleType?: string) {
       var scale: D3.Scale.Scale;
       switch (scaleType) {
         case "Category10":

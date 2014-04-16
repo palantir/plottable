@@ -75,11 +75,7 @@ module Plottable {
      */
     public rangeBand() : number {
       this._autoDomainIfNeeded();
-      if (this._rangeType === "bands") {
-        return this._d3Scale.rangeBand();
-      } else {
-        return 0;
-      }
+      return this._d3Scale.rangeBand();
     }
 
     /**

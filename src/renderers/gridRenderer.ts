@@ -11,9 +11,9 @@ module Plottable {
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
-     * @param {ColorScale} colorScale The color scale to use for each grid
+     * @param {OrdinalScale} xScale The x scale to use.
+     * @param {OrdinalScale} yScale The y scale to use.
+     * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
      *     cell.
      * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
      *     the x position of each grid cell from the data.
@@ -39,8 +39,6 @@ module Plottable {
 
       this.colorScale = colorScale;
       this.project("fill", valueAccessor, colorScale);
-
-      colorScale.autorangeDomain();
     }
 
     public _paint() {
