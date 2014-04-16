@@ -19,8 +19,8 @@ module Plottable {
       super(d3.scale.ordinal());
     }
 
-    public _getCombinedExtent(): any [] {
-      var extents = super._getCombinedExtent();
+    public _getExtent(): any[] {
+      var extents = this._getAllExtents();
       var concatenatedExtents: string[] = [];
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
