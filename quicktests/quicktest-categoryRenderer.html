@@ -2,15 +2,6 @@
   <head>
     <title>CATegory Bar Renderer Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <style>
-      .plottable .bounding-box {
-        stroke: none;
-      }
-
-      .plottable .bar-renderer .selected {
-        fill: pink;
-      }
-    </style>
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../build/plottable.js"></script>
     <script src="../../build/exampleUtil.js"></script>
@@ -23,57 +14,28 @@
           { name: "Sugar", age: 14 }
         ];
 
-      // var data2 = [
-      //   { name: "Spot", age: 8 },
-      //   { name: "Poptart", age: 1 },
-      //   { name: "Budoka", age: 3 }
-      // ];
-
       function makeCatXAxisChart() {
           var xScale = new Plottable.OrdinalScale();
           var xAxis = new Plottable.XAxis(xScale, "bottom", function(d) { return d; } );
 
           var yScale = new Plottable.LinearScale().domain([0, 15]);
           var yAxis = new Plottable.YAxis(yScale, "left");
-          // yAxis.showEndTickLabels(true);
+          yAxis.showEndTickLabels(true);
 
-          var barRenderer = new Plottable.CategoryBarRenderer(data, xScale, yScale);
-          barRenderer.project("x", "name", xScale);
-          // barRenderer.widthAccessor(50);
-          barRenderer.project("y", "age", yScale);
+          var barRenderer = new Plottable.CategoryBarRenderer(data, xScale, yScale)
+                                  .project("x", "name", xScale)
+                                  .project("y", "age", yScale)
+                                  .project("width", 50)
+                                  .project("fill", function() {return "steelblue"});
 
-          var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
-                                                .addComponent(0, 1, barRenderer)
-                                                .addComponent(1, 1, xAxis);
-
-          var svg = d3.select("#meow");
-          svg.attr("width", 480).attr("height", 320);
-          basicTable.renderTo(svg);
-
-          // barRenderer.data(data2); // update data
-          // barRenderer._render();
-
-          // var clickInteraction = new Plottable.ClickInteraction(barRenderer);
-          // var clickCallback = function(x, y) {
-          //   barRenderer.deselectAll();
-          //   var bar = barRenderer.selectBar(x, y);
-          //   if (bar != null) {
-          //     var alertString = bar.data()[0].name + " says: "
-          //     for (var i=0; i<bar.data()[0].age; i++) {
-          //       alertString += "meow ";
-          //     }
-          //     alert(alertString);
-          //   }
-          // };
-          // clickInteraction.callback(clickCallback);
-          // clickInteraction.registerWithComponent();
+          var chart = new Plottable.StandardChart().addCenterComponent(barRenderer).xAxis(xAxis).yAxis(yAxis);
+          chart.renderTo("#meow");
       };
 
       window.onload = function() { makeCatXAxisChart(); }
     </script>
   </head>
   <body>
-    <svg id="meow"></svg>
+    <svg id="meow" width="480" height="320"></svg>
   </body>
-
 </html>
