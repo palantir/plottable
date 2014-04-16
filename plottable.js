@@ -1,5 +1,5 @@
 /*!
-Plottable v0.7.0 (https://github.com/palantir/plottable)
+Plottable v0.8.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -490,7 +490,13 @@ var Plottable;
         Component.prototype.renderTo = function (element) {
             // When called on top-level-component, a shortcut for component._anchor(svg)._computeLayout()._render()
             if (this.element == null) {
-                this._anchor(element);
+                var selection;
+                if (typeof (element.node) === "function") {
+                    selection = element;
+                } else {
+                    selection = d3.select(element);
+                }
+                this._anchor(selection);
             }
             this._computeLayout()._render();
             return this;
@@ -1749,7 +1755,6 @@ var Plottable;
     var Renderer = (function (_super) {
         __extends(Renderer, _super);
         function Renderer(dataset) {
-            var _this = this;
             _super.call(this);
             this._animate = false;
             this._hasRendered = false;
@@ -1766,18 +1771,17 @@ var Plottable;
             this._fixedHeight = false;
             this.classed("renderer", true);
 
+            var dataSource;
             if (dataset != null) {
                 if (typeof dataset.data === "function") {
-                    this._dataSource = dataset;
+                    dataSource = dataset;
                 } else {
-                    this._dataSource = new Plottable.DataSource(dataset);
+                    dataSource = dataSource = new Plottable.DataSource(dataset);
                 }
-                this._dataSource.registerListener(this, function () {
-                    return _this._render();
-                });
             } else {
-                this._dataSource = new Plottable.DataSource();
+                dataSource = new Plottable.DataSource();
             }
+            this.dataSource(dataSource);
         }
         Renderer.prototype.dataSource = function (source) {
             var _this = this;
@@ -3187,6 +3191,32 @@ var Plottable;
         return YAxis;
     })(Axis);
     Plottable.YAxis = YAxis;
+})(Plottable || (Plottable = {}));
+///<reference path="reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (AxisUtils) {
+        AxisUtils.ONE_DAY = 24 * 60 * 60 * 1000;
+
+        /**
+        * Generates a relative date axis formatter.
+        *
+        * @param {number} baseValue The start date (as epoch time) used in computing relative dates
+        * @param {number} increment The unit used in calculating relative date tick values
+        * @param {string} label The label to append to tick values
+        */
+        function generateRelativeDateFormatter(baseValue, increment, label) {
+            if (typeof increment === "undefined") { increment = AxisUtils.ONE_DAY; }
+            if (typeof label === "undefined") { label = ""; }
+            var formatter = function (tickValue) {
+                var relativeDate = Math.round((tickValue.valueOf() - baseValue) / increment);
+                return relativeDate.toString() + label;
+            };
+            return formatter;
+        }
+        AxisUtils.generateRelativeDateFormatter = generateRelativeDateFormatter;
+    })(Plottable.AxisUtils || (Plottable.AxisUtils = {}));
+    var AxisUtils = Plottable.AxisUtils;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
 var Plottable;

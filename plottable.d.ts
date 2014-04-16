@@ -164,7 +164,7 @@ declare module Plottable {
         *
         * @returns {Component} The calling Component.
         */
-        public renderTo(element: D3.Selection): Component;
+        public renderTo(element: any): Component;
         /**
         * Sets the x alignment of the Component.
         *
@@ -995,6 +995,19 @@ declare module Plottable {
         */
         public tickLabelPosition(): string;
         public tickLabelPosition(position: string): YAxis;
+    }
+}
+declare module Plottable {
+    module AxisUtils {
+        var ONE_DAY: number;
+        /**
+        * Generates a relative date axis formatter.
+        *
+        * @param {number} baseValue The start date (as epoch time) used in computing relative dates
+        * @param {number} increment The unit used in calculating relative date tick values
+        * @param {string} label The label to append to tick values
+        */
+        function generateRelativeDateFormatter(baseValue: number, increment?: number, label?: string): (tickValue: any) => string;
     }
 }
 declare module Plottable {
