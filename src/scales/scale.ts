@@ -63,7 +63,7 @@ module Plottable {
       if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
         dataSource.registerListener(this, () => {
           this.isAutorangeUpToDate = false;
-          this.autorangeDomain();
+          this._autoDomainIfNeeded();
         });
       }
 
