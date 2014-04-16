@@ -55,34 +55,22 @@ describe("Scales", () => {
     });
 
     it("scale autorange works as expected with single dataSource", () => {
-      assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate is false by default");
       scale._addPerspective("1x", dataSource, "foo");
-      assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate set to false after adding perspective");
-      scale.autorangeDomain();
-      assert.isTrue((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate is true after autoranging");
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
       dataSource.data(data);
-      dataSource._broadcast();
-      assert.isFalse((<any> scale).isAutorangeUpToDate, "isAutorangeUpToDate set to false after modifying data");
-      scale.autorangeDomain();
       assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
     });
 
     it("scale reference counting works as expected", () => {
       scale._addPerspective("1x", dataSource, "foo");
       scale._addPerspective("2x", dataSource, "foo");
-      scale.autorangeDomain();
       scale._removePerspective("1x");
-      scale.autorangeDomain();
-      assert.isTrue((<any> scale).isAutorangeUpToDate, "scale autorange up to date");
-      dataSource._broadcast();
-      assert.isFalse((<any> scale).isAutorangeUpToDate, "scale was still listening to dataSource after one perspective deregistered");
+      dataSource.data([{foo: 10}, {foo: 11}]);
+      assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
       scale._removePerspective("2x");
-      scale.autorangeDomain();
-      assert.isTrue((<any> scale).isAutorangeUpToDate, "scale autorange up to date");
-      dataSource._broadcast();
-      assert.isTrue((<any> scale).isAutorangeUpToDate, "scale not listening to the dataSource after all perspectives removed");
+      // "scale not listening to the dataSource after all perspectives removed"
+      assert.throws(() => dataSource.deregisterListener(scale));
     });
 
     it("scale perspectives can be removed appropriately", () => {
