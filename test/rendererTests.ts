@@ -342,39 +342,16 @@ describe("Renderers", () => {
     });
 
     describe("Grid Renderer", () => {
-      var verifier = new MultiTestVerifier();
-      var svg: D3.Selection;
-      var xScale: Plottable.OrdinalScale;
-      var yScale: Plottable.OrdinalScale;
-      var colorScale: Plottable.InterpolatedColorScale;
-      var renderer: Plottable.GridRenderer;
-
       var SVG_WIDTH  = 400;
       var SVG_HEIGHT = 200;
+      var DATA       = [
+        {x: "A", y: "U", magnitude: 0},
+        {x: "B", y: "U", magnitude: 2},
+        {x: "A", y: "V", magnitude: 16},
+        {x: "B", y: "V", magnitude: 8},
+      ];
 
-      before(() => {
-        svg        = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale     = new Plottable.OrdinalScale();
-        yScale     = new Plottable.OrdinalScale();
-        colorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
-        var data = [
-          {x: "A", y: "U", magnitude: 0},
-          {x: "B", y: "U", magnitude: 2},
-          {x: "A", y: "V", magnitude: 16},
-          {x: "B", y: "V", magnitude: 8},
-        ];
-
-        renderer = new Plottable.GridRenderer(data, xScale, yScale, colorScale, "x", "y", "magnitude");
-        renderer.renderTo(svg);
-      });
-
-      beforeEach(() => {
-        verifier.start();
-      });
-
-      it("renders correctly", () => {
-        var renderArea = renderer.renderArea;
-        var cells = renderArea.selectAll("rect")[0];
+      var VERIFY_CELLS = (cells: any[]) => {
         assert.equal(cells.length, 4);
 
         var cellAU = d3.select(cells[0]);
@@ -405,14 +382,32 @@ describe("Renderers", () => {
         assert.equal(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
         assert.equal(cellBV.attr("y"), "100", "cell 'BV' x coord is correct");
         assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
+      };
 
-        verifier.end();
+      it("renders correctly", () => {
+        var xScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
+        var yScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
+        var colorScale: Plottable.InterpolatedColorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
+        var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var renderer: Plottable.GridRenderer = new Plottable.GridRenderer(DATA, xScale, yScale, colorScale, "x", "y", "magnitude");
+        renderer.renderTo(svg);
+        VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+        svg.remove();
       });
 
-      after(() => {
-        if (verifier.passed) {svg.remove();};
+      it("renders correctly when data is set after construction", () => {
+        var xScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
+        var yScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
+        var colorScale: Plottable.InterpolatedColorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
+        var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var renderer: Plottable.GridRenderer = new Plottable.GridRenderer(null, xScale, yScale, colorScale, "x", "y", "magnitude");
+        renderer.renderTo(svg);
+        renderer.dataSource().data(DATA);
+        VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+        svg.remove();
       });
     });
+
 
   });
 });

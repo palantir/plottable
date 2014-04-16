@@ -19,7 +19,11 @@ module Plottable {
       var extents = super._getCombinedExtent();
       var starts: number[] = extents.map((e) => e[0]);
       var ends: number[] = extents.map((e) => e[1]);
-      return [d3.min(starts), d3.max(ends)];
+      if (starts.length > 0) {
+        return [d3.min(starts), d3.max(ends)];
+      } else {
+        return [];
+      }
     }
 
     public autorangeDomain() {

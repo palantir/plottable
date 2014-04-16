@@ -55,7 +55,6 @@ module Plottable {
     public range(values: number[]): OrdinalScale;
     public range(values?: number[]): any {
       if (values == null) {
-        this._autoDomainIfNeeded();
         return this._range;
       } else {
         this._range = values;
@@ -74,7 +73,6 @@ module Plottable {
      * @returns {number} The range band width or 0 if rangeType isn't "bands".
      */
     public rangeBand() : number {
-      this._autoDomainIfNeeded();
       return this._d3Scale.rangeBand();
     }
 

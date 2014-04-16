@@ -73,7 +73,9 @@ module Plottable {
     private computeExtent(accessor: IAccessor): any[] {
       var appliedAccessor = Utils.applyAccessor(accessor, this);
       var mappedData = this._data.map(appliedAccessor);
-      if (typeof(appliedAccessor(this._data[0], 0)) === "string") {
+      if (mappedData.length === 0){
+        return undefined;
+      } else if (typeof(mappedData[0]) === "string") {
         return Utils.uniq(mappedData);
       } else {
         return d3.extent(mappedData);
