@@ -1065,3 +1065,19 @@ declare module Plottable {
         (broadcaster: Broadcaster, ...args: any[]): any;
     }
 }
+declare module Plottable {
+    class AreaRenderer extends XYRenderer {
+        /**
+        * Creates an AreaRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        * @param {any} [xAccessor] A function for extracting x values from the data.
+        * @param {any} [yAccessor] A function for extracting upper y values to color between.
+        * @param {any} [y0Accessor] A function for extracting lower y values to color between.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: any, yAccessor?: any, y0Accessor?: any);
+    }
+}

@@ -1489,6 +1489,81 @@ describe("Renderers", function () {
             });
         });
 
+        describe("Basic AreaRenderer functionality", function () {
+            var svg;
+            var xScale;
+            var yScale;
+            var areaRenderer;
+            var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            var renderArea;
+            var verifier = new MultiTestVerifier();
+
+            before(function () {
+                svg = generateSVG(500, 500);
+                xScale = new Plottable.LinearScale().domain([0, 1]);
+                yScale = new Plottable.LinearScale().domain([0, 1]);
+                var xAccessor = function (d) {
+                    return d.foo;
+                };
+                var yAccessor = function (d) {
+                    return d.bar;
+                };
+                var y0Accessor = function () {
+                    return 0;
+                };
+                var colorAccessor = function (d, i, m) {
+                    return d3.rgb(d.foo, d.bar, i).toString();
+                };
+                var fillAccessor = function () {
+                    return "steelblue";
+                };
+                areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor, y0Accessor);
+                areaRenderer.project("fill", fillAccessor).project("stroke", colorAccessor);
+                areaRenderer.renderTo(svg);
+                renderArea = areaRenderer.renderArea;
+            });
+
+            beforeEach(function () {
+                verifier.start();
+            });
+
+            it("fill colors set appropriately from accessor", function () {
+                var path = renderArea.select("path");
+                assert.equal(path.attr("fill"), "steelblue", "fill set correctly");
+                verifier.end();
+            });
+
+            it("fill colors can be changed by projecting new accessor and re-render appropriately", function () {
+                var newFillAccessor = function () {
+                    return "pink";
+                };
+                areaRenderer.project("fill", newFillAccessor);
+                areaRenderer.renderTo(svg);
+                renderArea = areaRenderer.renderArea;
+                var path = renderArea.select("path");
+                assert.equal(path.attr("fill"), "pink", "fill changed correctly");
+                verifier.end();
+            });
+
+            it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
+                areaRenderer.project("y0", function (d) {
+                    return d.bar / 2;
+                });
+                areaRenderer.renderTo(svg);
+                renderArea = areaRenderer.renderArea;
+                var path = renderArea.select("path");
+                assert.equal(path.attr("d"), "M0,500L500,0L500,250L0,500Z");
+                verifier.end();
+            });
+
+            after(function () {
+                if (verifier.passed) {
+                    svg.remove();
+                }
+                ;
+            });
+        });
+
         describe("Example CircleRenderer with quadratic series", function () {
             var svg;
             var xScale;
@@ -1707,39 +1782,16 @@ describe("Renderers", function () {
         });
 
         describe("Grid Renderer", function () {
-            var verifier = new MultiTestVerifier();
-            var svg;
-            var xScale;
-            var yScale;
-            var colorScale;
-            var renderer;
-
             var SVG_WIDTH = 400;
             var SVG_HEIGHT = 200;
+            var DATA = [
+                { x: "A", y: "U", magnitude: 0 },
+                { x: "B", y: "U", magnitude: 2 },
+                { x: "A", y: "V", magnitude: 16 },
+                { x: "B", y: "V", magnitude: 8 }
+            ];
 
-            before(function () {
-                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                xScale = new Plottable.OrdinalScale();
-                yScale = new Plottable.OrdinalScale();
-                colorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
-                var data = [
-                    { x: "A", y: "U", magnitude: 0 },
-                    { x: "B", y: "U", magnitude: 2 },
-                    { x: "A", y: "V", magnitude: 16 },
-                    { x: "B", y: "V", magnitude: 8 }
-                ];
-
-                renderer = new Plottable.GridRenderer(data, xScale, yScale, colorScale, "x", "y", "magnitude");
-                renderer.renderTo(svg);
-            });
-
-            beforeEach(function () {
-                verifier.start();
-            });
-
-            it("renders correctly", function () {
-                var renderArea = renderer.renderArea;
-                var cells = renderArea.selectAll("rect")[0];
+            var VERIFY_CELLS = function (cells) {
                 assert.equal(cells.length, 4);
 
                 var cellAU = d3.select(cells[0]);
@@ -1770,15 +1822,29 @@ describe("Renderers", function () {
                 assert.equal(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
                 assert.equal(cellBV.attr("y"), "100", "cell 'BV' x coord is correct");
                 assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
+            };
 
-                verifier.end();
+            it("renders correctly", function () {
+                var xScale = new Plottable.OrdinalScale();
+                var yScale = new Plottable.OrdinalScale();
+                var colorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var renderer = new Plottable.GridRenderer(DATA, xScale, yScale, colorScale, "x", "y", "magnitude");
+                renderer.renderTo(svg);
+                VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+                svg.remove();
             });
 
-            after(function () {
-                if (verifier.passed) {
-                    svg.remove();
-                }
-                ;
+            it("renders correctly when data is set after construction", function () {
+                var xScale = new Plottable.OrdinalScale();
+                var yScale = new Plottable.OrdinalScale();
+                var colorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var renderer = new Plottable.GridRenderer(null, xScale, yScale, colorScale, "x", "y", "magnitude");
+                renderer.renderTo(svg);
+                renderer.dataSource().data(DATA);
+                VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+                svg.remove();
             });
         });
     });
@@ -1838,34 +1904,25 @@ describe("Scales", function () {
         });
 
         it("scale autorange works as expected with single dataSource", function () {
-            assert.isFalse(scale.isAutorangeUpToDate, "isAutorangeUpToDate is false by default");
             scale._addPerspective("1x", dataSource, "foo");
-            assert.isFalse(scale.isAutorangeUpToDate, "isAutorangeUpToDate set to false after adding perspective");
-            scale.autorangeDomain();
-            assert.isTrue(scale.isAutorangeUpToDate, "isAutorangeUpToDate is true after autoranging");
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataSource.data(data);
-            dataSource._broadcast();
-            assert.isFalse(scale.isAutorangeUpToDate, "isAutorangeUpToDate set to false after modifying data");
-            scale.autorangeDomain();
             assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
         });
 
         it("scale reference counting works as expected", function () {
             scale._addPerspective("1x", dataSource, "foo");
             scale._addPerspective("2x", dataSource, "foo");
-            scale.autorangeDomain();
             scale._removePerspective("1x");
-            scale.autorangeDomain();
-            assert.isTrue(scale.isAutorangeUpToDate, "scale autorange up to date");
-            dataSource._broadcast();
-            assert.isFalse(scale.isAutorangeUpToDate, "scale was still listening to dataSource after one perspective deregistered");
+            dataSource.data([{ foo: 10 }, { foo: 11 }]);
+            assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
             scale._removePerspective("2x");
-            scale.autorangeDomain();
-            assert.isTrue(scale.isAutorangeUpToDate, "scale autorange up to date");
-            dataSource._broadcast();
-            assert.isTrue(scale.isAutorangeUpToDate, "scale not listening to the dataSource after all perspectives removed");
+
+            // "scale not listening to the dataSource after all perspectives removed"
+            assert.throws(function () {
+                return dataSource.deregisterListener(scale);
+            });
         });
 
         it("scale perspectives can be removed appropriately", function () {

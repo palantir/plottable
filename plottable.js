@@ -717,7 +717,6 @@ var Plottable;
             this._autoDomain = true;
             this.rendererID2Perspective = {};
             this.dataSourceReferenceCounter = new Plottable.Utils.IDCounter();
-            this.isAutorangeUpToDate = false;
             this._autoNice = false;
             this._autoPad = false;
             this._d3Scale = scale;
@@ -728,6 +727,8 @@ var Plottable;
                 var source = p.dataSource;
                 var accessor = p.accessor;
                 return source._getExtent(accessor);
+            }).filter(function (e) {
+                return e != null;
             });
             return extents;
         };
@@ -740,15 +741,8 @@ var Plottable;
         * represents a view in to the data.
         */
         Scale.prototype.autorangeDomain = function () {
-            this.isAutorangeUpToDate = true;
             this._setDomain(this._getCombinedExtent());
             return this;
-        };
-
-        Scale.prototype._autoDomainIfNeeded = function () {
-            if (!this.isAutorangeUpToDate && this._autoDomain) {
-                this.autorangeDomain();
-            }
         };
 
         Scale.prototype._addPerspective = function (rendererIDAttr, dataSource, accessor) {
@@ -761,11 +755,14 @@ var Plottable;
             var dataSourceID = dataSource._plottableID;
             if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1) {
                 dataSource.registerListener(this, function () {
-                    return _this.isAutorangeUpToDate = false;
+                    if (_this._autoDomain) {
+                        _this.autorangeDomain();
+                    }
                 });
             }
-
-            this.isAutorangeUpToDate = false;
+            if (this._autoDomain) {
+                this.autorangeDomain();
+            }
             return this;
         };
 
@@ -777,7 +774,9 @@ var Plottable;
             }
 
             delete this.rendererID2Perspective[rendererIDAttr];
-            this.isAutorangeUpToDate = false;
+            if (this._autoDomain) {
+                this.autorangeDomain();
+            }
             return this;
         };
 
@@ -788,13 +787,11 @@ var Plottable;
         * @returns {any} The range value corresponding to the supplied domain value.
         */
         Scale.prototype.scale = function (value) {
-            this._autoDomainIfNeeded();
             return this._d3Scale(value);
         };
 
         Scale.prototype.domain = function (values) {
             if (values == null) {
-                this._autoDomainIfNeeded();
                 return this._d3Scale.domain();
             } else {
                 this._autoDomain = false;
@@ -810,7 +807,6 @@ var Plottable;
 
         Scale.prototype.range = function (values) {
             if (values == null) {
-                this._autoDomainIfNeeded();
                 return this._d3Scale.range();
             } else {
                 this._d3Scale.range(values);
@@ -853,7 +849,11 @@ var Plottable;
             var ends = extents.map(function (e) {
                 return e[1];
             });
-            return [d3.min(starts), d3.max(ends)];
+            if (starts.length > 0) {
+                return [d3.min(starts), d3.max(ends)];
+            } else {
+                return [];
+            }
         };
 
         QuantitiveScale.prototype.autorangeDomain = function () {
@@ -1027,7 +1027,6 @@ var Plottable;
 
         OrdinalScale.prototype.range = function (values) {
             if (values == null) {
-                this._autoDomainIfNeeded();
                 return this._range;
             } else {
                 this._range = values;
@@ -1046,7 +1045,6 @@ var Plottable;
         * @returns {number} The range band width or 0 if rangeType isn't "bands".
         */
         OrdinalScale.prototype.rangeBand = function () {
-            this._autoDomainIfNeeded();
             return this._d3Scale.rangeBand();
         };
 
@@ -1284,7 +1282,9 @@ var Plottable;
         DataSource.prototype.computeExtent = function (accessor) {
             var appliedAccessor = Plottable.Utils.applyAccessor(accessor, this);
             var mappedData = this._data.map(appliedAccessor);
-            if (typeof (appliedAccessor(this._data[0], 0)) === "string") {
+            if (mappedData.length === 0) {
+                return undefined;
+            } else if (typeof (mappedData[0]) === "string") {
                 return Plottable.Utils.uniq(mappedData);
             } else {
                 return d3.extent(mappedData);
@@ -2837,7 +2837,6 @@ var Plottable;
         };
 
         Axis.prototype._render = function () {
-            this.axisScale._autoDomainIfNeeded();
             if (this.orient() === "left") {
                 this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");
             }
@@ -3372,4 +3371,50 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     ;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var AreaRenderer = (function (_super) {
+        __extends(AreaRenderer, _super);
+        /**
+        * Creates an AreaRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        * @param {any} [xAccessor] A function for extracting x values from the data.
+        * @param {any} [yAccessor] A function for extracting upper y values to color between.
+        * @param {any} [y0Accessor] A function for extracting lower y values to color between.
+        */
+        function AreaRenderer(dataset, xScale, yScale, xAccessor, yAccessor, y0Accessor) {
+            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+            this.classed("area-renderer", true);
+            if (!y0Accessor) {
+                y0Accessor = function () {
+                    return 0;
+                };
+            }
+            this.project("y0", y0Accessor, yScale);
+        }
+        AreaRenderer.prototype._anchor = function (element) {
+            _super.prototype._anchor.call(this, element);
+            this.path = this.renderArea.append("path").classed("area", true);
+            return this;
+        };
+
+        AreaRenderer.prototype._paint = function () {
+            _super.prototype._paint.call(this);
+            var attrToProjector = this._generateAttrToProjector();
+            this.area = d3.svg.area().x(attrToProjector["x"]).y0(attrToProjector["y0"]).y1(attrToProjector["y"]);
+            this.dataSelection = this.path.datum(this._dataSource.data());
+            delete attrToProjector["x"];
+            delete attrToProjector["y0"];
+            delete attrToProjector["y"];
+            this.path.attr("d", this.area).attr(attrToProjector);
+        };
+        return AreaRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.AreaRenderer = AreaRenderer;
 })(Plottable || (Plottable = {}));
