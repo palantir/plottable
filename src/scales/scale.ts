@@ -10,7 +10,6 @@ module Plottable {
     public _autoDomain = true;
     private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
     private dataSourceReferenceCounter = new Utils.IDCounter();
-    private isAutorangeUpToDate = false;
     public _autoNice = false;
     public _autoPad  = false;
     /**
@@ -42,15 +41,8 @@ module Plottable {
     * represents a view in to the data.
     */
     public autorangeDomain() {
-      this.isAutorangeUpToDate = true;
       this._setDomain(this._getCombinedExtent());
       return this;
-    }
-
-    public _autoDomainIfNeeded() {
-      if (!this.isAutorangeUpToDate && this._autoDomain) {
-        this.autorangeDomain();
-      }
     }
 
     public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any) {
@@ -62,12 +54,14 @@ module Plottable {
       var dataSourceID = dataSource._plottableID;
       if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
         dataSource.registerListener(this, () => {
-          this.isAutorangeUpToDate = false;
-          this._autoDomainIfNeeded();
+          if (this._autoDomain) {
+            this.autorangeDomain();
+          }
         });
       }
-
-      this.isAutorangeUpToDate = false;
+      if (this._autoDomain) {
+        this.autorangeDomain();
+      }
       return this;
     }
 
@@ -79,7 +73,9 @@ module Plottable {
       }
 
       delete this.rendererID2Perspective[rendererIDAttr];
-      this.isAutorangeUpToDate = false;
+      if (this._autoDomain) {
+        this.autorangeDomain();
+      }
       return this;
     }
 
@@ -90,7 +86,6 @@ module Plottable {
      * @returns {any} The range value corresponding to the supplied domain value.
      */
     public scale(value: any) {
-      this._autoDomainIfNeeded();
       return this._d3Scale(value);
     }
 
@@ -107,7 +102,6 @@ module Plottable {
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
-        this._autoDomainIfNeeded();
         return this._d3Scale.domain();
       } else {
         this._autoDomain = false;
@@ -131,7 +125,6 @@ module Plottable {
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {
-        this._autoDomainIfNeeded();
         return this._d3Scale.range();
       } else {
         this._d3Scale.range(values);
