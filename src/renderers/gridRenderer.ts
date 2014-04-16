@@ -33,17 +33,14 @@ module Plottable {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("grid-renderer", true);
 
-      this.colorScale = colorScale;
-      this.xScale     = xScale;
-      this.yScale     = yScale;
-
       // The x and y scales should render in bands with no padding
       this.xScale.rangeType("bands", 0, 0);
       this.yScale.rangeType("bands", 0, 0);
 
-      this.project("x", xAccessor, xScale);
-      this.project("y", yAccessor, yScale);
+      this.colorScale = colorScale;
       this.project("fill", valueAccessor, colorScale);
+
+      colorScale.autorangeDomain();
     }
 
     public _paint() {

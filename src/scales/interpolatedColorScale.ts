@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class InterpolatedColorScale extends Scale {
+  export class InterpolatedColorScale extends LinearScale {
     private static COLOR_SCALES = {
       reds : [
         "#FFFFFF", // white
@@ -58,7 +58,7 @@ module Plottable {
      *     values in hex ("#FFFFFF") or keywords ("white").
      * @returns a linear d3 scale.
      */
-    private static INTERPOLATE_COLORS(colors:string[]): D3.Scale.Scale {
+    private static INTERPOLATE_COLORS(colors:string[]): D3.Scale.LinearScale {
       if (colors.length < 2) throw new Error("Color scale arrays must have at least two elements.");
       return d3.scale.linear()
         .range([0, 1])
@@ -90,7 +90,7 @@ module Plottable {
      *     linearly between the color values across the domain.
      */
     constructor(scaleType?: any) {
-      var scale: D3.Scale.Scale;
+      var scale: D3.Scale.LinearScale;
       if (scaleType instanceof Array){
         scale = InterpolatedColorScale.INTERPOLATE_COLORS(scaleType);
       } else {
