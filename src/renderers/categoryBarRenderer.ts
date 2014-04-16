@@ -2,6 +2,7 @@
 
 module Plottable {
   export class CategoryBarRenderer extends XYRenderer {
+    public xScale: OrdinalScale;
     /**
      * Creates a CategoryBarRenderer.
      *

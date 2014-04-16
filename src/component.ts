@@ -45,6 +45,8 @@ module Plottable {
         // svg node gets the "plottable" CSS class
         this.rootSVG = element;
         this.rootSVG.classed("plottable", true);
+        // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
+        this.rootSVG.style("overflow", "visible");
         this.element = element.append("g");
         this.isTopLevelComponent = true;
       } else {
@@ -91,8 +93,10 @@ module Plottable {
           // we are the root node, retrieve height/width from root SVG
           xOrigin = 0;
           yOrigin = 0;
-          availableWidth = parseFloat(this.rootSVG.attr("width"));
-          availableHeight = parseFloat(this.rootSVG.attr("height"));
+
+          var elem:HTMLScriptElement = (<HTMLScriptElement>this.rootSVG.node());
+          availableWidth  = Utils.getElementWidth(elem);
+          availableHeight = Utils.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }

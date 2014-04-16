@@ -1,17 +1,19 @@
 ///<reference path="testReference.ts" />
 
-function generateSVG(width=400, height=400) {
-  var parent: D3.Selection;
+function generateSVG(width=400, height=400): D3.Selection {
+  var parent: D3.Selection = getSVGParent();
+  return parent.append("svg").attr("width", width).attr("height", height);
+}
+
+function getSVGParent(): D3.Selection {
   var mocha = d3.select("#mocha-report");
   if (mocha.node() != null) {
     var suites = mocha.selectAll(".suite");
     var lastSuite = d3.select(suites[0][suites[0].length - 1]);
-    parent = lastSuite.selectAll("ul");
+    return lastSuite.selectAll("ul");
   } else {
-    parent = d3.select("body");
+    return d3.select("body");
   }
-  var svg = parent.append("svg").attr("width", width).attr("height", height);
-  return svg;
 }
 
 function getTranslate(element: D3.Selection) {
@@ -33,7 +35,6 @@ function assertBBoxInclusion(outerEl, innerEl) {
   assert.operator(outerBox.right  + 0.5, ">=", innerBox.right,  "bounding rect right included" );
   assert.operator(outerBox.bottom + 0.5, ">=", innerBox.bottom, "bounding rect bottom included");
 }
-
 
 function assertXY(el: D3.Selection, xExpected, yExpected, message) {
   var x = el.attr("x");

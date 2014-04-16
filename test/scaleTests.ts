@@ -171,4 +171,29 @@ describe("Scales", () => {
     });
   });
 
+  describe("Ordinal Scales", () => {
+    it("defaults to \"points\" range type", () => {
+      var scale = new Plottable.OrdinalScale();
+      assert.deepEqual(scale.rangeType(), "points");
+    });
+
+    it("rangeBand returns 0 when in \"points\" mode", () => {
+      var scale = new Plottable.OrdinalScale();
+      assert.deepEqual(scale.rangeType(), "points");
+      assert.deepEqual(scale.rangeBand(), 0);
+    });
+
+    it("rangeBands are updated when we switch to \"bands\" mode", () => {
+      var scale = new Plottable.OrdinalScale();
+      scale.rangeType("bands");
+      assert.deepEqual(scale.rangeType(), "bands");
+      scale.range([0, 2679]);
+
+      scale.domain([1,2,3,4]);
+      assert.deepEqual(scale.rangeBand(), 399);
+
+      scale.domain([1,2,3,4,5]);
+      assert.deepEqual(scale.rangeBand(), 329);
+    });
+  });
 });

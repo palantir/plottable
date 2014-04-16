@@ -105,20 +105,42 @@ describe("Utils", () => {
     assert.equal(s.get("3"), "ball");
     });
 
-    it("uniq works as expected", () => {
-      var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
-      assert.deepEqual(Plottable.Utils.uniq(strings), ["foo", "bar", "baz", "bam"]);
-    });
+  it("uniq works as expected", () => {
+    var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
+    assert.deepEqual(Plottable.Utils.uniq(strings), ["foo", "bar", "baz", "bam"]);
+  });
 
-    it("IDCounter works as expected", () => {
-      var i = new Plottable.Utils.IDCounter();
-      assert.equal(i.get("f"), 0);
-      assert.equal(i.increment("f"), 1);
-      assert.equal(i.increment("g"), 1);
-      assert.equal(i.increment("f"), 2);
-      assert.equal(i.decrement("f"), 1);
-      assert.equal(i.get("f"), 1);
-      assert.equal(i.get("f"), 1);
-      assert.equal(i.decrement(2), -1);
-    });
+  it("IDCounter works as expected", () => {
+    var i = new Plottable.Utils.IDCounter();
+    assert.equal(i.get("f"), 0);
+    assert.equal(i.increment("f"), 1);
+    assert.equal(i.increment("g"), 1);
+    assert.equal(i.increment("f"), 2);
+    assert.equal(i.decrement("f"), 1);
+    assert.equal(i.get("f"), 1);
+    assert.equal(i.get("f"), 1);
+    assert.equal(i.decrement(2), -1);
+  });
+
+  it("can get a plain element's size", () => {
+    var parent = getSVGParent();
+    parent.style("width", "300px");
+    parent.style("height", "200px");
+    var parentElem = parent[0][0];
+
+    var width = Plottable.Utils.getElementWidth(parentElem);
+    assert.equal(width, 300, "measured width matches set width");
+    var height = Plottable.Utils.getElementHeight(parentElem);
+    assert.equal(height, 200, "measured height matches set height");
+  });
+
+  it("can get the svg's size", () => {
+    var svg = generateSVG(450, 120);
+    var svgElem = svg[0][0];
+
+    var width = Plottable.Utils.getElementWidth(svgElem);
+    assert.equal(width, 450, "measured width matches set width");
+    var height = Plottable.Utils.getElementHeight(svgElem);
+    assert.equal(height, 120, "measured height matches set height");
+  });
 });
