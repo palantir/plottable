@@ -38,6 +38,7 @@ module Plottable {
     }
 
     public _render() {
+      this.axisScale._autoDomainIfNeeded();
       if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
       if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
       var domain = this.d3Axis.scale().domain();
