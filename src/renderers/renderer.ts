@@ -46,16 +46,18 @@ module Plottable {
       this._fixedHeight = false;
       this.classed("renderer", true);
 
+      var dataSource: DataSource;
       if (dataset != null) {
-        if (typeof dataset.data === "function") { // DataSource
-          this._dataSource = <DataSource> dataset;
+        if (typeof dataset.data === "function") {
+
+          dataSource = <DataSource> dataset;
         } else {
-          this._dataSource = new DataSource(dataset);
+          dataSource = dataSource = new DataSource(dataset);
         }
-        this._dataSource.registerListener(this, () => this._render());
       } else {
-        this._dataSource = new DataSource();
+        dataSource = new DataSource();
       }
+      this.dataSource(dataSource);
     }
 
     /**
