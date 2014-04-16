@@ -21,7 +21,7 @@
       window.onload = function() {
         var dataseries = makeRandomData(20);
 
-        dataseries.data.forEach(function (datapoint){
+        dataseries.forEach(function (datapoint){
           // datapoint.x = datapoint.x * 2000;
         });
 
@@ -59,7 +59,7 @@
         var basicTable = new Plottable.Table([[null, xAxisTable2, null],
                                               [yAxisTable, renderAreaD1, yAxisTable2],
                                               [null, xAxisTable, null]]);
-        basicTable.renderTo(svg);
+        basicTable.renderTo("#axis-test");
         var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
         pzi.registerWithComponent();
       }
