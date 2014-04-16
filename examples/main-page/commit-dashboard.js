@@ -62,7 +62,10 @@ function commitDashboard(dataManager, svg) {
   // ---- Timeseries -----
   var tscYScale = new Plottable.LinearScale();
   var tscYAxis = new Plottable.YAxis(tscYScale, "left");
-  var tscDateAxis = new Plottable.XAxis(timeScale, "bottom", dateFormatter);
+  var tscDateAxis = new Plottable.XAxis(timeScale, "bottom");
+  var baseValue = d3.min(timeScale.domain());
+  var formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseValue, Plottable.Utils.ONE_DAY, "d");
+  tscDateAxis.tickFormat(formatter);
 
   var tscRenderArea = new Plottable.Gridlines(timeScale, tscYScale);
   var tscRenderers = {};
