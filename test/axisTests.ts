@@ -92,17 +92,27 @@ describe("Axes", () => {
     svg.remove();
   });
 
+  it("generate relative date formatter", () => {
+    var baseDate = new Date(2000, 0, 1);
+    var testDate = new Date(2001, 0, 1);
+    var formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate.valueOf());
+    assert.equal(formatter(testDate), "366"); // leap year
+
+    var formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate.valueOf(), Plottable.AxisUtils.ONE_DAY, "d");
+    assert.equal(formatter(testDate), "366d");
+  });
+
   it("render relative dates", () => {
     var svg = generateSVG(500, 100);
     var startDate = new Date(2000, 0, 1);
     var endDate = new Date(2001, 0, 1);
-    var timeScale = new Plottable.QuantitiveScale(d3.scale.linear());
+    var timeScale = new Plottable.LinearScale();
     timeScale.domain([startDate, endDate]);
     timeScale.nice();
     var xAxis = new Plottable.XAxis(timeScale, "bottom");
     var baseDate = d3.min(timeScale.domain());
 
-    var formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate);
+    var formatter = Plottable.AxisUtils.generateRelativeDateFormatter(+baseDate);
     xAxis.tickFormat(formatter);
     xAxis.renderTo(svg);
     var tickLabels = $(".tick").children("text");
@@ -114,10 +124,10 @@ describe("Axes", () => {
     endDate = new Date(2010, 0, 1);
     timeScale.domain([startDate, endDate]);
     var yAxis = new Plottable.YAxis(timeScale, "left");
-    var oneYear = 365 * Plottable.Utils.ONE_DAY;
+    var oneYear = 365 * Plottable.AxisUtils.ONE_DAY;
     baseDate = new Date(1990, 0, 1);
 
-    formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate, oneYear, "y");
+    formatter = Plottable.AxisUtils.generateRelativeDateFormatter(+baseDate, oneYear, "y");
     yAxis.tickFormat(formatter);
     yAxis.renderTo(svg);
     tickLabels = $(".tick").children("text");
