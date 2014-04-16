@@ -43,7 +43,7 @@ module Plottable {
     */
     public autorangeDomain() {
       this.isAutorangeUpToDate = true;
-      this.domain(this._getCombinedExtent());
+      this._setDomain(this._getCombinedExtent());
       return this;
     }
 
@@ -53,7 +53,7 @@ module Plottable {
       }
     }
 
-    public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: IAccessor) {
+    public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any) {
       if (this.rendererID2Perspective[rendererIDAttr] != null) {
         this._removePerspective(rendererIDAttr);
       }
@@ -107,10 +107,14 @@ module Plottable {
         return this._d3Scale.domain();
       } else {
         this._autoDomain = false;
-        this._d3Scale.domain(values);
-        this._broadcast();
+        this._setDomain(values);
         return this;
       }
+    }
+
+    public _setDomain(values: any[]) {
+      this._d3Scale.domain(values);
+      this._broadcast();
     }
 
     /**

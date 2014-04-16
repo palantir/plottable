@@ -37,11 +37,12 @@ module Plottable {
     public domain(): any[];
     public domain(values: any[]): OrdinalScale;
     public domain(values?: any[]): any {
-      var result = super.domain(values);
-      if (values != null) {
-        this.range(this.range()); // update range
-      }
-      return result;
+      return super.domain(values);
+    }
+
+    public _setDomain(values: any[]) {
+      super._setDomain(values);
+      this.range(this.range()); // update range
     }
 
     /**

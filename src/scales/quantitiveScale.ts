@@ -107,7 +107,7 @@ module Plottable {
      */
     public nice(count?: number) {
       this._d3Scale.nice(count);
-      this.domain(this._d3Scale.domain()); // nice() can change the domain, so update all listeners
+      this._setDomain(this._d3Scale.domain()); // nice() can change the domain, so update all listeners
       return this;
     }
 
@@ -145,7 +145,7 @@ module Plottable {
       var currentDomain = this.domain();
       var extent = currentDomain[1]-currentDomain[0];
       var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1] + padProportion/2 * extent];
-      this.domain(newDomain);
+      this._setDomain(newDomain);
       return this;
     }
   }
