@@ -2374,5 +2374,6 @@ describe("Utils", function () {
         assert.equal(width, 450, "measured width matches set width");
         var height = Plottable.Utils.getElementHeight(svgElem);
         assert.equal(height, 120, "measured height matches set height");
+        svg.remove();
     });
 });

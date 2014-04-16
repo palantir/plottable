@@ -2837,6 +2837,7 @@ var Plottable;
         };
 
         Axis.prototype._render = function () {
+            this.axisScale._autoDomainIfNeeded();
             if (this.orient() === "left") {
                 this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");
             }
