@@ -57,7 +57,6 @@ describe("Renderers", () => {
       var yAccessor = (d, i?, m?) => m.bar;
       var dataSource = new Plottable.DataSource(data, metadata);
       var renderer = new Plottable.CircleRenderer(dataSource, xScale, yScale, xAccessor, yAccessor);
-      renderer.autorangeDataOnLayout = false;
       renderer.renderTo(svg);
       var circles = renderer.renderArea.selectAll("circle");
       var c1 = d3.select(circles[0][0]);
@@ -207,74 +206,12 @@ describe("Renderers", () => {
         verifier.end();
       });
 
-      it("invertXYSelectionArea works", () => {
-        var actualDataAreaFull = circleRenderer.invertXYSelectionArea(pixelAreaFull);
-        assert.deepEqual(actualDataAreaFull, dataAreaFull, "the full data area is as expected");
-
-        var actualDataAreaPart = circleRenderer.invertXYSelectionArea(pixelAreaPart);
-
-        assert.closeTo(actualDataAreaPart.xMin, dataAreaPart.xMin, 1, "partial xMin is close");
-        assert.closeTo(actualDataAreaPart.xMax, dataAreaPart.xMax, 1, "partial xMax is close");
-        assert.closeTo(actualDataAreaPart.yMin, dataAreaPart.yMin, 1, "partial yMin is close");
-        assert.closeTo(actualDataAreaPart.yMax, dataAreaPart.yMax, 1, "partial yMax is close");
-        verifier.end();
-      });
-
-      it("getSelectionFromArea works", () => {
-        var selectionFull = circleRenderer.getSelectionFromArea(dataAreaFull);
-        assert.lengthOf(selectionFull[0], 10, "all 10 circles were selected by the full region");
-
-        var selectionPartial = circleRenderer.getSelectionFromArea(dataAreaPart);
-        assert.lengthOf(selectionPartial[0], 2, "2 circles were selected by the partial region");
-        verifier.end();
-      });
-
-      it("getDataIndicesFromArea works", () => {
-        var indicesFull = circleRenderer.getDataIndicesFromArea(dataAreaFull);
-        assert.deepEqual(indicesFull, d3.range(10), "all 10 circles were selected by the full region");
-
-        var indicesPartial = circleRenderer.getDataIndicesFromArea(dataAreaPart);
-        assert.deepEqual(indicesPartial, [6, 7], "2 circles were selected by the partial region");
-        verifier.end();
-      });
-
       describe("after the scale has changed", () => {
         before(() => {
           xScale.domain([0, 3]);
           yScale.domain([0, 9]);
           dataAreaFull = {xMin: 0, xMax: 3, yMin: 9, yMax: 0};
           dataAreaPart = {xMin: 1, xMax: 3, yMin: 6, yMax: 3};
-        });
-
-        it("invertXYSelectionArea works", () => {
-          var actualDataAreaFull = circleRenderer.invertXYSelectionArea(pixelAreaFull);
-          assert.deepEqual(actualDataAreaFull, dataAreaFull, "the full data area is as expected");
-
-          var actualDataAreaPart = circleRenderer.invertXYSelectionArea(pixelAreaPart);
-
-          assert.closeTo(actualDataAreaPart.xMin, dataAreaPart.xMin, 1, "partial xMin is close");
-          assert.closeTo(actualDataAreaPart.xMax, dataAreaPart.xMax, 1, "partial xMax is close");
-          assert.closeTo(actualDataAreaPart.yMin, dataAreaPart.yMin, 1, "partial yMin is close");
-          assert.closeTo(actualDataAreaPart.yMax, dataAreaPart.yMax, 1, "partial yMax is close");
-          verifier.end();
-        });
-
-        it("getSelectionFromArea works", () => {
-          var selectionFull = circleRenderer.getSelectionFromArea(dataAreaFull);
-          assert.lengthOf(selectionFull[0], 4, "four circles were selected by the full region");
-
-          var selectionPartial = circleRenderer.getSelectionFromArea(dataAreaPart);
-          assert.lengthOf(selectionPartial[0], 1, "one circle was selected by the partial region");
-          verifier.end();
-        });
-
-        it("getDataIndicesFromArea works", () => {
-          var indicesFull = circleRenderer.getDataIndicesFromArea(dataAreaFull);
-          assert.deepEqual(indicesFull, [0,1,2,3], "four circles were selected by the full region");
-
-          var indicesPartial = circleRenderer.getDataIndicesFromArea(dataAreaPart);
-          assert.deepEqual(indicesPartial, [2], "circle 2 was selected by the partial region");
-          verifier.end();
         });
 
         it("the circles re-rendered properly", () => {

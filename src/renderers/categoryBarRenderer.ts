@@ -1,21 +1,21 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class CategoryBarRenderer extends CategoryXYRenderer {
+  export class CategoryBarRenderer extends XYRenderer {
     /**
      * Creates a CategoryBarRenderer.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
      * @param {OrdinalScale} xScale The x scale to use.
-     * @param {QuantitiveScale} yScale The y scale to use.
+     * @param {Scale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
      * @param {IAccessor} [widthAccessor] A function for extracting the width position of each bar, in pixels, from the data.
      * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
      */
     constructor(dataset: any,
             xScale: OrdinalScale,
-            yScale: QuantitiveScale,
+            yScale: Scale,
             xAccessor?: IAccessor,
             widthAccessor?: IAccessor,
             yAccessor?: IAccessor) {

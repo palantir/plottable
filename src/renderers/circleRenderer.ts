@@ -1,20 +1,20 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class CircleRenderer extends NumericXYRenderer {
+  export class CircleRenderer extends XYRenderer {
 
     /**
      * Creates a CircleRenderer.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
-     * @param {QuantitiveScale} xScale The x scale to use.
-     * @param {QuantitiveScale} yScale The y scale to use.
+     * @param {Scale} xScale The x scale to use.
+     * @param {Scale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
      */
-    constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale,
+    constructor(dataset: any, xScale: Scale, yScale: Scale,
                 xAccessor?: any, yAccessor?: any, rAccessor?: any) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
 /*      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;*/

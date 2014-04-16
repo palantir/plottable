@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class BarRenderer extends NumericXYRenderer {
+  export class BarRenderer extends XYRenderer {
     public barPaddingPx = 1;
 
     public dxAccessor: any;
@@ -11,15 +11,15 @@ module Plottable {
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
-     * @param {QuantitiveScale} xScale The x scale to use.
-     * @param {QuantitiveScale} yScale The y scale to use.
+     * @param {Scale} xScale The x scale to use.
+     * @param {Scale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
      * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
      * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
      */
     constructor(dataset: any,
-                xScale: QuantitiveScale,
-                yScale: QuantitiveScale,
+                xScale: Scale,
+                yScale: Scale,
                 xAccessor?: IAccessor,
                 dxAccessor?: IAccessor,
                 yAccessor?: IAccessor) {

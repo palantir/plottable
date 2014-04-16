@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class LineRenderer extends NumericXYRenderer {
+  export class LineRenderer extends XYRenderer {
     private path: D3.Selection;
     private line: D3.Svg.Line;
 
@@ -10,12 +10,12 @@ module Plottable {
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
-     * @param {QuantitiveScale} xScale The x scale to use.
-     * @param {QuantitiveScale} yScale The y scale to use.
+     * @param {Scale} xScale The x scale to use.
+     * @param {Scale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      */
-    constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
+    constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("line-renderer", true);
     }

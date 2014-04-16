@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class SquareRenderer extends NumericXYRenderer {
+  export class SquareRenderer extends XYRenderer {
     private _rAccessor: any;
     private static defaultRAccessor = 3;
 
@@ -10,13 +10,13 @@ module Plottable {
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
-     * @param {QuantitiveScale} xScale The x scale to use.
-     * @param {QuantitiveScale} yScale The y scale to use.
+     * @param {Scale} xScale The x scale to use.
+     * @param {Scale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
      * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
      */
-    constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale,
+    constructor(dataset: any, xScale: Scale, yScale: Scale,
                 xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.project("r", 3);
