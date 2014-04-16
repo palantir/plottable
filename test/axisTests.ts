@@ -100,8 +100,10 @@ describe("Axes", () => {
     timeScale.domain([startDate, endDate]);
     timeScale.nice();
     var xAxis = new Plottable.XAxis(timeScale, "bottom");
+    var baseDate = d3.min(timeScale.domain());
 
-    Plottable.AxisUtils.setRelativeDateAxis(xAxis);
+    var formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate);
+    xAxis.tickFormat(formatter);
     xAxis.renderTo(svg);
     var tickLabels = $(".tick").children("text");
     assert.equal(tickLabels.first().text(), "0");
@@ -113,9 +115,10 @@ describe("Axes", () => {
     timeScale.domain([startDate, endDate]);
     var yAxis = new Plottable.YAxis(timeScale, "left");
     var oneYear = 365 * Plottable.Utils.ONE_DAY;
-    var baseDate = new Date(1990, 0, 1);
+    baseDate = new Date(1990, 0, 1);
 
-    Plottable.AxisUtils.setRelativeDateAxis(yAxis, oneYear, "y", baseDate.valueOf());
+    formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate, oneYear, "y");
+    yAxis.tickFormat(formatter);
     yAxis.renderTo(svg);
     tickLabels = $(".tick").children("text");
     assert.equal(tickLabels.text().slice(-1), "y");
