@@ -21,13 +21,6 @@
       window.onload = function() {
         var dataseries = makeRandomData(20);
 
-        dataseries.forEach(function (datapoint){
-          // datapoint.x = datapoint.x * 2000;
-        });
-
-        var svg = d3.select("#axis-test");
-        svg.attr("width", 640).attr("height", 480);
-
         var xScale = new Plottable.LinearScale();
         var xAxisLeft = new Plottable.XAxis(xScale, "bottom").tickLabelPosition("left");
         var xAxisCenter = new Plottable.XAxis(xScale, "bottom");
@@ -55,9 +48,10 @@
         var yAxisTable2 = new Plottable.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
         var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+        var gridlines = new Plottable.Gridlines(xScale, yScale);
 
         var basicTable = new Plottable.Table([[null, xAxisTable2, null],
-                                              [yAxisTable, renderAreaD1, yAxisTable2],
+                                              [yAxisTable, renderAreaD1.merge(gridlines), yAxisTable2],
                                               [null, xAxisTable, null]]);
         basicTable.renderTo("#axis-test");
         var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
@@ -66,7 +60,7 @@
     </script>
   </head>
   <body>
-    <svg id="axis-test"></svg>
+    <svg id="axis-test" width="640" height="480"></svg>
   </body>
 
 </html>
