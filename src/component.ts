@@ -135,10 +135,16 @@ module Plottable {
       return this;
     }
 
-    public renderTo(element: D3.Selection): Component {
+    public renderTo(element: any): Component {
       // When called on top-level-component, a shortcut for component._anchor(svg)._computeLayout()._render()
       if (this.element == null) {
-        this._anchor(element);
+        var selection: D3.Selection;
+        if (typeof(element.node) === "function") {
+          selection = (<D3.Selection> element);
+        } else {
+          selection = d3.select(element);
+        }
+        this._anchor(selection);
       }
       this._computeLayout()._render();
       return this;
