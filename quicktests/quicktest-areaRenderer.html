@@ -21,21 +21,16 @@
           dataseries_top[i].y += dataseries[i].y;
         }
 
-        var svg = d3.select("#areaRenderer-test");
-        svg.attr("width", 480).attr("height", 320);
-
         var xScale = new Plottable.LinearScale();
         var xAxis = new Plottable.XAxis(xScale, "bottom");
 
         var yScale = new Plottable.LinearScale();
         var yAxis = new Plottable.YAxis(yScale, "left");
 
-        var xAccessor = function(d) { return d.x; }
-        var yAccessor = function(d) { return d.y; }
         var y0Accessor = function(d, i) { return dataseries[i].y; }
 
         var renderAreaD1 = new Plottable.AreaRenderer(dataseries, xScale, yScale);
-        var renderAreaD2 = new Plottable.AreaRenderer(dataseries_top, xScale, yScale, xAccessor, yAccessor, y0Accessor);
+        var renderAreaD2 = new Plottable.AreaRenderer(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
 
         var fillAccessor = function() { return "steelblue"; }
         var fillAccessorTop = function() { return "pink"; }
@@ -45,17 +40,14 @@
         var gridlines = new Plottable.Gridlines(xScale, yScale);
         var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1, renderAreaD2]);
 
-        var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
-                                              .addComponent(0, 1, renderGroup)
-                                              .addComponent(1, 1, xAxis);
-        basicTable._anchor(svg);
-        basicTable._computeLayout()._render();
+        var chart = new Plottable.StandardChart()
+                        .addCenterComponent(renderGroup).xAxis(xAxis).yAxis(yAxis)
+                        .renderTo("#areaRenderer-test");
       }
     </script>
   </head>
   <body>
-    <svg id="areaRenderer-test"></svg>
+    <svg id="areaRenderer-test" width="480" height="320"></svg>
   </body>
 
 </html>
-
