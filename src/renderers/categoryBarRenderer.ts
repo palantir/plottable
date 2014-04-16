@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class CategoryBarRenderer extends CategoryXYRenderer {
+  export class CategoryBarRenderer extends XYRenderer {
     /**
      * Creates a CategoryBarRenderer.
      *
