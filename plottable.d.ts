@@ -915,8 +915,8 @@ declare module Plottable {
 }
 declare module Plottable {
     class Axis extends Component {
-        static yWidth: number;
-        static xHeight: number;
+        static Y_WIDTH: number;
+        static X_HEIGHT: number;
         public axisElement: D3.Selection;
         /**
         * Creates an Axis.
