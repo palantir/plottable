@@ -3,7 +3,6 @@
 module Plottable {
   export class ColorScale extends Scale {
 
-
     /**
      * Creates a ColorScale.
      *
