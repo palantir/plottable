@@ -206,7 +206,7 @@ module Plottable {
 
 
   export class ClickInteraction extends Interaction {
-    private _callback: (x: number, y:number) => any;
+    private _callback: (x: number, y: number) => any;
 
     /**
      * Creates a ClickInteraction.

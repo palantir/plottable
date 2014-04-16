@@ -24,7 +24,7 @@ describe("Axes", () => {
     xAxis.renderTo(svg);
     var tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     var tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
-    for (var i=0; i< tickMarks.length; i++) {
+    for (var i = 0; i< tickMarks.length; i++) {
       var markRect = tickMarks[i].getBoundingClientRect();
       var labelRect = tickLabels[i].getBoundingClientRect();
       assert.isTrue( (labelRect.left <= markRect.left && markRect.right <= labelRect.right),
@@ -35,7 +35,7 @@ describe("Axes", () => {
     xAxis._render();
     tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
-    for (i=0; i< tickMarks.length; i++) {
+    for (i = 0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
       assert.operator(labelRect.right, "<=", markRect.left, "tick label is to the left of the mark");
@@ -45,7 +45,7 @@ describe("Axes", () => {
     xAxis._render();
     tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
-    for (i=0; i< tickMarks.length; i++) {
+    for (i = 0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
       assert.operator(markRect.right, "<=", labelRect.left, "tick label is to the right of the mark");
@@ -62,7 +62,7 @@ describe("Axes", () => {
     yAxis.renderTo(svg);
     var tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
     var tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
-    for (var i=0; i< tickMarks.length; i++) {
+    for (var i = 0; i< tickMarks.length; i++) {
       var markRect = tickMarks[i].getBoundingClientRect();
       var labelRect = tickLabels[i].getBoundingClientRect();
       assert.isTrue( (labelRect.top <= markRect.top && markRect.bottom <= labelRect.bottom),
@@ -73,7 +73,7 @@ describe("Axes", () => {
     yAxis._render();
     tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
-    for (i=0; i< tickMarks.length; i++) {
+    for (i = 0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
       assert.operator(labelRect.bottom, "<=", markRect.top + 1,
@@ -84,7 +84,7 @@ describe("Axes", () => {
     yAxis._render();
     tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
     tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
-    for (i=0; i< tickMarks.length; i++) {
+    for (i = 0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
       assert.operator(markRect.bottom, "<=", labelRect.top, "tick label is below the mark");

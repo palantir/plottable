@@ -1,6 +1,6 @@
 ///<reference path="testReference.ts" />
 
-function generateSVG(width=400, height=400): D3.Selection {
+function generateSVG(width = 400, height = 400): D3.Selection {
   var parent: D3.Selection = getSVGParent();
   return parent.append("svg").attr("width", width).attr("height", height);
 }
@@ -51,14 +51,14 @@ function assertWidthHeight(el: D3.Selection, widthExpected, heightExpected, mess
 }
 
 
-function makeLinearSeries(n: number): {x: number; y:number;}[] {
+function makeLinearSeries(n: number): {x: number; y: number;}[] {
   function makePoint(x: number) {
     return {x: x, y: x};
   }
   return d3.range(n).map(makePoint);
 }
 
-function makeQuadraticSeries(n: number): {x: number; y:number;}[] {
+function makeQuadraticSeries(n: number): {x: number; y: number;}[] {
   function makeQuadraticPoint(x: number) {
     return {x: x, y: x*x};
   }

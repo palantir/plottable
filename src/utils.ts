@@ -70,7 +70,7 @@ module Plottable {
       }
 
       var numChars = text.length;
-      for (var i=1; i<numChars; i++) {
+      for (var i = 1; i<numChars; i++) {
         var testLength = textNode.getSubStringLength(0, i);
         if (testLength + dotLength > length) {
           element.text(originalText);
@@ -153,7 +153,7 @@ module Plottable {
       * @return {boolean} True if key already in store, false otherwise
       */
       public set(key: any, value: any) {
-        for (var i=0; i < this.keyValuePairs.length; i++) {
+        for (var i = 0; i < this.keyValuePairs.length; i++) {
           if (this.keyValuePairs[i][0] === key) {
             this.keyValuePairs[i][1] = value;
             return true;
@@ -164,7 +164,7 @@ module Plottable {
       }
 
       public get(key: any): any {
-        for (var i=0; i<this.keyValuePairs.length; i++) {
+        for (var i = 0; i<this.keyValuePairs.length; i++) {
           if (this.keyValuePairs[i][0] === key) {
             return this.keyValuePairs[i][1];
           }
@@ -173,7 +173,7 @@ module Plottable {
       }
 
       public has(key: any): boolean {
-        for (var i=0; i<this.keyValuePairs.length; i++) {
+        for (var i = 0; i<this.keyValuePairs.length; i++) {
           if (this.keyValuePairs[i][0] === key) {
             return true;
           }
@@ -186,7 +186,7 @@ module Plottable {
       }
 
       public delete(key: any): boolean {
-        for (var i=0; i < this.keyValuePairs.length; i++) {
+        for (var i = 0; i < this.keyValuePairs.length; i++) {
           if (this.keyValuePairs[i][0] === key) {
             this.keyValuePairs.splice(i, 1);
             return true;
