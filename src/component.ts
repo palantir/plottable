@@ -94,7 +94,7 @@ module Plottable {
           xOrigin = 0;
           yOrigin = 0;
 
-          var elem:HTMLScriptElement = (<HTMLScriptElement>this.rootSVG.node());
+          var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
           availableWidth  = Utils.getElementWidth(elem);
           availableHeight = Utils.getElementHeight(elem);
         } else {
@@ -264,7 +264,7 @@ module Plottable {
      */
     public classed(cssClass: string): boolean;
     public classed(cssClass: string, addClass: boolean): Component;
-    public classed(cssClass: string, addClass?:boolean): any {
+    public classed(cssClass: string, addClass?: boolean): any {
       if (addClass == null) {
         if (cssClass == null) {
           return false;

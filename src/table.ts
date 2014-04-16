@@ -28,8 +28,8 @@ module Plottable {
       this.rows = rows;
       this.nRows = rows.length;
       this.nCols = rows.length > 0 ? d3.max(rows, (r) => r.length) : 0;
-      this.rowWeights = this.rows.map(():any => null);
-      this.colWeights = d3.transpose(this.rows).map(():any => null);
+      this.rowWeights = this.rows.map((): any => null);
+      this.colWeights = d3.transpose(this.rows).map((): any => null);
     }
 
     /**
@@ -190,18 +190,18 @@ module Plottable {
     }
 
     private padTableToSize(nRows: number, nCols: number) {
-      for (var i=0; i<nRows; i++) {
+      for (var i = 0; i<nRows; i++) {
         if (this.rows[i] === undefined) {
           this.rows[i] = [];
           this.rowWeights[i] = null;
         }
-        for (var j=0; j<nCols; j++) {
+        for (var j = 0; j<nCols; j++) {
           if (this.rows[i][j] === undefined) {
             this.rows[i][j] = null;
           }
         }
       }
-      for (j=0; j<nCols; j++) {
+      for (j = 0; j<nCols; j++) {
         if (this.colWeights[j] === undefined) {
           this.colWeights[j] = null;
         }
