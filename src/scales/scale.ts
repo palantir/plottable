@@ -35,14 +35,22 @@ module Plottable {
     }
 
     /**
-    * Modify the domain on the scale so that it includes the extent of all perspectives it depends on.
-    * Extent: The (min, max) pair for a QuantitiativeScale, all covered strings for an OrdinalScale.
-    * Perspective: A combination of a DataSource and an Accessor that represents a view in to the data.
+    * Modify the domain on the scale so that it includes the extent of all
+    * perspectives it depends on. Extent: The (min, max) pair for a
+    * QuantitiativeScale, all covered strings for an OrdinalScale.
+    * Perspective: A combination of a DataSource and an Accessor that
+    * represents a view in to the data.
     */
     public autorangeDomain() {
-        this.isAutorangeUpToDate = true;
-        this._setDomain(this._getCombinedExtent());
-        return this;
+      this.isAutorangeUpToDate = true;
+      this._setDomain(this._getCombinedExtent());
+      return this;
+    }
+
+    public _autoDomainIfNeeded() {
+      if (!this.isAutorangeUpToDate && this._autoDomain) {
+        this.autorangeDomain();
+      }
     }
 
     public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any) {
@@ -79,25 +87,24 @@ module Plottable {
      * @returns {any} The range value corresponding to the supplied domain value.
      */
     public scale(value: any) {
-      if (!this.isAutorangeUpToDate && this._autoDomain) {
-        this.autorangeDomain();
-      }
+      this._autoDomainIfNeeded();
       return this._d3Scale(value);
     }
 
     /**
      * Retrieves the current domain, or sets the Scale's domain to the specified values.
      *
-     * @param {any[]} [values] The new value for the domain.
+     * @param {any[]} [values] The new value for the domain. This array may
+     *     contain more than 2 values if the scale type allows it (e.g.
+     *     ordinal scales). Other scales such as quantitative scales accept
+     *     only a 2-value extent array.
      * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
      */
     public domain(): any[];
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
-        if (!this.isAutorangeUpToDate && this._autoDomain) {
-          this.autorangeDomain();
-        }
+        this._autoDomainIfNeeded();
         return this._d3Scale.domain();
       } else {
         this._autoDomain = false;
@@ -121,6 +128,7 @@ module Plottable {
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {
+        this._autoDomainIfNeeded();
         return this._d3Scale.range();
       } else {
         this._d3Scale.range(values);
