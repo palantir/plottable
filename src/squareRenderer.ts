@@ -3,7 +3,7 @@
 module Plottable {
   export class SquareRenderer extends NumericXYRenderer {
     private _rAccessor: any;
-    private static defaultRAccessor = 3;
+    private static DEFAULT_R_ACCESSOR = 3;
 
     /**
      * Creates a SquareRenderer.
@@ -19,7 +19,7 @@ module Plottable {
     constructor(dataset: any, xScale: QuantitiveScale, yScale: QuantitiveScale,
                 xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this._rAccessor = (rAccessor != null) ? rAccessor : SquareRenderer.defaultRAccessor;
+      this._rAccessor = (rAccessor != null) ? rAccessor : SquareRenderer.DEFAULT_R_ACCESSOR;
       this.classed("square-renderer", true);
     }
 
