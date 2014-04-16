@@ -138,6 +138,65 @@ describe("Renderers", () => {
       });
     });
 
+    describe("Basic AreaRenderer functionality", () => {
+      var svg: D3.Selection;
+      var xScale;
+      var yScale;
+      var areaRenderer;
+      var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
+      var renderArea;
+      var verifier = new MultiTestVerifier();
+
+      before(() => {
+        svg = generateSVG(500, 500);
+        xScale = new Plottable.LinearScale().domain([0, 1]);
+        yScale = new Plottable.LinearScale().domain([0, 1]);
+        var xAccessor = (d) => d.foo;
+        var yAccessor = (d) => d.bar;
+        var y0Accessor = () => 0;
+        var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
+        var fillAccessor = () => "steelblue";
+        areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor, y0Accessor);
+        areaRenderer.project("fill", fillAccessor)
+                    .project("stroke", colorAccessor);
+        areaRenderer.renderTo(svg);
+        renderArea = areaRenderer.renderArea;
+      });
+
+      beforeEach(() => {
+        verifier.start();
+      });
+
+      it("fill colors set appropriately from accessor", () => {
+        var path = renderArea.select("path");
+        assert.equal(path.attr("fill"), "steelblue", "fill set correctly");
+        verifier.end();
+      });
+
+      it("fill colors can be changed by projecting new accessor and re-render appropriately", () => {
+        var newFillAccessor = () => "pink";
+        areaRenderer.project("fill", newFillAccessor);
+        areaRenderer.renderTo(svg);
+        renderArea = areaRenderer.renderArea;
+        var path = renderArea.select("path");
+        assert.equal(path.attr("fill"), "pink", "fill changed correctly");
+        verifier.end();
+      });
+
+      it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
+        areaRenderer.project("y0", (d) => d.bar/2);
+        areaRenderer.renderTo(svg);
+        renderArea = areaRenderer.renderArea;
+        var path = renderArea.select("path");
+        assert.equal(path.attr("d"), "M0,500L500,0L500,250L0,500Z");
+        verifier.end();
+      });
+
+      after(() => {
+        if (verifier.passed) {svg.remove();};
+      });
+    });
+
     describe("Example CircleRenderer with quadratic series", () => {
       var svg: D3.Selection;
       var xScale: Plottable.LinearScale;

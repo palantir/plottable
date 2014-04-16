@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <title>Area Renderer Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script>
+    <style>
+      .plottable .axis line {
+/*        stroke: black;
+        opacity: 1;*/
+      }
+    </style>
+
+    <script>
+      window.onload = function() {
+        var dataseries = makeRandomData(20, 0.3);
+        var dataseries_top = makeRandomData(20, 0.3);
+        for (var i = 0; i < 20; ++i) {
+          dataseries_top[i].x = dataseries[i].x;
+          dataseries_top[i].y += dataseries[i].y;
+        }
+
+        var svg = d3.select("#areaRenderer-test");
+        svg.attr("width", 480).attr("height", 320);
+
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var xAccessor = function(d) { return d.x; }
+        var yAccessor = function(d) { return d.y; }
+        var y0Accessor = function(d, i) { return dataseries[i].y; }
+
+        var renderAreaD1 = new Plottable.AreaRenderer(dataseries, xScale, yScale);
+        var renderAreaD2 = new Plottable.AreaRenderer(dataseries_top, xScale, yScale, xAccessor, yAccessor, y0Accessor);
+
+        var fillAccessor = function() { return "steelblue"; }
+        var fillAccessorTop = function() { return "pink"; }
+        renderAreaD1.project("fill", fillAccessor)
+        renderAreaD2.project("fill", fillAccessorTop)
+
+        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1, renderAreaD2]);
+
+        var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
+                                              .addComponent(0, 1, renderGroup)
+                                              .addComponent(1, 1, xAxis);
+        basicTable._anchor(svg);
+        basicTable._computeLayout()._render();
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="areaRenderer-test"></svg>
+  </body>
+
+</html>
+
