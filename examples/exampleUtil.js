@@ -9,7 +9,7 @@ function makeRandomData(numPoints, scaleFactor) {
     data.sort(function (a, b) {
         return a.x - b.x;
     });
-    return { data: data, metadata: { cssClass: "random-data" } };
+    return data;
 }
 
 function makeNormallyDistributedData(n, xMean, xStdDev, yMean, yStdDev) {
@@ -85,10 +85,7 @@ function makeRandomBucketData(numBuckets, bucketWidth, maxValue) {
             y: Math.round(Math.random() * maxValue)
         });
     }
-    return {
-        "data": data,
-        metadata: { cssClass: "random-buckets" }
-    };
+    return data;
 }
 
 function generateHeightWeightData(n) {
@@ -104,8 +101,5 @@ function generateHeightWeightData(n) {
         });
     }
 
-    return {
-        data: data,
-        metadata: { cssClass: "height-weight-data" }
-    };
+    return data;
 }

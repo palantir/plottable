@@ -184,67 +184,6 @@ module Plottable {
     }
   }
 
-  export class ZoomCallbackGenerator {
-    private xScaleMappings: QuantitiveScale[][] = [];
-    private yScaleMappings: QuantitiveScale[][] = [];
-
-    /**
-     * Adds listen-update pair of X scales.
-     *
-     * @param {QuantitiveScale} listenerScale An X scale to listen for events on.
-     * @param {QuantitiveScale} [targetScale] An X scale to update when events occur.
-     * If not supplied, listenerScale will be updated when an event occurs.
-     * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
-     */
-    public addXScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator {
-      if (targetScale == null) {
-        targetScale = listenerScale;
-      }
-      this.xScaleMappings.push([listenerScale, targetScale]);
-      return this;
-    }
-
-    /**
-     * Adds listen-update pair of Y scales.
-     *
-     * @param {QuantitiveScale} listenerScale A Y scale to listen for events on.
-     * @param {QuantitiveScale} [targetScale] A Y scale to update when events occur.
-     * If not supplied, listenerScale will be updated when an event occurs.
-     * @returns {ZoomCallbackGenerator} The calling ZoomCallbackGenerator.
-     */
-    public addYScale(listenerScale: QuantitiveScale, targetScale?: QuantitiveScale): ZoomCallbackGenerator {
-      if (targetScale == null) {
-        targetScale = listenerScale;
-      }
-      this.yScaleMappings.push([listenerScale, targetScale]);
-      return this;
-    }
-
-    private updateScale(referenceScale: QuantitiveScale, targetScale: QuantitiveScale, pixelMin: number, pixelMax: number) {
-      var originalDomain = referenceScale.domain();
-      var newDomain = [referenceScale.invert(pixelMin), referenceScale.invert(pixelMax)];
-      var sameDirection = (newDomain[0] < newDomain[1]) === (originalDomain[0] < originalDomain[1]);
-      if (!sameDirection) {newDomain.reverse();}
-      targetScale.domain(newDomain);
-    }
-
-    /**
-     * Generates a callback that can be passed to Interactions.
-     *
-     * @returns {(area: SelectionArea) => void} A callback that updates the scales previously specified.
-     */
-    public getCallback() {
-      return (area: SelectionArea) => {
-        this.xScaleMappings.forEach((sm: QuantitiveScale[]) => {
-          this.updateScale(sm[0], sm[1], area.xMin, area.xMax);
-        });
-        this.yScaleMappings.forEach((sm: QuantitiveScale[]) => {
-          this.updateScale(sm[0], sm[1], area.yMin, area.yMax);
-        });
-      };
-    }
-  }
-
   export class MousemoveInteraction extends Interaction {
     constructor(componentToListenTo: Component) {
       super(componentToListenTo);
@@ -341,62 +280,6 @@ module Plottable {
     public callback(cb: () => any): KeyInteraction {
       this._callback = cb;
       return this;
-    }
-  }
-
-
-  export class CrosshairsInteraction extends MousemoveInteraction {
-    private renderer: NumericXYRenderer;
-
-    private circle: D3.Selection;
-    private xLine: D3.Selection;
-    private yLine: D3.Selection;
-    private lastx: number;
-    private lasty: number;
-
-    constructor(renderer: NumericXYRenderer) {
-      super(renderer);
-      this.renderer = renderer;
-      renderer.xScale.registerListener(() => this.rescale());
-      renderer.yScale.registerListener(() => this.rescale());
-    }
-
-    public _anchor(hitBox: D3.Selection) {
-      super._anchor(hitBox);
-      var container = this.renderer.foregroundContainer.append("g").classed("crosshairs", true);
-      this.circle = container.append("circle").classed("centerpoint", true);
-      this.xLine = container.append("path").classed("x-line", true);
-      this.yLine = container.append("path").classed("y-line", true);
-      this.circle.attr("r", 5);
-    }
-
-    public mousemove(x: number, y: number) {
-      this.lastx = x;
-      this.lasty = y;
-      var domainX = this.renderer.xScale.invert(x);
-      var data = this.renderer._data;
-      var xA = this.renderer._getAppliedAccessor(this.renderer._xAccessor);
-      var yA = this.renderer._getAppliedAccessor(this.renderer._yAccessor);
-      var dataIndex = OSUtils.sortedIndex(domainX, data, xA);
-      dataIndex = dataIndex > 0 ? dataIndex - 1 : 0;
-      var dataPoint = data[dataIndex];
-
-      var dataX = xA(dataPoint, dataIndex);
-      var dataY = yA(dataPoint, dataIndex);
-      var pixelX = this.renderer.xScale.scale(dataX);
-      var pixelY = this.renderer.yScale.scale(dataY);
-      this.circle.attr("cx", pixelX).attr("cy", pixelY);
-
-      var width = this.renderer.availableWidth;
-      var height = this.renderer.availableHeight;
-      this.xLine.attr("d", "M 0 " + pixelY + " L " + width + " " + pixelY);
-      this.yLine.attr("d", "M " + pixelX + " 0 L " + pixelX + " " + height);
-    }
-
-    public rescale() {
-      if (this.lastx != null) {
-        this.mousemove(this.lastx, this.lasty);
-      }
     }
   }
 }

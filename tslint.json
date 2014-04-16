@@ -1,6 +1,6 @@
 {
   "rules": {
-    "class-name": true,
+    "class-name": false,
     "curly": true,
     "eofline": true,
     "forin": true,

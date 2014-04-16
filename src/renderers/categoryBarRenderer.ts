@@ -1,107 +1,62 @@
-///<reference path="reference.ts" />
+///<reference path="../reference.ts" />
 
 module Plottable {
-  export class CategoryBarRenderer extends CategoryXYRenderer {
-    private _widthAccessor: any;
-
+  export class CategoryBarRenderer extends XYRenderer {
+    public xScale: OrdinalScale;
     /**
      * Creates a CategoryBarRenderer.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
      * @param {OrdinalScale} xScale The x scale to use.
-     * @param {QuantitiveScale} yScale The y scale to use.
+     * @param {Scale} yScale The y scale to use.
      * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
      * @param {IAccessor} [widthAccessor] A function for extracting the width position of each bar, in pixels, from the data.
      * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
      */
     constructor(dataset: any,
             xScale: OrdinalScale,
-            yScale: QuantitiveScale,
+            yScale: Scale,
             xAccessor?: IAccessor,
             widthAccessor?: IAccessor,
             yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
       this._animate = true;
-      this._widthAccessor = (widthAccessor != null) ? widthAccessor : 10; // default width is 10px
-    }
-
-    /**
-     * Sets the width accessor.
-     *
-     * @param {any} accessor The new width accessor.
-     * @returns {CategoryBarRenderer} The calling CategoryBarRenderer.
-     */
-    public widthAccessor(accessor: any) {
-      this._widthAccessor = accessor;
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
-      return this;
+      this.project("width", 10);
     }
 
     public _paint() {
       super._paint();
       var yRange = this.yScale.range();
       var maxScaledY = Math.max(yRange[0], yRange[1]);
-      var xA = this._getAppliedAccessor(this._xAccessor);
+      var xA = Utils.applyAccessor(this._xAccessor, this.dataSource());
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._data, xA);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
       this.dataSelection.enter().append("rect");
 
-      var rangeType = this.xScale.rangeType();
+      var attrToProjector = this._generateAttrToProjector();
 
-      var widthFunction: (d:any, i: number) => number;
+      var rangeType = this.xScale.rangeType();
       if (rangeType === "points"){
-        widthFunction = this._getAppliedAccessor(this._widthAccessor);
+        var xF = attrToProjector["x"];
+        var widthF = attrToProjector["width"];
+        attrToProjector["x"] = (d: any, i: number) => xF(d, i) - widthF(d, i) / 2;
       } else {
-        widthFunction = (d:any, i: number) => this.xScale.rangeBand();
+        attrToProjector["width"] = (d: any, i: number) => this.xScale.rangeBand();
       }
 
-      var xFunction = (d: any, i: number) => {
-        var x = xA(d, i);
-        var scaledX = this.xScale.scale(x);
-        if (rangeType === "points") {
-          return scaledX - widthFunction(d, i)/2;
-        } else {
-          return scaledX;
-        }
-      };
-
-      var yA = this._getAppliedAccessor(this._yAccessor);
-      var yFunction = (d: any, i: number) => {
-        var y = yA(d, i);
-        var scaledY = this.yScale.scale(y);
-        return scaledY;
-      };
-
       var heightFunction = (d: any, i: number) => {
-        return maxScaledY - yFunction(d, i);
+        return maxScaledY - attrToProjector["y"](d, i);
       };
+      attrToProjector["height"] = heightFunction;
 
-      var updateSelection: any = this.dataSelection
-            .attr("fill", this._getAppliedAccessor(this._colorAccessor));
-
+      var updateSelection: any = this.dataSelection;
       if (this._animate) {
         updateSelection = updateSelection.transition();
       }
-
-      updateSelection
-            .attr("x", xFunction)
-            .attr("y", yFunction)
-            .attr("width", widthFunction)
-            .attr("height", heightFunction);
+      updateSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
-    }
-
-    public autorange() {
-      super.autorange();
-      var yDomain = this.yScale.domain();
-      if (yDomain[1] < 0 || yDomain[0] > 0) { // domain does not include 0
-        var newDomain = [Math.min(0, yDomain[0]), Math.max(0, yDomain[1])];
-        this.yScale.domain(newDomain);
-      }
-      return this;
     }
 
     /**

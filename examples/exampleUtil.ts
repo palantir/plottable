@@ -1,4 +1,4 @@
-function makeRandomData(numPoints, scaleFactor=1): Plottable.IDataset {
+function makeRandomData(numPoints, scaleFactor=1): any[] {
   var data = [];
   for (var i = 0; i < numPoints; i++) {
     var x = Math.random();
@@ -6,7 +6,7 @@ function makeRandomData(numPoints, scaleFactor=1): Plottable.IDataset {
     data.push(r);
   }
   data.sort((a: any, b: any) => a.x - b.x);
-  return {data: data, metadata: {cssClass: "random-data"}};
+  return data;
 }
 
 function makeNormallyDistributedData(n=100, xMean?, xStdDev?, yMean?, yStdDev?) {
@@ -53,7 +53,7 @@ function binByVal(data: any[], accessor: Plottable.IAccessor, range=[0,100], nBi
   })
   return bins;
 }
-function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue = 10): Plottable.IDataset {
+function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue = 10): any[] {
   var data = [];
   for (var i=0; i < numBuckets; i++) {
     data.push({
@@ -62,10 +62,7 @@ function makeRandomBucketData(numBuckets: number, bucketWidth: number, maxValue 
       y: Math.round(Math.random() * maxValue)
     });
   }
-  return {
-    "data": data,
-    metadata: {cssClass: "random-buckets"}
-  };
+  return data;
 }
 
 function generateHeightWeightData(n: number) {
@@ -81,8 +78,5 @@ function generateHeightWeightData(n: number) {
         });
     }
 
-    return {
-      data: data,
-      metadata: {cssClass: "height-weight-data"}
-    };
+    return data;
 }

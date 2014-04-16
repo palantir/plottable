@@ -13,6 +13,10 @@ module Plottable {
     (datum: any, index?: number, metadata?: any): any;
   };
 
+  export interface IAppliedAccessor {
+    (datum: any, index: number) : any;
+  }
+
   export interface SelectionArea {
     xMin: number;
     xMax: number;
@@ -26,10 +30,6 @@ module Plottable {
   }
 
   export interface IBroadcasterCallback {
-    (broadcaster: IBroadcaster, ...args: any[]): any;
-  }
-
-  export interface IBroadcaster {
-    registerListener: (cb: IBroadcasterCallback) => IBroadcaster;
+    (broadcaster: Broadcaster, ...args: any[]): any;
   }
 }

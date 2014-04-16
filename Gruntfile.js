@@ -66,7 +66,7 @@ module.exports = function(grunt) {
       },
       "rebuild": {
         "tasks": ["dev-compile"],
-        "files": ["src/*.ts"]
+        "files": ["src/**/*.ts"]
       },
       "tests": {
         "tasks": ["ts:test", "tslint"],
@@ -78,9 +78,9 @@ module.exports = function(grunt) {
       }
     },
     blanket_mocha: {
-      all: ['test/tests.html'],
+      all: ['test/coverage.html'],
       options: {
-        threshold: 85
+        threshold: 80
       }
     },
     connect: {
@@ -147,4 +147,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
+  grunt.registerTask("bm", ["blanket_mocha"]);
 };

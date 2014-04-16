@@ -1,10 +1,18 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class Scale implements IBroadcaster {
+  interface IPerspective {
+    dataSource: DataSource;
+    accessor: IAccessor;
+  }
+  export class Scale extends Broadcaster {
     public _d3Scale: D3.Scale.Scale;
-    public _broadcasterCallbacks: IBroadcasterCallback[] = [];
-
+    public _autoDomain = true;
+    private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
+    private dataSourceReferenceCounter = new Utils.IDCounter();
+    private isAutorangeUpToDate = false;
+    public _autoNice = false;
+    public _autoPad  = false;
     /**
      * Creates a new Scale.
      *
@@ -12,7 +20,64 @@ module Plottable {
      * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
     constructor(scale: D3.Scale.Scale) {
+      super();
       this._d3Scale = scale;
+    }
+
+    public _getCombinedExtent(): any[] {
+      var perspectives: IPerspective[] = d3.values(this.rendererID2Perspective);
+      var extents = perspectives.map((p) => {
+        var source = p.dataSource;
+        var accessor = p.accessor;
+        return source._getExtent(accessor);
+      });
+      return extents;
+    }
+
+    /**
+    * Modify the domain on the scale so that it includes the extent of all
+    * perspectives it depends on. Extent: The (min, max) pair for a
+    * QuantitiativeScale, all covered strings for an OrdinalScale.
+    * Perspective: A combination of a DataSource and an Accessor that
+    * represents a view in to the data.
+    */
+    public autorangeDomain() {
+      this.isAutorangeUpToDate = true;
+      this._setDomain(this._getCombinedExtent());
+      return this;
+    }
+
+    public _autoDomainIfNeeded() {
+      if (!this.isAutorangeUpToDate && this._autoDomain) {
+        this.autorangeDomain();
+      }
+    }
+
+    public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any) {
+      if (this.rendererID2Perspective[rendererIDAttr] != null) {
+        this._removePerspective(rendererIDAttr);
+      }
+      this.rendererID2Perspective[rendererIDAttr] = {dataSource: dataSource, accessor: accessor};
+
+      var dataSourceID = dataSource._plottableID;
+      if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
+        dataSource.registerListener(this, () => this.isAutorangeUpToDate = false );
+      }
+
+      this.isAutorangeUpToDate = false;
+      return this;
+    }
+
+    public _removePerspective(rendererIDAttr: string) {
+      var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
+      var dataSourceID = dataSource._plottableID;
+      if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
+        dataSource.deregisterListener(this);
+      }
+
+      delete this.rendererID2Perspective[rendererIDAttr];
+      this.isAutorangeUpToDate = false;
+      return this;
     }
 
     /**
@@ -22,25 +87,35 @@ module Plottable {
      * @returns {any} The range value corresponding to the supplied domain value.
      */
     public scale(value: any) {
+      this._autoDomainIfNeeded();
       return this._d3Scale(value);
     }
 
     /**
      * Retrieves the current domain, or sets the Scale's domain to the specified values.
      *
-     * @param {any[]} [values] The new value for the domain.
+     * @param {any[]} [values] The new value for the domain. This array may
+     *     contain more than 2 values if the scale type allows it (e.g.
+     *     ordinal scales). Other scales such as quantitative scales accept
+     *     only a 2-value extent array.
      * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
      */
     public domain(): any[];
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
+        this._autoDomainIfNeeded();
         return this._d3Scale.domain();
       } else {
-        this._d3Scale.domain(values);
-        this._broadcasterCallbacks.forEach((b) => b(this));
+        this._autoDomain = false;
+        this._setDomain(values);
         return this;
       }
+    }
+
+    public _setDomain(values: any[]) {
+      this._d3Scale.domain(values);
+      this._broadcast();
     }
 
     /**
@@ -53,6 +128,7 @@ module Plottable {
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {
+        this._autoDomainIfNeeded();
         return this._d3Scale.range();
       } else {
         this._d3Scale.range(values);
@@ -67,30 +143,6 @@ module Plottable {
      */
     public copy(): Scale {
       return new Scale(this._d3Scale.copy());
-    }
-
-    /**
-     * Registers a callback to be called when the scale's domain is changed.
-     *
-     * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
-     * @returns {Scale} The Calling Scale.
-     */
-    public registerListener(callback: IBroadcasterCallback) {
-      this._broadcasterCallbacks.push(callback);
-      return this;
-    }
-
-    /**
-     * Expands the Scale's domain to cover the data given.
-     * Passes an accessor through to the native d3 code.
-     *
-     * @param data The data to operate on.
-     * @param [accessor] The accessor to get values out of the data
-     * @returns {Scale} The Scale.
-     */
-    public widenDomainOnData(data: any[], accessor?: IAccessor): Scale {
-      // no-op; implementation is sublcass-dependent
-      return this;
     }
   }
 }
