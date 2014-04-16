@@ -30,7 +30,7 @@ module Plottable {
         var source = p.dataSource;
         var accessor = p.accessor;
         return source._getExtent(accessor);
-      });
+      }).filter((e) => e != null);
       return extents;
     }
 
@@ -61,7 +61,10 @@ module Plottable {
 
       var dataSourceID = dataSource._plottableID;
       if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
-        dataSource.registerListener(this, () => this.isAutorangeUpToDate = false );
+        dataSource.registerListener(this, () => {
+          this.isAutorangeUpToDate = false;
+          this.autorangeDomain();
+        });
       }
 
       this.isAutorangeUpToDate = false;

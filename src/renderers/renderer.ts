@@ -49,7 +49,6 @@ module Plottable {
       var dataSource: DataSource;
       if (dataset != null) {
         if (typeof dataset.data === "function") {
-
           dataSource = <DataSource> dataset;
         } else {
           dataSource = dataSource = new DataSource(dataset);
