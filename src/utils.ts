@@ -146,12 +146,12 @@ module Plottable {
       private keyValuePairs: any[][] = [];
 
       /**
-      * Set a new key/value pair in the store.
-      *
-      * @param {any} Key to set in the store
-      * @param {any} Value to set in the store
-      * @return {boolean} True if key already in store, false otherwise
-      */
+       * Set a new key/value pair in the store.
+       *
+       * @param {any} Key to set in the store
+       * @param {any} Value to set in the store
+       * @return {boolean} True if key already in store, false otherwise
+       */
       public set(key: any, value: any) {
         for (var i = 0; i < this.keyValuePairs.length; i++) {
           if (this.keyValuePairs[i][0] === key) {

@@ -5,6 +5,7 @@
     "eofline": true,
     "forin": true,
     "indent": [true, 2],
+    "jsdoc-format": true,
     "label-position": true,
     "label-undefined": true,
     "max-line-length": [true, 140],
