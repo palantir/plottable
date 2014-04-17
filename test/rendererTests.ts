@@ -288,76 +288,12 @@ describe("Renderers", () => {
     });
 
     describe("Bar Renderer", () => {
-      var svg: D3.Selection;
-      var xScale: Plottable.LinearScale;
-      var yScale: Plottable.LinearScale;
-      var barRenderer: Plottable.BarRenderer;
-      var SVG_WIDTH = 600;
-      var SVG_HEIGHT = 400;
-      var verifier = new MultiTestVerifier();
-      var d0 = {x: -2, dx: 1, y: 1};
-      var d1 = {x: 0, dx: 4, y: 4};
-      // Choosing data with a negative x value is significant, since there is
-      // a potential failure mode involving the xDomain with an initial
-      // point below 0
-      var dataset = new Plottable.DataSource([d0, d1]);
-
-      before(() => {
-        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.LinearScale().domain([-2, 4]);
-        yScale = new Plottable.LinearScale().domain([0, 4]);
-        barRenderer = new Plottable.BarRenderer(dataset, xScale, yScale);
-        barRenderer._anchor(svg)._computeLayout();
-      });
-
-      beforeEach(() => {
-        verifier.start();
-      });
-
-      it("bars were rendered correctly with padding disabled", () => {
-        barRenderer.barPaddingPx = 0;
-        barRenderer._render();
-        var renderArea = barRenderer.renderArea;
-        var bars = renderArea.selectAll("rect");
-        var bar0 = d3.select(bars[0][0]);
-        var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "400", "bar1 width is correct");
-        assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "400", "bar1 height is correct");
-        assert.equal(bar0.attr("x"), "0", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "200", "bar1 x is correct");
-        verifier.end();
-      });
-
-      it("bars were rendered correctly with padding enabled", () => {
-        barRenderer.barPaddingPx = 1;
-        barRenderer._render();
-        var renderArea = barRenderer.renderArea;
-        var bars = renderArea.selectAll("rect");
-        var bar0 = d3.select(bars[0][0]);
-        var bar1 = d3.select(bars[0][1]);
-        assert.equal(bar0.attr("width"), "98", "bar0 width is correct");
-        assert.equal(bar1.attr("width"), "398", "bar1 width is correct");
-        assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "400", "bar1 height is correct");
-        assert.equal(bar0.attr("x"), "1", "bar0 x is correct");
-        assert.equal(bar1.attr("x"), "201", "bar1 x is correct");
-        verifier.end();
-      });
-
-      after(() => {
-        if (verifier.passed) {svg.remove();};
-      });
-    });
-
-    describe("Category Bar Renderer", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.DataSource;
       var xScale: Plottable.OrdinalScale;
       var yScale: Plottable.LinearScale;
-      var renderer: Plottable.CategoryBarRenderer;
+      var renderer: Plottable.BarRenderer;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
@@ -367,21 +303,22 @@ describe("Renderers", () => {
         yScale = new Plottable.LinearScale();
         var data = [
           {x: "A", y: 1},
-          {x: "B", y: 2}
+          {x: "B", y: -1.5}
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.CategoryBarRenderer(dataset, xScale, yScale);
+        renderer = new Plottable.BarRenderer(dataset, xScale, yScale);
         renderer._animate = false;
         renderer.renderTo(svg);
       });
 
       beforeEach(() => {
+        yScale.domain([-2, 2]);
+        renderer.baseline(0);
         verifier.start();
       });
 
       it("renders correctly", () => {
-        yScale.domain([0, 4]);
         var renderArea = renderer.renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
@@ -389,7 +326,49 @@ describe("Renderers", () => {
         assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
         assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
         assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-        assert.equal(bar1.attr("height"), "200", "bar1 height is correct");
+        assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
+        assert.equal(bar0.attr("x"), "150", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "450", "bar1 x is correct");
+        assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
+
+        var baseline = renderArea.select(".baseline");
+        assert.equal(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
+        assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
+        assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+        assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+        verifier.end();
+      });
+
+      it("baseline value can be changed; renderer updates appropriately", () => {
+        renderer.baseline(-1);
+
+        var renderArea = renderer.renderArea;
+        var bars = renderArea.selectAll("rect");
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("height"), "200", "bar0 height is correct");
+        assert.equal(bar1.attr("height"), "50", "bar1 height is correct");
+        assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "300", "bar1 y is correct");
+
+        var baseline = renderArea.select(".baseline");
+        assert.equal(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
+        assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
+        assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+        assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+        verifier.end();
+      });
+
+      it("bar alignment can be changed; renderer updates appropriately", () => {
+        renderer.barAlignment("center");
+
+        var renderArea = renderer.renderArea;
+        var bars = renderArea.selectAll("rect");
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
         assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
         assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
         verifier.end();

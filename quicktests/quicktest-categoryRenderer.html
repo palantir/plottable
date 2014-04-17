@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>CATegory Bar Renderer Quicktest</title>
+    <title>Bar Renderer Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../build/plottable.js"></script>
@@ -11,31 +11,42 @@
           { name: "Spot", age: 8 },
           { name: "Poptart", age: 1 },
           { name: "Budoka", age: 3 },
-          { name: "Sugar", age: 14 }
+          { name: "Sugar", age: 14 },
+          { name: "Tac", age: -5 }
         ];
 
-      function makeCatXAxisChart() {
-          var xScale = new Plottable.OrdinalScale();
-          var xAxis = new Plottable.XAxis(xScale, "bottom", function(d) { return d; } );
+      var ds = new Plottable.DataSource(data);
+      var xScale = new Plottable.OrdinalScale().rangeType("bands");
+      var xAxis = new Plottable.XAxis(xScale, "bottom", function(d) { return d; } );
 
-          var yScale = new Plottable.LinearScale().domain([0, 15]);
-          var yAxis = new Plottable.YAxis(yScale, "left");
-          yAxis.showEndTickLabels(true);
+      var yScale = new Plottable.LinearScale();
+      var yAxis = new Plottable.YAxis(yScale, "left");
+      yAxis.showEndTickLabels(true);
 
-          var barRenderer = new Plottable.CategoryBarRenderer(data, xScale, yScale)
-                                  .project("x", "name", xScale)
-                                  .project("y", "age", yScale)
-                                  .project("width", 50)
-                                  .project("fill", function() {return "steelblue"});
+      var barRenderer = new Plottable.BarRenderer(ds, xScale, yScale)
+                              .project("x", "name", xScale)
+                              .project("y", "age", yScale)
+                              .project("fill", function() {return "steelblue"});
+      var chart = new Plottable.StandardChart().addCenterComponent(barRenderer).xAxis(xAxis).yAxis(yAxis);
+      // barRenderer._animate = false;
 
-          var chart = new Plottable.StandardChart().addCenterComponent(barRenderer).xAxis(xAxis).yAxis(yAxis);
-          chart.renderTo("#meow");
-      };
+      window.onload = function() { chart.renderTo("#meow"); }
 
-      window.onload = function() { makeCatXAxisChart(); }
+      function younger() {
+        var data = ds.data();
+        data.forEach(function(d) { d.age--; });
+        ds.data(data);
+      }
+      function older() {
+        var data = ds.data();
+        data.forEach(function(d) { d.age++; });
+        ds.data(data);
+      }
     </script>
   </head>
   <body>
     <svg id="meow" width="480" height="320"></svg>
+    <p />
+    <button name="minus-age" onclick="younger()">-1 year</button><button name="plus-age" onclick="older()">+1 year</button>
   </body>
 </html>
