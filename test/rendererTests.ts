@@ -313,12 +313,12 @@ describe("Renderers", () => {
       });
 
       beforeEach(() => {
+        yScale.domain([-2, 2]);
+        renderer.baseline(0);
         verifier.start();
       });
 
       it("renders correctly", () => {
-        yScale.domain([-2, 2]);
-
         var renderArea = renderer.renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
@@ -341,8 +341,7 @@ describe("Renderers", () => {
       });
 
       it("baseline value can be changed; renderer updates appropriately", () => {
-        yScale.domain([-2, 2]);
-        renderer.baselineValue(-1);
+        renderer.baseline(-1);
 
         var renderArea = renderer.renderArea;
         var bars = renderArea.selectAll("rect");
@@ -362,8 +361,6 @@ describe("Renderers", () => {
       });
 
       it("bar alignment can be changed; renderer updates appropriately", () => {
-        yScale.domain([-2, 2]);
-        renderer.baselineValue(0);
         renderer.barAlignment("center");
 
         var renderArea = renderer.renderArea;

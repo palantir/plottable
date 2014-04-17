@@ -2,8 +2,8 @@
 
 module Plottable {
   export class BarRenderer extends XYRenderer {
-    private baseline: D3.Selection;
-    private _baselineValue = 0;
+    private _baseline: D3.Selection;
+    private baselineValue = 0;
     private _barAlignment = "left";
 
     /**
@@ -34,7 +34,7 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      var scaledBaseline = this.yScale.scale(this._baselineValue);
+      var scaledBaseline = this.yScale.scale(this.baselineValue);
 
       var xA = Utils.applyAccessor(this._xAccessor, this.dataSource());
 
@@ -46,11 +46,8 @@ module Plottable {
       var xF = attrToProjector["x"];
       var widthF = attrToProjector["width"];
 
-      var rangeType = "points";
       var castXScale = (<OrdinalScale> this.xScale);
-      if (castXScale.rangeType != null) {
-        rangeType = castXScale.rangeType();
-      }
+      var rangeType = (castXScale.rangeType == null) ? "points" : castXScale.rangeType();
 
       if (rangeType === "points") {
         if (this._barAlignment === "center") {
@@ -78,32 +75,32 @@ module Plottable {
         this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
 
-      if (this.baseline == null) {
-        this.baseline = this.renderArea.append("line").classed("baseline", true);
+      if (this._baseline == null) {
+        this._baseline = this.renderArea.append("line").classed("baseline", true);
       }
 
       var updateSelection: any = this.dataSelection;
-      var baseline: any = this.baseline;
+      var baselineSelection: any = this._baseline;
       if (this._animate) {
         updateSelection = updateSelection.transition();
-        baseline = baseline.transition();
+        baselineSelection = baselineSelection.transition();
       }
 
       updateSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
 
-      baseline.attr("x1", 0).attr("x2", this.availableWidth)
+      baselineSelection.attr("x1", 0).attr("x2", this.availableWidth)
                    .attr("y1", scaledBaseline).attr("y2", scaledBaseline);
     }
 
     /**
      * Sets the baseline for the bars to the specified value.
      *
-     * @param {number} value
+     * @param {number} value The y-value to position the baseline at.
      * @return {BarRenderer} The calling BarRenderer.
      */
-    public baselineValue(value: number) {
-      this._baselineValue = value;
+    public baseline(value: number) {
+      this.baselineValue = value;
       if (this.element != null) {
         this._render();
       }
