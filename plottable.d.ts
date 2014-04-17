@@ -269,7 +269,7 @@ declare module Plottable {
         * Perspective: A combination of a DataSource and an Accessor that
         * represents a view in to the data.
         */
-        public autorangeDomain(): Scale;
+        public autoDomain(): Scale;
         /**
         * Returns the range value corresponding to a given domain value.
         *
@@ -313,7 +313,7 @@ declare module Plottable {
         * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
         */
         constructor(scale: D3.Scale.QuantitiveScale);
-        public autorangeDomain(): QuantitiveScale;
+        public autoDomain(): QuantitiveScale;
         /**
         * Retrieves the domain value corresponding to a supplied range value.
         *
@@ -723,20 +723,54 @@ declare module Plottable {
 }
 declare module Plottable {
     class BarRenderer extends XYRenderer {
-        public barPaddingPx: number;
-        public dxAccessor: any;
         /**
         * Creates a BarRenderer.
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-        * @param {IAccessor} [dxAccessor] A function for extracting the width of each bar from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
+        *     the start position of each bar from the data.
+        * @param {IAccessor|string|number} [widthAccessor] An accessor for extracting
+        *     the width of each bar, in pixels, from the data.
+        * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
+        *     the height of each bar from the data.
         */
-        constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, dxAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: Scale, yScale: QuantitiveScale, xAccessor?: IAccessor, widthAccessor?: IAccessor, yAccessor?: IAccessor);
+        /**
+        * Sets the baseline for the bars to the specified value.
+        *
+        * @param {number} value The y-value to position the baseline at.
+        * @return {BarRenderer} The calling BarRenderer.
+        */
+        public baseline(value: number): BarRenderer;
+        /**
+        * Sets the horizontal alignment of the bars.
+        *
+        * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
+        * @return {BarRenderer} The calling BarRenderer.
+        */
+        public barAlignment(alignment: string): BarRenderer;
+        /**
+        * Selects the bar under the given pixel position.
+        *
+        * @param {number} x The pixel x position.
+        * @param {number} y The pixel y position.
+        * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
+        * @return {D3.Selection} The selected bar, or null if no bar was selected.
+        */
+        public selectBar(x: number, y: number, select?: boolean): D3.Selection;
+        /**
+        * Deselects all bars.
+        * @return {BarRenderer} The calling BarRenderer.
+        */
+        public deselectAll(): BarRenderer;
+    }
+}
+declare module Plottable {
+    class CategoryBarRenderer extends BarRenderer {
+        constructor(dataset: any, xScale: Scale, yScale: QuantitiveScale, xAccessor?: IAccessor, widthAccessor?: IAccessor, yAccessor?: IAccessor);
     }
 }
 declare module Plottable {
@@ -753,36 +787,6 @@ declare module Plottable {
         * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
         constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor);
-    }
-}
-declare module Plottable {
-    class CategoryBarRenderer extends XYRenderer {
-        public xScale: OrdinalScale;
-        /**
-        * Creates a CategoryBarRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {OrdinalScale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting the start position of each bar from the data.
-        * @param {IAccessor} [widthAccessor] A function for extracting the width position of each bar, in pixels, from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting height of each bar from the data.
-        */
-        constructor(dataset: any, xScale: OrdinalScale, yScale: Scale, xAccessor?: IAccessor, widthAccessor?: IAccessor, yAccessor?: IAccessor);
-        /**
-        * Selects the bar under the given pixel position.
-        *
-        * @param {number} x The pixel x position.
-        * @param {number} y The pixel y position.
-        * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-        * @return {D3.Selection} The selected bar, or null if no bar was selected.
-        */
-        public selectBar(x: number, y: number, select?: boolean): D3.Selection;
-        /**
-        * Deselects all bars.
-        */
-        public deselectAll(): void;
     }
 }
 declare module Plottable {
