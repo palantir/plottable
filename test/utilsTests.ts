@@ -72,7 +72,7 @@ describe("Utils", () => {
     assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
 
     var a3 = Plottable.Utils.accessorize("#aaaa");
-    assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
+    assert.equal(a3(datum, 0, null), "aaaa", "strings beginning with # are returned as final value, with the # removed");
 
     var a4 = Plottable.Utils.accessorize(33);
     assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");

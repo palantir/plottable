@@ -122,7 +122,8 @@ module Plottable {
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
         return (d: any, i: number, s: any) => d[accessor];
       } else {
-        return (d: any, i: number, s: any) => accessor;
+        var truncatedString = accessor.slice(1);
+        return (d: any, i: number, s: any) => truncatedString;
       };
     }
 

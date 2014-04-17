@@ -155,9 +155,8 @@ describe("Renderers", () => {
         var yAccessor = (d) => d.bar;
         var y0Accessor = () => 0;
         var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
-        var fillAccessor = () => "steelblue";
         areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale, xAccessor, yAccessor, y0Accessor);
-        areaRenderer.project("fill", fillAccessor)
+        areaRenderer.project("fill", "#steelblue")
                     .project("stroke", colorAccessor);
         areaRenderer.renderTo(svg);
         renderArea = areaRenderer.renderArea;
