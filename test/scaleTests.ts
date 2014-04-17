@@ -48,7 +48,7 @@ describe("Scales", () => {
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
       scale._addPerspective("1", dataSource, "foo");
-      scale.autorangeDomain().padDomain().nice();
+      scale.autoDomain().padDomain().nice();
       assert.isTrue(scale._autoDomain, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
       assert.isFalse(scale._autoDomain, "the autoDomain flag is false after domain explicitly set");
