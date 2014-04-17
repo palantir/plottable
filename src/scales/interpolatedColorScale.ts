@@ -126,7 +126,7 @@ module Plottable {
     }
 
     /**
-     * Sets the color range.
+     * Gets or sets the color range.
      *
      * @param {string|string[]} [colorRange]. If no argument is passed,
      *     returns the current range of colors. If the param is one of
@@ -147,7 +147,7 @@ module Plottable {
     }
 
     /**
-     * Sets the internal scale type.
+     * Gets or sets the internal scale type.
      *
      * @param {string} [scaleType]. If no argument is passed, returns the
      *     current scale type string. Otherwise, we set the internal scale
