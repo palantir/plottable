@@ -67,12 +67,12 @@ module Plottable {
      *     type (linear/log/sqrt/pow)
      * @returns a quantitive d3 scale.
      */
-    public static SCALE_COLORS(colors:string[], scaleType:string): D3.Scale.QuantitiveScale {
+    private static getD3InterpolatedScale(colors:string[], scaleType:string): D3.Scale.QuantitiveScale {
       var scaleFn: ScaleFactory = (<ScaleFactoryProvider>d3.scale)[scaleType];
       if (scaleFn == null) throw new Error("unknown scale type " + scaleType);
       return (<D3.Scale.QuantitiveScale>scaleFn())
         .range([0, 1])
-        .interpolate(InterpolatedColorScale.INTERPOLATE_COLORS(colors));
+        .interpolate(InterpolatedColorScale.interpolateColors(colors));
     }
 
     /**
@@ -86,7 +86,7 @@ module Plottable {
      * @param {string[]} colors an array of strings representing color
      *     values in hex ("#FFFFFF") or keywords ("white").
      */
-    public static INTERPOLATE_COLORS(colors:string[]): D3.Transition.Interpolate {
+    private static interpolateColors(colors:string[]): D3.Transition.Interpolate {
       if (colors.length < 2) throw new Error("Color scale arrays must have at least two elements.");
       return (ignored:any): any => {
         return (t: any): any => {
@@ -122,7 +122,7 @@ module Plottable {
     constructor(colorRange: any = "reds", scaleType: string = "linear") {
       this._colorRange = this._resolveColorValues(colorRange);
       this._scaleType = scaleType;
-      super(InterpolatedColorScale.SCALE_COLORS(this._colorRange, this._scaleType));
+      super(InterpolatedColorScale.getD3InterpolatedScale(this._colorRange, this._scaleType));
     }
 
     /**
@@ -165,7 +165,7 @@ module Plottable {
     }
 
     private _resetScale(): any {
-      this._d3Scale = InterpolatedColorScale.SCALE_COLORS(this._colorRange, this._scaleType);
+      this._d3Scale = InterpolatedColorScale.getD3InterpolatedScale(this._colorRange, this._scaleType);
       this._broadcast();
     }
 
