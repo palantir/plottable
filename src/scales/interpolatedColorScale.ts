@@ -1,14 +1,6 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  interface ScaleFactory {
-    (): D3.Scale.Scale;
-  };
-
-  interface ScaleFactoryProvider extends D3.Scale.ScaleBase {
-    [key: string]: ScaleFactory;
-  };
-
   interface ColorGroups {
     [key: string]: string[];
   };
@@ -68,9 +60,23 @@ module Plottable {
      * @returns a quantitive d3 scale.
      */
     private static getD3InterpolatedScale(colors:string[], scaleType:string): D3.Scale.QuantitiveScale {
-      var scaleFn: ScaleFactory = (<ScaleFactoryProvider>d3.scale)[scaleType];
-      if (scaleFn == null) throw new Error("unknown scale type " + scaleType);
-      return (<D3.Scale.QuantitiveScale>scaleFn())
+      var scale: D3.Scale.QuantitiveScale;
+      switch(scaleType){
+        case "linear":
+          scale = d3.scale.linear();
+          break;
+        case "log":
+          scale = d3.scale.log();
+          break;
+        case "sqrt":
+          scale = d3.scale.sqrt();
+          break;
+        case "pow":
+          scale = d3.scale.pow();
+          break;
+      }
+      if (scale == null) throw new Error("unknown quantitive scale type " + scaleType);
+      return scale
         .range([0, 1])
         .interpolate(InterpolatedColorScale.interpolateColors(colors));
     }
