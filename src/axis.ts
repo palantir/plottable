@@ -2,8 +2,8 @@
 
 module Plottable {
   export class Axis extends Component {
-    public static yWidth = 50;
-    public static xHeight = 30;
+    public static Y_WIDTH = 50;
+    public static X_HEIGHT = 30;
     public axisElement: D3.Selection;
     private d3Axis: D3.Svg.Axis;
     private axisScale: Scale;
@@ -38,8 +38,8 @@ module Plottable {
     }
 
     public _render() {
-      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + Axis.yWidth + ", 0)");};
-      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.xHeight + ")");};
+      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + Axis.Y_WIDTH + ", 0)");};
+      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.X_HEIGHT + ")");};
       var domain = this.d3Axis.scale().domain();
       var extent = Math.abs(domain[1] - domain[0]);
       var min = +d3.min(domain);
@@ -270,7 +270,7 @@ module Plottable {
         throw new Error(orientation + " is not a valid orientation for XAxis");
       }
       super(scale, orientation, formatter);
-      super.rowMinimum(Axis.xHeight);
+      super.rowMinimum(Axis.X_HEIGHT);
       this._fixedWidth = false;
       this.tickLabelPosition("center");
     }
@@ -346,7 +346,7 @@ module Plottable {
         throw new Error(orientation + " is not a valid orientation for YAxis");
       }
       super(scale, orientation, formatter);
-      super.colMinimum(Axis.yWidth);
+      super.colMinimum(Axis.Y_WIDTH);
       this._fixedHeight = false;
       this.tickLabelPosition("middle");
     }

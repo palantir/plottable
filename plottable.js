@@ -253,7 +253,7 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (OSUtils) {
-        
+
 
         function sortedIndex(val, arr, accessor) {
             var low = 0;
@@ -1856,7 +1856,7 @@ var Plottable;
             this.renderArea = this.content.append("g").classed("render-area", true);
             return this;
         };
-        Renderer.defaultColorAccessor = function (d) {
+        Renderer.DEFAULT_COLOR_ACCESSOR = function (d) {
             return "#1f77b4";
         };
         return Renderer;
@@ -2108,7 +2108,7 @@ var Plottable;
             this.dataSelection.attr(attrToProjector);
             this.dataSelection.exit().remove();
         };
-        SquareRenderer.defaultRAccessor = 3;
+        SquareRenderer.DEFAULT_R_ACCESSOR = 3;
         return SquareRenderer;
     })(Plottable.XYRenderer);
     Plottable.SquareRenderer = SquareRenderer;
