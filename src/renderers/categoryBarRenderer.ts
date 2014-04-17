@@ -53,6 +53,11 @@ module Plottable {
 
       var updateSelection: any = this.dataSelection;
       if (this._animate) {
+        var fill = attrToProjector["fill"]
+        if (fill != null) {
+          updateSelection.attr("fill", fill);
+          delete attrToProjector["fill"];
+        }
         updateSelection = updateSelection.transition();
       }
       updateSelection.attr(attrToProjector);
