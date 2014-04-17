@@ -21,7 +21,6 @@
 /// <reference path="renderers/lineRenderer.ts" />
 /// <reference path="renderers/barRenderer.ts" />
 /// <reference path="renderers/squareRenderer.ts" />
-/// <reference path="renderers/categoryBarRenderer.ts" />
 /// <reference path="renderers/gridRenderer.ts" />
 /// <reference path="table.ts" />
 /// <reference path="coordinator.ts" />

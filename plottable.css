@@ -88,6 +88,10 @@
   stroke: black;
 }
 
+.plottable .bar-renderer .baseline {
+  stroke: #999;
+}
+
 .plottable .gridlines line {
   stroke: #999;
   stroke-dasharray: 2, 2;
