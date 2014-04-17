@@ -38,7 +38,8 @@ describe("Axes", () => {
     for (i = 0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
-      assert.operator(labelRect.right, "<=", markRect.left, "tick label is to the left of the mark");
+      assert.operator(labelRect.right, "<=", markRect.left + 1,
+          "tick label is to the left of the mark"); // +1 for off-by-one on some browsers
     }
 
     xAxis.tickLabelPosition("right");
@@ -48,7 +49,8 @@ describe("Axes", () => {
     for (i = 0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
-      assert.operator(markRect.right, "<=", labelRect.left, "tick label is to the right of the mark");
+      assert.operator(markRect.right, "<=", labelRect.left + 1,
+          "tick label is to the right of the mark"); // +1 for off-by-one on some browsers
     }
     svg.remove();
   });
@@ -76,8 +78,8 @@ describe("Axes", () => {
     for (i = 0; i< tickMarks.length; i++) {
       markRect = tickMarks[i].getBoundingClientRect();
       labelRect = tickLabels[i].getBoundingClientRect();
-      assert.operator(labelRect.bottom, "<=", markRect.top + 1,
-        "tick label above the mark"); // +1 for off-by-one on some browsers
+      assert.operator(labelRect.bottom, "<=", markRect.top + 2,
+        "tick label above the mark"); // +2 for off-by-two on some browsers
     }
 
     yAxis.tickLabelPosition("bottom");
@@ -116,7 +118,7 @@ describe("Axes", () => {
     xAxis.tickFormat(formatter);
     xAxis.renderTo(svg);
     var tickLabels = $(".tick").children("text");
-    assert.equal(tickLabels.first().text(), "0");
+    assert.equal(parseInt(tickLabels.first().text(), 10), 0);
     assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 365);
     svg.remove();
 
