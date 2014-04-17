@@ -15,8 +15,8 @@ module Plottable {
       super(scale);
     }
 
-    public _getCombinedExtent(): any [] {
-      var extents = super._getCombinedExtent();
+    public _getExtent(): any[] {
+      var extents = this._getAllExtents();
       var starts: number[] = extents.map((e) => e[0]);
       var ends: number[] = extents.map((e) => e[1]);
       if (starts.length > 0) {
@@ -26,8 +26,8 @@ module Plottable {
       }
     }
 
-    public autorangeDomain() {
-      super.autorangeDomain();
+    public autoDomain() {
+      super.autoDomain();
       if (this._autoPad) {
         this.padDomain();
       }

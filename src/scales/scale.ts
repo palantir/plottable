@@ -23,7 +23,7 @@ module Plottable {
       this._d3Scale = scale;
     }
 
-    public _getCombinedExtent(): any[] {
+    public _getAllExtents(): any[][] {
       var perspectives: IPerspective[] = d3.values(this.rendererID2Perspective);
       var extents = perspectives.map((p) => {
         var source = p.dataSource;
@@ -33,6 +33,10 @@ module Plottable {
       return extents;
     }
 
+    public _getExtent(): any[] {
+      return [] // this should be overwritten
+    }
+
     /**
     * Modify the domain on the scale so that it includes the extent of all
     * perspectives it depends on. Extent: The (min, max) pair for a
@@ -40,8 +44,8 @@ module Plottable {
     * Perspective: A combination of a DataSource and an Accessor that
     * represents a view in to the data.
     */
-    public autorangeDomain() {
-      this._setDomain(this._getCombinedExtent());
+    public autoDomain() {
+      this._setDomain(this._getExtent());
       return this;
     }
 
@@ -55,12 +59,12 @@ module Plottable {
       if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
         dataSource.registerListener(this, () => {
           if (this._autoDomain) {
-            this.autorangeDomain();
+            this.autoDomain();
           }
         });
       }
       if (this._autoDomain) {
-        this.autorangeDomain();
+        this.autoDomain();
       }
       return this;
     }
@@ -74,7 +78,7 @@ module Plottable {
 
       delete this.rendererID2Perspective[rendererIDAttr];
       if (this._autoDomain) {
-        this.autorangeDomain();
+        this.autoDomain();
       }
       return this;
     }

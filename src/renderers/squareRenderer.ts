@@ -3,7 +3,7 @@
 module Plottable {
   export class SquareRenderer extends XYRenderer {
     private _rAccessor: any;
-    private static defaultRAccessor = 3;
+    private static DEFAULT_R_ACCESSOR = 3;
 
     /**
      * Creates a SquareRenderer.
