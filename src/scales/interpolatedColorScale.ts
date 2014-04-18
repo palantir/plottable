@@ -172,6 +172,7 @@ module Plottable {
 
     private _resetScale(): any {
       this._d3Scale = InterpolatedColorScale.getD3InterpolatedScale(this._colorRange, this._scaleType);
+      if (this._autoDomain) this.autoDomain();
       this._broadcast();
     }
 
