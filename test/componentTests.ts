@@ -56,25 +56,33 @@ describe("Component behavior", () => {
     it("computeLayout works with CSS layouts", () => {
       // Manually size parent
       var parent = d3.select(svg.node().parentNode);
-      parent.style("width", "100px").style("height", "200px");
+      parent.style("width", "200px");
+      parent.style("height", "400px");
 
       // Remove width/height attributes and style with CSS
       svg.attr("width", null).attr("height", null);
-      svg.style("width", "50%").style("height", "50%");
+      svg.style("width", "50%");
+      svg.style("height", "50%");
 
       c._anchor(svg)._computeLayout();
-      assert.equal(c.availableWidth, 50, "computeLayout defaulted width to svg width");
-      assert.equal(c.availableHeight, 100, "computeLayout defaulted height to svg height");
+
+      assert.equal(c.availableWidth, 100, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableHeight, 200, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
       svg.style("width", "25%").style("height", "25%");
+
       c._computeLayout();
-      assert.equal(c.availableWidth, 25, "computeLayout updated width to new svg width");
-      assert.equal(c.availableHeight, 50, "computeLayout updated height to new svg height");
+
+      assert.equal(c.availableWidth, 50, "computeLayout updated width to new svg width");
+      assert.equal(c.availableHeight, 100, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
 
+      // reset test page DOM
+      parent.style("width", "auto");
+      parent.style("height", "auto");
       svg.remove();
     });
 
