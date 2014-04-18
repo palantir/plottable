@@ -17,9 +17,7 @@
     <script src="build/plottable.js"></script>
 
     <!-- examples -->
-    <script src="examples/exampleUtil.js"></script>
     <script src="examples/main-page/commit-chart-shared.js"></script>
-    <script src="examples/main-page/commit-chart.js"></script>
     <script src="examples/main-page/commit-dashboard-data-manager.js"></script>
     <script src="examples/main-page/commit-dashboard.js"></script>
 
@@ -42,42 +40,47 @@
           data.sort(function(a,b) {return a.date - b.date});
           var dataset = {data: data, metadata: {}};
           var dataManager = makeCommitDataManager(data);
-          // results = dataManager();
           var interactiveSVG = sizeSVG(d3.select("#interactive-demo"));
           commitDashboard(dataManager, interactiveSVG);
-
-          // var commitDataset = {data: data.commits, metadata: {}};
-          // var svg = d3.select("#commit-chart");
-          // sizeSVG(svg);
-          // commitChart(svg, commitDataset);
         });
       }
     </script>
+
+    <!-- style -->
+    <style type="text/css">
+      body > .container {
+        padding-top: 70px;
+      }
+    </style>
+
   </head>
 
   <body>
       <!-- fork me on GitHub! -->
-      <a href="https://github.com/palantir/plottable"><img style="z-index: 100000; position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+      <a href="https://github.com/palantir/plottable"><img style="z-index: 100000; position: fixed; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
-      <nav class="navbar navbar-default navbar-static-top" role="navigation">
-        <div class="container-fluid">
+
+    <div class="container">
+      <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
           <div class="navbar-header">
             <a class="navbar-brand" href="#">Plottable.js</a>
           </div>
         </div>
       </nav>
 
-
-    <div class="container">
       <h1>Plottable.js</h1>
       <h2>A library for concisely creating powerful, flexible, interactive charts. Built on D3.js.</h2>
 
       <svg id="interactive-demo" width="95%"></svg>
 
+      <!-- TODO sections -->
+      <!--
       <div class="page-header"><h1>Plot</h1></div>
       <div class="page-header"><h1>Layout</h1></div>
       <div class="page-header"><h1>Interact<h1></div>
       <div class="page-header"><h1>Synced</h1></div>
+      -->
 
       <!-- TODO built by palantir -->
     </div>
