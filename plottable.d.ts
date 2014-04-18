@@ -684,7 +684,6 @@ declare module Plottable {
         public renderArea: D3.Selection;
         public element: D3.Selection;
         public scales: Scale[];
-        };
         /**
         * Creates a Renderer.
         *
@@ -703,7 +702,6 @@ declare module Plottable {
         public dataSource(): DataSource;
         public dataSource(source: DataSource): Renderer;
         public project(attrToSet: string, accessor: any, scale?: Scale): Renderer;
-        };
     }
 }
 declare module Plottable {
