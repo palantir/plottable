@@ -1777,25 +1777,25 @@ describe("Renderers", function () {
                 assert.equal(cellAU.attr("height"), "100", "cell 'AU' height is correct");
                 assert.equal(cellAU.attr("width"), "200", "cell 'AU' width is correct");
                 assert.equal(cellAU.attr("x"), "0", "cell 'AU' x coord is correct");
-                assert.equal(cellAU.attr("y"), "0", "cell 'AU' x coord is correct");
+                assert.equal(cellAU.attr("y"), "100", "cell 'AU' x coord is correct");
                 assert.equal(cellAU.attr("fill"), "#000000", "cell 'AU' color is correct");
 
                 assert.equal(cellBU.attr("height"), "100", "cell 'BU' height is correct");
                 assert.equal(cellBU.attr("width"), "200", "cell 'BU' width is correct");
                 assert.equal(cellBU.attr("x"), "200", "cell 'BU' x coord is correct");
-                assert.equal(cellBU.attr("y"), "0", "cell 'BU' x coord is correct");
+                assert.equal(cellBU.attr("y"), "100", "cell 'BU' x coord is correct");
                 assert.equal(cellBU.attr("fill"), "#212121", "cell 'BU' color is correct");
 
                 assert.equal(cellAV.attr("height"), "100", "cell 'AV' height is correct");
                 assert.equal(cellAV.attr("width"), "200", "cell 'AV' width is correct");
                 assert.equal(cellAV.attr("x"), "0", "cell 'AV' x coord is correct");
-                assert.equal(cellAV.attr("y"), "100", "cell 'AV' x coord is correct");
+                assert.equal(cellAV.attr("y"), "0", "cell 'AV' x coord is correct");
                 assert.equal(cellAV.attr("fill"), "#ffffff", "cell 'AV' color is correct");
 
                 assert.equal(cellBV.attr("height"), "100", "cell 'BV' height is correct");
                 assert.equal(cellBV.attr("width"), "200", "cell 'BV' width is correct");
                 assert.equal(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
-                assert.equal(cellBV.attr("y"), "100", "cell 'BV' x coord is correct");
+                assert.equal(cellBV.attr("y"), "0", "cell 'BV' x coord is correct");
                 assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
             };
 
@@ -1819,6 +1819,43 @@ describe("Renderers", function () {
                 renderer.renderTo(svg);
                 renderer.dataSource().data(DATA);
                 VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+                svg.remove();
+            });
+
+            it("can invert y axis correctly", function () {
+                var xScale = new Plottable.OrdinalScale();
+                var yScale = new Plottable.OrdinalScale();
+                var colorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
+                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var renderer = new Plottable.GridRenderer(null, xScale, yScale, colorScale, "x", "y", "magnitude");
+                renderer.renderTo(svg);
+
+                yScale.domain(["U", "V"]);
+                renderer.dataSource().data(DATA);
+
+                var cells = renderer.renderArea.selectAll("rect")[0];
+                var cellAU = d3.select(cells[0]);
+                var cellAV = d3.select(cells[2]);
+                cellAU.attr("fill", "#000000");
+                cellAU.attr("x", "0");
+                cellAU.attr("y", "100");
+
+                cellAV.attr("fill", "#ffffff");
+                cellAV.attr("x", "0");
+                cellAV.attr("y", "0");
+
+                yScale.domain(["V", "U"]);
+                cells = renderer.renderArea.selectAll("rect")[0];
+                cellAU = d3.select(cells[0]);
+                cellAV = d3.select(cells[2]);
+                cellAU.attr("fill", "#000000");
+                cellAU.attr("x", "0");
+                cellAU.attr("y", "0");
+
+                cellAV.attr("fill", "#ffffff");
+                cellAV.attr("x", "0");
+                cellAV.attr("y", "100");
+
                 svg.remove();
             });
         });
@@ -1953,6 +1990,14 @@ describe("Scales", function () {
     });
 
     describe("Interpolated Color Scales", function () {
+        it("default scale uses reds and a linear scale type", function () {
+            var scale = new Plottable.InterpolatedColorScale();
+            scale.domain([0, 16]);
+            assert.equal("#ffffff", scale.scale(0));
+            assert.equal("#feb24c", scale.scale(8));
+            assert.equal("#b10026", scale.scale(16));
+        });
+
         it("linearly interpolates colors in L*a*b color space", function () {
             var scale = new Plottable.InterpolatedColorScale("reds");
             scale.domain([0, 1]);
@@ -1983,6 +2028,28 @@ describe("Scales", function () {
             assert.equal("#ffffff", scale.scale(16));
             assert.equal("#000000", scale.scale(-100));
             assert.equal("#ffffff", scale.scale(100));
+        });
+
+        it("can be converted to a different range", function () {
+            var scale = new Plottable.InterpolatedColorScale(["black", "white"]);
+            scale.domain([0, 16]);
+            assert.equal("#000000", scale.scale(0));
+            assert.equal("#ffffff", scale.scale(16));
+            scale.colorRange("reds");
+            assert.equal("#b10026", scale.scale(16));
+        });
+
+        it("can be converted to a different scale type", function () {
+            var scale = new Plottable.InterpolatedColorScale(["black", "white"]);
+            scale.domain([0, 16]);
+            assert.equal("#000000", scale.scale(0));
+            assert.equal("#ffffff", scale.scale(16));
+            assert.equal("#777777", scale.scale(8));
+
+            scale.scaleType("log");
+            assert.equal("#000000", scale.scale(0));
+            assert.equal("#ffffff", scale.scale(16));
+            assert.equal("#e3e3e3", scale.scale(8));
         });
     });
 

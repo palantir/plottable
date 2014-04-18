@@ -1,5 +1,5 @@
 /*!
-Plottable v0.8.0 (https://github.com/palantir/plottable)
+Plottable v0.8.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1122,54 +1122,73 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    ;
+
     var InterpolatedColorScale = (function (_super) {
         __extends(InterpolatedColorScale, _super);
         /**
         * Creates a InterpolatedColorScale.
         *
         * @constructor
-        * @param {string|string[]} [scaleType] the type of color scale to create
-        *     (reds/blues/posneg). Default is "reds". An array of color values
-        *     with at least 2 values may also be passed (e.g. ["#FF00FF", "red",
-        *     "dodgerblue"], in which case the resulting scale will interpolate
-        *     linearly between the color values across the domain.
+        * @param {string|string[]} [colorRange] the type of color scale to
+        *     create. Default is "reds". @see {@link colorRange} for further
+        *     options.
+        * @param {string} [scaleType] the type of underlying scale to use
+        *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
+        *     for further options.
         */
-        function InterpolatedColorScale(scaleType) {
-            var scale;
-            if (scaleType instanceof Array) {
-                scale = InterpolatedColorScale.INTERPOLATE_COLORS(scaleType);
-            } else {
-                switch (scaleType) {
-                    case "blues":
-                        scale = InterpolatedColorScale.INTERPOLATE_COLORS(InterpolatedColorScale.COLOR_SCALES["blues"]);
-                        break;
-                    case "posneg":
-                        scale = InterpolatedColorScale.INTERPOLATE_COLORS(InterpolatedColorScale.COLOR_SCALES["posneg"]);
-                        break;
-                    case "reds":
-                    default:
-                        scale = InterpolatedColorScale.INTERPOLATE_COLORS(InterpolatedColorScale.COLOR_SCALES["reds"]);
-                        break;
-                }
-            }
-            _super.call(this, scale);
+        function InterpolatedColorScale(colorRange, scaleType) {
+            if (typeof colorRange === "undefined") { colorRange = "reds"; }
+            if (typeof scaleType === "undefined") { scaleType = "linear"; }
+            this._colorRange = this._resolveColorValues(colorRange);
+            this._scaleType = scaleType;
+            _super.call(this, InterpolatedColorScale.getD3InterpolatedScale(this._colorRange, this._scaleType));
         }
         /**
-        * Converts the string array into a linear d3 scale.
+        * Converts the string array into a d3 scale.
+        *
+        * @param {string[]} colors an array of strings representing color
+        *     values in hex ("#FFFFFF") or keywords ("white").
+        * @param {string} scaleType a string representing the underlying scale
+        *     type (linear/log/sqrt/pow)
+        * @returns a quantitive d3 scale.
+        */
+        InterpolatedColorScale.getD3InterpolatedScale = function (colors, scaleType) {
+            var scale;
+            switch (scaleType) {
+                case "linear":
+                    scale = d3.scale.linear();
+                    break;
+                case "log":
+                    scale = d3.scale.log();
+                    break;
+                case "sqrt":
+                    scale = d3.scale.sqrt();
+                    break;
+                case "pow":
+                    scale = d3.scale.pow();
+                    break;
+            }
+            if (scale == null)
+                throw new Error("unknown quantitive scale type " + scaleType);
+            return scale.range([0, 1]).interpolate(InterpolatedColorScale.interpolateColors(colors));
+        };
+
+        /**
+        * Creates a d3 interpolator given the color array.
         *
         * d3 doesn't accept more than 2 range values unless we use a ordinal
         * scale. So, in order to interpolate smoothly between the full color
         * range, we must override the interpolator and compute the color values
         * manually.
         *
-        * @param {string[]} [colors] an array of strings representing color
+        * @param {string[]} colors an array of strings representing color
         *     values in hex ("#FFFFFF") or keywords ("white").
-        * @returns a linear d3 scale.
         */
-        InterpolatedColorScale.INTERPOLATE_COLORS = function (colors) {
+        InterpolatedColorScale.interpolateColors = function (colors) {
             if (colors.length < 2)
                 throw new Error("Color scale arrays must have at least two elements.");
-            return d3.scale.linear().range([0, 1]).interpolate(function (ignored) {
+            return function (ignored) {
                 return function (t) {
                     // Clamp t parameter to [0,1]
                     t = Math.max(0, Math.min(1, t));
@@ -1183,7 +1202,38 @@ var Plottable;
                     // Interpolate in the L*a*b color space
                     return d3.interpolateLab(colors[i0], colors[i1])(frac);
                 };
-            });
+            };
+        };
+
+        InterpolatedColorScale.prototype.colorRange = function (colorRange) {
+            if (colorRange == null)
+                return this._colorRange;
+            this._colorRange = this._resolveColorValues(colorRange);
+            this._resetScale();
+        };
+
+        InterpolatedColorScale.prototype.scaleType = function (scaleType) {
+            if (scaleType == null)
+                return this._scaleType;
+            this._scaleType = scaleType;
+            this._resetScale();
+        };
+
+        InterpolatedColorScale.prototype._resetScale = function () {
+            this._d3Scale = InterpolatedColorScale.getD3InterpolatedScale(this._colorRange, this._scaleType);
+            if (this._autoDomain)
+                this.autoDomain();
+            this._broadcast();
+        };
+
+        InterpolatedColorScale.prototype._resolveColorValues = function (colorRange) {
+            if (colorRange instanceof Array) {
+                return colorRange;
+            } else if (InterpolatedColorScale.COLOR_SCALES[colorRange] != null) {
+                return InterpolatedColorScale.COLOR_SCALES[colorRange];
+            } else {
+                return InterpolatedColorScale.COLOR_SCALES["reds"];
+            }
         };
         InterpolatedColorScale.COLOR_SCALES = {
             reds: [
@@ -1229,7 +1279,7 @@ var Plottable;
             ]
         };
         return InterpolatedColorScale;
-    })(Plottable.LinearScale);
+    })(Plottable.QuantitiveScale);
     Plottable.InterpolatedColorScale = InterpolatedColorScale;
 })(Plottable || (Plottable = {}));
 ///<reference path="reference.ts" />
@@ -2276,9 +2326,7 @@ var Plottable;
             this.dataSelection.enter().append("rect");
 
             var xStep = this.xScale.rangeBand();
-            var yr = this.yScale.range();
             var yStep = this.yScale.rangeBand();
-            var yMax = Math.max(yr[0], yr[1]) - yStep;
 
             var attrToProjector = this._generateAttrToProjector();
             attrToProjector["width"] = function () {
@@ -2286,10 +2334,6 @@ var Plottable;
             };
             attrToProjector["height"] = function () {
                 return yStep;
-            };
-            var yAttr = attrToProjector["y"];
-            attrToProjector["y"] = function (d, i) {
-                return yMax - yAttr(d, i);
             };
 
             this.dataSelection.attr(attrToProjector);
