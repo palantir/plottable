@@ -48,15 +48,11 @@ module Plottable {
       this.dataSelection.enter().append("rect");
 
       var xStep = this.xScale.rangeBand();
-      var yr    = this.yScale.range();
       var yStep = this.yScale.rangeBand();
-      var yMax  = Math.max(yr[0], yr[1]) - yStep;
 
       var attrToProjector = this._generateAttrToProjector();
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
-      var yAttr = attrToProjector["y"];
-      attrToProjector["y"] = (d: any, i: number) => yMax - yAttr(d,i);
 
       this.dataSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
