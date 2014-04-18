@@ -126,6 +126,14 @@ describe("Scales", () => {
   });
 
   describe("Interpolated Color Scales", () => {
+    it("default scale uses reds and a linear scale type", () => {
+      var scale = new Plottable.InterpolatedColorScale();
+      scale.domain([0, 16]);
+      assert.equal("#ffffff", scale.scale(0));
+      assert.equal("#feb24c", scale.scale(8));
+      assert.equal("#b10026", scale.scale(16));
+    });
+
     it("linearly interpolates colors in L*a*b color space", () => {
       var scale = new Plottable.InterpolatedColorScale("reds");
       scale.domain([0, 1]);
@@ -156,6 +164,28 @@ describe("Scales", () => {
       assert.equal("#ffffff", scale.scale(16));
       assert.equal("#000000", scale.scale(-100));
       assert.equal("#ffffff", scale.scale(100));
+    });
+
+    it("can be converted to a different range", () => {
+      var scale = new Plottable.InterpolatedColorScale(["black", "white"]);
+      scale.domain([0, 16]);
+      assert.equal("#000000", scale.scale(0));
+      assert.equal("#ffffff", scale.scale(16));
+      scale.colorRange("reds");
+      assert.equal("#b10026", scale.scale(16));
+    });
+
+    it("can be converted to a different scale type", () => {
+      var scale = new Plottable.InterpolatedColorScale(["black", "white"]);
+      scale.domain([0, 16]);
+      assert.equal("#000000", scale.scale(0));
+      assert.equal("#ffffff", scale.scale(16));
+      assert.equal("#777777", scale.scale(8));
+
+      scale.scaleType("log");
+      assert.equal("#000000", scale.scale(0));
+      assert.equal("#ffffff", scale.scale(16));
+      assert.equal("#e3e3e3", scale.scale(8));
     });
   });
 
