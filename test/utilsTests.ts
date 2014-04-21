@@ -144,4 +144,37 @@ describe("Utils", () => {
     assert.equal(height, 120, "measured height matches set height");
     svg.remove();
   });
+
+
+  it("can accept multiple units and convert to pixels", () => {
+    var parent     = getSVGParent();
+    var parentElem = parent[0][0];
+    var child      = parent.append("div");
+    var childElem  = child[0][0];
+
+    parent.style("width", "200px");
+    parent.style("height", "50px");
+    assert.equal(Plottable.Utils.getElementWidth(parentElem), 200, "width is correct");
+    assert.equal(Plottable.Utils.getElementHeight(parentElem), 50, "height is correct");
+
+    child.style("width", "20px");
+    child.style("height", "10px");
+    assert.equal(Plottable.Utils.getElementWidth(childElem), 20, "width is correct");
+    assert.equal(Plottable.Utils.getElementHeight(childElem), 10, "height is correct");
+
+    child.style("width", "100%");
+    child.style("height", "100%");
+    assert.equal(Plottable.Utils.getElementWidth(childElem), 200, "width is correct");
+    assert.equal(Plottable.Utils.getElementHeight(childElem), 50, "height is correct");
+
+    child.style("width", "50%");
+    child.style("height", "50%");
+    assert.equal(Plottable.Utils.getElementWidth(childElem), 100, "width is correct");
+    assert.equal(Plottable.Utils.getElementHeight(childElem), 25, "height is correct");
+
+    // reset test page DOM
+    parent.style("width", "auto");
+    parent.style("height", "auto");
+    child.remove();
+  });
 });
