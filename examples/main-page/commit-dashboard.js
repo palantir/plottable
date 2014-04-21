@@ -102,7 +102,7 @@ function commitDashboard(dataManager, svg) {
   // ----- /Legends -----
 
   // ----- Bar1: Lines changed by contributor -----
-  var contributorBarXScale = new Plottable.OrdinalScale().domain(dataManager.contributors);
+  var contributorBarXScale = new Plottable.OrdinalScale().domain(dataManager.contributors).rangeType('bands');
   var contributorBarYScale = new Plottable.LinearScale();
   var contributorBarXAxis = new Plottable.XAxis(contributorBarXScale, "bottom", function(d) { return d});
   var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right");
@@ -123,7 +123,7 @@ function commitDashboard(dataManager, svg) {
   // ----- Bar2: Lines by directory -----
   var directoryBarYScale = new Plottable.LinearScale();
   var directoryBarYAxis = new Plottable.YAxis(directoryBarYScale, "right");
-  var directoryBarXScale = new Plottable.OrdinalScale().domain(dataManager.directories);
+  var directoryBarXScale = new Plottable.OrdinalScale().domain(dataManager.directories).rangeType('bands');
   var directoryBarXAxis = new Plottable.XAxis(directoryBarXScale, "bottom", function(d) { return d});
   directoryBarXAxis.classed("no-tick-labels", true).rowMinimum(5);
   var directoryBarRenderer = new Plottable.BarRenderer(linesByDirectory,
