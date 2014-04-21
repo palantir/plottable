@@ -38,8 +38,8 @@ module Plottable {
     }
 
     public _render() {
-      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + Axis.Y_WIDTH + ", 0)");};
-      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + Axis.X_HEIGHT + ")");};
+      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + this.colMinimum() + ", 0)");};
+      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this.rowMinimum() + ")");};
       var domain = this.d3Axis.scale().domain();
       var extent = Math.abs(domain[1] - domain[0]);
       var min = +d3.min(domain);
