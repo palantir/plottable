@@ -12,10 +12,8 @@ module Plottable {
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
-    public _colorAccessor: IAccessor;
     public _animate = false;
     public _hasRendered = false;
-    private static DEFAULT_COLOR_ACCESSOR = (d: any) => "#1f77b4";
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
 
     public _rerenderUpdateSelection = false;

@@ -119,8 +119,13 @@ module Plottable {
     export function accessorize(accessor: any): IAccessor {
       if (typeof(accessor) === "function") {
         return (<IAccessor> accessor);
-      } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
-        return (d: any, i: number, s: any) => d[accessor];
+      } else if (typeof(accessor) === "string") {
+        if (accessor[0] !== "#"){
+          return (d: any, i: number, s: any) => d[accessor];
+        } else {
+          var truncatedString = accessor.slice(1);
+          return (d: any, i: number, s: any) => truncatedString;
+        }
       } else {
         return (d: any, i: number, s: any) => accessor;
       };
