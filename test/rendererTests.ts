@@ -362,7 +362,6 @@ describe("Renderers", () => {
 
       it("bar alignment can be changed; renderer updates appropriately", () => {
         renderer.barAlignment("center");
-
         var renderArea = renderer.renderArea;
         var bars = renderArea.selectAll("rect");
         var bar0 = d3.select(bars[0][0]);
@@ -371,6 +370,140 @@ describe("Renderers", () => {
         assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
         assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
         assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+
+        renderer.barAlignment("right");
+        renderArea = renderer.renderArea;
+        bars = renderArea.selectAll("rect");
+        bar0 = d3.select(bars[0][0]);
+        bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+        assert.equal(bar0.attr("x"), "140", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "440", "bar1 x is correct");
+
+        assert.throws(() => renderer.barAlignment("blargh"), Error);
+
+        verifier.end();
+      });
+
+      it("can select and deselect bars", () => {
+        var selectedBar = renderer.selectBar(145, 150); // in the middle of bar 0
+
+        assert.isNotNull(selectedBar, "a bar was selected");
+        assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
+        assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+        renderer.deselectAll();
+        assert.isFalse(selectedBar.classed("selected"), "the bar is no longer selected");
+
+        selectedBar = renderer.selectBar(-1, -1); // no bars here
+        assert.isNull(selectedBar, "returns null if no bar was selected");
+
+        verifier.end();
+      });
+
+      after(() => {
+        if (verifier.passed) {svg.remove();};
+      });
+    });
+
+    describe("Horizontal Bar Renderer", () => {
+      var verifier = new MultiTestVerifier();
+      var svg: D3.Selection;
+      var dataset: Plottable.DataSource;
+      var yScale: Plottable.OrdinalScale;
+      var xScale: Plottable.LinearScale;
+      var renderer: Plottable.HorizontalBarRenderer;
+      var SVG_WIDTH = 600;
+      var SVG_HEIGHT = 400;
+
+      before(() => {
+        svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        yScale = new Plottable.OrdinalScale().domain(["A", "B"]);
+        xScale = new Plottable.LinearScale();
+
+        var data = [
+          {y: "A", x: 1},
+          {y: "B", x: -1.5}
+        ];
+        dataset = new Plottable.DataSource(data);
+
+        renderer = new Plottable.HorizontalBarRenderer(dataset, xScale, yScale);
+        renderer._animate = false;
+        renderer.renderTo(svg);
+      });
+
+      beforeEach(() => {
+        xScale.domain([-3, 3]);
+        renderer.baseline(0);
+        verifier.start();
+      });
+
+      it("renders correctly", () => {
+        var renderArea = renderer.renderArea;
+        var bars = renderArea.selectAll("rect");
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+        assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+        assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
+        assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
+        assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+
+        var baseline = renderArea.select(".baseline");
+        assert.equal(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
+        assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
+        assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+        assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+        verifier.end();
+      });
+
+      it("baseline value can be changed; renderer updates appropriately", () => {
+        renderer.baseline(-1);
+
+        var renderArea = renderer.renderArea;
+        var bars = renderArea.selectAll("rect");
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("width"), "200", "bar0 width is correct");
+        assert.equal(bar1.attr("width"), "50", "bar1 width is correct");
+        assert.equal(bar0.attr("x"), "200", "bar0 x is correct");
+        assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+
+        var baseline = renderArea.select(".baseline");
+        assert.equal(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
+        assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
+        assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+        assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+        verifier.end();
+      });
+
+      it("bar alignment can be changed; renderer updates appropriately", () => {
+        renderer.barAlignment("middle");
+        var renderArea = renderer.renderArea;
+        var bars = renderArea.selectAll("rect");
+        var bar0 = d3.select(bars[0][0]);
+        var bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+        assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+        assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
+
+        renderer.barAlignment("bottom");
+        renderArea = renderer.renderArea;
+        bars = renderArea.selectAll("rect");
+        bar0 = d3.select(bars[0][0]);
+        bar1 = d3.select(bars[0][1]);
+        assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+        assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+        assert.equal(bar0.attr("y"), "290", "bar0 y is correct");
+        assert.equal(bar1.attr("y"), "90", "bar1 y is correct");
+
+        assert.throws(() => renderer.barAlignment("blargh"), Error);
+
         verifier.end();
       });
 
