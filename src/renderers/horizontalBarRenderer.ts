@@ -19,12 +19,11 @@ module Plottable {
      *     the start position of each bar from the data.
      */
     constructor(dataset: any,
-            xScale: QuantitiveScale,
-            yScale: Scale,
-            xAccessor?: IAccessor,
-            widthAccessor?: IAccessor,
-            yAccessor?: IAccessor) {
-      super(dataset, xScale, yScale, xAccessor, widthAccessor, yAccessor);
+                xScale: QuantitiveScale,
+                yScale: Scale,
+                xAccessor?: IAccessor,
+                yAccessor?: IAccessor) {
+      super(dataset, xScale, yScale, xAccessor, yAccessor);
     }
 
     public _paint() {
@@ -85,8 +84,12 @@ module Plottable {
       updateSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
 
-      baselineSelection.attr("y1", 0).attr("y2", this.availableHeight)
-                   .attr("x1", scaledBaseline).attr("x2", scaledBaseline);
+      baselineSelection.attr({
+        "x1": scaledBaseline,
+        "y1": 0,
+        "x2": scaledBaseline,
+        "y2": this.availableHeight
+      });
     }
 
     /**

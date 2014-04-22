@@ -13,18 +13,15 @@ module Plottable {
      * @param {QuantitiveScale} yScale The y scale to use.
      * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
      *     the start position of each bar from the data.
-     * @param {IAccessor|string|number} [widthAccessor] An accessor for extracting
-     *     the width of each bar, in pixels, from the data.
      * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
      *     the height of each bar from the data.
      */
     constructor(dataset: any,
-            xScale: Scale,
-            yScale: QuantitiveScale,
-            xAccessor?: IAccessor,
-            widthAccessor?: IAccessor,
-            yAccessor?: IAccessor) {
-      super(dataset, xScale, yScale, xAccessor, widthAccessor, yAccessor);
+                xScale: Scale,
+                yScale: QuantitiveScale,
+                xAccessor?: IAccessor,
+                yAccessor?: IAccessor) {
+      super(dataset, xScale, yScale, xAccessor, yAccessor);
     }
 
     public _paint() {
@@ -84,8 +81,12 @@ module Plottable {
       updateSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
 
-      baselineSelection.attr("x1", 0).attr("x2", this.availableWidth)
-                   .attr("y1", scaledBaseline).attr("y2", scaledBaseline);
+      baselineSelection.attr({
+        "x1": 0,
+        "y1": scaledBaseline,
+        "x2": this.availableWidth,
+        "y2": scaledBaseline
+      });
     }
 
     /**

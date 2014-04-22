@@ -18,7 +18,6 @@
       var ds = new Plottable.DataSource(data);
       var xScale = new Plottable.LinearScale();
       var xAxis = new Plottable.XAxis(xScale, "bottom");
-      // xAxis.showEndTickLabels(true);
 
       var yScale = new Plottable.OrdinalScale().rangeType("bands");
       var yAxis = new Plottable.YAxis(yScale, "left", function(d) { return d; } );
@@ -28,8 +27,6 @@
                               .project("x", "age", xScale)
                               .project("y", "name", yScale)
                               .project("fill", function() {return "steelblue"});
-
-      // barRenderer.project("width", 50);
 
       var chart = new Plottable.Table([
         [yAxis, barRenderer],
