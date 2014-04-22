@@ -18,7 +18,7 @@ describe("Labels", () => {
 
     var text = content.select("text");
     var bbox = Plottable.Utils.getBBox(text);
-    assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
+    assert.equal(bbox.height, label.minimumHeight(), "text height === label.minimumHeight()");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
   });
@@ -33,7 +33,7 @@ describe("Labels", () => {
     label._render();
     var textBBox = Plottable.Utils.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
-    assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
+    assert.equal(textBBox.height, label.minimumWidth(), "text height === label.minimumWidth() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
     svg.remove();
   });
@@ -48,7 +48,7 @@ describe("Labels", () => {
     label._render();
     var textBBox = Plottable.Utils.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
-    assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
+    assert.equal(textBBox.height, label.minimumWidth(), "text height === label.minimumWidth() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
     svg.remove();
   });
@@ -59,10 +59,10 @@ describe("Labels", () => {
     label._anchor(svg);
     var textEl = label.content.select("text");
     assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
-    assert.equal(label.rowMinimum(), 0, "rowMin is 0 for empty string");
+    assert.equal(label.minimumHeight(), 0, "rowMin is 0 for empty string");
     label.setText("hello world");
     assert.equal(textEl.text(), "hello world", "the label text updated properly");
-    assert.operator(label.rowMinimum(), ">", 0, "rowMin is > 0 for non-empty string");
+    assert.operator(label.minimumHeight(), ">", 0, "rowMin is > 0 for non-empty string");
     svg.remove();
   });
 
@@ -76,7 +76,7 @@ describe("Labels", () => {
     label._computeLayout();
     label._render();
     var bbox = Plottable.Utils.getBBox(text);
-    assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
+    assert.equal(bbox.height, label.minimumHeight(), "text height === label.minimumHeight()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
   });

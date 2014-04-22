@@ -23,7 +23,7 @@
       var yScale = new Plottable.OrdinalScale()//.rangeType("bands");
       // Plottable.Axis.Y_WIDTH = 60;
       var yAxis = new Plottable.YAxis(yScale, "left", function(d) { return d; } );
-      yAxis.colMinimum(60);
+      yAxis.minimumWidth(60);
 
       var barRenderer = new Plottable.CircleRenderer(ds, xScale, yScale)
                               .project("x", "age", xScale)

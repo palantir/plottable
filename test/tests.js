@@ -288,7 +288,7 @@ var assert = chai.assert;
 
 describe("ComponentGroups", function () {
     it("components in componentGroups overlap", function () {
-        var c1 = new Plottable.Component().rowMinimum(10).colMinimum(10);
+        var c1 = new Plottable.Component().minimumHeight(10).minimumWidth(10);
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
 
@@ -309,8 +309,8 @@ describe("ComponentGroups", function () {
     });
 
     it("components can be added before and after anchoring", function () {
-        var c1 = new Plottable.Component().rowMinimum(10).colMinimum(10);
-        var c2 = new Plottable.Component().rowMinimum(20).colMinimum(20);
+        var c1 = new Plottable.Component().minimumHeight(10).minimumWidth(10);
+        var c2 = new Plottable.Component().minimumHeight(20).minimumWidth(20);
         var c3 = new Plottable.Component();
 
         var cg = new Plottable.ComponentGroup([c1]);
@@ -556,7 +556,7 @@ describe("Component behavior", function () {
     });
 
     it("fixed-width component will align to the right spot", function () {
-        c.rowMinimum(100).colMinimum(100);
+        c.minimumHeight(100).minimumWidth(100);
         c._anchor(svg);
         c._computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -572,7 +572,7 @@ describe("Component behavior", function () {
     });
 
     it("components can be offset relative to their alignment, and throw errors if there is insufficient space", function () {
-        c.rowMinimum(100).colMinimum(100);
+        c.minimumHeight(100).minimumWidth(100);
         c._anchor(svg);
         c.xOffset(20).yOffset(20);
         c._computeLayout();
@@ -598,8 +598,8 @@ describe("Component behavior", function () {
     });
 
     it("component defaults are as expected", function () {
-        assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
-        assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
+        assert.equal(c.minimumHeight(), 0, "minimumHeight defaults to 0");
+        assert.equal(c.minimumWidth(), 0, "minimumWidth defaults to 0");
         assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
         assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
         assert.equal(c._xOffset, 0, "xOffset defaults to 0");
@@ -608,10 +608,10 @@ describe("Component behavior", function () {
     });
 
     it("getters and setters work as expected", function () {
-        c.rowMinimum(12);
-        assert.equal(c.rowMinimum(), 12, "rowMinimum setter works");
-        c.colMinimum(14);
-        assert.equal(c.colMinimum(), 14, "colMinimum setter works");
+        c.minimumHeight(12);
+        assert.equal(c.minimumHeight(), 12, "minimumHeight setter works");
+        c.minimumWidth(14);
+        assert.equal(c.minimumWidth(), 14, "minimumWidth setter works");
         svg.remove();
     });
 
@@ -1078,7 +1078,7 @@ describe("Labels", function () {
 
         var text = content.select("text");
         var bbox = Plottable.Utils.getBBox(text);
-        assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
+        assert.equal(bbox.height, label.minimumHeight(), "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -1093,7 +1093,7 @@ describe("Labels", function () {
         label._render();
         var textBBox = Plottable.Utils.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
+        assert.equal(textBBox.height, label.minimumWidth(), "text height === label.minimumWidth() (it's rotated)");
         assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
         svg.remove();
     });
@@ -1108,7 +1108,7 @@ describe("Labels", function () {
         label._render();
         var textBBox = Plottable.Utils.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.colMinimum(), "text height === label.colMinimum() (it's rotated)");
+        assert.equal(textBBox.height, label.minimumWidth(), "text height === label.minimumWidth() (it's rotated)");
         assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
         svg.remove();
     });
@@ -1119,10 +1119,10 @@ describe("Labels", function () {
         label._anchor(svg);
         var textEl = label.content.select("text");
         assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
-        assert.equal(label.rowMinimum(), 0, "rowMin is 0 for empty string");
+        assert.equal(label.minimumHeight(), 0, "rowMin is 0 for empty string");
         label.setText("hello world");
         assert.equal(textEl.text(), "hello world", "the label text updated properly");
-        assert.operator(label.rowMinimum(), ">", 0, "rowMin is > 0 for non-empty string");
+        assert.operator(label.minimumHeight(), ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
 
@@ -1136,7 +1136,7 @@ describe("Labels", function () {
         label._computeLayout();
         label._render();
         var bbox = Plottable.Utils.getBBox(text);
-        assert.equal(bbox.height, label.rowMinimum(), "text height === label.rowMinimum()");
+        assert.equal(bbox.height, label.minimumHeight(), "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
     });
@@ -1199,15 +1199,15 @@ describe("Legends", function () {
         svg.remove();
     });
 
-    it("legend domain can be updated after initialization, and rowMinimum updates as well", function () {
+    it("legend domain can be updated after initialization, and minimumHeight updates as well", function () {
         legend._anchor(svg);
         legend.scale(color);
-        assert.equal(legend.rowMinimum(), 0, "there is no rowMinimum while the domain is empty");
+        assert.equal(legend.minimumHeight(), 0, "there is no minimumHeight while the domain is empty");
         color.domain(["foo", "bar"]);
-        var height1 = legend.rowMinimum();
-        assert.operator(height1, ">", 0, "changing the domain gives a positive rowMinimum");
+        var height1 = legend.minimumHeight();
+        assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
         color.domain(["foo", "bar", "baz"]);
-        assert.operator(legend.rowMinimum(), ">", height1, "adding to the domain increases the rowMinimum");
+        assert.operator(legend.minimumHeight(), ">", height1, "adding to the domain increases the minimumHeight");
         svg.remove();
     });
 
@@ -1221,7 +1221,7 @@ describe("Legends", function () {
             totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
         });
         assert.lengthOf(legends[0], 8, "there were 8 legends");
-        assert.operator(totalHeight, "<=", legend.rowMinimum(), "the legend did not overflow its requested space");
+        assert.operator(totalHeight, "<=", legend.minimumHeight(), "the legend did not overflow its requested space");
         svg.remove();
     });
 
@@ -1264,9 +1264,9 @@ describe("Legends", function () {
         svg.remove();
     });
 
-    it("rowMinimum can't be set on a legend", function () {
+    it("minimumHeight can't be set on a legend", function () {
         assert.throws(function () {
-            return legend.rowMinimum(5);
+            return legend.minimumHeight(5);
         }, Error, "cannot be directly set");
         svg.remove();
     });
@@ -2173,7 +2173,7 @@ describe("Tables", function () {
 
     it("tables with insufficient space throw Insufficient Space", function () {
         var svg = generateSVG(200, 200);
-        var c = new Plottable.Component().rowMinimum(300).colMinimum(300);
+        var c = new Plottable.Component().minimumHeight(300).minimumWidth(300);
         var t = new Plottable.Table().addComponent(0, 0, c);
         t._anchor(svg);
         assert.throws(function () {
@@ -2263,14 +2263,14 @@ describe("Tables", function () {
         // [6 7 8] \\
         // First, set everything to have no weight
         components.forEach(function (r) {
-            return r.colMinimum(0).rowMinimum(0);
+            return r.minimumWidth(0).minimumHeight(0);
         });
 
         // give the axis-like objects a minimum
-        components[1].rowMinimum(30);
-        components[7].rowMinimum(30);
-        components[3].colMinimum(50);
-        components[5].colMinimum(50);
+        components[1].minimumHeight(30);
+        components[7].minimumHeight(30);
+        components[3].minimumWidth(50);
+        components[5].minimumWidth(50);
         components[4]._fixedWidth = false;
         components[4]._fixedHeight = false;
 
@@ -2303,13 +2303,13 @@ describe("Tables", function () {
         svg.remove();
     });
 
-    it("you can't set colMinimum or rowMinimum on tables directly", function () {
+    it("you can't set minimumWidth or minimumHeight on tables directly", function () {
         var table = new Plottable.Table();
         assert.throws(function () {
-            return table.rowMinimum(3);
+            return table.minimumHeight(3);
         }, Error, "cannot be directly set");
         assert.throws(function () {
-            return table.colMinimum(3);
+            return table.minimumWidth(3);
         }, Error, "cannot be directly set");
     });
 

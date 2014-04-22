@@ -14,8 +14,8 @@ module Plottable {
 
     public _fixedWidth = true;
     public _fixedHeight = true;
-    private _rowMinimum = 0;
-    private _colMinimum = 0;
+    private _minimumHeight = 0;
+    private _minimumWidth = 0;
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
@@ -106,17 +106,17 @@ module Plottable {
       var xPosition = this.xOrigin;
       var yPosition = this.yOrigin;
 
-      xPosition += (availableWidth - this.colMinimum()) * this._xAlignProportion;
+      xPosition += (availableWidth - this.minimumWidth()) * this._xAlignProportion;
       xPosition += this._xOffset;
-      if (this.colMinimum() !== 0 && this.isFixedWidth()) {
+      if (this.minimumWidth() !== 0 && this.isFixedWidth()) {
         // Decrease size so hitbox / bounding box and children are sized correctly
-        availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
+        availableWidth = availableWidth > this.minimumWidth() ? this.minimumWidth() : availableWidth;
       }
 
-      yPosition += (availableHeight - this.rowMinimum()) * this._yAlignProportion;
+      yPosition += (availableHeight - this.minimumHeight()) * this._yAlignProportion;
       yPosition += this._yOffset;
-      if (this.rowMinimum() !== 0 && this.isFixedHeight()) {
-        availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
+      if (this.minimumHeight() !== 0 && this.isFixedHeight()) {
+        availableHeight = availableHeight > this.minimumHeight() ? this.minimumHeight() : availableHeight;
       }
 
       this.availableWidth  = availableWidth;
@@ -297,14 +297,14 @@ module Plottable {
      * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
      * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
      */
-    public rowMinimum(): number;
-    public rowMinimum(newVal: number): Component;
-    public rowMinimum(newVal?: number): any {
+    public minimumHeight(): number;
+    public minimumHeight(newVal: number): Component;
+    public minimumHeight(newVal?: number): any {
       if (newVal != null) {
-        this._rowMinimum = newVal;
+        this._minimumHeight = newVal;
         return this;
       } else {
-        return this._rowMinimum;
+        return this._minimumHeight;
       }
     }
 
@@ -314,14 +314,14 @@ module Plottable {
      * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
      * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
      */
-    public colMinimum(): number;
-    public colMinimum(newVal: number): Component;
-    public colMinimum(newVal?: number): any {
+    public minimumWidth(): number;
+    public minimumWidth(newVal: number): Component;
+    public minimumWidth(newVal?: number): any {
       if (newVal != null) {
-        this._colMinimum = newVal;
+        this._minimumWidth = newVal;
         return this;
       } else {
-        return this._colMinimum;
+        return this._minimumWidth;
       }
     }
 

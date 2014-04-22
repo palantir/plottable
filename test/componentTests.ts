@@ -128,7 +128,7 @@ describe("Component behavior", () => {
   });
 
   it("fixed-width component will align to the right spot", () => {
-    c.rowMinimum(100).colMinimum(100);
+    c.minimumHeight(100).minimumWidth(100);
     c._anchor(svg);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -144,7 +144,7 @@ describe("Component behavior", () => {
   });
 
   it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
-      c.rowMinimum(100).colMinimum(100);
+      c.minimumHeight(100).minimumWidth(100);
       c._anchor(svg);
       c.xOffset(20).yOffset(20);
       c._computeLayout();
@@ -170,8 +170,8 @@ describe("Component behavior", () => {
     });
 
   it("component defaults are as expected", () => {
-    assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
-    assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
+    assert.equal(c.minimumHeight(), 0, "minimumHeight defaults to 0");
+    assert.equal(c.minimumWidth(), 0, "minimumWidth defaults to 0");
     assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
     assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
@@ -180,10 +180,10 @@ describe("Component behavior", () => {
   });
 
   it("getters and setters work as expected", () => {
-    c.rowMinimum(12);
-    assert.equal(c.rowMinimum(), 12, "rowMinimum setter works");
-    c.colMinimum(14);
-    assert.equal(c.colMinimum(), 14, "colMinimum setter works");
+    c.minimumHeight(12);
+    assert.equal(c.minimumHeight(), 12, "minimumHeight setter works");
+    c.minimumWidth(14);
+    assert.equal(c.minimumWidth(), 14, "minimumWidth setter works");
     svg.remove();
   });
 

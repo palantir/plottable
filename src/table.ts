@@ -6,8 +6,8 @@ module Plottable {
     private colPadding = 0;
 
     private rows: Component[][];
-    private rowMinimums: number[];
-    private colMinimums: number[];
+    private minimumHeights: number[];
+    private minimumWidths: number[];
 
     private rowWeights: number[];
     private colWeights: number[];
@@ -74,8 +74,8 @@ module Plottable {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
 
       // calculate the amount of free space by recursive col-/row- Minimum() calls
-      var freeWidth = this.availableWidth - this.colMinimum();
-      var freeHeight = this.availableHeight - this.rowMinimum();
+      var freeWidth = this.availableWidth - this.minimumWidth();
+      var freeHeight = this.availableHeight - this.minimumHeight();
       if (freeWidth < 0 || freeHeight < 0) {
         throw new Error("Insufficient Space");
       }
@@ -88,8 +88,8 @@ module Plottable {
       var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
 
       var sumPair = (p: number[]) => p[0] + p[1];
-      var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
-      var colWidths  = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
+      var rowHeights = d3.zip(rowProportionalSpace, this.minimumHeights).map(sumPair);
+      var colWidths  = d3.zip(colProportionalSpace, this.minimumWidths).map(sumPair);
 
       var childYOffset = 0;
       this.rows.forEach((row: Component[], rowIndex: number) => {
@@ -157,26 +157,26 @@ module Plottable {
       return this;
     }
 
-    public rowMinimum(): number;
-    public rowMinimum(newVal: number): Table;
-    public rowMinimum(newVal?: number): any {
+    public minimumHeight(): number;
+    public minimumHeight(newVal: number): Table;
+    public minimumHeight(newVal?: number): any {
       if (newVal != null) {
         throw new Error("Row minimum cannot be directly set on Table");
       } else {
-        this.rowMinimums = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => (r == null) ? 0 : r.rowMinimum()));
-        return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
+        this.minimumHeights = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => (r == null) ? 0 : r.minimumHeight()));
+        return d3.sum(this.minimumHeights) + this.rowPadding * (this.rows.length - 1);
       }
     }
 
-    public colMinimum(): number;
-    public colMinimum(newVal: number): Table;
-    public colMinimum(newVal?: number): any {
+    public minimumWidth(): number;
+    public minimumWidth(newVal: number): Table;
+    public minimumWidth(newVal?: number): any {
       if (newVal != null) {
         throw new Error("Col minimum cannot be directly set on Table");
       } else {
         var cols = d3.transpose(this.rows);
-        this.colMinimums = cols.map((col: Component[]) => d3.max(col, (c: Component) => (c == null) ? 0 : c.colMinimum()));
-        return d3.sum(this.colMinimums) + this.colPadding * (cols.length - 1);
+        this.minimumWidths = cols.map((col: Component[]) => d3.max(col, (c: Component) => (c == null) ? 0 : c.minimumWidth()));
+        return d3.sum(this.minimumWidths) + this.colPadding * (cols.length - 1);
       }
     }
 

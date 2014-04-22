@@ -18,7 +18,7 @@ module Plottable {
     constructor(colorScale?: ColorScale) {
       super();
       this.classed("legend", true);
-      this.colMinimum(120); // the default width
+      this.minimumWidth(120); // the default width
       this.colorScale = colorScale;
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
@@ -41,9 +41,9 @@ module Plottable {
       return this;
     }
 
-    public rowMinimum(): number;
-    public rowMinimum(newVal: number): Legend;
-    public rowMinimum(newVal?: number): any {
+    public minimumHeight(): number;
+    public minimumHeight(newVal: number): Legend;
+    public minimumHeight(newVal?: number): any {
       if (newVal != null) {
         throw new Error("Row minimum cannot be directly set on Legend");
       } else {
@@ -62,10 +62,10 @@ module Plottable {
 
     public _render(): Legend {
       super._render();
-      this.legendBox.attr("height", this.rowMinimum()).attr("width", this.colMinimum()); //HACKHACK #223
+      this.legendBox.attr("height", this.minimumHeight()).attr("width", this.minimumWidth()); //HACKHACK #223
       var domain = this.colorScale.domain();
       var textHeight = this.measureTextHeight();
-      var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
+      var availableWidth = this.minimumWidth() - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
 
       this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
