@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("ComponentGroups", () => {
   it("components in componentGroups overlap", () => {
-    var c1 = new Plottable.Component().rowMinimum(10).colMinimum(10);
+    var c1 = new Plottable.Component().minimumHeight(10).minimumWidth(10);
     var c2 = new Plottable.Component();
     var c3 = new Plottable.Component();
 
@@ -25,8 +25,8 @@ describe("ComponentGroups", () => {
   });
 
   it("components can be added before and after anchoring", () => {
-    var c1 = new Plottable.Component().rowMinimum(10).colMinimum(10);
-    var c2 = new Plottable.Component().rowMinimum(20).colMinimum(20);
+    var c1 = new Plottable.Component().minimumHeight(10).minimumWidth(10);
+    var c2 = new Plottable.Component().minimumHeight(20).minimumWidth(20);
     var c3 = new Plottable.Component();
 
     var cg = new Plottable.ComponentGroup([c1]);

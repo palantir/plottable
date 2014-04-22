@@ -63,13 +63,13 @@ describe("Axes", () => {
     var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
     xAxis.renderTo(svg);
 
-    var oldHeight = xAxis.rowMinimum();
+    var oldHeight = xAxis.minimumHeight();
     var axisBBoxBefore = (<any> xAxis.element.node()).getBBox();
     var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
     assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
 
     var newHeight = 60;
-    xAxis.rowMinimum(newHeight);
+    xAxis.minimumHeight(newHeight);
     xAxis.renderTo(svg);
     var axisBBoxAfter = (<any> xAxis.element.node()).getBBox();
     var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
@@ -127,13 +127,13 @@ describe("Axes", () => {
     var yAxis = new Plottable.YAxis(yScale, "left");
     yAxis.renderTo(svg);
 
-    var oldWidth = yAxis.colMinimum();
+    var oldWidth = yAxis.minimumWidth();
     var axisBBoxBefore = (<any> yAxis.element.node()).getBBox();
     var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
     assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
 
     var newWidth = 80;
-    yAxis.colMinimum(newWidth);
+    yAxis.minimumWidth(newWidth);
     yAxis.renderTo(svg);
     var axisBBoxAfter = (<any> yAxis.element.node()).getBBox();
     var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();

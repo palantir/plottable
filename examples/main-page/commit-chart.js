@@ -29,7 +29,7 @@ function commitChart(svg, dataset) {
                  .xAccessor("date").yAccessor(hourAccessor)
                  .rAccessor(radiusAccessor).colorAccessor(colorAccessor);
 
-  var legend    = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(10);
+  var legend    = new Plottable.Legend(colorScale).minimumWidth(160).xOffset(-15).yOffset(10);
   var gridlines = new Plottable.Gridlines(xScale, yScale);
   var group     = legend.merge(renderer).merge(gridlines);
 

@@ -38,8 +38,8 @@ module Plottable {
     }
 
     public _render() {
-      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + this.colMinimum() + ", 0)");};
-      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this.rowMinimum() + ")");};
+      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + this.minimumWidth() + ", 0)");};
+      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this.minimumHeight() + ")");};
       var domain = this.d3Axis.scale().domain();
       var extent = Math.abs(domain[1] - domain[0]);
       var min = +d3.min(domain);
@@ -270,7 +270,7 @@ module Plottable {
         throw new Error(orientation + " is not a valid orientation for XAxis");
       }
       super(scale, orientation, formatter);
-      super.rowMinimum(Axis.X_HEIGHT);
+      super.minimumHeight(Axis.X_HEIGHT);
       this._fixedWidth = false;
       this.tickLabelPosition("center");
     }
@@ -346,7 +346,7 @@ module Plottable {
         throw new Error(orientation + " is not a valid orientation for YAxis");
       }
       super(scale, orientation, formatter);
-      super.colMinimum(Axis.Y_WIDTH);
+      super.minimumWidth(Axis.Y_WIDTH);
       this._fixedHeight = false;
       this.tickLabelPosition("middle");
     }

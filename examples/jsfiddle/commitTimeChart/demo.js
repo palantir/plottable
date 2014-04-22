@@ -60,7 +60,7 @@ function commitChart(svg, dataset) {
   var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale, dateAccessor, hourAccessor, radiusAccessor)
                  .colorAccessor(colorAccessor);
 
-  var legend    = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(10);
+  var legend    = new Plottable.Legend(colorScale).minimumWidth(160).xOffset(-15).yOffset(10);
   var gridlines = new Plottable.Gridlines(xScale, yScale);
   var group     = gridlines.merge(renderer).merge(legend);
 

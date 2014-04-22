@@ -60,9 +60,9 @@ module Plottable {
       this.textHeight = bbox.height;
       this.textLength = bbox.width;
       if (this.orientation === "horizontal") {
-        this.rowMinimum(this.textHeight);
+        this.minimumHeight(this.textHeight);
       } else {
-        this.colMinimum(this.textHeight);
+        this.minimumWidth(this.textHeight);
       }
     }
 

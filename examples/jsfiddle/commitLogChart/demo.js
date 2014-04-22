@@ -25,7 +25,7 @@ function scatterFull(svg, dataset) {
   xScale.nice();
   yScale.nice();
 
-  var legend    = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(100);
+  var legend    = new Plottable.Legend(colorScale).minimumWidth(160).xOffset(-15).yOffset(100);
   var gridlines = new Plottable.Gridlines(xScale, yScale);
   var group     = gridlines.merge(renderer).merge(legend);
 

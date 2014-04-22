@@ -90,7 +90,7 @@ describe("Tables", () => {
 
   it("tables with insufficient space throw Insufficient Space", () => {
     var svg = generateSVG(200, 200);
-    var c = new Plottable.Component().rowMinimum(300).colMinimum(300);
+    var c = new Plottable.Component().minimumHeight(300).minimumWidth(300);
     var t = new Plottable.Table().addComponent(0, 0, c);
     t._anchor(svg);
     assert.throws(() => t._computeLayout(), Error, "Insufficient Space");
@@ -162,12 +162,12 @@ describe("Tables", () => {
     // [3 4 5] \\
     // [6 7 8] \\
     // First, set everything to have no weight
-    components.forEach((r) => r.colMinimum(0).rowMinimum(0));
+    components.forEach((r) => r.minimumWidth(0).minimumHeight(0));
     // give the axis-like objects a minimum
-    components[1].rowMinimum(30);
-    components[7].rowMinimum(30);
-    components[3].colMinimum(50);
-    components[5].colMinimum(50);
+    components[1].minimumHeight(30);
+    components[7].minimumHeight(30);
+    components[3].minimumWidth(50);
+    components[5].minimumWidth(50);
     components[4]._fixedWidth = false;
     components[4]._fixedHeight = false;
     // finally the center 'plot' object has a weight
@@ -192,10 +192,10 @@ describe("Tables", () => {
     svg.remove();
   });
 
-  it("you can't set colMinimum or rowMinimum on tables directly", () => {
+  it("you can't set minimumWidth or minimumHeight on tables directly", () => {
     var table = new Plottable.Table();
-    assert.throws(() => table.rowMinimum(3), Error, "cannot be directly set");
-    assert.throws(() => table.colMinimum(3), Error, "cannot be directly set");
+    assert.throws(() => table.minimumHeight(3), Error, "cannot be directly set");
+    assert.throws(() => table.minimumWidth(3), Error, "cannot be directly set");
   });
 
   it("table space fixity calculates properly", () => {

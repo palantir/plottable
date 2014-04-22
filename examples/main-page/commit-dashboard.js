@@ -89,12 +89,12 @@ function commitDashboard(dataManager, svg) {
   // ---- /Timeseries -----
 
   // ----- Legends -----
-  var contributorLegend = new Plottable.Legend(contributorColorScale).colMinimum(160);
+  var contributorLegend = new Plottable.Legend(contributorColorScale).minimumWidth(160);
   var contributorLegendTable = new Plottable.Table([
     [new Plottable.Label("Contributors").classed("legend-label", true)],
     [contributorLegend]
   ]);
-  var directoryLegend = new Plottable.Legend(directoryColorScale).colMinimum(160);
+  var directoryLegend = new Plottable.Legend(directoryColorScale).minimumWidth(160);
   var directoryLegendTable = new Plottable.Table([
     [new Plottable.Label("Directories").classed("legend-label", true)],
     [directoryLegend]
@@ -106,7 +106,7 @@ function commitDashboard(dataManager, svg) {
   var contributorBarYScale = new Plottable.LinearScale();
   var contributorBarXAxis = new Plottable.XAxis(contributorBarXScale, "bottom", function(d) { return d});
   var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right");
-  contributorBarXAxis.classed("no-tick-labels", true).rowMinimum(5);
+  contributorBarXAxis.classed("no-tick-labels", true).minimumHeight(5);
   var contributorBarRenderer = new Plottable.BarRenderer(linesByContributor,
                                                                  contributorBarXScale,
                                                                  contributorBarYScale);
@@ -125,7 +125,7 @@ function commitDashboard(dataManager, svg) {
   var directoryBarYAxis = new Plottable.YAxis(directoryBarYScale, "right");
   var directoryBarXScale = new Plottable.OrdinalScale().domain(dataManager.directories).rangeType('bands');
   var directoryBarXAxis = new Plottable.XAxis(directoryBarXScale, "bottom", function(d) { return d});
-  directoryBarXAxis.classed("no-tick-labels", true).rowMinimum(5);
+  directoryBarXAxis.classed("no-tick-labels", true).minimumHeight(5);
   var directoryBarRenderer = new Plottable.BarRenderer(linesByDirectory,
                                                                directoryBarXScale,
                                                                directoryBarYScale);
