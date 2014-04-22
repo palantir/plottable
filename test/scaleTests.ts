@@ -89,6 +89,17 @@ describe("Scales", () => {
     });
   });
 
+  describe("Quantitive Scales", () => {
+    it("autorange defaults to [0, 1] if no perspectives set", () => {
+      var scale = new Plottable.LinearScale();
+      scale.domain([]);
+      scale.autoDomain();
+      var d = scale.domain();
+      assert.equal(d[0], 0);
+      assert.equal(d[1], 1);
+    });
+  });
+
   describe("Ordinal Scales", () => {
     it("defaults to \"points\" range type", () => {
       var scale = new Plottable.OrdinalScale();
