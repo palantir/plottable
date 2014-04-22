@@ -366,8 +366,8 @@ var Plottable;
             this.clipPathEnabled = false;
             this._fixedWidth = true;
             this._fixedHeight = true;
-            this._rowMinimum = 0;
-            this._colMinimum = 0;
+            this._minimumHeight = 0;
+            this._minimumWidth = 0;
             this.isTopLevelComponent = false;
             this._xOffset = 0;
             this._yOffset = 0;
@@ -456,17 +456,17 @@ var Plottable;
             var xPosition = this.xOrigin;
             var yPosition = this.yOrigin;
 
-            xPosition += (availableWidth - this.colMinimum()) * this._xAlignProportion;
+            xPosition += (availableWidth - this.minimumWidth()) * this._xAlignProportion;
             xPosition += this._xOffset;
-            if (this.colMinimum() !== 0 && this.isFixedWidth()) {
+            if (this.minimumWidth() !== 0 && this.isFixedWidth()) {
                 // Decrease size so hitbox / bounding box and children are sized correctly
-                availableWidth = availableWidth > this.colMinimum() ? this.colMinimum() : availableWidth;
+                availableWidth = availableWidth > this.minimumWidth() ? this.minimumWidth() : availableWidth;
             }
 
-            yPosition += (availableHeight - this.rowMinimum()) * this._yAlignProportion;
+            yPosition += (availableHeight - this.minimumHeight()) * this._yAlignProportion;
             yPosition += this._yOffset;
-            if (this.rowMinimum() !== 0 && this.isFixedHeight()) {
-                availableHeight = availableHeight > this.rowMinimum() ? this.rowMinimum() : availableHeight;
+            if (this.minimumHeight() !== 0 && this.isFixedHeight()) {
+                availableHeight = availableHeight > this.minimumHeight() ? this.minimumHeight() : availableHeight;
             }
 
             this.availableWidth = availableWidth;
@@ -637,21 +637,21 @@ var Plottable;
             }
         };
 
-        Component.prototype.rowMinimum = function (newVal) {
+        Component.prototype.minimumHeight = function (newVal) {
             if (newVal != null) {
-                this._rowMinimum = newVal;
+                this._minimumHeight = newVal;
                 return this;
             } else {
-                return this._rowMinimum;
+                return this._minimumHeight;
             }
         };
 
-        Component.prototype.colMinimum = function (newVal) {
+        Component.prototype.minimumWidth = function (newVal) {
             if (newVal != null) {
-                this._colMinimum = newVal;
+                this._minimumWidth = newVal;
                 return this;
             } else {
-                return this._colMinimum;
+                return this._minimumWidth;
             }
         };
 
@@ -1734,9 +1734,9 @@ var Plottable;
             this.textHeight = bbox.height;
             this.textLength = bbox.width;
             if (this.orientation === "horizontal") {
-                this.rowMinimum(this.textHeight);
+                this.minimumHeight(this.textHeight);
             } else {
-                this.colMinimum(this.textHeight);
+                this.minimumWidth(this.textHeight);
             }
         };
 
@@ -2418,8 +2418,8 @@ var Plottable;
             _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
 
             // calculate the amount of free space by recursive col-/row- Minimum() calls
-            var freeWidth = this.availableWidth - this.colMinimum();
-            var freeHeight = this.availableHeight - this.rowMinimum();
+            var freeWidth = this.availableWidth - this.minimumWidth();
+            var freeHeight = this.availableHeight - this.minimumHeight();
             if (freeWidth < 0 || freeHeight < 0) {
                 throw new Error("Insufficient Space");
             }
@@ -2439,8 +2439,8 @@ var Plottable;
             var sumPair = function (p) {
                 return p[0] + p[1];
             };
-            var rowHeights = d3.zip(rowProportionalSpace, this.rowMinimums).map(sumPair);
-            var colWidths = d3.zip(colProportionalSpace, this.colMinimums).map(sumPair);
+            var rowHeights = d3.zip(rowProportionalSpace, this.minimumHeights).map(sumPair);
+            var colWidths = d3.zip(colProportionalSpace, this.minimumWidths).map(sumPair);
 
             var childYOffset = 0;
             this.rows.forEach(function (row, rowIndex) {
@@ -2508,30 +2508,30 @@ var Plottable;
             return this;
         };
 
-        Table.prototype.rowMinimum = function (newVal) {
+        Table.prototype.minimumHeight = function (newVal) {
             if (newVal != null) {
                 throw new Error("Row minimum cannot be directly set on Table");
             } else {
-                this.rowMinimums = this.rows.map(function (row) {
+                this.minimumHeights = this.rows.map(function (row) {
                     return d3.max(row, function (r) {
-                        return (r == null) ? 0 : r.rowMinimum();
+                        return (r == null) ? 0 : r.minimumHeight();
                     });
                 });
-                return d3.sum(this.rowMinimums) + this.rowPadding * (this.rows.length - 1);
+                return d3.sum(this.minimumHeights) + this.rowPadding * (this.rows.length - 1);
             }
         };
 
-        Table.prototype.colMinimum = function (newVal) {
+        Table.prototype.minimumWidth = function (newVal) {
             if (newVal != null) {
                 throw new Error("Col minimum cannot be directly set on Table");
             } else {
                 var cols = d3.transpose(this.rows);
-                this.colMinimums = cols.map(function (col) {
+                this.minimumWidths = cols.map(function (col) {
                     return d3.max(col, function (c) {
-                        return (c == null) ? 0 : c.colMinimum();
+                        return (c == null) ? 0 : c.minimumWidth();
                     });
                 });
-                return d3.sum(this.colMinimums) + this.colPadding * (cols.length - 1);
+                return d3.sum(this.minimumWidths) + this.colPadding * (cols.length - 1);
             }
         };
 
@@ -2665,7 +2665,7 @@ var Plottable;
         function Legend(colorScale) {
             _super.call(this);
             this.classed("legend", true);
-            this.colMinimum(120); // the default width
+            this.minimumWidth(120); // the default width
             this.colorScale = colorScale;
             this.xAlign("RIGHT").yAlign("TOP");
             this.xOffset(5).yOffset(5);
@@ -2687,7 +2687,7 @@ var Plottable;
             return this;
         };
 
-        Legend.prototype.rowMinimum = function (newVal) {
+        Legend.prototype.minimumHeight = function (newVal) {
             if (newVal != null) {
                 throw new Error("Row minimum cannot be directly set on Legend");
             } else {
@@ -2706,10 +2706,10 @@ var Plottable;
 
         Legend.prototype._render = function () {
             _super.prototype._render.call(this);
-            this.legendBox.attr("height", this.rowMinimum()).attr("width", this.colMinimum()); //HACKHACK #223
+            this.legendBox.attr("height", this.minimumHeight()).attr("width", this.minimumWidth()); //HACKHACK #223
             var domain = this.colorScale.domain();
             var textHeight = this.measureTextHeight();
-            var availableWidth = this.colMinimum() - textHeight - Legend.MARGIN;
+            var availableWidth = this.minimumWidth() - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
 
             this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
@@ -2909,11 +2909,11 @@ var Plottable;
 
         Axis.prototype._render = function () {
             if (this.orient() === "left") {
-                this.axisElement.attr("transform", "translate(" + Axis.Y_WIDTH + ", 0)");
+                this.axisElement.attr("transform", "translate(" + this.minimumWidth() + ", 0)");
             }
             ;
             if (this.orient() === "top") {
-                this.axisElement.attr("transform", "translate(0," + Axis.X_HEIGHT + ")");
+                this.axisElement.attr("transform", "translate(0," + this.minimumHeight() + ")");
             }
             ;
             var domain = this.d3Axis.scale().domain();
@@ -3138,7 +3138,7 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for XAxis");
             }
             _super.call(this, scale, orientation, formatter);
-            _super.prototype.rowMinimum.call(this, Axis.X_HEIGHT);
+            _super.prototype.minimumHeight.call(this, Axis.X_HEIGHT);
             this._fixedWidth = false;
             this.tickLabelPosition("center");
         }
@@ -3209,7 +3209,7 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for YAxis");
             }
             _super.call(this, scale, orientation, formatter);
-            _super.prototype.colMinimum.call(this, Axis.Y_WIDTH);
+            _super.prototype.minimumWidth.call(this, Axis.Y_WIDTH);
             this._fixedHeight = false;
             this.tickLabelPosition("middle");
         }
