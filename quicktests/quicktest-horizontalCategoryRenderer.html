@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Bar Renderer Quicktest</title>
+    <title>Horizontal Category Renderer Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="../../build/plottable.js"></script>
@@ -20,15 +20,17 @@
       var xAxis = new Plottable.XAxis(xScale, "bottom");
       // xAxis.showEndTickLabels(true);
 
-      var yScale = new Plottable.OrdinalScale()//.rangeType("bands");
-      // Plottable.Axis.Y_WIDTH = 60;
+      var yScale = new Plottable.OrdinalScale().rangeType("bands");
       var yAxis = new Plottable.YAxis(yScale, "left", function(d) { return d; } );
       yAxis.minimumWidth(60);
 
-      var barRenderer = new Plottable.CircleRenderer(ds, xScale, yScale)
+      var barRenderer = new Plottable.HorizontalBarRenderer(ds, xScale, yScale)
                               .project("x", "age", xScale)
                               .project("y", "name", yScale)
                               .project("fill", function() {return "steelblue"});
+
+      // barRenderer.project("width", 50);
+
       var chart = new Plottable.Table([
         [yAxis, barRenderer],
         [null, xAxis]

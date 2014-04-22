@@ -1,10 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class BarRenderer extends XYRenderer {
-    private _baseline: D3.Selection;
-    private baselineValue = 0;
-    private _barAlignment = "left";
+  export class BarRenderer extends AbstractBarRenderer {
+    public _barAlignment = "left";
 
     /**
      * Creates a BarRenderer.
@@ -26,15 +24,12 @@ module Plottable {
             xAccessor?: IAccessor,
             widthAccessor?: IAccessor,
             yAccessor?: IAccessor) {
-      super(dataset, xScale, yScale, xAccessor, yAccessor);
-      this.classed("bar-renderer", true);
-      this._animate = true;
-      this.project("width", 10);
+      super(dataset, xScale, yScale, xAccessor, widthAccessor, yAccessor);
     }
 
     public _paint() {
       super._paint();
-      var scaledBaseline = this.yScale.scale(this.baselineValue);
+      var scaledBaseline = this.yScale.scale(this._baselineValue);
 
       var xA = Utils.applyAccessor(this._xAccessor, this.dataSource());
 
@@ -94,20 +89,6 @@ module Plottable {
     }
 
     /**
-     * Sets the baseline for the bars to the specified value.
-     *
-     * @param {number} value The y-value to position the baseline at.
-     * @return {BarRenderer} The calling BarRenderer.
-     */
-    public baseline(value: number) {
-      this.baselineValue = value;
-      if (this.element != null) {
-        this._render();
-      }
-      return this;
-    }
-
-    /**
      * Sets the horizontal alignment of the bars.
      *
      * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
@@ -123,41 +104,6 @@ module Plottable {
       if (this.element != null) {
         this._render();
       }
-      return this;
-    }
-
-    /**
-     * Selects the bar under the given pixel position.
-     *
-     * @param {number} x The pixel x position.
-     * @param {number} y The pixel y position.
-     * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-     * @return {D3.Selection} The selected bar, or null if no bar was selected.
-     */
-    public selectBar(x: number, y: number, select = true): D3.Selection {
-      var selectedBar: D3.Selection = null;
-
-      this.dataSelection.each(function(d: any) {
-        var bbox = this.getBBox();
-        if (bbox.x <= x && x <= bbox.x + bbox.width &&
-            bbox.y <= y && y <= bbox.y + bbox.height) {
-          selectedBar = d3.select(this);
-        }
-      });
-
-      if (selectedBar != null) {
-        selectedBar.classed("selected", select);
-      }
-
-      return selectedBar;
-    }
-
-    /**
-     * Deselects all bars.
-     * @return {BarRenderer} The calling BarRenderer.
-     */
-    public deselectAll() {
-      this.dataSelection.classed("selected", false);
       return this;
     }
   }
