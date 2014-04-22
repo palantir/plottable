@@ -22,7 +22,7 @@ module Plottable {
       if (starts.length > 0) {
         return [d3.min(starts), d3.max(ends)];
       } else {
-        return [];
+        return [0, 1];
       }
     }
 
