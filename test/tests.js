@@ -139,6 +139,29 @@ describe("Axes", function () {
         svg.remove();
     });
 
+    it("X Axis height can be changed", function () {
+        var svg = generateSVG(500, 100);
+        var xScale = new Plottable.LinearScale();
+        xScale.domain([0, 10]);
+        xScale.range([0, 500]);
+        var xAxis = new Plottable.XAxis(xScale, "top");
+        xAxis.renderTo(svg);
+
+        var oldHeight = xAxis.minimumHeight();
+        var axisBBoxBefore = xAxis.element.node().getBBox();
+        var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
+        assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
+
+        var newHeight = 60;
+        xAxis.minimumHeight(newHeight);
+        xAxis.renderTo(svg);
+        var axisBBoxAfter = xAxis.element.node().getBBox();
+        var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
+        assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
+        assert.equal((baselineClientRectAfter.bottom - baselineClientRectBefore.bottom), (newHeight - oldHeight), "baseline has shifted down as a consequence");
+        svg.remove();
+    });
+
     it("YAxis positions tick labels correctly", function () {
         var svg = generateSVG(100, 500);
         var yScale = new Plottable.LinearScale();
@@ -173,6 +196,29 @@ describe("Axes", function () {
             labelRect = tickLabels[i].getBoundingClientRect();
             assert.operator(markRect.bottom, "<=", labelRect.top, "tick label is below the mark");
         }
+        svg.remove();
+    });
+
+    it("Y Axis width can be changed", function () {
+        var svg = generateSVG(100, 500);
+        var yScale = new Plottable.LinearScale();
+        yScale.domain([0, 10]);
+        yScale.range([500, 0]);
+        var yAxis = new Plottable.YAxis(yScale, "left");
+        yAxis.renderTo(svg);
+
+        var oldWidth = yAxis.minimumWidth();
+        var axisBBoxBefore = yAxis.element.node().getBBox();
+        var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
+        assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
+
+        var newWidth = 80;
+        yAxis.minimumWidth(newWidth);
+        yAxis.renderTo(svg);
+        var axisBBoxAfter = yAxis.element.node().getBBox();
+        var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
+        assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
+        assert.equal((baselineClientRectAfter.right - baselineClientRectBefore.right), (newWidth - oldWidth), "baseline has shifted over as a consequence");
         svg.remove();
     });
 
@@ -488,25 +534,33 @@ describe("Component behavior", function () {
         it("computeLayout works with CSS layouts", function () {
             // Manually size parent
             var parent = d3.select(svg.node().parentNode);
-            parent.style("width", "100px").style("height", "200px");
+            parent.style("width", "200px");
+            parent.style("height", "400px");
 
             // Remove width/height attributes and style with CSS
             svg.attr("width", null).attr("height", null);
-            svg.style("width", "50%").style("height", "50%");
+            svg.style("width", "50%");
+            svg.style("height", "50%");
 
             c._anchor(svg)._computeLayout();
-            assert.equal(c.availableWidth, 50, "computeLayout defaulted width to svg width");
-            assert.equal(c.availableHeight, 100, "computeLayout defaulted height to svg height");
+
+            assert.equal(c.availableWidth, 100, "computeLayout defaulted width to svg width");
+            assert.equal(c.availableHeight, 200, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
 
             svg.style("width", "25%").style("height", "25%");
+
             c._computeLayout();
-            assert.equal(c.availableWidth, 25, "computeLayout updated width to new svg width");
-            assert.equal(c.availableHeight, 50, "computeLayout updated height to new svg height");
+
+            assert.equal(c.availableWidth, 50, "computeLayout updated width to new svg width");
+            assert.equal(c.availableHeight, 100, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
 
+            // reset test page DOM
+            parent.style("width", "auto");
+            parent.style("height", "auto");
             svg.remove();
         });
 
@@ -2474,5 +2528,37 @@ describe("Utils", function () {
         var height = Plottable.Utils.getElementHeight(svgElem);
         assert.equal(height, 120, "measured height matches set height");
         svg.remove();
+    });
+
+    it("can accept multiple units and convert to pixels", function () {
+        var parent = getSVGParent();
+        var parentElem = parent[0][0];
+        var child = parent.append("div");
+        var childElem = child[0][0];
+
+        parent.style("width", "200px");
+        parent.style("height", "50px");
+        assert.equal(Plottable.Utils.getElementWidth(parentElem), 200, "width is correct");
+        assert.equal(Plottable.Utils.getElementHeight(parentElem), 50, "height is correct");
+
+        child.style("width", "20px");
+        child.style("height", "10px");
+        assert.equal(Plottable.Utils.getElementWidth(childElem), 20, "width is correct");
+        assert.equal(Plottable.Utils.getElementHeight(childElem), 10, "height is correct");
+
+        child.style("width", "100%");
+        child.style("height", "100%");
+        assert.equal(Plottable.Utils.getElementWidth(childElem), 200, "width is correct");
+        assert.equal(Plottable.Utils.getElementHeight(childElem), 50, "height is correct");
+
+        child.style("width", "50%");
+        child.style("height", "50%");
+        assert.equal(Plottable.Utils.getElementWidth(childElem), 100, "width is correct");
+        assert.equal(Plottable.Utils.getElementHeight(childElem), 25, "height is correct");
+
+        // reset test page DOM
+        parent.style("width", "auto");
+        parent.style("height", "auto");
+        child.remove();
     });
 });

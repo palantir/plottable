@@ -215,16 +215,16 @@ declare module Plottable {
         * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
         * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
         */
-        public rowMinimum(): number;
-        public rowMinimum(newVal: number): Component;
+        public minimumHeight(): number;
+        public minimumHeight(newVal: number): Component;
         /**
         * Sets or retrieves the Component's minimum width.
         *
         * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
         * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
         */
-        public colMinimum(): number;
-        public colMinimum(newVal: number): Component;
+        public minimumWidth(): number;
+        public minimumWidth(newVal: number): Component;
         /**
         * Checks if the Component has a fixed width or scales to fill available space.
         * Returns true by default on the base Component class.
@@ -684,7 +684,6 @@ declare module Plottable {
         public renderArea: D3.Selection;
         public element: D3.Selection;
         public scales: Scale[];
-        };
         /**
         * Creates a Renderer.
         *
@@ -703,7 +702,6 @@ declare module Plottable {
         public dataSource(): DataSource;
         public dataSource(source: DataSource): Renderer;
         public project(attrToSet: string, accessor: any, scale?: Scale): Renderer;
-        };
     }
 }
 declare module Plottable {
@@ -894,10 +892,10 @@ declare module Plottable {
         * @returns {Table} The calling Table.
         */
         public colWeight(index: number, weight: number): Table;
-        public rowMinimum(): number;
-        public rowMinimum(newVal: number): Table;
-        public colMinimum(): number;
-        public colMinimum(newVal: number): Table;
+        public minimumHeight(): number;
+        public minimumHeight(newVal: number): Table;
+        public minimumWidth(): number;
+        public minimumWidth(newVal: number): Table;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
     }
@@ -930,8 +928,8 @@ declare module Plottable {
         * @returns {Legend} The calling Legend.
         */
         public scale(scale: ColorScale): Legend;
-        public rowMinimum(): number;
-        public rowMinimum(newVal: number): Legend;
+        public minimumHeight(): number;
+        public minimumHeight(newVal: number): Legend;
     }
 }
 declare module Plottable {
