@@ -111,6 +111,7 @@ module.exports = function(grunt) {
         }
       }
     },
+    clean: {tscommand: ["tscommand*.tmp.txt"]},
     sed: sedJSON,
     copy: {
       dist: {
@@ -146,7 +147,8 @@ module.exports = function(grunt) {
                                   "ts:dev",
                                   "ts:test",
                                   "ts:examples",
-                                  "tslint"]);
+                                  "tslint",
+                                  "clean:tscommand"]);
 
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
