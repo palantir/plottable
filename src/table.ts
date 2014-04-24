@@ -239,5 +239,14 @@ module Plottable {
       var groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
       return all(componentGroup.map(groupIsFixed));
     }
+
+    public remove() {
+      this.rows.forEach((row) => {
+        row.forEach((component) => {
+          component.remove();
+        });
+      });
+      super.remove();
+    }
   }
 }

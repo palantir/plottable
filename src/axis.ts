@@ -28,7 +28,7 @@ module Plottable {
         formatter = d3.format(".3s");
       }
       this.d3Axis.tickFormat(formatter);
-      this.axisScale.registerListener(this, () => this.rescale());
+      this._registerToBroadcaster(this.axisScale, () => this.rescale());
     }
 
     public _anchor(element: D3.Selection) {

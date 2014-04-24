@@ -72,7 +72,7 @@ module Plottable {
         return this._dataSource;
       } else if (this._dataSource == null) {
         this._dataSource = source;
-        this._dataSource.registerListener(this, () => this._render());
+        this._registerToBroadcaster(this._dataSource, () => this._render());
         return this;
       } else {
         throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
@@ -88,11 +88,11 @@ module Plottable {
       }
       if (existingScale != null) {
         existingScale._removePerspective(rendererIDAttr);
-        existingScale.deregisterListener(this);
+        this._deregisterFromBroadcaster(existingScale);
       }
       if (scale != null) {
         scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
-        scale.registerListener(this, () => this._render());
+        this._registerToBroadcaster(scale, () => this._render());
       }
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
       this._requireRerender = true;

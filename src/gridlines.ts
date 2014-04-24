@@ -20,10 +20,10 @@ module Plottable {
       this.xScale = xScale;
       this.yScale = yScale;
       if (this.xScale != null) {
-        this.xScale.registerListener(this, () => this.redrawXLines());
+        this._registerToBroadcaster(this.xScale, () => this.redrawXLines());
       }
       if (this.yScale != null) {
-        this.yScale.registerListener(this, () => this.redrawYLines());
+        this._registerToBroadcaster(this.yScale, () => this.redrawYLines());
       }
     }
 
