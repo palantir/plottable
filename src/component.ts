@@ -153,8 +153,8 @@ module Plottable {
     /**
      * Cause the Component to recompute layout and redraw. Useful if the window resized.
      *
-     * @param {number} [availableWidth]  - optionally: the width of the container element
-     * @param {number} [availableHeight] - optionally: the height of the container element
+     * @param {number} [availableWidth]  - the width of the container element
+     * @param {number} [availableHeight] - the height of the container element
      */
     public resize(width?: number, height?: number): Component {
       if (this.element != null) {
