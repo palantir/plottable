@@ -132,7 +132,12 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public _render() {
+      RenderController.registerToRender(this);
       return this;
+    }
+
+    public _doRender() {
+      return this; //no-op
     }
 
     public renderTo(element: any): Component {

@@ -106,12 +106,12 @@ module Plottable {
       return this;
     }
 
-    public _render() {
+    public _doRender() {
       // recursively render children
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
           if (component != null) {
-            component._render();
+            component._doRender();
           }
         });
       });

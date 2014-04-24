@@ -112,7 +112,7 @@ module Plottable {
       return h;
     }
 
-    public _render(): Renderer {
+    public _doRender(): Renderer {
       if (this.element != null) {
         this._hasRendered = true;
         this._paint();

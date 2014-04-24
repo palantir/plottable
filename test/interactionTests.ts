@@ -1,6 +1,7 @@
 ///<reference path="testReference.ts" />
 
 var assert = chai.assert;
+Plottable.RenderController.enabled = false;
 
 function makeFakeEvent(x: number, y: number): D3.Event {
   return {

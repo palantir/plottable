@@ -50,9 +50,9 @@ module Plottable {
       return this;
     }
 
-    public _render() {
-      super._render();
-      this.components.forEach((c) => c._render());
+    public _doRender() {
+      super._doRender();
+      this.components.forEach((c) => c._doRender());
       return this;
     }
 

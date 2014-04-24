@@ -34,8 +34,8 @@ module Plottable {
       return this;
     }
 
-    public _render(): Gridlines {
-      super._render();
+    public _doRender(): Gridlines {
+      super._doRender();
       this.redrawXLines();
       this.redrawYLines();
       return this;

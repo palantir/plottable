@@ -1,6 +1,7 @@
 ///<reference path="testReference.ts" />
 
 var assert = chai.assert;
+Plottable.RenderController.enabled = false;
 
 function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
