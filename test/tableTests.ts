@@ -1,7 +1,7 @@
 ///<reference path="testReference.ts" />
 
 var assert = chai.assert;
-Plottable.RenderController.enabled = false;
+
 
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
