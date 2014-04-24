@@ -149,6 +149,20 @@ module Plottable {
       this._computeLayout()._render();
       return this;
     }
+
+    /**
+     * Cause the Component to recompute layout and redraw. Useful if the window resized.
+     *
+     * @param {number} [availableWidth]  - the width of the container element
+     * @param {number} [availableHeight] - the height of the container element
+     */
+    public resize(width?: number, height?: number): Component {
+      if (this.element != null) {
+        this._computeLayout(width, height)._render();
+      }
+      return this;
+    }
+
     /**
      * Sets the x alignment of the Component.
      *
