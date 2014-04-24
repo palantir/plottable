@@ -37,7 +37,7 @@ function commitChart(svg, dataset) {
   var xAxis  = new Plottable.XAxis(xScale, "bottom", dateFormatter);
   var yAxis  = new Plottable.YAxis(yScale, "left", hourFormatter).showEndTickLabels(true);
 
-  var chart = new Plottable.StandardChart().addCenterComponent(group)
+  var chart = new Plottable.StandardChart().center(group)
                   .xAxis(xAxis).yAxis(yAxis)
                   .xLabel("Date of Commit").yLabel("Commit Time")
                   .titleLabel("Commit History");

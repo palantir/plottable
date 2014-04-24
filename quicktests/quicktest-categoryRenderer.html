@@ -27,7 +27,7 @@
                               .project("x", "name", xScale)
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"});
-      var chart = new Plottable.StandardChart().addCenterComponent(barRenderer).xAxis(xAxis).yAxis(yAxis);
+      var chart = new Plottable.StandardChart().center(barRenderer).xAxis(xAxis).yAxis(yAxis);
       // barRenderer._animate = false;
 
       window.onload = function() { chart.renderTo("#meow"); }
