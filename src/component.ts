@@ -393,9 +393,6 @@ module Plottable {
       });
       this.hasBeenRemoved = true;
       this.element.remove();
-      if (this.isTopLevelComponent) {
-        this.rootSVG.remove();
-      }
       this.element = null;
     }
   }
