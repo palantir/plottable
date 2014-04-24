@@ -13,6 +13,8 @@ module Plottable {
      * is used to support deregistering the same callback later, by passing in the same listener.
      * If there is already a callback associated with that listener, then the callback will be replaced.
      *
+     * This should NOT be called directly by a Component; registerToBroadcaster should be used instead.
+     *
      * @param listener The listener associated with the callback.
      * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
      * @returns {Broadcaster} this object

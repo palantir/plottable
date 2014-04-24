@@ -63,5 +63,10 @@ module Plottable {
     public isFixedHeight(): boolean {
       return this.components.every((c) => c.isFixedHeight());
     }
+
+    public remove() {
+      this.components.forEach((c) => c.remove());
+      super.remove();
+    }
   }
 }

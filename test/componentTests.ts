@@ -297,4 +297,35 @@ describe("Component behavior", () => {
     assert.equal(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
     svg.remove();
   });
+
+  it("remove works as expected", () => {
+    var cbCalled = 0;
+    var cb = (b: Plottable.Broadcaster) => cbCalled++;
+    var b = new Plottable.Broadcaster();
+
+    var t = new Plottable.Table();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+
+    t._registerToBroadcaster(b, cb);
+    c1._registerToBroadcaster(b, cb);
+    c2._registerToBroadcaster(b, cb);
+    c3._registerToBroadcaster(b, cb);
+
+    var cg = c2.merge(c3);
+    t.addComponent(0, 0, c1);
+    t.addComponent(1, 0, cg);
+    t.renderTo(svg);
+    b._broadcast();
+    assert.equal(cbCalled, 4, "the callback was called 4 times");
+    assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
+    t.remove();
+    b._broadcast();
+    assert.equal(cbCalled, 4, "the callback was not called again");
+    assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
+
+    assert.throws(() => t.renderTo(svg), Error);
+    svg.remove();
+  });
 });

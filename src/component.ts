@@ -11,6 +11,8 @@ module Plottable {
     public backgroundContainer: D3.Selection;
     public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
+    private broadcastersCurrentlyListeningTo: {[key: string]: Broadcaster} = {};
+    private hasBeenRemoved = false;
 
     public _fixedWidth = true;
     public _fixedHeight = true;
@@ -40,6 +42,10 @@ module Plottable {
     public _anchor(element: D3.Selection) {
       if (element.node().childNodes.length > 0) {
         throw new Error("Can't anchor to a non-empty element");
+      }
+      if (this.hasBeenRemoved) {
+        // Since we deregister all the model bindings, this would be dangerous
+        throw new Error("Cannot reuse a component after removing it");
       }
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
@@ -269,6 +275,16 @@ module Plottable {
       return this;
     }
 
+    public _registerToBroadcaster(broadcaster: Broadcaster, callback: IBroadcasterCallback) {
+      broadcaster.registerListener(this, callback);
+      this.broadcastersCurrentlyListeningTo[broadcaster._plottableID] = broadcaster;
+    }
+
+    public _deregisterFromBroadcaster(broadcaster: Broadcaster) {
+      broadcaster.deregisterListener(this);
+      delete this.broadcastersCurrentlyListeningTo[broadcaster._plottableID];
+    }
+
     /**
      * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
      *
@@ -380,6 +396,18 @@ module Plottable {
         cg = new ComponentGroup([this, c]);
         return cg;
       }
+    }
+
+    /**
+     * Blow up a component and its DOM, so it can be safely removed
+     */
+    public remove() {
+      d3.values(this.broadcastersCurrentlyListeningTo).forEach((b) => {
+        b.deregisterListener(this);
+      });
+      this.hasBeenRemoved = true;
+      this.element.remove();
+      this.element = null;
     }
   }
 }
