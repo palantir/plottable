@@ -41,7 +41,7 @@
         var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1, renderAreaD2]);
 
         var chart = new Plottable.StandardChart()
-                        .addCenterComponent(renderGroup).xAxis(xAxis).yAxis(yAxis)
+                        .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
                         .renderTo("#areaRenderer-test");
       }
     </script>

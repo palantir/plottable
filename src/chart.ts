@@ -127,7 +127,7 @@ module Plottable {
       }
     }
 
-    public addCenterComponent(c: Component): StandardChart {
+    public center(c: Component): StandardChart {
       this.centerComponent.merge(c);
       return this;
     }
