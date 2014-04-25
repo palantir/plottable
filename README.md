@@ -1,7 +1,7 @@
 Plottable.js[![Builds](https://api.travis-ci.org/repositories/palantir/plottable.png?branch=master)](https://travis-ci.org/palantir/plottable)
 ============
 
-Plottable.js is a library for easily creating flexible, interactive, and performant charts for the web. It is built on top of d3 and provides a higher level of abstraction.
+Plottable.js is a library for easily creating flexible, interactive, and performant charts for the web. It is built on top of D3 and provides a higher level of abstraction.
 
 Plottable consists of three main pieces:
 - A grid-based layout engine which handles positioning, sizing, and alignment of components
