@@ -4,7 +4,7 @@ module Plottable {
   export class RenderController {
     private static componentsNeedingRender: {[key: string]: Component} = {};
     private static animationRequested = false;
-    public static enabled = (requestAnimationFrame != null) && ((<any> window).PlottableTestCode == null);
+    public static enabled = (<any> window).PlottableTestCode == null && (window.requestAnimationFrame) != null;
 
     public static registerToRender(c: Component) {
       if (!Plottable.RenderController.enabled) {
