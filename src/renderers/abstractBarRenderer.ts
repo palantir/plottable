@@ -25,7 +25,6 @@ module Plottable {
                 yAccessor?: IAccessor) {
       super(dataset, xScale, yScale, xAccessor, yAccessor);
       this.classed("bar-renderer", true);
-      this._animate = true;
       this.project("width", 10);
     }
 
