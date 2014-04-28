@@ -23,7 +23,7 @@ function commitDashboard(dataManager, svg) {
 
   var startDate = new Date(2014, 0, 20); // Jan 20, 2014
   var endDate = new Date(2014, 3, 1); // Mar 28, 2014
-  var timeScale = new Plottable.QuantitiveScale(d3.time.scale());
+  var timeScale = new Plottable.TimeScale();
   timeScale.domain([startDate, endDate]).nice();
   var dateFormatter = d3.time.format("%-m/%-d/%y");
 
