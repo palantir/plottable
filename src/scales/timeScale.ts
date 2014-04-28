@@ -8,7 +8,7 @@ module Plottable {
      * @constructor
      */
     constructor() {
-      super(<D3.Scale.QuantitiveScale> (<any> d3.time.scale()) );
+      super(<any> d3.time.scale());
     }
   }
 }
