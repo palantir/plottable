@@ -309,6 +309,8 @@ var Plottable;
         * is used to support deregistering the same callback later, by passing in the same listener.
         * If there is already a callback associated with that listener, then the callback will be replaced.
         *
+        * This should NOT be called directly by a Component; registerToBroadcaster should be used instead.
+        *
         * @param listener The listener associated with the callback.
         * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
         * @returns {Broadcaster} this object
@@ -364,6 +366,8 @@ var Plottable;
             this.interactionsToRegister = [];
             this.boxes = [];
             this.clipPathEnabled = false;
+            this.broadcastersCurrentlyListeningTo = {};
+            this.hasBeenRemoved = false;
             this._fixedWidth = true;
             this._fixedHeight = true;
             this._minimumHeight = 0;
@@ -385,6 +389,9 @@ var Plottable;
             var _this = this;
             if (element.node().childNodes.length > 0) {
                 throw new Error("Can't anchor to a non-empty element");
+            }
+            if (this.hasBeenRemoved) {
+                throw new Error("Cannot reuse a component after removing it");
             }
             if (element.node().nodeName === "svg") {
                 // svg node gets the "plottable" CSS class
@@ -503,6 +510,19 @@ var Plottable;
         };
 
         /**
+        * Cause the Component to recompute layout and redraw. Useful if the window resized.
+        *
+        * @param {number} [availableWidth]  - the width of the container element
+        * @param {number} [availableHeight] - the height of the container element
+        */
+        Component.prototype.resize = function (width, height) {
+            if (this.element != null) {
+                this._computeLayout(width, height)._render();
+            }
+            return this;
+        };
+
+        /**
         * Sets the x alignment of the Component.
         *
         * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
@@ -610,6 +630,16 @@ var Plottable;
             return this;
         };
 
+        Component.prototype._registerToBroadcaster = function (broadcaster, callback) {
+            broadcaster.registerListener(this, callback);
+            this.broadcastersCurrentlyListeningTo[broadcaster._plottableID] = broadcaster;
+        };
+
+        Component.prototype._deregisterFromBroadcaster = function (broadcaster) {
+            broadcaster.deregisterListener(this);
+            delete this.broadcastersCurrentlyListeningTo[broadcaster._plottableID];
+        };
+
         Component.prototype.classed = function (cssClass, addClass) {
             if (addClass == null) {
                 if (cssClass == null) {
@@ -696,6 +726,19 @@ var Plottable;
                 cg = new Plottable.ComponentGroup([this, c]);
                 return cg;
             }
+        };
+
+        /**
+        * Blow up a component and its DOM, so it can be safely removed
+        */
+        Component.prototype.remove = function () {
+            var _this = this;
+            d3.values(this.broadcastersCurrentlyListeningTo).forEach(function (b) {
+                b.deregisterListener(_this);
+            });
+            this.hasBeenRemoved = true;
+            this.element.remove();
+            this.element = null;
         };
         return Component;
     })(Plottable.PlottableObject);
@@ -856,7 +899,7 @@ var Plottable;
             if (starts.length > 0) {
                 return [d3.min(starts), d3.max(ends)];
             } else {
-                return [];
+                return [0, 1];
             }
         };
 
@@ -1118,6 +1161,23 @@ var Plottable;
         return ColorScale;
     })(Plottable.Scale);
     Plottable.ColorScale = ColorScale;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var TimeScale = (function (_super) {
+        __extends(TimeScale, _super);
+        /**
+        * Creates a new TimeScale.
+        *
+        * @constructor
+        */
+        function TimeScale() {
+            _super.call(this, d3.time.scale());
+        }
+        return TimeScale;
+    })(Plottable.QuantitiveScale);
+    Plottable.TimeScale = TimeScale;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -1843,7 +1903,7 @@ var Plottable;
                 return this._dataSource;
             } else if (this._dataSource == null) {
                 this._dataSource = source;
-                this._dataSource.registerListener(this, function () {
+                this._registerToBroadcaster(this._dataSource, function () {
                     return _this._render();
                 });
                 return this;
@@ -1862,11 +1922,11 @@ var Plottable;
             }
             if (existingScale != null) {
                 existingScale._removePerspective(rendererIDAttr);
-                existingScale.deregisterListener(this);
+                this._deregisterFromBroadcaster(existingScale);
             }
             if (scale != null) {
                 scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
-                scale.registerListener(this, function () {
+                this._registerToBroadcaster(scale, function () {
                     return _this._render();
                 });
             }
@@ -1929,17 +1989,13 @@ var Plottable;
         * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        function XYRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
-            if (typeof xAccessor === "undefined") { xAccessor = "x"; }
-            if (typeof yAccessor === "undefined") { yAccessor = "y"; }
+        function XYRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset);
             this.classed("xy-renderer", true);
 
-            this.project("x", xAccessor, xScale);
-            this.project("y", yAccessor, yScale);
+            this.project("x", "x", xScale); // default accessor
+            this.project("y", "y", yScale); // default accessor
         }
         XYRenderer.prototype.project = function (attrToSet, accessor, scale) {
             _super.prototype.project.call(this, attrToSet, accessor, scale);
@@ -1990,17 +2046,14 @@ var Plottable;
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        function CircleRenderer(dataset, xScale, yScale, xAccessor, yAccessor, rAccessor) {
-            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-
-            /*      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;*/
+        function CircleRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
             this.classed("circle-renderer", true);
-            this.project("r", 3);
-            this.project("fill", "#00ffaa");
+            this.project("r", 3); // default
+            this.project("fill", function () {
+                return "#00ffaa";
+            }); // default
         }
         CircleRenderer.prototype.project = function (attrToSet, accessor, scale) {
             attrToSet = attrToSet === "cx" ? "x" : attrToSet;
@@ -2038,11 +2091,9 @@ var Plottable;
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        function LineRenderer(dataset, xScale, yScale, xAccessor, yAccessor) {
-            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+        function LineRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
             this.classed("line-renderer", true);
         }
         LineRenderer.prototype._anchor = function (element) {
@@ -2067,6 +2118,90 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var AbstractBarRenderer = (function (_super) {
+        __extends(AbstractBarRenderer, _super);
+        /**
+        * Creates an AbstractBarRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        function AbstractBarRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
+            this._baselineValue = 0;
+            this.classed("bar-renderer", true);
+            this.project("width", 10);
+        }
+        /**
+        * Sets the baseline for the bars to the specified value.
+        *
+        * @param {number} value The value to position the baseline at.
+        * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+        */
+        AbstractBarRenderer.prototype.baseline = function (value) {
+            this._baselineValue = value;
+            if (this.element != null) {
+                this._render();
+            }
+            return this;
+        };
+
+        /**
+        * Sets the bar alignment relative to the independent axis.
+        * Behavior depends on subclass implementation.
+        *
+        * @param {string} alignment The desired alignment.
+        * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+        */
+        AbstractBarRenderer.prototype.barAlignment = function (alignment) {
+            // implementation in child classes
+            return this;
+        };
+
+        /**
+        * Selects the bar under the given pixel position.
+        *
+        * @param {number} x The pixel x position.
+        * @param {number} y The pixel y position.
+        * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
+        * @return {D3.Selection} The selected bar, or null if no bar was selected.
+        */
+        AbstractBarRenderer.prototype.selectBar = function (x, y, select) {
+            if (typeof select === "undefined") { select = true; }
+            var selectedBar = null;
+
+            // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
+            this.dataSelection.each(function (d) {
+                var bbox = this.getBBox();
+                if (bbox.x <= x && x <= bbox.x + bbox.width && bbox.y <= y && y <= bbox.y + bbox.height) {
+                    selectedBar = d3.select(this);
+                }
+            });
+
+            if (selectedBar != null) {
+                selectedBar.classed("selected", select);
+            }
+
+            return selectedBar;
+        };
+
+        /**
+        * Deselects all bars.
+        * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+        */
+        AbstractBarRenderer.prototype.deselectAll = function () {
+            this.dataSelection.classed("selected", false);
+            return this;
+        };
+        return AbstractBarRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.AbstractBarRenderer = AbstractBarRenderer;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var BarRenderer = (function (_super) {
         __extends(BarRenderer, _super);
         /**
@@ -2076,24 +2211,14 @@ var Plottable;
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {QuantitiveScale} yScale The y scale to use.
-        * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
-        *     the start position of each bar from the data.
-        * @param {IAccessor|string|number} [widthAccessor] An accessor for extracting
-        *     the width of each bar, in pixels, from the data.
-        * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
-        *     the height of each bar from the data.
         */
-        function BarRenderer(dataset, xScale, yScale, xAccessor, widthAccessor, yAccessor) {
-            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.baselineValue = 0;
+        function BarRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
             this._barAlignment = "left";
-            this.classed("bar-renderer", true);
-            this._animate = true;
-            this.project("width", 10);
         }
         BarRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
-            var scaledBaseline = this.yScale.scale(this.baselineValue);
+            var scaledBaseline = this.yScale.scale(this._baselineValue);
 
             var xA = Plottable.Utils.applyAccessor(this._xAccessor, this.dataSource());
 
@@ -2154,21 +2279,12 @@ var Plottable;
             updateSelection.attr(attrToProjector);
             this.dataSelection.exit().remove();
 
-            baselineSelection.attr("x1", 0).attr("x2", this.availableWidth).attr("y1", scaledBaseline).attr("y2", scaledBaseline);
-        };
-
-        /**
-        * Sets the baseline for the bars to the specified value.
-        *
-        * @param {number} value The y-value to position the baseline at.
-        * @return {BarRenderer} The calling BarRenderer.
-        */
-        BarRenderer.prototype.baseline = function (value) {
-            this.baselineValue = value;
-            if (this.element != null) {
-                this._render();
-            }
-            return this;
+            baselineSelection.attr({
+                "x1": 0,
+                "y1": scaledBaseline,
+                "x2": this.availableWidth,
+                "y2": scaledBaseline
+            });
         };
 
         /**
@@ -2189,58 +2305,120 @@ var Plottable;
             }
             return this;
         };
-
-        /**
-        * Selects the bar under the given pixel position.
-        *
-        * @param {number} x The pixel x position.
-        * @param {number} y The pixel y position.
-        * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-        * @return {D3.Selection} The selected bar, or null if no bar was selected.
-        */
-        BarRenderer.prototype.selectBar = function (x, y, select) {
-            if (typeof select === "undefined") { select = true; }
-            var selectedBar = null;
-
-            this.dataSelection.each(function (d) {
-                var bbox = this.getBBox();
-                if (bbox.x <= x && x <= bbox.x + bbox.width && bbox.y <= y && y <= bbox.y + bbox.height) {
-                    selectedBar = d3.select(this);
-                }
-            });
-
-            if (selectedBar != null) {
-                selectedBar.classed("selected", select);
-            }
-
-            return selectedBar;
-        };
-
-        /**
-        * Deselects all bars.
-        * @return {BarRenderer} The calling BarRenderer.
-        */
-        BarRenderer.prototype.deselectAll = function () {
-            this.dataSelection.classed("selected", false);
-            return this;
-        };
         return BarRenderer;
-    })(Plottable.XYRenderer);
+    })(Plottable.AbstractBarRenderer);
     Plottable.BarRenderer = BarRenderer;
 })(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var CategoryBarRenderer = (function (_super) {
-        __extends(CategoryBarRenderer, _super);
-        // convenience class to smooth the transition, will be going away soon.
-        function CategoryBarRenderer(dataset, xScale, yScale, xAccessor, widthAccessor, yAccessor) {
-            _super.call(this, dataset, xScale, yScale, xAccessor, widthAccessor, yAccessor);
-            console.log("Plottable.CategoryBarRenderer is deprecated and will be removed in the next version.");
-            console.log("Please use Plottable.BarRenderer instead.");
+    var HorizontalBarRenderer = (function (_super) {
+        __extends(HorizontalBarRenderer, _super);
+        /**
+        * Creates a HorizontalBarRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {QuantitiveScale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        function HorizontalBarRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
+            this._barAlignment = "top";
         }
-        return CategoryBarRenderer;
-    })(Plottable.BarRenderer);
-    Plottable.CategoryBarRenderer = CategoryBarRenderer;
+        HorizontalBarRenderer.prototype._paint = function () {
+            _super.prototype._paint.call(this);
+            var yA = Plottable.Utils.applyAccessor(this._yAccessor, this.dataSource());
+
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), yA);
+            this.dataSelection.enter().append("rect");
+
+            var attrToProjector = this._generateAttrToProjector();
+
+            var yFunction = attrToProjector["y"];
+
+            attrToProjector["height"] = attrToProjector["width"]; // remapping due to naming conventions
+            var heightFunction = attrToProjector["height"];
+
+            var castYScale = this.yScale;
+            var rangeType = (castYScale.rangeType == null) ? "points" : castYScale.rangeType();
+            if (rangeType === "points") {
+                if (this._barAlignment === "middle") {
+                    attrToProjector["y"] = function (d, i) {
+                        return yFunction(d, i) - heightFunction(d, i) / 2;
+                    };
+                } else if (this._barAlignment === "bottom") {
+                    attrToProjector["y"] = function (d, i) {
+                        return yFunction(d, i) - heightFunction(d, i);
+                    };
+                }
+            } else {
+                attrToProjector["height"] = function (d, i) {
+                    return castYScale.rangeBand();
+                };
+            }
+
+            var scaledBaseline = this.xScale.scale(this._baselineValue);
+
+            var xFunction = attrToProjector["x"];
+
+            attrToProjector["x"] = function (d, i) {
+                var originalX = xFunction(d, i);
+                return (originalX > scaledBaseline) ? scaledBaseline : originalX;
+            };
+
+            var widthFunction = function (d, i) {
+                return Math.abs(scaledBaseline - xFunction(d, i));
+            };
+            attrToProjector["width"] = widthFunction; // actual SVG rect width
+
+            if (attrToProjector["fill"] != null) {
+                this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+            }
+
+            if (this._baseline == null) {
+                this._baseline = this.renderArea.append("line").classed("baseline", true);
+            }
+
+            var updateSelection = this.dataSelection;
+            var baselineSelection = this._baseline;
+            if (this._animate) {
+                updateSelection = updateSelection.transition();
+                baselineSelection = baselineSelection.transition();
+            }
+
+            updateSelection.attr(attrToProjector);
+            this.dataSelection.exit().remove();
+
+            baselineSelection.attr({
+                "x1": scaledBaseline,
+                "y1": 0,
+                "x2": scaledBaseline,
+                "y2": this.availableHeight
+            });
+        };
+
+        /**
+        * Sets the vertical alignment of the bars.
+        *
+        * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
+        * @return {HorizontalBarRenderer} The calling HorizontalBarRenderer.
+        */
+        HorizontalBarRenderer.prototype.barAlignment = function (alignment) {
+            var alignmentLC = alignment.toLowerCase();
+            if (alignmentLC !== "top" && alignmentLC !== "middle" && alignmentLC !== "bottom") {
+                throw new Error("unsupported bar alignment");
+            }
+
+            this._barAlignment = alignmentLC;
+            if (this.element != null) {
+                this._render();
+            }
+            return this;
+        };
+        return HorizontalBarRenderer;
+    })(Plottable.AbstractBarRenderer);
+    Plottable.HorizontalBarRenderer = HorizontalBarRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -2254,14 +2432,11 @@ var Plottable;
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        function SquareRenderer(dataset, xScale, yScale, xAccessor, yAccessor, rAccessor) {
-            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
-            this.project("r", 3);
+        function SquareRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
             this.classed("square-renderer", true);
+            this.project("r", 3); // default
         }
         SquareRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
@@ -2300,16 +2475,9 @@ var Plottable;
         * @param {OrdinalScale} yScale The y scale to use.
         * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
         *     cell.
-        * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
-        *     the x position of each grid cell from the data.
-        * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
-        *     the y position of each grid cell from the data.
-        * @param {IAccessor|string|number} [valueAccessor] An accessor for
-        *     extracting value of each grid cell from the data. This value will
-        *     be pass through the color scale to determine the color of the cell.
         */
-        function GridRenderer(dataset, xScale, yScale, colorScale, xAccessor, yAccessor, valueAccessor) {
-            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+        function GridRenderer(dataset, xScale, yScale, colorScale) {
+            _super.call(this, dataset, xScale, yScale);
             this.classed("grid-renderer", true);
 
             // The x and y scales should render in bands with no padding
@@ -2317,8 +2485,16 @@ var Plottable;
             this.yScale.rangeType("bands", 0, 0);
 
             this.colorScale = colorScale;
-            this.project("fill", valueAccessor, colorScale);
+            this.project("fill", "value", colorScale); // default
         }
+        GridRenderer.prototype.project = function (attrToSet, accessor, scale) {
+            _super.prototype.project.call(this, attrToSet, accessor, scale);
+            if (attrToSet === "fill") {
+                this.colorScale = this._projectors["fill"].scale;
+            }
+            return this;
+        };
+
         GridRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
 
@@ -2608,6 +2784,15 @@ var Plottable;
             };
             return all(componentGroup.map(groupIsFixed));
         };
+
+        Table.prototype.remove = function () {
+            this.rows.forEach(function (row) {
+                row.forEach(function (component) {
+                    component.remove();
+                });
+            });
+            _super.prototype.remove.call(this);
+        };
         return Table;
     })(Plottable.Component);
     Plottable.Table = Table;
@@ -2833,7 +3018,7 @@ var Plottable;
             }
         };
 
-        StandardChart.prototype.addCenterComponent = function (c) {
+        StandardChart.prototype.center = function (c) {
             this.centerComponent.merge(c);
             return this;
         };
@@ -2851,6 +3036,7 @@ var Plottable;
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
+/// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="dataSource.ts" />
 //grunt-start
@@ -2862,8 +3048,9 @@ var Plottable;
 /// <reference path="renderers/xyRenderer.ts" />
 /// <reference path="renderers/circleRenderer.ts" />
 /// <reference path="renderers/lineRenderer.ts" />
+/// <reference path="renderers/abstractBarRenderer.ts" />
 /// <reference path="renderers/barRenderer.ts" />
-/// <reference path="renderers/categoryBarRenderer.ts" />
+/// <reference path="renderers/horizontalBarRenderer.ts" />
 /// <reference path="renderers/squareRenderer.ts" />
 /// <reference path="renderers/gridRenderer.ts" />
 /// <reference path="table.ts" />
@@ -2897,7 +3084,7 @@ var Plottable;
                 formatter = d3.format(".3s");
             }
             this.d3Axis.tickFormat(formatter);
-            this.axisScale.registerListener(this, function () {
+            this._registerToBroadcaster(this.axisScale, function () {
                 return _this.rescale();
             });
         }
@@ -3361,6 +3548,13 @@ var Plottable;
                 return c.isFixedHeight();
             });
         };
+
+        ComponentGroup.prototype.remove = function () {
+            this.components.forEach(function (c) {
+                return c.remove();
+            });
+            _super.prototype.remove.call(this);
+        };
         return ComponentGroup;
     })(Plottable.Component);
     Plottable.ComponentGroup = ComponentGroup;
@@ -3384,12 +3578,12 @@ var Plottable;
             this.xScale = xScale;
             this.yScale = yScale;
             if (this.xScale != null) {
-                this.xScale.registerListener(this, function () {
+                this._registerToBroadcaster(this.xScale, function () {
                     return _this.redrawXLines();
                 });
             }
             if (this.yScale != null) {
-                this.yScale.registerListener(this, function () {
+                this._registerToBroadcaster(this.yScale, function () {
                     return _this.redrawYLines();
                 });
             }
@@ -3455,19 +3649,11 @@ var Plottable;
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {any} [xAccessor] A function for extracting x values from the data.
-        * @param {any} [yAccessor] A function for extracting upper y values to color between.
-        * @param {any} [y0Accessor] A function for extracting lower y values to color between.
         */
-        function AreaRenderer(dataset, xScale, yScale, xAccessor, yAccessor, y0Accessor) {
-            _super.call(this, dataset, xScale, yScale, xAccessor, yAccessor);
+        function AreaRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
             this.classed("area-renderer", true);
-            if (!y0Accessor) {
-                y0Accessor = function () {
-                    return 0;
-                };
-            }
-            this.project("y0", y0Accessor, yScale);
+            this.project("y0", 0, yScale); // default
         }
         AreaRenderer.prototype._anchor = function (element) {
             _super.prototype._anchor.call(this, element);

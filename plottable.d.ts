@@ -111,6 +111,8 @@ declare module Plottable {
         * is used to support deregistering the same callback later, by passing in the same listener.
         * If there is already a callback associated with that listener, then the callback will be replaced.
         *
+        * This should NOT be called directly by a Component; registerToBroadcaster should be used instead.
+        *
         * @param listener The listener associated with the callback.
         * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
         * @returns {Broadcaster} this object
@@ -165,6 +167,13 @@ declare module Plottable {
         * @returns {Component} The calling Component.
         */
         public renderTo(element: any): Component;
+        /**
+        * Cause the Component to recompute layout and redraw. Useful if the window resized.
+        *
+        * @param {number} [availableWidth]  - the width of the container element
+        * @param {number} [availableHeight] - the height of the container element
+        */
+        public resize(width?: number, height?: number): Component;
         /**
         * Sets the x alignment of the Component.
         *
@@ -251,6 +260,10 @@ declare module Plottable {
         * @return {ComponentGroup}
         */
         public merge(c: Component): ComponentGroup;
+        /**
+        * Blow up a component and its DOM, so it can be safely removed
+        */
+        public remove(): void;
     }
 }
 declare module Plottable {
@@ -456,6 +469,16 @@ declare module Plottable {
         *     (Category10/Category20/Category20b/Category20c).
         */
         constructor(scaleType?: string);
+    }
+}
+declare module Plottable {
+    class TimeScale extends QuantitiveScale {
+        /**
+        * Creates a new TimeScale.
+        *
+        * @constructor
+        */
+        constructor();
     }
 }
 declare module Plottable {
@@ -716,10 +739,8 @@ declare module Plottable {
         * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: any, yAccessor?: any);
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
         public project(attrToSet: string, accessor: any, scale?: Scale): XYRenderer;
     }
 }
@@ -732,11 +753,8 @@ declare module Plottable {
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: any, yAccessor?: any, rAccessor?: any);
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
         public project(attrToSet: string, accessor: any, scale?: Scale): CircleRenderer;
     }
 }
@@ -749,43 +767,36 @@ declare module Plottable {
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
         */
-        constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
     }
 }
 declare module Plottable {
-    class BarRenderer extends XYRenderer {
+    class AbstractBarRenderer extends XYRenderer {
         /**
-        * Creates a BarRenderer.
+        * Creates an AbstractBarRenderer.
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
-        * @param {QuantitiveScale} yScale The y scale to use.
-        * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
-        *     the start position of each bar from the data.
-        * @param {IAccessor|string|number} [widthAccessor] An accessor for extracting
-        *     the width of each bar, in pixels, from the data.
-        * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
-        *     the height of each bar from the data.
+        * @param {Scale} yScale The y scale to use.
         */
-        constructor(dataset: any, xScale: Scale, yScale: QuantitiveScale, xAccessor?: IAccessor, widthAccessor?: IAccessor, yAccessor?: IAccessor);
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
         /**
         * Sets the baseline for the bars to the specified value.
         *
-        * @param {number} value The y-value to position the baseline at.
-        * @return {BarRenderer} The calling BarRenderer.
+        * @param {number} value The value to position the baseline at.
+        * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
         */
-        public baseline(value: number): BarRenderer;
+        public baseline(value: number): AbstractBarRenderer;
         /**
-        * Sets the horizontal alignment of the bars.
+        * Sets the bar alignment relative to the independent axis.
+        * Behavior depends on subclass implementation.
         *
-        * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
-        * @return {BarRenderer} The calling BarRenderer.
+        * @param {string} alignment The desired alignment.
+        * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
         */
-        public barAlignment(alignment: string): BarRenderer;
+        public barAlignment(alignment: string): AbstractBarRenderer;
         /**
         * Selects the bar under the given pixel position.
         *
@@ -797,14 +808,49 @@ declare module Plottable {
         public selectBar(x: number, y: number, select?: boolean): D3.Selection;
         /**
         * Deselects all bars.
-        * @return {BarRenderer} The calling BarRenderer.
+        * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
         */
-        public deselectAll(): BarRenderer;
+        public deselectAll(): AbstractBarRenderer;
     }
 }
 declare module Plottable {
-    class CategoryBarRenderer extends BarRenderer {
-        constructor(dataset: any, xScale: Scale, yScale: QuantitiveScale, xAccessor?: IAccessor, widthAccessor?: IAccessor, yAccessor?: IAccessor);
+    class BarRenderer extends AbstractBarRenderer {
+        /**
+        * Creates a BarRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {QuantitiveScale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: QuantitiveScale);
+        /**
+        * Sets the horizontal alignment of the bars.
+        *
+        * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
+        * @return {BarRenderer} The calling BarRenderer.
+        */
+        public barAlignment(alignment: string): BarRenderer;
+    }
+}
+declare module Plottable {
+    class HorizontalBarRenderer extends AbstractBarRenderer {
+        /**
+        * Creates a HorizontalBarRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {QuantitiveScale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: QuantitiveScale, yScale: Scale);
+        /**
+        * Sets the vertical alignment of the bars.
+        *
+        * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
+        * @return {HorizontalBarRenderer} The calling HorizontalBarRenderer.
+        */
+        public barAlignment(alignment: string): HorizontalBarRenderer;
     }
 }
 declare module Plottable {
@@ -816,11 +862,8 @@ declare module Plottable {
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-        * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-        * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
         */
-        constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor, rAccessor?: IAccessor);
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
     }
 }
 declare module Plottable {
@@ -837,15 +880,9 @@ declare module Plottable {
         * @param {OrdinalScale} yScale The y scale to use.
         * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
         *     cell.
-        * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
-        *     the x position of each grid cell from the data.
-        * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
-        *     the y position of each grid cell from the data.
-        * @param {IAccessor|string|number} [valueAccessor] An accessor for
-        *     extracting value of each grid cell from the data. This value will
-        *     be pass through the color scale to determine the color of the cell.
         */
-        constructor(dataset: any, xScale: OrdinalScale, yScale: OrdinalScale, colorScale: Scale, xAccessor?: any, yAccessor?: any, valueAccessor?: any);
+        constructor(dataset: any, xScale: OrdinalScale, yScale: OrdinalScale, colorScale: Scale);
+        public project(attrToSet: string, accessor: any, scale?: Scale): GridRenderer;
     }
 }
 declare module Plottable {
@@ -898,6 +935,7 @@ declare module Plottable {
         public minimumWidth(newVal: number): Table;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+        public remove(): void;
     }
 }
 declare module Plottable {
@@ -948,7 +986,7 @@ declare module Plottable {
         public titleLabel(x: TitleLabel): StandardChart;
         public titleLabel(x: string): StandardChart;
         public titleLabel(): TitleLabel;
-        public addCenterComponent(c: Component): StandardChart;
+        public center(c: Component): StandardChart;
     }
 }
 declare module Plottable {
@@ -1060,6 +1098,7 @@ declare module Plottable {
         public merge(c: Component): ComponentGroup;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
+        public remove(): void;
     }
 }
 declare module Plottable {
@@ -1112,10 +1151,7 @@ declare module Plottable {
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
-        * @param {any} [xAccessor] A function for extracting x values from the data.
-        * @param {any} [yAccessor] A function for extracting upper y values to color between.
-        * @param {any} [y0Accessor] A function for extracting lower y values to color between.
         */
-        constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: any, yAccessor?: any, y0Accessor?: any);
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
     }
 }
