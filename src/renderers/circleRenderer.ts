@@ -15,7 +15,7 @@ module Plottable {
       super(dataset, xScale, yScale);
       this.classed("circle-renderer", true);
       this.project("r", 3); // default
-      this.project("fill", () => "#00ffaa"); // default
+      this.project("fill", () => "steelblue"); // default
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {
