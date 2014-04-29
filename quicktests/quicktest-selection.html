@@ -9,11 +9,11 @@
     <script>
       window.onload = function() {
 
-        f1();
-        f2();
+        xdrag();
+        xydrag();
       }
 
-      function f1() {
+      function xydrag() {
         var dataseries = makeRandomData(20);
 
         var xScale = new Plottable.LinearScale();
@@ -30,9 +30,10 @@
                       .xAxis(xAxis).yAxis(yAxis)
                       .center(renderGroup)
                       .renderTo("#xy-test");
-        new Plottable.XYDragBoxInteraction(renderGroup).callback(function(x) {console.log(x)}).registerWithComponent();
+        cb = function(xy) {console.log("XY drag area: ", xy);}
+        new Plottable.XYDragBoxInteraction(renderGroup).callback(cb).registerWithComponent();
       }
-      function f2() {
+      function xdrag() {
         var dataseries = makeRandomData(20, 0.3);
         var dataseries_top = makeRandomData(20, 0.3);
         for (var i = 0; i < 20; ++i) {
@@ -63,7 +64,8 @@
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
                         .renderTo("#x-test");
 
-        new Plottable.XDragBoxInteraction(renderGroup).callback(function(x) {console.log(x)}).registerWithComponent();
+        cb = function(x) {console.log("X drag area: ", x);}
+        new Plottable.XDragBoxInteraction(renderGroup).callback(cb).registerWithComponent();
       }
 
 
