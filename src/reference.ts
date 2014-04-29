@@ -6,7 +6,7 @@
 /// <reference path="core/component.ts" />
 /// <reference path="core/dataSource.ts" />
 /// <reference path="core/table.ts" />
-/// <reference path="core/coordinator.ts" />
+/// <reference path="core/renderer.ts" />
 
 /// <reference path="scales/scale.ts" />
 /// <reference path="scales/quantitiveScale.ts" />
@@ -15,11 +15,11 @@
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
+/// <reference path="scales/scaleDomainCoordinator.ts" />
 
 /// <reference path="components/axis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
-/// <reference path="components/renderers/renderer.ts" />
 /// <reference path="components/renderers/xyRenderer.ts" />
 /// <reference path="components/renderers/circleRenderer.ts" />
 /// <reference path="components/renderers/lineRenderer.ts" />
@@ -36,4 +36,5 @@
 /// <reference path="interactions/mousemoveInteraction.ts" />
 /// <reference path="interactions/keyInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />
-/// <reference path="chart.ts" />
+
+/// <reference path="templates/standardChart.ts" />

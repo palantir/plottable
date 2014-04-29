@@ -1,4 +1,4 @@
-///<reference path="../../reference.ts" />
+///<reference path="../reference.ts" />
 
 module Plottable {
   export interface _IProjector {
