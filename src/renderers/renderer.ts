@@ -131,5 +131,13 @@ module Plottable {
       this.renderArea = this.content.append("g").classed("render-area", true);
       return this;
     }
+
+    public animate(toggle?: boolean) {
+      if (toggle == null) {
+        toggle = !this._animate;
+      }
+      this._animate = toggle;
+      return this;
+    }
   }
 }
