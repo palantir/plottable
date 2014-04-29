@@ -33,10 +33,13 @@
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
-/// <reference path="interactions/areaInteraction.ts" />
 /// <reference path="interactions/clickInteraction.ts" />
 /// <reference path="interactions/mousemoveInteraction.ts" />
 /// <reference path="interactions/keyInteraction.ts" />
 /// <reference path="interactions/panZoomInteraction.ts" />
+/// <reference path="interactions/drag/dragInteraction.ts" />
+/// <reference path="interactions/drag/dragBoxInteraction.ts" />
+/// <reference path="interactions/drag/xDragBoxInteraction.ts" />
+/// <reference path="interactions/drag/xYDragBoxInteraction.ts" />
 
 /// <reference path="templates/standardChart.ts" />

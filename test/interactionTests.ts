@@ -20,12 +20,12 @@ function makeFakeEvent(x: number, y: number): D3.Event {
 }
 
 function fakeDragSequence(anyedInteraction: any, startX: number, startY: number, endX: number, endY: number) {
-  anyedInteraction.dragstart();
+  anyedInteraction._dragstart();
   d3.event = makeFakeEvent(startX, startY);
-  anyedInteraction.drag();
+  anyedInteraction._drag();
   d3.event = makeFakeEvent(endX, endY);
-  anyedInteraction.drag();
-  anyedInteraction.dragend();
+  anyedInteraction._drag();
+  anyedInteraction._dragend();
   d3.event = null;
 }
 
@@ -78,7 +78,7 @@ describe("Interactions", () => {
     });
   });
 
-  describe("AreaInteraction", () => {
+  describe("XYDragBoxInteraction", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
@@ -86,7 +86,7 @@ describe("Interactions", () => {
     var xScale: Plottable.QuantitiveScale;
     var yScale: Plottable.QuantitiveScale;
     var renderer: Plottable.XYRenderer;
-    var interaction: Plottable.AreaInteraction;
+    var interaction: Plottable.XYDragBoxInteraction;
 
     var dragstartX = 20;
     var dragstartY = svgHeight-100;
@@ -100,12 +100,13 @@ describe("Interactions", () => {
       yScale = new Plottable.LinearScale();
       renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
       renderer.renderTo(svg);
-      interaction = new Plottable.AreaInteraction(renderer);
+      interaction = new Plottable.XYDragBoxInteraction(renderer);
       interaction.registerWithComponent();
     });
 
     afterEach(() => {
-      interaction.callback().clearBox();
+      interaction.callback();
+      interaction.clearBox();
     });
 
     it("All callbacks are notified with appropriate data when a drag finishes", () => {
@@ -132,7 +133,7 @@ describe("Interactions", () => {
 
     it("Highlights and un-highlights areas appropriately", () => {
       fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
-      var dragBoxClass = "." + (<any> Plottable.AreaInteraction).CLASS_DRAG_BOX;
+      var dragBoxClass = "." + (<any> Plottable.XYDragBoxInteraction).CLASS_DRAG_BOX;
       var dragBox = renderer.backgroundContainer.select(dragBoxClass);
       assert.isNotNull(dragBox, "the dragbox was created");
       var actualStartPosition = {x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y"))};
