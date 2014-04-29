@@ -1,5 +1,5 @@
 /*!
-Plottable v0.9.1 (https://github.com/palantir/plottable)
+Plottable v0.10.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1596,6 +1596,12 @@ var Plottable;
             var currentDomain = this.domain();
             var extent = currentDomain[1] - currentDomain[0];
             var newDomain = [currentDomain[0] - padProportion / 2 * extent, currentDomain[1] + padProportion / 2 * extent];
+            if (currentDomain[0] === 0) {
+                newDomain[0] = 0;
+            }
+            if (currentDomain[1] === 0) {
+                newDomain[1] = 0;
+            }
             this._setDomain(newDomain);
             return this;
         };
