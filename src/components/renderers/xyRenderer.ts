@@ -15,15 +15,13 @@ module Plottable {
      * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-     * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      */
-    constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor: any = "x", yAccessor: any = "y") {
+    constructor(dataset: any, xScale: Scale, yScale: Scale) {
       super(dataset);
       this.classed("xy-renderer", true);
 
-      this.project("x", xAccessor, xScale);
-      this.project("y", yAccessor, yScale);
+      this.project("x", "x", xScale); // default accessor
+      this.project("y", "y", yScale); // default accessor
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {

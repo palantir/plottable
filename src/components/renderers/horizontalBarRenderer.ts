@@ -11,19 +11,9 @@ module Plottable {
      * @param {IDataset} dataset The dataset to render.
      * @param {QuantitiveScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
-     *     the length of each bar from the data.
-     * @param {IAccessor|string|number} [widthAccessor] An accessor for extracting
-     *     the width of each bar, in pixels, from the data.
-     * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
-     *     the start position of each bar from the data.
      */
-    constructor(dataset: any,
-                xScale: QuantitiveScale,
-                yScale: Scale,
-                xAccessor?: IAccessor,
-                yAccessor?: IAccessor) {
-      super(dataset, xScale, yScale, xAccessor, yAccessor);
+    constructor(dataset: any, xScale: QuantitiveScale, yScale: Scale) {
+      super(dataset, xScale, yScale);
     }
 
     public _paint() {

@@ -12,11 +12,9 @@ module Plottable {
      * @param {IDataset} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-     * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
      */
-    constructor(dataset: any, xScale: Scale, yScale: Scale, xAccessor?: IAccessor, yAccessor?: IAccessor) {
-      super(dataset, xScale, yScale, xAccessor, yAccessor);
+    constructor(dataset: any, xScale: Scale, yScale: Scale) {
+      super(dataset, xScale, yScale);
       this.classed("line-renderer", true);
     }
 

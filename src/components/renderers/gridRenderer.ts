@@ -15,22 +15,9 @@ module Plottable {
      * @param {OrdinalScale} yScale The y scale to use.
      * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
      *     cell.
-     * @param {IAccessor|string|number} [xAccessor] An accessor for extracting
-     *     the x position of each grid cell from the data.
-     * @param {IAccessor|string|number} [yAccessor] An accessor for extracting
-     *     the y position of each grid cell from the data.
-     * @param {IAccessor|string|number} [valueAccessor] An accessor for
-     *     extracting value of each grid cell from the data. This value will
-     *     be pass through the color scale to determine the color of the cell.
      */
-    constructor(dataset: any,
-                xScale: OrdinalScale,
-                yScale: OrdinalScale,
-                colorScale: Scale,
-                xAccessor?: any,
-                yAccessor?: any,
-                valueAccessor?: any) {
-      super(dataset, xScale, yScale, xAccessor, yAccessor);
+    constructor(dataset: any, xScale: OrdinalScale, yScale: OrdinalScale, colorScale: Scale) {
+      super(dataset, xScale, yScale);
       this.classed("grid-renderer", true);
 
       // The x and y scales should render in bands with no padding
@@ -38,7 +25,15 @@ module Plottable {
       this.yScale.rangeType("bands", 0, 0);
 
       this.colorScale = colorScale;
-      this.project("fill", valueAccessor, colorScale);
+      this.project("fill", "value", colorScale); // default
+    }
+
+    public project(attrToSet: string, accessor: any, scale?: Scale) {
+      super.project(attrToSet, accessor, scale);
+      if (attrToSet === "fill") {
+        this.colorScale = this._projectors["fill"].scale;
+      }
+      return this;
     }
 
     public _paint() {

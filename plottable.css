@@ -1,7 +1,7 @@
 
 
 svg.plottable {
-  display : block; // SVGs must be block elements for width/height calculations to work in Firefox.
+  display : block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
 }
 
 .plottable div {

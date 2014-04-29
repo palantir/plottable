@@ -10,17 +10,12 @@ module Plottable {
      * @param {IDataset} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {IAccessor} [xAccessor] A function for extracting x values from the data.
-     * @param {IAccessor} [yAccessor] A function for extracting y values from the data.
-     * @param {IAccessor} [rAccessor] A function for extracting radius values from the data.
      */
-    constructor(dataset: any, xScale: Scale, yScale: Scale,
-                xAccessor?: any, yAccessor?: any, rAccessor?: any) {
-      super(dataset, xScale, yScale, xAccessor, yAccessor);
-/*      this._rAccessor = (rAccessor != null) ? rAccessor : CircleRenderer.defaultRAccessor;*/
+    constructor(dataset: any, xScale: Scale, yScale: Scale) {
+      super(dataset, xScale, yScale);
       this.classed("circle-renderer", true);
-      this.project("r", 3);
-      this.project("fill", "#00ffaa");
+      this.project("r", 3); // default
+      this.project("fill", () => "steelblue"); // default
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {

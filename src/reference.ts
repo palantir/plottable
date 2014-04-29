@@ -13,6 +13,7 @@
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
+/// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
 
 /// <reference path="components/axis.ts" />
