@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 function makeFakeEvent(x: number, y: number): D3.Event {
   return {
       dx: 0,

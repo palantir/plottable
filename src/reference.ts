@@ -7,6 +7,7 @@
 /// <reference path="core/dataSource.ts" />
 /// <reference path="core/table.ts" />
 /// <reference path="core/renderer.ts" />
+/// <reference path="core/renderController.ts" />
 
 /// <reference path="scales/scale.ts" />
 /// <reference path="scales/quantitiveScale.ts" />

@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 describe("Gridlines", () => {
   it("Gridlines and axis tick marks align", () => {
     var svg = generateSVG(640, 480);
