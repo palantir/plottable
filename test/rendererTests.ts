@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 var quadraticDataset = makeQuadraticSeries(10);
 
 describe("Renderers", () => {

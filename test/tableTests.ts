@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
