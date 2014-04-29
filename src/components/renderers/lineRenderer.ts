@@ -16,6 +16,7 @@ module Plottable {
     constructor(dataset: any, xScale: Scale, yScale: Scale) {
       super(dataset, xScale, yScale);
       this.classed("line-renderer", true);
+      this.project("stroke", () => "steelblue");
     }
 
     public _anchor(element: D3.Selection) {

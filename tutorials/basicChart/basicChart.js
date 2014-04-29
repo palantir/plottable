@@ -4,7 +4,7 @@ window.onload = function() {
 
   var xAxis = new Plottable.XAxis(xScale, "bottom");
   var yAxis = new Plottable.YAxis(yScale, "left");
-  var renderer = new Plottable.CircleRenderer(xyData, xScale, yScale);
+  var renderer = new Plottable.LineRenderer(xyData, xScale, yScale);
 
   var chart = new Plottable.Table([
                     [yAxis, renderer],
