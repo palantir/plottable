@@ -149,6 +149,12 @@ module Plottable {
       var currentDomain = this.domain();
       var extent = currentDomain[1]-currentDomain[0];
       var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1] + padProportion/2 * extent];
+      if (currentDomain[0] === 0) {
+        newDomain[0] = 0;
+      }
+      if (currentDomain[1] === 0) {
+        newDomain[1] = 0;
+      }
       this._setDomain(newDomain);
       return this;
     }
