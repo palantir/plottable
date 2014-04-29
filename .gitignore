@@ -1,5 +1,9 @@
 .DS_Store
 *.tmp.txt
 node_modules
-bower_components
 
+# Emacs
+.#*
+
+# vim
+*.swp

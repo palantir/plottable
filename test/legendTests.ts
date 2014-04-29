@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 describe("Legends", () => {
   var svg: D3.Selection;
   var color: Plottable.ColorScale;
@@ -30,15 +31,15 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it("legend domain can be updated after initialization, and rowMinimum updates as well", () => {
+  it("legend domain can be updated after initialization, and minimumHeight updates as well", () => {
     legend._anchor(svg);
     legend.scale(color);
-    assert.equal(legend.rowMinimum(), 0, "there is no rowMinimum while the domain is empty");
+    assert.equal(legend.minimumHeight(), 0, "there is no minimumHeight while the domain is empty");
     color.domain(["foo", "bar"]);
-    var height1 = legend.rowMinimum();
-    assert.operator(height1, ">", 0, "changing the domain gives a positive rowMinimum");
+    var height1 = legend.minimumHeight();
+    assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
     color.domain(["foo", "bar", "baz"]);
-    assert.operator(legend.rowMinimum(), ">", height1, "adding to the domain increases the rowMinimum");
+    assert.operator(legend.minimumHeight(), ">", height1, "adding to the domain increases the minimumHeight");
     svg.remove();
   });
 
@@ -52,7 +53,7 @@ describe("Legends", () => {
       totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
     });
     assert.lengthOf(legends[0], 8, "there were 8 legends");
-    assert.operator(totalHeight, "<=", legend.rowMinimum(), "the legend did not overflow its requested space");
+    assert.operator(totalHeight, "<=", legend.minimumHeight(), "the legend did not overflow its requested space");
     svg.remove();
   });
 
@@ -95,8 +96,8 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it("rowMinimum can't be set on a legend", () => {
-    assert.throws(() => legend.rowMinimum(5), Error, "cannot be directly set");
+  it("minimumHeight can't be set on a legend", () => {
+    assert.throws(() => legend.minimumHeight(5), Error, "cannot be directly set");
     svg.remove();
   });
 });

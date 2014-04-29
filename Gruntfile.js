@@ -10,50 +10,70 @@ module.exports = function(grunt) {
   var path = require("path");
   var cwd = process.cwd();
 
-  // project configuration
-  grunt.initConfig({
+  var tsJSON = {
+    dev: {
+      src: ["src/**/*.ts", "typings/**/*.d.ts"],
+      out: "build/plottable.js",
+      // watch: "src",
+      options: {
+        target: 'es5',
+        noImplicitAny: true,
+        sourceMap: false,
+        declaration: true,
+        removeComments: false
+      }
+    },
+    test: {
+      src: ["test/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
+      out: "build/tests.js",
+      // watch: "test",
+      options: {
+        target: 'es5',
+        sourceMap: false,
+        declaration: false,
+        removeComments: false
+      }
+    },
+    examples: {
+      src: ["examples/*.ts", "typings/**/*.d.ts"],
+      outDir: "build",
+      // watch: "examples",
+      options: {
+        target: 'es5',
+        sourceMap: false,
+        declaration: false,
+        removeComments: false
+      }
+    }
+  };
+
+  var prefixMatch = "\n *"
+  var varNameMatch = "[^:;]*"
+  var nestedBraceMatch = ": {[^{}]*}"
+  var typeNameMatch = ": [^;]*"
+  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?;"
+
+  var sedJSON = {
+    private_definitions: {
+      pattern: prefixMatch + "private " + varNameMatch + finalMatch,
+      replacement: "",
+      path: "plottable.d.ts"
+    },
+    protected_definitions: {
+      pattern: prefixMatch + "public _" + varNameMatch + finalMatch,
+      replacement: "",
+      path: "plottable.d.ts"
+    },
+  };
+
+  var configJSON = {
     concat: {
       license: {
         src: ["license_header.txt", "plottable.js"],
         dest: "plottable.js",
       },
     },
-    ts: {
-      dev: {
-        src: ["src/*.ts", "typings/**/*.d.ts"],
-        out: "build/plottable.js",
-        // watch: "src",
-        options: {
-          target: 'es5',
-          noImplicitAny: true,
-          sourceMap: false,
-          declaration: true,
-          removeComments: false
-        }
-      },
-      test: {
-        src: ["test/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
-        out: "build/tests.js",
-        // watch: "test",
-        options: {
-          target: 'es5',
-          sourceMap: false,
-          declaration: false,
-          removeComments: false
-        }
-      },
-      examples: {
-        src: ["examples/*.ts", "typings/**/*.d.ts"],
-        outDir: "build",
-        // watch: "examples",
-        options: {
-          target: 'es5',
-          sourceMap: false,
-          declaration: false,
-          removeComments: false
-        }
-      }
-    },
+    ts: tsJSON,
     tslint: {
       options: {
         configuration: grunt.file.readJSON("tslint.json")
@@ -66,7 +86,7 @@ module.exports = function(grunt) {
       },
       "rebuild": {
         "tasks": ["dev-compile"],
-        "files": ["src/*.ts"]
+        "files": ["src/**/*.ts"]
       },
       "tests": {
         "tasks": ["ts:test", "tslint"],
@@ -78,9 +98,9 @@ module.exports = function(grunt) {
       }
     },
     blanket_mocha: {
-      all: ['tests.html'],
+      all: ['test/coverage.html'],
       options: {
-        threshold: 85
+        threshold: 80
       }
     },
     connect: {
@@ -91,18 +111,8 @@ module.exports = function(grunt) {
         }
       }
     },
-    sed: {
-      private_definitions: {
-        pattern: "\n *private [^:;]*(: [^;]*)?;",
-        replacement: "",
-        path: "plottable.d.ts"
-      },
-      protected_definitions: {
-        pattern: "\n *public _[^:;]*(: [^;]*)?;",
-        replacement: "",
-        path: "plottable.d.ts"
-      },
-    },
+    clean: {tscommand: ["tscommand*.tmp.txt"]},
+    sed: sedJSON,
     copy: {
       dist: {
         files: [
@@ -123,7 +133,11 @@ module.exports = function(grunt) {
         }
       }
     }
-  });
+  };
+
+
+  // project configuration
+  grunt.initConfig(configJSON);
 
   require('load-grunt-tasks')(grunt);
 
@@ -133,7 +147,8 @@ module.exports = function(grunt) {
                                   "ts:dev",
                                   "ts:test",
                                   "ts:examples",
-                                  "tslint"]);
+                                  "tslint",
+                                  "clean:tscommand"]);
 
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
@@ -147,4 +162,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
+  grunt.registerTask("bm", ["blanket_mocha"]);
 };

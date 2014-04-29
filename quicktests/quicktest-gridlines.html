@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>Gridlines Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script>
+
+    <script>
+      window.onload = function() {
+        var dataseries = makeRandomData(20);
+
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderGroup = renderAreaD1.merge(gridlines);
+        var chart = new Plottable.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis);
+        chart.renderTo("#gridlines-test");
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="gridlines-test" width="480" height="320"></svg>
+  </body>
+
+</html>

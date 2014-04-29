@@ -1,6 +1,6 @@
 {
   "name": "plottable.js",
-  "version": "0.7.0",
+  "version": "0.9.1",
   "description": "Build flexible, performant, interactive charts using D3",
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
     "typescript": "~0.9.7",
     "grunt-sed": "~0.1.1",
     "grunt-git": "~0.2.6",
-    "grunt-contrib-copy": "~0.5.0"
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-clean": "~0.4.0"
   }
 }

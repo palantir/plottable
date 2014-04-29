@@ -1,10 +1,11 @@
 {
   "rules": {
-    "class-name": true,
+    "class-name": false,
     "curly": true,
     "eofline": true,
     "forin": true,
     "indent": [true, 2],
+    "jsdoc-format": true,
     "label-position": true,
     "label-undefined": true,
     "max-line-length": [true, 140],
@@ -29,6 +30,7 @@
     "radix": true,
     "semicolon": true,
     "triple-equals": [true, "allow-null-check"],
-    "variable-name": false
+    "variable-name": false,
+    "whitespace": ["check-branch", "check-decl", "check-type"]
   }
 }

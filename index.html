@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Plottable : A library for easily creating powerful, flexible, interactive charts. Built on D3.js" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="Plottable.js: a library for easily creating powerful, flexible, interactive charts. Built on D3.js." />
 
-    <link rel="stylesheet" type="text/css" media="screen" href="examples/main-page/stylesheet.css">
-    <link rel="stylesheet" type="text/css" media="screen" href="examples/main-page/mainpage-plottable.css">
+    <title>Plottable.js</title>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+    <!-- plottable and dependencies -->
+    <script src="bower_components/d3/d3.min.js"></script>
     <link href="plottable.css" type="text/css" rel="stylesheet" />
     <script src="examples/main-page/commit-dashboard.js"></script>
     <script src="examples/main-page/commit-dashboard-data-manager.js"></script>
@@ -18,6 +23,7 @@
     <script src="examples/main-page/commit-chart-shared.js"></script>
     <script src="examples/main-page/commit-chart.js"></script>
 
+    <!-- glue -->
     <script>
       function sizeSVG(svg) {
         var width = Plottable.Utils.getSVGPixelWidth(svg);
@@ -36,50 +42,49 @@
           data.sort(function(a,b) {return a.date - b.date});
           var dataset = {data: data, metadata: {}};
           var dataManager = makeCommitDataManager(data);
-          // results = dataManager();
           var interactiveSVG = sizeSVG(d3.select("#interactive-demo"));
           commitDashboard(dataManager, interactiveSVG);
-
-          // var commitDataset = {data: data.commits, metadata: {}};
-          // var svg = d3.select("#commit-chart");
-          // sizeSVG(svg);
-          // commitChart(svg, commitDataset);
         });
       }
     </script>
 
-    <title>Plottable</title>
+    <!-- style -->
+    <style type="text/css">
+      body > .container {
+        padding-top: 70px;
+      }
+    </style>
+
   </head>
 
   <body>
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/palantir/plottable">View on GitHub</a>
+      <!-- fork me on GitHub! -->
+      <a href="https://github.com/palantir/plottable"><img style="z-index: 100000; position: fixed; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
-          <h1 id="project_title">Plottable.js</h1>
-          <h2 id="project_tagline">A library for concisely creating powerful, flexible, interactive charts. Built on D3.js</h2>
 
-        </header>
-    </div>
-    <!-- MAIN CONTENT -->
-<!--     <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3> -->
-        <div class="outer-block">
-        <div class="background-block">
-            <svg id="interactive-demo" width="95%"></svg>
+    <div class="container">
+      <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">Plottable.js</a>
+          </div>
         </div>
-      </div>
-<!--         </h3>
-      </section>
-    </div> -->
+      </nav>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Plottable maintained by <a href="https://github.com/palantir">palantir</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
+      <h1>Plottable.js</h1>
+      <h2>A library for concisely creating powerful, flexible, interactive charts. Built on D3.js.</h2>
+
+      <svg id="interactive-demo" width="95%"></svg>
+
+      <!-- TODO sections -->
+      <!--
+      <div class="page-header"><h1>Plot</h1></div>
+      <div class="page-header"><h1>Layout</h1></div>
+      <div class="page-header"><h1>Interact<h1></div>
+      <div class="page-header"><h1>Synced</h1></div>
+      -->
+
+      <!-- TODO built by palantir -->
     </div>
 
 

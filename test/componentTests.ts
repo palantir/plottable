@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform(component.element.attr("transform")).translate;
@@ -53,6 +54,39 @@ describe("Component behavior", () => {
       svg.remove();
     });
 
+    it("computeLayout works with CSS layouts", () => {
+      // Manually size parent
+      var parent = d3.select(svg.node().parentNode);
+      parent.style("width", "200px");
+      parent.style("height", "400px");
+
+      // Remove width/height attributes and style with CSS
+      svg.attr("width", null).attr("height", null);
+      svg.style("width", "50%");
+      svg.style("height", "50%");
+
+      c._anchor(svg)._computeLayout();
+
+      assert.equal(c.availableWidth, 100, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableHeight, 200, "computeLayout defaulted height to svg height");
+      assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
+      assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
+
+      svg.style("width", "25%").style("height", "25%");
+
+      c._computeLayout();
+
+      assert.equal(c.availableWidth, 50, "computeLayout updated width to new svg width");
+      assert.equal(c.availableHeight, 100, "computeLayout updated height to new svg height");
+      assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
+      assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
+
+      // reset test page DOM
+      parent.style("width", "auto");
+      parent.style("height", "auto");
+      svg.remove();
+    });
+
     it("computeLayout will not default when attached to non-root node", () => {
       var g = svg.append("g");
       c._anchor(g);
@@ -95,7 +129,7 @@ describe("Component behavior", () => {
   });
 
   it("fixed-width component will align to the right spot", () => {
-    c.rowMinimum(100).colMinimum(100);
+    c.minimumHeight(100).minimumWidth(100);
     c._anchor(svg);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -111,7 +145,7 @@ describe("Component behavior", () => {
   });
 
   it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
-      c.rowMinimum(100).colMinimum(100);
+      c.minimumHeight(100).minimumWidth(100);
       c._anchor(svg);
       c.xOffset(20).yOffset(20);
       c._computeLayout();
@@ -136,10 +170,9 @@ describe("Component behavior", () => {
       svg.remove();
     });
 
-
   it("component defaults are as expected", () => {
-    assert.equal(c.rowMinimum(), 0, "rowMinimum defaults to 0");
-    assert.equal(c.colMinimum(), 0, "colMinimum defaults to 0");
+    assert.equal(c.minimumHeight(), 0, "minimumHeight defaults to 0");
+    assert.equal(c.minimumWidth(), 0, "minimumWidth defaults to 0");
     assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
     assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
@@ -148,24 +181,32 @@ describe("Component behavior", () => {
   });
 
   it("getters and setters work as expected", () => {
-    c.rowMinimum(12);
-    assert.equal(c.rowMinimum(), 12, "rowMinimum setter works");
-    c.colMinimum(14);
-    assert.equal(c.colMinimum(), 14, "colMinimum setter works");
+    c.minimumHeight(12);
+    assert.equal(c.minimumHeight(), 12, "minimumHeight setter works");
+    c.minimumWidth(14);
+    assert.equal(c.minimumWidth(), 14, "minimumWidth setter works");
     svg.remove();
   });
 
   it("clipPath works as expected", () => {
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
-    var expectedClipPathID: number = (<any> Plottable.Component).clipPathId;
+    var expectedClipPathID = c._plottableID;
     c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
-    assert.equal((<any> Plottable.Component).clipPathId, expectedClipPathID+1, "clipPathId incremented");
     var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
     assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
     var clipRect = (<any> c).boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
     assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
+    svg.remove();
+  });
+
+  it("componentID works as expected", () => {
+    var expectedID = (<any> Plottable.PlottableObject).nextID;
+    var c1 = new Plottable.Component();
+    assert.equal(c1._plottableID, expectedID, "component id on next component was as expected");
+    var c2 = new Plottable.Component();
+    assert.equal(c2._plottableID, expectedID+1, "future components increment appropriately");
     svg.remove();
   });
 
@@ -255,6 +296,37 @@ describe("Component behavior", () => {
     assert.isFalse(c.classed("CSS-POSTANCHOR"));
     assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
     assert.equal(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
+    svg.remove();
+  });
+
+  it("remove works as expected", () => {
+    var cbCalled = 0;
+    var cb = (b: Plottable.Broadcaster) => cbCalled++;
+    var b = new Plottable.Broadcaster();
+
+    var t = new Plottable.Table();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+
+    t._registerToBroadcaster(b, cb);
+    c1._registerToBroadcaster(b, cb);
+    c2._registerToBroadcaster(b, cb);
+    c3._registerToBroadcaster(b, cb);
+
+    var cg = c2.merge(c3);
+    t.addComponent(0, 0, c1);
+    t.addComponent(1, 0, cg);
+    t.renderTo(svg);
+    b._broadcast();
+    assert.equal(cbCalled, 4, "the callback was called 4 times");
+    assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
+    t.remove();
+    b._broadcast();
+    assert.equal(cbCalled, 4, "the callback was not called again");
+    assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
+
+    assert.throws(() => t.renderTo(svg), Error);
     svg.remove();
   });
 });

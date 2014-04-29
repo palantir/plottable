@@ -1,6 +1,6 @@
 {
   "name": "plottable",
-  "version": "0.7.0",
+  "version": "0.9.1",
   "ignore": [
     "**/*",
     "!plottable.js",
@@ -9,7 +9,7 @@
   ],
   "keywords": ["plottable", "plottablejs", "plottable.js"],
   "dependencies": {
-    "d3": ">=3.4.1"
+    "d3": "3.4.5"
   },
   "devDependencies": {
     "chai": "1.9.0",

@@ -29,7 +29,7 @@ function commitChart(svg, dataset) {
                  .xAccessor("date").yAccessor(hourAccessor)
                  .rAccessor(radiusAccessor).colorAccessor(colorAccessor);
 
-  var legend    = new Plottable.Legend(colorScale).colMinimum(160).xOffset(-15).yOffset(10);
+  var legend    = new Plottable.Legend(colorScale).minimumWidth(160).xOffset(-15).yOffset(10);
   var gridlines = new Plottable.Gridlines(xScale, yScale);
   var group     = legend.merge(renderer).merge(gridlines);
 
@@ -37,7 +37,7 @@ function commitChart(svg, dataset) {
   var xAxis  = new Plottable.XAxis(xScale, "bottom", dateFormatter);
   var yAxis  = new Plottable.YAxis(yScale, "left", hourFormatter).showEndTickLabels(true);
 
-  var chart = new Plottable.StandardChart().addCenterComponent(group)
+  var chart = new Plottable.StandardChart().center(group)
                   .xAxis(xAxis).yAxis(yAxis)
                   .xLabel("Date of Commit").yLabel("Commit Time")
                   .titleLabel("Commit History");

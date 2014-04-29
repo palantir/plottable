@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 function makeFakeEvent(x: number, y: number): D3.Event {
   return {
       dx: 0,
@@ -33,8 +34,8 @@ describe("Interactions", () => {
     it("Pans properly", () => {
       // The only difference between pan and zoom is internal to d3
       // Simulating zoom events is painful, so panning will suffice here
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
+      var xScale = new Plottable.LinearScale().domain([0, 11]);
+      var yScale = new Plottable.LinearScale().domain([11, 0]);
 
       var svg = generateSVG();
       var dataset = makeLinearSeries(11);
@@ -70,8 +71,8 @@ describe("Interactions", () => {
       var expectedXDragChange = -dragDistancePixelX * getSlope(xScale);
       var expectedYDragChange = -dragDistancePixelY * getSlope(yScale);
 
-      assert.equal(xDomainAfter[0]-xDomainBefore[0], expectedXDragChange, "x domain changed by the correct amount");
-      assert.equal(yDomainAfter[0]-yDomainBefore[0], expectedYDragChange, "y domain changed by the correct amount");
+      assert.closeTo(xDomainAfter[0]-xDomainBefore[0], expectedXDragChange, 1, "x domain changed by the correct amount");
+      assert.closeTo(yDomainAfter[0]-yDomainBefore[0], expectedYDragChange, 1, "y domain changed by the correct amount");
 
       svg.remove();
     });
@@ -81,7 +82,7 @@ describe("Interactions", () => {
     var svgWidth = 400;
     var svgHeight = 400;
     var svg: D3.Selection;
-    var dataset: Plottable.IDataset;
+    var dataset: Plottable.DataSource;
     var xScale: Plottable.QuantitiveScale;
     var yScale: Plottable.QuantitiveScale;
     var renderer: Plottable.XYRenderer;
@@ -94,7 +95,7 @@ describe("Interactions", () => {
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
-      dataset = makeLinearSeries(10);
+      dataset = new Plottable.DataSource(makeLinearSeries(10));
       xScale = new Plottable.LinearScale();
       yScale = new Plottable.LinearScale();
       renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
@@ -146,96 +147,6 @@ describe("Interactions", () => {
     });
 
     after(() => {
-      svg.remove();
-    });
-  });
-
-  describe("BrushZoomInteraction", () => {
-    it("Zooms in correctly on drag", () =>{
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
-
-      var svgWidth  = 400;
-      var svgHeight = 400;
-      var svg = generateSVG(svgWidth, svgHeight);
-      var dataset = makeLinearSeries(11);
-      var renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
-      renderer.renderTo(svg);
-
-      var xDomainBefore = xScale.domain();
-      var yDomainBefore = yScale.domain();
-
-      var dragstartX = 10;
-      var dragstartY = 210;
-      var dragendX = 190;
-      var dragendY = 390;
-
-      var expectedXDomain = [xScale.invert(dragstartX), xScale.invert(dragendX)];
-      var expectedYDomain = [yScale.invert(dragendY)  , yScale.invert(dragstartY)]; // reversed because Y scale is
-
-      var indicesCallbackCalled = false;
-      var interaction: any;
-      var indicesCallback = (indices: number[]) => {
-        indicesCallbackCalled = true;
-        interaction.clearBox();
-        assert.deepEqual(indices, [1, 2, 3, 4], "the correct points were selected");
-      };
-      var zoomCallback = new Plottable.ZoomCallbackGenerator().addXScale(xScale).addYScale(yScale).getCallback();
-      var callback = (a: Plottable.SelectionArea) => {
-        var dataArea = renderer.invertXYSelectionArea(a);
-        var indices = renderer.getDataIndicesFromArea(dataArea);
-        indicesCallback(indices);
-        zoomCallback(a);
-      };
-      interaction = new Plottable.AreaInteraction(renderer).callback(callback);
-      interaction.registerWithComponent();
-
-      fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
-      assert.isTrue(indicesCallbackCalled, "indicesCallback was called");
-      assert.deepEqual(xScale.domain(), expectedXDomain, "X scale domain was updated correctly");
-      assert.deepEqual(yScale.domain(), expectedYDomain, "Y scale domain was updated correclty");
-
-      svg.remove();
-    });
-  });
-
-  describe("CrosshairsInteraction", () => {
-    it("Crosshairs manifest basic functionality", () => {
-      var svg = generateSVG(400, 400);
-      var dp = (x, y) => { return {x: x, y: y}; };
-      var data = [dp(0, 0), dp(20, 10), dp(40, 40)];
-      var dataset = {metadata: {cssClass: "foo"}, data: data};
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
-      var circleRenderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
-      var crosshairs = new Plottable.CrosshairsInteraction(circleRenderer);
-      crosshairs.registerWithComponent();
-      circleRenderer.renderTo(svg);
-
-      var crosshairsG = circleRenderer.foregroundContainer.select(".crosshairs");
-      var circle = crosshairsG.select("circle");
-      var xLine = crosshairsG.select(".x-line");
-      var yLine = crosshairsG.select(".y-line");
-
-      crosshairs.mousemove(0,0);
-      assert.equal(circle.attr("cx"), 0, "the crosshairs are at x=0");
-      assert.equal(circle.attr("cy"), 400, "the crosshairs are at y=400");
-      assert.equal(xLine.attr("d"), "M 0 400 L 400 400", "the xLine behaves properly at y=400");
-      assert.equal(yLine.attr("d"), "M 0 0 L 0 400", "the yLine behaves properly at x=0");
-
-      crosshairs.mousemove(30, 0);
-      // It should stay in the same position
-      assert.equal(circle.attr("cx"), 0, "the crosshairs are at x=0 still");
-      assert.equal(circle.attr("cy"), 400, "the crosshairs are at y=400 still");
-      assert.equal(xLine.attr("d"), "M 0 400 L 400 400", "the xLine behaves properly at y=400");
-      assert.equal(yLine.attr("d"), "M 0 0 L 0 400", "the yLine behaves properly at x=0");
-
-      crosshairs.mousemove(300, 0);
-      assert.equal(circle.attr("cx"), 200, "the crosshairs are at x=200");
-      assert.equal(circle.attr("cy"), 300, "the crosshairs are at y=300");
-      assert.equal(xLine.attr("d"), "M 0 300 L 400 300", "the xLine behaves properly at y=300");
-      assert.equal(yLine.attr("d"), "M 200 0 L 200 400", "the yLine behaves properly at x=200");
-
       svg.remove();
     });
   });

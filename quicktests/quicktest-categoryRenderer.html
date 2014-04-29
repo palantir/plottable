@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <title>Bar Renderer Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script>
+
+    <script>
+      var data = [
+          { name: "Spot", age: 8 },
+          { name: "Poptart", age: 1 },
+          { name: "Budoka", age: 3 },
+          { name: "Sugar", age: 14 },
+          { name: "Tac", age: -5 }
+        ];
+
+      var ds = new Plottable.DataSource(data);
+      var xScale = new Plottable.OrdinalScale().rangeType("bands");
+      var xAxis = new Plottable.XAxis(xScale, "bottom", function(d) { return d; } );
+
+      var yScale = new Plottable.LinearScale();
+      var yAxis = new Plottable.YAxis(yScale, "left");
+      yAxis.showEndTickLabels(true);
+
+      var barRenderer = new Plottable.BarRenderer(ds, xScale, yScale)
+                              .project("x", "name", xScale)
+                              .project("y", "age", yScale)
+                              .project("fill", function() {return "steelblue"});
+      var chart = new Plottable.StandardChart().center(barRenderer).xAxis(xAxis).yAxis(yAxis);
+      // barRenderer._animate = false;
+
+      window.onload = function() { chart.renderTo("#meow"); }
+
+      function younger() {
+        var data = ds.data();
+        data.forEach(function(d) { d.age--; });
+        ds.data(data);
+      }
+      function older() {
+        var data = ds.data();
+        data.forEach(function(d) { d.age++; });
+        ds.data(data);
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="meow" width="480" height="320"></svg>
+    <p />
+    <button name="minus-age" onclick="younger()">-1 year</button><button name="plus-age" onclick="older()">+1 year</button>
+  </body>
+</html>

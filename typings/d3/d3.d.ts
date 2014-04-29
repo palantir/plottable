@@ -242,7 +242,7 @@ declare module D3 {
         *
         * @param map Array of objects to get the values from
         */
-        values(map: any[]): any[];
+        values(map: any): any[];
         /**
         * List the key-value entries of an associative array.
         *

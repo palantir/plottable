@@ -60,4 +60,121 @@ describe("Utils", () => {
     assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
     svg.remove();
   });
+
+  it("accessorize works properly", () => {
+    var datum = {"foo": 2, "bar": 3, "key": 4};
+
+    var f = (d: any, i: number, m: any) => d + i;
+    var a1 = Plottable.Utils.accessorize(f);
+    assert.equal(f, a1, "function passes through accessorize unchanged");
+
+    var a2 = Plottable.Utils.accessorize("key");
+    assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
+
+    var a3 = Plottable.Utils.accessorize("#aaaa");
+    assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
+
+    var a4 = Plottable.Utils.accessorize(33);
+    assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
+
+    var a5 = Plottable.Utils.accessorize(datum);
+    assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
+  });
+
+  it("StrictEqualityAssociativeArray works as expected", () => {
+    var s = new Plottable.Utils.StrictEqualityAssociativeArray();
+    var o1 = {};
+    var o2 = {};
+    assert.isFalse(s.has(o1));
+    assert.isFalse(s.delete(o1));
+    assert.isUndefined(s.get(o1));
+    assert.isFalse(s.set(o1, "foo"));
+    assert.equal(s.get(o1), "foo");
+    assert.isTrue(s.set(o1, "bar"));
+    assert.equal(s.get(o1), "bar");
+    s.set(o2, "baz");
+    s.set(3, "bam");
+    s.set("3", "ball");
+    assert.equal(s.get(o1), "bar");
+    assert.equal(s.get(o2), "baz");
+    assert.equal(s.get(3), "bam");
+    assert.equal(s.get("3"), "ball");
+    assert.isTrue(s.delete(3));
+    assert.isUndefined(s.get(3));
+    assert.equal(s.get(o2), "baz");
+    assert.equal(s.get("3"), "ball");
+    });
+
+  it("uniq works as expected", () => {
+    var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
+    assert.deepEqual(Plottable.Utils.uniq(strings), ["foo", "bar", "baz", "bam"]);
+  });
+
+  it("IDCounter works as expected", () => {
+    var i = new Plottable.Utils.IDCounter();
+    assert.equal(i.get("f"), 0);
+    assert.equal(i.increment("f"), 1);
+    assert.equal(i.increment("g"), 1);
+    assert.equal(i.increment("f"), 2);
+    assert.equal(i.decrement("f"), 1);
+    assert.equal(i.get("f"), 1);
+    assert.equal(i.get("f"), 1);
+    assert.equal(i.decrement(2), -1);
+  });
+
+  it("can get a plain element's size", () => {
+    var parent = getSVGParent();
+    parent.style("width", "300px");
+    parent.style("height", "200px");
+    var parentElem = parent[0][0];
+
+    var width = Plottable.Utils.getElementWidth(parentElem);
+    assert.equal(width, 300, "measured width matches set width");
+    var height = Plottable.Utils.getElementHeight(parentElem);
+    assert.equal(height, 200, "measured height matches set height");
+  });
+
+  it("can get the svg's size", () => {
+    var svg = generateSVG(450, 120);
+    var svgElem = svg[0][0];
+
+    var width = Plottable.Utils.getElementWidth(svgElem);
+    assert.equal(width, 450, "measured width matches set width");
+    var height = Plottable.Utils.getElementHeight(svgElem);
+    assert.equal(height, 120, "measured height matches set height");
+    svg.remove();
+  });
+
+
+  it("can accept multiple units and convert to pixels", () => {
+    var parent     = getSVGParent();
+    var parentElem = parent[0][0];
+    var child      = parent.append("div");
+    var childElem  = child[0][0];
+
+    parent.style("width", "200px");
+    parent.style("height", "50px");
+    assert.equal(Plottable.Utils.getElementWidth(parentElem), 200, "width is correct");
+    assert.equal(Plottable.Utils.getElementHeight(parentElem), 50, "height is correct");
+
+    child.style("width", "20px");
+    child.style("height", "10px");
+    assert.equal(Plottable.Utils.getElementWidth(childElem), 20, "width is correct");
+    assert.equal(Plottable.Utils.getElementHeight(childElem), 10, "height is correct");
+
+    child.style("width", "100%");
+    child.style("height", "100%");
+    assert.equal(Plottable.Utils.getElementWidth(childElem), 200, "width is correct");
+    assert.equal(Plottable.Utils.getElementHeight(childElem), 50, "height is correct");
+
+    child.style("width", "50%");
+    child.style("height", "50%");
+    assert.equal(Plottable.Utils.getElementWidth(childElem), 100, "width is correct");
+    assert.equal(Plottable.Utils.getElementHeight(childElem), 25, "height is correct");
+
+    // reset test page DOM
+    parent.style("width", "auto");
+    parent.style("height", "auto");
+    child.remove();
+  });
 });
