@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-  export class XAreaInteraction extends DragBoxInteraction {
+  export class XDragBoxInteraction extends DragBoxInteraction {
     public _drag(){
       super._drag();
       var width  = Math.abs(this.origin[0] - this.location[0]);
