@@ -40,6 +40,6 @@
 /// <reference path="interactions/drag/dragInteraction.ts" />
 /// <reference path="interactions/drag/dragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xDragBoxInteraction.ts" />
-/// <reference path="interactions/drag/xYDragBoxInteraction.ts" />
+/// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 
 /// <reference path="templates/standardChart.ts" />
