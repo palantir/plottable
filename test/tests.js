@@ -976,12 +976,12 @@ function makeFakeEvent(x, y) {
 }
 
 function fakeDragSequence(anyedInteraction, startX, startY, endX, endY) {
-    anyedInteraction.dragstart();
+    anyedInteraction._dragstart();
     d3.event = makeFakeEvent(startX, startY);
-    anyedInteraction.drag();
+    anyedInteraction._drag();
     d3.event = makeFakeEvent(endX, endY);
-    anyedInteraction.drag();
-    anyedInteraction.dragend();
+    anyedInteraction._drag();
+    anyedInteraction._dragend();
     d3.event = null;
 }
 
@@ -1035,7 +1035,7 @@ describe("Interactions", function () {
         });
     });
 
-    describe("AreaInteraction", function () {
+    describe("XYDragBoxInteraction", function () {
         var svgWidth = 400;
         var svgHeight = 400;
         var svg;
@@ -1057,12 +1057,13 @@ describe("Interactions", function () {
             yScale = new Plottable.LinearScale();
             renderer = new Plottable.CircleRenderer(dataset, xScale, yScale);
             renderer.renderTo(svg);
-            interaction = new Plottable.AreaInteraction(renderer);
+            interaction = new Plottable.XYDragBoxInteraction(renderer);
             interaction.registerWithComponent();
         });
 
         afterEach(function () {
-            interaction.callback().clearBox();
+            interaction.callback();
+            interaction.clearBox();
         });
 
         it("All callbacks are notified with appropriate data when a drag finishes", function () {
@@ -1088,7 +1089,7 @@ describe("Interactions", function () {
 
         it("Highlights and un-highlights areas appropriately", function () {
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            var dragBoxClass = "." + Plottable.AreaInteraction.CLASS_DRAG_BOX;
+            var dragBoxClass = "." + Plottable.XYDragBoxInteraction.CLASS_DRAG_BOX;
             var dragBox = renderer.backgroundContainer.select(dragBoxClass);
             assert.isNotNull(dragBox, "the dragbox was created");
             var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
