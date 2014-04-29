@@ -1970,6 +1970,14 @@ var Plottable;
             this.renderArea = this.content.append("g").classed("render-area", true);
             return this;
         };
+
+        Renderer.prototype.animate = function (toggle) {
+            if (toggle == null) {
+                toggle = !this._animate;
+            }
+            this._animate = toggle;
+            return this;
+        };
         Renderer.DEFAULT_COLOR_ACCESSOR = function (d) {
             return "#1f77b4";
         };
@@ -2052,7 +2060,7 @@ var Plottable;
             this.classed("circle-renderer", true);
             this.project("r", 3); // default
             this.project("fill", function () {
-                return "#00ffaa";
+                return "steelblue";
             }); // default
         }
         CircleRenderer.prototype.project = function (attrToSet, accessor, scale) {
