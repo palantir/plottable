@@ -3,13 +3,14 @@
 
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
-/// <reference path="core/component.ts" />
 /// <reference path="core/dataSource.ts" />
+/// <reference path="core/component.ts" />
+/// <reference path="core/componentGroup.ts" />
 /// <reference path="core/table.ts" />
+/// <reference path="core/scale.ts" />
 /// <reference path="core/renderer.ts" />
 /// <reference path="core/renderController.ts" />
 
-/// <reference path="scales/scale.ts" />
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
@@ -24,11 +25,11 @@
 /// <reference path="components/renderers/xyRenderer.ts" />
 /// <reference path="components/renderers/circleRenderer.ts" />
 /// <reference path="components/renderers/lineRenderer.ts" />
+/// <reference path="components/renderers/squareRenderer.ts" />
+/// <reference path="components/renderers/gridRenderer.ts" />
 /// <reference path="components/renderers/abstractBarRenderer.ts" />
 /// <reference path="components/renderers/barRenderer.ts" />
 /// <reference path="components/renderers/horizontalBarRenderer.ts" />
-/// <reference path="components/renderers/squareRenderer.ts" />
-/// <reference path="components/renderers/gridRenderer.ts" />
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
