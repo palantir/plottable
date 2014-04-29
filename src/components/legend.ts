@@ -1,4 +1,4 @@
-///<reference path="reference.ts" />
+///<reference path="../reference.ts" />
 
 module Plottable {
   export class Legend extends Component {
@@ -60,8 +60,8 @@ module Plottable {
       return textHeight;
     }
 
-    public _render(): Legend {
-      super._render();
+    public _doRender(): Legend {
+      super._doRender();
       this.legendBox.attr("height", this.minimumHeight()).attr("width", this.minimumWidth()); //HACKHACK #223
       var domain = this.colorScale.domain();
       var textHeight = this.measureTextHeight();

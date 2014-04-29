@@ -725,6 +725,7 @@ declare module Plottable {
         public dataSource(): DataSource;
         public dataSource(source: DataSource): Renderer;
         public project(attrToSet: string, accessor: any, scale?: Scale): Renderer;
+        public animate(toggle?: boolean): Renderer;
     }
 }
 declare module Plottable {

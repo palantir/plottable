@@ -112,7 +112,7 @@ module Plottable {
       return h;
     }
 
-    public _render(): Renderer {
+    public _doRender(): Renderer {
       if (this.element != null) {
         this._hasRendered = true;
         this._paint();
@@ -129,6 +129,14 @@ module Plottable {
     public _anchor(element: D3.Selection) {
       super._anchor(element);
       this.renderArea = this.content.append("g").classed("render-area", true);
+      return this;
+    }
+
+    public animate(toggle?: boolean) {
+      if (toggle == null) {
+        toggle = !this._animate;
+      }
+      this._animate = toggle;
       return this;
     }
   }

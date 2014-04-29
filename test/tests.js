@@ -1771,7 +1771,7 @@ describe("Renderers", function () {
                 dataset = new Plottable.DataSource(data);
 
                 renderer = new Plottable.BarRenderer(dataset, xScale, yScale);
-                renderer._animate = false;
+                renderer.animate(false);
                 renderer.renderTo(svg);
             });
 

@@ -1,4 +1,4 @@
-///<reference path="reference.ts" />
+///<reference path="../reference.ts" />
 
 module Plottable {
   export class Axis extends Component {
@@ -37,7 +37,7 @@ module Plottable {
       return this;
     }
 
-    public _render() {
+    public _doRender() {
       if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + this.minimumWidth() + ", 0)");};
       if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this.minimumHeight() + ")");};
       var domain = this.d3Axis.scale().domain();
@@ -305,8 +305,8 @@ module Plottable {
       }
     }
 
-    public _render() {
-      super._render();
+    public _doRender() {
+      super._doRender();
       if (this.tickLabelPosition() !== "center") {
         var tickTextLabels = this.axisElement.selectAll("text");
         tickTextLabels.attr("y", "0px");
@@ -381,8 +381,8 @@ module Plottable {
       }
     }
 
-    public _render() {
-      super._render();
+    public _doRender() {
+      super._doRender();
       if (this.tickLabelPosition() !== "middle") {
         var tickTextLabels = this.axisElement.selectAll("text");
         tickTextLabels.attr("x", "0px");

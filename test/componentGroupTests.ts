@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 describe("ComponentGroups", () => {
   it("components in componentGroups overlap", () => {
     var c1 = new Plottable.Component().minimumHeight(10).minimumWidth(10);

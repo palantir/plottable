@@ -1,32 +1,42 @@
 /// <reference path="utils.ts" />
 /// <reference path="osUtils.ts" />
-/// <reference path="plottableObject.ts" />
-/// <reference path="broadcaster.ts" />
-/// <reference path="component.ts" />
-/// <reference path="scales/scale.ts" />
+
+/// <reference path="core/plottableObject.ts" />
+/// <reference path="core/broadcaster.ts" />
+/// <reference path="core/dataSource.ts" />
+/// <reference path="core/component.ts" />
+/// <reference path="core/componentGroup.ts" />
+/// <reference path="core/table.ts" />
+/// <reference path="core/scale.ts" />
+/// <reference path="core/renderer.ts" />
+/// <reference path="core/renderController.ts" />
+
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
-/// <reference path="dataSource.ts" />
-//grunt-start
-/// <reference path="axis.ts" />
-/// <reference path="keyEventListener.ts" />
-/// <reference path="interaction.ts" />
-/// <reference path="label.ts" />
-/// <reference path="renderers/renderer.ts" />
-/// <reference path="renderers/xyRenderer.ts" />
-/// <reference path="renderers/circleRenderer.ts" />
-/// <reference path="renderers/lineRenderer.ts" />
-/// <reference path="renderers/abstractBarRenderer.ts" />
-/// <reference path="renderers/barRenderer.ts" />
-/// <reference path="renderers/horizontalBarRenderer.ts" />
-/// <reference path="renderers/squareRenderer.ts" />
-/// <reference path="renderers/gridRenderer.ts" />
-/// <reference path="table.ts" />
-/// <reference path="coordinator.ts" />
-/// <reference path="legend.ts" />
-/// <reference path="chart.ts" />
-//grunt-end
+/// <reference path="scales/scaleDomainCoordinator.ts" />
+
+/// <reference path="components/axis.ts" />
+/// <reference path="components/label.ts" />
+/// <reference path="components/legend.ts" />
+/// <reference path="components/renderers/xyRenderer.ts" />
+/// <reference path="components/renderers/circleRenderer.ts" />
+/// <reference path="components/renderers/lineRenderer.ts" />
+/// <reference path="components/renderers/squareRenderer.ts" />
+/// <reference path="components/renderers/gridRenderer.ts" />
+/// <reference path="components/renderers/abstractBarRenderer.ts" />
+/// <reference path="components/renderers/barRenderer.ts" />
+/// <reference path="components/renderers/horizontalBarRenderer.ts" />
+
+/// <reference path="interactions/keyEventListener.ts" />
+/// <reference path="interactions/interaction.ts" />
+/// <reference path="interactions/areaInteraction.ts" />
+/// <reference path="interactions/clickInteraction.ts" />
+/// <reference path="interactions/mousemoveInteraction.ts" />
+/// <reference path="interactions/keyInteraction.ts" />
+/// <reference path="interactions/panZoomInteraction.ts" />
+
+/// <reference path="templates/standardChart.ts" />

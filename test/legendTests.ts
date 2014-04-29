@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 describe("Legends", () => {
   var svg: D3.Selection;
   var color: Plottable.ColorScale;

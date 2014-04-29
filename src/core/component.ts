@@ -1,4 +1,4 @@
-///<reference path="reference.ts" />
+///<reference path="../reference.ts" />
 
 module Plottable {
   export class Component extends PlottableObject {
@@ -138,7 +138,12 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public _render() {
+      RenderController.registerToRender(this);
       return this;
+    }
+
+    public _doRender() {
+      return this; //no-op
     }
 
     public renderTo(element: any): Component {

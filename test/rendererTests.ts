@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 var quadraticDataset = makeQuadraticSeries(10);
 
 describe("Renderers", () => {
@@ -315,7 +316,7 @@ describe("Renderers", () => {
         dataset = new Plottable.DataSource(data);
 
         renderer = new Plottable.BarRenderer(dataset, xScale, yScale);
-        renderer._animate = false;
+        renderer.animate(false);
         renderer.renderTo(svg);
       });
 

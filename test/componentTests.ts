@@ -2,6 +2,7 @@
 
 var assert = chai.assert;
 
+
 function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform(component.element.attr("transform")).translate;
