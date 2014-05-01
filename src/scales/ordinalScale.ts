@@ -99,8 +99,12 @@ module Plottable {
           throw new Error("Unsupported range type: " + rangeType);
         }
         this._rangeType = rangeType;
-        if(outerPadding != null) this._outerPadding = outerPadding;
-        if(innerPadding != null) this._innerPadding = innerPadding;
+        if (outerPadding != null) {
+          this._outerPadding = outerPadding;
+        }
+        if (innerPadding != null) {
+          this._innerPadding = innerPadding;
+        }
         return this;
       }
     }
