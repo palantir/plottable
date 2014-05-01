@@ -1,4 +1,4 @@
-window.onload = function() {
+function makeBasicChart() {
   // These scales are Plottable wrappers for a d3.scale object.
   // Like D3 scales, they manage a mapping from data to visual properties; pixel positions in this case
   // Unlike D3 scales, they automatically set their domain and range, and have event handling to update dependent components on changes
@@ -19,5 +19,5 @@ window.onload = function() {
                     [null,  xAxis   ]
                   ]);
 
-  chart.renderTo("#chart");
+  chart.renderTo("#basicChart");
 }

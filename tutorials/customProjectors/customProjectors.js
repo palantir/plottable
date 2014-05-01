@@ -1,4 +1,4 @@
-window.onload = function() {
+function makeCustomProjectorChart() {
   var xScale = new Plottable.LinearScale();
   var yScale = new Plottable.LinearScale();
 
@@ -41,5 +41,5 @@ window.onload = function() {
                     [null,  xAxis   ]
                   ]);
 
-  chart.renderTo("#chart");
+  chart.renderTo("#customProjectorChart");
 }
