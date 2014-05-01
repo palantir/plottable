@@ -1,5 +1,5 @@
 /*!
-Plottable v0.10.0 (https://github.com/palantir/plottable)
+Plottable v0.10.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1628,6 +1628,26 @@ var Plottable;
         return LinearScale;
     })(Plottable.QuantitiveScale);
     Plottable.LinearScale = LinearScale;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var LogScale = (function (_super) {
+        __extends(LogScale, _super);
+        function LogScale(scale) {
+            _super.call(this, scale == null ? d3.scale.log() : scale);
+        }
+        /**
+        * Creates a copy of the LogScale with the same domain and range but without any registered listeners.
+        *
+        * @returns {LogScale} A copy of the calling LogScale.
+        */
+        LogScale.prototype.copy = function () {
+            return new LogScale(this._d3Scale.copy());
+        };
+        return LogScale;
+    })(Plottable.QuantitiveScale);
+    Plottable.LogScale = LogScale;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -3268,6 +3288,7 @@ var Plottable;
 /// <reference path="core/renderController.ts" />
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />
+/// <reference path="scales/logScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
