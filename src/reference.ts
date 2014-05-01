@@ -13,6 +13,7 @@
 
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />
+/// <reference path="scales/logScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />

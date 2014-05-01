@@ -107,6 +107,7 @@ svg.plottable {
 .plottable .drag-box {
   fill: aliceblue;
   opacity: 1;
+  stroke: #C0C8FF;
 
 }
 
