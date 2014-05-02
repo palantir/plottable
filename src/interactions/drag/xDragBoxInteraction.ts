@@ -4,11 +4,7 @@ module Plottable {
   export class XDragBoxInteraction extends DragBoxInteraction {
     public _drag(){
       super._drag();
-      var width  = Math.abs(this.origin[0] - this.location[0]);
-      var height = this.componentToListenTo.availableHeight;
-      var x      = Math.min(this.origin[0] , this.location[0]);
-      var y      = 0
-      this.dragBox.attr({x: x, y: y, height: height, width: width});
+      this.setBox(this.origin[0], this.location[0]);
     }
 
     public _doDragend(){
