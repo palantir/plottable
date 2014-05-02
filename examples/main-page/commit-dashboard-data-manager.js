@@ -11,7 +11,17 @@ function makeCommitDataManager(data) {
   linesByDirectory   : an array of [directory, lines] pairs, filtered by the person selector (if appropriate) - FILTER BY PERSON ONLY
 
   */
-  var contributors = ["danmane", "jlan", "aramaswamy", "derekcicerone"];
+  var contributors = function() {
+    var cfound = {};
+    var out = [];
+    data.forEach(function(c) {
+      if (cfound[c.name] == null) {
+        cfound[c.name] = true;
+        out.push(c.name);
+      }
+    });
+    return out;
+  }();
   var directories = ["/", "lib", "src", "examples", "typings", "test"];
 
   var f = function(selector) {
@@ -27,7 +37,7 @@ function makeCommitDataManager(data) {
 
     processedCommits = [];
     directoryTimeSeries = {"/": [], "src": [], "lib": [], "examples": [], "typings": [], "test": []};
-    linesByContributorObj = {"danmane": 0, "jlan": 0, "aramaswamy": 0, "derekcicerone": 0};
+    linesByContributorObj = {};
     linesByDirectoryObj = {"/": 0, "src": 0, "lib": 0, "examples": 0, "typings": 0, "test": 0};
 
     data.forEach(function(c) {
@@ -55,6 +65,9 @@ function makeCommitDataManager(data) {
       });
       if (personFilter(c) && lines > 0) {
         processedCommits.push({name: c.name, date: date, lines: lines});
+      }
+      if (linesByContributorObj[c.name] == null) {
+        linesByContributorObj[c.name] = 0;
       }
       linesByContributorObj[c.name] += lines;
     });

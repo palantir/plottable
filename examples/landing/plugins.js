@@ -4,7 +4,7 @@ function pluginsChart(gitData) {
   var colorScale = new Plottable.ColorScale("category10");
 
   // The Axes and LineRenderer are all Components, meaning they take up visual space and are placed by the layout engine
-  var xAxis  = new Plottable.XAxis(xScale, "bottom");
+  var xAxis  = new Plottable.XAxis(xScale, "bottom", d3.format("%"));
   var yAxis  = new Plottable.YAxis(yScale, "left");
 
 
