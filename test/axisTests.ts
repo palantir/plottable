@@ -215,12 +215,6 @@ describe("Axes", () => {
     });
     assert.isFalse(labelsOverlap, "labels don't overlap");
 
-    var secondLabelTSpans = d3.select(tickTexts[0][1]).selectAll("tspan");
-    assert.equal(secondLabelTSpans[0].length, 2, "second label was wrapped to two lines");
-
-    var fourthLabelTSpans = d3.select(tickTexts[0][3]).selectAll("tspan");
-    assert.equal(fourthLabelTSpans[0].length, 3, "fourth label was wrapped to three lines");
-
     var allTopsEqual = clientRects.map((r) => r.top).every((t: number) => t === clientRects[0].top);
     assert.isTrue(allTopsEqual, "tops of labels align");
 
@@ -252,12 +246,6 @@ describe("Axes", () => {
       }
     });
     assert.isFalse(labelsOverlap, "labels don't overlap");
-
-    var secondLabelText = d3.select(tickTexts[0][1]).text();
-    assert.equal(secondLabelText.substr(secondLabelText.length-3, 3), "...", "second label was truncated");
-
-    var fourthLabelTSpans = d3.select(tickTexts[0][3]).selectAll("tspan");
-    assert.equal(fourthLabelTSpans[0].length, 4, "fourth label was wrapped to four lines");
 
     var allTopsEqual = clientRects.map((r) => r.right).every((t: number) => t === clientRects[0].right);
     assert.isTrue(allTopsEqual, "right edges of labels align");
