@@ -20,5 +20,10 @@ module Plottable {
       var pixelArea = {xMin: xMin, xMax: xMax};
       this.callbackToCall(pixelArea);
     }
+
+    public setBox(x0: number, x1: number) {
+      super.setBox(x0, x1, 0, this.componentToListenTo.availableHeight);
+      return this;
+    }
   }
 }

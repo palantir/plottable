@@ -19,6 +19,15 @@ module Plottable {
       this.dragBox.attr("height", 0).attr("width", 0);
       return this;
     }
+    
+    public setBox(x0: number, x1: number, y0: number, y1: number) {
+      var w = Math.abs(x0 - x1);
+      var h = Math.abs(y0 - y1);
+      var xo = Math.min(x0, x1);
+      var yo = Math.min(y0, y1);
+      this.dragBox.attr({x: xo, y: yo, width: w, height: h});
+      return this;
+    }
 
     public _anchor(hitBox: D3.Selection) {
       super._anchor(hitBox);
