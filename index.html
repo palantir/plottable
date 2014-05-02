@@ -100,7 +100,7 @@
         shows Plottable's git commit history, including breakdown by contributor and directory.
       </p>
       <div class="svg-container"><svg id="interactive-demo" width="100%"></svg></div>
-      <h2> Plottable is Easy </h2>
+      <br><br><h2>Easy</h2>
       <p>
          Because Plottable includes high level components, throwing together simple charts is easy.
          Here's an example of a basic Plottable chart, and the 20 lines of associated code.
@@ -133,7 +133,7 @@
   chart.renderTo("#basicChart");
 }
 </code></pre>
-    <h2>Plottable is Flexible</h2>
+    <br><br><h2>Powerful</h2>
     <p>
     We've also designed Plottable to be highly flexible and customizable. Plottable renderers are agonstic to the way data is structured,
     and support setting arbitrary SVG attributes based on functions and scales they are given. In the example below, we have a CircleRenderer that
@@ -181,7 +181,7 @@
 
 </code></pre>
 
-    <h2>Plottable's Layout Engine is Powerful</h2>
+    <br><br><h2>Flexible</h2>
       <p>
         Rather than supporting only a small set of predefined chart templates, Plottable has an expressive Table-based layout engine for
         constructing arbitrary dashboards. This layout engine handles a lot of the detail work of setting up a chart, like making sure that
@@ -205,7 +205,7 @@
   // In the previous example, we implicitly created a DataSource by putting the data directly into the Renderer constructor
   var gitDataSource   = new Plottable.DataSource(data);
   var commitsRenderer = new Plottable.LineRenderer(gitDataSource, xScale, yScaleCommits);
-  var locRenderer     = new Plottable.LineRenderer(gitDataSource, xScale, yScaleLOC);
+  var locRenderer     = new Plottable.AreaRenderer(gitDataSource, xScale, yScaleLOC);
 
   commitsRenderer.project("x", "day_delta", xScale);
   locRenderer    .project("x", "day_delta", xScale);
@@ -237,7 +237,7 @@
 
 </code></pre>
 
-      <h2>Plottable is Pluggable</h2>
+      <br><br><h2>Pluggable</h2>
       <p>
         Plottable consists of a small core architecture and a large set of lightweight plugins. In the example below, almost everything is
         a plugin: the CircleRenderer, the Gridlines, the Legend, and the DragBoxInteraction. Adding a new Component or Interaction - say, a DragBox that
