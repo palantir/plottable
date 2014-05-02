@@ -17,6 +17,7 @@ module Plottable {
       super(dataset, xScale, yScale);
       this.classed("area-renderer", true);
       this.project("y0", 0, yScale); // default
+      this.project("fill", () => "steelblue"); // default
     }
 
     public _anchor(element: D3.Selection) {
