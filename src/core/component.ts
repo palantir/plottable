@@ -47,6 +47,9 @@ module Plottable {
         // Since we deregister all the model bindings, this would be dangerous
         throw new Error("Cannot reuse a component after removing it");
       }
+      if (this.element != null) {
+        throw new Error("Cannot re-anchor a component after it is already anchored");
+      }
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
         this.rootSVG = element;
