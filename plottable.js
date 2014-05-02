@@ -3839,6 +3839,9 @@ var Plottable;
             _super.call(this, dataset, xScale, yScale);
             this.classed("area-renderer", true);
             this.project("y0", 0, yScale); // default
+            this.project("fill", function () {
+                return "steelblue";
+            }); // default
         }
         AreaRenderer.prototype._anchor = function (element) {
             _super.prototype._anchor.call(this, element);

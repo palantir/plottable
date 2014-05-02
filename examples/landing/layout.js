@@ -12,7 +12,7 @@ function layoutChart(data) {
   // In the previous example, we implicitly created a DataSource by putting the data directly into the Renderer constructor
   var gitDataSource   = new Plottable.DataSource(data);
   var commitsRenderer = new Plottable.LineRenderer(gitDataSource, xScale, yScaleCommits);
-  var locRenderer     = new Plottable.LineRenderer(gitDataSource, xScale, yScaleLOC);
+  var locRenderer     = new Plottable.AreaRenderer(gitDataSource, xScale, yScaleLOC);
 
   commitsRenderer.project("x", "day_delta", xScale);
   locRenderer    .project("x", "day_delta", xScale);
