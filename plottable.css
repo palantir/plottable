@@ -124,6 +124,5 @@ svg.plottable {
 }
 
 .plottable .legend .legend-box {
-  fill: white;
-  opacity: 0.7;
+  opacity: 0;
 }

@@ -22,17 +22,14 @@ function commitDashboard(dataManager, svg) {
   var linesByDirectory = data.linesByDirectory;
 
   var startDate = new Date(2014, 0, 20); // Jan 20, 2014
-  var endDate = new Date(2014, 3, 1); // Mar 28, 2014
+  var endDate = new Date(2014, 4, 1); // Mar 28, 2014
   var timeScale = new Plottable.TimeScale();
   timeScale.domain([startDate, endDate]).nice();
   var dateFormatter = d3.time.format("%-m/%-d/%y");
 
-  var contributorColorScale = new Plottable.ColorScale()
-                    .domain(dataManager.contributors)
-                    .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
+  var contributorColorScale = new Plottable.ColorScale("category10");
 
   var directoryColorScale = new Plottable.ColorScale("20")
-                    .domain(dataManager.directories);
 
   function linesAddedAccessor(d) {
     return d.lines > 0 ? d.lines : 1;
@@ -40,8 +37,8 @@ function commitDashboard(dataManager, svg) {
   // ----- /Shared objects -----
 
   // ---- Scatterplot -----
-  var scatterYScale = new Plottable.LinearScale().domain([8, 26]);
-  var scatterYAxis  = new Plottable.YAxis(scatterYScale, "left", hourFormatter).showEndTickLabels(true);
+  var scatterYScale = new Plottable.LinearScale();//.domain([8, 26]);
+  var scatterYAxis  = new Plottable.YAxis(scatterYScale, "left", hourFormatter).showEndTickLabels(false);
   var scatterDateAxis = new Plottable.XAxis(timeScale, "bottom", dateFormatter);
 
   var rScale = new Plottable.QuantitiveScale(d3.scale.log())
@@ -102,7 +99,7 @@ function commitDashboard(dataManager, svg) {
   // ----- /Legends -----
 
   // ----- Bar1: Lines changed by contributor -----
-  var contributorBarXScale = new Plottable.OrdinalScale().domain(dataManager.contributors).rangeType('bands');
+  var contributorBarXScale = new Plottable.OrdinalScale().rangeType('bands');
   var contributorBarYScale = new Plottable.LinearScale();
   var contributorBarXAxis = new Plottable.XAxis(contributorBarXScale, "bottom", function(d) { return d});
   var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right");
@@ -159,31 +156,30 @@ function commitDashboard(dataManager, svg) {
     directoryBarYScale.domain([0, 30000]);
   }
 
-  resetDomains();
+  // resetDomains();
 
   // ----- Interactions -----
   var dummyScale = new Plottable.LinearScale();
   var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderArea, timeScale, dummyScale);
+  var scatterPanZoom = new Plottable.PanZoomInteraction(scatterRenderArea, timeScale, dummyScale);
   tscPanZoom.registerWithComponent();
+  scatterPanZoom.registerWithComponent();
 
   function updateData(filter) {
     var newData = dataManager(filter);
 
-    scatterRenderer.data(newData.commits);
+    scatterRenderer.dataSource().data(newData.commits);
 
     tscYScale.domain([0, 0]);
     dataManager.directories.forEach(function(dir) {
-      tscRenderers[dir].data(newData.directoryTimeSeries[dir]);
-      tscRenderers[dir].autorange();
+      tscRenderers[dir].dataSource().data(newData.directoryTimeSeries[dir]);
     });
 
-    contributorBarRenderer.data(newData.linesByContributor);
+    contributorBarRenderer.dataSource().data(newData.linesByContributor);
     contributorBarYScale.domain([0, 0]);
-    contributorBarRenderer.autorange();
 
-    directoryBarRenderer.data(newData.linesByDirectory);
+    directoryBarRenderer.dataSource().data(newData.linesByDirectory);
     directoryBarYScale.domain([0, 0]);
-    directoryBarRenderer.autorange();
 
     timeScale.domain([startDate, endDate]).nice();
     tscPanZoom.resetZoom();
@@ -204,7 +200,7 @@ function commitDashboard(dataManager, svg) {
     }
     updateData(lastContributor);
   };
-  contributorClick.callback(contributorClickCallback).registerWithComponent();
+  // contributorClick.callback(contributorClickCallback).registerWithComponent();
 
   var directoryClick = new Plottable.ClickInteraction(directoryBarRenderer);
   var lastDirectory = null;
@@ -220,6 +216,6 @@ function commitDashboard(dataManager, svg) {
     }
     updateData(lastDirectory);
   };
-  directoryClick.callback(directoryClickCallback).registerWithComponent();
+  // directoryClick.callback(directoryClickCallback).registerWithComponent();
   // ----- /Interactions -----
 }

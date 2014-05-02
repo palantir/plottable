@@ -4,11 +4,7 @@ module Plottable {
   export class XDragBoxInteraction extends DragBoxInteraction {
     public _drag(){
       super._drag();
-      var width  = Math.abs(this.origin[0] - this.location[0]);
-      var height = this.componentToListenTo.availableHeight;
-      var x      = Math.min(this.origin[0] , this.location[0]);
-      var y      = 0
-      this.dragBox.attr({x: x, y: y, height: height, width: width});
+      this.setBox(this.origin[0], this.location[0]);
     }
 
     public _doDragend(){
@@ -19,6 +15,11 @@ module Plottable {
       var xMax = Math.max(this.origin[0], this.location[0]);
       var pixelArea = {xMin: xMin, xMax: xMax};
       this.callbackToCall(pixelArea);
+    }
+
+    public setBox(x0: number, x1: number) {
+      super.setBox(x0, x1, 0, this.componentToListenTo.availableHeight);
+      return this;
     }
   }
 }
