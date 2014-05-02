@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="Plottable.js: a library for easily creating powerful, flexible, interactive charts. Built on D3.js." />
+
+    <title>Plottable.js</title>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+    <!-- plottable and dependencies -->
+    <script src="/bower_components/d3/d3.min.js"></script>
+    <link href="/plottable.css" type="text/css" rel="stylesheet" />
+    <script src="/build/plottable.js"></script>
+
+    <!-- examples -->
+    <script src="/examples/main-page/commit-chart-shared.js"></script>
+    <script src="/examples/main-page/commit-dashboard-data-manager.js"></script>
+    <script src="/examples/main-page/commit-dashboard.js"></script>
+    <script src="/examples/landing/customProjectors.js"></script>
+    <script src="/examples/landing/basicChart.js"></script>
+    <script src="/examples/landing/plugins.js"></script>
+    <script src="/examples/data/xyData.js"></script>
+    <script src="/examples/landing/layout.js"></script>
+
+    <!-- glue -->
+    <script>
+      function sizeSVG(selection) {
+        var svg = d3.select(selection);
+        var width = Plottable.Utils.getSVGPixelWidth(svg);
+        svg.attr("width", width);
+        var height = Math.min(width*.75, 1000);
+        svg.attr("height", height);
+        return svg;
+      }
+
+      window.onload = function() {
+        d3.json("/examples/data/gitstats2.json", function(data) {
+          data.forEach(function(d) {
+            d.date = new Date(d.date);
+            d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
+          });
+          var dataManager = makeCommitDataManager(data);
+          var interactiveSVG = d3.select("#interactive-demo");
+          sizeSVG("#layout");
+          sizeSVG("#basicChart");
+          sizeSVG("#customProjectors");
+          sizeSVG("#plugins");
+          sizeSVG("#interactive-demo");
+          commitDashboard(dataManager, interactiveSVG);
+          makeBasicChart();
+          customProjectorChart(data);
+          layoutChart(data);
+          pluginsChart(data);
+        });
+      }
+    </script>
+
+    <!-- style -->
+    <style type="text/css">
+      body > .container {
+        padding-top: 70px;
+      }
+    </style>
+
+  </head>
+
+  <body>
+      <!-- fork me on GitHub! -->
+      <a href="https://github.com/palantir/plottable"><img style="z-index: 100000; position: fixed; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+
+    <div class="container">
+      <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">Plottable.js</a>
+          </div>
+        </div>
+      </nav>
+
+      <h1>Plottable.js</h1>
+      <h2>A library for concisely creating powerful, flexible, interactive charts. Built on D3.js.</h2>
+
+      <svg id="interactive-demo" width="95%"></svg>
+
+      <svg id="basicChart" width="80%"></svg>
+      <svg id="customProjectors" width="80%"></svg>
+      <svg id="layout" width="80%"></svg>
+      <svg id="plugins" width="80%"></svg>
+
+      <!-- TODO sections -->
+      <!--
+      <div class="page-header"><h1>Plot</h1></div>
+      <div class="page-header"><h1>Layout</h1></div>
+      <div class="page-header"><h1>Interact<h1></div>
+      <div class="page-header"><h1>Synced</h1></div>
+      -->
+
+      <!-- TODO built by palantir -->
+    </div>
+
+
+
+  </body>
+</html>
