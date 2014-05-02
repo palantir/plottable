@@ -6,8 +6,10 @@ function makeBasicChart() {
   var yScale = new Plottable.LinearScale();
 
   // The Axes and LineRenderer are all Components, meaning they take up visual space and are placed by the layout engine
-  var xAxis = new Plottable.XAxis(xScale, "bottom");
+  var xAxis = new Plottable.XAxis(xScale, "bottom", d3.format("d"));
   var yAxis = new Plottable.YAxis(yScale, "left");
+
+  // In this case, the xyData is organized to be an array of {x, y} points. The Renderer automatically accesses these attributes.
   var renderer = new Plottable.LineRenderer(xyData, xScale, yScale);
 
   // Now we'll make a Table to organize the layout of the components. The first row will have a yAxis and renderer; the second will

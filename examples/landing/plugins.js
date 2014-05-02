@@ -3,7 +3,8 @@ function pluginsChart(gitData) {
   var yScale = new Plottable.LogScale().domain([0.9, 100000]);
   var colorScale = new Plottable.ColorScale("category10");
 
-  // The Axes and LineRenderer are all Components, meaning they take up visual space and are placed by the layout engine
+  // The Axes and LineRenderer are all Components,
+  // meaning they take up visual space and are placed by the layout engine
   var xAxis  = new Plottable.XAxis(xScale, "bottom", d3.format("%"));
   var yAxis  = new Plottable.YAxis(yScale, "left");
 
@@ -27,6 +28,8 @@ function pluginsChart(gitData) {
                     [yAxis, center  ],
                     [null,  xAxis   ]
                   ]);
+
+  var dragBox = new Plottable.XDragBoxInteraction(center).registerWithComponent();
 
   chart.renderTo("#plugins");
 }

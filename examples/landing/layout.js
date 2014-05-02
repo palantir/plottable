@@ -23,6 +23,14 @@ function layoutChart(data) {
   var commitsTitle = new Plottable.TitleLabel("# of Commits Over Time");
   var locTitle     = new Plottable.TitleLabel("# of Lines Of Code Over Time");
 
+  // A Table is the principle abstraction for laying out Plottable Components.
+  // The rows and columns express alignment constraints between objects, and Tables can be nested inside other
+  // Tables to allow for complex arrangements.
+  // In this case, we just put the axes into the first and third columns, with everything else in the second column.
+  // YAxes are fixed-width, but the Renderers are variable-width, so they automatically expand to fill all space
+  // left over by the Axes.
+  // If we had multiple columns with variable-width components, we could let Plottable balance the columns between them,
+  // or set proportional "weights" on each column.
   var chart = new Plottable.Table([
                     [null        , commitsTitle   , null        ],
                     [yAxisCommits, commitsRenderer, null        ],
