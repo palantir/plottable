@@ -170,11 +170,13 @@ function commitDashboard(dataManager, svg) {
   // resetDomains();
 
   // ----- Interactions -----
-  var dummyScale = new Plottable.LinearScale();
-  var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderArea, timeScale, dummyScale);
-  var scatterPanZoom = new Plottable.PanZoomInteraction(scatterRenderArea, timeScale, dummyScale);
-  tscPanZoom.registerWithComponent();
-  scatterPanZoom.registerWithComponent();
+  if (!window.mobilecheck || !window.mobilecheck()) {
+    var dummyScale = new Plottable.LinearScale();
+    var tscPanZoom = new Plottable.PanZoomInteraction(tscRenderArea, timeScale, dummyScale);
+    var scatterPanZoom = new Plottable.PanZoomInteraction(scatterRenderArea, timeScale, dummyScale);
+    tscPanZoom.registerWithComponent();
+    scatterPanZoom.registerWithComponent();
+  }
 
   function updateData(filter) {
     var newData = dataManager(filter);
