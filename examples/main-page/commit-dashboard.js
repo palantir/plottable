@@ -37,7 +37,7 @@ function commitDashboard(dataManager, svg) {
   // ----- /Shared objects -----
 
   // ---- Scatterplot -----
-  var scatterYScale = new Plottable.LinearScale();//.domain([8, 26]);
+  var scatterYScale = new Plottable.LinearScale();
   var scatterYAxis  = new Plottable.YAxis(scatterYScale, "left", hourFormatter).showEndTickLabels(false);
   var scatterDateAxis = new Plottable.XAxis(timeScale, "bottom", dateFormatter);
 
@@ -100,9 +100,9 @@ function commitDashboard(dataManager, svg) {
 
   // ----- Bar1: Lines changed by contributor -----
   var contributorBarXScale = new Plottable.OrdinalScale().rangeType('bands');
-  var contributorBarYScale = new Plottable.LinearScale();
+  var contributorBarYScale = new Plottable.LinearScale().domain([0, 100000]);
   var contributorBarXAxis = new Plottable.XAxis(contributorBarXScale, "bottom", function(d) { return d});
-  var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right");
+  var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right").showEndTickLabels(true);
   contributorBarXAxis.classed("no-tick-labels", true).minimumHeight(5);
   var contributorBarRenderer = new Plottable.BarRenderer(linesByContributor,
                                                                  contributorBarXScale,
@@ -112,8 +112,7 @@ function commitDashboard(dataManager, svg) {
                         .project("x", "name").project("y", linesAddedAccessor);
   var contributorGridlines = new Plottable.Gridlines(null, contributorBarYScale);
   var contributorBarChart = new Plottable.Table([
-    [contributorBarRenderer.merge(contributorGridlines), contributorBarYAxis],
-    [contributorBarXAxis, null]
+    [contributorBarRenderer.merge(contributorGridlines), contributorBarYAxis]
   ]);
   // ----- /Bar1 -----
 
@@ -132,22 +131,34 @@ function commitDashboard(dataManager, svg) {
                       .project("y", linesAddedAccessor);
   var directoryGridlines = new Plottable.Gridlines(null, directoryBarYScale);
   var directoryBarChart = new Plottable.Table([
-    [directoryBarRenderer.merge(directoryGridlines), directoryBarYAxis],
-    [directoryBarXAxis, null]
-  ]);
+    [directoryBarRenderer.merge(directoryGridlines), directoryBarYAxis]  ]);
   // ----- /Bar2 -----
 
+
+  var scatterLabel = new Plottable.AxisLabel("Commits over time");
+  var bar1Label    = new Plottable.AxisLabel("Lines of code by contributor");
+  var renderLabel  = new Plottable.AxisLabel("Lines of code over time");
+  var bar2Label    = new Plottable.AxisLabel("Lines of code by directory");
+  var filler = new Plottable.Component().minimumHeight(5);
   // ---- Assemble! -----
   var dashboardTable = new Plottable.Table([
+    [null,         scatterLabel,      null,                   bar1Label          ],
+    [filler,       null,              null,                   null               ],
     [scatterYAxis, scatterRenderArea, contributorLegendTable, contributorBarChart],
     [null,         scatterDateAxis,   null,                   null               ],
+    [null,         renderLabel,       null,                   bar2Label          ],
     [tscYAxis,     tscRenderArea,     directoryLegendTable,   directoryBarChart  ],
     [null,         tscDateAxis,       null,                   null               ]
   ]);
   dashboardTable.padding(0, 10);
   dashboardTable.colWeight(1, 3);
   dashboardTable.colWeight(2, 0);
-  dashboardTable.renderTo(svg);
+  var titleLabel = new Plottable.TitleLabel("Plottable Git Commit History").classed("major", true);
+  var outerTable = new Plottable.Table([
+    [titleLabel],
+    [new Plottable.Component().minimumHeight(5)],
+    [dashboardTable]
+    ]).renderTo(svg);
 
   function resetDomains() {
     timeScale.domain([startDate, endDate]).nice();
