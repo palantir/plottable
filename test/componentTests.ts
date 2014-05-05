@@ -325,9 +325,6 @@ describe("Component behavior", () => {
     assert.equal(cbCalled, 2, "the callback is still attached to the component");
     assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
-    c1.renderTo(svg);
-    assert.isTrue(svg.node().hasChildNodes(), "element can be re-anchored after removing");
-
     svg.remove();
   });
 });
