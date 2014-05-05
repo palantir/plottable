@@ -67,7 +67,7 @@ module Plottable {
     }
 
     private truncateTextAndRemeasure(availableLength: number) {
-      var shortText = Utils.truncateTextToLength(this.text, availableLength, this.textElement);
+      var shortText = Utils.getTruncatedText(this.text, availableLength, this.textElement);
       this.textElement.text(shortText);
       this.measureAndSetTextSize();
     }

@@ -6,7 +6,7 @@ module Plottable {
     public static X_HEIGHT = 30;
     public axisElement: D3.Selection;
     private d3Axis: D3.Svg.Axis;
-    private axisScale: Scale;
+    public _axisScale: Scale;
     private _showEndTickLabels = false;
     private tickPositioning = "center";
 
@@ -20,15 +20,21 @@ module Plottable {
      */
     constructor(axisScale: Scale, orientation: string, formatter?: any) {
       super();
-      this.axisScale = axisScale;
+      this._axisScale = axisScale;
       orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
       this.classed("axis", true);
       if (formatter == null) {
-        formatter = d3.format(".3s");
+        var numberFormatter = d3.format(".3s");
+        formatter = function(d: any) {
+          if (typeof d === "number") {
+            return numberFormatter(d);
+          }
+          return d;
+        };
       }
       this.d3Axis.tickFormat(formatter);
-      this._registerToBroadcaster(this.axisScale, () => this.rescale());
+      this._registerToBroadcaster(this._axisScale, () => this.rescale());
     }
 
     public _anchor(element: D3.Selection) {
@@ -53,8 +59,8 @@ module Plottable {
       }
 
       // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
-      if ((<QuantitiveScale> this.axisScale).ticks != null) {
-        var scale = <QuantitiveScale> this.axisScale;
+      if ((<QuantitiveScale> this._axisScale).ticks != null) {
+        var scale = <QuantitiveScale> this._axisScale;
         var nTicks = 10;
         var ticks = scale.ticks(nTicks);
         var numericDomain = scale.domain();
@@ -136,9 +142,9 @@ module Plottable {
     public scale(newScale: Scale): Axis;
     public scale(newScale?: Scale): any {
       if (newScale == null) {
-        return this.axisScale;
+        return this._axisScale;
       } else {
-        this.axisScale = newScale;
+        this._axisScale = newScale;
         this.d3Axis.scale(newScale._d3Scale);
         return this;
       }
@@ -307,23 +313,59 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      if (this.tickLabelPosition() !== "center") {
-        var tickTextLabels = this.axisElement.selectAll("text");
-        tickTextLabels.attr("y", "0px");
 
-        if (this.orient() === "bottom") {
-          tickTextLabels.attr("dy", "1em");
-        } else {
-          tickTextLabels.attr("dy", "-0.25em");
+      var tickTextLabels = this.axisElement.selectAll("text");
+      if (tickTextLabels[0].length > 0) { // at least one tick label
+        if (this.tickLabelPosition() !== "center") {
+          tickTextLabels.attr("y", "0px");
+
+          if (this.orient() === "bottom") {
+            tickTextLabels.attr("dy", "1em");
+          } else {
+            tickTextLabels.attr("dy", "-0.25em");
+          }
+
+          if (this.tickLabelPosition() === "right") {
+            tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
+          } else if (this.tickLabelPosition() === "left") {
+            tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
+          }
         }
 
-        if (this.tickLabelPosition() === "right") {
-          tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
-        } else if (this.tickLabelPosition() === "left") {
-          tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
+        var scaleRange = this._axisScale.range();
+        var availableWidth = this.availableWidth;
+        var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
+        var availableHeight = this.availableHeight - tickLengthWithPadding;
+        if (tickTextLabels[0].length > 1) { // more than one label
+          var tickValues = tickTextLabels.data();
+          var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
+          tickPositions.forEach((p: number, i: number) => {
+            var spacing = Math.abs(tickPositions[i + 1] - p);
+            availableWidth = (spacing < availableWidth) ? spacing : availableWidth;
+          });
         }
+
+        availableWidth = 0.9 * availableWidth; // add in some padding
+
+        tickTextLabels.each(function(t: any, i: number) {
+          var textEl = d3.select(this);
+          var currentText = textEl.text();
+          var wrappedLines = Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+          if (wrappedLines.length === 1) {
+            textEl.text(Utils.getTruncatedText(currentText, availableWidth, textEl));
+          } else {
+            textEl.text("");
+            var tspans = textEl.selectAll("tspan").data(wrappedLines);
+            tspans.enter().append("tspan");
+            tspans.text((line: string) => line)
+                  .attr("x", "0")
+                  // first line gets the original shift, each subsequent line is one line down
+                  .attr("dy", (line: string, i: number) => (i === 0) ? textEl.attr("dy") : "1em")
+                  .style("text-anchor", textEl.style("text-anchor"));
+          }
+        });
       }
-      this._hideOverlappingTickLabels();
+
       if (!this.showEndTickLabels()) {
         this._hideCutOffTickLabels();
       }
@@ -383,23 +425,67 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      if (this.tickLabelPosition() !== "middle") {
-        var tickTextLabels = this.axisElement.selectAll("text");
-        tickTextLabels.attr("x", "0px");
 
-        if (this.orient() === "left") {
-          tickTextLabels.attr("dx", "-0.25em");
-        } else {
-          tickTextLabels.attr("dx", "0.25em");
+      var tickTextLabels = this.axisElement.selectAll("text");
+      if (tickTextLabels[0].length > 0) { // at least one tick label
+        if (this.tickLabelPosition() !== "middle") {
+          tickTextLabels.attr("x", "0px");
+
+          if (this.orient() === "left") {
+            tickTextLabels.attr("dx", "-0.25em");
+          } else {
+            tickTextLabels.attr("dx", "0.25em");
+          }
+
+          if (this.tickLabelPosition() === "top") {
+            tickTextLabels.attr("dy", "-0.3em");
+          } else if (this.tickLabelPosition() === "bottom") {
+            tickTextLabels.attr("dy", "1em");
+          }
         }
 
-        if (this.tickLabelPosition() === "top") {
-          tickTextLabels.attr("dy", "-0.3em");
-        } else if (this.tickLabelPosition() === "bottom") {
-          tickTextLabels.attr("dy", "1em");
+        var scaleRange = this._axisScale.range();
+        var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
+        var availableWidth = this.availableWidth - tickLengthWithPadding;
+        var availableHeight = this.availableHeight;
+        if (tickTextLabels[0].length > 1) { // more than one label
+          var tickValues = tickTextLabels.data();
+          var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
+          tickPositions.forEach((p: number, i: number) => {
+            var spacing = Math.abs(tickPositions[i + 1] - p);
+            availableHeight = (spacing < availableHeight) ? spacing : availableHeight;
+          });
         }
+
+        var tickLabelPosition = this.tickLabelPosition();
+        tickTextLabels.each(function(t: any, i: number) {
+          var textEl = d3.select(this);
+          var currentText = textEl.text();
+          var wrappedLines = Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+          if (wrappedLines.length === 1) {
+            textEl.text(Utils.getTruncatedText(currentText, availableWidth, textEl));
+          } else {
+            var baseY = 0; // measured in ems
+            if (tickLabelPosition === "top") {
+              baseY = -(wrappedLines.length - 1);
+            } else if (tickLabelPosition === "middle") {
+              baseY = -(wrappedLines.length - 1) / 2;
+            }
+
+            textEl.text("");
+            var tspans = textEl.selectAll("tspan").data(wrappedLines);
+            tspans.enter().append("tspan");
+            tspans.text((line: string) => line)
+                  .attr( {
+                    "dy": textEl.attr("dy"),
+                    "x": textEl.attr("x"),
+                    "y": (line: string, i: number) => (baseY + i) + "em" // shift each line down one relative to the previous line
+                  })
+                  .style("text-anchor", textEl.style("text-anchor"));
+          }
+        });
       }
-      this._hideOverlappingTickLabels();
+
       if (!this.showEndTickLabels()) {
         this._hideCutOffTickLabels();
       }
