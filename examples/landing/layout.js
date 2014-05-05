@@ -1,10 +1,10 @@
 function layoutChart(data) {
   // The two subplots will share an xScale, but have two seperate yScales for their data
-  var xScale        = new Plottable.LinearScale();
+  var xScale        = new Plottable.LinearScale().domain([0, 100]);
   var yScaleCommits = new Plottable.LinearScale();
   var yScaleLOC     = new Plottable.LinearScale();
 
-  var xAxis         = new Plottable.XAxis(xScale, "bottom");
+  var xAxis         = new Plottable.XAxis(xScale, "bottom").showEndTickLabels(true);
   var yAxisCommits  = new Plottable.YAxis(yScaleCommits, "left");
   var yAxisLOC      = new Plottable.YAxis(yScaleLOC, "right");
 

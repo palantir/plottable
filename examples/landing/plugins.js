@@ -21,15 +21,14 @@ function pluginsChart(gitData) {
   var legend    = new Plottable.Legend(colorScale).xOffset(-80).minimumWidth(200);
   var center = renderer.merge(gridlines).merge(legend);
 
+  var dragBox = new Plottable.XYDragBoxInteraction(center).registerWithComponent();
+  Plottable.setupDragBoxZoom(dragBox, xScale, yScale);
   // Now we'll make a Table to organize the layout of the components. The first row will have a yAxis and renderer; the second will
   // only have the xAxis, and it will be aligned to the column of the renderer.
   // The yAxis is fixed-width and the xAxis is fixed-height, so the renderer will naturally expand to take up all free space
-  var chart = new Plottable.Table([
-                    [yAxis, center  ],
-                    [null,  xAxis   ]
-                  ]);
-
-  var dragBox = new Plottable.XDragBoxInteraction(center).registerWithComponent();
-
-  chart.renderTo("#plugins");
+  new Plottable.StandardChart().xAxis(xAxis).yAxis(yAxis).center(center)
+                               .xLabel("% of Lines Changed that were Additions")
+                               .yLabel("# of Lines Changed")
+                               .titleLabel("Commits by Lines Changed and % Additions")
+                               .renderTo("#plugins");
 }

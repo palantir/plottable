@@ -9,7 +9,8 @@
     <title>Plottable.js</title>
 
     <!-- bootstrap -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="examples/landing/bootstrap.min.css">
+    <link rel="stylesheet" href="examples/landing/prettify.css">
 
     <!-- plottable and dependencies -->
     <script src="bower_components/d3/d3.min.js"></script>
@@ -25,7 +26,7 @@
     <script src="examples/landing/plugins.js"></script>
     <script src="examples/data/xyData.js"></script>
     <script src="examples/landing/layout.js"></script>
-    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <script src="examples/landing/run_prettify.js"></script>
 
     <!-- glue -->
     <script>
@@ -73,6 +74,22 @@
       .plottable circle {
         opacity: 0.8;
       }
+      h1 {
+        text-align: center;
+        font-size: 56px;
+      }
+      h2 {
+        text-align: center;
+        font-size: 40px;
+      }
+      body {
+        background-color: #f8f8f8;
+      }
+      .internal {
+        background-color: #fff;
+        border: 25px solid #fff;
+      }
+
     </style>
 
   </head>
@@ -90,7 +107,7 @@
           </div>
         </div>
       </nav>
-
+      <div class="internal">
       <h1>Plottable.js</h1>
       <h2>What is Plottable?</h2>
       <p>
@@ -145,7 +162,7 @@
   var xScale = new Plottable.LinearScale().domain([-5, 100]);
   var yScale = new Plottable.LogScale().domain([0.5, 100000]);
 
-  var xAxis = new Plottable.XAxis(xScale, "bottom");
+  var xAxis = new Plottable.XAxis(xScale, "bottom", d3.format("d"));
   var yAxis = new Plottable.YAxis(yScale, "left");
 
   var renderer = new Plottable.CircleRenderer(data, xScale, yScale);
@@ -176,9 +193,9 @@
                     .center(renderer)
                     .xLabel("days since start of project")
                     .yLabel("Total lines changed by commit")
+                    .titleLabel("Commits colored by additions relative to deletions")
                     .renderTo("#customProjectors");
 }
-
 </code></pre>
 
     <br><br><h2>Flexible</h2>
@@ -193,11 +210,11 @@
       <br>
       <pre class="prettyprint"><code>function layoutChart(data) {
   // The two subplots will share an xScale, but have two seperate yScales for their data
-  var xScale        = new Plottable.LinearScale();
+  var xScale        = new Plottable.LinearScale().domain([0, 100]);
   var yScaleCommits = new Plottable.LinearScale();
   var yScaleLOC     = new Plottable.LinearScale();
 
-  var xAxis         = new Plottable.XAxis(xScale, "bottom");
+  var xAxis         = new Plottable.XAxis(xScale, "bottom").showEndTickLabels(true);
   var yAxisCommits  = new Plottable.YAxis(yScaleCommits, "left");
   var yAxisLOC      = new Plottable.YAxis(yScaleLOC, "right");
 
@@ -234,7 +251,6 @@
 
   chart.renderTo("#layout");
 }
-
 </code></pre>
 
       <br><br><h2>Pluggable</h2>
@@ -242,6 +258,9 @@
         Plottable consists of a small core architecture and a large set of lightweight plugins. In the example below, almost everything is
         a plugin: the CircleRenderer, the Gridlines, the Legend, and the DragBoxInteraction. Adding a new Component or Interaction - say, a DragBox that
         can be dragged and repositioned after it is created - would only be 10-20 lines of Typescript code. </p>
+      <p>
+        The chart below is interactive - try dragging out a box on it, or double-click to reset.
+      </p>
       <div class="svg-container"><svg id="plugins" width="100%"></svg></div>
       <br>
 <pre class="prettyprint"><code>function pluginsChart(gitData) {
@@ -267,17 +286,16 @@
   var legend    = new Plottable.Legend(colorScale).xOffset(-80).minimumWidth(200);
   var center = renderer.merge(gridlines).merge(legend);
 
+  var dragBox = new Plottable.XYDragBoxInteraction(center).registerWithComponent();
+  Plottable.setupDragBoxZoom(dragBox, xScale, yScale);
   // Now we'll make a Table to organize the layout of the components. The first row will have a yAxis and renderer; the second will
   // only have the xAxis, and it will be aligned to the column of the renderer.
   // The yAxis is fixed-width and the xAxis is fixed-height, so the renderer will naturally expand to take up all free space
-  var chart = new Plottable.Table([
-                    [yAxis, center  ],
-                    [null,  xAxis   ]
-                  ]);
-
-  var dragBox = new Plottable.XDragBoxInteraction(center).registerWithComponent();
-
-  chart.renderTo("#plugins");
+  new Plottable.StandardChart().xAxis(xAxis).yAxis(yAxis).center(center)
+                               .xLabel("% of Lines Changed that were Additions")
+                               .yLabel("# of Lines Changed")
+                               .titleLabel("Commits by Lines Changed and % Additions")
+                               .renderTo("#plugins");
 }
 </code></pre>
       <!-- TODO sections -->
@@ -292,6 +310,6 @@
     </div>
 
 
-
+  </div>
   </body>
 </html>

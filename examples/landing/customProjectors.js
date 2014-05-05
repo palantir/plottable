@@ -2,7 +2,7 @@ function customProjectorChart(data) {
   var xScale = new Plottable.LinearScale().domain([-5, 100]);
   var yScale = new Plottable.LogScale().domain([0.5, 100000]);
 
-  var xAxis = new Plottable.XAxis(xScale, "bottom");
+  var xAxis = new Plottable.XAxis(xScale, "bottom", d3.format("d"));
   var yAxis = new Plottable.YAxis(yScale, "left");
 
   var renderer = new Plottable.CircleRenderer(data, xScale, yScale);
@@ -33,5 +33,6 @@ function customProjectorChart(data) {
                     .center(renderer)
                     .xLabel("days since start of project")
                     .yLabel("Total lines changed by commit")
+                    .titleLabel("Commits colored by additions relative to deletions")
                     .renderTo("#customProjectors");
 }
