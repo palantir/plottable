@@ -1037,6 +1037,15 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    interface IPixelArea {
+        xMin: number;
+        xMax: number;
+        yMin: number;
+        yMax: number;
+    }
+    function setupDragBoxZoom(dragBox: XYDragBoxInteraction, xScale: QuantitiveScale, yScale: QuantitiveScale): void;
+}
+declare module Plottable {
     class StandardChart extends Table {
         constructor();
         public yAxis(y: YAxis): StandardChart;
