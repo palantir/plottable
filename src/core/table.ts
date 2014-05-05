@@ -63,7 +63,7 @@ module Plottable {
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
           if (component != null) {
-            component._anchor(this.content.append("g"));
+            component._anchor(this.content);
           }
         });
       });
@@ -240,13 +240,18 @@ module Plottable {
       return all(componentGroup.map(groupIsFixed));
     }
 
-    public remove() {
+
+    /**
+     * Removes the Table and all constituent Components from the DOM
+     * and disconnects them from all broadcasters.
+     */
+    public destroy() {
       this.rows.forEach((row) => {
         row.forEach((component) => {
-          component.remove();
+          component.destroy();
         });
       });
-      super.remove();
+      super.destroy();
     }
   }
 }

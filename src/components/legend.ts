@@ -26,7 +26,9 @@ module Plottable {
 
     public _anchor(element: D3.Selection): Legend {
       super._anchor(element);
-      this.legendBox = this.content.append("rect").classed("legend-box", true);
+      if (this.legendBox == null) {
+        this.legendBox = this.content.append("rect").classed("legend-box", true);
+      }
       return this;
     }
 

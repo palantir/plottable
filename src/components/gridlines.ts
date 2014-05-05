@@ -29,8 +29,12 @@ module Plottable {
 
     public _anchor(element: D3.Selection): Gridlines {
       super._anchor(element);
-      this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
-      this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
+      if (this.xLinesContainer == null) {
+        this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
+      }
+      if (this.yLinesContainer == null) {
+        this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
+      }
       return this;
     }
 

@@ -128,7 +128,9 @@ module Plottable {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this.renderArea = this.content.append("g").classed("render-area", true);
+      if (this.renderArea == null) {
+        this.renderArea = this.content.append("g").classed("render-area", true);
+      }
       return this;
     }
 

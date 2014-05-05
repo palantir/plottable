@@ -23,7 +23,7 @@ module Plottable {
         this.components.push(c);
       }
       if (this.element != null) {
-        c._anchor(this.content.insert("g", "g"));
+        c._anchor(this.content);
       }
       return this;
     }
@@ -33,9 +33,36 @@ module Plottable {
       return this;
     }
 
+    /**
+     * If the given component exists in the ComponentGroup, removes it from the
+     * group and the DOM.
+     *
+     * @param {Component} c The component to be removed.
+     * @returns {ComponentGroup} The calling ComponentGroup.
+     */
+    public removeComponent(c: Component): ComponentGroup {
+      var removeIndex = this.components.indexOf(c);
+      if (removeIndex >= 0) {
+        this.components.splice(removeIndex, 1);
+        c.remove();
+      }
+      return this;
+    }
+
+    /**
+     * Removes all Components in the ComponentGroup from the group and the DOM.
+     *
+     * @returns {ComponentGroup} The calling ComponentGroup.
+     */
+    public empty(): ComponentGroup {
+      this.components.forEach((c: Component) => c.remove());
+      this.components = [];
+      return this;
+    }
+
     public _anchor(element: D3.Selection): ComponentGroup {
       super._anchor(element);
-      this.components.forEach((c) => c._anchor(this.content.insert("g", "g")));
+      this.components.forEach((c) => c._anchor(this.content));
       return this;
     }
 
@@ -64,9 +91,13 @@ module Plottable {
       return this.components.every((c) => c.isFixedHeight());
     }
 
-    public remove() {
-      this.components.forEach((c) => c.remove());
-      super.remove();
+    /**
+     * Removes the ComponentGroup and all constituent Components from the DOM
+     * and disconnects them from all broadcasters.
+     */
+    public destroy() {
+      this.components.forEach((c) => c.destroy());
+      super.destroy();
     }
   }
 }

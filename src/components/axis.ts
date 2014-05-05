@@ -33,7 +33,9 @@ module Plottable {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this.axisElement = this.content.append("g").classed("axis", true);
+      if (this.axisElement == null) {
+        this.axisElement = this.content.append("g").classed("axis", true);
+      }
       return this;
     }
 

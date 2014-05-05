@@ -21,7 +21,9 @@ module Plottable {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
-      this.path = this.renderArea.append("path").classed("area", true);
+      if (this.path == null) {
+        this.path = this.renderArea.append("path").classed("area", true);
+      }
       return this;
     }
 

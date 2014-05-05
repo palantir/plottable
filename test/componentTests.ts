@@ -25,14 +25,21 @@ describe("Component behavior", () => {
   describe("anchor", () => {
     it("anchoring works as expected", () => {
       c._anchor(svg);
-      assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the svg");
+      assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
+      assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
 
-    it("you cannot anchor to non-empty elements", () => {
-      svg.append("rect");
-      assert.throws(() => c._anchor(svg), Error);
+    it("can re-anchor to a different element", () => {
+      c._anchor(svg);
+
+      var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      c._anchor(svg2);
+      assert.equal(c.element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
+      assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
+
       svg.remove();
+      svg2.remove();
     });
   });
 
@@ -304,29 +311,23 @@ describe("Component behavior", () => {
     var cb = (b: Plottable.Broadcaster) => cbCalled++;
     var b = new Plottable.Broadcaster();
 
-    var t = new Plottable.Table();
     var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
-    var c3 = new Plottable.Component();
 
-    t._registerToBroadcaster(b, cb);
     c1._registerToBroadcaster(b, cb);
-    c2._registerToBroadcaster(b, cb);
-    c3._registerToBroadcaster(b, cb);
 
-    var cg = c2.merge(c3);
-    t.addComponent(0, 0, c1);
-    t.addComponent(1, 0, cg);
-    t.renderTo(svg);
+    c1.renderTo(svg);
     b._broadcast();
-    assert.equal(cbCalled, 4, "the callback was called 4 times");
+    assert.equal(cbCalled, 1, "the callback was called");
     assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
-    t.remove();
+    c1.remove();
+
     b._broadcast();
-    assert.equal(cbCalled, 4, "the callback was not called again");
+    assert.equal(cbCalled, 2, "the callback is still attached to the component");
     assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
-    assert.throws(() => t.renderTo(svg), Error);
+    c1.renderTo(svg);
+    assert.isTrue(svg.node().hasChildNodes(), "element can be re-anchored after removing");
+
     svg.remove();
   });
 });
