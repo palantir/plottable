@@ -8,7 +8,7 @@ module Plottable {
 
     public _dragstart() {
       super._dragstart();
-      if (this.callbackToCall != null && this.boxIsDrawn) {
+      if (this.callbackToCall != null) {
         this.callbackToCall(null);
       }
       this.clearBox();
