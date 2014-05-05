@@ -98,6 +98,12 @@
         font-size: 12pt;
       }
 
+      #layout .bounding-box {
+        stroke: #ccc;
+      }
+      p {
+        font-size: 14pt;
+      }
     </style>
 
   </head>
@@ -119,9 +125,12 @@
       <h1>Plottable.js</h1>
       <h2>What is Plottable?</h2>
       <p>
-        Plottable.js is a library for data visualization and charting, being developed by Palantir Technologies.
-        Plottable can be thought of as a higher-level visualization library built on D3. It is highly pluggable, so it is easy to leverage
-        the full expressivity of D3 by writing new plugins for Plottable. Here's an example of a complex dashboard, written in Plottable, that
+        Plottable.js is a library for data visualization and charting, under development by Palantir Technologies.
+        Plottable is built on D3 and provides higher-level components like a CircleRenderer, Legend, and TitleLabel. These components are
+        bundled with a layout engine that can position them in complex arrangements and size them. Plottable is flexible, pluggable, performant, and interactive.
+      </p>
+      <p>
+          Here's an example of a complex dashboard, written in Plottable, that
         shows Plottable's git commit history, including breakdown by contributor and directory.
       </p>
       <div class="svg-container"><svg id="interactive-demo" width="100%"></svg></div>
@@ -214,6 +223,9 @@
         a dashboard with two subplots, a shared x-axis, and y-axes on opposite sides of the plots.
       </p>
 
+      <p>
+        In the example below, the component's bounding boxes have been given a stroke, so it's easier to see how the Table is arranged.
+      </p>
       <div class="svg-container"><svg id="layout" width="100%"></svg></div>
       <br>
       <pre class="prettyprint"><code>function layoutChart(data) {
