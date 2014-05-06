@@ -150,13 +150,6 @@ module.exports = function(grunt) {
           src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json"]
         }
       }
-    },
-    gittag: {
-      task: {
-        options: {
-          tag: "v" + grunt.file.readJSON('package.json').version
-        }
-      }
     }
   };
 
