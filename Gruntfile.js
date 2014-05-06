@@ -81,7 +81,7 @@ module.exports = function(grunt) {
   };
 
   var configJSON = {
-    bump: bumpJSON;
+    bump: bumpJSON,
     concat: {
       header: {
         src: ["license_header.tmp", "plottable.js"],
@@ -150,6 +150,13 @@ module.exports = function(grunt) {
           src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json"]
         }
       }
+    },
+    gittag: {
+      task: {
+        options: {
+          tag: "v" + grunt.file.readJSON('package.json').version
+        }
+      }
     }
   };
 
@@ -169,20 +176,19 @@ module.exports = function(grunt) {
                                   "ts:examples",
                                   "tslint",
                                   "clean:tscommand"]);
-  grunt.registerTask("release:patch", ["bump:patch", "dist-compile"]);
-  grunt.registerTask("release:minor", ["bump:minor", "dist-compile"]);
-  grunt.registerTask("release:major", ["bump:major", "dist-compile"]);
+  grunt.registerTask("release:patch", ["bump:patch", "commitjs"]);
+  grunt.registerTask("release:minor", ["bump:minor", "commitjs"]);
+  grunt.registerTask("release:major", ["bump:major", "commitjs"]);
 
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
                                   "blanket_mocha",
                                   "copy:dist",
-                                  "concat:license",
+                                  "concat:header",
                                   "sed:private_definitions",
                                   "sed:protected_definitions"]);
 
-  grunt.registerTask("commitjs", ["dist-compile", "gitcommit"]);
-  grunt.registerTask("commit-js", ["dist-compile", "gitcommit"]);
+  grunt.registerTask("commitjs", ["dist-compile", "gitcommit", "gittag"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
