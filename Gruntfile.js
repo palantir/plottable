@@ -50,6 +50,7 @@ module.exports = function(grunt) {
   var bumpJSON = {
     options: {
       files: ['package.json', 'bower.json'],
+      updateConfigs: ['pkg'],
       commit: false,
       createTag: false,
       push: false
@@ -75,12 +76,13 @@ module.exports = function(grunt) {
     },
     header: {
       pattern: "VERSION",
-      replacement: grunt.file.readJSON('package.json').version,
+      replacement: "<%= pkg.version %>",
       path: "license_header.tmp",
     }
   };
 
   var configJSON = {
+    pkg: grunt.file.readJSON("package.json"),
     bump: bumpJSON,
     concat: {
       header: {
@@ -144,7 +146,7 @@ module.exports = function(grunt) {
     gitcommit: {
       task: {
         options: {
-          message: "Release version " + grunt.file.readJSON('package.json').version
+          message: "Release version <%= pkg.version %>"
         },
         files: {
           src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json"]
@@ -177,11 +179,11 @@ module.exports = function(grunt) {
                                   "dev-compile",
                                   "blanket_mocha",
                                   "copy:dist",
-                                  "concat:header",
+                                  "handle-header",
                                   "sed:private_definitions",
                                   "sed:protected_definitions"]);
 
-  grunt.registerTask("commitjs", ["dist-compile", "gitcommit", "gittag"]);
+  grunt.registerTask("commitjs", ["dist-compile", "gitcommit"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
