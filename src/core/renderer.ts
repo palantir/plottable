@@ -126,11 +126,9 @@ module Plottable {
       // no-op
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
-      if (this.renderArea == null) {
-        this.renderArea = this.content.append("g").classed("render-area", true);
-      }
+    public _setup() {
+      super._setup();
+      this.renderArea = this.content.append("g").classed("render-area", true);
       return this;
     }
 

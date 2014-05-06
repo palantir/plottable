@@ -19,11 +19,9 @@ module Plottable {
       this.project("stroke", () => "steelblue");
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
-      if (this.path == null) {
-        this.path = this.renderArea.append("path").classed("line", true);
-      }
+    public _setup() {
+      super._setup();
+      this.path = this.renderArea.append("path").classed("line", true);
       return this;
     }
 

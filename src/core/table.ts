@@ -239,19 +239,5 @@ module Plottable {
       var groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
       return all(componentGroup.map(groupIsFixed));
     }
-
-
-    /**
-     * Removes the Table and all constituent Components from the DOM
-     * and disconnects them from all broadcasters.
-     */
-    public destroy() {
-      this.rows.forEach((row) => {
-        row.forEach((component) => {
-          component.destroy();
-        });
-      });
-      super.destroy();
-    }
   }
 }

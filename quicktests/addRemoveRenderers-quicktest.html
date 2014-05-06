@@ -1,0 +1,75 @@
+<html>
+  <head>
+    <title>Add/Remove Renderers Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script>
+
+    <script>
+      var renderers = [];
+
+
+      var colors = new Plottable.ColorScale("20").range();
+
+      var xScale = new Plottable.LinearScale();
+      var yScale = new Plottable.LinearScale();
+      var numRenderers = 4;
+
+      for (var i=0; i<numRenderers; i++) {
+        var data = makeRandomData(20);
+        var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+        renderers.push(renderer);
+      }
+
+      var cg = new Plottable.ComponentGroup();
+
+      renderers.forEach(function(renderer, i) {
+        renderer.project("stroke", function() { return colors[i]; });
+        cg.merge(renderer);
+      })
+
+      var xAxis = new Plottable.XAxis(xScale, "bottom");
+      var yAxis = new Plottable.YAxis(yScale, "left");
+
+      var chart = new Plottable.Table([
+                                  [yAxis, cg],
+                                  [null,  xAxis]
+                                ]);
+
+      window.onload = function() {
+        chart.renderTo("#chart");
+        var pzi = new Plottable.PanZoomInteraction(cg, xScale, yScale);
+        pzi.registerWithComponent();
+
+      }
+
+      function removeRenderer() {
+        if (numRenderers > 0) {
+          cg.removeComponent(renderers[numRenderers - 1]);
+          numRenderers--;
+        }
+      }
+
+      function addRenderer() {
+        if (numRenderers >= renderers.length) {
+          var data = makeRandomData(20);
+          var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+          var nextColor = colors[numRenderers]
+          renderer.project("stroke", function() { return nextColor; });
+          renderers.push(renderer);
+        }
+        cg.merge(renderers[numRenderers]);
+        numRenderers++;
+        chart.renderTo();
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="chart" width="480" height="320"></svg>
+    <p />
+    <button name="remove" onclick="removeRenderer()">Remove</button>
+    <button name="add" onclick="addRenderer()">Add</button>
+  </body>
+
+</html>

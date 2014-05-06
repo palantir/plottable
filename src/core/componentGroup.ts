@@ -90,14 +90,5 @@ module Plottable {
     public isFixedHeight(): boolean {
       return this.components.every((c) => c.isFixedHeight());
     }
-
-    /**
-     * Removes the ComponentGroup and all constituent Components from the DOM
-     * and disconnects them from all broadcasters.
-     */
-    public destroy() {
-      this.components.forEach((c) => c.destroy());
-      super.destroy();
-    }
   }
 }

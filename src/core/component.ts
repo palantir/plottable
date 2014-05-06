@@ -52,10 +52,22 @@ module Plottable {
         // reattach existing element
         element.node().appendChild(this.element.node());
         return this;
+      } else {
+        this.element = element.append("g");
+        this._setup();
       }
 
-      this.element = element.append("g");
+      return this;
+    }
 
+    /**
+     * Creates additional elements as necessary for the Component to function.
+     * Called during _anchor() if the Component's element has not been created yet.
+     * Override in subclasses to provide additional functionality.
+     *
+     * @returns {Component} The calling Component.
+     */
+    public _setup() {
       this.cssClasses.forEach((cssClass: string) => {
         this.element.classed(cssClass, true);
       });
@@ -74,6 +86,7 @@ module Plottable {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
+
       return this;
     }
 
@@ -411,17 +424,6 @@ module Plottable {
     public remove() {
       this.element.remove();
       return this;
-    }
-
-    /**
-     * Removes a Component from the DOM and disconnects it from all broadcasters.
-     */
-    public destroy() {
-      d3.values(this.broadcastersCurrentlyListeningTo).forEach((b) => {
-        b.deregisterListener(this);
-      });
-      this.remove();
-      this.element = null;
     }
   }
 }
