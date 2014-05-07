@@ -32,5 +32,5 @@ function makeChartWithSubplots() {
                     [null,        xAxis   ]
                   ]);
 
-  chart.renderTo("#customProjectorChart");
+  chart.renderTo("#chart");
 }
