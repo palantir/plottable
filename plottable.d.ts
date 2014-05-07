@@ -1017,21 +1017,33 @@ declare module Plottable {
 declare module Plottable {
     class DragBoxInteraction extends DragInteraction {
         public dragBox: D3.Selection;
+        public boxIsDrawn: boolean;
         /**
         * Clears the highlighted drag-selection box drawn by the AreaInteraction.
         *
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
         public clearBox(): DragBoxInteraction;
+        public setBox(x0: number, x1: number, y0: number, y1: number): DragBoxInteraction;
     }
 }
 declare module Plottable {
     class XDragBoxInteraction extends DragBoxInteraction {
+        public setBox(x0: number, x1: number): XDragBoxInteraction;
     }
 }
 declare module Plottable {
     class XYDragBoxInteraction extends DragBoxInteraction {
     }
+}
+declare module Plottable {
+    interface IPixelArea {
+        xMin: number;
+        xMax: number;
+        yMin: number;
+        yMax: number;
+    }
+    function setupDragBoxZoom(dragBox: XYDragBoxInteraction, xScale: QuantitiveScale, yScale: QuantitiveScale): void;
 }
 declare module Plottable {
     class StandardChart extends Table {

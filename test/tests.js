@@ -2596,16 +2596,16 @@ describe("Utils", function () {
         assert.equal(si(1.5, a), 1, "returns 1 when val is between the first and second elements");
     });
 
-    it("truncateTextToLength works properly", function () {
+    it("getTruncatedText works properly", function () {
         var svg = generateSVG();
         var textEl = svg.append("text").attr("x", 20).attr("y", 50);
         textEl.text("foobar");
 
-        var fullText = Plottable.Utils.truncateTextToLength("hellom world!", 200, textEl);
+        var fullText = Plottable.Utils.getTruncatedText("hellom world!", 200, textEl);
         assert.equal(fullText, "hellom world!", "text untruncated");
-        var partialText = Plottable.Utils.truncateTextToLength("hellom world!", 70, textEl);
+        var partialText = Plottable.Utils.getTruncatedText("hellom world!", 70, textEl);
         assert.equal(partialText, "hello...", "text truncated");
-        var tinyText = Plottable.Utils.truncateTextToLength("hellom world!", 5, textEl);
+        var tinyText = Plottable.Utils.getTruncatedText("hellom world!", 5, textEl);
         assert.equal(tinyText, "", "empty string for tiny text");
 
         assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");

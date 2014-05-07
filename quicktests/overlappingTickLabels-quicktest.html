@@ -1,0 +1,82 @@
+<html>
+  <head>
+    <title>Overlapping Labels</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script>
+
+    <script>
+      var data = [
+          { name: "Spot", age: 8 },
+          { name: "Poptart", age: 1 },
+          { name: "Budoka", age: 3 },
+          { name: "Sugar", age: 14 },
+          { name: "Temporal Asynchronous Cat", age: -5 }
+        ];
+
+      var cuteFormatter = function(d) { return d + " is a pretty darn cute cat"; } ;
+
+      var ds = new Plottable.DataSource(data);
+      var xScale = new Plottable.OrdinalScale().rangeType("bands");
+      var xAxis = new Plottable.XAxis(xScale, "bottom", cuteFormatter);
+      xAxis.minimumHeight(60);
+
+      var yScale = new Plottable.LinearScale();
+      var yAxis = new Plottable.YAxis(yScale, "left");
+      yAxis.showEndTickLabels(true);
+
+      var barRenderer = new Plottable.BarRenderer(ds, xScale, yScale)
+                              .project("x", "name", xScale)
+                              .project("y", "age", yScale)
+                              .project("fill", function() {return "steelblue"; })
+                              .animate(true);
+      var chart = new Plottable.Table([
+                                  [yAxis, barRenderer],
+                                  [null,  xAxis]
+                                ]);
+
+      var xScale2 = new Plottable.LinearScale();
+      var xAxis2 = new Plottable.XAxis(xScale2, "bottom");
+
+      var yScale2 = new Plottable.OrdinalScale().rangeType("bands");
+      var yAxis2 = new Plottable.YAxis(yScale2, "left");//, cuteFormatter);
+      yAxis2.minimumWidth(80);
+
+      var horizBarRenderer = new Plottable.HorizontalBarRenderer(ds, xScale2, yScale2)
+                              .project("x", "age", xScale2)
+                              .project("y", "name", yScale2)
+                              .project("fill", function() {return "steelblue"; })
+                              .animate(true);
+
+      var horizChart = new Plottable.Table([
+        [yAxis2, horizBarRenderer],
+        [null, xAxis2]
+      ]);
+
+      window.onload = function() {
+        chart.renderTo("#meow");
+        horizChart.renderTo("#nya");
+      }
+
+      function younger() {
+        var data = ds.data();
+        data.forEach(function(d) { d.age--; });
+        ds.data(data);
+      }
+      function older() {
+        var data = ds.data();
+        data.forEach(function(d) { d.age++; });
+        ds.data(data);
+      }
+
+    </script>
+  </head>
+  <body>
+    <svg id="meow" width="480" height="320"></svg>
+    <p />
+    <button name="minus-age" onclick="younger()">-1 year</button><button name="plus-age" onclick="older()">+1 year</button>
+    <p />
+    <svg id="nya" width="480" height="320"></svg>
+  </body>
+</html>

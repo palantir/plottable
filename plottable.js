@@ -1,5 +1,5 @@
 /*!
-Plottable v0.10.1 (https://github.com/palantir/plottable)
+Plottable v0.10.2 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -458,6 +458,9 @@ var Plottable;
             }
             if (this.hasBeenRemoved) {
                 throw new Error("Cannot reuse a component after removing it");
+            }
+            if (this.element != null) {
+                throw new Error("Cannot re-anchor a component after it is already anchored");
             }
             if (element.node().nodeName === "svg") {
                 // svg node gets the "plottable" CSS class
@@ -3074,9 +3077,13 @@ var Plottable;
         __extends(DragBoxInteraction, _super);
         function DragBoxInteraction() {
             _super.apply(this, arguments);
+            this.boxIsDrawn = false;
         }
         DragBoxInteraction.prototype._dragstart = function () {
             _super.prototype._dragstart.call(this);
+            if (this.callbackToCall != null) {
+                this.callbackToCall(null);
+            }
             this.clearBox();
         };
 
@@ -3087,6 +3094,17 @@ var Plottable;
         */
         DragBoxInteraction.prototype.clearBox = function () {
             this.dragBox.attr("height", 0).attr("width", 0);
+            this.boxIsDrawn = false;
+            return this;
+        };
+
+        DragBoxInteraction.prototype.setBox = function (x0, x1, y0, y1) {
+            var w = Math.abs(x0 - x1);
+            var h = Math.abs(y0 - y1);
+            var xo = Math.min(x0, x1);
+            var yo = Math.min(y0, y1);
+            this.dragBox.attr({ x: xo, y: yo, width: w, height: h });
+            this.boxIsDrawn = (w > 0 && h > 0);
             return this;
         };
 
@@ -3112,11 +3130,7 @@ var Plottable;
         }
         XDragBoxInteraction.prototype._drag = function () {
             _super.prototype._drag.call(this);
-            var width = Math.abs(this.origin[0] - this.location[0]);
-            var height = this.componentToListenTo.availableHeight;
-            var x = Math.min(this.origin[0], this.location[0]);
-            var y = 0;
-            this.dragBox.attr({ x: x, y: y, height: height, width: width });
+            this.setBox(this.origin[0], this.location[0]);
         };
 
         XDragBoxInteraction.prototype._doDragend = function () {
@@ -3127,6 +3141,11 @@ var Plottable;
             var xMax = Math.max(this.origin[0], this.location[0]);
             var pixelArea = { xMin: xMin, xMax: xMax };
             this.callbackToCall(pixelArea);
+        };
+
+        XDragBoxInteraction.prototype.setBox = function (x0, x1) {
+            _super.prototype.setBox.call(this, x0, x1, 0, this.componentToListenTo.availableHeight);
+            return this;
         };
         return XDragBoxInteraction;
     })(Plottable.DragBoxInteraction);
@@ -3142,18 +3161,13 @@ var Plottable;
         }
         XYDragBoxInteraction.prototype._drag = function () {
             _super.prototype._drag.call(this);
-            var width = Math.abs(this.origin[0] - this.location[0]);
-            var height = Math.abs(this.origin[1] - this.location[1]);
-            var x = Math.min(this.origin[0], this.location[0]);
-            var y = Math.min(this.origin[1], this.location[1]);
-            this.dragBox.attr({ x: x, y: y, height: height, width: width });
+            this.setBox(this.origin[0], this.location[0], this.origin[1], this.location[1]);
         };
 
         XYDragBoxInteraction.prototype._doDragend = function () {
             if (this.callbackToCall == null) {
                 return;
             }
-
             var xMin = Math.min(this.origin[0], this.location[0]);
             var xMax = Math.max(this.origin[0], this.location[0]);
             var yMin = Math.min(this.origin[1], this.location[1]);
@@ -3164,6 +3178,32 @@ var Plottable;
         return XYDragBoxInteraction;
     })(Plottable.DragBoxInteraction);
     Plottable.XYDragBoxInteraction = XYDragBoxInteraction;
+})(Plottable || (Plottable = {}));
+///<reference path="../../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    function setupDragBoxZoom(dragBox, xScale, yScale) {
+        var xDomainOriginal = xScale.domain();
+        var yDomainOriginal = yScale.domain();
+        var resetOnNextClick = false;
+        function callback(pixelArea) {
+            if (pixelArea == null) {
+                if (resetOnNextClick) {
+                    xScale.domain(xDomainOriginal);
+                    yScale.domain(yDomainOriginal);
+                }
+                resetOnNextClick = !resetOnNextClick;
+                return;
+            }
+            resetOnNextClick = false;
+            xScale.domain([xScale.invert(pixelArea.xMin), xScale.invert(pixelArea.xMax)]);
+            yScale.domain([yScale.invert(pixelArea.yMax), yScale.invert(pixelArea.yMin)]);
+            dragBox.clearBox();
+            return;
+        }
+        dragBox.callback(callback);
+    }
+    Plottable.setupDragBoxZoom = setupDragBoxZoom;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -3315,6 +3355,7 @@ var Plottable;
 /// <reference path="interactions/drag/dragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
+/// <reference path="interactions/drag/setupDragBoxZoom.ts" />
 /// <reference path="templates/standardChart.ts" />
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -3825,6 +3866,9 @@ var Plottable;
             _super.call(this, dataset, xScale, yScale);
             this.classed("area-renderer", true);
             this.project("y0", 0, yScale); // default
+            this.project("fill", function () {
+                return "steelblue";
+            }); // default
         }
         AreaRenderer.prototype._anchor = function (element) {
             _super.prototype._anchor.call(this, element);

@@ -161,7 +161,7 @@ module Plottable {
     public minimumHeight(newVal: number): Table;
     public minimumHeight(newVal?: number): any {
       if (newVal != null) {
-        throw new Error("Row minimum cannot be directly set on Table");
+        throw new Error("minimumHeight cannot be directly set on Table");
       } else {
         this.minimumHeights = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => (r == null) ? 0 : r.minimumHeight()));
         return d3.sum(this.minimumHeights) + this.rowPadding * (this.rows.length - 1);
@@ -172,7 +172,7 @@ module Plottable {
     public minimumWidth(newVal: number): Table;
     public minimumWidth(newVal?: number): any {
       if (newVal != null) {
-        throw new Error("Col minimum cannot be directly set on Table");
+        throw new Error("minimumWidth cannot be directly set on Table");
       } else {
         var cols = d3.transpose(this.rows);
         this.minimumWidths = cols.map((col: Component[]) => d3.max(col, (c: Component) => (c == null) ? 0 : c.minimumWidth()));
