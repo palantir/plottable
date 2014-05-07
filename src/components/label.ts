@@ -33,8 +33,8 @@ module Plottable {
       this.xAlign("CENTER").yAlign("CENTER"); // the defaults
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.textElement = this.content.append("text");
       this.setText(this.text);
       return this;

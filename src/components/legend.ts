@@ -24,8 +24,8 @@ module Plottable {
       this.xOffset(5).yOffset(5);
     }
 
-    public _anchor(element: D3.Selection): Legend {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.legendBox = this.content.append("rect").classed("legend-box", true);
       return this;
     }

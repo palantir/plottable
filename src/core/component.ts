@@ -12,7 +12,6 @@ module Plottable {
     public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
     private broadcastersCurrentlyListeningTo: {[key: string]: Broadcaster} = {};
-    private hasBeenRemoved = false;
 
     public _fixedWidth = true;
     public _fixedHeight = true;
@@ -34,34 +33,40 @@ module Plottable {
     private cssClasses: string[] = ["component"];
 
     /**
-     * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+     * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
      *
-     * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
+     * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
      * @returns {Component} The calling component.
      */
     public _anchor(element: D3.Selection) {
-      if (element.node().childNodes.length > 0) {
-        throw new Error("Can't anchor to a non-empty element");
-      }
-      if (this.hasBeenRemoved) {
-        // Since we deregister all the model bindings, this would be dangerous
-        throw new Error("Cannot reuse a component after removing it");
-      }
-      if (this.element != null) {
-        throw new Error("Cannot re-anchor a component after it is already anchored");
-      }
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
         this.rootSVG = element;
         this.rootSVG.classed("plottable", true);
         // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
         this.rootSVG.style("overflow", "visible");
-        this.element = element.append("g");
         this.isTopLevelComponent = true;
-      } else {
-        this.element = element;
       }
 
+      if (this.element != null) {
+        // reattach existing element
+        element.node().appendChild(this.element.node());
+      } else {
+        this.element = element.append("g");
+        this._setup();
+      }
+
+      return this;
+    }
+
+    /**
+     * Creates additional elements as necessary for the Component to function.
+     * Called during _anchor() if the Component's element has not been created yet.
+     * Override in subclasses to provide additional functionality.
+     *
+     * @returns {Component} The calling Component.
+     */
+    public _setup() {
       this.cssClasses.forEach((cssClass: string) => {
         this.element.classed(cssClass, true);
       });
@@ -80,6 +85,7 @@ module Plottable {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
+
       return this;
     }
 
@@ -149,9 +155,14 @@ module Plottable {
       return this; //no-op
     }
 
+    /**
+     * Renders the Component into a given DOM element.
+     *
+     * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+     * @return {Component} The calling component.
+     */
     public renderTo(element: any): Component {
-      // When called on top-level-component, a shortcut for component._anchor(svg)._computeLayout()._render()
-      if (this.element == null) {
+      if (element != null) {
         var selection: D3.Selection;
         if (typeof(element.node) === "function") {
           selection = (<D3.Selection> element);
@@ -407,15 +418,11 @@ module Plottable {
     }
 
     /**
-     * Blow up a component and its DOM, so it can be safely removed
+     * Removes a Component from the DOM.
      */
     public remove() {
-      d3.values(this.broadcastersCurrentlyListeningTo).forEach((b) => {
-        b.deregisterListener(this);
-      });
-      this.hasBeenRemoved = true;
       this.element.remove();
-      this.element = null;
+      return this;
     }
   }
 }

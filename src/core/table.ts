@@ -63,7 +63,7 @@ module Plottable {
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
           if (component != null) {
-            component._anchor(this.content.append("g"));
+            component._anchor(this.content);
           }
         });
       });
@@ -238,15 +238,6 @@ module Plottable {
       var all = (bools: boolean[]) => bools.reduce((a, b) => a && b);
       var groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
       return all(componentGroup.map(groupIsFixed));
-    }
-
-    public remove() {
-      this.rows.forEach((row) => {
-        row.forEach((component) => {
-          component.remove();
-        });
-      });
-      super.remove();
     }
   }
 }

@@ -98,6 +98,45 @@ describe("ComponentGroups", () => {
     svg.remove();
     });
 
+  it("remove() and removeComponent work correctly for componentGroup", () => {
+    var c1 = new Plottable.Component().classed("component-1", true);
+    var c2 = new Plottable.Component().classed("component-2", true);
+    var cg = new Plottable.ComponentGroup([c1, c2]);
+
+    var svg = generateSVG(200, 200);
+    cg.renderTo(svg);
+
+    var c1Node = svg.select(".component-1").node();
+    var c2Node = svg.select(".component-2").node();
+
+    assert.isNotNull(c1Node, "component 1 was added to the DOM");
+    assert.isNotNull(c2Node, "component 2 was added to the DOM");
+
+    cg.removeComponent(c2);
+
+    c1Node = svg.select(".component-1").node();
+    c2Node = svg.select(".comopnent-2").node();
+
+    assert.isNotNull(c1Node, "component 1 is still in the DOM");
+    assert.isNull(c2Node, "component 2 was removed from the DOM");
+
+    cg.remove();
+    var cgNode = svg.select(".component-group").node();
+    c1Node = svg.select(".component-1").node();
+
+    assert.isNull(cgNode, "component group was removed from the DOM");
+    assert.isNull(c1Node, "componet 1 was also removed from the DOM");
+
+    cg.renderTo(svg);
+    cgNode = svg.select(".component-group").node();
+    c1Node = svg.select(".component-1").node();
+
+    assert.isNotNull(cgNode, "component group was added back to the DOM");
+    assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
+
+    svg.remove();
+  });
+
     describe("Component.merge works as expected", () => {
       var c1 = new Plottable.Component();
       var c2 = new Plottable.Component();

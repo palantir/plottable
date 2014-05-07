@@ -37,8 +37,8 @@ module Plottable {
       this._registerToBroadcaster(this._axisScale, () => this.rescale());
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.axisElement = this.content.append("g").classed("axis", true);
       return this;
     }
@@ -281,8 +281,8 @@ module Plottable {
       this.tickLabelPosition("center");
     }
 
-    public _anchor(element: D3.Selection): XAxis {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.axisElement.classed("x-axis", true);
       return this;
     }
@@ -393,8 +393,8 @@ module Plottable {
       this.tickLabelPosition("middle");
     }
 
-    public _anchor(element: D3.Selection): YAxis {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.axisElement.classed("y-axis", true);
       return this;
     }

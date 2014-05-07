@@ -176,8 +176,9 @@ describe("Axes", () => {
 
     svg = generateSVG(100, 500);
     endDate = new Date(2010, 0, 1);
-    timeScale.domain([startDate, endDate]);
-    var yAxis = new Plottable.YAxis(timeScale, "left");
+    var timescaleY = new Plottable.LinearScale().domain([startDate, endDate])
+                                                .range([0, 500]);
+    var yAxis = new Plottable.YAxis(timescaleY, "left");
     var oneYear = 365 * Plottable.AxisUtils.ONE_DAY;
     baseDate = new Date(1990, 0, 1);
 

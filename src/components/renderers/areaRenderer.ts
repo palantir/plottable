@@ -20,8 +20,8 @@ module Plottable {
       this.project("fill", () => "steelblue"); // default
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.path = this.renderArea.append("path").classed("area", true);
       return this;
     }

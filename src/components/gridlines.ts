@@ -27,8 +27,8 @@ module Plottable {
       }
     }
 
-    public _anchor(element: D3.Selection): Gridlines {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
       this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
       return this;
