@@ -51,7 +51,6 @@ module Plottable {
       if (this.element != null) {
         // reattach existing element
         element.node().appendChild(this.element.node());
-        return this;
       } else {
         this.element = element.append("g");
         this._setup();
