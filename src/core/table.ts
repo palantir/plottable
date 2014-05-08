@@ -56,9 +56,9 @@ module Plottable {
         throw new Error("addComponent cannot be called after anchoring (for the moment)");
       }
 
-      this.nRows = Math.max(row, this.nRows);
-      this.nCols = Math.max(col, this.nCols);
-      this.padTableToSize(this.nRows + 1, this.nCols + 1);
+      this.nRows = Math.max(row + 1, this.nRows);
+      this.nCols = Math.max(col + 1, this.nCols);
+      this.padTableToSize(this.nRows, this.nCols);
 
       var currentComponent = this.rows[row][col];
       if (currentComponent != null) {
