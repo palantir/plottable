@@ -285,5 +285,13 @@ module Plottable {
         return this.counter[id];
       }
     }
+
+    export function repeat(element: any, count: number) {
+      var out: any[] = [];
+      for (var i=0; i<count; i++) {
+        out[i] = element;
+      }
+      return out;
+    }
   }
 }

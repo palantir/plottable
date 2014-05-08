@@ -70,39 +70,80 @@ module Plottable {
       return this;
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
+      super._computeLayout(xOffset, yOffset, availableX, availableY);
+      var i: number, j: number;
+      var stable = false;
+      var unsatisfiedComponents: any[][] = [];
 
-      // calculate the amount of free space by recursive col-/row- Minimum() calls
-      var freeWidth = this.availableWidth - this.minimumWidth();
-      var freeHeight = this.availableHeight - this.minimumHeight();
-      if (freeWidth < 0 || freeHeight < 0) {
-        throw new Error("Insufficient Space");
+      var xAllocations = Utils.repeat(this.availableWidth / this.nCols, this.nCols);
+      var yAllocations = Utils.repeat(this.availableHeight / this.nRows, this.nRows);
+
+      this.rows.forEach((row: Component[], rowIndex: number) => {
+        row.forEach((component: Component, colIndex: number) => {
+          if (!(component.widthProportional && component.heightProportional)) {
+            unsatisfiedComponents.push[component, rowIndex, colIndex];
+          }
+        }
       }
 
-      var cols = d3.transpose(this.rows);
-      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
-      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c.isFixedWidth());
-      // distribute remaining height to rows
-      var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
-      var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
+      var freeHeight = 0;
+      var freeWidth = 0;
+      var nIterations = 0;
+      while ((freeHeight > 0 || freeWidth > 0) && unsatisfiedComponents.length > 0) {
+        var nextIterationUnsatisfied = [];
+        unsatisfiedComponents.forEach((crc) => {
+          var c: Component = crc[0];
+          var row: number = crc[1];
+          var col: number = crc[2];
+          var xOffered = xAllocations[col];
+          var yOffered = yAllocations[row];
+          var requestedXY = c.requestedWidthHeight(offeredWidth, offeredHeight);
+          var requestedX = requestedXY[0];
+          var requestedY = requestedXY[1];
 
-      var sumPair = (p: number[]) => p[0] + p[1];
-      var rowHeights = d3.zip(rowProportionalSpace, this.minimumHeights).map(sumPair);
-      var colWidths  = d3.zip(colProportionalSpace, this.minimumWidths).map(sumPair);
-
-      var childYOffset = 0;
-      this.rows.forEach((row: Component[], rowIndex: number) => {
-        var childXOffset = 0;
-        row.forEach((component: Component, colIndex: number) => {
-          // recursively compute layout
-          if (component != null) {
-            component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+          var widthSatisfied = c.widthProportional || requestedWH[0] < offeredWidth;
+          var heightSatisfied = c.widthProportional || requestedWH[0] < offeredWidth;
+          if (!(widthSatisfied && heightSatisfied)) {
+            nextIterationUnsatisfied.push(crc);
           }
-          childXOffset += colWidths[colIndex] + this.colPadding;
+          freeWidth += offeredWidth - requestedWH[0];
+          freeHeight += offeredHeight - requestedWH[1];
         });
-        childYOffset += rowHeights[rowIndex] + this.rowPadding;
-      });
+      }
+
+
+
+      // // calculate the amount of free space by recursive col-/row- Minimum() calls
+      // var freeWidth = this.availableWidth - this.minimumWidth();
+      // var freeHeight = this.availableHeight - this.minimumHeight();
+      // if (freeWidth < 0 || freeHeight < 0) {
+      //   throw new Error("Insufficient Space");
+      // }
+
+      // var cols = d3.transpose(this.rows);
+      // var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
+      // var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c.isFixedWidth());
+      // // distribute remaining height to rows
+      // var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
+      // var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
+
+      // var sumPair = (p: number[]) => p[0] + p[1];
+      // var rowHeights = d3.zip(rowProportionalSpace, this.minimumHeights).map(sumPair);
+      // var colWidths  = d3.zip(colProportionalSpace, this.minimumWidths).map(sumPair);
+
+      // var childYOffset = 0;
+      // this.rows.forEach((row: Component[], rowIndex: number) => {
+      //   var childXOffset = 0;
+      //   row.forEach((component: Component, colIndex: number) => {
+      //     // recursively compute layout
+      //     if (component != null) {
+      //       component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
+      //     }
+      //     childXOffset += colWidths[colIndex] + this.colPadding;
+      //   });
+      //   childYOffset += rowHeights[rowIndex] + this.rowPadding;
+      // });
       return this;
     }
 

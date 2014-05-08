@@ -2,6 +2,14 @@
 
 module Plottable {
   export class Component extends PlottableObject {
+
+    public widthProportional = true;
+    public heightProportional = true;
+
+    public requestedWidthHeight(availableWidth, availableHeight) {
+      return [this.widthProportional ? 0 : this.minimumWidth(), this.heightProportional ? 0 : this.minimumHeight()];
+    }
+
     public element: D3.Selection;
     public content: D3.Selection;
     private hitBox: D3.Selection;
