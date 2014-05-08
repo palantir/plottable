@@ -1,5 +1,5 @@
 /*!
-Plottable v0.10.2 (https://github.com/palantir/plottable)
+Plottable 0.11.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -47,26 +47,26 @@ var Plottable;
         Utils.getElementHeight = getElementHeight;
 
         /**
-        * Truncates a text string to a max length, given the element in which to draw the text
+        * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
         *
-        * @param {string} text: The string to put in the text element, and truncate
-        * @param {D3.Selection} element: The element in which to measure and place the text
-        * @param {number} length: How much space to truncate text into
+        * @param {string} text: The string to be truncated
+        * @param {number} availableSpace: The avialable space, in pixels
+        * @param {D3.Selection} element: The text element used to measure the text
         * @returns {string} text - the shortened text
         */
-        function truncateTextToLength(text, length, element) {
+        function getTruncatedText(text, availableSpace, element) {
             var originalText = element.text();
             element.text(text);
             var bbox = Utils.getBBox(element);
             var textLength = bbox.width;
-            if (textLength < length) {
+            if (textLength < availableSpace) {
                 element.text(originalText);
                 return text;
             }
             element.text(text + "...");
             var textNode = element.node();
             var dotLength = textNode.getSubStringLength(textNode.textContent.length - 3, 3);
-            if (dotLength > length) {
+            if (dotLength > availableSpace) {
                 element.text(originalText);
                 return "";
             }
@@ -74,13 +74,13 @@ var Plottable;
             var numChars = text.length;
             for (var i = 1; i < numChars; i++) {
                 var testLength = textNode.getSubStringLength(0, i);
-                if (testLength + dotLength > length) {
+                if (testLength + dotLength > availableSpace) {
                     element.text(originalText);
                     return text.substr(0, i - 1).trim() + "...";
                 }
             }
         }
-        Utils.truncateTextToLength = truncateTextToLength;
+        Utils.getTruncatedText = getTruncatedText;
 
         /**
         * Gets the height of a text element, as rendered.
@@ -96,6 +96,71 @@ var Plottable;
             return height;
         }
         Utils.getTextHeight = getTextHeight;
+
+        /**
+        * Converts a string into an array of strings, all of which fit in the available space.
+        *
+        * @returns {string[]} The input text broken into substrings that fit in the avialable space.
+        */
+        function getWrappedText(text, availableWidth, availableHeight, textElement, cutoffRatio) {
+            if (typeof cutoffRatio === "undefined") { cutoffRatio = 0.7; }
+            var originalText = textElement.text();
+            var textNode = textElement.node();
+
+            textElement.text("-");
+            var hyphenLength = textNode.getSubStringLength(0, 1);
+
+            textElement.text(text);
+            var bbox = Utils.getBBox(textElement);
+            var textLength = bbox.width;
+            var textHeight = bbox.height;
+
+            var linesAvailable = Math.floor(availableHeight / textHeight);
+            var numChars = text.length;
+
+            var lines = [];
+            var remainingText;
+
+            var cutoffEnd = availableWidth - hyphenLength;
+            var cutoffStart = cutoffRatio * cutoffEnd;
+
+            var lineStartPosition = 0;
+            for (var i = 1; i < numChars; i++) {
+                var testLength = textNode.getSubStringLength(lineStartPosition, i - lineStartPosition);
+
+                if (testLength > cutoffStart) {
+                    var currentCharacter = text.charAt(i);
+                    if (testLength > cutoffEnd) {
+                        if (lines.length + 1 >= linesAvailable) {
+                            remainingText = text.substring(lineStartPosition, text.length).trim();
+                            lines.push(getTruncatedText(remainingText, availableWidth, textElement));
+                            break;
+                        }
+
+                        // break line on the previous character to leave room for the hyphen
+                        lines.push(text.substring(lineStartPosition, i - 1).trim() + "-");
+                        lineStartPosition = i - 1;
+                    } else if (currentCharacter === " ") {
+                        if (lines.length + 1 >= linesAvailable) {
+                            remainingText = text.substring(lineStartPosition, text.length).trim();
+                            lines.push(getTruncatedText(remainingText, availableWidth, textElement));
+                            break;
+                        }
+
+                        // break line after the current character
+                        lines.push(text.substring(lineStartPosition, i + 1).trim());
+                        lineStartPosition = i + 1;
+                    }
+                }
+            }
+            if (lineStartPosition < numChars && lines.length < linesAvailable) {
+                lines.push(text.substring(lineStartPosition, numChars).trim());
+            }
+
+            textElement.text(originalText);
+            return lines;
+        }
+        Utils.getWrappedText = getWrappedText;
 
         function getSVGPixelWidth(svg) {
             var width = svg.node().clientWidth;
@@ -433,7 +498,6 @@ var Plottable;
             this.boxes = [];
             this.clipPathEnabled = false;
             this.broadcastersCurrentlyListeningTo = {};
-            this.hasBeenRemoved = false;
             this._fixedWidth = true;
             this._fixedHeight = true;
             this._minimumHeight = 0;
@@ -446,22 +510,12 @@ var Plottable;
             this.cssClasses = ["component"];
         }
         /**
-        * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+        * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
         *
-        * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
+        * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
         * @returns {Component} The calling component.
         */
         Component.prototype._anchor = function (element) {
-            var _this = this;
-            if (element.node().childNodes.length > 0) {
-                throw new Error("Can't anchor to a non-empty element");
-            }
-            if (this.hasBeenRemoved) {
-                throw new Error("Cannot reuse a component after removing it");
-            }
-            if (this.element != null) {
-                throw new Error("Cannot re-anchor a component after it is already anchored");
-            }
             if (element.node().nodeName === "svg") {
                 // svg node gets the "plottable" CSS class
                 this.rootSVG = element;
@@ -469,12 +523,29 @@ var Plottable;
 
                 // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
                 this.rootSVG.style("overflow", "visible");
-                this.element = element.append("g");
                 this.isTopLevelComponent = true;
-            } else {
-                this.element = element;
             }
 
+            if (this.element != null) {
+                // reattach existing element
+                element.node().appendChild(this.element.node());
+            } else {
+                this.element = element.append("g");
+                this._setup();
+            }
+
+            return this;
+        };
+
+        /**
+        * Creates additional elements as necessary for the Component to function.
+        * Called during _anchor() if the Component's element has not been created yet.
+        * Override in subclasses to provide additional functionality.
+        *
+        * @returns {Component} The calling Component.
+        */
+        Component.prototype._setup = function () {
+            var _this = this;
             this.cssClasses.forEach(function (cssClass) {
                 _this.element.classed(cssClass, true);
             });
@@ -496,6 +567,7 @@ var Plottable;
                 return _this.registerInteraction(r);
             });
             this.interactionsToRegister = null;
+
             return this;
         };
 
@@ -568,9 +640,14 @@ var Plottable;
             return this;
         };
 
+        /**
+        * Renders the Component into a given DOM element.
+        *
+        * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+        * @return {Component} The calling component.
+        */
         Component.prototype.renderTo = function (element) {
-            // When called on top-level-component, a shortcut for component._anchor(svg)._computeLayout()._render()
-            if (this.element == null) {
+            if (element != null) {
                 var selection;
                 if (typeof (element.node) === "function") {
                     selection = element;
@@ -803,16 +880,11 @@ var Plottable;
         };
 
         /**
-        * Blow up a component and its DOM, so it can be safely removed
+        * Removes a Component from the DOM.
         */
         Component.prototype.remove = function () {
-            var _this = this;
-            d3.values(this.broadcastersCurrentlyListeningTo).forEach(function (b) {
-                b.deregisterListener(_this);
-            });
-            this.hasBeenRemoved = true;
             this.element.remove();
-            this.element = null;
+            return this;
         };
         return Component;
     })(Plottable.PlottableObject);
@@ -843,7 +915,7 @@ var Plottable;
                 this.components.push(c);
             }
             if (this.element != null) {
-                c._anchor(this.content.insert("g", "g"));
+                c._anchor(this.content);
             }
             return this;
         };
@@ -853,11 +925,40 @@ var Plottable;
             return this;
         };
 
+        /**
+        * If the given component exists in the ComponentGroup, removes it from the
+        * group and the DOM.
+        *
+        * @param {Component} c The component to be removed.
+        * @returns {ComponentGroup} The calling ComponentGroup.
+        */
+        ComponentGroup.prototype.removeComponent = function (c) {
+            var removeIndex = this.components.indexOf(c);
+            if (removeIndex >= 0) {
+                this.components.splice(removeIndex, 1);
+                c.remove();
+            }
+            return this;
+        };
+
+        /**
+        * Removes all Components in the ComponentGroup from the group and the DOM.
+        *
+        * @returns {ComponentGroup} The calling ComponentGroup.
+        */
+        ComponentGroup.prototype.empty = function () {
+            this.components.forEach(function (c) {
+                return c.remove();
+            });
+            this.components = [];
+            return this;
+        };
+
         ComponentGroup.prototype._anchor = function (element) {
             var _this = this;
             _super.prototype._anchor.call(this, element);
             this.components.forEach(function (c) {
-                return c._anchor(_this.content.insert("g", "g"));
+                return c._anchor(_this.content);
             });
             return this;
         };
@@ -889,13 +990,6 @@ var Plottable;
             return this.components.every(function (c) {
                 return c.isFixedHeight();
             });
-        };
-
-        ComponentGroup.prototype.remove = function () {
-            this.components.forEach(function (c) {
-                return c.remove();
-            });
-            _super.prototype.remove.call(this);
         };
         return ComponentGroup;
     })(Plottable.Component);
@@ -964,7 +1058,7 @@ var Plottable;
             this.rows.forEach(function (row, rowIndex) {
                 row.forEach(function (component, colIndex) {
                     if (component != null) {
-                        component._anchor(_this.content.append("g"));
+                        component._anchor(_this.content);
                     }
                 });
             });
@@ -1068,7 +1162,7 @@ var Plottable;
 
         Table.prototype.minimumHeight = function (newVal) {
             if (newVal != null) {
-                throw new Error("Row minimum cannot be directly set on Table");
+                throw new Error("minimumHeight cannot be directly set on Table");
             } else {
                 this.minimumHeights = this.rows.map(function (row) {
                     return d3.max(row, function (r) {
@@ -1081,7 +1175,7 @@ var Plottable;
 
         Table.prototype.minimumWidth = function (newVal) {
             if (newVal != null) {
-                throw new Error("Col minimum cannot be directly set on Table");
+                throw new Error("minimumWidth cannot be directly set on Table");
             } else {
                 var cols = d3.transpose(this.rows);
                 this.minimumWidths = cols.map(function (col) {
@@ -1165,15 +1259,6 @@ var Plottable;
                 return all(components.map(fixityAccessor));
             };
             return all(componentGroup.map(groupIsFixed));
-        };
-
-        Table.prototype.remove = function () {
-            this.rows.forEach(function (row) {
-                row.forEach(function (component) {
-                    component.remove();
-                });
-            });
-            _super.prototype.remove.call(this);
         };
         return Table;
     })(Plottable.Component);
@@ -1410,8 +1495,8 @@ var Plottable;
             // no-op
         };
 
-        Renderer.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        Renderer.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.renderArea = this.content.append("g").classed("render-area", true);
             return this;
         };
@@ -1719,10 +1804,12 @@ var Plottable;
                     throw new Error("Unsupported range type: " + rangeType);
                 }
                 this._rangeType = rangeType;
-                if (outerPadding != null)
+                if (outerPadding != null) {
                     this._outerPadding = outerPadding;
-                if (innerPadding != null)
+                }
+                if (innerPadding != null) {
                     this._innerPadding = innerPadding;
+                }
                 return this;
             }
         };
@@ -2028,8 +2115,8 @@ var Plottable;
             }
             this.xAlign("CENTER").yAlign("CENTER"); // the defaults
         }
-        Label.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        Label.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.textElement = this.content.append("text");
             this.setText(this.text);
             return this;
@@ -2062,7 +2149,7 @@ var Plottable;
         };
 
         Label.prototype.truncateTextAndRemeasure = function (availableLength) {
-            var shortText = Plottable.Utils.truncateTextToLength(this.text, availableLength, this.textElement);
+            var shortText = Plottable.Utils.getTruncatedText(this.text, availableLength, this.textElement);
             this.textElement.text(shortText);
             this.measureAndSetTextSize();
         };
@@ -2143,8 +2230,8 @@ var Plottable;
             this.xAlign("RIGHT").yAlign("TOP");
             this.xOffset(5).yOffset(5);
         }
-        Legend.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        Legend.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.legendBox = this.content.append("rect").classed("legend-box", true);
             return this;
         };
@@ -2194,7 +2281,7 @@ var Plottable;
             legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
             legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
             legend.selectAll("text").text(function (d, i) {
-                return Plottable.Utils.truncateTextToLength(d, availableWidth, d3.select(this));
+                return Plottable.Utils.getTruncatedText(d, availableWidth, d3.select(this));
             });
             return this;
         };
@@ -2326,8 +2413,8 @@ var Plottable;
                 return "steelblue";
             });
         }
-        LineRenderer.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        LineRenderer.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.path = this.renderArea.append("path").classed("line", true);
             return this;
         };
@@ -3375,20 +3462,26 @@ var Plottable;
             _super.call(this);
             this._showEndTickLabels = false;
             this.tickPositioning = "center";
-            this.axisScale = axisScale;
+            this._axisScale = axisScale;
             orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
             this.classed("axis", true);
             if (formatter == null) {
-                formatter = d3.format(".3s");
+                var numberFormatter = d3.format(".3s");
+                formatter = function (d) {
+                    if (typeof d === "number") {
+                        return numberFormatter(d);
+                    }
+                    return d;
+                };
             }
             this.d3Axis.tickFormat(formatter);
-            this._registerToBroadcaster(this.axisScale, function () {
+            this._registerToBroadcaster(this._axisScale, function () {
                 return _this.rescale();
             });
         }
-        Axis.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        Axis.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.axisElement = this.content.append("g").classed("axis", true);
             return this;
         };
@@ -3415,8 +3508,8 @@ var Plottable;
             }
 
             // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
-            if (this.axisScale.ticks != null) {
-                var scale = this.axisScale;
+            if (this._axisScale.ticks != null) {
+                var scale = this._axisScale;
                 var nTicks = 10;
                 var ticks = scale.ticks(nTicks);
                 var numericDomain = scale.domain();
@@ -3502,9 +3595,9 @@ var Plottable;
 
         Axis.prototype.scale = function (newScale) {
             if (newScale == null) {
-                return this.axisScale;
+                return this._axisScale;
             } else {
-                this.axisScale = newScale;
+                this._axisScale = newScale;
                 this.d3Axis.scale(newScale._d3Scale);
                 return this;
             }
@@ -3628,8 +3721,8 @@ var Plottable;
             this._fixedWidth = false;
             this.tickLabelPosition("center");
         }
-        XAxis.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        XAxis.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.axisElement.classed("x-axis", true);
             return this;
         };
@@ -3651,24 +3744,63 @@ var Plottable;
         };
 
         XAxis.prototype._doRender = function () {
+            var _this = this;
             _super.prototype._doRender.call(this);
-            if (this.tickLabelPosition() !== "center") {
-                var tickTextLabels = this.axisElement.selectAll("text");
-                tickTextLabels.attr("y", "0px");
 
-                if (this.orient() === "bottom") {
-                    tickTextLabels.attr("dy", "1em");
-                } else {
-                    tickTextLabels.attr("dy", "-0.25em");
+            var tickTextLabels = this.axisElement.selectAll("text");
+            if (tickTextLabels[0].length > 0) {
+                if (this.tickLabelPosition() !== "center") {
+                    tickTextLabels.attr("y", "0px");
+
+                    if (this.orient() === "bottom") {
+                        tickTextLabels.attr("dy", "1em");
+                    } else {
+                        tickTextLabels.attr("dy", "-0.25em");
+                    }
+
+                    if (this.tickLabelPosition() === "right") {
+                        tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
+                    } else if (this.tickLabelPosition() === "left") {
+                        tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
+                    }
                 }
 
-                if (this.tickLabelPosition() === "right") {
-                    tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
-                } else if (this.tickLabelPosition() === "left") {
-                    tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
+                var scaleRange = this._axisScale.range();
+                var availableWidth = this.availableWidth;
+                var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
+                var availableHeight = this.availableHeight - tickLengthWithPadding;
+                if (tickTextLabels[0].length > 1) {
+                    var tickValues = tickTextLabels.data();
+                    var tickPositions = tickValues.map(function (v) {
+                        return _this._axisScale.scale(v);
+                    });
+                    tickPositions.forEach(function (p, i) {
+                        var spacing = Math.abs(tickPositions[i + 1] - p);
+                        availableWidth = (spacing < availableWidth) ? spacing : availableWidth;
+                    });
                 }
+
+                availableWidth = 0.9 * availableWidth; // add in some padding
+
+                tickTextLabels.each(function (t, i) {
+                    var textEl = d3.select(this);
+                    var currentText = textEl.text();
+                    var wrappedLines = Plottable.Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+                    if (wrappedLines.length === 1) {
+                        textEl.text(Plottable.Utils.getTruncatedText(currentText, availableWidth, textEl));
+                    } else {
+                        textEl.text("");
+                        var tspans = textEl.selectAll("tspan").data(wrappedLines);
+                        tspans.enter().append("tspan");
+                        tspans.text(function (line) {
+                            return line;
+                        }).attr("x", "0").attr("dy", function (line, i) {
+                            return (i === 0) ? textEl.attr("dy") : "1em";
+                        }).style("text-anchor", textEl.style("text-anchor"));
+                    }
+                });
             }
-            this._hideOverlappingTickLabels();
+
             if (!this.showEndTickLabels()) {
                 this._hideCutOffTickLabels();
             }
@@ -3699,8 +3831,8 @@ var Plottable;
             this._fixedHeight = false;
             this.tickLabelPosition("middle");
         }
-        YAxis.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        YAxis.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.axisElement.classed("y-axis", true);
             return this;
         };
@@ -3722,24 +3854,73 @@ var Plottable;
         };
 
         YAxis.prototype._doRender = function () {
+            var _this = this;
             _super.prototype._doRender.call(this);
-            if (this.tickLabelPosition() !== "middle") {
-                var tickTextLabels = this.axisElement.selectAll("text");
-                tickTextLabels.attr("x", "0px");
 
-                if (this.orient() === "left") {
-                    tickTextLabels.attr("dx", "-0.25em");
-                } else {
-                    tickTextLabels.attr("dx", "0.25em");
+            var tickTextLabels = this.axisElement.selectAll("text");
+            if (tickTextLabels[0].length > 0) {
+                if (this.tickLabelPosition() !== "middle") {
+                    tickTextLabels.attr("x", "0px");
+
+                    if (this.orient() === "left") {
+                        tickTextLabels.attr("dx", "-0.25em");
+                    } else {
+                        tickTextLabels.attr("dx", "0.25em");
+                    }
+
+                    if (this.tickLabelPosition() === "top") {
+                        tickTextLabels.attr("dy", "-0.3em");
+                    } else if (this.tickLabelPosition() === "bottom") {
+                        tickTextLabels.attr("dy", "1em");
+                    }
                 }
 
-                if (this.tickLabelPosition() === "top") {
-                    tickTextLabels.attr("dy", "-0.3em");
-                } else if (this.tickLabelPosition() === "bottom") {
-                    tickTextLabels.attr("dy", "1em");
+                var scaleRange = this._axisScale.range();
+                var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
+                var availableWidth = this.availableWidth - tickLengthWithPadding;
+                var availableHeight = this.availableHeight;
+                if (tickTextLabels[0].length > 1) {
+                    var tickValues = tickTextLabels.data();
+                    var tickPositions = tickValues.map(function (v) {
+                        return _this._axisScale.scale(v);
+                    });
+                    tickPositions.forEach(function (p, i) {
+                        var spacing = Math.abs(tickPositions[i + 1] - p);
+                        availableHeight = (spacing < availableHeight) ? spacing : availableHeight;
+                    });
                 }
+
+                var tickLabelPosition = this.tickLabelPosition();
+                tickTextLabels.each(function (t, i) {
+                    var textEl = d3.select(this);
+                    var currentText = textEl.text();
+                    var wrappedLines = Plottable.Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+                    if (wrappedLines.length === 1) {
+                        textEl.text(Plottable.Utils.getTruncatedText(currentText, availableWidth, textEl));
+                    } else {
+                        var baseY = 0;
+                        if (tickLabelPosition === "top") {
+                            baseY = -(wrappedLines.length - 1);
+                        } else if (tickLabelPosition === "middle") {
+                            baseY = -(wrappedLines.length - 1) / 2;
+                        }
+
+                        textEl.text("");
+                        var tspans = textEl.selectAll("tspan").data(wrappedLines);
+                        tspans.enter().append("tspan");
+                        tspans.text(function (line) {
+                            return line;
+                        }).attr({
+                            "dy": textEl.attr("dy"),
+                            "x": textEl.attr("x"),
+                            "y": function (line, i) {
+                                return (baseY + i) + "em";
+                            }
+                        }).style("text-anchor", textEl.style("text-anchor"));
+                    }
+                });
             }
-            this._hideOverlappingTickLabels();
+
             if (!this.showEndTickLabels()) {
                 this._hideCutOffTickLabels();
             }
@@ -3804,8 +3985,8 @@ var Plottable;
                 });
             }
         }
-        Gridlines.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        Gridlines.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
             this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
             return this;
@@ -3870,8 +4051,8 @@ var Plottable;
                 return "steelblue";
             }); // default
         }
-        AreaRenderer.prototype._anchor = function (element) {
-            _super.prototype._anchor.call(this, element);
+        AreaRenderer.prototype._setup = function () {
+            _super.prototype._setup.call(this);
             this.path = this.renderArea.append("path").classed("area", true);
             return this;
         };

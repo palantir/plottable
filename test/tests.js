@@ -238,6 +238,7 @@ describe("Axes", function () {
         var endDate = new Date(2001, 0, 1);
         var timeScale = new Plottable.LinearScale();
         timeScale.domain([startDate, endDate]);
+        timeScale.range([0, 500]);
         timeScale.nice();
         var xAxis = new Plottable.XAxis(timeScale, "bottom");
         var baseDate = d3.min(timeScale.domain());
@@ -248,12 +249,13 @@ describe("Axes", function () {
         var tickLabels = $(".tick").children("text");
         assert.equal(parseInt(tickLabels.first().text(), 10), 0);
         assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 365);
+        xAxis.remove();
         svg.remove();
 
         svg = generateSVG(100, 500);
         endDate = new Date(2010, 0, 1);
-        timeScale.domain([startDate, endDate]);
-        var yAxis = new Plottable.YAxis(timeScale, "left");
+        var timescaleY = new Plottable.LinearScale().domain([startDate, endDate]).range([0, 500]);
+        var yAxis = new Plottable.YAxis(timescaleY, "left");
         var oneYear = 365 * Plottable.AxisUtils.ONE_DAY;
         baseDate = new Date(1990, 0, 1);
 
@@ -264,6 +266,84 @@ describe("Axes", function () {
         assert.equal(tickLabels.text().slice(-1), "y");
         assert.isTrue(parseInt(tickLabels.first().text(), 10) <= 10);
         assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 20);
+        svg.remove();
+    });
+
+    it("XAxis wraps long tick label texts so they don't overlap", function () {
+        var svg = generateSVG(300, 60);
+        var ordinalScale = new Plottable.OrdinalScale();
+        ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
+        ordinalScale.range([0, 300]);
+
+        var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
+        xAxis.minimumHeight(60);
+        xAxis.renderTo(svg);
+
+        var tickTexts = svg.selectAll(".tick text");
+        assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
+
+        var clientRects = tickTexts[0].map(function (t) {
+            return t.getBoundingClientRect();
+        });
+        var labelsOverlap = false;
+        clientRects.forEach(function (rect, i) {
+            if (i > 0) {
+                if (rect.left < clientRects[i - 1].left) {
+                    labelsOverlap = true;
+                }
+            }
+        });
+        assert.isFalse(labelsOverlap, "labels don't overlap");
+
+        var allTopsEqual = clientRects.map(function (r) {
+            return r.top;
+        }).every(function (t) {
+            return t === clientRects[0].top;
+        });
+        assert.isTrue(allTopsEqual, "tops of labels align");
+
+        assert.isTrue(clientRects.every(function (rect) {
+            return rect.height < xAxis.minimumHeight() - xAxis.tickSize();
+        }), "all labels fit within the available space");
+        svg.remove();
+    });
+
+    it("Yaxis wraps long tick label texts so they don't overlap", function () {
+        var svg = generateSVG(100, 300);
+        var ordinalScale = new Plottable.OrdinalScale();
+        ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
+        ordinalScale.range([0, 300]);
+
+        var yAxis = new Plottable.YAxis(ordinalScale, "left");
+        yAxis.minimumWidth(100);
+        yAxis.renderTo(svg);
+
+        var tickTexts = svg.selectAll(".tick text");
+        assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
+
+        var clientRects = tickTexts[0].map(function (t) {
+            return t.getBoundingClientRect();
+        });
+        var labelsOverlap = false;
+        clientRects.forEach(function (rect, i) {
+            if (i > 0) {
+                if (rect.top < clientRects[i - 1].bottom) {
+                    labelsOverlap = true;
+                }
+            }
+        });
+        assert.isFalse(labelsOverlap, "labels don't overlap");
+
+        var allTopsEqual = clientRects.map(function (r) {
+            return r.right;
+        }).every(function (t) {
+            return t === clientRects[0].right;
+        });
+        assert.isTrue(allTopsEqual, "right edges of labels align");
+
+        assert.isTrue(clientRects.every(function (rect) {
+            return rect.width < yAxis.minimumWidth() - yAxis.tickSize();
+        }), "all labels fit within the available space");
         svg.remove();
     });
 });
@@ -427,6 +507,45 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
 
+    it("remove() and removeComponent work correctly for componentGroup", function () {
+        var c1 = new Plottable.Component().classed("component-1", true);
+        var c2 = new Plottable.Component().classed("component-2", true);
+        var cg = new Plottable.ComponentGroup([c1, c2]);
+
+        var svg = generateSVG(200, 200);
+        cg.renderTo(svg);
+
+        var c1Node = svg.select(".component-1").node();
+        var c2Node = svg.select(".component-2").node();
+
+        assert.isNotNull(c1Node, "component 1 was added to the DOM");
+        assert.isNotNull(c2Node, "component 2 was added to the DOM");
+
+        cg.removeComponent(c2);
+
+        c1Node = svg.select(".component-1").node();
+        c2Node = svg.select(".comopnent-2").node();
+
+        assert.isNotNull(c1Node, "component 1 is still in the DOM");
+        assert.isNull(c2Node, "component 2 was removed from the DOM");
+
+        cg.remove();
+        var cgNode = svg.select(".component-group").node();
+        c1Node = svg.select(".component-1").node();
+
+        assert.isNull(cgNode, "component group was removed from the DOM");
+        assert.isNull(c1Node, "componet 1 was also removed from the DOM");
+
+        cg.renderTo(svg);
+        cgNode = svg.select(".component-group").node();
+        c1Node = svg.select(".component-1").node();
+
+        assert.isNotNull(cgNode, "component group was added back to the DOM");
+        assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
+
+        svg.remove();
+    });
+
     describe("Component.merge works as expected", function () {
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
@@ -500,16 +619,21 @@ describe("Component behavior", function () {
     describe("anchor", function () {
         it("anchoring works as expected", function () {
             c._anchor(svg);
-            assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the svg");
+            assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
+            assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
             svg.remove();
         });
 
-        it("you cannot anchor to non-empty elements", function () {
-            svg.append("rect");
-            assert.throws(function () {
-                return c._anchor(svg);
-            }, Error);
+        it("can re-anchor to a different element", function () {
+            c._anchor(svg);
+
+            var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            c._anchor(svg2);
+            assert.equal(c.element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
+            assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
+
             svg.remove();
+            svg2.remove();
         });
     });
 
@@ -797,31 +921,20 @@ describe("Component behavior", function () {
         };
         var b = new Plottable.Broadcaster();
 
-        var t = new Plottable.Table();
         var c1 = new Plottable.Component();
-        var c2 = new Plottable.Component();
-        var c3 = new Plottable.Component();
 
-        t._registerToBroadcaster(b, cb);
         c1._registerToBroadcaster(b, cb);
-        c2._registerToBroadcaster(b, cb);
-        c3._registerToBroadcaster(b, cb);
 
-        var cg = c2.merge(c3);
-        t.addComponent(0, 0, c1);
-        t.addComponent(1, 0, cg);
-        t.renderTo(svg);
+        c1.renderTo(svg);
         b._broadcast();
-        assert.equal(cbCalled, 4, "the callback was called 4 times");
+        assert.equal(cbCalled, 1, "the callback was called");
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
-        t.remove();
+        c1.remove();
+
         b._broadcast();
-        assert.equal(cbCalled, 4, "the callback was not called again");
+        assert.equal(cbCalled, 2, "the callback is still attached to the component");
         assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
-        assert.throws(function () {
-            return t.renderTo(svg);
-        }, Error);
         svg.remove();
     });
 });
@@ -1067,16 +1180,21 @@ describe("Interactions", function () {
         });
 
         it("All callbacks are notified with appropriate data when a drag finishes", function () {
-            var areaCallbackCalled = false;
+            var timesCalled = 0;
             var areaCallback = function (a) {
-                areaCallbackCalled = true;
-                var expectedPixelArea = {
-                    xMin: dragstartX,
-                    xMax: dragendX,
-                    yMin: dragstartY,
-                    yMax: dragendY
-                };
-                assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
+                timesCalled++;
+                if (timesCalled === 1) {
+                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
+                }
+                if (timesCalled === 2) {
+                    var expectedPixelArea = {
+                        xMin: dragstartX,
+                        xMax: dragendX,
+                        yMin: dragstartY,
+                        yMax: dragendY
+                    };
+                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
+                }
             };
 
             interaction.callback(areaCallback);
@@ -1084,7 +1202,7 @@ describe("Interactions", function () {
             // fake a drag event
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
 
-            assert.isTrue(areaCallbackCalled, "areaCallback was called");
+            assert.equal(timesCalled, 2, "areaCallback was called twice");
         });
 
         it("Highlights and un-highlights areas appropriately", function () {
@@ -2628,6 +2746,39 @@ describe("Utils", function () {
         textEl.text(" ");
         assert.equal(Plottable.Utils.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
         assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
+        svg.remove();
+    });
+
+    it("getWrappedText works properly", function () {
+        var svg = generateSVG();
+        var textEl = svg.append("text").attr("x", 20).attr("y", 50);
+        textEl.style("font-size", "12pt").style("font-family", "sans-serif");
+
+        textEl.text("foobar");
+        var textWithSpaces = "012345 6 789";
+        var wrappedLines = Plottable.Utils.getWrappedText(textWithSpaces, 100, 100, textEl);
+        assert.deepEqual(wrappedLines, ["012345 6", "789"], "Wraps at first space after the cutoff");
+        assert.equal(textEl.text(), "foobar", "getWrappedText did not modify the text in the element");
+
+        wrappedLines = Plottable.Utils.getWrappedText(textWithSpaces, 100, 100, textEl, 0.5);
+        assert.deepEqual(wrappedLines, ["012345", "6 789"], "reducing the cutoff ratio causes text to wrap at an earlier space");
+
+        var shortText = "a";
+        wrappedLines = Plottable.Utils.getWrappedText(shortText, 100, 100, textEl);
+        assert.deepEqual(wrappedLines, ["a"], "short text is unchanged");
+
+        var longTextNoSpaces = "Supercalifragilisticexpialidocious";
+        wrappedLines = Plottable.Utils.getWrappedText(longTextNoSpaces, 100, 100, textEl);
+        assert.operator(wrappedLines.length, ">=", 2, "long text with no spaces gets wrapped");
+        wrappedLines.forEach(function (line, i) {
+            if (i < wrappedLines.length - 1) {
+                assert.equal(line.charAt(line.length - 1), "-", "long text with no spaces gets hyphenated");
+            }
+        });
+
+        wrappedLines = Plottable.Utils.getWrappedText(longTextNoSpaces, 100, 20, textEl);
+        assert.equal(wrappedLines[0].substr(wrappedLines[0].length - 3, 3), "...", "text gets truncated if there's not enough height for all lines");
+
         svg.remove();
     });
 

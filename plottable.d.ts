@@ -13,14 +13,14 @@ declare module Plottable {
         function getElementWidth(elem: HTMLScriptElement): number;
         function getElementHeight(elem: HTMLScriptElement): number;
         /**
-        * Truncates a text string to a max length, given the element in which to draw the text
+        * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
         *
-        * @param {string} text: The string to put in the text element, and truncate
-        * @param {D3.Selection} element: The element in which to measure and place the text
-        * @param {number} length: How much space to truncate text into
+        * @param {string} text: The string to be truncated
+        * @param {number} availableSpace: The avialable space, in pixels
+        * @param {D3.Selection} element: The text element used to measure the text
         * @returns {string} text - the shortened text
         */
-        function truncateTextToLength(text: string, length: number, element: D3.Selection): string;
+        function getTruncatedText(text: string, availableSpace: number, element: D3.Selection): string;
         /**
         * Gets the height of a text element, as rendered.
         *
@@ -28,6 +28,12 @@ declare module Plottable {
         * @return {number} The height of the text element, in pixels.
         */
         function getTextHeight(textElement: D3.Selection): number;
+        /**
+        * Converts a string into an array of strings, all of which fit in the available space.
+        *
+        * @returns {string[]} The input text broken into substrings that fit in the avialable space.
+        */
+        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): string[];
         function getSVGPixelWidth(svg: D3.Selection): number;
         function accessorize(accessor: any): IAccessor;
         function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
@@ -173,10 +179,17 @@ declare module Plottable {
         public xOrigin: number;
         public yOrigin: number;
         /**
-        * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+        * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
         *
-        * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
+        * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
         * @returns {Component} The calling component.
+        */
+        /**
+        * Creates additional elements as necessary for the Component to function.
+        * Called during _anchor() if the Component's element has not been created yet.
+        * Override in subclasses to provide additional functionality.
+        *
+        * @returns {Component} The calling Component.
         */
         /**
         * Computes the size, position, and alignment from the specified values.
@@ -193,6 +206,12 @@ declare module Plottable {
         * Renders the component.
         *
         * @returns {Component} The calling Component.
+        */
+        /**
+        * Renders the Component into a given DOM element.
+        *
+        * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+        * @return {Component} The calling component.
         */
         public renderTo(element: any): Component;
         /**
@@ -289,9 +308,9 @@ declare module Plottable {
         */
         public merge(c: Component): ComponentGroup;
         /**
-        * Blow up a component and its DOM, so it can be safely removed
+        * Removes a Component from the DOM.
         */
-        public remove(): void;
+        public remove(): Component;
     }
 }
 declare module Plottable {
@@ -304,9 +323,22 @@ declare module Plottable {
         */
         constructor(components?: Component[]);
         public merge(c: Component): ComponentGroup;
+        /**
+        * If the given component exists in the ComponentGroup, removes it from the
+        * group and the DOM.
+        *
+        * @param {Component} c The component to be removed.
+        * @returns {ComponentGroup} The calling ComponentGroup.
+        */
+        public removeComponent(c: Component): ComponentGroup;
+        /**
+        * Removes all Components in the ComponentGroup from the group and the DOM.
+        *
+        * @returns {ComponentGroup} The calling ComponentGroup.
+        */
+        public empty(): ComponentGroup;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
-        public remove(): void;
     }
 }
 declare module Plottable {
@@ -359,7 +391,6 @@ declare module Plottable {
         public minimumWidth(newVal: number): Table;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
-        public remove(): void;
     }
 }
 declare module Plottable {
