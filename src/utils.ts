@@ -289,7 +289,7 @@ module Plottable {
     export function repeat(element: any, count: number) {
       var out: any[] = [];
       for (var i=0; i<count; i++) {
-        out[i] = element;
+        out[i] = typeof(element) === "function" ? element() : element;
       }
       return out;
     }

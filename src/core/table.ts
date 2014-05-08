@@ -87,10 +87,10 @@ module Plottable {
         }
       }
 
-      var freeHeight = 0;
-      var freeWidth = 0;
+      var freeX = 0;
+      var freeY = 0;
       var nIterations = 0;
-      while ((freeHeight > 0 || freeWidth > 0) && unsatisfiedComponents.length > 0) {
+      while ((freeX > 0 || freeY > 0) && unsatisfiedComponents.length > 0) {
         var nextIterationUnsatisfied = [];
         unsatisfiedComponents.forEach((crc) => {
           var c: Component = crc[0];
@@ -102,13 +102,14 @@ module Plottable {
           var requestedX = requestedXY[0];
           var requestedY = requestedXY[1];
 
-          var widthSatisfied = c.widthProportional || requestedWH[0] < offeredWidth;
-          var heightSatisfied = c.widthProportional || requestedWH[0] < offeredWidth;
-          if (!(widthSatisfied && heightSatisfied)) {
+          var satisfiedX = c.isProportionalX || requestedX[0] < offeredX;
+          var satisfiedY = c.isProportionalY || requestedY[0] < offeredY;
+          if (!(satisfiedX && satisfiedY)) {
             nextIterationUnsatisfied.push(crc);
           }
-          freeWidth += offeredWidth - requestedWH[0];
-          freeHeight += offeredHeight - requestedWH[1];
+          freeX += offeredX - requestedX;
+          freeY += offeredY - requestedY;
+
         });
       }
 
