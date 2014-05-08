@@ -1,4 +1,3 @@
-
 function makeDateData(start, end, nPoints, randomFactor, cssClass) {
     var out = [];
     var delta = end.getTime() - start.getTime();
@@ -9,7 +8,7 @@ function makeDateData(start, end, nPoints, randomFactor, cssClass) {
         var d = {x: date, y: val};
         out.push(d);
     }
-    return {data: out, metadata: {cssClass: cssClass}};
+    return new Plottable.DataSource(out, {cssClass: cssClass});
 }
 
 window.onload = function() {
@@ -28,7 +27,7 @@ window.onload = function() {
                              .tickSize(50);
 
     var data1 = makeDateData(start, end, 24, 1, "USA");
-    var data2 = makeDateData(start, end, 24, 2, "Canada");
+    var data2 = makeDateData(start, end, 24, 2, "CANADA");
 
     var renderer1 = new Plottable.LineRenderer(data1, xScale, yScale);
     var renderer2 = new Plottable.LineRenderer(data2, xScale, yScale);
@@ -43,8 +42,8 @@ window.onload = function() {
         return colorScale.scale(m.cssClass);
     }
 
-    renderer1.colorAccessor(colorAccessor);
-    renderer2.colorAccessor(colorAccessor);
+    renderer1.project("stroke", colorAccessor);
+    renderer2.project("stroke", colorAccessor);
 
     var innerTable = new Plottable.Table([[yAxis, renderArea],
                                           [null, xAxis]]);
