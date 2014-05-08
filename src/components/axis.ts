@@ -88,8 +88,8 @@ module Plottable {
     }
 
     public _hideCutOffTickLabels() {
-      var availableWidth = this.availableWidth;
-      var availableHeight = this.availableHeight;
+      var availableX = this.availableX;
+      var availableY = this.availableY;
       var tickLabels = this.axisElement.selectAll(".tick").select("text");
 
       var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
@@ -97,8 +97,8 @@ module Plottable {
       var isInsideBBox = (tickBox: ClientRect) => {
         return (boundingBox.left <= tickBox.left &&
                 boundingBox.top <= tickBox.top &&
-                tickBox.right <= boundingBox.left + this.availableWidth &&
-                tickBox.bottom <= boundingBox.top + this.availableHeight);
+                tickBox.right <= boundingBox.left + this.availableX &&
+                tickBox.bottom <= boundingBox.top + this.availableY);
       };
 
       tickLabels.each(function (d: any){
@@ -333,26 +333,26 @@ module Plottable {
         }
 
         var scaleRange = this._axisScale.range();
-        var availableWidth = this.availableWidth;
+        var availableX = this.availableX;
         var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
-        var availableHeight = this.availableHeight - tickLengthWithPadding;
+        var availableY = this.availableY - tickLengthWithPadding;
         if (tickTextLabels[0].length > 1) { // more than one label
           var tickValues = tickTextLabels.data();
           var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
           tickPositions.forEach((p: number, i: number) => {
             var spacing = Math.abs(tickPositions[i + 1] - p);
-            availableWidth = (spacing < availableWidth) ? spacing : availableWidth;
+            availableX = (spacing < availableX) ? spacing : availableX;
           });
         }
 
-        availableWidth = 0.9 * availableWidth; // add in some padding
+        availableX = 0.9 * availableX; // add in some padding
 
         tickTextLabels.each(function(t: any, i: number) {
           var textEl = d3.select(this);
           var currentText = textEl.text();
-          var wrappedLines = Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+          var wrappedLines = Utils.getWrappedText(currentText, availableX, availableY, textEl);
           if (wrappedLines.length === 1) {
-            textEl.text(Utils.getTruncatedText(currentText, availableWidth, textEl));
+            textEl.text(Utils.getTruncatedText(currentText, availableX, textEl));
           } else {
             textEl.text("");
             var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -446,14 +446,14 @@ module Plottable {
 
         var scaleRange = this._axisScale.range();
         var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
-        var availableWidth = this.availableWidth - tickLengthWithPadding;
-        var availableHeight = this.availableHeight;
+        var availableX = this.availableX - tickLengthWithPadding;
+        var availableY = this.availableY;
         if (tickTextLabels[0].length > 1) { // more than one label
           var tickValues = tickTextLabels.data();
           var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
           tickPositions.forEach((p: number, i: number) => {
             var spacing = Math.abs(tickPositions[i + 1] - p);
-            availableHeight = (spacing < availableHeight) ? spacing : availableHeight;
+            availableY = (spacing < availableY) ? spacing : availableY;
           });
         }
 
@@ -461,9 +461,9 @@ module Plottable {
         tickTextLabels.each(function(t: any, i: number) {
           var textEl = d3.select(this);
           var currentText = textEl.text();
-          var wrappedLines = Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+          var wrappedLines = Utils.getWrappedText(currentText, availableX, availableY, textEl);
           if (wrappedLines.length === 1) {
-            textEl.text(Utils.getTruncatedText(currentText, availableWidth, textEl));
+            textEl.text(Utils.getTruncatedText(currentText, availableX, textEl));
           } else {
             var baseY = 0; // measured in ems
             if (tickLabelPosition === "top") {

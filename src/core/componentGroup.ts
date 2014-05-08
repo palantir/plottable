@@ -68,11 +68,11 @@ module Plottable {
 
     public _computeLayout(xOrigin?: number,
                          yOrigin?: number,
-                  availableWidth?: number,
-                 availableHeight?: number): ComponentGroup {
-      super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
+                  availableX?: number,
+                 availableY?: number): ComponentGroup {
+      super._computeLayout(xOrigin, yOrigin, availableX, availableY);
       this.components.forEach((c) => {
-        c._computeLayout(0, 0, this.availableWidth, this.availableHeight);
+        c._computeLayout(0, 0, this.availableX, this.availableY);
       });
       return this;
     }

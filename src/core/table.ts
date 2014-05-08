@@ -76,8 +76,8 @@ module Plottable {
       var stable = false;
       var unsatisfiedComponents: any[][] = [];
 
-      var xAllocations = Utils.repeat(this.availableWidth / this.nCols, this.nCols);
-      var yAllocations = Utils.repeat(this.availableHeight / this.nRows, this.nRows);
+      var xAllocations = Utils.repeat(this.availableX / this.nCols, this.nCols);
+      var yAllocations = Utils.repeat(this.availableY / this.nRows, this.nRows);
 
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
@@ -115,8 +115,8 @@ module Plottable {
 
 
       // // calculate the amount of free space by recursive col-/row- Minimum() calls
-      // var freeWidth = this.availableWidth - this.minimumWidth();
-      // var freeHeight = this.availableHeight - this.minimumHeight();
+      // var freeWidth = this.availableX - this.minimumWidth();
+      // var freeHeight = this.availableY - this.minimumHeight();
       // if (freeWidth < 0 || freeHeight < 0) {
       //   throw new Error("Insufficient Space");
       // }

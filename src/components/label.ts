@@ -72,8 +72,8 @@ module Plottable {
       this.measureAndSetTextSize();
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+    public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
+      super._computeLayout(xOffset, yOffset, availableX, availableY);
       this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
       // We need to undo translation on the original element, since that effects
       // alignment, but we are going to do that manually on the text element.
@@ -85,11 +85,11 @@ module Plottable {
       var yShift = 0;
 
       if (this.orientation === "horizontal") {
-        this.truncateTextAndRemeasure(this.availableWidth);
-        xShift = (this.availableWidth  - this.textLength) * this._xAlignProportion;
+        this.truncateTextAndRemeasure(this.availableX);
+        xShift = (this.availableX  - this.textLength) * this._xAlignProportion;
       } else {
-        this.truncateTextAndRemeasure(this.availableHeight);
-        xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
+        this.truncateTextAndRemeasure(this.availableY);
+        xShift = (this.availableY - this.textLength) * this._yAlignProportion;
 
         if (this.orientation === "vertical-right") {
           this.textElement.attr("transform", "rotate(90)");

@@ -46,15 +46,15 @@ describe("Component behavior", () => {
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
       c._anchor(svg)._computeLayout();
-      assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
-      assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
+      assert.equal(c.availableX, SVG_WIDTH, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableY, SVG_HEIGHT, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
       svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
       c._computeLayout();
-      assert.equal(c.availableWidth, 2*SVG_WIDTH, "computeLayout updated width to new svg width");
-      assert.equal(c.availableHeight, 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
+      assert.equal(c.availableX, 2*SVG_WIDTH, "computeLayout updated width to new svg width");
+      assert.equal(c.availableY, 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
 
@@ -74,8 +74,8 @@ describe("Component behavior", () => {
 
       c._anchor(svg)._computeLayout();
 
-      assert.equal(c.availableWidth, 100, "computeLayout defaulted width to svg width");
-      assert.equal(c.availableHeight, 200, "computeLayout defaulted height to svg height");
+      assert.equal(c.availableX, 100, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableY, 200, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
@@ -83,8 +83,8 @@ describe("Component behavior", () => {
 
       c._computeLayout();
 
-      assert.equal(c.availableWidth, 50, "computeLayout updated width to new svg width");
-      assert.equal(c.availableHeight, 100, "computeLayout updated height to new svg height");
+      assert.equal(c.availableX, 50, "computeLayout updated width to new svg width");
+      assert.equal(c.availableY, 100, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
 
@@ -115,8 +115,8 @@ describe("Component behavior", () => {
       c._anchor(g)._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate(c.element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-      assert.equal(c.availableWidth, width, "the width set properly");
-      assert.equal(c.availableHeight, height, "the height set propery");
+      assert.equal(c.availableX, width, "the width set properly");
+      assert.equal(c.availableY, height, "the height set propery");
       svg.remove();
     });
   });

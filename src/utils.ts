@@ -99,8 +99,8 @@ module Plottable {
      * @returns {string[]} The input text broken into substrings that fit in the avialable space.
      */
     export function getWrappedText(text: string,
-                                   availableWidth: number,
-                                   availableHeight: number,
+                                   availableX: number,
+                                   availableY: number,
                                    textElement: D3.Selection,
                                    cutoffRatio = 0.7) {
       var originalText = textElement.text();
@@ -114,13 +114,13 @@ module Plottable {
       var textLength = bbox.width;
       var textHeight = bbox.height;
 
-      var linesAvailable = Math.floor(availableHeight/textHeight); // number of lines that will fit
+      var linesAvailable = Math.floor(availableY/textHeight); // number of lines that will fit
       var numChars = text.length;
 
       var lines: string[] = [];
       var remainingText: string;
 
-      var cutoffEnd = availableWidth - hyphenLength; // room for hyphen
+      var cutoffEnd = availableX - hyphenLength; // room for hyphen
       var cutoffStart = cutoffRatio * cutoffEnd;
 
       var lineStartPosition = 0;
@@ -132,7 +132,7 @@ module Plottable {
           if (testLength > cutoffEnd) {
             if (lines.length + 1 >= linesAvailable) {
               remainingText = text.substring(lineStartPosition, text.length).trim();
-              lines.push(getTruncatedText(remainingText, availableWidth, textElement));
+              lines.push(getTruncatedText(remainingText, availableX, textElement));
               break;
             }
             // break line on the previous character to leave room for the hyphen
@@ -141,7 +141,7 @@ module Plottable {
           } else if (currentCharacter === " ") {
             if (lines.length + 1 >= linesAvailable) {
               remainingText = text.substring(lineStartPosition, text.length).trim();
-              lines.push(getTruncatedText(remainingText, availableWidth, textElement));
+              lines.push(getTruncatedText(remainingText, availableX, textElement));
               break;
             }
             // break line after the current character

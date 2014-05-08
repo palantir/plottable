@@ -3,11 +3,11 @@
 module Plottable {
   export class Component extends PlottableObject {
 
-    public widthProportional = true;
-    public heightProportional = true;
+    public isProportionalX = true;
+    public isProportionalY = true;
 
-    public requestedWidthHeight(availableWidth, availableHeight) {
-      return [this.widthProportional ? 0 : this.minimumWidth(), this.heightProportional ? 0 : this.minimumHeight()];
+    public requestedXY(availableX, availableY) {
+      return [this.isProportionalX ? 0 : this.minimumWidth(), this.isProportionalY ? 0 : this.minimumHeight()];
     }
 
     public element: D3.Selection;
@@ -29,8 +29,8 @@ module Plottable {
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
 
-    public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    public availableHeight: number;
+    public availableX : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    public availableY: number;
     public xOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
     public yOrigin        : number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
@@ -104,12 +104,12 @@ module Plottable {
      *
      * @param {number} xOrigin
      * @param {number} yOrigin
-     * @param {number} availableWidth
-     * @param {number} availableHeight
+     * @param {number} availableX
+     * @param {number} availableY
      * @returns {Component} The calling Component.
      */
-    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
+    public _computeLayout(xOrigin?: number, yOrigin?: number, availableX?: number, availableY?: number) {
+      if (xOrigin == null || yOrigin == null || availableX == null || availableY == null) {
         if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
         } else if (this.isTopLevelComponent) {
@@ -118,8 +118,8 @@ module Plottable {
           yOrigin = 0;
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth  = Utils.getElementWidth(elem);
-          availableHeight = Utils.getElementHeight(elem);
+          availableX  = Utils.getElementWidth(elem);
+          availableY = Utils.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
@@ -129,23 +129,23 @@ module Plottable {
       var xPosition = this.xOrigin;
       var yPosition = this.yOrigin;
 
-      xPosition += (availableWidth - this.minimumWidth()) * this._xAlignProportion;
+      xPosition += (availableX - this.minimumWidth()) * this._xAlignProportion;
       xPosition += this._xOffset;
       if (this.minimumWidth() !== 0 && this.isFixedWidth()) {
         // Decrease size so hitbox / bounding box and children are sized correctly
-        availableWidth = availableWidth > this.minimumWidth() ? this.minimumWidth() : availableWidth;
+        availableX = availableX > this.minimumWidth() ? this.minimumWidth() : availableX;
       }
 
-      yPosition += (availableHeight - this.minimumHeight()) * this._yAlignProportion;
+      yPosition += (availableY - this.minimumHeight()) * this._yAlignProportion;
       yPosition += this._yOffset;
       if (this.minimumHeight() !== 0 && this.isFixedHeight()) {
-        availableHeight = availableHeight > this.minimumHeight() ? this.minimumHeight() : availableHeight;
+        availableY = availableY > this.minimumHeight() ? this.minimumHeight() : availableY;
       }
 
-      this.availableWidth  = availableWidth;
-      this.availableHeight = availableHeight;
+      this.availableX  = availableX;
+      this.availableY = availableY;
       this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableX).attr("height", this.availableY));
       return this;
     }
 
@@ -186,8 +186,8 @@ module Plottable {
     /**
      * Cause the Component to recompute layout and redraw. Useful if the window resized.
      *
-     * @param {number} [availableWidth]  - the width of the container element
-     * @param {number} [availableHeight] - the height of the container element
+     * @param {number} [availableX]  - the width of the container element
+     * @param {number} [availableY] - the height of the container element
      */
     public resize(width?: number, height?: number): Component {
       if (this.element != null) {
@@ -266,8 +266,8 @@ module Plottable {
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
       this.boxes.push(box);
-      if (this.availableWidth != null && this.availableHeight != null) {
-        box.attr("width", this.availableWidth).attr("height", this.availableHeight);
+      if (this.availableX != null && this.availableY != null) {
+        box.attr("width", this.availableX).attr("height", this.availableY);
       }
       return box;
     }

@@ -65,7 +65,7 @@ module Plottable {
       this.legendBox.attr("height", this.minimumHeight()).attr("width", this.minimumWidth()); //HACKHACK #223
       var domain = this.colorScale.domain();
       var textHeight = this.measureTextHeight();
-      var availableWidth = this.minimumWidth() - textHeight - Legend.MARGIN;
+      var availableX = this.minimumWidth() - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
 
       this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
@@ -82,7 +82,7 @@ module Plottable {
           .attr("y", Legend.MARGIN + textHeight / 2);
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: any, i: number) {return Utils.getTruncatedText(d, availableWidth, d3.select(this));});
+            .text(function(d: any, i: number) {return Utils.getTruncatedText(d, availableX, d3.select(this));});
       return this;
     }
   }
