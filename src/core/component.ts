@@ -3,11 +3,8 @@
 module Plottable {
   export class Component extends PlottableObject {
 
-    public isProportionalX = true;
-    public isProportionalY = true;
-
-    public requestedXY(availableX, availableY) {
-      return [this.isProportionalX ? 0 : this.minimumWidth(), this.isProportionalY ? 0 : this.minimumHeight()];
+    public requestedXY(availableX: number, availableY: number) {
+      return [this.isFixedWidth ? this.minimumWidth() : 0, this.isFixedHeight() ? this.minimumHeight() : 0];
     }
 
     public element: D3.Selection;
@@ -29,10 +26,10 @@ module Plottable {
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
 
-    public availableX : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    public availableX: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     public availableY: number;
-    public xOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
-    public yOrigin        : number;
+    public xOrigin   : number; // Origin of the coordinate space for the component. Passed down from parent
+    public yOrigin   : number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
