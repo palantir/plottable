@@ -40,6 +40,8 @@ describe("Legends", () => {
     assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
     color.domain(["foo", "bar", "baz"]);
     assert.operator(legend.minimumHeight(), ">", height1, "adding to the domain increases the minimumHeight");
+    var numRows = legend.content.selectAll(".legend-row")[0].length;
+    assert.equal(numRows, 3, "there are 3 rows");
     svg.remove();
   });
 

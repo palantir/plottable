@@ -32,6 +32,9 @@ module Plottable {
 
     private cssClasses: string[] = ["component"];
 
+    private isSetup = false;
+    private isAnchored = false;
+
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
      *
@@ -55,7 +58,7 @@ module Plottable {
         this.element = element.append("g");
         this._setup();
       }
-
+      this.isAnchored = true;
       return this;
     }
 
@@ -85,7 +88,7 @@ module Plottable {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
-
+      this.isSetup = true;
       return this;
     }
 
@@ -147,7 +150,9 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public _render() {
-      RenderController.registerToRender(this);
+      if (this.isAnchored && this.isSetup) {
+        RenderController.registerToRender(this);
+      }
       return this;
     }
 
@@ -422,6 +427,7 @@ module Plottable {
      */
     public remove() {
       this.element.remove();
+      this.isAnchored = false;
       return this;
     }
   }
