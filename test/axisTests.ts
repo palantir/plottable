@@ -14,7 +14,7 @@ describe("Axes", () => {
     var ticks = svg.selectAll(".tick");
     assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
 
-    var tickTexts = ticks.select("text")[0].map(function(t: HTMLElement) { return t.innerHTML; });
+    var tickTexts = ticks.select("text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
     var generatedTicks = xScale.ticks().map(formatter);
     assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
     svg.remove();
