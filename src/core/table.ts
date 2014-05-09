@@ -11,6 +11,8 @@ module Plottable {
     xAllocations: number[];
     yAllocations: number[];
     unsatisfiedComponents: IComponentPosition[];
+    unsatisfiedX: boolean;
+    unsatisfiedY: boolean;
 
   }
   export class Table extends Component {
@@ -89,6 +91,8 @@ module Plottable {
       var nextIterationUnsatisfied: IComponentPosition[] = [];
       var xRequested = Utils.repeat(0, this.nCols);
       var yRequested = Utils.repeat(0, this.nRows);
+      var layoutUnsatisfiedX = false;
+      var layoutUnsatisfiedY = false;
       unsatisfied.forEach((u) => {
         var x = xAllocations[u.col] + xProportionalSpace[u.col];
         var y = yAllocations[u.row] + yProportionalSpace[u.row];
@@ -100,8 +104,10 @@ module Plottable {
         if (unsatisfiedX || unsatisfiedY) {
           nextIterationUnsatisfied.push(u);
         }
+        layoutUnsatisfiedX = layoutUnsatisfiedX || unsatisfiedX;
+        layoutUnsatisfiedY = layoutUnsatisfiedY || unsatisfiedY;
       });
-      return {xAllocations: xRequested, yAllocations: yRequested, unsatisfiedComponents: nextIterationUnsatisfied}
+      return {xAllocations: xRequested, yAllocations: yRequested, unsatisfiedComponents: nextIterationUnsatisfied, unsatisfiedX: layoutUnsatisfiedX, unsatisfiedY: layoutUnsatisfiedY}
     }
 
     private generateComponentPositions() {
@@ -131,31 +137,37 @@ module Plottable {
       var yAllocations = Utils.repeat(0, this.nRows);
       var unsatisfied = this.generateComponentPositions();
 
-      var freeX = this.availableX - d3.sum(xAllocations);
-      var freeY = this.availableY - d3.sum(yAllocations);
+      var freeX = this.availableX - d3.sum(xAllocations) - this.colPadding * (this.nCols - 1);
+      var freeY = this.availableY - d3.sum(yAllocations) - this.rowPadding * (this.nRows - 1);
+      var unsatisfiedX = true;
+      var unsatisfiedY = true;
 
       var nIterations = 0;
-      while ((freeX > 0 || freeY > 0) && unsatisfied.length > 0) {
+      while ((freeX > 0 && unsatisfiedX) || (freeY > 0 && unsatisfiedY)) {
         var layout = this.determineAllocations(unsatisfied, xAllocations, yAllocations, xProportionalSpace, yProportionalSpace)
         unsatisfied = layout.unsatisfiedComponents;
         xAllocations = layout.xAllocations;
         yAllocations = layout.yAllocations;
+        unsatisfiedX = layout.unsatisfiedX;
+        unsatisfiedY = layout.unsatisfiedY;
 
-        freeX = this.availableX - d3.sum(xAllocations);
-        freeY = this.availableY - d3.sum(yAllocations);
+        freeX = this.availableX - d3.sum(xAllocations) - this.colPadding * (this.nCols - 1);
+        freeY = this.availableY - d3.sum(yAllocations) - this.rowPadding * (this.nRows - 1);
         xProportionalSpace = Table.calcProportionalSpace(colWeights, freeX);
         yProportionalSpace = Table.calcProportionalSpace(rowWeights, freeY);
         nIterations++;
 
         if (freeX < 0 || freeY < 0) {
-          throw new Error("Insufficient Space");
+          throw new Error("Invariant violation!");
+        }
+        if (nIterations > 10) {
+          debugger;
         }
       }
 
       var sumPair = (p: number[]) => p[0] + p[1];
       var rowHeights = d3.zip(yProportionalSpace, yAllocations).map(sumPair);
       var colWidths  = d3.zip(xProportionalSpace, xAllocations).map(sumPair);
-      console.log(rowHeights, colWidths);
       var childYOffset = 0;
       this.rows.forEach((row: Component[], rowIndex: number) => {
         var childXOffset = 0;
