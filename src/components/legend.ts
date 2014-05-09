@@ -20,7 +20,7 @@ module Plottable {
       super();
       this.classed("legend", true);
       this.minimumWidth(120); // the default width
-      this.colorScale = colorScale;
+      this.scale(colorScale);
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
     }
@@ -37,9 +37,19 @@ module Plottable {
      * @param {ColorScale} scale
      * @returns {Legend} The calling Legend.
      */
-    public scale(scale: ColorScale): Legend {
-      this.colorScale = scale;
-      return this;
+    public scale(scale: ColorScale): Legend;
+    public scale(): ColorScale;
+    public scale(scale?: ColorScale): any {
+      if (scale != null) {
+        if (this.colorScale != null) {
+          this._deregisterFromBroadcaster(this.colorScale);
+        }
+        this.colorScale = scale;
+        this._registerToBroadcaster(this.colorScale, () => this._render());
+        return this;
+      } else {
+        return this.colorScale;
+      }
     }
 
     public requestedXY(availableX: number, availableY: number) {
