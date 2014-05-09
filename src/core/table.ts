@@ -10,7 +10,6 @@ module Plottable {
   interface LayoutIteration {
     xAllocations: number[];
     yAllocations: number[];
-    unsatisfiedComponents: IComponentPosition[];
     unsatisfiedX: boolean;
     unsatisfiedY: boolean;
 
@@ -84,40 +83,30 @@ module Plottable {
       return this;
     }
 
-    private determineAllocations(unsatisfied: IComponentPosition[],
-      xAllocations: number[], yAllocations: number[],
+    private determineAllocations(xAllocations: number[], yAllocations: number[],
       xProportionalSpace: number[], yProportionalSpace: number[]
     ) {
-      var nextIterationUnsatisfied: IComponentPosition[] = [];
       var xRequested = Utils.repeat(0, this.nCols);
       var yRequested = Utils.repeat(0, this.nRows);
       var layoutUnsatisfiedX = false;
       var layoutUnsatisfiedY = false;
-      unsatisfied.forEach((u) => {
-        var x = xAllocations[u.col] + xProportionalSpace[u.col];
-        var y = yAllocations[u.row] + yProportionalSpace[u.row];
-        var requestedXY = u.component != null ? u.component.requestedXY(x, y) : [0, 0];
-        xRequested[u.col] = Math.max(xRequested[u.col], requestedXY[0]);
-        yRequested[u.row] = Math.max(yRequested[u.row], requestedXY[1]);
-        var unsatisfiedX = u.component != null && u.component.isFixedWidth()  && requestedXY[0] === x;
-        var unsatisfiedY = u.component != null && u.component.isFixedHeight() && requestedXY[1] === y;
-        if (unsatisfiedX || unsatisfiedY) {
-          nextIterationUnsatisfied.push(u);
-        }
-        layoutUnsatisfiedX = layoutUnsatisfiedX || unsatisfiedX;
-        layoutUnsatisfiedY = layoutUnsatisfiedY || unsatisfiedY;
-      });
-      return {xAllocations: xRequested, yAllocations: yRequested, unsatisfiedComponents: nextIterationUnsatisfied, unsatisfiedX: layoutUnsatisfiedX, unsatisfiedY: layoutUnsatisfiedY}
-    }
-
-    private generateComponentPositions() {
-      var out: IComponentPosition[] = [];
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
-          out.push({component: component, row: rowIndex, col: colIndex});
+          var x = xAllocations[colIndex] + xProportionalSpace[colIndex];
+          var y = yAllocations[rowIndex] + yProportionalSpace[rowIndex];
+          var requestedXY = component != null ? component.requestedXY(x, y) : [0, 0];
+          if (requestedXY[0] > x || requestedXY[1] > y) {
+            throw new Error("Invariant Violation: Component cannot request more space than is offered");
+          }
+          xRequested[colIndex] = Math.max(xRequested[colIndex], requestedXY[0]);
+          yRequested[rowIndex] = Math.max(yRequested[rowIndex], requestedXY[1]);
+          var unsatisfiedX = component != null && component.isFixedWidth()  && requestedXY[0] === x;
+          var unsatisfiedY = component != null && component.isFixedHeight() && requestedXY[1] === y;
+          layoutUnsatisfiedX = layoutUnsatisfiedX || unsatisfiedX;
+          layoutUnsatisfiedY = layoutUnsatisfiedY || unsatisfiedY;
         });
       });
-      return out;
+      return {xAllocations: xRequested, yAllocations: yRequested, unsatisfiedX: layoutUnsatisfiedX, unsatisfiedY: layoutUnsatisfiedY}
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
@@ -135,7 +124,6 @@ module Plottable {
 
       var xAllocations = Utils.repeat(0, this.nCols);
       var yAllocations = Utils.repeat(0, this.nRows);
-      var unsatisfied = this.generateComponentPositions();
 
       var freeX = this.availableX - d3.sum(xAllocations) - this.colPadding * (this.nCols - 1);
       var freeY = this.availableY - d3.sum(yAllocations) - this.rowPadding * (this.nRows - 1);
@@ -144,8 +132,7 @@ module Plottable {
 
       var nIterations = 0;
       while ((freeX > 0 && unsatisfiedX) || (freeY > 0 && unsatisfiedY)) {
-        var layout = this.determineAllocations(unsatisfied, xAllocations, yAllocations, xProportionalSpace, yProportionalSpace)
-        unsatisfied = layout.unsatisfiedComponents;
+        var layout = this.determineAllocations(xAllocations, yAllocations, xProportionalSpace, yProportionalSpace)
         xAllocations = layout.xAllocations;
         yAllocations = layout.yAllocations;
         unsatisfiedX = layout.unsatisfiedX;
@@ -157,11 +144,11 @@ module Plottable {
         yProportionalSpace = Table.calcProportionalSpace(rowWeights, freeY);
         nIterations++;
 
-        if (freeX < 0 || freeY < 0) {
-          throw new Error("Invariant violation!");
-        }
         if (nIterations > 10) {
           debugger;
+          if (nIterations > 15) {
+            break;
+          }
         }
       }
 

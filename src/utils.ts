@@ -94,6 +94,20 @@ module Plottable {
     }
 
     /**
+     * Gets the width of a text element, as rendered.
+     *
+     * @param {D3.Selection} textElement
+     * @return {number} The width of the text element, in pixels.
+     */
+    export function getTextWidth(textElement: D3.Selection, text: string) {
+      var originalText = textElement.text();
+      textElement.text(text);
+      var width = Utils.getBBox(textElement).width;
+      textElement.text(originalText);
+      return width;
+    }
+
+    /**
      * Converts a string into an array of strings, all of which fit in the available space.
      *
      * @returns {string[]} The input text broken into substrings that fit in the avialable space.

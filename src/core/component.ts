@@ -4,7 +4,12 @@ module Plottable {
   export class Component extends PlottableObject {
 
     public requestedXY(availableX: number, availableY: number) {
-      return [this.isFixedWidth ? this.minimumWidth() : 0, this.isFixedHeight() ? this.minimumHeight() : 0];
+      var x = this.isFixedWidth() ? this.minimumWidth() : 0;
+      var y = this.isFixedHeight() ? this.minimumHeight() : 0;
+      if (x > availableX || y > availableY) {
+        throw new Error("Insufficient Space Error");
+      }
+      return [x, y];
     }
 
     public element: D3.Selection;
@@ -356,6 +361,7 @@ module Plottable {
     public minimumHeight(newVal?: number): any {
       if (newVal != null) {
         this._minimumHeight = newVal;
+        console.log("Setting the minimumHeight programatically is being deprecated");
         return this;
       } else {
         return this._minimumHeight;
@@ -373,6 +379,7 @@ module Plottable {
     public minimumWidth(newVal?: number): any {
       if (newVal != null) {
         this._minimumWidth = newVal;
+        console.log("Setting the minimumWidth programatically is being deprecated");
         return this;
       } else {
         return this._minimumWidth;

@@ -8,6 +8,7 @@ module Plottable {
     private colorScale: ColorScale;
     private maxWidth: number;
     private legendBox: D3.Selection;
+    private nRowsDrawn: number;
 
     /**
      * Creates a Legend.
@@ -41,15 +42,17 @@ module Plottable {
       return this;
     }
 
-    public minimumHeight(): number;
-    public minimumHeight(newVal: number): Legend;
-    public minimumHeight(newVal?: number): any {
-      if (newVal != null) {
-        throw new Error("Row minimum cannot be directly set on Legend");
-      } else {
-        var textHeight = this.measureTextHeight();
-        return this.colorScale.domain().length * textHeight;
-      }
+    public requestedXY(availableX: number, availableY: number) {
+      var textHeight = this.measureTextHeight();
+      var domainLength = this.colorScale.domain().length;
+      this.nRowsDrawn = Math.min(domainLength, Math.floor(availableY / textHeight));
+      var y = this.nRowsDrawn * textHeight;
+      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var fakeText = fakeLegendEl.append("text");
+      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Utils.getTextWidth(fakeText, d));
+      fakeLegendEl.remove();
+      var x = Math.min(availableX, maxWidth + textHeight + Legend.MARGIN);
+      return [x, y];
     }
 
     private measureTextHeight(): number {
@@ -63,7 +66,7 @@ module Plottable {
     public _doRender(): Legend {
       super._doRender();
       this.legendBox.attr("height", this.minimumHeight()).attr("width", this.minimumWidth()); //HACKHACK #223
-      var domain = this.colorScale.domain();
+      var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
       var availableX = this.minimumWidth() - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
