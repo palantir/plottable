@@ -50,9 +50,12 @@ module Plottable {
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Utils.getTextWidth(fakeText, d));
+      maxWidth = maxWidth === undefined ? 0 : maxWidth;
       fakeLegendEl.remove();
       var x = Math.min(availableX, maxWidth + textHeight + Legend.MARGIN);
-      return [x, y];
+      var unsatisfiedX = availableX < maxWidth + textHeight + Legend.MARGIN;
+      var unsatisfiedY = this.nRowsDrawn < domainLength;
+      return [x, y, unsatisfiedX, unsatisfiedY];
     }
 
     private measureTextHeight(): number {

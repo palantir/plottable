@@ -2,14 +2,14 @@
 
 module Plottable {
   export class Component extends PlottableObject {
-
-    public requestedXY(availableX: number, availableY: number) {
+    public requestedXY(availableX: number, availableY: number): any[] {
       var x = this.isFixedWidth() ? this.minimumWidth() : 0;
       var y = this.isFixedHeight() ? this.minimumHeight() : 0;
-      if (x > availableX || y > availableY) {
-        throw new Error("Insufficient Space Error");
-      }
-      return [x, y];
+      var unsatisfiedX = x > availableX;
+      var unsatisfiedY = y > availableY;
+      x = Math.min(x, availableX);
+      y = Math.min(y, availableY);
+      return [x, y, unsatisfiedX, unsatisfiedY];
     }
 
     public element: D3.Selection;

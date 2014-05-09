@@ -102,8 +102,8 @@ module Plottable {
           yRequested[rowIndex] = Math.max(yRequested[rowIndex], requestedXY[1]);
           var unsatisfiedX = component != null && component.isFixedWidth()  && requestedXY[0] === x;
           var unsatisfiedY = component != null && component.isFixedHeight() && requestedXY[1] === y;
-          layoutUnsatisfiedX = layoutUnsatisfiedX || unsatisfiedX;
-          layoutUnsatisfiedY = layoutUnsatisfiedY || unsatisfiedY;
+          layoutUnsatisfiedX = layoutUnsatisfiedX || requestedXY[2];
+          layoutUnsatisfiedY = layoutUnsatisfiedY || requestedXY[3];
         });
       });
       return {xAllocations: xRequested, yAllocations: yRequested, unsatisfiedX: layoutUnsatisfiedX, unsatisfiedY: layoutUnsatisfiedY}
@@ -131,7 +131,7 @@ module Plottable {
       var unsatisfiedY = true;
 
       var nIterations = 0;
-      while ((freeX > 0 && unsatisfiedX) || (freeY > 0 && unsatisfiedY)) {
+      while ((freeX > 1 && unsatisfiedX) || (freeY > 1 && unsatisfiedY)) {
         var layout = this.determineAllocations(xAllocations, yAllocations, xProportionalSpace, yProportionalSpace)
         xAllocations = layout.xAllocations;
         yAllocations = layout.yAllocations;

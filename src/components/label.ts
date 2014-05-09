@@ -33,6 +33,21 @@ module Plottable {
       this.xAlign("CENTER").yAlign("CENTER"); // the defaults
     }
 
+    public requestedXY(availableX: number, availableY: number) {
+      var width = Utils.getTextWidth(this.textElement, this.text);
+      var height = Utils.getTextHeight(this.textElement);
+      var idealX: number;
+      var idealY: number;
+      if (this.orientation === "horizontal") {
+        idealX = width;
+        idealY = height;
+      } else {
+        idealX = height;
+        idealY = width;
+      }
+      return [Math.min(idealX, availableX), Math.min(idealY, availableY), idealX > availableX, idealY > availableY]
+    }
+
     public _setup() {
       super._setup();
       this.textElement = this.content.append("text");
