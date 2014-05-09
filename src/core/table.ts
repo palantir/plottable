@@ -109,9 +109,7 @@ module Plottable {
       return {xAllocations: xRequested, yAllocations: yRequested, unsatisfiedX: layoutUnsatisfiedX, unsatisfiedY: layoutUnsatisfiedY}
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
-      super._computeLayout(xOffset, yOffset, availableX, availableY);
-
+    public iterateLayout(availableX: number, availableY: number) {
       var cols = d3.transpose(this.rows);
       var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
       var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c.isFixedWidth());
@@ -151,6 +149,26 @@ module Plottable {
           }
         }
       }
+      return [xProportionalSpace, yProportionalSpace, xAllocations, yAllocations, unsatisfiedX, unsatisfiedY];
+    }
+
+    public requestedXY(availableX: number, availableY: number): any[] {
+      var layout: any[] = this.iterateLayout(availableX, availableY);
+      var xAllocations: number[] = layout[2];
+      var yAllocations: number[] = layout[3];
+      var unsatisfiedX = layout[4];
+      var unsatisfiedY = layout[5];
+      return [d3.sum(xAllocations), d3.sum(yAllocations), unsatisfiedX, unsatisfiedY];
+    }
+
+    public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
+      super._computeLayout(xOffset, yOffset, availableX, availableY);
+      var layout = this.iterateLayout(availableX, availableY);
+
+      var xProportionalSpace = layout[0];
+      var yProportionalSpace = layout[1];
+      var xAllocations = layout[2];
+      var yAllocations = layout[3];
 
       var sumPair = (p: number[]) => p[0] + p[1];
       var rowHeights = d3.zip(yProportionalSpace, yAllocations).map(sumPair);
