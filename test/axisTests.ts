@@ -8,10 +8,42 @@ describe("Axes", () => {
     var xScale = new Plottable.LinearScale();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
-    var axis = new Plottable.XAxis(xScale, "bottom");
+    var formatter = function(d: number) { return String(d); };
+    var axis = new Plottable.XAxis(xScale, "bottom", formatter);
     axis.renderTo(svg);
     var ticks = svg.selectAll(".tick");
     assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
+
+    var tickTexts = ticks.select("text")[0].map(function(t: HTMLElement) { return t.innerHTML; });
+    var generatedTicks = xScale.ticks().map(formatter);
+    assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
+    svg.remove();
+  });
+
+  it("Still displays tick labels if space is constrained.", () => {
+    var svg = generateSVG(100, 100);
+    var yScale = new Plottable.LinearScale()
+                                .domain([0, 10])
+                                .range([0, 100]);
+    var yAxis = new Plottable.YAxis(yScale, "left");
+    yAxis.renderTo(svg);
+    var tickTexts = svg.selectAll(".tick text");
+    var visibleTickTexts = tickTexts.filter(function() {
+      return d3.select(this).style("visibility") === "visible";
+    });
+    assert.operator(visibleTickTexts[0].length, ">=", 2, "Two tick labels remain visible");
+    yAxis.remove();
+
+    var xScale = new Plottable.LinearScale()
+                                .domain([0, 10])
+                                .range([0, 100]);
+    var xAxis = new Plottable.XAxis(yScale, "bottom");
+    xAxis.renderTo(svg);
+    tickTexts = svg.selectAll(".tick text");
+    visibleTickTexts = tickTexts.filter(function() {
+      return d3.select(this).style("visibility") === "visible";
+    });
+    assert.operator(visibleTickTexts[0].length, ">=", 2, "Two tick labels remain visible");
     svg.remove();
   });
 
