@@ -22,11 +22,6 @@ module Plottable {
       orientation = orientation.toLowerCase();
       if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
         this.orientation = orientation;
-        if (orientation === "horizontal") {
-          this._fixedWidth = false;
-        } else {
-          this._fixedHeight = false;
-        }
       } else {
         throw new Error(orientation + " is not a valid orientation for LabelComponent");
       }
@@ -34,7 +29,7 @@ module Plottable {
     }
 
     public requestedXY(availableX: number, availableY: number) {
-      var width = Utils.getTextWidth(this.textElement, this.text);
+      var width  = Utils.getTextWidth(this.textElement, this.text);
       var height = Utils.getTextHeight(this.textElement);
       var idealX: number;
       var idealY: number;
@@ -65,26 +60,13 @@ module Plottable {
       this.text = text;
       if (this.element != null) {
         this.textElement.text(text);
-        this.measureAndSetTextSize();
       }
       return this;
-    }
-
-    private measureAndSetTextSize() {
-      var bbox = Utils.getBBox(this.textElement);
-      this.textHeight = bbox.height;
-      this.textLength = bbox.width;
-      if (this.orientation === "horizontal") {
-        this.minimumHeight(this.textHeight);
-      } else {
-        this.minimumWidth(this.textHeight);
-      }
     }
 
     private truncateTextAndRemeasure(availableLength: number) {
       var shortText = Utils.getTruncatedText(this.text, availableLength, this.textElement);
       this.textElement.text(shortText);
-      this.measureAndSetTextSize();
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
