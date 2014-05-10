@@ -57,7 +57,7 @@ module Plottable {
       element.text(text);
       var bbox = Utils.getBBox(element);
       var textLength = bbox.width;
-      if (textLength < availableSpace) {
+      if (textLength <= availableSpace) {
         element.text(originalText);
         return text;
       }
