@@ -131,17 +131,21 @@ module Plottable {
       var xPosition = this.xOrigin;
       var yPosition = this.yOrigin;
 
-      xPosition += (availableX - this.minimumWidth()) * this._xAlignProportion;
+      var requestedXY = this.requestedXY(availableX, availableY);
+      var requestedX = requestedXY[0];
+      var requestedY = requestedXY[1];
+
+      xPosition += (availableX - requestedX) * this._xAlignProportion;
       xPosition += this._xOffset;
-      if (this.minimumWidth() !== 0 && this.isFixedWidth()) {
+      if (this.isFixedWidth()) {
         // Decrease size so hitbox / bounding box and children are sized correctly
-        availableX = availableX > this.minimumWidth() ? this.minimumWidth() : availableX;
+        availableX = Math.min(availableX, requestedX);
       }
 
-      yPosition += (availableY - this.minimumHeight()) * this._yAlignProportion;
+      yPosition += (availableY - requestedY) * this._yAlignProportion;
       yPosition += this._yOffset;
-      if (this.minimumHeight() !== 0 && this.isFixedHeight()) {
-        availableY = availableY > this.minimumHeight() ? this.minimumHeight() : availableY;
+      if (this.isFixedHeight()) {
+        availableY = Math.min(availableY, requestedY);
       }
 
       this.availableX  = availableX;
