@@ -779,6 +779,7 @@ declare module Plottable {
         * @returns {Legend} The calling Legend.
         */
         public scale(scale: ColorScale): Legend;
+        public scale(): ColorScale;
         public minimumHeight(): number;
         public minimumHeight(newVal: number): Legend;
     }

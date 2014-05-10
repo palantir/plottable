@@ -1,5 +1,5 @@
 /*!
-Plottable 0.11.0 (https://github.com/palantir/plottable)
+Plottable 0.11.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -508,6 +508,8 @@ var Plottable;
             this._xAlignProportion = 0;
             this._yAlignProportion = 0;
             this.cssClasses = ["component"];
+            this.isSetup = false;
+            this.isAnchored = false;
         }
         /**
         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -533,7 +535,7 @@ var Plottable;
                 this.element = element.append("g");
                 this._setup();
             }
-
+            this.isAnchored = true;
             return this;
         };
 
@@ -567,7 +569,7 @@ var Plottable;
                 return _this.registerInteraction(r);
             });
             this.interactionsToRegister = null;
-
+            this.isSetup = true;
             return this;
         };
 
@@ -632,7 +634,9 @@ var Plottable;
         * @returns {Component} The calling Component.
         */
         Component.prototype._render = function () {
-            Plottable.RenderController.registerToRender(this);
+            if (this.isAnchored && this.isSetup) {
+                Plottable.RenderController.registerToRender(this);
+            }
             return this;
         };
 
@@ -884,6 +888,7 @@ var Plottable;
         */
         Component.prototype.remove = function () {
             this.element.remove();
+            this.isAnchored = false;
             return this;
         };
         return Component;
@@ -2226,7 +2231,7 @@ var Plottable;
             _super.call(this);
             this.classed("legend", true);
             this.minimumWidth(120); // the default width
-            this.colorScale = colorScale;
+            this.scale(colorScale);
             this.xAlign("RIGHT").yAlign("TOP");
             this.xOffset(5).yOffset(5);
         }
@@ -2236,15 +2241,20 @@ var Plottable;
             return this;
         };
 
-        /**
-        * Assigns a new ColorScale to the Legend.
-        *
-        * @param {ColorScale} scale
-        * @returns {Legend} The calling Legend.
-        */
         Legend.prototype.scale = function (scale) {
-            this.colorScale = scale;
-            return this;
+            var _this = this;
+            if (scale != null) {
+                if (this.colorScale != null) {
+                    this._deregisterFromBroadcaster(this.colorScale);
+                }
+                this.colorScale = scale;
+                this._registerToBroadcaster(this.colorScale, function () {
+                    return _this._render();
+                });
+                return this;
+            } else {
+                return this.colorScale;
+            }
         };
 
         Legend.prototype.minimumHeight = function (newVal) {
@@ -3765,40 +3775,44 @@ var Plottable;
                     }
                 }
 
-                var scaleRange = this._axisScale.range();
-                var availableWidth = this.availableWidth;
-                var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
-                var availableHeight = this.availableHeight - tickLengthWithPadding;
-                if (tickTextLabels[0].length > 1) {
-                    var tickValues = tickTextLabels.data();
-                    var tickPositions = tickValues.map(function (v) {
-                        return _this._axisScale.scale(v);
-                    });
-                    tickPositions.forEach(function (p, i) {
-                        var spacing = Math.abs(tickPositions[i + 1] - p);
-                        availableWidth = (spacing < availableWidth) ? spacing : availableWidth;
-                    });
-                }
-
-                availableWidth = 0.9 * availableWidth; // add in some padding
-
-                tickTextLabels.each(function (t, i) {
-                    var textEl = d3.select(this);
-                    var currentText = textEl.text();
-                    var wrappedLines = Plottable.Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
-                    if (wrappedLines.length === 1) {
-                        textEl.text(Plottable.Utils.getTruncatedText(currentText, availableWidth, textEl));
-                    } else {
-                        textEl.text("");
-                        var tspans = textEl.selectAll("tspan").data(wrappedLines);
-                        tspans.enter().append("tspan");
-                        tspans.text(function (line) {
-                            return line;
-                        }).attr("x", "0").attr("dy", function (line, i) {
-                            return (i === 0) ? textEl.attr("dy") : "1em";
-                        }).style("text-anchor", textEl.style("text-anchor"));
+                if (this._axisScale.rangeType != null) {
+                    var scaleRange = this._axisScale.range();
+                    var availableWidth = this.availableWidth;
+                    var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
+                    var availableHeight = this.availableHeight - tickLengthWithPadding;
+                    if (tickTextLabels[0].length > 1) {
+                        var tickValues = tickTextLabels.data();
+                        var tickPositions = tickValues.map(function (v) {
+                            return _this._axisScale.scale(v);
+                        });
+                        tickPositions.forEach(function (p, i) {
+                            var spacing = Math.abs(tickPositions[i + 1] - p);
+                            availableWidth = (spacing < availableWidth) ? spacing : availableWidth;
+                        });
                     }
-                });
+
+                    availableWidth = 0.9 * availableWidth; // add in some padding
+
+                    tickTextLabels.each(function (t, i) {
+                        var textEl = d3.select(this);
+                        var currentText = textEl.text();
+                        var wrappedLines = Plottable.Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+                        if (wrappedLines.length === 1) {
+                            textEl.text(Plottable.Utils.getTruncatedText(currentText, availableWidth, textEl));
+                        } else {
+                            textEl.text("");
+                            var tspans = textEl.selectAll("tspan").data(wrappedLines);
+                            tspans.enter().append("tspan");
+                            tspans.text(function (line) {
+                                return line;
+                            }).attr("x", "0").attr("dy", function (line, i) {
+                                return (i === 0) ? textEl.attr("dy") : "1em";
+                            }).style("text-anchor", textEl.style("text-anchor"));
+                        }
+                    });
+                } else {
+                    this._hideOverlappingTickLabels();
+                }
             }
 
             if (!this.showEndTickLabels()) {
@@ -3875,50 +3889,54 @@ var Plottable;
                     }
                 }
 
-                var scaleRange = this._axisScale.range();
-                var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
-                var availableWidth = this.availableWidth - tickLengthWithPadding;
-                var availableHeight = this.availableHeight;
-                if (tickTextLabels[0].length > 1) {
-                    var tickValues = tickTextLabels.data();
-                    var tickPositions = tickValues.map(function (v) {
-                        return _this._axisScale.scale(v);
-                    });
-                    tickPositions.forEach(function (p, i) {
-                        var spacing = Math.abs(tickPositions[i + 1] - p);
-                        availableHeight = (spacing < availableHeight) ? spacing : availableHeight;
-                    });
-                }
-
-                var tickLabelPosition = this.tickLabelPosition();
-                tickTextLabels.each(function (t, i) {
-                    var textEl = d3.select(this);
-                    var currentText = textEl.text();
-                    var wrappedLines = Plottable.Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
-                    if (wrappedLines.length === 1) {
-                        textEl.text(Plottable.Utils.getTruncatedText(currentText, availableWidth, textEl));
-                    } else {
-                        var baseY = 0;
-                        if (tickLabelPosition === "top") {
-                            baseY = -(wrappedLines.length - 1);
-                        } else if (tickLabelPosition === "middle") {
-                            baseY = -(wrappedLines.length - 1) / 2;
-                        }
-
-                        textEl.text("");
-                        var tspans = textEl.selectAll("tspan").data(wrappedLines);
-                        tspans.enter().append("tspan");
-                        tspans.text(function (line) {
-                            return line;
-                        }).attr({
-                            "dy": textEl.attr("dy"),
-                            "x": textEl.attr("x"),
-                            "y": function (line, i) {
-                                return (baseY + i) + "em";
-                            }
-                        }).style("text-anchor", textEl.style("text-anchor"));
+                if (this._axisScale.rangeType != null) {
+                    var scaleRange = this._axisScale.range();
+                    var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
+                    var availableWidth = this.availableWidth - tickLengthWithPadding;
+                    var availableHeight = this.availableHeight;
+                    if (tickTextLabels[0].length > 1) {
+                        var tickValues = tickTextLabels.data();
+                        var tickPositions = tickValues.map(function (v) {
+                            return _this._axisScale.scale(v);
+                        });
+                        tickPositions.forEach(function (p, i) {
+                            var spacing = Math.abs(tickPositions[i + 1] - p);
+                            availableHeight = (spacing < availableHeight) ? spacing : availableHeight;
+                        });
                     }
-                });
+
+                    var tickLabelPosition = this.tickLabelPosition();
+                    tickTextLabels.each(function (t, i) {
+                        var textEl = d3.select(this);
+                        var currentText = textEl.text();
+                        var wrappedLines = Plottable.Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+                        if (wrappedLines.length === 1) {
+                            textEl.text(Plottable.Utils.getTruncatedText(currentText, availableWidth, textEl));
+                        } else {
+                            var baseY = 0;
+                            if (tickLabelPosition === "top") {
+                                baseY = -(wrappedLines.length - 1);
+                            } else if (tickLabelPosition === "middle") {
+                                baseY = -(wrappedLines.length - 1) / 2;
+                            }
+
+                            textEl.text("");
+                            var tspans = textEl.selectAll("tspan").data(wrappedLines);
+                            tspans.enter().append("tspan");
+                            tspans.text(function (line) {
+                                return line;
+                            }).attr({
+                                "dy": textEl.attr("dy"),
+                                "x": textEl.attr("x"),
+                                "y": function (line, i) {
+                                    return (baseY + i) + "em";
+                                }
+                            }).style("text-anchor", textEl.style("text-anchor"));
+                        }
+                    });
+                } else {
+                    this._hideOverlappingTickLabels();
+                }
             }
 
             if (!this.showEndTickLabels()) {
