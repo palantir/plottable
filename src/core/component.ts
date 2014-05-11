@@ -23,8 +23,8 @@ module Plottable {
     public clipPathEnabled = false;
     private broadcastersCurrentlyListeningTo: {[key: string]: Broadcaster} = {};
 
-    public _fixedWidth = true;
-    public _fixedHeight = true;
+    public _fixedWidth = false;
+    public _fixedHeight = false;
     private _minimumHeight = 0;
     private _minimumWidth = 0;
 
@@ -369,6 +369,7 @@ module Plottable {
     public minimumHeight(newVal: number): Component;
     public minimumHeight(newVal?: number): any {
       if (newVal != null) {
+        this._fixedHeight = true;
         this._minimumHeight = newVal;
         console.log("Setting the minimumHeight programatically is being deprecated");
         return this;
@@ -387,6 +388,7 @@ module Plottable {
     public minimumWidth(newVal: number): Component;
     public minimumWidth(newVal?: number): any {
       if (newVal != null) {
+        this._fixedWidth = true;
         this._minimumWidth = newVal;
         console.log("Setting the minimumWidth programatically is being deprecated");
         return this;
