@@ -2,14 +2,14 @@
 
 module Plottable {
   export class Component extends PlottableObject {
-    public requestedXY(availableX: number, availableY: number): any[] {
+    public requestedXY(availableX: number, availableY: number): IXYPacket {
       var x = this.isFixedWidth() ? this.minimumWidth() : 0;
       var y = this.isFixedHeight() ? this.minimumHeight() : 0;
       var unsatisfiedX = x > availableX;
       var unsatisfiedY = y > availableY;
       x = Math.min(x, availableX);
       y = Math.min(y, availableY);
-      return [x, y, unsatisfiedX, unsatisfiedY];
+      return {x: x, y: y, unsatisfiedX: unsatisfiedX, unsatisfiedY: unsatisfiedY};
     }
 
     public element: D3.Selection;
@@ -132,8 +132,8 @@ module Plottable {
       var yPosition = this.yOrigin;
 
       var requestedXY = this.requestedXY(availableX, availableY);
-      var requestedX = requestedXY[0];
-      var requestedY = requestedXY[1];
+      var requestedX = requestedXY.x;
+      var requestedY = requestedXY.y;
 
       xPosition += (availableX - requestedX) * this._xAlignProportion;
       xPosition += this._xOffset;

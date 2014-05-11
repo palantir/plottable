@@ -40,7 +40,11 @@ module Plottable {
         idealX = height;
         idealY = width;
       }
-      return [Math.min(idealX, availableX), Math.min(idealY, availableY), idealX > availableX, idealY > availableY]
+      return {
+        x: Math.min(idealX, availableX),
+        y: Math.min(idealY, availableY),
+        unsatisfiedX: idealX > availableX,
+        unsatisfiedY: idealY > availableY};
     }
 
     public _setup() {

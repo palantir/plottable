@@ -2,6 +2,10 @@
 
 module Plottable {
   export module Utils {
+
+    export function any(bools: boolean[]) {
+      return bools.some((x: boolean) => x);
+    }
     /**
      * Checks if x is between a and b.
      */

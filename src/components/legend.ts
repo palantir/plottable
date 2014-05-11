@@ -55,7 +55,7 @@ module Plottable {
       var x = Math.min(availableX, maxWidth + textHeight + Legend.MARGIN);
       var unsatisfiedX = availableX < maxWidth + textHeight + Legend.MARGIN;
       var unsatisfiedY = this.nRowsDrawn < domainLength;
-      return [x, y, unsatisfiedX, unsatisfiedY];
+      return {x: x, y: y, unsatisfiedX: unsatisfiedX, unsatisfiedY: unsatisfiedY};
     }
 
     private measureTextHeight(): number {

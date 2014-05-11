@@ -10,9 +10,8 @@ module Plottable {
   interface LayoutIteration {
     xAllocations: number[];
     yAllocations: number[];
-    unsatisfiedX: boolean[];
-    unsatisfiedY: boolean[];
-
+    unsatisfiedXArr: boolean[];
+    unsatisfiedYArr: boolean[];
   }
   export class Table extends Component {
     private rowPadding = 0;
@@ -85,7 +84,7 @@ module Plottable {
 
     private determineAllocations(xAllocations: number[], yAllocations: number[],
       xProportionalSpace: number[], yProportionalSpace: number[]
-    ) {
+    ): LayoutIteration {
       var xRequested = Utils.repeat(0, this.nCols);
       var yRequested = Utils.repeat(0, this.nRows);
       var layoutUnsatisfiedX = Utils.repeat(false, this.nCols);
@@ -94,19 +93,22 @@ module Plottable {
         row.forEach((component: Component, colIndex: number) => {
           var x = xAllocations[colIndex] + xProportionalSpace[colIndex];
           var y = yAllocations[rowIndex] + yProportionalSpace[rowIndex];
-          var requestedXY = component != null ? component.requestedXY(x, y) : [0, 0];
-          if (requestedXY[0] > x || requestedXY[1] > y) {
+          var requestedXY: IXYPacket = component != null
+                    ? component.requestedXY(x, y)
+                    : {x: 0, y: 0, unsatisfiedX: false, unsatisfiedY: false};
+          if (requestedXY.x > x || requestedXY.y > y) {
             throw new Error("Invariant Violation: Component cannot request more space than is offered");
           }
-          xRequested[colIndex] = Math.max(xRequested[colIndex], requestedXY[0]);
-          yRequested[rowIndex] = Math.max(yRequested[rowIndex], requestedXY[1]);
-          var unsatisfiedX = component != null && component.isFixedWidth()  && requestedXY[0] === x;
-          var unsatisfiedY = component != null && component.isFixedHeight() && requestedXY[1] === y;
-          layoutUnsatisfiedX[colIndex] = layoutUnsatisfiedX[colIndex] || requestedXY[2];
-          layoutUnsatisfiedY[rowIndex] = layoutUnsatisfiedY[rowIndex] || requestedXY[3];
+          xRequested[colIndex] = Math.max(xRequested[colIndex], requestedXY.x);
+          yRequested[rowIndex] = Math.max(yRequested[rowIndex], requestedXY.y);
+          layoutUnsatisfiedX[colIndex] = layoutUnsatisfiedX[colIndex] || requestedXY.unsatisfiedX;
+          layoutUnsatisfiedY[rowIndex] = layoutUnsatisfiedY[rowIndex] || requestedXY.unsatisfiedY;
         });
       });
-      return {xAllocations: xRequested, yAllocations: yRequested, unsatisfiedX: layoutUnsatisfiedX, unsatisfiedY: layoutUnsatisfiedY}
+      return {xAllocations: xRequested,
+              yAllocations: yRequested,
+              unsatisfiedXArr: layoutUnsatisfiedX,
+              unsatisfiedYArr: layoutUnsatisfiedY}
     }
 
     public iterateLayout(availableX: number, availableY: number) {
@@ -134,8 +136,8 @@ module Plottable {
         var layout = this.determineAllocations(xAllocations, yAllocations, xProportionalSpace, yProportionalSpace)
         xAllocations = layout.xAllocations;
         yAllocations = layout.yAllocations;
-        var unsatisfiedXArr = layout.unsatisfiedX;
-        var unsatisfiedYArr = layout.unsatisfiedY;
+        var unsatisfiedXArr = layout.unsatisfiedXArr;
+        var unsatisfiedYArr = layout.unsatisfiedYArr;
         unsatisfiedX = unsatisfiedXArr.some(id);
         unsatisfiedY = unsatisfiedYArr.some(id);
 
@@ -166,30 +168,29 @@ module Plottable {
           }
         }
       }
-      return [xProportionalSpace, yProportionalSpace, xAllocations, yAllocations, unsatisfiedX, unsatisfiedY];
+      return {xProportionalSpace: xProportionalSpace,
+              yProportionalSpace: yProportionalSpace,
+              xAllocations: xAllocations,
+              yAllocations: yAllocations,
+              unsatisfiedX: unsatisfiedX,
+              unsatisfiedY: unsatisfiedY};
     }
 
-    public requestedXY(availableX: number, availableY: number): any[] {
-      var layout: any[] = this.iterateLayout(availableX, availableY);
-      var xAllocations: number[] = layout[2];
-      var yAllocations: number[] = layout[3];
-      var unsatisfiedX = layout[4];
-      var unsatisfiedY = layout[5];
-      return [d3.sum(xAllocations), d3.sum(yAllocations), unsatisfiedX, unsatisfiedY];
+    public requestedXY(availableX: number, availableY: number): IXYPacket {
+      var layout = this.iterateLayout(availableX, availableY);
+      return {x: d3.sum(layout.xAllocations),
+              y: d3.sum(layout.yAllocations),
+              unsatisfiedX: layout.unsatisfiedX,
+              unsatisfiedY: layout.unsatisfiedY};
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
       super._computeLayout(xOffset, yOffset, availableX, availableY);
       var layout = this.iterateLayout(this.availableX, this.availableY);
 
-      var xProportionalSpace = layout[0];
-      var yProportionalSpace = layout[1];
-      var xAllocations = layout[2];
-      var yAllocations = layout[3];
-
       var sumPair = (p: number[]) => p[0] + p[1];
-      var rowHeights = d3.zip(yProportionalSpace, yAllocations).map(sumPair);
-      var colWidths  = d3.zip(xProportionalSpace, xAllocations).map(sumPair);
+      var rowHeights = d3.zip(layout.yProportionalSpace, layout.yAllocations).map(sumPair);
+      var colWidths  = d3.zip(layout.xProportionalSpace, layout.xAllocations).map(sumPair);
       var childYOffset = 0;
       this.rows.forEach((row: Component[], rowIndex: number) => {
         var childXOffset = 0;
