@@ -143,22 +143,28 @@ function commitDashboard(dataManager, svg) {
   // ---- Assemble! -----
   var dashboardTable = new Plottable.Table([
     [null,         scatterLabel,      null,                   bar1Label          ],
-    [filler,       null,              null,                   null               ],
     [scatterYAxis, scatterRenderArea, contributorLegendTable, contributorBarChart],
     [null,         scatterDateAxis,   null,                   null               ],
     [null,         renderLabel,       null,                   bar2Label          ],
     [tscYAxis,     tscRenderArea,     directoryLegendTable,   directoryBarChart  ],
     [null,         tscDateAxis,       null,                   null               ]
   ]);
+  window.contributorLegendTable = contributorLegendTable;
+  window.directoryLegendTable = directoryLegendTable;
+  window.scatterYAxis = scatterYAxis;
+  window.tscYAxis = tscYAxis;
+  window.scatterLabel = scatterLabel;
+  dashboardTable.debug = true;
   dashboardTable.padding(0, 10);
   dashboardTable.colWeight(1, 3);
   dashboardTable.colWeight(2, 0);
-  var titleLabel = new Plottable.TitleLabel("Plottable Git Commit History").classed("major", true);
-  var outerTable = new Plottable.Table([
-    [titleLabel],
-    [new Plottable.Component().minimumHeight(5)],
-    [dashboardTable]
-    ]).renderTo(svg);
+  dashboardTable.renderTo(svg);
+  // var titleLabel = new Plottable.TitleLabel("Plottable Git Commit History").classed("major", true);
+  // var outerTable = new Plottable.Table([
+  //   [titleLabel],
+  //   [new Plottable.Component().minimumHeight(5)],
+  //   [dashboardTable]
+  //   ]).renderTo(svg);
 
   function resetDomains() {
     timeScale.domain([startDate, endDate]).nice();
