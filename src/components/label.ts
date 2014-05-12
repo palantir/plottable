@@ -31,16 +31,14 @@ module Plottable {
     }
 
     public requestedXY(availableX: number, availableY: number) {
-      var width  = Utils.getTextWidth(this.textElement, this.text);
-      var height = Utils.getTextHeight(this.textElement);
       var idealX: number;
       var idealY: number;
       if (this.orientation === "horizontal") {
-        idealX = width;
-        idealY = height;
+        idealX = this.textLength;
+        idealY = this.textHeight;
       } else {
-        idealX = height;
-        idealY = width;
+        idealX = this.textHeight;
+        idealY = this.textLength;
       }
       return {
         x: Math.min(idealX, availableX),
@@ -66,13 +64,21 @@ module Plottable {
       this.text = text;
       if (this.element != null) {
         this.textElement.text(text);
+        this.measureAndSetTextSize();
       }
       return this;
+    }
+
+    private measureAndSetTextSize() {
+      var bbox = Utils.getBBox(this.textElement);
+      this.textHeight = bbox.height;
+      this.textLength = bbox.width;
     }
 
     private truncateTextAndRemeasure(availableLength: number) {
       var shortText = Utils.getTruncatedText(this.text, availableLength, this.textElement);
       this.textElement.text(shortText);
+      this.measureAndSetTextSize();
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {

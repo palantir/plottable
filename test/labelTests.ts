@@ -57,11 +57,12 @@ describe("Labels", () => {
   it("Label text can be changed after label is created", () => {
     var svg = generateSVG(400, 80);
     var label = new Plottable.TitleLabel();
-    label._anchor(svg);
+    label.renderTo(svg);
     var textEl = label.content.select("text");
     assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
     assert.equal(label.availableY, 0, "rowMin is 0 for empty string");
     label.setText("hello world");
+    label.renderTo(svg);
     assert.equal(textEl.text(), "hello world", "the label text updated properly");
     assert.operator(label.availableY, ">", 0, "rowMin is > 0 for non-empty string");
     svg.remove();
