@@ -16,6 +16,18 @@ module Plottable {
       this.components = components;
     }
 
+    public requestedXY(x: number, y: number): IXYPacket {
+      var layouts = this.components.map((c: Component) => c.requestedXY(x, y));
+      var maxX = d3.max(layouts, (l: IXYPacket) => l.x);
+      var maxY = d3.max(layouts, (l: IXYPacket) => l.y);
+      return {
+        x: maxX,
+        y: maxY,
+        unsatisfiedX: maxX > x,
+        unsatisfiedY: maxY > y,
+      }
+    }
+
     public _addComponentToGroup(c: Component, prepend = false): ComponentGroup {
       if (prepend) {
         this.components.unshift(c);
