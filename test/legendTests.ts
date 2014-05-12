@@ -59,6 +59,7 @@ describe("Legends", () => {
 
   it("a legend with a long label does not overflow horizontally", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
+    svg.attr("width", 100);
     legend.renderTo(svg);
     var text = legend.content.select("text").text();
     assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
