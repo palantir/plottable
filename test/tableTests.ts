@@ -155,17 +155,24 @@ describe("Tables", () => {
 
   it("table with fixed-size objects on every side lays out properly", () => {
     var svg = generateSVG();
-    var tableAndcomponents = generateBasicTable(3,3);
-    var table = tableAndcomponents.table;
-    var components = tableAndcomponents.components;
+    var c4 = new Plottable.Component();
+    var c1 = new Plottable.Component();
+    var c7 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+    var c5 = new Plottable.Component();
+    var table = new Plottable.Table([[null, c1, null],
+                                     [c3  , c4, c5  ],
+                                     [null, c7, null]]);
     // [0 1 2] \\
     // [3 4 5] \\
     // [6 7 8] \\
     // give the axis-like objects a minimum
-    makeComponentFixedSize(components[1], 0, 30);
-    makeComponentFixedSize(components[7], 0, 30);
-    makeComponentFixedSize(components[3], 50, 0);
-    makeComponentFixedSize(components[5], 50, 0);
+    makeComponentFixedSize(c1, 0, 30);
+    makeComponentFixedSize(c7, 0, 30);
+    makeComponentFixedSize(c3, 50, 0);
+    makeComponentFixedSize(c5, 50, 0);
+
+    var components = [c1, c3, c4, c5, c7];
 
     table.renderTo(svg);
 
@@ -173,17 +180,17 @@ describe("Tables", () => {
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.getBBox(e));
     // test the translates
-    assert.deepEqual(translates[1], [50, 0]  , "top axis translate");
-    assert.deepEqual(translates[7], [50, 370], "bottom axis translate");
-    assert.deepEqual(translates[3], [0, 30]  , "left axis translate");
-    assert.deepEqual(translates[5], [350, 30], "right axis translate");
-    assert.deepEqual(translates[4], [50, 30] , "plot translate");
+    assert.deepEqual(translates[0], [50, 0]  , "top axis translate");
+    assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
+    assert.deepEqual(translates[1], [0, 30]  , "left axis translate");
+    assert.deepEqual(translates[3], [350, 30], "right axis translate");
+    assert.deepEqual(translates[2], [50, 30] , "plot translate");
     // test the bboxes
-    assertBBoxEquivalence(bboxes[1], [300, 30], "top axis bbox");
-    assertBBoxEquivalence(bboxes[7], [300, 30], "bottom axis bbox");
-    assertBBoxEquivalence(bboxes[3], [50, 340], "left axis bbox");
-    assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
-    assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
+    assertBBoxEquivalence(bboxes[0], [300, 30], "top axis bbox");
+    assertBBoxEquivalence(bboxes[4], [300, 30], "bottom axis bbox");
+    assertBBoxEquivalence(bboxes[1], [50, 340], "left axis bbox");
+    assertBBoxEquivalence(bboxes[3], [50, 340], "right axis bbox");
+    assertBBoxEquivalence(bboxes[2], [300, 340], "plot bbox");
     svg.remove();
   });
 
@@ -191,6 +198,7 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(3,3);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
+    components.forEach((c) => {c._fixedWidth = true; c._fixedHeight = true;});
     assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
     assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
     components[0]._fixedWidth = false;
