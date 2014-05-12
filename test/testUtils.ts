@@ -16,6 +16,24 @@ function getSVGParent(): D3.Selection {
   }
 }
 
+function fixedSizeRequestXY(fixedX: number, fixedY: number){
+  return function (x: number, y: number): Plottable.IXYPacket {
+    return {
+      x: Math.min(x, fixedX),
+      y: Math.min(y, fixedY),
+      unsatisfiedX: (x < fixedX),
+      unsatisfiedY: (y < fixedY)
+    };
+  };
+}
+
+function makeComponentFixedSize(c: Plottable.Component, fixedX: number, fixedY: number) {
+  c.requestedXY  = fixedSizeRequestXY(fixedX, fixedY);
+  c._fixedWidth  = fixedX > 0;
+  c._fixedHeight = fixedY > 0;
+  return c;
+}
+
 function getTranslate(element: D3.Selection) {
   return d3.transform(element.attr("transform")).translate;
 }

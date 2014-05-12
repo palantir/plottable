@@ -19,7 +19,6 @@ module Plottable {
     constructor(colorScale?: ColorScale) {
       super();
       this.classed("legend", true);
-      this.minimumWidth(120); // the default width
       this.scale(colorScale);
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
@@ -78,10 +77,9 @@ module Plottable {
 
     public _doRender(): Legend {
       super._doRender();
-      this.legendBox.attr("height", this.minimumHeight()).attr("width", this.minimumWidth()); //HACKHACK #223
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
-      var availableX = this.minimumWidth() - textHeight - Legend.MARGIN;
+      var availableX = this.availableX - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
 
       this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly

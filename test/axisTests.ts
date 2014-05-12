@@ -55,30 +55,30 @@ describe("Axes", () => {
     svg.remove();
   });
 
-  it("X Axis height can be changed", () => {
-    var svg = generateSVG(500, 100);
-    var xScale = new Plottable.LinearScale();
-    xScale.domain([0, 10]);
-    xScale.range([0, 500]);
-    var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
-    xAxis.renderTo(svg);
+  // it("X Axis height can be changed", () => {
+  //   var svg = generateSVG(500, 100);
+  //   var xScale = new Plottable.LinearScale();
+  //   xScale.domain([0, 10]);
+  //   xScale.range([0, 500]);
+  //   var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
+  //   xAxis.renderTo(svg);
 
-    var oldHeight = xAxis.minimumHeight();
-    var axisBBoxBefore = (<any> xAxis.element.node()).getBBox();
-    var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
-    assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
+  //   var oldHeight = xAxis.minimumHeight();
+  //   var axisBBoxBefore = (<any> xAxis.element.node()).getBBox();
+  //   var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
+  //   assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
 
-    var newHeight = 60;
-    xAxis.minimumHeight(newHeight);
-    xAxis.renderTo(svg);
-    var axisBBoxAfter = (<any> xAxis.element.node()).getBBox();
-    var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
-    assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
-    assert.equal( (baselineClientRectAfter.bottom - baselineClientRectBefore.bottom),
-                  (newHeight - oldHeight),
-                  "baseline has shifted down as a consequence" );
-    svg.remove();
-  });
+  //   var newHeight = 60;
+  //   xAxis.minimumHeight(newHeight);
+  //   xAxis.renderTo(svg);
+  //   var axisBBoxAfter = (<any> xAxis.element.node()).getBBox();
+  //   var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
+  //   assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
+  //   assert.equal( (baselineClientRectAfter.bottom - baselineClientRectBefore.bottom),
+  //                 (newHeight - oldHeight),
+  //                 "baseline has shifted down as a consequence" );
+  //   svg.remove();
+  // });
 
   it("YAxis positions tick labels correctly", () => {
     var svg = generateSVG(100, 500);
@@ -119,30 +119,30 @@ describe("Axes", () => {
     svg.remove();
   });
 
-  it("Y Axis width can be changed", () => {
-    var svg = generateSVG(100, 500);
-    var yScale = new Plottable.LinearScale();
-    yScale.domain([0, 10]);
-    yScale.range([500, 0]);
-    var yAxis = new Plottable.YAxis(yScale, "left");
-    yAxis.renderTo(svg);
+  // it("Y Axis width can be changed", () => {
+  //   var svg = generateSVG(100, 500);
+  //   var yScale = new Plottable.LinearScale();
+  //   yScale.domain([0, 10]);
+  //   yScale.range([500, 0]);
+  //   var yAxis = new Plottable.YAxis(yScale, "left");
+  //   yAxis.renderTo(svg);
 
-    var oldWidth = yAxis.minimumWidth();
-    var axisBBoxBefore = (<any> yAxis.element.node()).getBBox();
-    var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
-    assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
+  //   var oldWidth = yAxis.minimumWidth();
+  //   var axisBBoxBefore = (<any> yAxis.element.node()).getBBox();
+  //   var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
+  //   assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
 
-    var newWidth = 80;
-    yAxis.minimumWidth(newWidth);
-    yAxis.renderTo(svg);
-    var axisBBoxAfter = (<any> yAxis.element.node()).getBBox();
-    var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
-    assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
-    assert.equal( (baselineClientRectAfter.right - baselineClientRectBefore.right),
-                  (newWidth - oldWidth),
-                  "baseline has shifted over as a consequence" );
-    svg.remove();
-  });
+  //   var newWidth = 80;
+  //   yAxis.minimumWidth(newWidth);
+  //   yAxis.renderTo(svg);
+  //   var axisBBoxAfter = (<any> yAxis.element.node()).getBBox();
+  //   var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
+  //   assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
+  //   assert.equal( (baselineClientRectAfter.right - baselineClientRectBefore.right),
+  //                 (newWidth - oldWidth),
+  //                 "baseline has shifted over as a consequence" );
+  //   svg.remove();
+  // });
 
   it("generate relative date formatter", () => {
     var baseDate = new Date(2000, 0, 1);
@@ -192,67 +192,67 @@ describe("Axes", () => {
     svg.remove();
   });
 
-  it("XAxis wraps long tick label texts so they don't overlap", () => {
-    var svg = generateSVG(300, 60);
-    var ordinalScale = new Plottable.OrdinalScale();
-    ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
-    ordinalScale.range([0, 300]);
+  // it("XAxis wraps long tick label texts so they don't overlap", () => {
+  //   var svg = generateSVG(300, 60);
+  //   var ordinalScale = new Plottable.OrdinalScale();
+  //   ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
+  //   ordinalScale.range([0, 300]);
 
-    var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
-    xAxis.minimumHeight(60);
-    xAxis.renderTo(svg);
+  //   var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
+  //   xAxis.minimumHeight(60);
+  //   xAxis.renderTo(svg);
 
-    var tickTexts = svg.selectAll(".tick text");
-    assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
+  //   var tickTexts = svg.selectAll(".tick text");
+  //   assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
 
-    var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
-    var labelsOverlap = false;
-    clientRects.forEach((rect, i) => {
-      if (i > 0) {
-        if (rect.left < clientRects[i-1].left) {
-          labelsOverlap = true;
-        }
-      }
-    });
-    assert.isFalse(labelsOverlap, "labels don't overlap");
+  //   var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
+  //   var labelsOverlap = false;
+  //   clientRects.forEach((rect, i) => {
+  //     if (i > 0) {
+  //       if (rect.left < clientRects[i-1].left) {
+  //         labelsOverlap = true;
+  //       }
+  //     }
+  //   });
+  //   assert.isFalse(labelsOverlap, "labels don't overlap");
 
-    var allTopsEqual = clientRects.map((r) => r.top).every((t: number) => t === clientRects[0].top);
-    assert.isTrue(allTopsEqual, "tops of labels align");
+  //   var allTopsEqual = clientRects.map((r) => r.top).every((t: number) => t === clientRects[0].top);
+  //   assert.isTrue(allTopsEqual, "tops of labels align");
 
-    assert.isTrue(clientRects.every((rect) => rect.height < xAxis.minimumHeight() - xAxis.tickSize()),
-                  "all labels fit within the available space");
-    svg.remove();
-  });
+  //   assert.isTrue(clientRects.every((rect) => rect.height < xAxis.minimumHeight() - xAxis.tickSize()),
+  //                 "all labels fit within the available space");
+  //   svg.remove();
+  // });
 
-  it("Yaxis wraps long tick label texts so they don't overlap", () => {
-    var svg = generateSVG(100, 300);
-    var ordinalScale = new Plottable.OrdinalScale();
-    ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
-    ordinalScale.range([0, 300]);
+  // it("Yaxis wraps long tick label texts so they don't overlap", () => {
+  //   var svg = generateSVG(100, 300);
+  //   var ordinalScale = new Plottable.OrdinalScale();
+  //   ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
+  //   ordinalScale.range([0, 300]);
 
-    var yAxis = new Plottable.YAxis(ordinalScale, "left");
-    yAxis.minimumWidth(100);
-    yAxis.renderTo(svg);
+  //   var yAxis = new Plottable.YAxis(ordinalScale, "left");
+  //   yAxis.minimumWidth(100);
+  //   yAxis.renderTo(svg);
 
-    var tickTexts = svg.selectAll(".tick text");
-    assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
+  //   var tickTexts = svg.selectAll(".tick text");
+  //   assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
 
-    var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
-    var labelsOverlap = false;
-    clientRects.forEach((rect, i) => {
-      if (i > 0) {
-        if (rect.top < clientRects[i-1].bottom) {
-          labelsOverlap = true;
-        }
-      }
-    });
-    assert.isFalse(labelsOverlap, "labels don't overlap");
+  //   var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
+  //   var labelsOverlap = false;
+  //   clientRects.forEach((rect, i) => {
+  //     if (i > 0) {
+  //       if (rect.top < clientRects[i-1].bottom) {
+  //         labelsOverlap = true;
+  //       }
+  //     }
+  //   });
+  //   assert.isFalse(labelsOverlap, "labels don't overlap");
 
-    var allTopsEqual = clientRects.map((r) => r.right).every((t: number) => t === clientRects[0].right);
-    assert.isTrue(allTopsEqual, "right edges of labels align");
+  //   var allTopsEqual = clientRects.map((r) => r.right).every((t: number) => t === clientRects[0].right);
+  //   assert.isTrue(allTopsEqual, "right edges of labels align");
 
-    assert.isTrue(clientRects.every((rect) => rect.width < yAxis.minimumWidth() - yAxis.tickSize()),
-                  "all labels fit within the available space");
-    svg.remove();
-  });
+  //   assert.isTrue(clientRects.every((rect) => rect.width < yAxis.minimumWidth() - yAxis.tickSize()),
+  //                 "all labels fit within the available space");
+  //   svg.remove();
+  // });
 });

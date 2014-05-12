@@ -31,19 +31,17 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it("legend domain can be updated after initialization, and minimumHeight updates as well", () => {
-    legend._anchor(svg);
-    legend.scale(color);
-    assert.equal(legend.minimumHeight(), 0, "there is no minimumHeight while the domain is empty");
-    color.domain(["foo", "bar"]);
-    var height1 = legend.minimumHeight();
-    assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
-    color.domain(["foo", "bar", "baz"]);
-    assert.operator(legend.minimumHeight(), ">", height1, "adding to the domain increases the minimumHeight");
-    var numRows = legend.content.selectAll(".legend-row")[0].length;
-    assert.equal(numRows, 3, "there are 3 rows");
-    svg.remove();
-  });
+  // it("legend domain can be updated after initialization, and minimumHeight updates as well", () => {
+  //   legend._anchor(svg);
+  //   legend.scale(color);
+  //   assert.equal(legend.minimumHeight(), 0, "there is no minimumHeight while the domain is empty");
+  //   color.domain(["foo", "bar"]);
+  //   var height1 = legend.minimumHeight();
+  //   assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
+  //   color.domain(["foo", "bar", "baz"]);
+  //   assert.operator(legend.minimumHeight(), ">", height1, "adding to the domain increases the minimumHeight");
+  //   svg.remove();
+  // });
 
   it.skip("a legend with many labels does not overflow vertically", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
@@ -55,7 +53,7 @@ describe("Legends", () => {
       totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
     });
     assert.lengthOf(legends[0], 8, "there were 8 legends");
-    assert.operator(totalHeight, "<=", legend.minimumHeight(), "the legend did not overflow its requested space");
+    assert.operator(totalHeight, "<=", legend.availableY, "the legend did not overflow its space");
     svg.remove();
   });
 
@@ -95,11 +93,6 @@ describe("Legends", () => {
       assert.equal(fill, color.scale(d), "the fill was set properly");
     });
     assert.lengthOf(legend.content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
-    svg.remove();
-  });
-
-  it("minimumHeight can't be set on a legend", () => {
-    assert.throws(() => legend.minimumHeight(5), Error, "cannot be directly set");
     svg.remove();
   });
 });

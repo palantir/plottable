@@ -3,13 +3,7 @@
 module Plottable {
   export class Component extends PlottableObject {
     public requestedXY(availableX: number, availableY: number): IXYPacket {
-      var x = this.isFixedWidth() ? this.minimumWidth() : 0;
-      var y = this.isFixedHeight() ? this.minimumHeight() : 0;
-      var unsatisfiedX = x > availableX;
-      var unsatisfiedY = y > availableY;
-      x = Math.min(x, availableX);
-      y = Math.min(y, availableY);
-      return {x: x, y: y, unsatisfiedX: unsatisfiedX, unsatisfiedY: unsatisfiedY};
+      return {x: 0, y: 0, unsatisfiedX: false, unsatisfiedY: false};
     }
 
     public element: D3.Selection;
@@ -356,44 +350,6 @@ module Plottable {
           this.element.classed(cssClass, addClass);
         }
         return this;
-      }
-    }
-
-    /**
-     * Sets or retrieves the Component's minimum height.
-     *
-     * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
-     * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
-     */
-    public minimumHeight(): number;
-    public minimumHeight(newVal: number): Component;
-    public minimumHeight(newVal?: number): any {
-      if (newVal != null) {
-        this._fixedHeight = true;
-        this._minimumHeight = newVal;
-        console.log("Setting the minimumHeight programatically is being deprecated");
-        return this;
-      } else {
-        return this._minimumHeight;
-      }
-    }
-
-    /**
-     * Sets or retrieves the Component's minimum width.
-     *
-     * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
-     * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
-     */
-    public minimumWidth(): number;
-    public minimumWidth(newVal: number): Component;
-    public minimumWidth(newVal?: number): any {
-      if (newVal != null) {
-        this._fixedWidth = true;
-        this._minimumWidth = newVal;
-        console.log("Setting the minimumWidth programatically is being deprecated");
-        return this;
-      } else {
-        return this._minimumWidth;
       }
     }
 

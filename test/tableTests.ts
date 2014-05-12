@@ -2,7 +2,6 @@
 
 var assert = chai.assert;
 
-
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
@@ -89,14 +88,14 @@ describe("Tables", () => {
   });
 
 
-  it("tables with insufficient space throw Insufficient Space", () => {
-    var svg = generateSVG(200, 200);
-    var c = new Plottable.Component().minimumHeight(300).minimumWidth(300);
-    var t = new Plottable.Table().addComponent(0, 0, c);
-    t._anchor(svg);
-    assert.throws(() => t._computeLayout(), Error, "Insufficient Space");
-    svg.remove();
-  });
+  // it("tables with insufficient space throw Insufficient Space", () => {
+  //   var svg = generateSVG(200, 200);
+  //   var c = new Plottable.Component().minimumHeight(300).minimumWidth(300);
+  //   var t = new Plottable.Table().addComponent(0, 0, c);
+  //   t._anchor(svg);
+  //   assert.throws(() => t._computeLayout(), Error, "Insufficient Space");
+  //   svg.remove();
+  // });
 
   it("basic table with 2 rows 2 cols lays out properly", () => {
     var tableAndcomponents = generateBasicTable(2,2);
@@ -162,16 +161,11 @@ describe("Tables", () => {
     // [0 1 2] \\
     // [3 4 5] \\
     // [6 7 8] \\
-    // First, set everything to have no weight
-    components.forEach((r) => r.minimumWidth(0).minimumHeight(0));
     // give the axis-like objects a minimum
-    components[1].minimumHeight(30);
-    components[7].minimumHeight(30);
-    components[3].minimumWidth(50);
-    components[5].minimumWidth(50);
-    components[4]._fixedWidth = false;
-    components[4]._fixedHeight = false;
-    // finally the center 'plot' object has a weight
+    makeComponentFixedSize(components[1], 0, 30);
+    makeComponentFixedSize(components[7], 0, 30);
+    makeComponentFixedSize(components[3], 50, 0);
+    makeComponentFixedSize(components[5], 50, 0);
 
     table.renderTo(svg);
 
@@ -191,12 +185,6 @@ describe("Tables", () => {
     assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
     assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
     svg.remove();
-  });
-
-  it("you can't set minimumWidth or minimumHeight on tables directly", () => {
-    var table = new Plottable.Table();
-    assert.throws(() => table.minimumHeight(3), Error, "cannot be directly set");
-    assert.throws(() => table.minimumWidth(3), Error, "cannot be directly set");
   });
 
   it("table space fixity calculates properly", () => {

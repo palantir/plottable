@@ -136,7 +136,7 @@ describe("Component behavior", () => {
   });
 
   it("fixed-width component will align to the right spot", () => {
-    c.minimumHeight(100).minimumWidth(100);
+    makeComponentFixedSize(c, 100, 100);
     c._anchor(svg);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -151,47 +151,42 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
-      c.minimumHeight(100).minimumWidth(100);
-      c._anchor(svg);
-      c.xOffset(20).yOffset(20);
-      c._computeLayout();
-      assertComponentXY(c, 20, 20, "top-left component offsets correctly");
+it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
+    makeComponentFixedSize(c, 100, 100);
+    c._anchor(svg);
+    c.xOffset(20).yOffset(20);
+    c._computeLayout();
+    assertComponentXY(c, 20, 20, "top-left component offsets correctly");
 
-      c.xAlign("CENTER").yAlign("CENTER");
-      c._computeLayout();
-      assertComponentXY(c, 170, 120, "center component offsets correctly");
+    c.xAlign("CENTER").yAlign("CENTER");
+    c._computeLayout();
+    assertComponentXY(c, 170, 120, "center component offsets correctly");
 
-      c.xAlign("RIGHT").yAlign("BOTTOM");
-      c._computeLayout();
-      assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
+    c.xAlign("RIGHT").yAlign("BOTTOM");
+    c._computeLayout();
+    assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
 
-      c.xOffset(0).yOffset(0);
-      c._computeLayout();
-      assertComponentXY(c, 300, 200, "bottom-right component offset resets");
+    c.xOffset(0).yOffset(0);
+    c._computeLayout();
+    assertComponentXY(c, 300, 200, "bottom-right component offset resets");
 
-      c.xOffset(-20).yOffset(-30);
-      c._computeLayout();
-      assertComponentXY(c, 280, 170, "negative offsets work properly");
+    c.xOffset(-20).yOffset(-30);
+    c._computeLayout();
+    assertComponentXY(c, 280, 170, "negative offsets work properly");
 
-      svg.remove();
-    });
+    svg.remove();
+  });
 
   it("component defaults are as expected", () => {
-    assert.equal(c.minimumHeight(), 0, "minimumHeight defaults to 0");
-    assert.equal(c.minimumWidth(), 0, "minimumWidth defaults to 0");
+    var layout = c.requestedXY(1, 1);
+    assert.equal(layout.x, 0, "requested x defaults to 0");
+    assert.equal(layout.y, 0, "requested y defaults to 0");
+    assert.equal(layout.unsatisfiedX, false, "requestedXY().unsatisfiedX defaults to false");
+    assert.equal(layout.unsatisfiedY, false, "requestedXY().unsatisfiedY defaults to false");
     assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
     assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
     assert.equal((<any> c)._yOffset, 0, "yOffset defaults to 0");
-    svg.remove();
-  });
-
-  it("getters and setters work as expected", () => {
-    c.minimumHeight(12);
-    assert.equal(c.minimumHeight(), 12, "minimumHeight setter works");
-    c.minimumWidth(14);
-    assert.equal(c.minimumWidth(), 14, "minimumWidth setter works");
     svg.remove();
   });
 
