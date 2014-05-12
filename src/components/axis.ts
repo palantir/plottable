@@ -277,6 +277,7 @@ module Plottable {
       }
       super(scale, orientation, formatter);
       this._fixedWidth = false;
+      this._fixedHeight = true;
       this.tickLabelPosition("center");
     }
 
@@ -284,6 +285,15 @@ module Plottable {
       super._setup();
       this.axisElement.classed("x-axis", true);
       return this;
+    }
+
+    public requestedXY(x: number, y: number): IXYPacket {
+      return {
+        x: 0,
+        y: Math.min(y, Axis.X_HEIGHT),
+        unsatisfiedX: false,
+        unsatisfiedY: y < Axis.X_HEIGHT
+      }
     }
 
     /**
@@ -388,6 +398,7 @@ module Plottable {
       }
       super(scale, orientation, formatter);
       this._fixedHeight = false;
+      this._fixedWidth = true;
       this.tickLabelPosition("middle");
     }
 
@@ -395,6 +406,15 @@ module Plottable {
       super._setup();
       this.axisElement.classed("y-axis", true);
       return this;
+    }
+
+    public requestedXY(x: number, y: number): IXYPacket {
+      return {
+        x: Math.min(x, Axis.Y_WIDTH),
+        y: 0,
+        unsatisfiedX: x < Axis.Y_WIDTH,
+        unsatisfiedY: false
+      }
     }
 
     /**
