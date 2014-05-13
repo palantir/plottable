@@ -1,5 +1,6 @@
 declare module Plottable {
     module Utils {
+        function any(bools: boolean[]): boolean;
         /**
         * Checks if x is between a and b.
         */
@@ -29,11 +30,18 @@ declare module Plottable {
         */
         function getTextHeight(textElement: D3.Selection): number;
         /**
+        * Gets the width of a text element, as rendered.
+        *
+        * @param {D3.Selection} textElement
+        * @return {number} The width of the text element, in pixels.
+        */
+        function getTextWidth(textElement: D3.Selection, text: string): number;
+        /**
         * Converts a string into an array of strings, all of which fit in the available space.
         *
         * @returns {string[]} The input text broken into substrings that fit in the avialable space.
         */
-        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): string[];
+        function getWrappedText(text: string, availableX: number, availableY: number, textElement: D3.Selection, cutoffRatio?: number): string[];
         function getSVGPixelWidth(svg: D3.Selection): number;
         function accessorize(accessor: any): IAccessor;
         function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
@@ -62,6 +70,7 @@ declare module Plottable {
             public decrement(id: any): number;
             public get(id: any): number;
         }
+        function repeat(element: any, count: number): any[];
     }
 }
 declare module Plottable {
@@ -169,13 +178,14 @@ declare module Plottable {
 }
 declare module Plottable {
     class Component extends PlottableObject {
+        public requestedXY(availableX: number, availableY: number): IXYPacket;
         public element: D3.Selection;
         public content: D3.Selection;
         public backgroundContainer: D3.Selection;
         public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
-        public availableWidth: number;
-        public availableHeight: number;
+        public availableX: number;
+        public availableY: number;
         public xOrigin: number;
         public yOrigin: number;
         /**
@@ -198,8 +208,8 @@ declare module Plottable {
         *
         * @param {number} xOrigin
         * @param {number} yOrigin
-        * @param {number} availableWidth
-        * @param {number} availableHeight
+        * @param {number} availableX
+        * @param {number} availableY
         * @returns {Component} The calling Component.
         */
         /**
@@ -217,8 +227,8 @@ declare module Plottable {
         /**
         * Cause the Component to recompute layout and redraw. Useful if the window resized.
         *
-        * @param {number} [availableWidth]  - the width of the container element
-        * @param {number} [availableHeight] - the height of the container element
+        * @param {number} [availableX]  - the width of the container element
+        * @param {number} [availableY] - the height of the container element
         */
         public resize(width?: number, height?: number): Component;
         /**
@@ -266,22 +276,6 @@ declare module Plottable {
         public classed(cssClass: string): boolean;
         public classed(cssClass: string, addClass: boolean): Component;
         /**
-        * Sets or retrieves the Component's minimum height.
-        *
-        * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
-        * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
-        */
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Component;
-        /**
-        * Sets or retrieves the Component's minimum width.
-        *
-        * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
-        * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
-        */
-        public minimumWidth(): number;
-        public minimumWidth(newVal: number): Component;
-        /**
         * Checks if the Component has a fixed width or scales to fill available space.
         * Returns true by default on the base Component class.
         *
@@ -322,6 +316,7 @@ declare module Plottable {
         * @param {Component[]} [components] The Components in the ComponentGroup.
         */
         constructor(components?: Component[]);
+        public requestedXY(x: number, y: number): IXYPacket;
         public merge(c: Component): ComponentGroup;
         /**
         * If the given component exists in the ComponentGroup, removes it from the
@@ -359,6 +354,15 @@ declare module Plottable {
         * @param {Component} component The Component to be added.
         */
         public addComponent(row: number, col: number, component: Component): Table;
+        public iterateLayout(availableX: number, availableY: number): {
+            xProportionalSpace: number[];
+            yProportionalSpace: number[];
+            xAllocations: any[];
+            yAllocations: any[];
+            unsatisfiedX: boolean;
+            unsatisfiedY: boolean;
+        };
+        public requestedXY(availableX: number, availableY: number): IXYPacket;
         /**
         * Sets the row and column padding on the Table.
         *
@@ -385,10 +389,6 @@ declare module Plottable {
         * @returns {Table} The calling Table.
         */
         public colWeight(index: number, weight: number): Table;
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Table;
-        public minimumWidth(): number;
-        public minimumWidth(newVal: number): Table;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
     }
@@ -601,7 +601,7 @@ declare module Plottable {
         *
         * @constructor
         */
-        constructor();
+        constructor(scale?: D3.Scale.OrdinalScale);
         /**
         * Retrieves the current domain, or sets the Scale's domain to the specified values.
         *
@@ -748,6 +748,12 @@ declare module Plottable {
         * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
         */
         constructor(text?: string, orientation?: string);
+        public requestedXY(availableX: number, availableY: number): {
+            x: number;
+            y: number;
+            unsatisfiedX: boolean;
+            unsatisfiedY: boolean;
+        };
         /**
         * Sets the text on the Label.
         *
@@ -779,8 +785,13 @@ declare module Plottable {
         * @returns {Legend} The calling Legend.
         */
         public scale(scale: ColorScale): Legend;
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Legend;
+        public scale(): ColorScale;
+        public requestedXY(availableX: number, availableY: number): {
+            x: number;
+            y: number;
+            unsatisfiedX: boolean;
+            unsatisfiedY: boolean;
+        };
     }
 }
 declare module Plottable {
@@ -1150,6 +1161,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
+        public requestedXY(x: number, y: number): IXYPacket;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -1169,6 +1181,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
+        public requestedXY(x: number, y: number): IXYPacket;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -1244,5 +1257,11 @@ declare module Plottable {
     }
     interface IBroadcasterCallback {
         (broadcaster: Broadcaster, ...args: any[]): any;
+    }
+    interface IXYPacket {
+        x: number;
+        y: number;
+        unsatisfiedX: boolean;
+        unsatisfiedY: boolean;
     }
 }
