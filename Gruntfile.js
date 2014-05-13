@@ -144,14 +144,22 @@ module.exports = function(grunt) {
       }
     },
     gitcommit: {
-      task: {
+      version: {
         options: {
           message: "Release version <%= pkg.version %>"
         },
         files: {
           src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json"]
         }
-      }
+      },
+      built: {
+        options: {
+          message: "Update built files"
+        },
+        files: {
+          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js']
+        }
+    }
     }
   };
 
@@ -171,9 +179,9 @@ module.exports = function(grunt) {
                                   "ts:examples",
                                   "tslint",
                                   "clean:tscommand"]);
-  grunt.registerTask("release:patch", ["bump:patch", "commitjs"]);
-  grunt.registerTask("release:minor", ["bump:minor", "commitjs"]);
-  grunt.registerTask("release:major", ["bump:major", "commitjs"]);
+  grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
+  grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
+  grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
@@ -183,7 +191,7 @@ module.exports = function(grunt) {
                                   "sed:private_definitions",
                                   "sed:protected_definitions"]);
 
-  grunt.registerTask("commitjs", ["dist-compile", "gitcommit"]);
+  grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
