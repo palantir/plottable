@@ -55,18 +55,21 @@ module Plottable {
 
     public requestedXY(availableX: number, availableY: number) {
       var textHeight = this.measureTextHeight();
-      var domainLength = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(domainLength, Math.floor(availableY / textHeight));
-      var y = this.nRowsDrawn * textHeight;
+      var totalNumRows = this.colorScale.domain().length;
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(availableY / textHeight));
+
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Utils.getTextWidth(fakeText, d));
-      maxWidth = maxWidth === undefined ? 0 : maxWidth;
       fakeLegendEl.remove();
-      var x = Math.min(availableX, maxWidth + textHeight + Legend.MARGIN);
-      var unsatisfiedX = availableX < maxWidth + textHeight + Legend.MARGIN;
-      var unsatisfiedY = this.nRowsDrawn < domainLength;
-      return {x: x, y: y, unsatisfiedX: unsatisfiedX, unsatisfiedY: unsatisfiedY};
+      maxWidth = maxWidth === undefined ? 0 : maxWidth;
+      var desiredX = maxWidth + textHeight + Legend.MARGIN;
+      return {
+        x: Math.min(desiredX, availableX),
+        y: this.nRowsDrawn * textHeight,
+        unsatisfiedX: availableX < desiredX,
+        unsatisfiedY: this.nRowsDrawn < totalNumRows
+      };
     }
 
     private measureTextHeight(): number {
