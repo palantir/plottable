@@ -19,13 +19,16 @@
         var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
         var gridlines = new Plottable.Gridlines(xScale, yScale);
         var renderGroup = renderAreaD1.merge(gridlines);
-        var chart = new Plottable.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis);
+        var chart = new Plottable.Table([[yAxis, renderGroup],
+                                         [null,  xAxis]]);
         chart.renderTo("#gridlines-test");
       }
     </script>
   </head>
   <body>
-    <svg id="gridlines-test" width="480" height="320"></svg>
+    <div style="width:640; height:480">
+      <svg id="gridlines-test"></svg>
+    </div>
   </body>
 
 </html>
