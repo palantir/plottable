@@ -31,17 +31,20 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  // it("legend domain can be updated after initialization, and minimumHeight updates as well", () => {
-  //   legend._anchor(svg);
-  //   legend.scale(color);
-  //   assert.equal(legend.minimumHeight(), 0, "there is no minimumHeight while the domain is empty");
-  //   color.domain(["foo", "bar"]);
-  //   var height1 = legend.minimumHeight();
-  //   assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
-  //   color.domain(["foo", "bar", "baz"]);
-  //   assert.operator(legend.minimumHeight(), ">", height1, "adding to the domain increases the minimumHeight");
-  //   svg.remove();
-  // });
+  it("legend domain can be updated after initialization, and minimumHeight updates as well", () => {
+    legend.renderTo(svg);
+    legend.scale(color);
+    assert.equal(legend.requestedXY(200, 200).y, 0, "there is no requested y when domain is empty");
+    color.domain(["foo", "bar"]);
+    var height1 = legend.requestedXY(400, 400).y;
+    assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
+    color.domain(["foo", "bar", "baz"]);
+    assert.operator(legend.requestedXY(400, 400).y, ">", height1, "adding to the domain increases the minimumHeight");
+    legend.renderTo(svg);
+    var numRows = legend.content.selectAll(".legend-row")[0].length;
+    assert.equal(numRows, 3, "there are 3 rows");
+    svg.remove();
+  });
 
   it.skip("a legend with many labels does not overflow vertically", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
