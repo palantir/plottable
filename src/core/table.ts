@@ -7,7 +7,7 @@ module Plottable {
     row: number;
     col: number;
   }
-  interface LayoutIteration {
+  interface LayoutAllocation {
     xAllocations: number[];
     yAllocations: number[];
     unsatisfiedXArr: boolean[];
@@ -84,7 +84,7 @@ module Plottable {
 
     private determineAllocations(xAllocations: number[], yAllocations: number[],
       xProportionalSpace: number[], yProportionalSpace: number[]
-    ): LayoutIteration {
+    ): LayoutAllocation {
       var xRequested = Utils.repeat(0, this.nCols);
       var yRequested = Utils.repeat(0, this.nRows);
       var layoutUnsatisfiedX = Utils.repeat(false, this.nCols);
@@ -111,48 +111,74 @@ module Plottable {
               unsatisfiedYArr: layoutUnsatisfiedY}
     }
 
-    public iterateLayout(availableX: number, availableY: number) {
+
+    /**
+     * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
+     *
+     * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
+     * "variableSpace", which is being given to proportionally-growing components according to the weights on the table.
+     * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
+     * the free width is allocated to columns based on their colWeights. Then, in determineAllocations, every component is
+     * offered its column's width and may request some amount of it for rendering, which increases that column's guaranteed
+     * width. If there are some components that were not satisfied with the width they were offered, and there is free
+     * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
+     * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
+     * according to the colWeights.
+     * The guaranteed width will monotonically increase in the number of iterations. We also stop the iteration if we see
+     * that the freeWidth didn't change in the last run, since that implies that further iterations will not result in an
+     * improved layout.
+     * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
+     * circumstances this will happen or if it will happen at all.
+     *
+     */
+    private iterateLayout(availableX: number, availableY: number) {
       var cols = d3.transpose(this.rows);
+      var availableXAfterPadding = availableX - this.colPadding * (this.nCols - 1);
+      var availableYAfterPadding = availableY - this.rowPadding * (this.nRows - 1);
+
+
       var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
       var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c.isFixedWidth());
 
+      // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
+      // so that they will get some initial space allocated to work with
       var heuristicColWeights = colWeights.map((c) => c === 0 ? 0.5 : c);
       var heuristicRowWeights = rowWeights.map((c) => c === 0 ? 0.5 : c);
 
-      var xProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableX);
-      var yProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableY);
+      var xProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableXAfterPadding);
+      var yProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableYAfterPadding);
 
       var xAllocations = Utils.repeat(0, this.nCols);
       var yAllocations = Utils.repeat(0, this.nRows);
 
-      var freeX = availableX - d3.sum(xAllocations) - this.colPadding * (this.nCols - 1);
-      var freeY = availableY - d3.sum(yAllocations) - this.rowPadding * (this.nRows - 1);
+      var freeX = availableXAfterPadding;
+      var freeY = availableYAfterPadding;
+      var lastFreeX = 0;
+      var lastFreeY = 0;
       var unsatisfiedX = true;
       var unsatisfiedY = true;
       var id = (x: boolean) => x;
 
       var nIterations = 0;
-      while ((freeX > 1 && unsatisfiedX) || (freeY > 1 && unsatisfiedY)) {
+      while ((freeX > 1 && unsatisfiedX && freeX !== lastFreeX) || (freeY > 1 && unsatisfiedY && freeY !== lastFreeY)) {
         var layout = this.determineAllocations(xAllocations, yAllocations, xProportionalSpace, yProportionalSpace)
-        xAllocations = layout.xAllocations;
-        yAllocations = layout.yAllocations;
-        var unsatisfiedXArr = layout.unsatisfiedXArr;
-        var unsatisfiedYArr = layout.unsatisfiedYArr;
-        unsatisfiedX = unsatisfiedXArr.some(id);
-        unsatisfiedY = unsatisfiedYArr.some(id);
+        unsatisfiedX = layout.unsatisfiedXArr.some(id);
+        unsatisfiedY = layout.unsatisfiedYArr.some(id);
 
-        freeX = availableX - d3.sum(xAllocations) - this.colPadding * (this.nCols - 1);
-        freeY = availableY - d3.sum(yAllocations) - this.rowPadding * (this.nRows - 1);
+        lastFreeX = freeX;
+        lastFreeY = freeY;
+        freeX = availableXAfterPadding - d3.sum(layout.xAllocations);
+        freeY = availableYAfterPadding - d3.sum(layout.yAllocations);
         var xWeights: number[];
-        var yWeights: number[];
         if (unsatisfiedX) {
-          xWeights = unsatisfiedXArr.map((x) => x ? 1 : 0);
+          xWeights = layout.unsatisfiedXArr.map((x) => x ? 1 : 0);
         } else {
           xWeights = colWeights;
         }
 
+        var yWeights: number[];
         if (unsatisfiedY) {
-          yWeights = unsatisfiedYArr.map((x) => x ? 1 : 0);
+          yWeights = layout.unsatisfiedYArr.map((x) => x ? 1 : 0);
         } else {
           yWeights = rowWeights;
         }
@@ -161,17 +187,15 @@ module Plottable {
         yProportionalSpace = Table.calcProportionalSpace(yWeights, freeY);
         nIterations++;
 
-        if (nIterations > 10) {
-          debugger;
-          if (nIterations > 15) {
-            break;
-          }
+        if (nIterations > 5) {
+          console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances https://github.com/palantir/plottable/");
+          break;
         }
       }
       return {xProportionalSpace: xProportionalSpace,
               yProportionalSpace: yProportionalSpace,
-              xAllocations: xAllocations,
-              yAllocations: yAllocations,
+              xAllocations: layout.xAllocations,
+              yAllocations: layout.yAllocations,
               unsatisfiedX: unsatisfiedX,
               unsatisfiedY: unsatisfiedY};
     }
