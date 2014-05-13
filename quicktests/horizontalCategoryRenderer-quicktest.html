@@ -21,7 +21,6 @@
 
       var yScale = new Plottable.OrdinalScale().rangeType("bands");
       var yAxis = new Plottable.YAxis(yScale, "left", function(d) { return d; } );
-      yAxis.minimumWidth(60);
 
       var barRenderer = new Plottable.HorizontalBarRenderer(ds, xScale, yScale)
                               .project("x", "age", xScale)

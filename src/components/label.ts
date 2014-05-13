@@ -83,7 +83,6 @@ module Plottable {
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
       super._computeLayout(xOffset, yOffset, availableX, availableY);
-      this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
       // We need to undo translation on the original element, since that effects
       // alignment, but we are going to do that manually on the text element.
       this.textElement.attr("dy", 0); // Reset this so we maintain idempotence

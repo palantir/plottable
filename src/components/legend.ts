@@ -20,6 +20,8 @@ module Plottable {
       super();
       this.classed("legend", true);
       this.scale(colorScale);
+      this._fixedHeight = true;
+      this._fixedWidth = true;
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
     }

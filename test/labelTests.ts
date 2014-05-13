@@ -95,7 +95,8 @@ describe("Labels", () => {
   it("centered text in a table is positioned properly", () => {
     var svg = generateSVG(400, 400);
     var label = new Plottable.TitleLabel(".");
-    var t = new Plottable.Table().addComponent(0, 0, label);
+    var t = new Plottable.Table().addComponent(0, 0, label)
+                                 .addComponent(1, 0, new Plottable.Component());
     t.renderTo(svg);
     var textElement = svg.select("text");
     var textX = parseFloat(textElement.attr("x"));

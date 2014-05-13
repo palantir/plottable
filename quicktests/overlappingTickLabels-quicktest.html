@@ -20,7 +20,6 @@
       var ds = new Plottable.DataSource(data);
       var xScale = new Plottable.OrdinalScale().rangeType("bands");
       var xAxis = new Plottable.XAxis(xScale, "bottom", cuteFormatter);
-      xAxis.minimumHeight(60);
 
       var yScale = new Plottable.LinearScale();
       var yAxis = new Plottable.YAxis(yScale, "left");
@@ -41,7 +40,6 @@
 
       var yScale2 = new Plottable.OrdinalScale().rangeType("bands");
       var yAxis2 = new Plottable.YAxis(yScale2, "left");//, cuteFormatter);
-      yAxis2.minimumWidth(80);
 
       var horizBarRenderer = new Plottable.HorizontalBarRenderer(ds, xScale2, yScale2)
                               .project("x", "age", xScale2)
