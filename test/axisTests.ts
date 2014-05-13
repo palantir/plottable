@@ -8,15 +8,35 @@ describe("Axes", () => {
     var xScale = new Plottable.LinearScale();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
-    var formatter = function(d: number) { return String(d); };
-    var axis = new Plottable.XAxis(xScale, "bottom", formatter);
+    var axis = new Plottable.XAxis(xScale, "bottom");
     axis.renderTo(svg);
     var ticks = svg.selectAll(".tick");
     assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
 
     var tickTexts = ticks.select("text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
-    var generatedTicks = xScale.ticks().map(formatter);
+    var generatedTicks = xScale.ticks().map(axis.formatter());
     assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
+    svg.remove();
+  });
+
+  it("formatter can be changed", () => {
+    var svg = generateSVG(500, 100);
+    var xScale = new Plottable.LinearScale();
+    xScale.domain([0, 10]);
+    xScale.range([0, 500]);
+    var axis = new Plottable.XAxis(xScale, "bottom");
+    axis.renderTo(svg);
+
+    var tickTexts = svg.selectAll(".tick text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
+    var generatedTicks = xScale.ticks().map(axis.formatter());
+    assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
+
+    var blarghFormatter = (d: any) => "blargh";
+    axis.formatter(blarghFormatter);
+    tickTexts = svg.selectAll(".tick text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
+    generatedTicks = xScale.ticks().map(axis.formatter());
+    assert.deepEqual(tickTexts, generatedTicks, "Tick texts updated based on new formatter");
+
     svg.remove();
   });
 
