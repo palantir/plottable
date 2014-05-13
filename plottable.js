@@ -3480,12 +3480,16 @@ var Plottable;
                 var numberFormatter = d3.format(".3s");
                 formatter = function (d) {
                     if (typeof d === "number") {
+                        if (Math.abs(d) < 1) {
+                            return String(Math.round(1000 * d) / 1000);
+                        }
                         return numberFormatter(d);
                     }
                     return d;
                 };
             }
-            this.d3Axis.tickFormat(formatter);
+            this.formatFunction = formatter;
+            this.d3Axis.tickFormat(this.formatFunction);
             this._registerToBroadcaster(this._axisScale, function () {
                 return _this.rescale();
             });
@@ -3611,6 +3615,16 @@ var Plottable;
                 this.d3Axis.scale(newScale._d3Scale);
                 return this;
             }
+        };
+
+        Axis.prototype.formatter = function (formatFunction) {
+            if (formatFunction == null) {
+                return this.formatFunction;
+            }
+            this.formatFunction = formatFunction;
+            this.d3Axis.tickFormat(this.formatFunction);
+            this._render();
+            return this;
         };
 
         Axis.prototype.tickLabelPosition = function (position) {
