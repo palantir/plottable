@@ -19,7 +19,7 @@
 
       var ds = new Plottable.DataSource(data);
       var xScale = new Plottable.OrdinalScale().rangeType("bands");
-      var xAxis = new Plottable.XAxis(xScale, "bottom", cuteFormatter);
+      var xAxis = new Plottable.XAxis(xScale, "bottom", cuteFormatter).height(60);
 
       var yScale = new Plottable.LinearScale();
       var yAxis = new Plottable.YAxis(yScale, "left");
@@ -39,7 +39,7 @@
       var xAxis2 = new Plottable.XAxis(xScale2, "bottom");
 
       var yScale2 = new Plottable.OrdinalScale().rangeType("bands");
-      var yAxis2 = new Plottable.YAxis(yScale2, "left");//, cuteFormatter);
+      var yAxis2 = new Plottable.YAxis(yScale2, "left").width(80);//, cuteFormatter);
 
       var horizBarRenderer = new Plottable.HorizontalBarRenderer(ds, xScale2, yScale2)
                               .project("x", "age", xScale2)
