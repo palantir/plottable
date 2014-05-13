@@ -594,6 +594,16 @@ var Plottable;
                     xOrigin = 0;
                     yOrigin = 0;
 
+                    // Set width/height to 100% if not specified, to allow accurate size calculation
+                    // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
+                    // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
+                    if (this.rootSVG.attr("width") == null) {
+                        this.rootSVG.attr("width", "100%");
+                    }
+                    if (this.rootSVG.attr("height") == null) {
+                        this.rootSVG.attr("height", "100%");
+                    }
+
                     var elem = this.rootSVG.node();
                     availableWidth = Plottable.Utils.getElementWidth(elem);
                     availableHeight = Plottable.Utils.getElementHeight(elem);
