@@ -5,6 +5,7 @@ declare module Plottable {
         * Checks if x is between a and b.
         */
         function inRange(x: number, a: number, b: number): boolean;
+        function mPlus(alist: number[], blist: number[]): number[];
         /**
         * Gets the bounding box of an element.
         * @param {D3.Selection} element
@@ -41,7 +42,7 @@ declare module Plottable {
         *
         * @returns {string[]} The input text broken into substrings that fit in the avialable space.
         */
-        function getWrappedText(text: string, availableX: number, availableY: number, textElement: D3.Selection, cutoffRatio?: number): string[];
+        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): string[];
         function getSVGPixelWidth(svg: D3.Selection): number;
         function accessorize(accessor: any): IAccessor;
         function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
@@ -178,14 +179,13 @@ declare module Plottable {
 }
 declare module Plottable {
     class Component extends PlottableObject {
-        public requestedXY(availableX: number, availableY: number): IXYPacket;
         public element: D3.Selection;
         public content: D3.Selection;
         public backgroundContainer: D3.Selection;
         public foregroundContainer: D3.Selection;
         public clipPathEnabled: boolean;
-        public availableX: number;
-        public availableY: number;
+        public availableWidth: number;
+        public availableHeight: number;
         public xOrigin: number;
         public yOrigin: number;
         /**
@@ -208,8 +208,8 @@ declare module Plottable {
         *
         * @param {number} xOrigin
         * @param {number} yOrigin
-        * @param {number} availableX
-        * @param {number} availableY
+        * @param {number} availableWidth
+        * @param {number} availableHeight
         * @returns {Component} The calling Component.
         */
         /**
@@ -227,8 +227,8 @@ declare module Plottable {
         /**
         * Cause the Component to recompute layout and redraw. Useful if the window resized.
         *
-        * @param {number} [availableX]  - the width of the container element
-        * @param {number} [availableY] - the height of the container element
+        * @param {number} [availableWidth ]  - the width of the container element
+        * @param {number} [availableHeight] - the height of the container element
         */
         public resize(width?: number, height?: number): Component;
         /**
@@ -316,7 +316,6 @@ declare module Plottable {
         * @param {Component[]} [components] The Components in the ComponentGroup.
         */
         constructor(components?: Component[]);
-        public requestedXY(x: number, y: number): IXYPacket;
         public merge(c: Component): ComponentGroup;
         /**
         * If the given component exists in the ComponentGroup, removes it from the
@@ -354,15 +353,25 @@ declare module Plottable {
         * @param {Component} component The Component to be added.
         */
         public addComponent(row: number, col: number, component: Component): Table;
-        public iterateLayout(availableX: number, availableY: number): {
-            xProportionalSpace: number[];
-            yProportionalSpace: number[];
-            xAllocations: any[];
-            yAllocations: any[];
-            unsatisfiedX: boolean;
-            unsatisfiedY: boolean;
-        };
-        public requestedXY(availableX: number, availableY: number): IXYPacket;
+        /**
+        * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
+        *
+        * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
+        * "variableSpace", which is being given to proportionally-growing components according to the weights on the table.
+        * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
+        * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
+        * offered its column's width and may request some amount of it for rendering, which increases that column's guaranteed
+        * width. If there are some components that were not satisfied with the width they were offered, and there is free
+        * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
+        * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
+        * according to the colWeights.
+        * The guaranteed width will monotonically increase in the number of iterations. We also stop the iteration if we see
+        * that the freeWidth didn't change in the last run, since that implies that further iterations will not result in an
+        * improved layout.
+        * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
+        * circumstances this will happen or if it will happen at all.
+        *
+        */
         /**
         * Sets the row and column padding on the Table.
         *
@@ -748,11 +757,9 @@ declare module Plottable {
         * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
         */
         constructor(text?: string, orientation?: string);
-        public requestedXY(availableX: number, availableY: number): {
-            x: number;
-            y: number;
-            unsatisfiedX: boolean;
-            unsatisfiedY: boolean;
+            height: number;
+            wantsWidth: boolean;
+            wantsHeight: boolean;
         };
         /**
         * Sets the text on the Label.
@@ -786,17 +793,10 @@ declare module Plottable {
         */
         public scale(scale: ColorScale): Legend;
         public scale(): ColorScale;
-<<<<<<< HEAD
-        public requestedXY(availableX: number, availableY: number): {
-            x: number;
-            y: number;
-            unsatisfiedX: boolean;
-            unsatisfiedY: boolean;
+            height: number;
+            wantsWidth: boolean;
+            wantsHeight: boolean;
         };
-=======
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Legend;
->>>>>>> master
     }
 }
 declare module Plottable {
@@ -1113,8 +1113,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Axis extends Component {
-        static Y_WIDTH: number;
-        static X_HEIGHT: number;
         public axisElement: D3.Selection;
         /**
         * Creates an Axis.
@@ -1166,7 +1164,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
-        public requestedXY(x: number, y: number): IXYPacket;
+        public height(h: number): XAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -1186,7 +1184,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
-        public requestedXY(x: number, y: number): IXYPacket;
+        public width(w: number): YAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -1263,10 +1261,10 @@ declare module Plottable {
     interface IBroadcasterCallback {
         (broadcaster: Broadcaster, ...args: any[]): any;
     }
-    interface IXYPacket {
-        x: number;
-        y: number;
-        unsatisfiedX: boolean;
-        unsatisfiedY: boolean;
+    interface ISpaceRequest {
+        width: number;
+        height: number;
+        wantsWidth: boolean;
+        wantsHeight: boolean;
     }
 }

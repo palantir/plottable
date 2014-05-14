@@ -17,21 +17,21 @@ function getSVGParent() {
     }
 }
 
-function fixedSizeRequestXY(fixedX, fixedY) {
-    return function (x, y) {
+function fixedSizeRequestSpace(fixedWidth, fixedHeight) {
+    return function (offeredWidth, offeredHeight) {
         return {
-            x: Math.min(x, fixedX),
-            y: Math.min(y, fixedY),
-            unsatisfiedX: (x < fixedX),
-            unsatisfiedY: (y < fixedY)
+            width: Math.min(offeredWidth, fixedWidth),
+            height: Math.min(offeredHeight, fixedHeight),
+            wantsWidth: (offeredWidth < fixedWidth),
+            wantsHeight: (offeredHeight < fixedHeight)
         };
     };
 }
 
-function makeComponentFixedSize(c, fixedX, fixedY) {
-    c.requestedXY = fixedSizeRequestXY(fixedX, fixedY);
-    c._fixedWidth = fixedX > 0;
-    c._fixedHeight = fixedY > 0;
+function makeComponentFixedSize(c, fixedWidth, fixedHeight) {
+    c._requestedSpace = fixedSizeRequestSpace(fixedWidth, fixedHeight);
+    c._fixedWidth = fixedWidth > 0;
+    c._fixedHeight = fixedHeight > 0;
     return c;
 }
 
@@ -665,15 +665,15 @@ describe("Component behavior", function () {
     describe("computeLayout", function () {
         it("computeLayout defaults and updates intelligently", function () {
             c._anchor(svg)._computeLayout();
-            assert.equal(c.availableX, SVG_WIDTH, "computeLayout defaulted width to svg width");
-            assert.equal(c.availableY, SVG_HEIGHT, "computeLayout defaulted height to svg height");
+            assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
+            assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
 
             svg.attr("width", 2 * SVG_WIDTH).attr("height", 2 * SVG_HEIGHT);
             c._computeLayout();
-            assert.equal(c.availableX, 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
-            assert.equal(c.availableY, 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
+            assert.equal(c.availableWidth, 2 * SVG_WIDTH, "computeLayout updated width to new svg width");
+            assert.equal(c.availableHeight, 2 * SVG_HEIGHT, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
 
@@ -693,8 +693,8 @@ describe("Component behavior", function () {
 
             c._anchor(svg)._computeLayout();
 
-            assert.equal(c.availableX, 100, "computeLayout defaulted width to svg width");
-            assert.equal(c.availableY, 200, "computeLayout defaulted height to svg height");
+            assert.equal(c.availableWidth, 100, "computeLayout defaulted width to svg width");
+            assert.equal(c.availableHeight, 200, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
             assert.equal(c.yOrigin, 0, "yOrigin defaulted to 0");
 
@@ -702,8 +702,8 @@ describe("Component behavior", function () {
 
             c._computeLayout();
 
-            assert.equal(c.availableX, 50, "computeLayout updated width to new svg width");
-            assert.equal(c.availableY, 100, "computeLayout updated height to new svg height");
+            assert.equal(c.availableWidth, 50, "computeLayout updated width to new svg width");
+            assert.equal(c.availableHeight, 100, "computeLayout updated height to new svg height");
             assert.equal(c.xOrigin, 0, "xOrigin is still 0");
             assert.equal(c.yOrigin, 0, "yOrigin is still 0");
 
@@ -738,8 +738,8 @@ describe("Component behavior", function () {
             c._anchor(g)._computeLayout(xOff, yOff, width, height);
             var translate = getTranslate(c.element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-            assert.equal(c.availableX, width, "the width set properly");
-            assert.equal(c.availableY, height, "the height set propery");
+            assert.equal(c.availableWidth, width, "the width set properly");
+            assert.equal(c.availableHeight, height, "the height set propery");
             svg.remove();
         });
     });
@@ -801,11 +801,11 @@ describe("Component behavior", function () {
     });
 
     it("component defaults are as expected", function () {
-        var layout = c.requestedXY(1, 1);
-        assert.equal(layout.x, 0, "requested x defaults to 0");
-        assert.equal(layout.y, 0, "requested y defaults to 0");
-        assert.equal(layout.unsatisfiedX, false, "requestedXY().unsatisfiedX defaults to false");
-        assert.equal(layout.unsatisfiedY, false, "requestedXY().unsatisfiedY defaults to false");
+        var layout = c._requestedSpace(1, 1);
+        assert.equal(layout.width, 0, "requested width defaults to 0");
+        assert.equal(layout.height, 0, "requested height defaults to 0");
+        assert.equal(layout.wantsWidth, false, "_requestedSpace().wantsWidth  defaults to false");
+        assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
         assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
         assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
         assert.equal(c._xOffset, 0, "xOffset defaults to 0");
@@ -1057,8 +1057,8 @@ describe("Gridlines", function () {
 
         basicTable._anchor(svg);
         basicTable._computeLayout();
-        xScale.range([0, xAxis.availableX]); // manually set range since we don't have a renderer
-        yScale.range([yAxis.availableY, 0]);
+        xScale.range([0, xAxis.availableWidth]); // manually set range since we don't have a renderer
+        yScale.range([yAxis.availableHeight, 0]);
         basicTable._render();
 
         var xAxisTickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
@@ -1306,7 +1306,7 @@ describe("Labels", function () {
 
         var text = content.select("text");
         var bbox = Plottable.Utils.getBBox(text);
-        assert.equal(bbox.height, label.availableY, "text height === label.minimumHeight()");
+        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -1321,7 +1321,7 @@ describe("Labels", function () {
         label._render();
         var textBBox = Plottable.Utils.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.availableX, "text height === label.minimumWidth() (it's rotated)");
+        assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
         assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
         svg.remove();
     });
@@ -1336,7 +1336,7 @@ describe("Labels", function () {
         label._render();
         var textBBox = Plottable.Utils.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.availableX, "text height === label.minimumWidth() (it's rotated)");
+        assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
         assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
         svg.remove();
     });
@@ -1347,11 +1347,11 @@ describe("Labels", function () {
         label.renderTo(svg);
         var textEl = label.content.select("text");
         assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
-        assert.equal(label.availableY, 0, "rowMin is 0 for empty string");
+        assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
         label.setText("hello world");
         label.renderTo(svg);
         assert.equal(textEl.text(), "hello world", "the label text updated properly");
-        assert.operator(label.availableY, ">", 0, "rowMin is > 0 for non-empty string");
+        assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
 
@@ -1365,7 +1365,7 @@ describe("Labels", function () {
         label._computeLayout();
         label._render();
         var bbox = Plottable.Utils.getBBox(text);
-        assert.equal(bbox.height, label.availableY, "text height === label.minimumHeight()");
+        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
     });
@@ -1431,17 +1431,13 @@ describe("Legends", function () {
     it("legend domain can be updated after initialization, and minimumHeight updates as well", function () {
         legend.renderTo(svg);
         legend.scale(color);
-        assert.equal(legend.requestedXY(200, 200).y, 0, "there is no requested y when domain is empty");
+        assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
         color.domain(["foo", "bar"]);
-        var height1 = legend.requestedXY(400, 400).y;
+        var height1 = legend._requestedSpace(400, 400).height;
         assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
         color.domain(["foo", "bar", "baz"]);
-<<<<<<< HEAD
-        assert.operator(legend.requestedXY(400, 400).y, ">", height1, "adding to the domain increases the minimumHeight");
+        assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the minimumHeight");
         legend.renderTo(svg);
-=======
-        assert.operator(legend.minimumHeight(), ">", height1, "adding to the domain increases the minimumHeight");
->>>>>>> master
         var numRows = legend.content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 rows");
         svg.remove();
@@ -1457,7 +1453,7 @@ describe("Legends", function () {
             totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
         });
         assert.lengthOf(legends[0], 8, "there were 8 legends");
-        assert.operator(totalHeight, "<=", legend.availableY, "the legend did not overflow its space");
+        assert.operator(totalHeight, "<=", legend.availableHeight, "the legend did not overflow its space");
         svg.remove();
     });
 
