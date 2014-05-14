@@ -92,9 +92,9 @@ module Plottable {
 
       var isInsideBBox = (tickBox: ClientRect) => {
         return (boundingBox.left <= tickBox.left &&
-                boundingBox.top <= tickBox.top &&
-                tickBox.right <= boundingBox.left + this.availableWidth  &&
-                tickBox.bottom <= boundingBox.top + this.availableHeight);
+                boundingBox.top  <= tickBox.top  &&
+                tickBox.right  <= boundingBox.left + this.availableWidth &&
+                tickBox.bottom <= boundingBox.top  + this.availableHeight);
       };
 
       tickLabels.each(function (d: any){
@@ -291,9 +291,9 @@ module Plottable {
 
     public _requestedSpace(x: number, y: number): ISpaceRequest {
       return {
-        width: 0,
+        width : 0,
         height: Math.min(y, this._height),
-        wantsWidth: false,
+        wantsWidth : false,
         wantsHeight: y < this._height
       }
     }

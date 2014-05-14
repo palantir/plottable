@@ -81,19 +81,21 @@ module Plottable {
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
      * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
-     * "variableSpace", which is being given to proportionally-growing components according to the weights on the table.
+     * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
      * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
      * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
-     * offered its column's width and may request some amount of it for rendering, which increases that column's guaranteed
+     * offered its column's width and may request some amount of it, which increases that column's guaranteed
      * width. If there are some components that were not satisfied with the width they were offered, and there is free
      * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
      * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
      * according to the colWeights.
-     * The guaranteed width will monotonically increase in the number of iterations. We also stop the iteration if we see
-     * that the freeWidth didn't change in the last run, since that implies that further iterations will not result in an
-     * improved layout.
+     *
+     * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
+     * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
+     * is possible, so the algorithm will not continue iterating on that dimension's account.
+     *
      * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
-     * circumstances this will happen or if it will happen at all.
+     * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
      *
      */
     private iterateLayout(availableWidth : number, availableHeight: number) {
@@ -121,24 +123,23 @@ module Plottable {
       var lastFreeHeight = 0;
       var wantsWidth = true;
       var wantsHeight = true;
-      var id = (x: boolean) => x;
 
       var nIterations = 0;
-      while ((freeWidth  > 1 && wantsWidth && freeWidth  !== lastFreeWidth) || (freeHeight > 1 && wantsHeight && freeHeight !== lastFreeHeight)) {
-        var offeredHeights = Utils.mPlus(guaranteedHeights, rowProportionalSpace);
-        var offeredWidths  = Utils.mPlus(guaranteedWidths,  colProportionalSpace);
+      while ((freeWidth > 1 && wantsWidth && freeWidth  !== lastFreeWidth) || (freeHeight > 1 && wantsHeight && freeHeight !== lastFreeHeight)) {
+        var offeredHeights = Utils.addArrays(guaranteedHeights, rowProportionalSpace);
+        var offeredWidths  = Utils.addArrays(guaranteedWidths,  colProportionalSpace);
         var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
-        wantsWidth  = guarantees.wantsWidthArr .some(id);
-        wantsHeight = guarantees.wantsHeightArr.some(id);
+        wantsWidth  = Utils.any(guarantees.wantsWidthArr );
+        wantsHeight = Utils.any(guarantees.wantsHeightArr);
 
         lastFreeWidth  = freeWidth ;
         lastFreeHeight = freeHeight;
         freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
         freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
         var xWeights: number[];
-        if (wantsWidth) {
+        if (wantsWidth) { // If something wants width, divide free space between components that want more width
           xWeights = guarantees.wantsWidthArr.map((x) => x ? 1 : 0);
-        } else {
+        } else { // Otherwise, divide free space according to the weights
           xWeights = colWeights;
         }
 
@@ -167,26 +168,30 @@ module Plottable {
     }
 
     private determineGuarantees(offeredWidths: number[], offeredHeights: number[]): LayoutAllocation {
-      var colRequestedWidths  = Utils.repeat(0, this.nCols);
-      var rowRequestedHeights = Utils.repeat(0, this.nRows);
+      var requestedWidths  = Utils.repeat(0, this.nCols);
+      var requestedHeights = Utils.repeat(0, this.nRows);
       var layoutWantsWidth  = Utils.repeat(false, this.nCols);
       var layoutWantsHeight = Utils.repeat(false, this.nRows);
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
-          var _requestedSpace: ISpaceRequest = component != null
-                    ? component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex])
-                    : {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
-          if (_requestedSpace.width > offeredWidths[colIndex] || _requestedSpace.height > offeredHeights[rowIndex]) {
+          var spaceRequest: ISpaceRequest;
+          if (component != null) {
+            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+          } else {
+            spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+          }
+          if (spaceRequest.width > offeredWidths[colIndex] || spaceRequest.height > offeredHeights[rowIndex]) {
             throw new Error("Invariant Violation: Component cannot request more space than is offered");
           }
-          colRequestedWidths [colIndex] = Math.max(colRequestedWidths [colIndex], _requestedSpace.width );
-          rowRequestedHeights[rowIndex] = Math.max(rowRequestedHeights[rowIndex], _requestedSpace.height);
-          layoutWantsWidth [colIndex] = layoutWantsWidth [colIndex] || _requestedSpace.wantsWidth;
-          layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || _requestedSpace.wantsHeight;
+
+          requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], spaceRequest.width );
+          requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], spaceRequest.height);
+          layoutWantsWidth [colIndex] = layoutWantsWidth [colIndex] || spaceRequest.wantsWidth;
+          layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
         });
       });
-      return {guaranteedWidths : colRequestedWidths ,
-              guaranteedHeights: rowRequestedHeights,
+      return {guaranteedWidths : requestedWidths ,
+              guaranteedHeights: requestedHeights,
               wantsWidthArr : layoutWantsWidth,
               wantsHeightArr: layoutWantsHeight}
     }
@@ -205,8 +210,8 @@ module Plottable {
       var layout = this.iterateLayout(this.availableWidth , this.availableHeight);
 
       var sumPair = (p: number[]) => p[0] + p[1];
-      var rowHeights = d3.zip(layout.rowProportionalSpace, layout.guaranteedHeights).map(sumPair);
-      var colWidths  = d3.zip(layout.colProportionalSpace, layout.guaranteedWidths ).map(sumPair);
+      var rowHeights = Utils.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
+      var colWidths  = Utils.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
       var childYOffset = 0;
       this.rows.forEach((row: Component[], rowIndex: number) => {
         var childXOffset = 0;

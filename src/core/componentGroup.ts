@@ -79,12 +79,12 @@ module Plottable {
     }
 
     public _computeLayout(xOrigin?: number,
-                         yOrigin?: number,
-                  availableWidth ?: number,
-                 availableHeight?: number): ComponentGroup {
-      super._computeLayout(xOrigin, yOrigin, availableWidth , availableHeight);
+                          yOrigin?: number,
+                   availableWidth?: number,
+                  availableHeight?: number): ComponentGroup {
+      super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       this.components.forEach((c) => {
-        c._computeLayout(0, 0, this.availableWidth , this.availableHeight);
+        c._computeLayout(0, 0, this.availableWidth, this.availableHeight);
       });
       return this;
     }

@@ -63,7 +63,7 @@ module Plottable {
         yLines.enter().append("line");
         yLines.attr("x1", 0)
               .attr("y1", getScaledYValue)
-              .attr("x2", this.availableWidth )
+              .attr("x2", this.availableWidth)
               .attr("y2", getScaledYValue);
         yLines.exit().remove();
       }

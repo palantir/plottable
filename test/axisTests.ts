@@ -87,30 +87,30 @@ describe("Axes", () => {
     svg.remove();
   });
 
-  // it("X Axis height can be changed", () => {
-  //   var svg = generateSVG(500, 100);
-  //   var xScale = new Plottable.LinearScale();
-  //   xScale.domain([0, 10]);
-  //   xScale.range([0, 500]);
-  //   var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
-  //   xAxis.renderTo(svg);
+  it("X Axis height can be changed", () => {
+    var svg = generateSVG(500, 100);
+    var xScale = new Plottable.LinearScale();
+    xScale.domain([0, 10]);
+    xScale.range([0, 500]);
+    var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
+    xAxis.renderTo(svg);
 
-  //   var oldHeight = xAxis.minimumHeight();
-  //   var axisBBoxBefore = (<any> xAxis.element.node()).getBBox();
-  //   var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
-  //   assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
+    var oldHeight = xAxis._requestedSpace(500, 100).height;
+    var axisBBoxBefore = (<any> xAxis.element.node()).getBBox();
+    var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
+    assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
 
-  //   var newHeight = 60;
-  //   xAxis.minimumHeight(newHeight);
-  //   xAxis.renderTo(svg);
-  //   var axisBBoxAfter = (<any> xAxis.element.node()).getBBox();
-  //   var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
-  //   assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
-  //   assert.equal( (baselineClientRectAfter.bottom - baselineClientRectBefore.bottom),
-  //                 (newHeight - oldHeight),
-  //                 "baseline has shifted down as a consequence" );
-  //   svg.remove();
-  // });
+    var newHeight = 60;
+    xAxis.height(newHeight);
+    xAxis.renderTo(svg);
+    var axisBBoxAfter = (<any> xAxis.element.node()).getBBox();
+    var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
+    assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
+    assert.equal( (baselineClientRectAfter.bottom - baselineClientRectBefore.bottom),
+                  (newHeight - oldHeight),
+                  "baseline has shifted down as a consequence" );
+    svg.remove();
+  });
 
   it("YAxis positions tick labels correctly", () => {
     var svg = generateSVG(100, 500);
@@ -151,30 +151,30 @@ describe("Axes", () => {
     svg.remove();
   });
 
-  // it("Y Axis width can be changed", () => {
-  //   var svg = generateSVG(100, 500);
-  //   var yScale = new Plottable.LinearScale();
-  //   yScale.domain([0, 10]);
-  //   yScale.range([500, 0]);
-  //   var yAxis = new Plottable.YAxis(yScale, "left");
-  //   yAxis.renderTo(svg);
+  it("Y Axis width can be changed", () => {
+    var svg = generateSVG(100, 500);
+    var yScale = new Plottable.LinearScale();
+    yScale.domain([0, 10]);
+    yScale.range([500, 0]);
+    var yAxis = new Plottable.YAxis(yScale, "left");
+    yAxis.renderTo(svg);
 
-  //   var oldWidth = yAxis.minimumWidth();
-  //   var axisBBoxBefore = (<any> yAxis.element.node()).getBBox();
-  //   var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
-  //   assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
+    var oldWidth = yAxis._requestedSpace(100, 500).width;
+    var axisBBoxBefore = (<any> yAxis.element.node()).getBBox();
+    var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
+    assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
 
-  //   var newWidth = 80;
-  //   yAxis.minimumWidth(newWidth);
-  //   yAxis.renderTo(svg);
-  //   var axisBBoxAfter = (<any> yAxis.element.node()).getBBox();
-  //   var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
-  //   assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
-  //   assert.equal( (baselineClientRectAfter.right - baselineClientRectBefore.right),
-  //                 (newWidth - oldWidth),
-  //                 "baseline has shifted over as a consequence" );
-  //   svg.remove();
-  // });
+    var newWidth = 80;
+    yAxis.width(newWidth);
+    yAxis.renderTo(svg);
+    var axisBBoxAfter = (<any> yAxis.element.node()).getBBox();
+    var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
+    assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
+    assert.equal( (baselineClientRectAfter.right - baselineClientRectBefore.right),
+                  (newWidth - oldWidth),
+                  "baseline has shifted over as a consequence" );
+    svg.remove();
+  });
 
   it("generate relative date formatter", () => {
     var baseDate = new Date(2000, 0, 1);

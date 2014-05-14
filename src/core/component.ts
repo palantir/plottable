@@ -24,8 +24,8 @@ module Plottable {
 
     public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     public availableHeight: number;
-    public xOrigin   : number; // Origin of the coordinate space for the component. Passed down from parent
-    public yOrigin   : number;
+    public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
+    public yOrigin: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -118,7 +118,7 @@ module Plottable {
           yOrigin = 0;
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth   = Utils.getElementWidth(elem);
+          availableWidth  = Utils.getElementWidth(elem);
           availableHeight = Utils.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");

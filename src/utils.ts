@@ -13,7 +13,7 @@ module Plottable {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
     }
 
-    export function mPlus(alist: number[], blist: number[]): number[] {
+    export function addArrays(alist: number[], blist: number[]): number[] {
       return alist.map((_: number, i: number) => alist[i] + blist[i]);
     }
 

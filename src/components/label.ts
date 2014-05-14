@@ -82,9 +82,7 @@ module Plottable {
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
-      super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
-      // We need to undo translation on the original element, since that effects
-      // alignment, but we are going to do that manually on the text element.
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
       var bbox = Utils.getBBox(this.textElement);
       this.textElement.attr("dy", -bbox.y);

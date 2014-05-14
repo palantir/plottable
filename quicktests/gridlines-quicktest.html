@@ -15,11 +15,14 @@
 
         var yScale = new Plottable.LinearScale();
         var yAxis = new Plottable.YAxis(yScale, "left");
+        window.yAxis = yAxis;
+        yAxis.debug = true;
 
         var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
         var gridlines = new Plottable.Gridlines(xScale, yScale);
         var renderGroup = renderAreaD1.merge(gridlines);
         var chart = new Plottable.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis);
+        window.chart = chart;
         chart.renderTo("#gridlines-test");
       }
     </script>
