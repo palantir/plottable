@@ -209,4 +209,38 @@ describe("Tables", () => {
     assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
     assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
+
+  it("table._requestedSpace works properly", () => {
+    // [0 1]
+    // [2 3]
+    var c0 = new Plottable.Component();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+    makeComponentFixedSize(c1, 50, 50);
+    makeComponentFixedSize(c2, 20, 50);
+    makeComponentFixedSize(c3, 20, 20);
+
+    function verifySpaceRequest(sr: Plottable.SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
+      assert.equal(sr.width, w, "width requested is as expected #" + id);
+      assert.equal(sr.height, h, "height requested is as expected #" + id);
+      assert.equal(sr.wantsWidth, ww, "needs more width is as expected #" + id);
+      assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+    }
+
+    var table = new Plottable.Table([[c0, c1], [c2, c3]]);
+
+    var spaceRequest = table._requestedSpace(30, 30);
+    verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
+
+    spaceRequest = table._requestedSpace(50, 50);
+    verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
+
+    spaceRequest = table._requestedSpace(90, 90);
+    verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
+
+    spaceRequest = table._requestedSpace(200, 200);
+    verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
+
+  });
 });
