@@ -45,8 +45,8 @@ module Plottable {
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight? :number) {
       this._hasRendered = false;
-      super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
-      this.xScale.range([0, this.availableWidth ]);
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+      this.xScale.range([0, this.availableWidth]);
       this.yScale.range([this.availableHeight, 0]);
       return this;
     }

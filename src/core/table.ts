@@ -127,8 +127,8 @@ module Plottable {
         var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
         guaranteedWidths = guarantees.guaranteedWidths;
         guaranteedHeights = guarantees.guaranteedHeights;
-        var wantsWidth  = Utils.any(guarantees.wantsWidthArr );
-        var wantsHeight = Utils.any(guarantees.wantsHeightArr);
+        var wantsWidth  = guarantees.wantsWidthArr .some((x: boolean) => x);
+        var wantsHeight = guarantees.wantsHeightArr.some((x: boolean) => x);
 
         var lastFreeWidth  = freeWidth ;
         var lastFreeHeight = freeHeight;
@@ -160,11 +160,8 @@ module Plottable {
         }
 
         if (nIterations > 5) {
-          console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances https://github.com/palantir/plottable/");
-          debugger;
-          if (nIterations > 10) {
-            break;
-          }
+          console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances");
+          break;
         }
       }
       return {colProportionalSpace: colProportionalSpace,
@@ -198,10 +195,10 @@ module Plottable {
           layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
         });
       });
-      return {guaranteedWidths : requestedWidths ,
-              guaranteedHeights: requestedHeights,
-              wantsWidthArr : layoutWantsWidth,
-              wantsHeightArr: layoutWantsHeight}
+      return {guaranteedWidths : requestedWidths  ,
+              guaranteedHeights: requestedHeights ,
+              wantsWidthArr    : layoutWantsWidth ,
+              wantsHeightArr   : layoutWantsHeight};
     }
 
 

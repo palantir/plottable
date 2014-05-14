@@ -3,9 +3,6 @@
 module Plottable {
   export module Utils {
 
-    export function any(bools: boolean[]) {
-      return bools.some((x: boolean) => x);
-    }
     /**
      * Checks if x is between a and b.
      */
@@ -308,6 +305,11 @@ module Plottable {
       }
     }
 
+    /**
+     * Takes an element, repeats it `count` times, and returns that list of length `count`
+     * If it takes a function, it calls that function to generate the items of the array.
+     * This way if you want, for example, an array of unique empty lists, use repeat(() => [], count)
+     */
     export function repeat(element: any, count: number) {
       var out: any[] = [];
       for (var i = 0; i<count; i++) {

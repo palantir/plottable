@@ -99,7 +99,6 @@ module Plottable {
 
       tickLabels.each(function (d: any){
         if (!isInsideBBox(this.getBoundingClientRect())) {
-          debugger;
           d3.select(this).style("visibility", "hidden");
         }
       });
@@ -290,12 +289,12 @@ module Plottable {
       return this;
     }
 
-    public _requestedSpace(x: number, y: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       return {
         width : 0,
-        height: Math.min(y, this._height),
+        height: Math.min(offeredHeight, this._height),
         wantsWidth : false,
-        wantsHeight: y < this._height
+        wantsHeight: offeredHeight < this._height
       }
     }
 

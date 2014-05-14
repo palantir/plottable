@@ -23,9 +23,9 @@ module Plottable {
       return {
         width : Math.min(desiredWidth , offeredWidth ),
         height: Math.min(desiredHeight, offeredHeight),
-        wantsWidth : desiredWidth  > offeredWidth ,
-        wantsHeight: desiredHeight > offeredHeight,
-      }
+        wantsWidth : desiredWidth  > offeredWidth,
+        wantsHeight: desiredHeight > offeredHeight
+      };
     }
 
     public _addComponentToGroup(c: Component, prepend = false): ComponentGroup {
