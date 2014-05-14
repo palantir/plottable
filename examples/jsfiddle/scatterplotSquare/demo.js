@@ -11,7 +11,7 @@ function makeScatterplotSquare() {
                              .tickSize(50);
 
     function rAccessor() { return 5; }
-    var r  = new Plottable.SquareRenderer(dataset, xScale, yScale,
+    var r  = new Plottable.RectRenderer(dataset, xScale, yScale,
                                             null, null, rAccessor);
 
     var svg = d3.select("#scatterplot-square");

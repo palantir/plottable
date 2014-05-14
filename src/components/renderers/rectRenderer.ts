@@ -1,12 +1,9 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-  export class SquareRenderer extends XYRenderer {
-    private _rAccessor: any;
-    private static DEFAULT_R_ACCESSOR = 3;
-
+  export class RectRenderer extends XYRenderer {
     /**
-     * Creates a SquareRenderer.
+     * Creates a RectRenderer.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
@@ -15,8 +12,9 @@ module Plottable {
      */
     constructor(dataset: any, xScale: Scale, yScale: Scale) {
       super(dataset, xScale, yScale);
-      this.classed("square-renderer", true);
-      this.project("r", 3); // default
+      this.classed("rect-renderer", true);
+      this.project("width" , 3); // default
+      this.project("height", 3); // default
     }
 
     public _paint() {
@@ -24,9 +22,10 @@ module Plottable {
       var attrToProjector = this._generateAttrToProjector();
       var xF = attrToProjector["x"];
       var yF = attrToProjector["y"];
-      var rF = attrToProjector["r"];
-      attrToProjector["x"] = (d: any, i: number) => xF(d, i) - rF(d, i);
-      attrToProjector["y"] = (d: any, i: number) => yF(d, i) - rF(d, i);
+      var widthF = attrToProjector["width"];
+      var heightF = attrToProjector["height"];
+      attrToProjector["x"] = (d: any, i: number) => xF(d, i) -  widthF(d, i) / 2;
+      attrToProjector["y"] = (d: any, i: number) => yF(d, i) - heightF(d, i) / 2;
 
       this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this.dataSelection.enter().append("rect");
