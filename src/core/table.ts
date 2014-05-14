@@ -117,23 +117,21 @@ module Plottable {
       var guaranteedWidths  = Utils.repeat(0, this.nCols);
       var guaranteedHeights = Utils.repeat(0, this.nRows);
 
-      var freeWidth  = availableWidthAfterPadding ;
-      var freeHeight = availableHeightAfterPadding;
-      var lastFreeWidth  = 0;
-      var lastFreeHeight = 0;
-      var wantsWidth = true;
-      var wantsHeight = true;
+      var freeWidth : number;
+      var freeHeight: number;
 
       var nIterations = 0;
-      while ((freeWidth > 1 && wantsWidth && freeWidth  !== lastFreeWidth) || (freeHeight > 1 && wantsHeight && freeHeight !== lastFreeHeight)) {
+      while (true) {
         var offeredHeights = Utils.addArrays(guaranteedHeights, rowProportionalSpace);
         var offeredWidths  = Utils.addArrays(guaranteedWidths,  colProportionalSpace);
         var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
-        wantsWidth  = Utils.any(guarantees.wantsWidthArr );
-        wantsHeight = Utils.any(guarantees.wantsHeightArr);
+        guaranteedWidths = guarantees.guaranteedWidths;
+        guaranteedHeights = guarantees.guaranteedHeights;
+        var wantsWidth  = Utils.any(guarantees.wantsWidthArr );
+        var wantsHeight = Utils.any(guarantees.wantsHeightArr);
 
-        lastFreeWidth  = freeWidth ;
-        lastFreeHeight = freeHeight;
+        var lastFreeWidth  = freeWidth ;
+        var lastFreeHeight = freeHeight;
         freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
         freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
         var xWeights: number[];
@@ -154,9 +152,19 @@ module Plottable {
         rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
         nIterations++;
 
+        var canImproveWidthAllocation  = freeWidth  > 0 && wantsWidth  && freeWidth  !== lastFreeWidth;
+        var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
+
+        if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
+          break;
+        }
+
         if (nIterations > 5) {
           console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances https://github.com/palantir/plottable/");
-          break;
+          debugger;
+          if (nIterations > 10) {
+            break;
+          }
         }
       }
       return {colProportionalSpace: colProportionalSpace,
