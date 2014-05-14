@@ -157,13 +157,11 @@ function commitDashboard(dataManager, svg) {
   dashboardTable.padding(0, 10);
   dashboardTable.colWeight(1, 3);
   dashboardTable.colWeight(2, 0);
-  dashboardTable.renderTo(svg);
-  // var titleLabel = new Plottable.TitleLabel("Plottable Git Commit History").classed("major", true);
-  // var outerTable = new Plottable.Table([
-  //   [titleLabel],
-  //   [new Plottable.Component().minimumHeight(5)],
-  //   [dashboardTable]
-  //   ]).renderTo(svg);
+  var titleLabel = new Plottable.TitleLabel("Plottable Git Commit History").classed("major", true);
+  var outerTable = new Plottable.Table([
+    [titleLabel],
+    [dashboardTable]])
+    .renderTo(svg);
 
   function resetDomains() {
     timeScale.domain([startDate, endDate]).nice();
