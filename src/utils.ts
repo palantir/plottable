@@ -13,6 +13,10 @@ module Plottable {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
     }
 
+    export function mPlus(alist: number[], blist: number[]): number[] {
+      return alist.map((_: number, i: number) => alist[i] + blist[i]);
+    }
+
     /**
      * Gets the bounding box of an element.
      * @param {D3.Selection} element
