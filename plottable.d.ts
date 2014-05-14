@@ -829,9 +829,9 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class SquareRenderer extends XYRenderer {
+    class RectRenderer extends XYRenderer {
         /**
-        * Creates a SquareRenderer.
+        * Creates a RectRenderer.
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
