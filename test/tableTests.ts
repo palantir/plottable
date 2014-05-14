@@ -241,6 +241,34 @@ describe("Tables", () => {
 
     spaceRequest = table._requestedSpace(200, 200);
     verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
+  });
 
+  it("table.iterateLayout works properly", () => {
+    // This unit test would have caught #405
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+    var c4 = new Plottable.Component();
+    makeComponentFixedSize(c1, 50, 50);
+    makeComponentFixedSize(c4, 20, 10);
+    var table = new Plottable.Table([
+      [c1, c2],
+      [c3, c4]]);
+
+    function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
+      assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
+      assert.deepEqual(result.rowProportionalSpace, rPS, "rowProportionalSpace:" + id);
+      assert.deepEqual(result.guaranteedWidths, gW, "guaranteedWidths:" + id);
+      assert.deepEqual(result.guaranteedHeights, gH, "guaranteedHeights:" + id);
+      assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
+      assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
+    }
+
+    var result = (<any> table).iterateLayout(500, 500);
+    verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "1");
+
+    makeComponentFixedSize(c1, 490, 50);
+    result = (<any> table).iterateLayout(500, 500);
+    verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "2");
   });
 });
