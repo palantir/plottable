@@ -295,7 +295,7 @@ module Plottable {
         height: Math.min(offeredHeight, this._height),
         wantsWidth : false,
         wantsHeight: offeredHeight < this._height
-      }
+      };
     }
 
     /**
@@ -428,7 +428,7 @@ module Plottable {
         height: 0,
         wantsWidth : offeredWidth < this._width,
         wantsHeight: false
-      }
+      };
     }
 
     /**
