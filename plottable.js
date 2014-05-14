@@ -23,12 +23,12 @@ var Plottable;
         }
         Utils.inRange = inRange;
 
-        function mPlus(alist, blist) {
+        function addArrays(alist, blist) {
             return alist.map(function (_, i) {
                 return alist[i] + blist[i];
             });
         }
-        Utils.mPlus = mPlus;
+        Utils.addArrays = addArrays;
 
         /**
         * Gets the bounding box of an element.
@@ -1118,19 +1118,21 @@ var Plottable;
         * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
         *
         * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
-        * "variableSpace", which is being given to proportionally-growing components according to the weights on the table.
+        * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
         * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
         * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
-        * offered its column's width and may request some amount of it for rendering, which increases that column's guaranteed
+        * offered its column's width and may request some amount of it, which increases that column's guaranteed
         * width. If there are some components that were not satisfied with the width they were offered, and there is free
         * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
         * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
         * according to the colWeights.
-        * The guaranteed width will monotonically increase in the number of iterations. We also stop the iteration if we see
-        * that the freeWidth didn't change in the last run, since that implies that further iterations will not result in an
-        * improved layout.
+        *
+        * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
+        * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
+        * is possible, so the algorithm will not continue iterating on that dimension's account.
+        *
         * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
-        * circumstances this will happen or if it will happen at all.
+        * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
         *
         */
         Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
@@ -1160,26 +1162,21 @@ var Plottable;
             var guaranteedWidths = Plottable.Utils.repeat(0, this.nCols);
             var guaranteedHeights = Plottable.Utils.repeat(0, this.nRows);
 
-            var freeWidth = availableWidthAfterPadding;
-            var freeHeight = availableHeightAfterPadding;
-            var lastFreeWidth = 0;
-            var lastFreeHeight = 0;
-            var wantsWidth = true;
-            var wantsHeight = true;
-            var id = function (x) {
-                return x;
-            };
+            var freeWidth;
+            var freeHeight;
 
             var nIterations = 0;
-            while ((freeWidth > 1 && wantsWidth && freeWidth !== lastFreeWidth) || (freeHeight > 1 && wantsHeight && freeHeight !== lastFreeHeight)) {
-                var offeredHeights = Plottable.Utils.mPlus(guaranteedHeights, rowProportionalSpace);
-                var offeredWidths = Plottable.Utils.mPlus(guaranteedWidths, colProportionalSpace);
+            while (true) {
+                var offeredHeights = Plottable.Utils.addArrays(guaranteedHeights, rowProportionalSpace);
+                var offeredWidths = Plottable.Utils.addArrays(guaranteedWidths, colProportionalSpace);
                 var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
-                wantsWidth = guarantees.wantsWidthArr.some(id);
-                wantsHeight = guarantees.wantsHeightArr.some(id);
+                guaranteedWidths = guarantees.guaranteedWidths;
+                guaranteedHeights = guarantees.guaranteedHeights;
+                var wantsWidth = Plottable.Utils.any(guarantees.wantsWidthArr);
+                var wantsHeight = Plottable.Utils.any(guarantees.wantsHeightArr);
 
-                lastFreeWidth = freeWidth;
-                lastFreeHeight = freeHeight;
+                var lastFreeWidth = freeWidth;
+                var lastFreeHeight = freeHeight;
                 freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
                 freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
                 var xWeights;
@@ -1204,9 +1201,19 @@ var Plottable;
                 rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
                 nIterations++;
 
+                var canImproveWidthAllocation = freeWidth > 0 && wantsWidth && freeWidth !== lastFreeWidth;
+                var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
+
+                if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
+                    break;
+                }
+
                 if (nIterations > 5) {
                     console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances https://github.com/palantir/plottable/");
-                    break;
+                    debugger;
+                    if (nIterations > 10) {
+                        break;
+                    }
                 }
             }
             return {
@@ -1219,25 +1226,31 @@ var Plottable;
         };
 
         Table.prototype.determineGuarantees = function (offeredWidths, offeredHeights) {
-            var colRequestedWidths = Plottable.Utils.repeat(0, this.nCols);
-            var rowRequestedHeights = Plottable.Utils.repeat(0, this.nRows);
+            var requestedWidths = Plottable.Utils.repeat(0, this.nCols);
+            var requestedHeights = Plottable.Utils.repeat(0, this.nRows);
             var layoutWantsWidth = Plottable.Utils.repeat(false, this.nCols);
             var layoutWantsHeight = Plottable.Utils.repeat(false, this.nRows);
             this.rows.forEach(function (row, rowIndex) {
                 row.forEach(function (component, colIndex) {
-                    var _requestedSpace = component != null ? component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]) : { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
-                    if (_requestedSpace.width > offeredWidths[colIndex] || _requestedSpace.height > offeredHeights[rowIndex]) {
+                    var spaceRequest;
+                    if (component != null) {
+                        spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+                    } else {
+                        spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+                    }
+                    if (spaceRequest.width > offeredWidths[colIndex] || spaceRequest.height > offeredHeights[rowIndex]) {
                         throw new Error("Invariant Violation: Component cannot request more space than is offered");
                     }
-                    colRequestedWidths[colIndex] = Math.max(colRequestedWidths[colIndex], _requestedSpace.width);
-                    rowRequestedHeights[rowIndex] = Math.max(rowRequestedHeights[rowIndex], _requestedSpace.height);
-                    layoutWantsWidth[colIndex] = layoutWantsWidth[colIndex] || _requestedSpace.wantsWidth;
-                    layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || _requestedSpace.wantsHeight;
+
+                    requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], spaceRequest.width);
+                    requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], spaceRequest.height);
+                    layoutWantsWidth[colIndex] = layoutWantsWidth[colIndex] || spaceRequest.wantsWidth;
+                    layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
                 });
             });
             return {
-                guaranteedWidths: colRequestedWidths,
-                guaranteedHeights: rowRequestedHeights,
+                guaranteedWidths: requestedWidths,
+                guaranteedHeights: requestedHeights,
                 wantsWidthArr: layoutWantsWidth,
                 wantsHeightArr: layoutWantsHeight };
         };
@@ -1259,8 +1272,8 @@ var Plottable;
             var sumPair = function (p) {
                 return p[0] + p[1];
             };
-            var rowHeights = d3.zip(layout.rowProportionalSpace, layout.guaranteedHeights).map(sumPair);
-            var colWidths = d3.zip(layout.colProportionalSpace, layout.guaranteedWidths).map(sumPair);
+            var rowHeights = Plottable.Utils.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
+            var colWidths = Plottable.Utils.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
             var childYOffset = 0;
             this.rows.forEach(function (row, rowIndex) {
                 var childXOffset = 0;
@@ -2314,9 +2327,6 @@ var Plottable;
 
         Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
             _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-
-            // We need to undo translation on the original element, since that effects
-            // alignment, but we are going to do that manually on the text element.
             this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
             var bbox = Plottable.Utils.getBBox(this.textElement);
             this.textElement.attr("dy", -bbox.y);
@@ -3716,6 +3726,7 @@ var Plottable;
 
             tickLabels.each(function (d) {
                 if (!isInsideBBox(this.getBoundingClientRect())) {
+                    debugger;
                     d3.select(this).style("visibility", "hidden");
                 }
             });
@@ -3926,7 +3937,7 @@ var Plottable;
             var _this = this;
             _super.prototype._doRender.call(this);
             if (this.orient() === "top") {
-                this.axisElement.attr("transform", "translate(0," + this.height + ")");
+                this.axisElement.attr("transform", "translate(0," + this._height + ")");
             }
             ;
 

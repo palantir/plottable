@@ -189,28 +189,29 @@ describe("Axes", function () {
         svg.remove();
     });
 
-    // it("X Axis height can be changed", () => {
-    //   var svg = generateSVG(500, 100);
-    //   var xScale = new Plottable.LinearScale();
-    //   xScale.domain([0, 10]);
-    //   xScale.range([0, 500]);
-    //   var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
-    //   xAxis.renderTo(svg);
-    //   var oldHeight = xAxis.minimumHeight();
-    //   var axisBBoxBefore = (<any> xAxis.element.node()).getBBox();
-    //   var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
-    //   assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
-    //   var newHeight = 60;
-    //   xAxis.minimumHeight(newHeight);
-    //   xAxis.renderTo(svg);
-    //   var axisBBoxAfter = (<any> xAxis.element.node()).getBBox();
-    //   var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
-    //   assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
-    //   assert.equal( (baselineClientRectAfter.bottom - baselineClientRectBefore.bottom),
-    //                 (newHeight - oldHeight),
-    //                 "baseline has shifted down as a consequence" );
-    //   svg.remove();
-    // });
+    it("X Axis height can be changed", function () {
+        var svg = generateSVG(500, 100);
+        var xScale = new Plottable.LinearScale();
+        xScale.domain([0, 10]);
+        xScale.range([0, 500]);
+        var xAxis = new Plottable.XAxis(xScale, "top");
+        xAxis.renderTo(svg);
+
+        var oldHeight = xAxis._requestedSpace(500, 100).height;
+        var axisBBoxBefore = xAxis.element.node().getBBox();
+        var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
+        assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
+
+        var newHeight = 60;
+        xAxis.height(newHeight);
+        xAxis.renderTo(svg);
+        var axisBBoxAfter = xAxis.element.node().getBBox();
+        var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
+        assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
+        assert.equal((baselineClientRectAfter.bottom - baselineClientRectBefore.bottom), (newHeight - oldHeight), "baseline has shifted down as a consequence");
+        svg.remove();
+    });
+
     it("YAxis positions tick labels correctly", function () {
         var svg = generateSVG(100, 500);
         var yScale = new Plottable.LinearScale();
@@ -248,28 +249,29 @@ describe("Axes", function () {
         svg.remove();
     });
 
-    // it("Y Axis width can be changed", () => {
-    //   var svg = generateSVG(100, 500);
-    //   var yScale = new Plottable.LinearScale();
-    //   yScale.domain([0, 10]);
-    //   yScale.range([500, 0]);
-    //   var yAxis = new Plottable.YAxis(yScale, "left");
-    //   yAxis.renderTo(svg);
-    //   var oldWidth = yAxis.minimumWidth();
-    //   var axisBBoxBefore = (<any> yAxis.element.node()).getBBox();
-    //   var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
-    //   assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
-    //   var newWidth = 80;
-    //   yAxis.minimumWidth(newWidth);
-    //   yAxis.renderTo(svg);
-    //   var axisBBoxAfter = (<any> yAxis.element.node()).getBBox();
-    //   var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
-    //   assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
-    //   assert.equal( (baselineClientRectAfter.right - baselineClientRectBefore.right),
-    //                 (newWidth - oldWidth),
-    //                 "baseline has shifted over as a consequence" );
-    //   svg.remove();
-    // });
+    it("Y Axis width can be changed", function () {
+        var svg = generateSVG(100, 500);
+        var yScale = new Plottable.LinearScale();
+        yScale.domain([0, 10]);
+        yScale.range([500, 0]);
+        var yAxis = new Plottable.YAxis(yScale, "left");
+        yAxis.renderTo(svg);
+
+        var oldWidth = yAxis._requestedSpace(100, 500).width;
+        var axisBBoxBefore = yAxis.element.node().getBBox();
+        var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
+        assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
+
+        var newWidth = 80;
+        yAxis.width(newWidth);
+        yAxis.renderTo(svg);
+        var axisBBoxAfter = yAxis.element.node().getBBox();
+        var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
+        assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
+        assert.equal((baselineClientRectAfter.right - baselineClientRectBefore.right), (newWidth - oldWidth), "baseline has shifted over as a consequence");
+        svg.remove();
+    });
+
     it("generate relative date formatter", function () {
         var baseDate = new Date(2000, 0, 1);
         var testDate = new Date(2001, 0, 1);
@@ -2694,6 +2696,39 @@ describe("Tables", function () {
         components[0]._fixedWidth = true;
         assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
         assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+    });
+
+    it("table._requestedSpace works properly", function () {
+        // [0 1]
+        // [2 3]
+        var c0 = new Plottable.Component();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        makeComponentFixedSize(c1, 50, 50);
+        makeComponentFixedSize(c2, 20, 50);
+        makeComponentFixedSize(c3, 20, 20);
+
+        function verifySpaceRequest(sr, w, h, ww, wh, id) {
+            assert.equal(sr.width, w, "width requested is as expected #" + id);
+            assert.equal(sr.height, h, "height requested is as expected #" + id);
+            assert.equal(sr.wantsWidth, ww, "needs more width is as expected #" + id);
+            assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+        }
+
+        var table = new Plottable.Table([[c0, c1], [c2, c3]]);
+
+        var spaceRequest = table._requestedSpace(30, 30);
+        verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
+
+        spaceRequest = table._requestedSpace(50, 50);
+        verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
+
+        spaceRequest = table._requestedSpace(90, 90);
+        verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
+
+        spaceRequest = table._requestedSpace(200, 200);
+        verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
     });
 });
 ///<reference path="testReference.ts" />

@@ -5,7 +5,7 @@ declare module Plottable {
         * Checks if x is between a and b.
         */
         function inRange(x: number, a: number, b: number): boolean;
-        function mPlus(alist: number[], blist: number[]): number[];
+        function addArrays(alist: number[], blist: number[]): number[];
         /**
         * Gets the bounding box of an element.
         * @param {D3.Selection} element
@@ -357,19 +357,21 @@ declare module Plottable {
         * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
         *
         * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
-        * "variableSpace", which is being given to proportionally-growing components according to the weights on the table.
+        * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
         * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
         * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
-        * offered its column's width and may request some amount of it for rendering, which increases that column's guaranteed
+        * offered its column's width and may request some amount of it, which increases that column's guaranteed
         * width. If there are some components that were not satisfied with the width they were offered, and there is free
         * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
         * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
         * according to the colWeights.
-        * The guaranteed width will monotonically increase in the number of iterations. We also stop the iteration if we see
-        * that the freeWidth didn't change in the last run, since that implies that further iterations will not result in an
-        * improved layout.
+        *
+        * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
+        * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
+        * is possible, so the algorithm will not continue iterating on that dimension's account.
+        *
         * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
-        * circumstances this will happen or if it will happen at all.
+        * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
         *
         */
         /**
