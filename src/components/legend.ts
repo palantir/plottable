@@ -19,14 +19,9 @@ module Plottable {
     constructor(colorScale?: ColorScale) {
       super();
       this.classed("legend", true);
-<<<<<<< HEAD
       this.scale(colorScale);
       this._fixedHeight = true;
       this._fixedWidth = true;
-=======
-      this.minimumWidth(120); // the default width
-      this.scale(colorScale);
->>>>>>> master
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
     }
@@ -53,19 +48,6 @@ module Plottable {
         this.colorScale = scale;
         this._registerToBroadcaster(this.colorScale, () => this._render());
         return this;
-<<<<<<< HEAD
-=======
-      } else {
-        return this.colorScale;
-      }
-    }
-
-    public minimumHeight(): number;
-    public minimumHeight(newVal: number): Legend;
-    public minimumHeight(newVal?: number): any {
-      if (newVal != null) {
-        throw new Error("Row minimum cannot be directly set on Legend");
->>>>>>> master
       } else {
         return this.colorScale;
       }

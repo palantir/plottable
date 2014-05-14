@@ -345,18 +345,6 @@ module Plottable {
           }
         }
 
-<<<<<<< HEAD
-        var scaleRange = this._axisScale.range();
-        var availableWidth  = this.availableWidth ;
-        var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
-        var availableHeight = this.availableHeight - tickLengthWithPadding;
-        if (tickTextLabels[0].length > 1) { // more than one label
-          var tickValues = tickTextLabels.data();
-          var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
-          tickPositions.forEach((p: number, i: number) => {
-            var spacing = Math.abs(tickPositions[i + 1] - p);
-            availableWidth  = (spacing < availableWidth ) ? spacing : availableWidth ;
-=======
         if ((<OrdinalScale> this._axisScale).rangeType != null) { // ordinal scale
           var scaleRange = this._axisScale.range();
           var availableWidth = this.availableWidth;
@@ -389,34 +377,10 @@ module Plottable {
                     .attr("dy", (line: string, i: number) => (i === 0) ? textEl.attr("dy") : "1em")
                     .style("text-anchor", textEl.style("text-anchor"));
             }
->>>>>>> master
           });
         } else { // numeric scale
           this._hideOverlappingTickLabels();
         }
-<<<<<<< HEAD
-
-        availableWidth  = 0.9 * availableWidth ; // add in some padding
-
-        tickTextLabels.each(function(t: any, i: number) {
-          var textEl = d3.select(this);
-          var currentText = textEl.text();
-          var wrappedLines = Utils.getWrappedText(currentText, availableWidth , availableHeight, textEl);
-          if (wrappedLines.length === 1) {
-            textEl.text(Utils.getTruncatedText(currentText, availableWidth , textEl));
-          } else {
-            textEl.text("");
-            var tspans = textEl.selectAll("tspan").data(wrappedLines);
-            tspans.enter().append("tspan");
-            tspans.text((line: string) => line)
-                  .attr("x", "0")
-                  // first line gets the original shift, each subsequent line is one line down
-                  .attr("dy", (line: string, i: number) => (i === 0) ? textEl.attr("dy") : "1em")
-                  .style("text-anchor", textEl.style("text-anchor"));
-          }
-        });
-=======
->>>>>>> master
       }
 
       if (!this.showEndTickLabels()) {
@@ -514,34 +478,6 @@ module Plottable {
           }
         }
 
-<<<<<<< HEAD
-        var scaleRange = this._axisScale.range();
-        var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
-        var availableWidth  = this.availableWidth  - tickLengthWithPadding;
-        var availableHeight = this.availableHeight;
-        if (tickTextLabels[0].length > 1) { // more than one label
-          var tickValues = tickTextLabels.data();
-          var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
-          tickPositions.forEach((p: number, i: number) => {
-            var spacing = Math.abs(tickPositions[i + 1] - p);
-            availableHeight = (spacing < availableHeight) ? spacing : availableHeight;
-          });
-        }
-
-        var tickLabelPosition = this.tickLabelPosition();
-        tickTextLabels.each(function(t: any, i: number) {
-          var textEl = d3.select(this);
-          var currentText = textEl.text();
-          var wrappedLines = Utils.getWrappedText(currentText, availableWidth , availableHeight, textEl);
-          if (wrappedLines.length === 1) {
-            textEl.text(Utils.getTruncatedText(currentText, availableWidth , textEl));
-          } else {
-            var baseY = 0; // measured in ems
-            if (tickLabelPosition === "top") {
-              baseY = -(wrappedLines.length - 1);
-            } else if (tickLabelPosition === "middle") {
-              baseY = -(wrappedLines.length - 1) / 2;
-=======
         if ((<OrdinalScale> this._axisScale).rangeType != null) { // ordinal scale
           var scaleRange = this._axisScale.range();
           var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
@@ -581,7 +517,6 @@ module Plottable {
                       "y": (line: string, i: number) => (baseY + i) + "em" // shift each line down one relative to the previous line
                     })
                     .style("text-anchor", textEl.style("text-anchor"));
->>>>>>> master
             }
           });
         } else {
