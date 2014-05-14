@@ -43,11 +43,11 @@ module Plottable {
       return this;
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY? :number) {
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight? :number) {
       this._hasRendered = false;
-      super._computeLayout(xOffset, yOffset, availableX, availableY);
-      this.xScale.range([0, this.availableX]);
-      this.yScale.range([this.availableY, 0]);
+      super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
+      this.xScale.range([0, this.availableWidth ]);
+      this.yScale.range([this.availableHeight, 0]);
       return this;
     }
 

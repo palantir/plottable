@@ -16,15 +16,15 @@ module Plottable {
       this.components = components;
     }
 
-    public requestedXY(x: number, y: number): IXYPacket {
-      var layouts = this.components.map((c: Component) => c.requestedXY(x, y));
-      var maxX = d3.max(layouts, (l: IXYPacket) => l.x);
-      var maxY = d3.max(layouts, (l: IXYPacket) => l.y);
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+      var requests = this.components.map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
+      var desiredWidth  = d3.max(requests, (l: ISpaceRequest) => l.width );
+      var desiredHeight = d3.max(requests, (l: ISpaceRequest) => l.height);
       return {
-        x: maxX,
-        y: maxY,
-        unsatisfiedX: maxX > x,
-        unsatisfiedY: maxY > y,
+        width : Math.min(desiredWidth , offeredWidth ),
+        height: Math.min(desiredHeight, offeredHeight),
+        wantsWidth : desiredWidth  > offeredWidth ,
+        wantsHeight: desiredHeight > offeredHeight,
       }
     }
 
@@ -80,11 +80,11 @@ module Plottable {
 
     public _computeLayout(xOrigin?: number,
                          yOrigin?: number,
-                  availableX?: number,
-                 availableY?: number): ComponentGroup {
-      super._computeLayout(xOrigin, yOrigin, availableX, availableY);
+                  availableWidth ?: number,
+                 availableHeight?: number): ComponentGroup {
+      super._computeLayout(xOrigin, yOrigin, availableWidth , availableHeight);
       this.components.forEach((c) => {
-        c._computeLayout(0, 0, this.availableX, this.availableY);
+        c._computeLayout(0, 0, this.availableWidth , this.availableHeight);
       });
       return this;
     }

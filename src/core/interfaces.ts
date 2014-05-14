@@ -33,10 +33,10 @@ module Plottable {
     (broadcaster: Broadcaster, ...args: any[]): any;
   }
 
-  export interface IXYPacket {
-    x: number;
-    y: number;
-    unsatisfiedX: boolean;
-    unsatisfiedY: boolean;
+  export interface ISpaceRequest {
+    width: number;
+    height: number;
+    wantsWidth: boolean;
+    wantsHeight: boolean;
   }
 }

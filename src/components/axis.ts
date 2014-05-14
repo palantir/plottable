@@ -84,8 +84,8 @@ module Plottable {
     }
 
     public _hideCutOffTickLabels() {
-      var availableX = this.availableX;
-      var availableY = this.availableY;
+      var availableWidth  = this.availableWidth ;
+      var availableHeight = this.availableHeight;
       var tickLabels = this.axisElement.selectAll(".tick").select("text");
 
       var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
@@ -93,8 +93,8 @@ module Plottable {
       var isInsideBBox = (tickBox: ClientRect) => {
         return (boundingBox.left <= tickBox.left &&
                 boundingBox.top <= tickBox.top &&
-                tickBox.right <= boundingBox.left + this.availableX &&
-                tickBox.bottom <= boundingBox.top + this.availableY);
+                tickBox.right <= boundingBox.left + this.availableWidth  &&
+                tickBox.bottom <= boundingBox.top + this.availableHeight);
       };
 
       tickLabels.each(function (d: any){
@@ -289,12 +289,12 @@ module Plottable {
       return this;
     }
 
-    public requestedXY(x: number, y: number): IXYPacket {
+    public _requestedSpace(x: number, y: number): ISpaceRequest {
       return {
-        x: 0,
-        y: Math.min(y, this._height),
-        unsatisfiedX: false,
-        unsatisfiedY: y < this._height
+        width: 0,
+        height: Math.min(y, this._height),
+        wantsWidth: false,
+        wantsHeight: y < this._height
       }
     }
 
@@ -346,26 +346,26 @@ module Plottable {
         }
 
         var scaleRange = this._axisScale.range();
-        var availableX = this.availableX;
+        var availableWidth  = this.availableWidth ;
         var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
-        var availableY = this.availableY - tickLengthWithPadding;
+        var availableHeight = this.availableHeight - tickLengthWithPadding;
         if (tickTextLabels[0].length > 1) { // more than one label
           var tickValues = tickTextLabels.data();
           var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
           tickPositions.forEach((p: number, i: number) => {
             var spacing = Math.abs(tickPositions[i + 1] - p);
-            availableX = (spacing < availableX) ? spacing : availableX;
+            availableWidth  = (spacing < availableWidth ) ? spacing : availableWidth ;
           });
         }
 
-        availableX = 0.9 * availableX; // add in some padding
+        availableWidth  = 0.9 * availableWidth ; // add in some padding
 
         tickTextLabels.each(function(t: any, i: number) {
           var textEl = d3.select(this);
           var currentText = textEl.text();
-          var wrappedLines = Utils.getWrappedText(currentText, availableX, availableY, textEl);
+          var wrappedLines = Utils.getWrappedText(currentText, availableWidth , availableHeight, textEl);
           if (wrappedLines.length === 1) {
-            textEl.text(Utils.getTruncatedText(currentText, availableX, textEl));
+            textEl.text(Utils.getTruncatedText(currentText, availableWidth , textEl));
           } else {
             textEl.text("");
             var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -418,12 +418,12 @@ module Plottable {
       return this;
     }
 
-    public requestedXY(x: number, y: number): IXYPacket {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       return {
-        x: Math.min(x, this._width),
-        y: 0,
-        unsatisfiedX: x < this._width,
-        unsatisfiedY: false
+        width : Math.min(offeredWidth, this._width),
+        height: 0,
+        wantsWidth : offeredWidth < this._width,
+        wantsHeight: false
       }
     }
 
@@ -476,14 +476,14 @@ module Plottable {
 
         var scaleRange = this._axisScale.range();
         var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
-        var availableX = this.availableX - tickLengthWithPadding;
-        var availableY = this.availableY;
+        var availableWidth  = this.availableWidth  - tickLengthWithPadding;
+        var availableHeight = this.availableHeight;
         if (tickTextLabels[0].length > 1) { // more than one label
           var tickValues = tickTextLabels.data();
           var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
           tickPositions.forEach((p: number, i: number) => {
             var spacing = Math.abs(tickPositions[i + 1] - p);
-            availableY = (spacing < availableY) ? spacing : availableY;
+            availableHeight = (spacing < availableHeight) ? spacing : availableHeight;
           });
         }
 
@@ -491,9 +491,9 @@ module Plottable {
         tickTextLabels.each(function(t: any, i: number) {
           var textEl = d3.select(this);
           var currentText = textEl.text();
-          var wrappedLines = Utils.getWrappedText(currentText, availableX, availableY, textEl);
+          var wrappedLines = Utils.getWrappedText(currentText, availableWidth , availableHeight, textEl);
           if (wrappedLines.length === 1) {
-            textEl.text(Utils.getTruncatedText(currentText, availableX, textEl));
+            textEl.text(Utils.getTruncatedText(currentText, availableWidth , textEl));
           } else {
             var baseY = 0; // measured in ems
             if (tickLabelPosition === "top") {

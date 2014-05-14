@@ -16,21 +16,21 @@ function getSVGParent(): D3.Selection {
   }
 }
 
-function fixedSizeRequestXY(fixedX: number, fixedY: number){
-  return function (x: number, y: number): Plottable.IXYPacket {
+function fixedSizeRequestSpace(fixedWidth: number, fixedHeight: number){
+  return function (offeredWidth: number, offeredHeight: number): Plottable.ISpaceRequest {
     return {
-      x: Math.min(x, fixedX),
-      y: Math.min(y, fixedY),
-      unsatisfiedX: (x < fixedX),
-      unsatisfiedY: (y < fixedY)
+      width : Math.min(offeredWidth , fixedWidth ),
+      height: Math.min(offeredHeight, fixedHeight),
+      wantsWidth : (offeredWidth  < fixedWidth   ),
+      wantsHeight: (offeredHeight < fixedHeight  )
     };
   };
 }
 
-function makeComponentFixedSize(c: Plottable.Component, fixedX: number, fixedY: number) {
-  c.requestedXY  = fixedSizeRequestXY(fixedX, fixedY);
-  c._fixedWidth  = fixedX > 0;
-  c._fixedHeight = fixedY > 0;
+function makeComponentFixedSize(c: Plottable.Component, fixedWidth: number, fixedHeight: number) {
+  c._requestedSpace  = fixedSizeRequestSpace(fixedWidth, fixedHeight);
+  c._fixedWidth  = fixedWidth > 0;
+  c._fixedHeight = fixedHeight > 0;
   return c;
 }
 

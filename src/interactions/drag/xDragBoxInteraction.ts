@@ -18,7 +18,7 @@ module Plottable {
     }
 
     public setBox(x0: number, x1: number) {
-      super.setBox(x0, x1, 0, this.componentToListenTo.availableY);
+      super.setBox(x0, x1, 0, this.componentToListenTo.availableHeight);
       return this;
     }
   }

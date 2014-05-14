@@ -30,21 +30,21 @@ module Plottable {
       this.xAlign("CENTER").yAlign("CENTER"); // the defaults
     }
 
-    public requestedXY(availableX: number, availableY: number) {
-      var idealX: number;
-      var idealY: number;
+    public _requestedSpace(offeredWidth: number, offeredHeight: number) {
+      var desiredWidth : number;
+      var desiredHeight: number;
       if (this.orientation === "horizontal") {
-        idealX = this.textLength;
-        idealY = this.textHeight;
+        desiredWidth  = this.textLength;
+        desiredHeight = this.textHeight;
       } else {
-        idealX = this.textHeight;
-        idealY = this.textLength;
+        desiredWidth  = this.textHeight;
+        desiredHeight = this.textLength;
       }
       return {
-        x: Math.min(idealX, availableX),
-        y: Math.min(idealY, availableY),
-        unsatisfiedX: idealX > availableX,
-        unsatisfiedY: idealY > availableY};
+        width : Math.min(desiredWidth , offeredWidth),
+        height: Math.min(desiredHeight, offeredHeight),
+        wantsWidth : desiredWidth  > offeredWidth,
+        wantsHeight: desiredHeight > offeredHeight};
     }
 
     public _setup() {
@@ -81,8 +81,8 @@ module Plottable {
       this.measureAndSetTextSize();
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
-      super._computeLayout(xOffset, yOffset, availableX, availableY);
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
       // We need to undo translation on the original element, since that effects
       // alignment, but we are going to do that manually on the text element.
       this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
@@ -93,11 +93,11 @@ module Plottable {
       var yShift = 0;
 
       if (this.orientation === "horizontal") {
-        this.truncateTextAndRemeasure(this.availableX);
-        xShift = (this.availableX  - this.textLength) * this._xAlignProportion;
+        this.truncateTextAndRemeasure(this.availableWidth );
+        xShift = (this.availableWidth   - this.textLength) * this._xAlignProportion;
       } else {
-        this.truncateTextAndRemeasure(this.availableY);
-        xShift = (this.availableY - this.textLength) * this._yAlignProportion;
+        this.truncateTextAndRemeasure(this.availableHeight);
+        xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
 
         if (this.orientation === "vertical-right") {
           this.textElement.attr("transform", "rotate(90)");

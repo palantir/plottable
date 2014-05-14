@@ -76,7 +76,7 @@ module Plottable {
       baselineSelection.attr({
         "x1": 0,
         "y1": scaledBaseline,
-        "x2": this.availableX,
+        "x2": this.availableWidth ,
         "y2": scaledBaseline
       });
     }

@@ -2,16 +2,11 @@
 
 module Plottable {
 
-  interface IComponentPosition {
-    component: Component;
-    row: number;
-    col: number;
-  }
   interface LayoutAllocation {
-    xAllocations: number[];
-    yAllocations: number[];
-    unsatisfiedXArr: boolean[];
-    unsatisfiedYArr: boolean[];
+    colGuaranteedWidths : number[];
+    rowGuaranteedHeights: number[];
+    wantsWidthArr : boolean[];
+    wantsHeightArr: boolean[];
   }
   export class Table extends Component {
     private rowPadding = 0;
@@ -82,33 +77,33 @@ module Plottable {
       return this;
     }
 
-    private determineAllocations(xAllocations: number[], yAllocations: number[],
+    private determineAllocations(colGuaranteedWidths : number[], rowGuaranteedHeights: number[],
       xProportionalSpace: number[], yProportionalSpace: number[]
     ): LayoutAllocation {
-      var xRequested = Utils.repeat(0, this.nCols);
-      var yRequested = Utils.repeat(0, this.nRows);
-      var layoutUnsatisfiedX = Utils.repeat(false, this.nCols);
-      var layoutUnsatisfiedY = Utils.repeat(false, this.nRows);
+      var colRequestedWidths  = Utils.repeat(0, this.nCols);
+      var rowRequestedHeights = Utils.repeat(0, this.nRows);
+      var layoutWantsWidth  = Utils.repeat(false, this.nCols);
+      var layoutWantsHeight = Utils.repeat(false, this.nRows);
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
-          var x = xAllocations[colIndex] + xProportionalSpace[colIndex];
-          var y = yAllocations[rowIndex] + yProportionalSpace[rowIndex];
-          var requestedXY: IXYPacket = component != null
-                    ? component.requestedXY(x, y)
-                    : {x: 0, y: 0, unsatisfiedX: false, unsatisfiedY: false};
-          if (requestedXY.x > x || requestedXY.y > y) {
+          var x = colGuaranteedWidths [colIndex] + xProportionalSpace[colIndex];
+          var y = rowGuaranteedHeights[rowIndex] + yProportionalSpace[rowIndex];
+          var _requestedSpace: ISpaceRequest = component != null
+                    ? component._requestedSpace(x, y)
+                    : {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+          if (_requestedSpace.width > x || _requestedSpace.height > y) {
             throw new Error("Invariant Violation: Component cannot request more space than is offered");
           }
-          xRequested[colIndex] = Math.max(xRequested[colIndex], requestedXY.x);
-          yRequested[rowIndex] = Math.max(yRequested[rowIndex], requestedXY.y);
-          layoutUnsatisfiedX[colIndex] = layoutUnsatisfiedX[colIndex] || requestedXY.unsatisfiedX;
-          layoutUnsatisfiedY[rowIndex] = layoutUnsatisfiedY[rowIndex] || requestedXY.unsatisfiedY;
+          colRequestedWidths [colIndex] = Math.max(colRequestedWidths [colIndex], _requestedSpace.width );
+          rowRequestedHeights[rowIndex] = Math.max(rowRequestedHeights[rowIndex], _requestedSpace.height);
+          layoutWantsWidth [colIndex] = layoutWantsWidth [colIndex] || _requestedSpace.wantsWidth;
+          layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || _requestedSpace.wantsHeight;
         });
       });
-      return {xAllocations: xRequested,
-              yAllocations: yRequested,
-              unsatisfiedXArr: layoutUnsatisfiedX,
-              unsatisfiedYArr: layoutUnsatisfiedY}
+      return {colGuaranteedWidths : colRequestedWidths ,
+              rowGuaranteedHeights: rowRequestedHeights,
+              wantsWidthArr : layoutWantsWidth,
+              wantsHeightArr: layoutWantsHeight}
     }
 
 
@@ -131,10 +126,10 @@ module Plottable {
      * circumstances this will happen or if it will happen at all.
      *
      */
-    private iterateLayout(availableX: number, availableY: number) {
+    private iterateLayout(availableWidth : number, availableHeight: number) {
       var cols = d3.transpose(this.rows);
-      var availableXAfterPadding = availableX - this.colPadding * (this.nCols - 1);
-      var availableYAfterPadding = availableY - this.rowPadding * (this.nRows - 1);
+      var availableWidthAfterPadding  = availableWidth  - this.colPadding * (this.nCols - 1);
+      var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
 
 
       var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
@@ -145,46 +140,46 @@ module Plottable {
       var heuristicColWeights = colWeights.map((c) => c === 0 ? 0.5 : c);
       var heuristicRowWeights = rowWeights.map((c) => c === 0 ? 0.5 : c);
 
-      var xProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableXAfterPadding);
-      var yProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableYAfterPadding);
+      var xProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding );
+      var yProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
 
-      var xAllocations = Utils.repeat(0, this.nCols);
-      var yAllocations = Utils.repeat(0, this.nRows);
+      var colGuaranteedWidths  = Utils.repeat(0, this.nCols);
+      var rowGuaranteedHeights = Utils.repeat(0, this.nRows);
 
-      var freeX = availableXAfterPadding;
-      var freeY = availableYAfterPadding;
-      var lastFreeX = 0;
-      var lastFreeY = 0;
-      var unsatisfiedX = true;
-      var unsatisfiedY = true;
+      var freeWidth  = availableWidthAfterPadding ;
+      var freeHeight = availableHeightAfterPadding;
+      var lastFreeWidth  = 0;
+      var lastFreeHeight = 0;
+      var wantsWidth = true;
+      var wantsHeight = true;
       var id = (x: boolean) => x;
 
       var nIterations = 0;
-      while ((freeX > 1 && unsatisfiedX && freeX !== lastFreeX) || (freeY > 1 && unsatisfiedY && freeY !== lastFreeY)) {
-        var layout = this.determineAllocations(xAllocations, yAllocations, xProportionalSpace, yProportionalSpace)
-        unsatisfiedX = layout.unsatisfiedXArr.some(id);
-        unsatisfiedY = layout.unsatisfiedYArr.some(id);
+      while ((freeWidth  > 1 && wantsWidth && freeWidth  !== lastFreeWidth) || (freeHeight > 1 && wantsHeight && freeHeight !== lastFreeHeight)) {
+        var layout = this.determineAllocations(colGuaranteedWidths , rowGuaranteedHeights, xProportionalSpace, yProportionalSpace)
+        wantsWidth  = layout.wantsWidthArr .some(id);
+        wantsHeight = layout.wantsHeightArr.some(id);
 
-        lastFreeX = freeX;
-        lastFreeY = freeY;
-        freeX = availableXAfterPadding - d3.sum(layout.xAllocations);
-        freeY = availableYAfterPadding - d3.sum(layout.yAllocations);
+        lastFreeWidth  = freeWidth ;
+        lastFreeHeight = freeHeight;
+        freeWidth  = availableWidthAfterPadding  - d3.sum(layout.colGuaranteedWidths );
+        freeHeight = availableHeightAfterPadding - d3.sum(layout.rowGuaranteedHeights);
         var xWeights: number[];
-        if (unsatisfiedX) {
-          xWeights = layout.unsatisfiedXArr.map((x) => x ? 1 : 0);
+        if (wantsWidth) {
+          xWeights = layout.wantsWidthArr.map((x) => x ? 1 : 0);
         } else {
           xWeights = colWeights;
         }
 
         var yWeights: number[];
-        if (unsatisfiedY) {
-          yWeights = layout.unsatisfiedYArr.map((x) => x ? 1 : 0);
+        if (wantsHeight) {
+          yWeights = layout.wantsHeightArr.map((x) => x ? 1 : 0);
         } else {
           yWeights = rowWeights;
         }
 
-        xProportionalSpace = Table.calcProportionalSpace(xWeights, freeX);
-        yProportionalSpace = Table.calcProportionalSpace(yWeights, freeY);
+        xProportionalSpace = Table.calcProportionalSpace(xWeights, freeWidth );
+        yProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
         nIterations++;
 
         if (nIterations > 5) {
@@ -194,27 +189,27 @@ module Plottable {
       }
       return {xProportionalSpace: xProportionalSpace,
               yProportionalSpace: yProportionalSpace,
-              xAllocations: layout.xAllocations,
-              yAllocations: layout.yAllocations,
-              unsatisfiedX: unsatisfiedX,
-              unsatisfiedY: unsatisfiedY};
+              colGuaranteedWidths : layout.colGuaranteedWidths ,
+              rowGuaranteedHeights: layout.rowGuaranteedHeights,
+              wantsWidth: wantsWidth,
+              wantsHeight: wantsHeight};
     }
 
-    public requestedXY(availableX: number, availableY: number): IXYPacket {
-      var layout = this.iterateLayout(availableX, availableY);
-      return {x: d3.sum(layout.xAllocations),
-              y: d3.sum(layout.yAllocations),
-              unsatisfiedX: layout.unsatisfiedX,
-              unsatisfiedY: layout.unsatisfiedY};
+    public _requestedSpace(offeredWidth : number, offeredHeight: number): ISpaceRequest {
+      var layout = this.iterateLayout(offeredWidth , offeredHeight);
+      return {width : d3.sum(layout.colGuaranteedWidths ),
+              height: d3.sum(layout.rowGuaranteedHeights),
+              wantsWidth: layout.wantsWidth,
+              wantsHeight: layout.wantsHeight};
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableX?: number, availableY?: number) {
-      super._computeLayout(xOffset, yOffset, availableX, availableY);
-      var layout = this.iterateLayout(this.availableX, this.availableY);
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
+      var layout = this.iterateLayout(this.availableWidth , this.availableHeight);
 
       var sumPair = (p: number[]) => p[0] + p[1];
-      var rowHeights = d3.zip(layout.yProportionalSpace, layout.yAllocations).map(sumPair);
-      var colWidths  = d3.zip(layout.xProportionalSpace, layout.xAllocations).map(sumPair);
+      var rowHeights = d3.zip(layout.yProportionalSpace, layout.rowGuaranteedHeights).map(sumPair);
+      var colWidths  = d3.zip(layout.xProportionalSpace, layout.colGuaranteedWidths ).map(sumPair);
       var childYOffset = 0;
       this.rows.forEach((row: Component[], rowIndex: number) => {
         var childXOffset = 0;

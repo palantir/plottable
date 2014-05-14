@@ -46,15 +46,15 @@ describe("Component behavior", () => {
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
       c._anchor(svg)._computeLayout();
-      assert.equal(c.availableX, SVG_WIDTH, "computeLayout defaulted width to svg width");
-      assert.equal(c.availableY, SVG_HEIGHT, "computeLayout defaulted height to svg height");
+      assert.equal(c.availableWidth , SVG_WIDTH, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
       svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
       c._computeLayout();
-      assert.equal(c.availableX, 2*SVG_WIDTH, "computeLayout updated width to new svg width");
-      assert.equal(c.availableY, 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
+      assert.equal(c.availableWidth , 2*SVG_WIDTH, "computeLayout updated width to new svg width");
+      assert.equal(c.availableHeight, 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
 
@@ -74,8 +74,8 @@ describe("Component behavior", () => {
 
       c._anchor(svg)._computeLayout();
 
-      assert.equal(c.availableX, 100, "computeLayout defaulted width to svg width");
-      assert.equal(c.availableY, 200, "computeLayout defaulted height to svg height");
+      assert.equal(c.availableWidth , 100, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableHeight, 200, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
@@ -83,8 +83,8 @@ describe("Component behavior", () => {
 
       c._computeLayout();
 
-      assert.equal(c.availableX, 50, "computeLayout updated width to new svg width");
-      assert.equal(c.availableY, 100, "computeLayout updated height to new svg height");
+      assert.equal(c.availableWidth , 50, "computeLayout updated width to new svg width");
+      assert.equal(c.availableHeight, 100, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
 
@@ -115,8 +115,8 @@ describe("Component behavior", () => {
       c._anchor(g)._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate(c.element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-      assert.equal(c.availableX, width, "the width set properly");
-      assert.equal(c.availableY, height, "the height set propery");
+      assert.equal(c.availableWidth , width, "the width set properly");
+      assert.equal(c.availableHeight, height, "the height set propery");
       svg.remove();
     });
   });
@@ -178,11 +178,11 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("component defaults are as expected", () => {
-    var layout = c.requestedXY(1, 1);
-    assert.equal(layout.x, 0, "requested x defaults to 0");
-    assert.equal(layout.y, 0, "requested y defaults to 0");
-    assert.equal(layout.unsatisfiedX, false, "requestedXY().unsatisfiedX defaults to false");
-    assert.equal(layout.unsatisfiedY, false, "requestedXY().unsatisfiedY defaults to false");
+    var layout = c._requestedSpace(1, 1);
+    assert.equal(layout.width, 0, "requested width defaults to 0");
+    assert.equal(layout.height, 0, "requested height defaults to 0");
+    assert.equal(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
+    assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
     assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
     assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");

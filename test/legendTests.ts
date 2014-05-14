@@ -34,12 +34,12 @@ describe("Legends", () => {
   it("legend domain can be updated after initialization, and minimumHeight updates as well", () => {
     legend.renderTo(svg);
     legend.scale(color);
-    assert.equal(legend.requestedXY(200, 200).y, 0, "there is no requested y when domain is empty");
+    assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
     color.domain(["foo", "bar"]);
-    var height1 = legend.requestedXY(400, 400).y;
+    var height1 = legend._requestedSpace(400, 400).height;
     assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
     color.domain(["foo", "bar", "baz"]);
-    assert.operator(legend.requestedXY(400, 400).y, ">", height1, "adding to the domain increases the minimumHeight");
+    assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the minimumHeight");
     legend.renderTo(svg);
     var numRows = legend.content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 rows");
@@ -56,7 +56,7 @@ describe("Legends", () => {
       totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
     });
     assert.lengthOf(legends[0], 8, "there were 8 legends");
-    assert.operator(totalHeight, "<=", legend.availableY, "the legend did not overflow its space");
+    assert.operator(totalHeight, "<=", legend.availableHeight, "the legend did not overflow its space");
     svg.remove();
   });
 

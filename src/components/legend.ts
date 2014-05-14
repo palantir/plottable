@@ -53,22 +53,22 @@ module Plottable {
       }
     }
 
-    public requestedXY(availableX: number, availableY: number) {
+    public _requestedSpace(offeredWidth: number, offeredY: number) {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(availableY / textHeight));
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Utils.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
-      var desiredX = maxWidth + textHeight + Legend.MARGIN;
+      var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
       return {
-        x: Math.min(desiredX, availableX),
-        y: this.nRowsDrawn * textHeight,
-        unsatisfiedX: availableX < desiredX,
-        unsatisfiedY: this.nRowsDrawn < totalNumRows
+        width : Math.min(desiredWidth, offeredWidth),
+        height: this.nRowsDrawn * textHeight,
+        wantsWidth: offeredWidth < desiredWidth,
+        wantsHeight: this.nRowsDrawn < totalNumRows
       };
     }
 
@@ -84,7 +84,7 @@ module Plottable {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
-      var availableX = this.availableX - textHeight - Legend.MARGIN;
+      var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
 
       this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
@@ -101,7 +101,7 @@ module Plottable {
           .attr("y", Legend.MARGIN + textHeight / 2);
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: any, i: number) {return Utils.getTruncatedText(d, availableX, d3.select(this));});
+            .text(function(d: any, i: number) {return Utils.getTruncatedText(d, availableWidth , d3.select(this));});
       return this;
     }
   }
