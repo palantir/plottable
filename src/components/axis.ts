@@ -37,8 +37,7 @@ module Plottable {
           return d;
         };
       }
-      this.formatFunction = formatter;
-      this.d3Axis.tickFormat(this.formatFunction);
+      this.formatter(formatter);
       this._registerToBroadcaster(this._axisScale, () => this.rescale());
     }
 
