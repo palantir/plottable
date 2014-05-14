@@ -786,12 +786,17 @@ declare module Plottable {
         */
         public scale(scale: ColorScale): Legend;
         public scale(): ColorScale;
+<<<<<<< HEAD
         public requestedXY(availableX: number, availableY: number): {
             x: number;
             y: number;
             unsatisfiedX: boolean;
             unsatisfiedY: boolean;
         };
+=======
+        public minimumHeight(): number;
+        public minimumHeight(newVal: number): Legend;
+>>>>>>> master
     }
 }
 declare module Plottable {
