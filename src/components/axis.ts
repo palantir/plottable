@@ -99,6 +99,7 @@ module Plottable {
 
       tickLabels.each(function (d: any){
         if (!isInsideBBox(this.getBoundingClientRect())) {
+          debugger;
           d3.select(this).style("visibility", "hidden");
         }
       });
@@ -324,7 +325,7 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this.height + ")");};
+      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this._height + ")");};
 
 
       var tickTextLabels = this.axisElement.selectAll("text");
