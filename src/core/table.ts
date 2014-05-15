@@ -164,12 +164,19 @@ module Plottable {
           break;
         }
       }
-      return {colProportionalSpace: colProportionalSpace,
-              rowProportionalSpace: rowProportionalSpace,
-              guaranteedWidths : guarantees.guaranteedWidths ,
-              guaranteedHeights: guarantees.guaranteedHeights,
-              wantsWidth : wantsWidth,
-              wantsHeight: wantsHeight};
+
+      // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
+      freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
+      freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+      colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth );
+      rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
+
+      return {colProportionalSpace: colProportionalSpace        ,
+              rowProportionalSpace: rowProportionalSpace        ,
+              guaranteedWidths    : guarantees.guaranteedWidths ,
+              guaranteedHeights   : guarantees.guaranteedHeights,
+              wantsWidth          : wantsWidth                  ,
+              wantsHeight         : wantsHeight                 };
     }
 
     private determineGuarantees(offeredWidths: number[], offeredHeights: number[]): LayoutAllocation {

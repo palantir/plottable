@@ -215,18 +215,8 @@ describe("Tables", () => {
     verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
   });
 
-  it("table.iterateLayout works properly", () => {
-    // This unit test would have caught #405
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
-    var c3 = new Plottable.Component();
-    var c4 = new Plottable.Component();
-    fixComponentSize(c1, 50, 50);
-    fixComponentSize(c4, 20, 10);
-    var table = new Plottable.Table([
-      [c1, c2],
-      [c3, c4]]);
-
+  describe("table.iterateLayout works properly", () => {
+    // This test battery would have caught #405
     function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
       assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
       assert.deepEqual(result.rowProportionalSpace, rPS, "rowProportionalSpace:" + id);
@@ -236,11 +226,57 @@ describe("Tables", () => {
       assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
     }
 
-    var result = (<any> table).iterateLayout(500, 500);
-    verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "1");
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+    var c4 = new Plottable.Component();
+    var table = new Plottable.Table([
+      [c1, c2],
+      [c3, c4]]);
 
-    fixComponentSize(c1, 490, 50);
-    result = (<any> table).iterateLayout(500, 500);
-    verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "2");
+    it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", () => {
+      fixComponentSize(c1, 50, 50);
+      fixComponentSize(c4, 20, 10);
+      var result = (<any> table).iterateLayout(500, 500);
+      verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
+    });
+
+    it("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", () => {
+      fixComponentSize(c1, 490, 50);
+      var result = (<any> table).iterateLayout(500, 500);
+      verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
+    });
+
+    it("iterateLayout works in the case where all components are fixed-size", () => {
+      fixComponentSize(c1, 50, 50);
+      fixComponentSize(c2, 50, 50);
+      fixComponentSize(c3, 50, 50);
+      fixComponentSize(c4, 50, 50);
+      var result = (<any> table).iterateLayout(100, 100);
+      verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's exactly enough space");
+
+      result = (<any> table).iterateLayout(80, 80);
+      verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
+
+      result = (<any> table).iterateLayout(120, 120);
+      verifyLayoutResult(result, [10, 10], [10, 10], [50, 50], [50, 50], false, false, "..when there's extra space");
+    });
+
+    it("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {
+      table = new Plottable.Table([[c1, c2]]);
+      fixComponentSize(c1, null, null);
+      c2._requestedSpace = (w: number, h: number) => {
+        return {
+          width: w >= 200 ? 200 : 0,
+          height: h >= 200 ? 200 : 0,
+          wantsWidth: w < 200,
+          wantsHeight: h < 200
+        };
+      };
+      var result = (<any> table).iterateLayout(200, 200);
+      verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
+      result = (<any> table).iterateLayout(150, 200);
+      verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
+    });
   });
 });
