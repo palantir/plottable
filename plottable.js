@@ -551,7 +551,7 @@ var Plottable;
         * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
         * @returns {Component} The calling component.
         */
-        Component.prototype._anchor = function (element) {
+        Component.prototype._anchor = function (element, parent) {
             if (element.node().nodeName === "svg") {
                 // svg node gets the "plottable" CSS class
                 this.rootSVG = element;
@@ -561,6 +561,10 @@ var Plottable;
                 this.rootSVG.style("overflow", "visible");
                 this.isTopLevelComponent = true;
             }
+            if (parent == null && !this.isTopLevelComponent) {
+                throw new Error("Components must be top-level or have a parent");
+            }
+            this.parent = parent;
 
             if (this.element != null) {
                 // reattach existing element
@@ -680,8 +684,25 @@ var Plottable;
             return this;
         };
 
+        Component.prototype._scheduleComputeLayout = function () {
+            if (this.isAnchored && this.isSetup) {
+                Plottable.RenderController.registerToComputeLayout(this);
+            }
+            return this;
+        };
+
         Component.prototype._doRender = function () {
             return this;
+        };
+
+        Component.prototype._invalidateLayout = function () {
+            if (this.isAnchored && this.isSetup) {
+                if (this.isTopLevelComponent) {
+                    this._scheduleComputeLayout();
+                } else {
+                    this.parent._invalidateLayout();
+                }
+            }
         };
 
         /**
@@ -698,7 +719,7 @@ var Plottable;
                 } else {
                     selection = d3.select(element);
                 }
-                this._anchor(selection);
+                this._anchor(selection, null);
             }
             this._computeLayout()._render();
             return this;
@@ -734,6 +755,7 @@ var Plottable;
             } else {
                 throw new Error("Unsupported alignment");
             }
+            this._invalidateLayout();
             return this;
         };
 
@@ -754,6 +776,7 @@ var Plottable;
             } else {
                 throw new Error("Unsupported alignment");
             }
+            this._invalidateLayout();
             return this;
         };
 
@@ -765,6 +788,7 @@ var Plottable;
         */
         Component.prototype.xOffset = function (offset) {
             this._xOffset = offset;
+            this._invalidateLayout();
             return this;
         };
 
@@ -776,6 +800,7 @@ var Plottable;
         */
         Component.prototype.yOffset = function (offset) {
             this._yOffset = offset;
+            this._invalidateLayout();
             return this;
         };
 
@@ -899,9 +924,12 @@ var Plottable;
         */
         Component.prototype.merge = function (c) {
             var cg;
+            if (this.isSetup || this.isAnchored) {
+                throw new Error("Can't presently merge a component that's already been anchored");
+            }
             if (Plottable.ComponentGroup.prototype.isPrototypeOf(c)) {
                 cg = c;
-                cg._addComponentToGroup(this, true);
+                cg._addComponent(this, true);
                 return cg;
             } else {
                 cg = new Plottable.ComponentGroup([this, c]);
@@ -914,12 +942,55 @@ var Plottable;
         */
         Component.prototype.remove = function () {
             this.element.remove();
+            if (this.parent != null) {
+                this.parent._removeComponent(this);
+            }
             this.isAnchored = false;
+            this.parent = null;
             return this;
         };
         return Component;
     })(Plottable.PlottableObject);
     Plottable.Component = Component;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var AbstractComponentContainer = (function (_super) {
+        __extends(AbstractComponentContainer, _super);
+        function AbstractComponentContainer() {
+            _super.apply(this, arguments);
+            this._components = [];
+        }
+        AbstractComponentContainer.prototype._removeComponent = function (c) {
+            var removeIndex = this._components.indexOf(c);
+            if (removeIndex < 0) {
+                throw new Error("Attempt to remove component, but component not found");
+            }
+            this._components.splice(removeIndex, 1);
+            this._invalidateLayout();
+            return this;
+        };
+
+        AbstractComponentContainer.prototype._addComponent = function (c) {
+            this._components.push(c);
+            this._invalidateLayout();
+            return this;
+        };
+
+        AbstractComponentContainer.prototype.getComponents = function () {
+            return this._components;
+        };
+
+        AbstractComponentContainer.prototype.empty = function () {
+            var _this = this;
+            this._components.forEach(function (c) {
+                return _this._removeComponent(c);
+            });
+        };
+        return AbstractComponentContainer;
+    })(Plottable.Component);
+    Plottable.AbstractComponentContainer = AbstractComponentContainer;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -934,12 +1005,15 @@ var Plottable;
         */
         function ComponentGroup(components) {
             if (typeof components === "undefined") { components = []; }
+            var _this = this;
             _super.call(this);
             this.classed("component-group", true);
-            this.components = components;
+            components.forEach(function (c) {
+                return _this._addComponent(c);
+            });
         }
         ComponentGroup.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-            var requests = this.components.map(function (c) {
+            var requests = this._components.map(function (c) {
                 return c._requestedSpace(offeredWidth, offeredHeight);
             });
             var desiredWidth = d3.max(requests, function (l) {
@@ -956,58 +1030,30 @@ var Plottable;
             };
         };
 
-        ComponentGroup.prototype._addComponentToGroup = function (c, prepend) {
+        ComponentGroup.prototype._addComponent = function (c, prepend) {
             if (typeof prepend === "undefined") { prepend = false; }
             if (prepend) {
-                this.components.unshift(c);
+                this._components.unshift(c);
             } else {
-                this.components.push(c);
+                this._components.push(c);
             }
             if (this.element != null) {
-                c._anchor(this.content);
+                c._anchor(this.content, this);
             }
+            this._invalidateLayout();
             return this;
         };
 
         ComponentGroup.prototype.merge = function (c) {
-            this._addComponentToGroup(c);
+            this._addComponent(c);
             return this;
         };
 
-        /**
-        * If the given component exists in the ComponentGroup, removes it from the
-        * group and the DOM.
-        *
-        * @param {Component} c The component to be removed.
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        ComponentGroup.prototype.removeComponent = function (c) {
-            var removeIndex = this.components.indexOf(c);
-            if (removeIndex >= 0) {
-                this.components.splice(removeIndex, 1);
-                c.remove();
-            }
-            return this;
-        };
-
-        /**
-        * Removes all Components in the ComponentGroup from the group and the DOM.
-        *
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        ComponentGroup.prototype.empty = function () {
-            this.components.forEach(function (c) {
-                return c.remove();
-            });
-            this.components = [];
-            return this;
-        };
-
-        ComponentGroup.prototype._anchor = function (element) {
+        ComponentGroup.prototype._anchor = function (element, parent) {
             var _this = this;
-            _super.prototype._anchor.call(this, element);
-            this.components.forEach(function (c) {
-                return c._anchor(_this.content);
+            _super.prototype._anchor.call(this, element, parent);
+            this._components.forEach(function (c) {
+                return c._anchor(_this.content, _this);
             });
             return this;
         };
@@ -1015,7 +1061,7 @@ var Plottable;
         ComponentGroup.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
             var _this = this;
             _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
-            this.components.forEach(function (c) {
+            this._components.forEach(function (c) {
                 c._computeLayout(0, 0, _this.availableWidth, _this.availableHeight);
             });
             return this;
@@ -1023,25 +1069,25 @@ var Plottable;
 
         ComponentGroup.prototype._doRender = function () {
             _super.prototype._doRender.call(this);
-            this.components.forEach(function (c) {
+            this._components.forEach(function (c) {
                 return c._doRender();
             });
             return this;
         };
 
         ComponentGroup.prototype.isFixedWidth = function () {
-            return this.components.every(function (c) {
+            return this._components.every(function (c) {
                 return c.isFixedWidth();
             });
         };
 
         ComponentGroup.prototype.isFixedHeight = function () {
-            return this.components.every(function (c) {
+            return this._components.every(function (c) {
                 return c.isFixedHeight();
             });
         };
         return ComponentGroup;
-    })(Plottable.Component);
+    })(Plottable.AbstractComponentContainer);
     Plottable.ComponentGroup = ComponentGroup;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
@@ -1083,7 +1129,7 @@ var Plottable;
         */
         Table.prototype.addComponent = function (row, col, component) {
             if (this.element != null) {
-                throw new Error("addComponent cannot be called after anchoring (for the moment)");
+                throw new Error("Table.addComponent cannot be called after anchoring (for the moment)");
             }
 
             this.nRows = Math.max(row + 1, this.nRows);
@@ -1092,22 +1138,28 @@ var Plottable;
 
             var currentComponent = this.rows[row][col];
             if (currentComponent != null) {
-                throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
+                throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
             }
 
             this.rows[row][col] = component;
+            this._addComponent(component);
             return this;
         };
 
-        Table.prototype._anchor = function (element) {
+        Table.prototype._removeComponent = function (c) {
+            throw new Error("_removeComponent not yet implemented on Table");
+            return this;
+        };
+
+        Table.prototype._anchor = function (element, parent) {
             var _this = this;
-            _super.prototype._anchor.call(this, element);
+            _super.prototype._anchor.call(this, element, parent);
 
             // recursively anchor children
             this.rows.forEach(function (row, rowIndex) {
                 row.forEach(function (component, colIndex) {
                     if (component != null) {
-                        component._anchor(_this.content);
+                        component._anchor(_this.content, _this);
                     }
                 });
             });
@@ -1217,6 +1269,13 @@ var Plottable;
                     break;
                 }
             }
+
+            // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
+            freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
+            freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+            colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
+            rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
+
             return {
                 colProportionalSpace: colProportionalSpace,
                 rowProportionalSpace: rowProportionalSpace,
@@ -1312,6 +1371,7 @@ var Plottable;
         Table.prototype.padding = function (rowPadding, colPadding) {
             this.rowPadding = rowPadding;
             this.colPadding = colPadding;
+            this._invalidateLayout();
             return this;
         };
 
@@ -1325,6 +1385,7 @@ var Plottable;
         */
         Table.prototype.rowWeight = function (index, weight) {
             this.rowWeights[index] = weight;
+            this._invalidateLayout();
             return this;
         };
 
@@ -1338,6 +1399,7 @@ var Plottable;
         */
         Table.prototype.colWeight = function (index, weight) {
             this.colWeights[index] = weight;
+            this._invalidateLayout();
             return this;
         };
 
@@ -1392,10 +1454,7 @@ var Plottable;
         Table.calcProportionalSpace = function (weights, freeSpace) {
             var weightSum = d3.sum(weights);
             if (weightSum === 0) {
-                var numGroups = weights.length;
-                return weights.map(function (w) {
-                    return freeSpace / numGroups;
-                });
+                return Plottable.Utils.createFilledArray(0, weights.length);
             } else {
                 return weights.map(function (w) {
                     return freeSpace * w / weightSum;
@@ -1415,7 +1474,7 @@ var Plottable;
             return all(componentGroup.map(groupIsFixed));
         };
         return Table;
-    })(Plottable.Component);
+    })(Plottable.AbstractComponentContainer);
     Plottable.Table = Table;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
@@ -1679,6 +1738,20 @@ var Plottable;
                 return;
             }
             RenderController.componentsNeedingRender[c._plottableID] = c;
+            RenderController.requestFrame();
+        };
+
+        RenderController.registerToComputeLayout = function (c) {
+            if (!Plottable.RenderController.enabled) {
+                c._computeLayout()._render();
+                return;
+            }
+            RenderController.componentsNeedingComputeLayout[c._plottableID] = c;
+            RenderController.componentsNeedingRender[c._plottableID] = c;
+            RenderController.requestFrame();
+        };
+
+        RenderController.requestFrame = function () {
             if (!RenderController.animationRequested) {
                 requestAnimationFrame(RenderController.doRender);
                 RenderController.animationRequested = true;
@@ -1686,14 +1759,20 @@ var Plottable;
         };
 
         RenderController.doRender = function () {
-            var components = d3.values(RenderController.componentsNeedingRender);
-            components.forEach(function (c) {
+            var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
+            toCompute.forEach(function (c) {
+                return c._computeLayout();
+            });
+            var toRender = d3.values(RenderController.componentsNeedingRender);
+            toRender.forEach(function (c) {
                 return c._doRender();
             });
+            RenderController.componentsNeedingComputeLayout = {};
             RenderController.componentsNeedingRender = {};
             RenderController.animationRequested = false;
         };
         RenderController.componentsNeedingRender = {};
+        RenderController.componentsNeedingComputeLayout = {};
         RenderController.animationRequested = false;
         RenderController.enabled = window.PlottableTestCode == null && (window.requestAnimationFrame) != null;
         return RenderController;
@@ -2307,6 +2386,7 @@ var Plottable;
                 this.textElement.text(text);
                 this.measureAndSetTextSize();
             }
+            this._invalidateLayout();
             return this;
         };
 
@@ -2407,7 +2487,7 @@ var Plottable;
                 }
                 this.colorScale = scale;
                 this._registerToBroadcaster(this.colorScale, function () {
-                    return _this._render();
+                    return _this._invalidateLayout();
                 });
                 return this;
             } else {
@@ -3594,6 +3674,7 @@ var Plottable;
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
 /// <reference path="core/component.ts" />
+/// <reference path="core/abstractComponentContainer.ts" />
 /// <reference path="core/componentGroup.ts" />
 /// <reference path="core/table.ts" />
 /// <reference path="core/scale.ts" />
@@ -3664,8 +3745,7 @@ var Plottable;
                     return d;
                 };
             }
-            this.formatFunction = formatter;
-            this.d3Axis.tickFormat(this.formatFunction);
+            this.tickFormat(formatter);
             this._registerToBroadcaster(this._axisScale, function () {
                 return _this.rescale();
             });
@@ -3785,16 +3865,6 @@ var Plottable;
             }
         };
 
-        Axis.prototype.formatter = function (formatFunction) {
-            if (formatFunction == null) {
-                return this.formatFunction;
-            }
-            this.formatFunction = formatFunction;
-            this.d3Axis.tickFormat(this.formatFunction);
-            this._render();
-            return this;
-        };
-
         Axis.prototype.tickLabelPosition = function (position) {
             if (position == null) {
                 return this.tickPositioning;
@@ -3883,6 +3953,7 @@ var Plottable;
                 return this.d3Axis.tickFormat();
             } else {
                 this.d3Axis.tickFormat(formatter);
+                this._invalidateLayout();
                 return this;
             }
         };
@@ -3912,6 +3983,7 @@ var Plottable;
         }
         XAxis.prototype.height = function (h) {
             this._height = h;
+            this._invalidateLayout();
             return this;
         };
 
@@ -4049,6 +4121,7 @@ var Plottable;
 
         YAxis.prototype.width = function (w) {
             this._width = w;
+            this._invalidateLayout();
             return this;
         };
 

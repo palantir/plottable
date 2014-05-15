@@ -119,7 +119,7 @@ describe("Axes", function () {
         var tickTexts = ticks.select("text")[0].map(function (t) {
             return d3.select(t).text();
         });
-        var generatedTicks = xScale.ticks().map(axis.formatter());
+        var generatedTicks = xScale.ticks().map(axis.tickFormat());
         assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
         svg.remove();
     });
@@ -135,17 +135,17 @@ describe("Axes", function () {
         var tickTexts = svg.selectAll(".tick text")[0].map(function (t) {
             return d3.select(t).text();
         });
-        var generatedTicks = xScale.ticks().map(axis.formatter());
+        var generatedTicks = xScale.ticks().map(axis.tickFormat());
         assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
 
         var blarghFormatter = function (d) {
             return "blargh";
         };
-        axis.formatter(blarghFormatter);
+        axis.tickFormat(blarghFormatter);
         tickTexts = svg.selectAll(".tick text")[0].map(function (t) {
             return d3.select(t).text();
         });
-        generatedTicks = xScale.ticks().map(axis.formatter());
+        generatedTicks = xScale.ticks().map(axis.tickFormat());
         assert.deepEqual(tickTexts, generatedTicks, "Tick texts updated based on new formatter");
 
         svg.remove();
@@ -492,7 +492,7 @@ describe("ComponentGroups", function () {
 
         var cg = new Plottable.ComponentGroup([c1, c2, c3]);
         var svg = generateSVG(400, 400);
-        cg._anchor(svg);
+        cg._anchor(svg, null);
         c1.addBox("test-box1");
         c2.addBox("test-box2");
         c3.addBox("test-box3");
@@ -513,7 +513,7 @@ describe("ComponentGroups", function () {
 
         var cg = new Plottable.ComponentGroup([c1]);
         var svg = generateSVG(400, 400);
-        cg.merge(c2)._anchor(svg);
+        cg.merge(c2)._anchor(svg, null);
         c1.addBox("test-box1");
         c2.addBox("test-box2");
         cg._computeLayout()._render();
@@ -554,7 +554,7 @@ describe("ComponentGroups", function () {
         cg.merge(c1).merge(c2);
 
         var svg = generateSVG();
-        cg._anchor(svg);
+        cg._anchor(svg, null);
         cg._computeLayout(50, 50, 350, 350);
 
         var cgTranslate = d3.transform(cg.element.attr("transform")).translate;
@@ -583,7 +583,7 @@ describe("ComponentGroups", function () {
         assert.isNotNull(c1Node, "component 1 was added to the DOM");
         assert.isNotNull(c2Node, "component 2 was added to the DOM");
 
-        cg.removeComponent(c2);
+        c2.remove();
 
         c1Node = svg.select(".component-1").node();
         c2Node = svg.select(".comopnent-2").node();
@@ -616,7 +616,7 @@ describe("ComponentGroups", function () {
 
         it("Component.merge works as expected (Component.merge Component)", function () {
             var cg = c1.merge(c2);
-            var innerComponents = cg.components;
+            var innerComponents = cg._components;
             assert.lengthOf(innerComponents, 2, "There are two components");
             assert.equal(innerComponents[0], c1, "first component correct");
             assert.equal(innerComponents[1], c2, "second component correct");
@@ -626,7 +626,7 @@ describe("ComponentGroups", function () {
             var cg = new Plottable.ComponentGroup([c2, c3, c4]);
             var cg2 = c1.merge(cg);
             assert.equal(cg, cg2, "c.merge(cg) returns cg");
-            var components = cg.components;
+            var components = cg._components;
             assert.lengthOf(components, 4, "four components");
             assert.equal(components[0], c1, "first component in front");
             assert.equal(components[1], c2, "second component is second");
@@ -636,7 +636,7 @@ describe("ComponentGroups", function () {
             var cg = new Plottable.ComponentGroup([c1, c2, c3]);
             var cg2 = cg.merge(c4);
             assert.equal(cg, cg2, "cg.merge(c) returns cg");
-            var components = cg.components;
+            var components = cg._components;
             assert.lengthOf(components, 4, "there are four components");
             assert.equal(components[0], c1, "first is first");
             assert.equal(components[3], c4, "fourth is fourth");
@@ -648,7 +648,7 @@ describe("ComponentGroups", function () {
             var cg = cg1.merge(cg2);
             assert.equal(cg, cg1, "merged == cg1");
             assert.notEqual(cg, cg2, "merged != cg2");
-            var components = cg.components;
+            var components = cg._components;
             assert.lengthOf(components, 3, "there are three inner components");
             assert.equal(components[0], c1, "components are inside");
             assert.equal(components[1], c2, "components are inside");
@@ -680,14 +680,14 @@ describe("Component behavior", function () {
 
     describe("anchor", function () {
         it("anchoring works as expected", function () {
-            c._anchor(svg);
+            c._anchor(svg, null);
             assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
             assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
             svg.remove();
         });
 
         it("can re-anchor to a different element", function () {
-            c._anchor(svg);
+            c._anchor(svg, null);
 
             var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             c._anchor(svg2);
@@ -701,7 +701,7 @@ describe("Component behavior", function () {
 
     describe("computeLayout", function () {
         it("computeLayout defaults and updates intelligently", function () {
-            c._anchor(svg)._computeLayout();
+            c._anchor(svg, null)._computeLayout();
             assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
@@ -728,7 +728,7 @@ describe("Component behavior", function () {
             svg.style("width", "50%");
             svg.style("height", "50%");
 
-            c._anchor(svg)._computeLayout();
+            c._anchor(svg, null)._computeLayout();
 
             assert.equal(c.availableWidth, 100, "computeLayout defaulted width to svg width");
             assert.equal(c.availableHeight, 200, "computeLayout defaulted height to svg height");
@@ -752,7 +752,7 @@ describe("Component behavior", function () {
 
         it("computeLayout will not default when attached to non-root node", function () {
             var g = svg.append("g");
-            c._anchor(g);
+            c._anchor(g, new Plottable.ComponentGroup());
             assert.throws(function () {
                 return c._computeLayout();
             }, "null arguments");
@@ -772,7 +772,7 @@ describe("Component behavior", function () {
             var yOff = 20;
             var width = 100;
             var height = 200;
-            c._anchor(g)._computeLayout(xOff, yOff, width, height);
+            c._anchor(g, new Plottable.ComponentGroup())._computeLayout(xOff, yOff, width, height);
             var translate = getTranslate(c.element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
             assert.equal(c.availableWidth, width, "the width set properly");
@@ -797,7 +797,7 @@ describe("Component behavior", function () {
 
     it("fixed-width component will align to the right spot", function () {
         fixComponentSize(c, 100, 100);
-        c._anchor(svg);
+        c._anchor(svg, null);
         c._computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
@@ -813,7 +813,7 @@ describe("Component behavior", function () {
 
     it("components can be offset relative to their alignment, and throw errors if there is insufficient space", function () {
         fixComponentSize(c, 100, 100);
-        c._anchor(svg);
+        c._anchor(svg, null);
         c.xOffset(20).yOffset(20);
         c._computeLayout();
         assertComponentXY(c, 20, 20, "top-left component offsets correctly");
@@ -854,7 +854,7 @@ describe("Component behavior", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
         var expectedClipPathID = c._plottableID;
-        c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
+        c._anchor(svg, null)._computeLayout(0, 0, 100, 100)._render();
         var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
         assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");
@@ -902,20 +902,20 @@ describe("Component behavior", function () {
             assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
         }
 
-        c._anchor(svg);
+        c._anchor(svg, null);
         assert.isUndefined(c.hitBox, "no hitBox was created when there were no registered interactions");
         svg.remove();
         svg = generateSVG();
 
         c = new Plottable.Component();
         var i = new Plottable.Interaction(c).registerWithComponent();
-        c._anchor(svg);
+        c._anchor(svg, null);
         verifyHitbox(c);
         svg.remove();
         svg = generateSVG();
 
         c = new Plottable.Component();
-        c._anchor(svg);
+        c._anchor(svg, null);
         i = new Plottable.Interaction(c).registerWithComponent();
         verifyHitbox(c);
         svg.remove();
@@ -958,7 +958,7 @@ describe("Component behavior", function () {
         c.classed("CSS-PREANCHOR-REMOVE", false);
         assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
 
-        c._anchor(svg);
+        c._anchor(svg, null);
         assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
         assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
         assert.isFalse(c.classed("CSS-POSTANCHOR"));
@@ -992,6 +992,20 @@ describe("Component behavior", function () {
         assert.equal(cbCalled, 2, "the callback is still attached to the component");
         assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
+        svg.remove();
+    });
+
+    it("_invalidateLayout works as expected", function () {
+        var cg = new Plottable.ComponentGroup();
+        var c = makeFixedSizeComponent(10, 10);
+        cg._addComponent(c);
+        cg.renderTo(svg);
+        assert.equal(cg.availableHeight, 10, "availableHeight initially 10 for fixed-size component");
+        assert.equal(cg.availableWidth, 10, "availableWidth initially 10 for fixed-size component");
+        fixComponentSize(c, 50, 50);
+        c._invalidateLayout();
+        assert.equal(cg.availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
+        assert.equal(cg.availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
         svg.remove();
     });
 });
@@ -1092,7 +1106,7 @@ describe("Gridlines", function () {
         var gridlines = new Plottable.Gridlines(xScale, yScale);
         var basicTable = new Plottable.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
 
-        basicTable._anchor(svg);
+        basicTable._anchor(svg, null);
         basicTable._computeLayout();
         xScale.range([0, xAxis.availableWidth]); // manually set range since we don't have a renderer
         yScale.range([yAxis.availableHeight, 0]);
@@ -1332,7 +1346,7 @@ describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.TitleLabel("A CHART TITLE");
-        label._anchor(svg);
+        label._anchor(svg, null);
         label._computeLayout();
 
         var content = label.content;
@@ -1351,7 +1365,7 @@ describe("Labels", function () {
     it("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
-        label._anchor(svg);
+        label._anchor(svg, null);
         var content = label.content;
         var text = content.select("text");
         label._computeLayout();
@@ -1366,7 +1380,7 @@ describe("Labels", function () {
     it("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
-        label._anchor(svg);
+        label._anchor(svg, null);
         var content = label.content;
         var text = content.select("text");
         label._computeLayout();
@@ -1396,7 +1410,7 @@ describe("Labels", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
         var label = new Plottable.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label._anchor(svg);
+        label._anchor(svg, null);
         var content = label.content;
         var text = content.select("text");
         label._computeLayout();
@@ -1465,16 +1479,18 @@ describe("Legends", function () {
         svg.remove();
     });
 
-    it("legend domain can be updated after initialization, and minimumHeight updates as well", function () {
+    it("legend domain can be updated after initialization, and height updates as well", function () {
         legend.renderTo(svg);
         legend.scale(color);
         assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
         color.domain(["foo", "bar"]);
         var height1 = legend._requestedSpace(400, 400).height;
-        assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
+        var actualHeight1 = legend.availableHeight;
+        assert.operator(height1, ">", 0, "changing the domain gives a positive height");
         color.domain(["foo", "bar", "baz"]);
-        assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the minimumHeight");
-        legend.renderTo(svg);
+        assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
+        var actualHeight2 = legend.availableHeight;
+        assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
         var numRows = legend.content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 rows");
         svg.remove();
@@ -2737,18 +2753,8 @@ describe("Tables", function () {
         verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
     });
 
-    it("table.iterateLayout works properly", function () {
-        // This unit test would have caught #405
-        var c1 = new Plottable.Component();
-        var c2 = new Plottable.Component();
-        var c3 = new Plottable.Component();
-        var c4 = new Plottable.Component();
-        fixComponentSize(c1, 50, 50);
-        fixComponentSize(c4, 20, 10);
-        var table = new Plottable.Table([
-            [c1, c2],
-            [c3, c4]]);
-
+    describe("table.iterateLayout works properly", function () {
+        // This test battery would have caught #405
         function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
             assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
             assert.deepEqual(result.rowProportionalSpace, rPS, "rowProportionalSpace:" + id);
@@ -2758,12 +2764,60 @@ describe("Tables", function () {
             assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
         }
 
-        var result = table.iterateLayout(500, 500);
-        verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "1");
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        var c4 = new Plottable.Component();
+        var table = new Plottable.Table([
+            [c1, c2],
+            [c3, c4]]);
 
-        fixComponentSize(c1, 490, 50);
-        result = table.iterateLayout(500, 500);
-        verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "2");
+        it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", function () {
+            fixComponentSize(c1, 50, 50);
+            fixComponentSize(c4, 20, 10);
+            var result = table.iterateLayout(500, 500);
+            verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
+        });
+
+        it("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
+            fixComponentSize(c1, 490, 50);
+            var result = table.iterateLayout(500, 500);
+            verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
+        });
+
+        it("iterateLayout works in the case where all components are fixed-size", function () {
+            fixComponentSize(c1, 50, 50);
+            fixComponentSize(c2, 50, 50);
+            fixComponentSize(c3, 50, 50);
+            fixComponentSize(c4, 50, 50);
+            var result = table.iterateLayout(100, 100);
+            verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's exactly enough space");
+
+            result = table.iterateLayout(80, 80);
+            verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
+
+            result = table.iterateLayout(120, 120);
+
+            // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
+            verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
+        });
+
+        it("iterateLayout works in the tricky case when components can be unsatisfied but request little space", function () {
+            table = new Plottable.Table([[c1, c2]]);
+            fixComponentSize(c1, null, null);
+            c2._requestedSpace = function (w, h) {
+                return {
+                    width: w >= 200 ? 200 : 0,
+                    height: h >= 200 ? 200 : 0,
+                    wantsWidth: w < 200,
+                    wantsHeight: h < 200
+                };
+            };
+            var result = table.iterateLayout(200, 200);
+            verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
+            result = table.iterateLayout(150, 200);
+            verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
+        });
     });
 });
 ///<reference path="testReference.ts" />
