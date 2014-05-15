@@ -113,7 +113,7 @@ var Plottable;
         function getTextWidth(textElement, text) {
             var originalText = textElement.text();
             textElement.text(text);
-            var width = Utils.getBBox(textElement).width;
+            var width = text === "" ? 0 : Utils.getBBox(textElement).width;
             textElement.text(originalText);
             return width;
         }
@@ -1148,7 +1148,10 @@ var Plottable;
 
         Table.prototype._removeComponent = function (c) {
             throw new Error("_removeComponent not yet implemented on Table");
+
+            /* tslint:disable:no-unreachable */
             return this;
+            /* tslint:enable:no-unreachable */
         };
 
         Table.prototype._anchor = function (element, parent) {
@@ -2172,8 +2175,9 @@ var Plottable;
                     scale = d3.scale.pow();
                     break;
             }
-            if (scale == null)
+            if (scale == null) {
                 throw new Error("unknown quantitive scale type " + scaleType);
+            }
             return scale.range([0, 1]).interpolate(InterpolatedColorScale.interpolateColors(colors));
         };
 
@@ -2189,8 +2193,10 @@ var Plottable;
         *     values in hex ("#FFFFFF") or keywords ("white").
         */
         InterpolatedColorScale.interpolateColors = function (colors) {
-            if (colors.length < 2)
+            if (colors.length < 2) {
                 throw new Error("Color scale arrays must have at least two elements.");
+            }
+            ;
             return function (ignored) {
                 return function (t) {
                     // Clamp t parameter to [0,1]
@@ -2209,23 +2215,26 @@ var Plottable;
         };
 
         InterpolatedColorScale.prototype.colorRange = function (colorRange) {
-            if (colorRange == null)
+            if (colorRange == null) {
                 return this._colorRange;
+            }
             this._colorRange = this._resolveColorValues(colorRange);
             this._resetScale();
         };
 
         InterpolatedColorScale.prototype.scaleType = function (scaleType) {
-            if (scaleType == null)
+            if (scaleType == null) {
                 return this._scaleType;
+            }
             this._scaleType = scaleType;
             this._resetScale();
         };
 
         InterpolatedColorScale.prototype._resetScale = function () {
             this._d3Scale = InterpolatedColorScale.getD3InterpolatedScale(this._colorRange, this._scaleType);
-            if (this._autoDomain)
+            if (this._autoDomain) {
                 this.autoDomain();
+            }
             this._broadcast();
         };
 
@@ -2393,7 +2402,7 @@ var Plottable;
         Label.prototype.measureAndSetTextSize = function () {
             var bbox = Plottable.Utils.getBBox(this.textElement);
             this.textHeight = bbox.height;
-            this.textLength = bbox.width;
+            this.textLength = this.text === "" ? 0 : bbox.width;
         };
 
         Label.prototype.truncateTextAndRemeasure = function (availableLength) {
