@@ -95,7 +95,7 @@ module.exports = function(grunt) {
       options: {
         configuration: grunt.file.readJSON("tslint.json")
       },
-      files: ["src/*.ts", "test/*.ts"]
+      files: ["src/**/*.ts", "test/**.ts"]
     },
     watch: {
       "options": {

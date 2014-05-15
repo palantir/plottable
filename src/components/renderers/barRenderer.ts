@@ -48,7 +48,7 @@ module Plottable {
       attrToProjector["y"] = (d: any, i: number) => {
         var originalY = yFunction(d, i);
         return (originalY > scaledBaseline) ? scaledBaseline : originalY;
-      }
+      };
 
       var heightFunction = (d: any, i: number) => {
         return Math.abs(scaledBaseline - yFunction(d, i));

@@ -49,7 +49,7 @@ module Plottable {
       attrToProjector["x"] = (d: any, i: number) => {
         var originalX = xFunction(d, i);
         return (originalX > scaledBaseline) ? scaledBaseline : originalX;
-      }
+      };
 
       var widthFunction = (d: any, i: number) => {
         return Math.abs(scaledBaseline - xFunction(d, i));
