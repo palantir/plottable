@@ -167,7 +167,7 @@ module Plottable {
       if (this.isAnchored && this.isSetup) {
         RenderController.registerToComputeLayout(this);
       }
-      return this
+      return this;
     }
 
     public _doRender() {
