@@ -261,7 +261,7 @@ module Plottable {
         return this.d3Axis.tickFormat();
       } else {
         this.d3Axis.tickFormat(formatter);
-        this._render();
+        this._invalidateLayout();
         return this;
       }
     }
@@ -288,6 +288,7 @@ module Plottable {
 
     public height(h: number) {
       this._height = h;
+      this._invalidateLayout();
       return this;
     }
 
@@ -425,6 +426,7 @@ module Plottable {
 
     public width(w: number) {
       this._width = w;
+      this._invalidateLayout();
       return this;
     }
 

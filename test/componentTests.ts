@@ -322,4 +322,17 @@ it("components can be offset relative to their alignment, and throw errors if th
 
     svg.remove();
   });
+
+  it("_invalidateLayout works as expected", () => {
+    var cg = new Plottable.ComponentGroup();
+    var c = makeFixedSizeComponent(10, 10);
+    cg._addComponentToGroup(c);
+    cg.renderTo(svg);
+    assert.equal(cg.availableHeight, 10, "availableHeight initially 10 for fixed-size component");
+    assert.equal(cg.availableWidth, 10, "availableWidth initially 10 for fixed-size component");
+    fixComponentSize(c, 50, 50);
+    c._invalidateLayout();
+    assert.equal(cg.availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
+    assert.equal(cg.availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
+  });
 });

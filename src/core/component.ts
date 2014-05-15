@@ -163,8 +163,26 @@ module Plottable {
       return this;
     }
 
+    public _scheduleComputeLayout() {
+      if (this.isAnchored && this.isSetup) {
+        RenderController.registerToComputeLayout(this);
+      }
+      return this
+    }
+
     public _doRender() {
       return this; //no-op
+    }
+
+
+    public _invalidateLayout() {
+      if (this.isAnchored && this.isSetup) {
+        if (this.isTopLevelComponent) {
+          this._scheduleComputeLayout();
+        } else {
+          this.parent._invalidateLayout();
+        }
+      }
     }
 
     /**
@@ -217,6 +235,7 @@ module Plottable {
       } else {
         throw new Error("Unsupported alignment");
       }
+      this._invalidateLayout();
       return this;
     }
 
@@ -237,6 +256,7 @@ module Plottable {
       } else {
         throw new Error("Unsupported alignment");
       }
+      this._invalidateLayout();
       return this;
     }
 
@@ -248,6 +268,7 @@ module Plottable {
      */
     public xOffset(offset: number): Component {
       this._xOffset = offset;
+      this._invalidateLayout();
       return this;
     }
 
@@ -259,6 +280,7 @@ module Plottable {
      */
     public yOffset(offset: number): Component {
       this._yOffset = offset;
+      this._invalidateLayout();
       return this;
     }
 
@@ -389,6 +411,9 @@ module Plottable {
      */
     public merge(c: Component): ComponentGroup {
       var cg: ComponentGroup;
+      if (this.isSetup || this.isAnchored) {
+        throw new Error("Can't presently merge a component that's already been anchored");
+      }
       if (ComponentGroup.prototype.isPrototypeOf(c)) {
         cg = (<ComponentGroup> c);
         cg._addComponentToGroup(this, true);
@@ -404,6 +429,7 @@ module Plottable {
      */
     public remove() {
       this.element.remove();
+      this._invalidateLayout();
       this.isAnchored = false;
       this.parent = null;
       return this;

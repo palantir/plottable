@@ -261,6 +261,7 @@ module Plottable {
     public padding(rowPadding: number, colPadding: number) {
       this.rowPadding = rowPadding;
       this.colPadding = colPadding;
+      this._invalidateLayout();
       return this;
     }
 
@@ -274,6 +275,7 @@ module Plottable {
      */
     public rowWeight(index: number, weight: number) {
       this.rowWeights[index] = weight;
+      this._invalidateLayout();
       return this;
     }
 
@@ -287,6 +289,7 @@ module Plottable {
      */
     public colWeight(index: number, weight: number) {
       this.colWeights[index] = weight;
+      this._invalidateLayout();
       return this;
     }
 

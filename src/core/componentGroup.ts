@@ -29,6 +29,7 @@ module Plottable {
     }
 
     public _addComponentToGroup(c: Component, prepend = false): ComponentGroup {
+      this._invalidateLayout();
       if (prepend) {
         this.components.unshift(c);
       } else {
@@ -57,6 +58,7 @@ module Plottable {
       if (removeIndex >= 0) {
         this.components.splice(removeIndex, 1);
         c.remove();
+        this._invalidateLayout();
       }
       return this;
     }
@@ -69,6 +71,7 @@ module Plottable {
     public empty(): ComponentGroup {
       this.components.forEach((c: Component) => c.remove());
       this.components = [];
+      this._invalidateLayout();
       return this;
     }
 

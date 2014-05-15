@@ -64,6 +64,7 @@ module Plottable {
         this.textElement.text(text);
         this.measureAndSetTextSize();
       }
+      this._invalidateLayout();
       return this;
     }
 
