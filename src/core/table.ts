@@ -67,7 +67,9 @@ module Plottable {
 
     public _removeComponent(c: Component) {
       throw new Error("_removeComponent not yet implemented on Table");
+      /* tslint:disable:no-unreachable */
       return this;
+      /* tslint:enable:no-unreachable */
     }
 
     public _anchor(element: D3.Selection, parent?: AbstractComponentContainer) {
