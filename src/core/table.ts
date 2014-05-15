@@ -77,7 +77,8 @@ module Plottable {
       return this;
     }
 
-    /**
+    private iterateLayout(availableWidth : number, availableHeight: number) {
+    /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
      * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
@@ -98,7 +99,6 @@ module Plottable {
      * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
      *
      */
-    private iterateLayout(availableWidth : number, availableHeight: number) {
       var cols = d3.transpose(this.rows);
       var availableWidthAfterPadding  = availableWidth  - this.colPadding * (this.nCols - 1);
       var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
