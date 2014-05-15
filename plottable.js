@@ -8,13 +8,6 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 var Plottable;
 (function (Plottable) {
     (function (Utils) {
-        function any(bools) {
-            return bools.some(function (x) {
-                return x;
-            });
-        }
-        Utils.any = any;
-
         /**
         * Checks if x is between a and b.
         */
@@ -340,14 +333,21 @@ var Plottable;
         })();
         Utils.IDCounter = IDCounter;
 
-        function repeat(element, count) {
+        /**
+        * Creates an array of length `count`, filled with value or (if value is a function), value()
+        *
+        * @param {any} value The value to fill the array with, or, if a function, a generator for values
+        * @param {number} count The length of the array to generate
+        * @return {any[]}
+        */
+        function createFilledArray(value, count) {
             var out = [];
             for (var i = 0; i < count; i++) {
-                out[i] = typeof (element) === "function" ? element() : element;
+                out[i] = typeof (value) === "function" ? value(i) : value;
             }
             return out;
         }
-        Utils.repeat = repeat;
+        Utils.createFilledArray = createFilledArray;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -536,10 +536,6 @@ var Plottable;
             this.boxes = [];
             this.clipPathEnabled = false;
             this.broadcastersCurrentlyListeningTo = {};
-            this._fixedWidth = false;
-            this._fixedHeight = false;
-            this._minimumHeight = 0;
-            this._minimumWidth = 0;
             this.isTopLevelComponent = false;
             this._xOffset = 0;
             this._yOffset = 0;
@@ -711,7 +707,7 @@ var Plottable;
         /**
         * Cause the Component to recompute layout and redraw. Useful if the window resized.
         *
-        * @param {number} [availableWidth ]  - the width of the container element
+        * @param {number} [availableWidth]  - the width of the container element
         * @param {number} [availableHeight] - the height of the container element
         */
         Component.prototype.resize = function (width, height) {
@@ -867,23 +863,27 @@ var Plottable;
         };
 
         /**
-        * Checks if the Component has a fixed width or scales to fill available space.
-        * Returns true by default on the base Component class.
+        * Checks if the Component has a fixed width or false if it grows to fill available space.
+        * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed width.
         */
         Component.prototype.isFixedWidth = function () {
-            return this._fixedWidth;
+            // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
+            // some fixed size you aspire to.
+            // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
+            // For example a label with an empty string.
+            return this._requestedSpace(-1, -1).wantsWidth;
         };
 
         /**
-        * Checks if the Component has a fixed height or scales to fill available space.
-        * Returns true by default on the base Component class.
+        * Checks if the Component has a fixed height or false if it grows to fill available space.
+        * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed height.
         */
         Component.prototype.isFixedHeight = function () {
-            return this._fixedHeight;
+            return this._requestedSpace(-1, -1).wantsHeight;
         };
 
         /**
@@ -1114,28 +1114,28 @@ var Plottable;
             return this;
         };
 
-        /**
-        * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
-        *
-        * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
-        * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
-        * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
-        * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
-        * offered its column's width and may request some amount of it, which increases that column's guaranteed
-        * width. If there are some components that were not satisfied with the width they were offered, and there is free
-        * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
-        * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
-        * according to the colWeights.
-        *
-        * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
-        * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
-        * is possible, so the algorithm will not continue iterating on that dimension's account.
-        *
-        * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
-        * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
-        *
-        */
         Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
+            /*
+            * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
+            *
+            * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
+            * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
+            * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
+            * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
+            * offered its column's width and may request some amount of it, which increases that column's guaranteed
+            * width. If there are some components that were not satisfied with the width they were offered, and there is free
+            * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
+            * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
+            * according to the colWeights.
+            *
+            * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
+            * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
+            * is possible, so the algorithm will not continue iterating on that dimension's account.
+            *
+            * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
+            * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
+            *
+            */
             var cols = d3.transpose(this.rows);
             var availableWidthAfterPadding = availableWidth - this.colPadding * (this.nCols - 1);
             var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
@@ -1159,8 +1159,8 @@ var Plottable;
             var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
             var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
 
-            var guaranteedWidths = Plottable.Utils.repeat(0, this.nCols);
-            var guaranteedHeights = Plottable.Utils.repeat(0, this.nRows);
+            var guaranteedWidths = Plottable.Utils.createFilledArray(0, this.nCols);
+            var guaranteedHeights = Plottable.Utils.createFilledArray(0, this.nRows);
 
             var freeWidth;
             var freeHeight;
@@ -1172,8 +1172,12 @@ var Plottable;
                 var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
                 guaranteedWidths = guarantees.guaranteedWidths;
                 guaranteedHeights = guarantees.guaranteedHeights;
-                var wantsWidth = Plottable.Utils.any(guarantees.wantsWidthArr);
-                var wantsHeight = Plottable.Utils.any(guarantees.wantsHeightArr);
+                var wantsWidth = guarantees.wantsWidthArr.some(function (x) {
+                    return x;
+                });
+                var wantsHeight = guarantees.wantsHeightArr.some(function (x) {
+                    return x;
+                });
 
                 var lastFreeWidth = freeWidth;
                 var lastFreeHeight = freeHeight;
@@ -1209,11 +1213,8 @@ var Plottable;
                 }
 
                 if (nIterations > 5) {
-                    console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances https://github.com/palantir/plottable/");
-                    debugger;
-                    if (nIterations > 10) {
-                        break;
-                    }
+                    console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances");
+                    break;
                 }
             }
             return {
@@ -1226,10 +1227,10 @@ var Plottable;
         };
 
         Table.prototype.determineGuarantees = function (offeredWidths, offeredHeights) {
-            var requestedWidths = Plottable.Utils.repeat(0, this.nCols);
-            var requestedHeights = Plottable.Utils.repeat(0, this.nRows);
-            var layoutWantsWidth = Plottable.Utils.repeat(false, this.nCols);
-            var layoutWantsHeight = Plottable.Utils.repeat(false, this.nRows);
+            var requestedWidths = Plottable.Utils.createFilledArray(0, this.nCols);
+            var requestedHeights = Plottable.Utils.createFilledArray(0, this.nRows);
+            var layoutWantsWidth = Plottable.Utils.createFilledArray(false, this.nCols);
+            var layoutWantsHeight = Plottable.Utils.createFilledArray(false, this.nRows);
             this.rows.forEach(function (row, rowIndex) {
                 row.forEach(function (component, colIndex) {
                     var spaceRequest;
@@ -1564,8 +1565,6 @@ var Plottable;
             // to recompute attributes on the entire update selection.
             this._requireRerender = false;
             this.clipPathEnabled = true;
-            this._fixedWidth = false;
-            this._fixedHeight = false;
             this.classed("renderer", true);
 
             var dataSource;
@@ -2264,8 +2263,6 @@ var Plottable;
             _super.call(this);
             this.classed("label", true);
             this.setText(text);
-            this._fixedHeight = true;
-            this._fixedWidth = true;
             orientation = orientation.toLowerCase();
             if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
                 this.orientation = orientation;
@@ -2393,8 +2390,6 @@ var Plottable;
             _super.call(this);
             this.classed("legend", true);
             this.scale(colorScale);
-            this._fixedHeight = true;
-            this._fixedWidth = true;
             this.xAlign("RIGHT").yAlign("TOP");
             this.xOffset(5).yOffset(5);
         }
@@ -2420,10 +2415,18 @@ var Plottable;
             }
         };
 
+        Legend.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+            _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
+            var textHeight = this.measureTextHeight();
+            var totalNumRows = this.colorScale.domain().length;
+            this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
+            return this;
+        };
+
         Legend.prototype._requestedSpace = function (offeredWidth, offeredY) {
             var textHeight = this.measureTextHeight();
             var totalNumRows = this.colorScale.domain().length;
-            this.nRowsDrawn = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
+            var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
             var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
             var fakeText = fakeLegendEl.append("text");
@@ -2435,9 +2438,9 @@ var Plottable;
             var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
             return {
                 width: Math.min(desiredWidth, offeredWidth),
-                height: this.nRowsDrawn * textHeight,
+                height: rowsICanFit * textHeight,
                 wantsWidth: offeredWidth < desiredWidth,
-                wantsHeight: this.nRowsDrawn < totalNumRows
+                wantsHeight: rowsICanFit < totalNumRows
             };
         };
 
@@ -2455,7 +2458,6 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-
             this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
             var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
             var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
@@ -3726,7 +3728,6 @@ var Plottable;
 
             tickLabels.each(function (d) {
                 if (!isInsideBBox(this.getBoundingClientRect())) {
-                    debugger;
                     d3.select(this).style("visibility", "hidden");
                 }
             });
@@ -3893,8 +3894,6 @@ var Plottable;
             if (orientation !== "top" && orientation !== "bottom") {
                 throw new Error(orientation + " is not a valid orientation for XAxis");
             }
-            this._fixedWidth = false;
-            this._fixedHeight = true;
             this.tickLabelPosition("center");
         }
         XAxis.prototype.height = function (h) {
@@ -3908,12 +3907,12 @@ var Plottable;
             return this;
         };
 
-        XAxis.prototype._requestedSpace = function (x, y) {
+        XAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
             return {
                 width: 0,
-                height: Math.min(y, this._height),
+                height: Math.min(offeredHeight, this._height),
                 wantsWidth: false,
-                wantsHeight: y < this._height
+                wantsHeight: offeredHeight < this._height
             };
         };
 
@@ -4026,8 +4025,6 @@ var Plottable;
             if (orientation !== "left" && orientation !== "right") {
                 throw new Error(orientation + " is not a valid orientation for YAxis");
             }
-            this._fixedHeight = false;
-            this._fixedWidth = true;
             this.tickLabelPosition("middle");
         }
         YAxis.prototype._setup = function () {

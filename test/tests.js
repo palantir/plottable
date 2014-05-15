@@ -17,22 +17,20 @@ function getSVGParent() {
     }
 }
 
-function fixedSizeRequestSpace(fixedWidth, fixedHeight) {
-    return function (offeredWidth, offeredHeight) {
+function fixComponentSize(c, fixedWidth, fixedHeight) {
+    c._requestedSpace = function (w, h) {
         return {
-            width: Math.min(offeredWidth, fixedWidth),
-            height: Math.min(offeredHeight, fixedHeight),
-            wantsWidth: (offeredWidth < fixedWidth),
-            wantsHeight: (offeredHeight < fixedHeight)
+            width: fixedWidth == null ? 0 : Math.min(w, fixedWidth),
+            height: fixedHeight == null ? 0 : Math.min(h, fixedHeight),
+            wantsWidth: fixedWidth == null ? false : w < fixedWidth,
+            wantsHeight: fixedHeight == null ? false : h < fixedHeight
         };
     };
+    return c;
 }
 
-function makeComponentFixedSize(c, fixedWidth, fixedHeight) {
-    c._requestedSpace = fixedSizeRequestSpace(fixedWidth, fixedHeight);
-    c._fixedWidth = fixedWidth > 0;
-    c._fixedHeight = fixedHeight > 0;
-    return c;
+function makeFixedSizeComponent(fixedWidth, fixedHeight) {
+    return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
 }
 
 function getTranslate(element) {
@@ -318,58 +316,84 @@ describe("Axes", function () {
         assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 20);
         svg.remove();
     });
-    // it("XAxis wraps long tick label texts so they don't overlap", () => {
-    //   var svg = generateSVG(300, 60);
-    //   var ordinalScale = new Plottable.OrdinalScale();
-    //   ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
-    //   ordinalScale.range([0, 300]);
-    //   var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
-    //   xAxis.minimumHeight(60);
-    //   xAxis.renderTo(svg);
-    //   var tickTexts = svg.selectAll(".tick text");
-    //   assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
-    //   var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
-    //   var labelsOverlap = false;
-    //   clientRects.forEach((rect, i) => {
-    //     if (i > 0) {
-    //       if (rect.left < clientRects[i-1].left) {
-    //         labelsOverlap = true;
-    //       }
-    //     }
-    //   });
-    //   assert.isFalse(labelsOverlap, "labels don't overlap");
-    //   var allTopsEqual = clientRects.map((r) => r.top).every((t: number) => t === clientRects[0].top);
-    //   assert.isTrue(allTopsEqual, "tops of labels align");
-    //   assert.isTrue(clientRects.every((rect) => rect.height < xAxis.minimumHeight() - xAxis.tickSize()),
-    //                 "all labels fit within the available space");
-    //   svg.remove();
-    // });
-    // it("Yaxis wraps long tick label texts so they don't overlap", () => {
-    //   var svg = generateSVG(100, 300);
-    //   var ordinalScale = new Plottable.OrdinalScale();
-    //   ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
-    //   ordinalScale.range([0, 300]);
-    //   var yAxis = new Plottable.YAxis(ordinalScale, "left");
-    //   yAxis.minimumWidth(100);
-    //   yAxis.renderTo(svg);
-    //   var tickTexts = svg.selectAll(".tick text");
-    //   assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
-    //   var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
-    //   var labelsOverlap = false;
-    //   clientRects.forEach((rect, i) => {
-    //     if (i > 0) {
-    //       if (rect.top < clientRects[i-1].bottom) {
-    //         labelsOverlap = true;
-    //       }
-    //     }
-    //   });
-    //   assert.isFalse(labelsOverlap, "labels don't overlap");
-    //   var allTopsEqual = clientRects.map((r) => r.right).every((t: number) => t === clientRects[0].right);
-    //   assert.isTrue(allTopsEqual, "right edges of labels align");
-    //   assert.isTrue(clientRects.every((rect) => rect.width < yAxis.minimumWidth() - yAxis.tickSize()),
-    //                 "all labels fit within the available space");
-    //   svg.remove();
-    // });
+
+    it("XAxis wraps long tick label texts so they don't overlap", function () {
+        var svg = generateSVG(300, 60);
+        var ordinalScale = new Plottable.OrdinalScale();
+        ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
+        ordinalScale.range([0, 300]);
+
+        var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
+        xAxis.height(60);
+        xAxis.renderTo(svg);
+
+        var tickTexts = svg.selectAll(".tick text");
+        assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
+
+        var clientRects = tickTexts[0].map(function (t) {
+            return t.getBoundingClientRect();
+        });
+        var labelsOverlap = false;
+        clientRects.forEach(function (rect, i) {
+            if (i > 0) {
+                if (rect.left < clientRects[i - 1].left) {
+                    labelsOverlap = true;
+                }
+            }
+        });
+        assert.isFalse(labelsOverlap, "labels don't overlap");
+
+        var allTopsEqual = clientRects.map(function (r) {
+            return r.top;
+        }).every(function (t) {
+            return t === clientRects[0].top;
+        });
+        assert.isTrue(allTopsEqual, "tops of labels align");
+
+        assert.isTrue(clientRects.every(function (rect) {
+            return rect.height < xAxis._height - xAxis.tickSize();
+        }), "all labels fit within the available space");
+        svg.remove();
+    });
+
+    it("Yaxis wraps long tick label texts so they don't overlap", function () {
+        var svg = generateSVG(100, 300);
+        var ordinalScale = new Plottable.OrdinalScale();
+        ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
+        ordinalScale.range([0, 300]);
+
+        var yAxis = new Plottable.YAxis(ordinalScale, "left");
+        yAxis.width(100);
+        yAxis.renderTo(svg);
+
+        var tickTexts = svg.selectAll(".tick text");
+        assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
+
+        var clientRects = tickTexts[0].map(function (t) {
+            return t.getBoundingClientRect();
+        });
+        var labelsOverlap = false;
+        clientRects.forEach(function (rect, i) {
+            if (i > 0) {
+                if (rect.top < clientRects[i - 1].bottom) {
+                    labelsOverlap = true;
+                }
+            }
+        });
+        assert.isFalse(labelsOverlap, "labels don't overlap");
+
+        var allTopsEqual = clientRects.map(function (r) {
+            return r.right;
+        }).every(function (t) {
+            return t === clientRects[0].right;
+        });
+        assert.isTrue(allTopsEqual, "right edges of labels align");
+
+        assert.isTrue(clientRects.every(function (rect) {
+            return rect.width < yAxis._width - yAxis.tickSize();
+        }), "all labels fit within the available space");
+        svg.remove();
+    });
 });
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
@@ -438,8 +462,7 @@ var assert = chai.assert;
 
 describe("ComponentGroups", function () {
     it("components in componentGroups overlap", function () {
-        var c1 = new Plottable.Component();
-        makeComponentFixedSize(c1, 10, 10);
+        var c1 = makeFixedSizeComponent(10, 10);
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
 
@@ -460,10 +483,8 @@ describe("ComponentGroups", function () {
     });
 
     it("components can be added before and after anchoring", function () {
-        var c1 = new Plottable.Component();
-        var c2 = new Plottable.Component();
-        makeComponentFixedSize(c1, 10, 10);
-        makeComponentFixedSize(c2, 20, 20);
+        var c1 = makeFixedSizeComponent(10, 10);
+        var c2 = makeFixedSizeComponent(20, 20);
         var c3 = new Plottable.Component();
 
         var cg = new Plottable.ComponentGroup([c1]);
@@ -487,23 +508,17 @@ describe("ComponentGroups", function () {
     it("component fixity is computed appropriately", function () {
         var cg = new Plottable.ComponentGroup();
         var c1 = new Plottable.Component();
-        c1._fixedHeight = false;
-        c1._fixedWidth = false;
         var c2 = new Plottable.Component();
-        c2._fixedHeight = false;
-        c2._fixedWidth = false;
 
         cg.merge(c1).merge(c2);
         assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
         assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
 
-        c1._fixedHeight = true;
-        c1._fixedWidth = true;
-
+        fixComponentSize(c1, 10, 10);
         assert.isFalse(cg.isFixedHeight(), "height not fixed when one component unfixed");
         assert.isFalse(cg.isFixedWidth(), "width not fixed when one component unfixed");
 
-        c2._fixedHeight = true;
+        fixComponentSize(c2, null, 10);
         assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
         assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
     });
@@ -511,11 +526,7 @@ describe("ComponentGroups", function () {
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
         var cg = new Plottable.ComponentGroup();
         var c1 = new Plottable.Component();
-        c1._fixedHeight = false;
-        c1._fixedWidth = false;
         var c2 = new Plottable.Component();
-        c2._fixedHeight = false;
-        c2._fixedWidth = false;
         cg.merge(c1).merge(c2);
 
         var svg = generateSVG();
@@ -761,7 +772,7 @@ describe("Component behavior", function () {
     });
 
     it("fixed-width component will align to the right spot", function () {
-        makeComponentFixedSize(c, 100, 100);
+        fixComponentSize(c, 100, 100);
         c._anchor(svg);
         c._computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -777,7 +788,7 @@ describe("Component behavior", function () {
     });
 
     it("components can be offset relative to their alignment, and throw errors if there is insufficient space", function () {
-        makeComponentFixedSize(c, 100, 100);
+        fixComponentSize(c, 100, 100);
         c._anchor(svg);
         c.xOffset(20).yOffset(20);
         c._computeLayout();
@@ -2550,24 +2561,10 @@ describe("Tables", function () {
         svg.remove();
     });
 
-    // it("tables with insufficient space throw Insufficient Space", () => {
-    //   var svg = generateSVG(200, 200);
-    //   var c = new Plottable.Component().minimumHeight(300).minimumWidth(300);
-    //   var t = new Plottable.Table().addComponent(0, 0, c);
-    //   t._anchor(svg);
-    //   assert.throws(() => t._computeLayout(), Error, "Insufficient Space");
-    //   svg.remove();
-    // });
     it("basic table with 2 rows 2 cols lays out properly", function () {
         var tableAndcomponents = generateBasicTable(2, 2);
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
-
-        // force the components to have non-fixed layout; eg. as if they were renderers
-        components.forEach(function (c) {
-            c._fixedWidth = false;
-            c._fixedHeight = false;
-        });
 
         var svg = generateSVG();
         table.renderTo(svg);
@@ -2596,13 +2593,6 @@ describe("Tables", function () {
         var tableAndcomponents = generateBasicTable(2, 2);
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
-
-        // force the components to have non-fixed layout; eg. as if they were renderers
-        components.forEach(function (c) {
-            c._fixedWidth = false;
-            c._fixedHeight = false;
-        });
-
         table.padding(5, 5);
 
         var svg = generateSVG(415, 415);
@@ -2631,23 +2621,19 @@ describe("Tables", function () {
     it("table with fixed-size objects on every side lays out properly", function () {
         var svg = generateSVG();
         var c4 = new Plottable.Component();
-        var c1 = new Plottable.Component();
-        var c7 = new Plottable.Component();
-        var c3 = new Plottable.Component();
-        var c5 = new Plottable.Component();
-        var table = new Plottable.Table([
-            [null, c1, null],
-            [c3, c4, c5],
-            [null, c7, null]]);
 
         // [0 1 2] \\
         // [3 4 5] \\
         // [6 7 8] \\
         // give the axis-like objects a minimum
-        makeComponentFixedSize(c1, 0, 30);
-        makeComponentFixedSize(c7, 0, 30);
-        makeComponentFixedSize(c3, 50, 0);
-        makeComponentFixedSize(c5, 50, 0);
+        var c1 = makeFixedSizeComponent(null, 30);
+        var c7 = makeFixedSizeComponent(null, 30);
+        var c3 = makeFixedSizeComponent(50, null);
+        var c5 = makeFixedSizeComponent(50, null);
+        var table = new Plottable.Table([
+            [null, c1, null],
+            [c3, c4, c5],
+            [null, c7, null]]);
 
         var components = [c1, c3, c4, c5, c7];
 
@@ -2684,16 +2670,15 @@ describe("Tables", function () {
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
         components.forEach(function (c) {
-            c._fixedWidth = true;
-            c._fixedHeight = true;
+            return fixComponentSize(c, 10, 10);
         });
         assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
         assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
-        components[0]._fixedWidth = false;
+        fixComponentSize(components[0], null, 10);
         assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
         assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
-        components[8]._fixedHeight = false;
-        components[0]._fixedWidth = true;
+        fixComponentSize(components[8], 10, null);
+        fixComponentSize(components[0], 10, 10);
         assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
         assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });
@@ -2702,12 +2687,9 @@ describe("Tables", function () {
         // [0 1]
         // [2 3]
         var c0 = new Plottable.Component();
-        var c1 = new Plottable.Component();
-        var c2 = new Plottable.Component();
-        var c3 = new Plottable.Component();
-        makeComponentFixedSize(c1, 50, 50);
-        makeComponentFixedSize(c2, 20, 50);
-        makeComponentFixedSize(c3, 20, 20);
+        var c1 = makeFixedSizeComponent(50, 50);
+        var c2 = makeFixedSizeComponent(20, 50);
+        var c3 = makeFixedSizeComponent(20, 20);
 
         function verifySpaceRequest(sr, w, h, ww, wh, id) {
             assert.equal(sr.width, w, "width requested is as expected #" + id);
@@ -2729,6 +2711,35 @@ describe("Tables", function () {
 
         spaceRequest = table._requestedSpace(200, 200);
         verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
+    });
+
+    it("table.iterateLayout works properly", function () {
+        // This unit test would have caught #405
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        var c4 = new Plottable.Component();
+        fixComponentSize(c1, 50, 50);
+        fixComponentSize(c4, 20, 10);
+        var table = new Plottable.Table([
+            [c1, c2],
+            [c3, c4]]);
+
+        function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
+            assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
+            assert.deepEqual(result.rowProportionalSpace, rPS, "rowProportionalSpace:" + id);
+            assert.deepEqual(result.guaranteedWidths, gW, "guaranteedWidths:" + id);
+            assert.deepEqual(result.guaranteedHeights, gH, "guaranteedHeights:" + id);
+            assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
+            assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
+        }
+
+        var result = table.iterateLayout(500, 500);
+        verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "1");
+
+        fixComponentSize(c1, 490, 50);
+        result = table.iterateLayout(500, 500);
+        verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "2");
     });
 });
 ///<reference path="testReference.ts" />

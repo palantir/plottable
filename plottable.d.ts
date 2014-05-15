@@ -1,6 +1,5 @@
 declare module Plottable {
     module Utils {
-        function any(bools: boolean[]): boolean;
         /**
         * Checks if x is between a and b.
         */
@@ -71,7 +70,14 @@ declare module Plottable {
             public decrement(id: any): number;
             public get(id: any): number;
         }
-        function repeat(element: any, count: number): any[];
+        /**
+        * Creates an array of length `count`, filled with value or (if value is a function), value()
+        *
+        * @param {any} value The value to fill the array with, or, if a function, a generator for values
+        * @param {number} count The length of the array to generate
+        * @return {any[]}
+        */
+        function createFilledArray(value: any, count: number): any[];
     }
 }
 declare module Plottable {
@@ -227,7 +233,7 @@ declare module Plottable {
         /**
         * Cause the Component to recompute layout and redraw. Useful if the window resized.
         *
-        * @param {number} [availableWidth ]  - the width of the container element
+        * @param {number} [availableWidth]  - the width of the container element
         * @param {number} [availableHeight] - the height of the container element
         */
         public resize(width?: number, height?: number): Component;
@@ -276,15 +282,15 @@ declare module Plottable {
         public classed(cssClass: string): boolean;
         public classed(cssClass: string, addClass: boolean): Component;
         /**
-        * Checks if the Component has a fixed width or scales to fill available space.
-        * Returns true by default on the base Component class.
+        * Checks if the Component has a fixed width or false if it grows to fill available space.
+        * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed width.
         */
         public isFixedWidth(): boolean;
         /**
-        * Checks if the Component has a fixed height or scales to fill available space.
-        * Returns true by default on the base Component class.
+        * Checks if the Component has a fixed height or false if it grows to fill available space.
+        * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed height.
         */
@@ -353,27 +359,6 @@ declare module Plottable {
         * @param {Component} component The Component to be added.
         */
         public addComponent(row: number, col: number, component: Component): Table;
-        /**
-        * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
-        *
-        * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
-        * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
-        * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
-        * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
-        * offered its column's width and may request some amount of it, which increases that column's guaranteed
-        * width. If there are some components that were not satisfied with the width they were offered, and there is free
-        * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
-        * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
-        * according to the colWeights.
-        *
-        * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
-        * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
-        * is possible, so the algorithm will not continue iterating on that dimension's account.
-        *
-        * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
-        * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
-        *
-        */
         /**
         * Sets the row and column padding on the Table.
         *
