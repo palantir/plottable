@@ -35,7 +35,7 @@ module Plottable {
         this.components.push(c);
       }
       if (this.element != null) {
-        c._anchor(this.content);
+        c._anchor(this.content, this);
       }
       return this;
     }
@@ -72,9 +72,9 @@ module Plottable {
       return this;
     }
 
-    public _anchor(element: D3.Selection): ComponentGroup {
-      super._anchor(element);
-      this.components.forEach((c) => c._anchor(this.content));
+    public _anchor(element: D3.Selection, parent: Component): ComponentGroup {
+      super._anchor(element, parent);
+      this.components.forEach((c) => c._anchor(this.content, this));
       return this;
     }
 
