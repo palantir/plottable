@@ -105,6 +105,15 @@ describe("Labels", () => {
     svg.remove();
   });
 
+  it("if a label text is changed to empty string, width updates to 0", () => {
+    var svg = generateSVG(400, 400);
+    var label = new Plottable.TitleLabel("foo");
+    label.renderTo(svg);
+    label.setText("");
+    assert.equal(label.availableWidth, 0, "width updated to 0");
+    svg.remove();
+  });
+
   it("unsupported alignments and orientations are unsupported", () => {
     assert.throws(() => new Plottable.Label("foo", "bar"), Error, "not a valid orientation");
   });
