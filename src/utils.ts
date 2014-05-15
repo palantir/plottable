@@ -306,14 +306,16 @@ module Plottable {
     }
 
     /**
-     * Takes an element, repeats it `count` times, and returns that list of length `count`
-     * If it takes a function, it calls that function to generate the items of the array.
-     * This way if you want, for example, an array of unique empty lists, use repeat(() => [], count)
+     * Creates an array of length `count`, filled with value or (if value is a function), value()
+     *
+     * @param {any} value The value to fill the array with, or, if a function, a generator for values
+     * @param {number} count The length of the array to generate
+     * @return {any[]}
      */
-    export function repeat(element: any, count: number) {
+    export function createFilledArray(value: any, count: number) {
       var out: any[] = [];
       for (var i = 0; i<count; i++) {
-        out[i] = typeof(element) === "function" ? element() : element;
+        out[i] = typeof(value) === "function" ? value(i) : value;
       }
       return out;
     }

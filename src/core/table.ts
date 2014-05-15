@@ -114,8 +114,8 @@ module Plottable {
       var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding );
       var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
 
-      var guaranteedWidths  = Utils.repeat(0, this.nCols);
-      var guaranteedHeights = Utils.repeat(0, this.nRows);
+      var guaranteedWidths  = Utils.createFilledArray(0, this.nCols);
+      var guaranteedHeights = Utils.createFilledArray(0, this.nRows);
 
       var freeWidth : number;
       var freeHeight: number;
@@ -173,10 +173,10 @@ module Plottable {
     }
 
     private determineGuarantees(offeredWidths: number[], offeredHeights: number[]): LayoutAllocation {
-      var requestedWidths  = Utils.repeat(0, this.nCols);
-      var requestedHeights = Utils.repeat(0, this.nRows);
-      var layoutWantsWidth  = Utils.repeat(false, this.nCols);
-      var layoutWantsHeight = Utils.repeat(false, this.nRows);
+      var requestedWidths  = Utils.createFilledArray(0, this.nCols);
+      var requestedHeights = Utils.createFilledArray(0, this.nRows);
+      var layoutWantsWidth  = Utils.createFilledArray(false, this.nCols);
+      var layoutWantsHeight = Utils.createFilledArray(false, this.nRows);
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
           var spaceRequest: ISpaceRequest;
