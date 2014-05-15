@@ -22,15 +22,27 @@ module Plottable {
       orientation = orientation.toLowerCase();
       if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
         this.orientation = orientation;
-        if (orientation === "horizontal") {
-          this._fixedWidth = false;
-        } else {
-          this._fixedHeight = false;
-        }
       } else {
         throw new Error(orientation + " is not a valid orientation for LabelComponent");
       }
       this.xAlign("CENTER").yAlign("CENTER"); // the defaults
+    }
+
+    public _requestedSpace(offeredWidth: number, offeredHeight: number) {
+      var desiredWidth : number;
+      var desiredHeight: number;
+      if (this.orientation === "horizontal") {
+        desiredWidth  = this.textLength;
+        desiredHeight = this.textHeight;
+      } else {
+        desiredWidth  = this.textHeight;
+        desiredHeight = this.textLength;
+      }
+      return {
+        width : Math.min(desiredWidth , offeredWidth),
+        height: Math.min(desiredHeight, offeredHeight),
+        wantsWidth : desiredWidth  > offeredWidth,
+        wantsHeight: desiredHeight > offeredHeight};
     }
 
     public _setup() {
@@ -59,11 +71,6 @@ module Plottable {
       var bbox = Utils.getBBox(this.textElement);
       this.textHeight = bbox.height;
       this.textLength = bbox.width;
-      if (this.orientation === "horizontal") {
-        this.minimumHeight(this.textHeight);
-      } else {
-        this.minimumWidth(this.textHeight);
-      }
     }
 
     private truncateTextAndRemeasure(availableLength: number) {
@@ -72,11 +79,8 @@ module Plottable {
       this.measureAndSetTextSize();
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
-      // We need to undo translation on the original element, since that effects
-      // alignment, but we are going to do that manually on the text element.
       this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
       var bbox = Utils.getBBox(this.textElement);
       this.textElement.attr("dy", -bbox.y);
@@ -85,8 +89,8 @@ module Plottable {
       var yShift = 0;
 
       if (this.orientation === "horizontal") {
-        this.truncateTextAndRemeasure(this.availableWidth);
-        xShift = (this.availableWidth  - this.textLength) * this._xAlignProportion;
+        this.truncateTextAndRemeasure(this.availableWidth );
+        xShift = (this.availableWidth   - this.textLength) * this._xAlignProportion;
       } else {
         this.truncateTextAndRemeasure(this.availableHeight);
         xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;

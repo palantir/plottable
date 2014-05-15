@@ -1,6 +1,13 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+
+  interface LayoutAllocation {
+    guaranteedWidths : number[];
+    guaranteedHeights: number[];
+    wantsWidthArr : boolean[];
+    wantsHeightArr: boolean[];
+  }
   export class Table extends Component {
     private rowPadding = 0;
     private colPadding = 0;
@@ -44,9 +51,9 @@ module Plottable {
         throw new Error("addComponent cannot be called after anchoring (for the moment)");
       }
 
-      this.nRows = Math.max(row, this.nRows);
-      this.nCols = Math.max(col, this.nCols);
-      this.padTableToSize(this.nRows + 1, this.nCols + 1);
+      this.nRows = Math.max(row + 1, this.nRows);
+      this.nCols = Math.max(col + 1, this.nCols);
+      this.padTableToSize(this.nRows, this.nCols);
 
       var currentComponent = this.rows[row][col];
       if (currentComponent != null) {
@@ -70,27 +77,153 @@ module Plottable {
       return this;
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-
-      // calculate the amount of free space by recursive col-/row- Minimum() calls
-      var freeWidth = this.availableWidth - this.minimumWidth();
-      var freeHeight = this.availableHeight - this.minimumHeight();
-      if (freeWidth < 0 || freeHeight < 0) {
-        throw new Error("Insufficient Space");
-      }
-
+    private iterateLayout(availableWidth : number, availableHeight: number) {
+    /*
+     * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
+     *
+     * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
+     * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
+     * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
+     * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
+     * offered its column's width and may request some amount of it, which increases that column's guaranteed
+     * width. If there are some components that were not satisfied with the width they were offered, and there is free
+     * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
+     * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
+     * according to the colWeights.
+     *
+     * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
+     * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
+     * is possible, so the algorithm will not continue iterating on that dimension's account.
+     *
+     * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
+     * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
+     *
+     */
       var cols = d3.transpose(this.rows);
+      var availableWidthAfterPadding  = availableWidth  - this.colPadding * (this.nCols - 1);
+      var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
+
       var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
       var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c.isFixedWidth());
-      // distribute remaining height to rows
-      var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
-      var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
+
+      // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
+      // so that they will get some initial space allocated to work with
+      var heuristicColWeights = colWeights.map((c) => c === 0 ? 0.5 : c);
+      var heuristicRowWeights = rowWeights.map((c) => c === 0 ? 0.5 : c);
+
+      var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding );
+      var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
+
+      var guaranteedWidths  = Utils.createFilledArray(0, this.nCols);
+      var guaranteedHeights = Utils.createFilledArray(0, this.nRows);
+
+      var freeWidth : number;
+      var freeHeight: number;
+
+      var nIterations = 0;
+      while (true) {
+        var offeredHeights = Utils.addArrays(guaranteedHeights, rowProportionalSpace);
+        var offeredWidths  = Utils.addArrays(guaranteedWidths,  colProportionalSpace);
+        var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
+        guaranteedWidths = guarantees.guaranteedWidths;
+        guaranteedHeights = guarantees.guaranteedHeights;
+        var wantsWidth  = guarantees.wantsWidthArr .some((x: boolean) => x);
+        var wantsHeight = guarantees.wantsHeightArr.some((x: boolean) => x);
+
+        var lastFreeWidth  = freeWidth ;
+        var lastFreeHeight = freeHeight;
+        freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
+        freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+        var xWeights: number[];
+        if (wantsWidth) { // If something wants width, divide free space between components that want more width
+          xWeights = guarantees.wantsWidthArr.map((x) => x ? 1 : 0);
+        } else { // Otherwise, divide free space according to the weights
+          xWeights = colWeights;
+        }
+
+        var yWeights: number[];
+        if (wantsHeight) {
+          yWeights = guarantees.wantsHeightArr.map((x) => x ? 1 : 0);
+        } else {
+          yWeights = rowWeights;
+        }
+
+        colProportionalSpace = Table.calcProportionalSpace(xWeights, freeWidth );
+        rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
+        nIterations++;
+
+        var canImproveWidthAllocation  = freeWidth  > 0 && wantsWidth  && freeWidth  !== lastFreeWidth;
+        var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
+
+        if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
+          break;
+        }
+
+        if (nIterations > 5) {
+          console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances");
+          break;
+        }
+      }
+
+      // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
+      freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
+      freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+      colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth );
+      rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
+
+      return {colProportionalSpace: colProportionalSpace        ,
+              rowProportionalSpace: rowProportionalSpace        ,
+              guaranteedWidths    : guarantees.guaranteedWidths ,
+              guaranteedHeights   : guarantees.guaranteedHeights,
+              wantsWidth          : wantsWidth                  ,
+              wantsHeight         : wantsHeight                 };
+    }
+
+    private determineGuarantees(offeredWidths: number[], offeredHeights: number[]): LayoutAllocation {
+      var requestedWidths  = Utils.createFilledArray(0, this.nCols);
+      var requestedHeights = Utils.createFilledArray(0, this.nRows);
+      var layoutWantsWidth  = Utils.createFilledArray(false, this.nCols);
+      var layoutWantsHeight = Utils.createFilledArray(false, this.nRows);
+      this.rows.forEach((row: Component[], rowIndex: number) => {
+        row.forEach((component: Component, colIndex: number) => {
+          var spaceRequest: ISpaceRequest;
+          if (component != null) {
+            spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+          } else {
+            spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+          }
+          if (spaceRequest.width > offeredWidths[colIndex] || spaceRequest.height > offeredHeights[rowIndex]) {
+            throw new Error("Invariant Violation: Component cannot request more space than is offered");
+          }
+
+          requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], spaceRequest.width );
+          requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], spaceRequest.height);
+          layoutWantsWidth [colIndex] = layoutWantsWidth [colIndex] || spaceRequest.wantsWidth;
+          layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
+        });
+      });
+      return {guaranteedWidths : requestedWidths  ,
+              guaranteedHeights: requestedHeights ,
+              wantsWidthArr    : layoutWantsWidth ,
+              wantsHeightArr   : layoutWantsHeight};
+    }
+
+
+    public _requestedSpace(offeredWidth : number, offeredHeight: number): ISpaceRequest {
+      var layout = this.iterateLayout(offeredWidth , offeredHeight);
+      return {width : d3.sum(layout.guaranteedWidths ),
+              height: d3.sum(layout.guaranteedHeights),
+              wantsWidth: layout.wantsWidth,
+              wantsHeight: layout.wantsHeight};
+    }
+
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
+      var layout = this.iterateLayout(this.availableWidth , this.availableHeight);
 
       var sumPair = (p: number[]) => p[0] + p[1];
-      var rowHeights = d3.zip(rowProportionalSpace, this.minimumHeights).map(sumPair);
-      var colWidths  = d3.zip(colProportionalSpace, this.minimumWidths).map(sumPair);
-
+      var rowHeights = Utils.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
+      var colWidths  = Utils.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
       var childYOffset = 0;
       this.rows.forEach((row: Component[], rowIndex: number) => {
         var childXOffset = 0;
@@ -157,29 +290,6 @@ module Plottable {
       return this;
     }
 
-    public minimumHeight(): number;
-    public minimumHeight(newVal: number): Table;
-    public minimumHeight(newVal?: number): any {
-      if (newVal != null) {
-        throw new Error("minimumHeight cannot be directly set on Table");
-      } else {
-        this.minimumHeights = this.rows.map((row: Component[]) => d3.max(row, (r: Component) => (r == null) ? 0 : r.minimumHeight()));
-        return d3.sum(this.minimumHeights) + this.rowPadding * (this.rows.length - 1);
-      }
-    }
-
-    public minimumWidth(): number;
-    public minimumWidth(newVal: number): Table;
-    public minimumWidth(newVal?: number): any {
-      if (newVal != null) {
-        throw new Error("minimumWidth cannot be directly set on Table");
-      } else {
-        var cols = d3.transpose(this.rows);
-        this.minimumWidths = cols.map((col: Component[]) => d3.max(col, (c: Component) => (c == null) ? 0 : c.minimumWidth()));
-        return d3.sum(this.minimumWidths) + this.colPadding * (cols.length - 1);
-      }
-    }
-
     public isFixedWidth(): boolean {
       var cols = d3.transpose(this.rows);
       return Table.fixedSpace(cols, (c: Component) => (c == null) || c.isFixedWidth());
@@ -227,8 +337,7 @@ module Plottable {
     private static calcProportionalSpace(weights: number[], freeSpace: number): number[] {
       var weightSum = d3.sum(weights);
       if (weightSum === 0) {
-        var numGroups = weights.length;
-        return weights.map((w) => freeSpace / numGroups);
+        return Utils.createFilledArray(0, weights.length);
       } else {
         return weights.map((w) => freeSpace * w / weightSum);
       }

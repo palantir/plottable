@@ -46,14 +46,14 @@ describe("Component behavior", () => {
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
       c._anchor(svg)._computeLayout();
-      assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableWidth , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
 
       svg.attr("width", 2*SVG_WIDTH).attr("height", 2*SVG_HEIGHT);
       c._computeLayout();
-      assert.equal(c.availableWidth, 2*SVG_WIDTH, "computeLayout updated width to new svg width");
+      assert.equal(c.availableWidth , 2*SVG_WIDTH, "computeLayout updated width to new svg width");
       assert.equal(c.availableHeight, 2*SVG_HEIGHT, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
@@ -74,7 +74,7 @@ describe("Component behavior", () => {
 
       c._anchor(svg)._computeLayout();
 
-      assert.equal(c.availableWidth, 100, "computeLayout defaulted width to svg width");
+      assert.equal(c.availableWidth , 100, "computeLayout defaulted width to svg width");
       assert.equal(c.availableHeight, 200, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin defaulted to 0");
@@ -83,7 +83,7 @@ describe("Component behavior", () => {
 
       c._computeLayout();
 
-      assert.equal(c.availableWidth, 50, "computeLayout updated width to new svg width");
+      assert.equal(c.availableWidth , 50, "computeLayout updated width to new svg width");
       assert.equal(c.availableHeight, 100, "computeLayout updated height to new svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin is still 0");
       assert.equal((<any> c).yOrigin, 0 ,"yOrigin is still 0");
@@ -115,7 +115,7 @@ describe("Component behavior", () => {
       c._anchor(g)._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate(c.element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
-      assert.equal(c.availableWidth, width, "the width set properly");
+      assert.equal(c.availableWidth , width, "the width set properly");
       assert.equal(c.availableHeight, height, "the height set propery");
       svg.remove();
     });
@@ -136,7 +136,7 @@ describe("Component behavior", () => {
   });
 
   it("fixed-width component will align to the right spot", () => {
-    c.minimumHeight(100).minimumWidth(100);
+    fixComponentSize(c, 100, 100);
     c._anchor(svg);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -151,47 +151,42 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
-      c.minimumHeight(100).minimumWidth(100);
-      c._anchor(svg);
-      c.xOffset(20).yOffset(20);
-      c._computeLayout();
-      assertComponentXY(c, 20, 20, "top-left component offsets correctly");
+it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
+    fixComponentSize(c, 100, 100);
+    c._anchor(svg);
+    c.xOffset(20).yOffset(20);
+    c._computeLayout();
+    assertComponentXY(c, 20, 20, "top-left component offsets correctly");
 
-      c.xAlign("CENTER").yAlign("CENTER");
-      c._computeLayout();
-      assertComponentXY(c, 170, 120, "center component offsets correctly");
+    c.xAlign("CENTER").yAlign("CENTER");
+    c._computeLayout();
+    assertComponentXY(c, 170, 120, "center component offsets correctly");
 
-      c.xAlign("RIGHT").yAlign("BOTTOM");
-      c._computeLayout();
-      assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
+    c.xAlign("RIGHT").yAlign("BOTTOM");
+    c._computeLayout();
+    assertComponentXY(c, 320, 220, "bottom-right component offsets correctly");
 
-      c.xOffset(0).yOffset(0);
-      c._computeLayout();
-      assertComponentXY(c, 300, 200, "bottom-right component offset resets");
+    c.xOffset(0).yOffset(0);
+    c._computeLayout();
+    assertComponentXY(c, 300, 200, "bottom-right component offset resets");
 
-      c.xOffset(-20).yOffset(-30);
-      c._computeLayout();
-      assertComponentXY(c, 280, 170, "negative offsets work properly");
+    c.xOffset(-20).yOffset(-30);
+    c._computeLayout();
+    assertComponentXY(c, 280, 170, "negative offsets work properly");
 
-      svg.remove();
-    });
+    svg.remove();
+  });
 
   it("component defaults are as expected", () => {
-    assert.equal(c.minimumHeight(), 0, "minimumHeight defaults to 0");
-    assert.equal(c.minimumWidth(), 0, "minimumWidth defaults to 0");
+    var layout = c._requestedSpace(1, 1);
+    assert.equal(layout.width, 0, "requested width defaults to 0");
+    assert.equal(layout.height, 0, "requested height defaults to 0");
+    assert.equal(layout.wantsWidth , false, "_requestedSpace().wantsWidth  defaults to false");
+    assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
     assert.equal((<any> c)._xAlignProportion, 0, "_xAlignProportion defaults to 0");
     assert.equal((<any> c)._yAlignProportion, 0, "_yAlignProportion defaults to 0");
     assert.equal((<any> c)._xOffset, 0, "xOffset defaults to 0");
     assert.equal((<any> c)._yOffset, 0, "yOffset defaults to 0");
-    svg.remove();
-  });
-
-  it("getters and setters work as expected", () => {
-    c.minimumHeight(12);
-    assert.equal(c.minimumHeight(), 12, "minimumHeight setter works");
-    c.minimumWidth(14);
-    assert.equal(c.minimumWidth(), 14, "minimumWidth setter works");
     svg.remove();
   });
 

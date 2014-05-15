@@ -2,8 +2,6 @@
 
 module Plottable {
   export class Axis extends Component {
-    public static Y_WIDTH = 50;
-    public static X_HEIGHT = 30;
     public axisElement: D3.Selection;
     private d3Axis: D3.Svg.Axis;
     public _axisScale: Scale;
@@ -48,8 +46,6 @@ module Plottable {
     }
 
     public _doRender() {
-      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + this.minimumWidth() + ", 0)");};
-      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this.minimumHeight() + ")");};
       var domain = this.d3Axis.scale().domain();
       var extent = Math.abs(domain[1] - domain[0]);
       var min = +d3.min(domain);
@@ -92,7 +88,7 @@ module Plottable {
     }
 
     public _hideCutOffTickLabels() {
-      var availableWidth = this.availableWidth;
+      var availableWidth  = this.availableWidth ;
       var availableHeight = this.availableHeight;
       var tickLabels = this.axisElement.selectAll(".tick").select("text");
 
@@ -100,9 +96,9 @@ module Plottable {
 
       var isInsideBBox = (tickBox: ClientRect) => {
         return (boundingBox.left <= tickBox.left &&
-                boundingBox.top <= tickBox.top &&
-                tickBox.right <= boundingBox.left + this.availableWidth &&
-                tickBox.bottom <= boundingBox.top + this.availableHeight);
+                boundingBox.top  <= tickBox.top  &&
+                tickBox.right  <= boundingBox.left + this.availableWidth &&
+                tickBox.bottom <= boundingBox.top  + this.availableHeight);
       };
 
       tickLabels.each(function (d: any){
@@ -278,6 +274,7 @@ module Plottable {
   }
 
   export class XAxis extends Axis {
+    private _height = 30;
     /**
      * Creates an XAxis (a horizontal Axis).
      *
@@ -287,20 +284,32 @@ module Plottable {
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
+      super(scale, orientation, formatter);
       var orientation = orientation.toLowerCase();
       if (orientation !== "top" && orientation !== "bottom") {
         throw new Error(orientation + " is not a valid orientation for XAxis");
       }
-      super(scale, orientation, formatter);
-      super.minimumHeight(Axis.X_HEIGHT);
-      this._fixedWidth = false;
       this.tickLabelPosition("center");
+    }
+
+    public height(h: number) {
+      this._height = h;
+      return this;
     }
 
     public _setup() {
       super._setup();
       this.axisElement.classed("x-axis", true);
       return this;
+    }
+
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+      return {
+        width : 0,
+        height: Math.min(offeredHeight, this._height),
+        wantsWidth : false,
+        wantsHeight: offeredHeight < this._height
+      };
     }
 
     /**
@@ -329,6 +338,8 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
+      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this._height + ")");};
+
 
       var tickTextLabels = this.axisElement.selectAll("text");
       if (tickTextLabels[0].length > 0) { // at least one tick label
@@ -394,6 +405,7 @@ module Plottable {
   }
 
   export class YAxis extends Axis {
+    private _width = 50;
     /**
      * Creates a YAxis (a vertical Axis).
      *
@@ -403,13 +415,11 @@ module Plottable {
      * @param {any} [formatter] a D3 formatter
      */
     constructor(scale: Scale, orientation: string, formatter: any = null) {
+      super(scale, orientation, formatter);
       orientation = orientation.toLowerCase();
       if (orientation !== "left" && orientation !== "right") {
         throw new Error(orientation + " is not a valid orientation for YAxis");
       }
-      super(scale, orientation, formatter);
-      super.minimumWidth(Axis.Y_WIDTH);
-      this._fixedHeight = false;
       this.tickLabelPosition("middle");
     }
 
@@ -417,6 +427,20 @@ module Plottable {
       super._setup();
       this.axisElement.classed("y-axis", true);
       return this;
+    }
+
+    public width(w: number) {
+      this._width = w;
+      return this;
+    }
+
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+      return {
+        width : Math.min(offeredWidth, this._width),
+        height: 0,
+        wantsWidth : offeredWidth < this._width,
+        wantsHeight: false
+      };
     }
 
     /**
@@ -445,6 +469,8 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
+      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + this._width + ", 0)");};
+
 
       var tickTextLabels = this.axisElement.selectAll("text");
       if (tickTextLabels[0].length > 0) { // at least one tick label

@@ -15,8 +15,8 @@ module Plottable {
      *
      * @constructor
      */
-    constructor() {
-      super(d3.scale.ordinal());
+    constructor(scale?: D3.Scale.OrdinalScale) {
+      super(scale == null ? d3.scale.ordinal() : scale);
     }
 
     public _getExtent(): any[] {

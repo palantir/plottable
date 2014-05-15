@@ -16,6 +16,13 @@ var Plottable;
         }
         Utils.inRange = inRange;
 
+        function addArrays(alist, blist) {
+            return alist.map(function (_, i) {
+                return alist[i] + blist[i];
+            });
+        }
+        Utils.addArrays = addArrays;
+
         /**
         * Gets the bounding box of an element.
         * @param {D3.Selection} element
@@ -59,7 +66,7 @@ var Plottable;
             element.text(text);
             var bbox = Utils.getBBox(element);
             var textLength = bbox.width;
-            if (textLength < availableSpace) {
+            if (textLength <= availableSpace) {
                 element.text(originalText);
                 return text;
             }
@@ -96,6 +103,21 @@ var Plottable;
             return height;
         }
         Utils.getTextHeight = getTextHeight;
+
+        /**
+        * Gets the width of a text element, as rendered.
+        *
+        * @param {D3.Selection} textElement
+        * @return {number} The width of the text element, in pixels.
+        */
+        function getTextWidth(textElement, text) {
+            var originalText = textElement.text();
+            textElement.text(text);
+            var width = Utils.getBBox(textElement).width;
+            textElement.text(originalText);
+            return width;
+        }
+        Utils.getTextWidth = getTextWidth;
 
         /**
         * Converts a string into an array of strings, all of which fit in the available space.
@@ -310,6 +332,22 @@ var Plottable;
             return IDCounter;
         })();
         Utils.IDCounter = IDCounter;
+
+        /**
+        * Creates an array of length `count`, filled with value or (if value is a function), value()
+        *
+        * @param {any} value The value to fill the array with, or, if a function, a generator for values
+        * @param {number} count The length of the array to generate
+        * @return {any[]}
+        */
+        function createFilledArray(value, count) {
+            var out = [];
+            for (var i = 0; i < count; i++) {
+                out[i] = typeof (value) === "function" ? value(i) : value;
+            }
+            return out;
+        }
+        Utils.createFilledArray = createFilledArray;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -498,10 +536,6 @@ var Plottable;
             this.boxes = [];
             this.clipPathEnabled = false;
             this.broadcastersCurrentlyListeningTo = {};
-            this._fixedWidth = true;
-            this._fixedHeight = true;
-            this._minimumHeight = 0;
-            this._minimumWidth = 0;
             this.isTopLevelComponent = false;
             this._xOffset = 0;
             this._yOffset = 0;
@@ -573,6 +607,10 @@ var Plottable;
             return this;
         };
 
+        Component.prototype._requestedSpace = function (availableWidth, availableHeight) {
+            return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+        };
+
         /**
         * Computes the size, position, and alignment from the specified values.
         * If no parameters are supplied and the component is a root node,
@@ -606,17 +644,19 @@ var Plottable;
             var xPosition = this.xOrigin;
             var yPosition = this.yOrigin;
 
-            xPosition += (availableWidth - this.minimumWidth()) * this._xAlignProportion;
+            var requestedSpace = this._requestedSpace(availableWidth, availableHeight);
+
+            xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
             xPosition += this._xOffset;
-            if (this.minimumWidth() !== 0 && this.isFixedWidth()) {
+            if (this.isFixedWidth()) {
                 // Decrease size so hitbox / bounding box and children are sized correctly
-                availableWidth = availableWidth > this.minimumWidth() ? this.minimumWidth() : availableWidth;
+                availableWidth = Math.min(availableWidth, requestedSpace.width);
             }
 
-            yPosition += (availableHeight - this.minimumHeight()) * this._yAlignProportion;
+            yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
             yPosition += this._yOffset;
-            if (this.minimumHeight() !== 0 && this.isFixedHeight()) {
-                availableHeight = availableHeight > this.minimumHeight() ? this.minimumHeight() : availableHeight;
+            if (this.isFixedHeight()) {
+                availableHeight = Math.min(availableHeight, requestedSpace.height);
             }
 
             this.availableWidth = availableWidth;
@@ -822,42 +862,28 @@ var Plottable;
             }
         };
 
-        Component.prototype.minimumHeight = function (newVal) {
-            if (newVal != null) {
-                this._minimumHeight = newVal;
-                return this;
-            } else {
-                return this._minimumHeight;
-            }
-        };
-
-        Component.prototype.minimumWidth = function (newVal) {
-            if (newVal != null) {
-                this._minimumWidth = newVal;
-                return this;
-            } else {
-                return this._minimumWidth;
-            }
-        };
-
         /**
-        * Checks if the Component has a fixed width or scales to fill available space.
-        * Returns true by default on the base Component class.
+        * Checks if the Component has a fixed width or false if it grows to fill available space.
+        * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed width.
         */
         Component.prototype.isFixedWidth = function () {
-            return this._fixedWidth;
+            // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
+            // some fixed size you aspire to.
+            // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
+            // For example a label with an empty string.
+            return this._requestedSpace(-1, -1).wantsWidth;
         };
 
         /**
-        * Checks if the Component has a fixed height or scales to fill available space.
-        * Returns true by default on the base Component class.
+        * Checks if the Component has a fixed height or false if it grows to fill available space.
+        * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed height.
         */
         Component.prototype.isFixedHeight = function () {
-            return this._fixedHeight;
+            return this._requestedSpace(-1, -1).wantsHeight;
         };
 
         /**
@@ -912,6 +938,24 @@ var Plottable;
             this.classed("component-group", true);
             this.components = components;
         }
+        ComponentGroup.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            var requests = this.components.map(function (c) {
+                return c._requestedSpace(offeredWidth, offeredHeight);
+            });
+            var desiredWidth = d3.max(requests, function (l) {
+                return l.width;
+            });
+            var desiredHeight = d3.max(requests, function (l) {
+                return l.height;
+            });
+            return {
+                width: Math.min(desiredWidth, offeredWidth),
+                height: Math.min(desiredHeight, offeredHeight),
+                wantsWidth: desiredWidth > offeredWidth,
+                wantsHeight: desiredHeight > offeredHeight
+            };
+        };
+
         ComponentGroup.prototype._addComponentToGroup = function (c, prepend) {
             if (typeof prepend === "undefined") { prepend = false; }
             if (prepend) {
@@ -1042,9 +1086,9 @@ var Plottable;
                 throw new Error("addComponent cannot be called after anchoring (for the moment)");
             }
 
-            this.nRows = Math.max(row, this.nRows);
-            this.nCols = Math.max(col, this.nCols);
-            this.padTableToSize(this.nRows + 1, this.nCols + 1);
+            this.nRows = Math.max(row + 1, this.nRows);
+            this.nCols = Math.max(col + 1, this.nCols);
+            this.padTableToSize(this.nRows, this.nCols);
 
             var currentComponent = this.rows[row][col];
             if (currentComponent != null) {
@@ -1070,18 +1114,32 @@ var Plottable;
             return this;
         };
 
-        Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-            var _this = this;
-            _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-
-            // calculate the amount of free space by recursive col-/row- Minimum() calls
-            var freeWidth = this.availableWidth - this.minimumWidth();
-            var freeHeight = this.availableHeight - this.minimumHeight();
-            if (freeWidth < 0 || freeHeight < 0) {
-                throw new Error("Insufficient Space");
-            }
-
+        Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
+            /*
+            * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
+            *
+            * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
+            * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
+            * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
+            * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
+            * offered its column's width and may request some amount of it, which increases that column's guaranteed
+            * width. If there are some components that were not satisfied with the width they were offered, and there is free
+            * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
+            * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
+            * according to the colWeights.
+            *
+            * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
+            * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
+            * is possible, so the algorithm will not continue iterating on that dimension's account.
+            *
+            * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
+            * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
+            *
+            */
             var cols = d3.transpose(this.rows);
+            var availableWidthAfterPadding = availableWidth - this.colPadding * (this.nCols - 1);
+            var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
+
             var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, function (c) {
                 return (c == null) || c.isFixedHeight();
             });
@@ -1089,16 +1147,134 @@ var Plottable;
                 return (c == null) || c.isFixedWidth();
             });
 
-            // distribute remaining height to rows
-            var rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
-            var colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
+            // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
+            // so that they will get some initial space allocated to work with
+            var heuristicColWeights = colWeights.map(function (c) {
+                return c === 0 ? 0.5 : c;
+            });
+            var heuristicRowWeights = rowWeights.map(function (c) {
+                return c === 0 ? 0.5 : c;
+            });
+
+            var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
+            var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
+
+            var guaranteedWidths = Plottable.Utils.createFilledArray(0, this.nCols);
+            var guaranteedHeights = Plottable.Utils.createFilledArray(0, this.nRows);
+
+            var freeWidth;
+            var freeHeight;
+
+            var nIterations = 0;
+            while (true) {
+                var offeredHeights = Plottable.Utils.addArrays(guaranteedHeights, rowProportionalSpace);
+                var offeredWidths = Plottable.Utils.addArrays(guaranteedWidths, colProportionalSpace);
+                var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
+                guaranteedWidths = guarantees.guaranteedWidths;
+                guaranteedHeights = guarantees.guaranteedHeights;
+                var wantsWidth = guarantees.wantsWidthArr.some(function (x) {
+                    return x;
+                });
+                var wantsHeight = guarantees.wantsHeightArr.some(function (x) {
+                    return x;
+                });
+
+                var lastFreeWidth = freeWidth;
+                var lastFreeHeight = freeHeight;
+                freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
+                freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+                var xWeights;
+                if (wantsWidth) {
+                    xWeights = guarantees.wantsWidthArr.map(function (x) {
+                        return x ? 1 : 0;
+                    });
+                } else {
+                    xWeights = colWeights;
+                }
+
+                var yWeights;
+                if (wantsHeight) {
+                    yWeights = guarantees.wantsHeightArr.map(function (x) {
+                        return x ? 1 : 0;
+                    });
+                } else {
+                    yWeights = rowWeights;
+                }
+
+                colProportionalSpace = Table.calcProportionalSpace(xWeights, freeWidth);
+                rowProportionalSpace = Table.calcProportionalSpace(yWeights, freeHeight);
+                nIterations++;
+
+                var canImproveWidthAllocation = freeWidth > 0 && wantsWidth && freeWidth !== lastFreeWidth;
+                var canImproveHeightAllocation = freeHeight > 0 && wantsHeight && freeHeight !== lastFreeHeight;
+
+                if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
+                    break;
+                }
+
+                if (nIterations > 5) {
+                    console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances");
+                    break;
+                }
+            }
+            return {
+                colProportionalSpace: colProportionalSpace,
+                rowProportionalSpace: rowProportionalSpace,
+                guaranteedWidths: guarantees.guaranteedWidths,
+                guaranteedHeights: guarantees.guaranteedHeights,
+                wantsWidth: wantsWidth,
+                wantsHeight: wantsHeight };
+        };
+
+        Table.prototype.determineGuarantees = function (offeredWidths, offeredHeights) {
+            var requestedWidths = Plottable.Utils.createFilledArray(0, this.nCols);
+            var requestedHeights = Plottable.Utils.createFilledArray(0, this.nRows);
+            var layoutWantsWidth = Plottable.Utils.createFilledArray(false, this.nCols);
+            var layoutWantsHeight = Plottable.Utils.createFilledArray(false, this.nRows);
+            this.rows.forEach(function (row, rowIndex) {
+                row.forEach(function (component, colIndex) {
+                    var spaceRequest;
+                    if (component != null) {
+                        spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+                    } else {
+                        spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
+                    }
+                    if (spaceRequest.width > offeredWidths[colIndex] || spaceRequest.height > offeredHeights[rowIndex]) {
+                        throw new Error("Invariant Violation: Component cannot request more space than is offered");
+                    }
+
+                    requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], spaceRequest.width);
+                    requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], spaceRequest.height);
+                    layoutWantsWidth[colIndex] = layoutWantsWidth[colIndex] || spaceRequest.wantsWidth;
+                    layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
+                });
+            });
+            return {
+                guaranteedWidths: requestedWidths,
+                guaranteedHeights: requestedHeights,
+                wantsWidthArr: layoutWantsWidth,
+                wantsHeightArr: layoutWantsHeight };
+        };
+
+        Table.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            var layout = this.iterateLayout(offeredWidth, offeredHeight);
+            return {
+                width: d3.sum(layout.guaranteedWidths),
+                height: d3.sum(layout.guaranteedHeights),
+                wantsWidth: layout.wantsWidth,
+                wantsHeight: layout.wantsHeight };
+        };
+
+        Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+            var _this = this;
+            _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+            var layout = this.iterateLayout(this.availableWidth, this.availableHeight);
 
             var sumPair = function (p) {
                 return p[0] + p[1];
             };
-            var rowHeights = d3.zip(rowProportionalSpace, this.minimumHeights).map(sumPair);
-            var colWidths = d3.zip(colProportionalSpace, this.minimumWidths).map(sumPair);
-
+            var rowHeights = Plottable.Utils.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
+            var colWidths = Plottable.Utils.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
             var childYOffset = 0;
             this.rows.forEach(function (row, rowIndex) {
                 var childXOffset = 0;
@@ -1163,33 +1339,6 @@ var Plottable;
         Table.prototype.colWeight = function (index, weight) {
             this.colWeights[index] = weight;
             return this;
-        };
-
-        Table.prototype.minimumHeight = function (newVal) {
-            if (newVal != null) {
-                throw new Error("minimumHeight cannot be directly set on Table");
-            } else {
-                this.minimumHeights = this.rows.map(function (row) {
-                    return d3.max(row, function (r) {
-                        return (r == null) ? 0 : r.minimumHeight();
-                    });
-                });
-                return d3.sum(this.minimumHeights) + this.rowPadding * (this.rows.length - 1);
-            }
-        };
-
-        Table.prototype.minimumWidth = function (newVal) {
-            if (newVal != null) {
-                throw new Error("minimumWidth cannot be directly set on Table");
-            } else {
-                var cols = d3.transpose(this.rows);
-                this.minimumWidths = cols.map(function (col) {
-                    return d3.max(col, function (c) {
-                        return (c == null) ? 0 : c.minimumWidth();
-                    });
-                });
-                return d3.sum(this.minimumWidths) + this.colPadding * (cols.length - 1);
-            }
         };
 
         Table.prototype.isFixedWidth = function () {
@@ -1416,8 +1565,6 @@ var Plottable;
             // to recompute attributes on the entire update selection.
             this._requireRerender = false;
             this.clipPathEnabled = true;
-            this._fixedWidth = false;
-            this._fixedHeight = false;
             this.classed("renderer", true);
 
             var dataSource;
@@ -1752,8 +1899,8 @@ var Plottable;
         *
         * @constructor
         */
-        function OrdinalScale() {
-            _super.call(this, d3.scale.ordinal());
+        function OrdinalScale(scale) {
+            _super.call(this, scale == null ? d3.scale.ordinal() : scale);
             this._range = [0, 1];
             this._rangeType = "points";
             // Padding as a proportion of the spacing between domain values
@@ -1866,6 +2013,15 @@ var Plottable;
             }
             _super.call(this, scale);
         }
+        // Duplicated from OrdinalScale._getExtent - should be removed in #388
+        ColorScale.prototype._getExtent = function () {
+            var extents = this._getAllExtents();
+            var concatenatedExtents = [];
+            extents.forEach(function (e) {
+                concatenatedExtents = concatenatedExtents.concat(e);
+            });
+            return Plottable.Utils.uniq(concatenatedExtents);
+        };
         return ColorScale;
     })(Plottable.Scale);
     Plottable.ColorScale = ColorScale;
@@ -2110,16 +2266,28 @@ var Plottable;
             orientation = orientation.toLowerCase();
             if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
                 this.orientation = orientation;
-                if (orientation === "horizontal") {
-                    this._fixedWidth = false;
-                } else {
-                    this._fixedHeight = false;
-                }
             } else {
                 throw new Error(orientation + " is not a valid orientation for LabelComponent");
             }
             this.xAlign("CENTER").yAlign("CENTER"); // the defaults
         }
+        Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            var desiredWidth;
+            var desiredHeight;
+            if (this.orientation === "horizontal") {
+                desiredWidth = this.textLength;
+                desiredHeight = this.textHeight;
+            } else {
+                desiredWidth = this.textHeight;
+                desiredHeight = this.textLength;
+            }
+            return {
+                width: Math.min(desiredWidth, offeredWidth),
+                height: Math.min(desiredHeight, offeredHeight),
+                wantsWidth: desiredWidth > offeredWidth,
+                wantsHeight: desiredHeight > offeredHeight };
+        };
+
         Label.prototype._setup = function () {
             _super.prototype._setup.call(this);
             this.textElement = this.content.append("text");
@@ -2146,11 +2314,6 @@ var Plottable;
             var bbox = Plottable.Utils.getBBox(this.textElement);
             this.textHeight = bbox.height;
             this.textLength = bbox.width;
-            if (this.orientation === "horizontal") {
-                this.minimumHeight(this.textHeight);
-            } else {
-                this.minimumWidth(this.textHeight);
-            }
         };
 
         Label.prototype.truncateTextAndRemeasure = function (availableLength) {
@@ -2161,10 +2324,6 @@ var Plottable;
 
         Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
             _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-            this.element.attr("transform", "translate(" + this.xOrigin + "," + this.yOrigin + ")");
-
-            // We need to undo translation on the original element, since that effects
-            // alignment, but we are going to do that manually on the text element.
             this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
             var bbox = Plottable.Utils.getBBox(this.textElement);
             this.textElement.attr("dy", -bbox.y);
@@ -2230,7 +2389,6 @@ var Plottable;
         function Legend(colorScale) {
             _super.call(this);
             this.classed("legend", true);
-            this.minimumWidth(120); // the default width
             this.scale(colorScale);
             this.xAlign("RIGHT").yAlign("TOP");
             this.xOffset(5).yOffset(5);
@@ -2257,13 +2415,33 @@ var Plottable;
             }
         };
 
-        Legend.prototype.minimumHeight = function (newVal) {
-            if (newVal != null) {
-                throw new Error("Row minimum cannot be directly set on Legend");
-            } else {
-                var textHeight = this.measureTextHeight();
-                return this.colorScale.domain().length * textHeight;
-            }
+        Legend.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+            _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
+            var textHeight = this.measureTextHeight();
+            var totalNumRows = this.colorScale.domain().length;
+            this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
+            return this;
+        };
+
+        Legend.prototype._requestedSpace = function (offeredWidth, offeredY) {
+            var textHeight = this.measureTextHeight();
+            var totalNumRows = this.colorScale.domain().length;
+            var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
+
+            var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+            var fakeText = fakeLegendEl.append("text");
+            var maxWidth = d3.max(this.colorScale.domain(), function (d) {
+                return Plottable.Utils.getTextWidth(fakeText, d);
+            });
+            fakeLegendEl.remove();
+            maxWidth = maxWidth === undefined ? 0 : maxWidth;
+            var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
+            return {
+                width: Math.min(desiredWidth, offeredWidth),
+                height: rowsICanFit * textHeight,
+                wantsWidth: offeredWidth < desiredWidth,
+                wantsHeight: rowsICanFit < totalNumRows
+            };
         };
 
         Legend.prototype.measureTextHeight = function () {
@@ -2276,12 +2454,10 @@ var Plottable;
 
         Legend.prototype._doRender = function () {
             _super.prototype._doRender.call(this);
-            this.legendBox.attr("height", this.minimumHeight()).attr("width", this.minimumWidth()); //HACKHACK #223
-            var domain = this.colorScale.domain();
+            var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
             var textHeight = this.measureTextHeight();
-            var availableWidth = this.minimumWidth() - textHeight - Legend.MARGIN;
+            var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-
             this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
             var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
             var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
@@ -3501,14 +3677,6 @@ var Plottable;
         };
 
         Axis.prototype._doRender = function () {
-            if (this.orient() === "left") {
-                this.axisElement.attr("transform", "translate(" + this.minimumWidth() + ", 0)");
-            }
-            ;
-            if (this.orient() === "top") {
-                this.axisElement.attr("transform", "translate(0," + this.minimumHeight() + ")");
-            }
-            ;
             var domain = this.d3Axis.scale().domain();
             var extent = Math.abs(domain[1] - domain[0]);
             var min = +d3.min(domain);
@@ -3718,8 +3886,6 @@ var Plottable;
                 return this;
             }
         };
-        Axis.Y_WIDTH = 50;
-        Axis.X_HEIGHT = 30;
         return Axis;
     })(Plottable.Component);
     Plottable.Axis = Axis;
@@ -3736,19 +3902,32 @@ var Plottable;
         */
         function XAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
+            _super.call(this, scale, orientation, formatter);
+            this._height = 30;
             var orientation = orientation.toLowerCase();
             if (orientation !== "top" && orientation !== "bottom") {
                 throw new Error(orientation + " is not a valid orientation for XAxis");
             }
-            _super.call(this, scale, orientation, formatter);
-            _super.prototype.minimumHeight.call(this, Axis.X_HEIGHT);
-            this._fixedWidth = false;
             this.tickLabelPosition("center");
         }
+        XAxis.prototype.height = function (h) {
+            this._height = h;
+            return this;
+        };
+
         XAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
             this.axisElement.classed("x-axis", true);
             return this;
+        };
+
+        XAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            return {
+                width: 0,
+                height: Math.min(offeredHeight, this._height),
+                wantsWidth: false,
+                wantsHeight: offeredHeight < this._height
+            };
         };
 
         XAxis.prototype.tickLabelPosition = function (position) {
@@ -3770,6 +3949,10 @@ var Plottable;
         XAxis.prototype._doRender = function () {
             var _this = this;
             _super.prototype._doRender.call(this);
+            if (this.orient() === "top") {
+                this.axisElement.attr("transform", "translate(0," + this._height + ")");
+            }
+            ;
 
             var tickTextLabels = this.axisElement.selectAll("text");
             if (tickTextLabels[0].length > 0) {
@@ -3850,19 +4033,32 @@ var Plottable;
         */
         function YAxis(scale, orientation, formatter) {
             if (typeof formatter === "undefined") { formatter = null; }
+            _super.call(this, scale, orientation, formatter);
+            this._width = 50;
             orientation = orientation.toLowerCase();
             if (orientation !== "left" && orientation !== "right") {
                 throw new Error(orientation + " is not a valid orientation for YAxis");
             }
-            _super.call(this, scale, orientation, formatter);
-            _super.prototype.minimumWidth.call(this, Axis.Y_WIDTH);
-            this._fixedHeight = false;
             this.tickLabelPosition("middle");
         }
         YAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
             this.axisElement.classed("y-axis", true);
             return this;
+        };
+
+        YAxis.prototype.width = function (w) {
+            this._width = w;
+            return this;
+        };
+
+        YAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            return {
+                width: Math.min(offeredWidth, this._width),
+                height: 0,
+                wantsWidth: offeredWidth < this._width,
+                wantsHeight: false
+            };
         };
 
         YAxis.prototype.tickLabelPosition = function (position) {
@@ -3884,6 +4080,10 @@ var Plottable;
         YAxis.prototype._doRender = function () {
             var _this = this;
             _super.prototype._doRender.call(this);
+            if (this.orient() === "left") {
+                this.axisElement.attr("transform", "translate(" + this._width + ", 0)");
+            }
+            ;
 
             var tickTextLabels = this.axisElement.selectAll("text");
             if (tickTextLabels[0].length > 0) {

@@ -11,7 +11,7 @@ module Plottable {
      *     (Category10/Category20/Category20b/Category20c).
      */
     constructor(scaleType?: string) {
-      var scale: D3.Scale.Scale;
+      var scale: D3.Scale.OrdinalScale;
       switch (scaleType) {
         case "Category10":
         case "category10":
@@ -41,6 +41,16 @@ module Plottable {
           throw new Error("Unsupported ColorScale type");
       }
       super(scale);
+    }
+
+    // Duplicated from OrdinalScale._getExtent - should be removed in #388
+    public _getExtent(): any[] {
+      var extents = this._getAllExtents();
+      var concatenatedExtents: string[] = [];
+      extents.forEach((e) => {
+        concatenatedExtents = concatenatedExtents.concat(e);
+      });
+      return Utils.uniq(concatenatedExtents);
     }
   }
 }

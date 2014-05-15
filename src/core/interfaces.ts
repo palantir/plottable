@@ -32,4 +32,11 @@ module Plottable {
   export interface IBroadcasterCallback {
     (broadcaster: Broadcaster, ...args: any[]): any;
   }
+
+  export interface ISpaceRequest {
+    width: number;
+    height: number;
+    wantsWidth: boolean;
+    wantsHeight: boolean;
+  }
 }

@@ -86,12 +86,12 @@ function commitDashboard(dataManager, svg) {
   // ---- /Timeseries -----
 
   // ----- Legends -----
-  var contributorLegend = new Plottable.Legend(contributorColorScale).minimumWidth(160);
+  var contributorLegend = new Plottable.Legend(contributorColorScale);
   var contributorLegendTable = new Plottable.Table([
     [new Plottable.Label("Contributors").classed("legend-label", true)],
     [contributorLegend]
   ]);
-  var directoryLegend = new Plottable.Legend(directoryColorScale).minimumWidth(160);
+  var directoryLegend = new Plottable.Legend(directoryColorScale);
   var directoryLegendTable = new Plottable.Table([
     [new Plottable.Label("Directories").classed("legend-label", true)],
     [directoryLegend]
@@ -103,7 +103,7 @@ function commitDashboard(dataManager, svg) {
   var contributorBarYScale = new Plottable.LinearScale().domain([0, 100000]);
   var contributorBarXAxis = new Plottable.XAxis(contributorBarXScale, "bottom", function(d) { return d});
   var contributorBarYAxis = new Plottable.YAxis(contributorBarYScale, "right").showEndTickLabels(true);
-  contributorBarXAxis.classed("no-tick-labels", true).minimumHeight(5);
+  contributorBarXAxis.classed("no-tick-labels", true);
   var contributorBarRenderer = new Plottable.BarRenderer(linesByContributor,
                                                                  contributorBarXScale,
                                                                  contributorBarYScale);
@@ -121,7 +121,7 @@ function commitDashboard(dataManager, svg) {
   var directoryBarYAxis = new Plottable.YAxis(directoryBarYScale, "right");
   var directoryBarXScale = new Plottable.OrdinalScale().domain(dataManager.directories).rangeType('bands');
   var directoryBarXAxis = new Plottable.XAxis(directoryBarXScale, "bottom", function(d) { return d});
-  directoryBarXAxis.classed("no-tick-labels", true).minimumHeight(5);
+  directoryBarXAxis.classed("no-tick-labels", true);
   var directoryBarRenderer = new Plottable.BarRenderer(linesByDirectory,
                                                                directoryBarXScale,
                                                                directoryBarYScale);
@@ -139,26 +139,29 @@ function commitDashboard(dataManager, svg) {
   var bar1Label    = new Plottable.AxisLabel("Lines of code by contributor");
   var renderLabel  = new Plottable.AxisLabel("Lines of code over time");
   var bar2Label    = new Plottable.AxisLabel("Lines of code by directory");
-  var filler = new Plottable.Component().minimumHeight(5);
   // ---- Assemble! -----
   var dashboardTable = new Plottable.Table([
     [null,         scatterLabel,      null,                   bar1Label          ],
-    [filler,       null,              null,                   null               ],
     [scatterYAxis, scatterRenderArea, contributorLegendTable, contributorBarChart],
     [null,         scatterDateAxis,   null,                   null               ],
     [null,         renderLabel,       null,                   bar2Label          ],
     [tscYAxis,     tscRenderArea,     directoryLegendTable,   directoryBarChart  ],
     [null,         tscDateAxis,       null,                   null               ]
   ]);
+  window.contributorLegendTable = contributorLegendTable;
+  window.directoryLegendTable = directoryLegendTable;
+  window.scatterYAxis = scatterYAxis;
+  window.tscYAxis = tscYAxis;
+  window.scatterLabel = scatterLabel;
+  dashboardTable.debug = true;
   dashboardTable.padding(0, 10);
   dashboardTable.colWeight(1, 3);
   dashboardTable.colWeight(2, 0);
   var titleLabel = new Plottable.TitleLabel("Plottable Git Commit History").classed("major", true);
   var outerTable = new Plottable.Table([
     [titleLabel],
-    [new Plottable.Component().minimumHeight(5)],
-    [dashboardTable]
-    ]).renderTo(svg);
+    [dashboardTable]])
+    .renderTo(svg);
 
   function resetDomains() {
     timeScale.domain([startDate, endDate]).nice();

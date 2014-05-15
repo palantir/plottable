@@ -21,7 +21,7 @@ describe("Gridlines", () => {
 
     basicTable._anchor(svg);
     basicTable._computeLayout();
-    xScale.range([0, xAxis.availableWidth]); // manually set range since we don't have a renderer
+    xScale.range([0, xAxis.availableWidth ]); // manually set range since we don't have a renderer
     yScale.range([yAxis.availableHeight, 0]);
     basicTable._render();
 

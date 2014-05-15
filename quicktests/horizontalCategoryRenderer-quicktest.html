@@ -2,7 +2,7 @@
   <head>
     <title>Horizontal Category Renderer Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../../build/plottable.js"></script>
     <script src="../../build/exampleUtil.js"></script>
 
@@ -21,7 +21,7 @@
 
       var yScale = new Plottable.OrdinalScale().rangeType("bands");
       var yAxis = new Plottable.YAxis(yScale, "left", function(d) { return d; } );
-      yAxis.minimumWidth(60);
+      yAxis.width(60);
 
       var barRenderer = new Plottable.HorizontalBarRenderer(ds, xScale, yScale)
                               .project("x", "age", xScale)

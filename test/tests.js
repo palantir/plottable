@@ -17,6 +17,22 @@ function getSVGParent() {
     }
 }
 
+function fixComponentSize(c, fixedWidth, fixedHeight) {
+    c._requestedSpace = function (w, h) {
+        return {
+            width: fixedWidth == null ? 0 : Math.min(w, fixedWidth),
+            height: fixedHeight == null ? 0 : Math.min(h, fixedHeight),
+            wantsWidth: fixedWidth == null ? false : w < fixedWidth,
+            wantsHeight: fixedHeight == null ? false : h < fixedHeight
+        };
+    };
+    return c;
+}
+
+function makeFixedSizeComponent(fixedWidth, fixedHeight) {
+    return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
+}
+
 function getTranslate(element) {
     return d3.transform(element.attr("transform")).translate;
 }
@@ -203,13 +219,13 @@ describe("Axes", function () {
         var xAxis = new Plottable.XAxis(xScale, "top");
         xAxis.renderTo(svg);
 
-        var oldHeight = xAxis.minimumHeight();
+        var oldHeight = xAxis._requestedSpace(500, 100).height;
         var axisBBoxBefore = xAxis.element.node().getBBox();
         var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
         assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
 
         var newHeight = 60;
-        xAxis.minimumHeight(newHeight);
+        xAxis.height(newHeight);
         xAxis.renderTo(svg);
         var axisBBoxAfter = xAxis.element.node().getBBox();
         var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
@@ -263,13 +279,13 @@ describe("Axes", function () {
         var yAxis = new Plottable.YAxis(yScale, "left");
         yAxis.renderTo(svg);
 
-        var oldWidth = yAxis.minimumWidth();
+        var oldWidth = yAxis._requestedSpace(100, 500).width;
         var axisBBoxBefore = yAxis.element.node().getBBox();
         var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
         assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
 
         var newWidth = 80;
-        yAxis.minimumWidth(newWidth);
+        yAxis.width(newWidth);
         yAxis.renderTo(svg);
         var axisBBoxAfter = yAxis.element.node().getBBox();
         var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
@@ -332,7 +348,7 @@ describe("Axes", function () {
         ordinalScale.range([0, 300]);
 
         var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
-        xAxis.minimumHeight(60);
+        xAxis.height(60);
         xAxis.renderTo(svg);
 
         var tickTexts = svg.selectAll(".tick text");
@@ -359,7 +375,7 @@ describe("Axes", function () {
         assert.isTrue(allTopsEqual, "tops of labels align");
 
         assert.isTrue(clientRects.every(function (rect) {
-            return rect.height < xAxis.minimumHeight() - xAxis.tickSize();
+            return rect.height < xAxis._height - xAxis.tickSize();
         }), "all labels fit within the available space");
         svg.remove();
     });
@@ -371,7 +387,7 @@ describe("Axes", function () {
         ordinalScale.range([0, 300]);
 
         var yAxis = new Plottable.YAxis(ordinalScale, "left");
-        yAxis.minimumWidth(100);
+        yAxis.width(100);
         yAxis.renderTo(svg);
 
         var tickTexts = svg.selectAll(".tick text");
@@ -398,7 +414,7 @@ describe("Axes", function () {
         assert.isTrue(allTopsEqual, "right edges of labels align");
 
         assert.isTrue(clientRects.every(function (rect) {
-            return rect.width < yAxis.minimumWidth() - yAxis.tickSize();
+            return rect.width < yAxis._width - yAxis.tickSize();
         }), "all labels fit within the available space");
         svg.remove();
     });
@@ -470,7 +486,7 @@ var assert = chai.assert;
 
 describe("ComponentGroups", function () {
     it("components in componentGroups overlap", function () {
-        var c1 = new Plottable.Component().minimumHeight(10).minimumWidth(10);
+        var c1 = makeFixedSizeComponent(10, 10);
         var c2 = new Plottable.Component();
         var c3 = new Plottable.Component();
 
@@ -491,8 +507,8 @@ describe("ComponentGroups", function () {
     });
 
     it("components can be added before and after anchoring", function () {
-        var c1 = new Plottable.Component().minimumHeight(10).minimumWidth(10);
-        var c2 = new Plottable.Component().minimumHeight(20).minimumWidth(20);
+        var c1 = makeFixedSizeComponent(10, 10);
+        var c2 = makeFixedSizeComponent(20, 20);
         var c3 = new Plottable.Component();
 
         var cg = new Plottable.ComponentGroup([c1]);
@@ -516,23 +532,17 @@ describe("ComponentGroups", function () {
     it("component fixity is computed appropriately", function () {
         var cg = new Plottable.ComponentGroup();
         var c1 = new Plottable.Component();
-        c1._fixedHeight = false;
-        c1._fixedWidth = false;
         var c2 = new Plottable.Component();
-        c2._fixedHeight = false;
-        c2._fixedWidth = false;
 
         cg.merge(c1).merge(c2);
         assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
         assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
 
-        c1._fixedHeight = true;
-        c1._fixedWidth = true;
-
+        fixComponentSize(c1, 10, 10);
         assert.isFalse(cg.isFixedHeight(), "height not fixed when one component unfixed");
         assert.isFalse(cg.isFixedWidth(), "width not fixed when one component unfixed");
 
-        c2._fixedHeight = true;
+        fixComponentSize(c2, null, 10);
         assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
         assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
     });
@@ -540,11 +550,7 @@ describe("ComponentGroups", function () {
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
         var cg = new Plottable.ComponentGroup();
         var c1 = new Plottable.Component();
-        c1._fixedHeight = false;
-        c1._fixedWidth = false;
         var c2 = new Plottable.Component();
-        c2._fixedHeight = false;
-        c2._fixedWidth = false;
         cg.merge(c1).merge(c2);
 
         var svg = generateSVG();
@@ -790,7 +796,7 @@ describe("Component behavior", function () {
     });
 
     it("fixed-width component will align to the right spot", function () {
-        c.minimumHeight(100).minimumWidth(100);
+        fixComponentSize(c, 100, 100);
         c._anchor(svg);
         c._computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -806,7 +812,7 @@ describe("Component behavior", function () {
     });
 
     it("components can be offset relative to their alignment, and throw errors if there is insufficient space", function () {
-        c.minimumHeight(100).minimumWidth(100);
+        fixComponentSize(c, 100, 100);
         c._anchor(svg);
         c.xOffset(20).yOffset(20);
         c._computeLayout();
@@ -832,20 +838,15 @@ describe("Component behavior", function () {
     });
 
     it("component defaults are as expected", function () {
-        assert.equal(c.minimumHeight(), 0, "minimumHeight defaults to 0");
-        assert.equal(c.minimumWidth(), 0, "minimumWidth defaults to 0");
+        var layout = c._requestedSpace(1, 1);
+        assert.equal(layout.width, 0, "requested width defaults to 0");
+        assert.equal(layout.height, 0, "requested height defaults to 0");
+        assert.equal(layout.wantsWidth, false, "_requestedSpace().wantsWidth  defaults to false");
+        assert.equal(layout.wantsHeight, false, "_requestedSpace().wantsHeight defaults to false");
         assert.equal(c._xAlignProportion, 0, "_xAlignProportion defaults to 0");
         assert.equal(c._yAlignProportion, 0, "_yAlignProportion defaults to 0");
         assert.equal(c._xOffset, 0, "xOffset defaults to 0");
         assert.equal(c._yOffset, 0, "yOffset defaults to 0");
-        svg.remove();
-    });
-
-    it("getters and setters work as expected", function () {
-        c.minimumHeight(12);
-        assert.equal(c.minimumHeight(), 12, "minimumHeight setter works");
-        c.minimumWidth(14);
-        assert.equal(c.minimumWidth(), 14, "minimumWidth setter works");
         svg.remove();
     });
 
@@ -1342,7 +1343,7 @@ describe("Labels", function () {
 
         var text = content.select("text");
         var bbox = Plottable.Utils.getBBox(text);
-        assert.equal(bbox.height, label.minimumHeight(), "text height === label.minimumHeight()");
+        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
         assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
@@ -1357,7 +1358,7 @@ describe("Labels", function () {
         label._render();
         var textBBox = Plottable.Utils.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.minimumWidth(), "text height === label.minimumWidth() (it's rotated)");
+        assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
         assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
         svg.remove();
     });
@@ -1372,7 +1373,7 @@ describe("Labels", function () {
         label._render();
         var textBBox = Plottable.Utils.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.minimumWidth(), "text height === label.minimumWidth() (it's rotated)");
+        assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
         assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
         svg.remove();
     });
@@ -1380,13 +1381,14 @@ describe("Labels", function () {
     it("Label text can be changed after label is created", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.TitleLabel();
-        label._anchor(svg);
+        label.renderTo(svg);
         var textEl = label.content.select("text");
         assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
-        assert.equal(label.minimumHeight(), 0, "rowMin is 0 for empty string");
+        assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
         label.setText("hello world");
+        label.renderTo(svg);
         assert.equal(textEl.text(), "hello world", "the label text updated properly");
-        assert.operator(label.minimumHeight(), ">", 0, "rowMin is > 0 for non-empty string");
+        assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
 
@@ -1400,7 +1402,7 @@ describe("Labels", function () {
         label._computeLayout();
         label._render();
         var bbox = Plottable.Utils.getBBox(text);
-        assert.equal(bbox.height, label.minimumHeight(), "text height === label.minimumHeight()");
+        assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
     });
@@ -1417,7 +1419,7 @@ describe("Labels", function () {
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.TitleLabel(".");
-        var t = new Plottable.Table().addComponent(0, 0, label);
+        var t = new Plottable.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Component());
         t.renderTo(svg);
         var textElement = svg.select("text");
         var textX = parseFloat(textElement.attr("x"));
@@ -1464,14 +1466,15 @@ describe("Legends", function () {
     });
 
     it("legend domain can be updated after initialization, and minimumHeight updates as well", function () {
-        legend._anchor(svg);
+        legend.renderTo(svg);
         legend.scale(color);
-        assert.equal(legend.minimumHeight(), 0, "there is no minimumHeight while the domain is empty");
+        assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
         color.domain(["foo", "bar"]);
-        var height1 = legend.minimumHeight();
+        var height1 = legend._requestedSpace(400, 400).height;
         assert.operator(height1, ">", 0, "changing the domain gives a positive minimumHeight");
         color.domain(["foo", "bar", "baz"]);
-        assert.operator(legend.minimumHeight(), ">", height1, "adding to the domain increases the minimumHeight");
+        assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the minimumHeight");
+        legend.renderTo(svg);
         var numRows = legend.content.selectAll(".legend-row")[0].length;
         assert.equal(numRows, 3, "there are 3 rows");
         svg.remove();
@@ -1487,12 +1490,13 @@ describe("Legends", function () {
             totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
         });
         assert.lengthOf(legends[0], 8, "there were 8 legends");
-        assert.operator(totalHeight, "<=", legend.minimumHeight(), "the legend did not overflow its requested space");
+        assert.operator(totalHeight, "<=", legend.availableHeight, "the legend did not overflow its space");
         svg.remove();
     });
 
     it("a legend with a long label does not overflow horizontally", function () {
         color.domain(["foooboooloonoogoorooboopoo"]);
+        svg.attr("width", 100);
         legend.renderTo(svg);
         var text = legend.content.select("text").text();
         assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
@@ -1527,13 +1531,6 @@ describe("Legends", function () {
             assert.equal(fill, color.scale(d), "the fill was set properly");
         });
         assert.lengthOf(legend.content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
-        svg.remove();
-    });
-
-    it("minimumHeight can't be set on a legend", function () {
-        assert.throws(function () {
-            return legend.minimumHeight(5);
-        }, Error, "cannot be directly set");
         svg.remove();
     });
 });
@@ -2588,27 +2585,10 @@ describe("Tables", function () {
         svg.remove();
     });
 
-    it("tables with insufficient space throw Insufficient Space", function () {
-        var svg = generateSVG(200, 200);
-        var c = new Plottable.Component().minimumHeight(300).minimumWidth(300);
-        var t = new Plottable.Table().addComponent(0, 0, c);
-        t._anchor(svg);
-        assert.throws(function () {
-            return t._computeLayout();
-        }, Error, "Insufficient Space");
-        svg.remove();
-    });
-
     it("basic table with 2 rows 2 cols lays out properly", function () {
         var tableAndcomponents = generateBasicTable(2, 2);
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
-
-        // force the components to have non-fixed layout; eg. as if they were renderers
-        components.forEach(function (c) {
-            c._fixedWidth = false;
-            c._fixedHeight = false;
-        });
 
         var svg = generateSVG();
         table.renderTo(svg);
@@ -2637,13 +2617,6 @@ describe("Tables", function () {
         var tableAndcomponents = generateBasicTable(2, 2);
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
-
-        // force the components to have non-fixed layout; eg. as if they were renderers
-        components.forEach(function (c) {
-            c._fixedWidth = false;
-            c._fixedHeight = false;
-        });
-
         table.padding(5, 5);
 
         var svg = generateSVG(415, 415);
@@ -2671,27 +2644,23 @@ describe("Tables", function () {
 
     it("table with fixed-size objects on every side lays out properly", function () {
         var svg = generateSVG();
-        var tableAndcomponents = generateBasicTable(3, 3);
-        var table = tableAndcomponents.table;
-        var components = tableAndcomponents.components;
+        var c4 = new Plottable.Component();
 
         // [0 1 2] \\
         // [3 4 5] \\
         // [6 7 8] \\
-        // First, set everything to have no weight
-        components.forEach(function (r) {
-            return r.minimumWidth(0).minimumHeight(0);
-        });
-
         // give the axis-like objects a minimum
-        components[1].minimumHeight(30);
-        components[7].minimumHeight(30);
-        components[3].minimumWidth(50);
-        components[5].minimumWidth(50);
-        components[4]._fixedWidth = false;
-        components[4]._fixedHeight = false;
+        var c1 = makeFixedSizeComponent(null, 30);
+        var c7 = makeFixedSizeComponent(null, 30);
+        var c3 = makeFixedSizeComponent(50, null);
+        var c5 = makeFixedSizeComponent(50, null);
+        var table = new Plottable.Table([
+            [null, c1, null],
+            [c3, c4, c5],
+            [null, c7, null]]);
 
-        // finally the center 'plot' object has a weight
+        var components = [c1, c3, c4, c5, c7];
+
         table.renderTo(svg);
 
         var elements = components.map(function (r) {
@@ -2705,44 +2674,96 @@ describe("Tables", function () {
         });
 
         // test the translates
-        assert.deepEqual(translates[1], [50, 0], "top axis translate");
-        assert.deepEqual(translates[7], [50, 370], "bottom axis translate");
-        assert.deepEqual(translates[3], [0, 30], "left axis translate");
-        assert.deepEqual(translates[5], [350, 30], "right axis translate");
-        assert.deepEqual(translates[4], [50, 30], "plot translate");
+        assert.deepEqual(translates[0], [50, 0], "top axis translate");
+        assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
+        assert.deepEqual(translates[1], [0, 30], "left axis translate");
+        assert.deepEqual(translates[3], [350, 30], "right axis translate");
+        assert.deepEqual(translates[2], [50, 30], "plot translate");
 
         // test the bboxes
-        assertBBoxEquivalence(bboxes[1], [300, 30], "top axis bbox");
-        assertBBoxEquivalence(bboxes[7], [300, 30], "bottom axis bbox");
-        assertBBoxEquivalence(bboxes[3], [50, 340], "left axis bbox");
-        assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
-        assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
+        assertBBoxEquivalence(bboxes[0], [300, 30], "top axis bbox");
+        assertBBoxEquivalence(bboxes[4], [300, 30], "bottom axis bbox");
+        assertBBoxEquivalence(bboxes[1], [50, 340], "left axis bbox");
+        assertBBoxEquivalence(bboxes[3], [50, 340], "right axis bbox");
+        assertBBoxEquivalence(bboxes[2], [300, 340], "plot bbox");
         svg.remove();
-    });
-
-    it("you can't set minimumWidth or minimumHeight on tables directly", function () {
-        var table = new Plottable.Table();
-        assert.throws(function () {
-            return table.minimumHeight(3);
-        }, Error, "cannot be directly set");
-        assert.throws(function () {
-            return table.minimumWidth(3);
-        }, Error, "cannot be directly set");
     });
 
     it("table space fixity calculates properly", function () {
         var tableAndcomponents = generateBasicTable(3, 3);
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
+        components.forEach(function (c) {
+            return fixComponentSize(c, 10, 10);
+        });
         assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
         assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
-        components[0]._fixedWidth = false;
+        fixComponentSize(components[0], null, 10);
         assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
         assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
-        components[8]._fixedHeight = false;
-        components[0]._fixedWidth = true;
+        fixComponentSize(components[8], 10, null);
+        fixComponentSize(components[0], 10, 10);
         assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
         assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+    });
+
+    it("table._requestedSpace works properly", function () {
+        // [0 1]
+        // [2 3]
+        var c0 = new Plottable.Component();
+        var c1 = makeFixedSizeComponent(50, 50);
+        var c2 = makeFixedSizeComponent(20, 50);
+        var c3 = makeFixedSizeComponent(20, 20);
+
+        function verifySpaceRequest(sr, w, h, ww, wh, id) {
+            assert.equal(sr.width, w, "width requested is as expected #" + id);
+            assert.equal(sr.height, h, "height requested is as expected #" + id);
+            assert.equal(sr.wantsWidth, ww, "needs more width is as expected #" + id);
+            assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+        }
+
+        var table = new Plottable.Table([[c0, c1], [c2, c3]]);
+
+        var spaceRequest = table._requestedSpace(30, 30);
+        verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
+
+        spaceRequest = table._requestedSpace(50, 50);
+        verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
+
+        spaceRequest = table._requestedSpace(90, 90);
+        verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
+
+        spaceRequest = table._requestedSpace(200, 200);
+        verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
+    });
+
+    it("table.iterateLayout works properly", function () {
+        // This unit test would have caught #405
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        var c4 = new Plottable.Component();
+        fixComponentSize(c1, 50, 50);
+        fixComponentSize(c4, 20, 10);
+        var table = new Plottable.Table([
+            [c1, c2],
+            [c3, c4]]);
+
+        function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
+            assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
+            assert.deepEqual(result.rowProportionalSpace, rPS, "rowProportionalSpace:" + id);
+            assert.deepEqual(result.guaranteedWidths, gW, "guaranteedWidths:" + id);
+            assert.deepEqual(result.guaranteedHeights, gH, "guaranteedHeights:" + id);
+            assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
+            assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
+        }
+
+        var result = table.iterateLayout(500, 500);
+        verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "1");
+
+        fixComponentSize(c1, 490, 50);
+        result = table.iterateLayout(500, 500);
+        verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "2");
     });
 });
 ///<reference path="testReference.ts" />

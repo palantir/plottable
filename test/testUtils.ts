@@ -16,6 +16,22 @@ function getSVGParent(): D3.Selection {
   }
 }
 
+function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
+  c._requestedSpace = function(w, h) {
+    return {
+      width:  fixedWidth  == null ? 0 : Math.min(w, fixedWidth) ,
+      height: fixedHeight == null ? 0 : Math.min(h, fixedHeight),
+      wantsWidth : fixedWidth  == null ? false : w < fixedWidth ,
+      wantsHeight: fixedHeight == null ? false : h < fixedHeight
+    };
+  };
+  return c;
+}
+
+function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number) {
+  return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
+}
+
 function getTranslate(element: D3.Selection) {
   return d3.transform(element.attr("transform")).translate;
 }

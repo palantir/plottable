@@ -4,6 +4,7 @@ declare module Plottable {
         * Checks if x is between a and b.
         */
         function inRange(x: number, a: number, b: number): boolean;
+        function addArrays(alist: number[], blist: number[]): number[];
         /**
         * Gets the bounding box of an element.
         * @param {D3.Selection} element
@@ -28,6 +29,13 @@ declare module Plottable {
         * @return {number} The height of the text element, in pixels.
         */
         function getTextHeight(textElement: D3.Selection): number;
+        /**
+        * Gets the width of a text element, as rendered.
+        *
+        * @param {D3.Selection} textElement
+        * @return {number} The width of the text element, in pixels.
+        */
+        function getTextWidth(textElement: D3.Selection, text: string): number;
         /**
         * Converts a string into an array of strings, all of which fit in the available space.
         *
@@ -62,6 +70,14 @@ declare module Plottable {
             public decrement(id: any): number;
             public get(id: any): number;
         }
+        /**
+        * Creates an array of length `count`, filled with value or (if value is a function), value()
+        *
+        * @param {any} value The value to fill the array with, or, if a function, a generator for values
+        * @param {number} count The length of the array to generate
+        * @return {any[]}
+        */
+        function createFilledArray(value: any, count: number): any[];
     }
 }
 declare module Plottable {
@@ -266,31 +282,15 @@ declare module Plottable {
         public classed(cssClass: string): boolean;
         public classed(cssClass: string, addClass: boolean): Component;
         /**
-        * Sets or retrieves the Component's minimum height.
-        *
-        * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
-        * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
-        */
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Component;
-        /**
-        * Sets or retrieves the Component's minimum width.
-        *
-        * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
-        * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
-        */
-        public minimumWidth(): number;
-        public minimumWidth(newVal: number): Component;
-        /**
-        * Checks if the Component has a fixed width or scales to fill available space.
-        * Returns true by default on the base Component class.
+        * Checks if the Component has a fixed width or false if it grows to fill available space.
+        * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed width.
         */
         public isFixedWidth(): boolean;
         /**
-        * Checks if the Component has a fixed height or scales to fill available space.
-        * Returns true by default on the base Component class.
+        * Checks if the Component has a fixed height or false if it grows to fill available space.
+        * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed height.
         */
@@ -385,10 +385,6 @@ declare module Plottable {
         * @returns {Table} The calling Table.
         */
         public colWeight(index: number, weight: number): Table;
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Table;
-        public minimumWidth(): number;
-        public minimumWidth(newVal: number): Table;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
     }
@@ -601,7 +597,7 @@ declare module Plottable {
         *
         * @constructor
         */
-        constructor();
+        constructor(scale?: D3.Scale.OrdinalScale);
         /**
         * Retrieves the current domain, or sets the Scale's domain to the specified values.
         *
@@ -748,6 +744,10 @@ declare module Plottable {
         * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
         */
         constructor(text?: string, orientation?: string);
+            height: number;
+            wantsWidth: boolean;
+            wantsHeight: boolean;
+        };
         /**
         * Sets the text on the Label.
         *
@@ -780,8 +780,10 @@ declare module Plottable {
         */
         public scale(scale: ColorScale): Legend;
         public scale(): ColorScale;
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Legend;
+            height: number;
+            wantsWidth: boolean;
+            wantsHeight: boolean;
+        };
     }
 }
 declare module Plottable {
@@ -1098,8 +1100,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Axis extends Component {
-        static Y_WIDTH: number;
-        static X_HEIGHT: number;
         public axisElement: D3.Selection;
         /**
         * Creates an Axis.
@@ -1153,6 +1153,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
+        public height(h: number): XAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -1172,6 +1173,7 @@ declare module Plottable {
         * @param {any} [formatter] a D3 formatter
         */
         constructor(scale: Scale, orientation: string, formatter?: any);
+        public width(w: number): YAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -1247,5 +1249,11 @@ declare module Plottable {
     }
     interface IBroadcasterCallback {
         (broadcaster: Broadcaster, ...args: any[]): any;
+    }
+    interface ISpaceRequest {
+        width: number;
+        height: number;
+        wantsWidth: boolean;
+        wantsHeight: boolean;
     }
 }

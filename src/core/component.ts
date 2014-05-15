@@ -2,6 +2,7 @@
 
 module Plottable {
   export class Component extends PlottableObject {
+
     public element: D3.Selection;
     public content: D3.Selection;
     private hitBox: D3.Selection;
@@ -13,18 +14,13 @@ module Plottable {
     public clipPathEnabled = false;
     private broadcastersCurrentlyListeningTo: {[key: string]: Broadcaster} = {};
 
-    public _fixedWidth = true;
-    public _fixedHeight = true;
-    private _minimumHeight = 0;
-    private _minimumWidth = 0;
-
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
 
     public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     public availableHeight: number;
-    public xOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
-    public yOrigin        : number;
+    public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
+    public yOrigin: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -92,6 +88,10 @@ module Plottable {
       return this;
     }
 
+    public _requestedSpace(availableWidth : number, availableHeight: number): ISpaceRequest {
+      return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
+    }
+
     /**
      * Computes the size, position, and alignment from the specified values.
      * If no parameters are supplied and the component is a root node,
@@ -124,23 +124,25 @@ module Plottable {
       var xPosition = this.xOrigin;
       var yPosition = this.yOrigin;
 
-      xPosition += (availableWidth - this.minimumWidth()) * this._xAlignProportion;
+      var requestedSpace = this._requestedSpace(availableWidth , availableHeight);
+
+      xPosition += (availableWidth  - requestedSpace.width) * this._xAlignProportion;
       xPosition += this._xOffset;
-      if (this.minimumWidth() !== 0 && this.isFixedWidth()) {
+      if (this.isFixedWidth()) {
         // Decrease size so hitbox / bounding box and children are sized correctly
-        availableWidth = availableWidth > this.minimumWidth() ? this.minimumWidth() : availableWidth;
+        availableWidth  = Math.min(availableWidth , requestedSpace.width);
       }
 
-      yPosition += (availableHeight - this.minimumHeight()) * this._yAlignProportion;
+      yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
       yPosition += this._yOffset;
-      if (this.minimumHeight() !== 0 && this.isFixedHeight()) {
-        availableHeight = availableHeight > this.minimumHeight() ? this.minimumHeight() : availableHeight;
+      if (this.isFixedHeight()) {
+        availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
-      this.availableWidth  = availableWidth;
+      this.availableWidth   = availableWidth ;
       this.availableHeight = availableHeight;
       this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth ).attr("height", this.availableHeight));
       return this;
     }
 
@@ -263,8 +265,8 @@ module Plottable {
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
       this.boxes.push(box);
-      if (this.availableWidth != null && this.availableHeight != null) {
-        box.attr("width", this.availableWidth).attr("height", this.availableHeight);
+      if (this.availableWidth  != null && this.availableHeight != null) {
+        box.attr("width", this.availableWidth ).attr("height", this.availableHeight);
       }
       return box;
     }
@@ -346,57 +348,27 @@ module Plottable {
     }
 
     /**
-     * Sets or retrieves the Component's minimum height.
-     *
-     * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
-     * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
-     */
-    public minimumHeight(): number;
-    public minimumHeight(newVal: number): Component;
-    public minimumHeight(newVal?: number): any {
-      if (newVal != null) {
-        this._minimumHeight = newVal;
-        return this;
-      } else {
-        return this._minimumHeight;
-      }
-    }
-
-    /**
-     * Sets or retrieves the Component's minimum width.
-     *
-     * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
-     * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
-     */
-    public minimumWidth(): number;
-    public minimumWidth(newVal: number): Component;
-    public minimumWidth(newVal?: number): any {
-      if (newVal != null) {
-        this._minimumWidth = newVal;
-        return this;
-      } else {
-        return this._minimumWidth;
-      }
-    }
-
-    /**
-     * Checks if the Component has a fixed width or scales to fill available space.
-     * Returns true by default on the base Component class.
+     * Checks if the Component has a fixed width or false if it grows to fill available space.
+     * Returns false by default on the base Component class.
      *
      * @return {boolean} Whether the component has a fixed width.
      */
     public isFixedWidth(): boolean {
-      return this._fixedWidth;
+      // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
+      // some fixed size you aspire to.
+      // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
+      // For example a label with an empty string.
+      return this._requestedSpace(-1, -1).wantsWidth;
     }
 
     /**
-     * Checks if the Component has a fixed height or scales to fill available space.
-     * Returns true by default on the base Component class.
+     * Checks if the Component has a fixed height or false if it grows to fill available space.
+     * Returns false by default on the base Component class.
      *
      * @return {boolean} Whether the component has a fixed height.
      */
     public isFixedHeight(): boolean {
-      return this._fixedHeight;
+      return this._requestedSpace(-1, -1).wantsHeight;
     }
 
     /**
