@@ -259,7 +259,8 @@ describe("Tables", () => {
       verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
 
       result = (<any> table).iterateLayout(120, 120);
-      verifyLayoutResult(result, [10, 10], [10, 10], [50, 50], [50, 50], false, false, "..when there's extra space");
+      // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
+      verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
     });
 
     it("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {

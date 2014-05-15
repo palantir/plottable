@@ -337,8 +337,7 @@ module Plottable {
     private static calcProportionalSpace(weights: number[], freeSpace: number): number[] {
       var weightSum = d3.sum(weights);
       if (weightSum === 0) {
-        var numGroups = weights.length;
-        return weights.map((w) => freeSpace / numGroups);
+        return Utils.createFilledArray(0, weights.length);
       } else {
         return weights.map((w) => freeSpace * w / weightSum);
       }
