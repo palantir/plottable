@@ -2,7 +2,6 @@
 
 var assert = chai.assert;
 
-
 function generateBasicTable(nRows, nCols) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
@@ -88,25 +87,10 @@ describe("Tables", () => {
     svg.remove();
   });
 
-
-  it("tables with insufficient space throw Insufficient Space", () => {
-    var svg = generateSVG(200, 200);
-    var c = new Plottable.Component().minimumHeight(300).minimumWidth(300);
-    var t = new Plottable.Table().addComponent(0, 0, c);
-    t._anchor(svg);
-    assert.throws(() => t._computeLayout(), Error, "Insufficient Space");
-    svg.remove();
-  });
-
   it("basic table with 2 rows 2 cols lays out properly", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
-    // force the components to have non-fixed layout; eg. as if they were renderers
-    components.forEach((c) => {
-      c._fixedWidth = false;
-      c._fixedHeight = false;
-    });
 
     var svg = generateSVG();
     table.renderTo(svg);
@@ -129,12 +113,6 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
-    // force the components to have non-fixed layout; eg. as if they were renderers
-    components.forEach((c) => {
-      c._fixedWidth = false;
-      c._fixedHeight = false;
-    });
-
     table.padding(5,5);
 
     var svg = generateSVG(415, 415);
@@ -156,22 +134,20 @@ describe("Tables", () => {
 
   it("table with fixed-size objects on every side lays out properly", () => {
     var svg = generateSVG();
-    var tableAndcomponents = generateBasicTable(3,3);
-    var table = tableAndcomponents.table;
-    var components = tableAndcomponents.components;
+    var c4 = new Plottable.Component();
     // [0 1 2] \\
     // [3 4 5] \\
     // [6 7 8] \\
-    // First, set everything to have no weight
-    components.forEach((r) => r.minimumWidth(0).minimumHeight(0));
     // give the axis-like objects a minimum
-    components[1].minimumHeight(30);
-    components[7].minimumHeight(30);
-    components[3].minimumWidth(50);
-    components[5].minimumWidth(50);
-    components[4]._fixedWidth = false;
-    components[4]._fixedHeight = false;
-    // finally the center 'plot' object has a weight
+    var c1 = makeFixedSizeComponent(null, 30);
+    var c7 = makeFixedSizeComponent(null, 30);
+    var c3 = makeFixedSizeComponent(50, null);
+    var c5 = makeFixedSizeComponent(50, null);
+    var table = new Plottable.Table([[null, c1, null],
+                                     [c3  , c4, c5  ],
+                                     [null, c7, null]]);
+
+    var components = [c1, c3, c4, c5, c7];
 
     table.renderTo(svg);
 
@@ -179,38 +155,129 @@ describe("Tables", () => {
     var translates = elements.map((e) => getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.getBBox(e));
     // test the translates
-    assert.deepEqual(translates[1], [50, 0]  , "top axis translate");
-    assert.deepEqual(translates[7], [50, 370], "bottom axis translate");
-    assert.deepEqual(translates[3], [0, 30]  , "left axis translate");
-    assert.deepEqual(translates[5], [350, 30], "right axis translate");
-    assert.deepEqual(translates[4], [50, 30] , "plot translate");
+    assert.deepEqual(translates[0], [50, 0]  , "top axis translate");
+    assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
+    assert.deepEqual(translates[1], [0, 30]  , "left axis translate");
+    assert.deepEqual(translates[3], [350, 30], "right axis translate");
+    assert.deepEqual(translates[2], [50, 30] , "plot translate");
     // test the bboxes
-    assertBBoxEquivalence(bboxes[1], [300, 30], "top axis bbox");
-    assertBBoxEquivalence(bboxes[7], [300, 30], "bottom axis bbox");
-    assertBBoxEquivalence(bboxes[3], [50, 340], "left axis bbox");
-    assertBBoxEquivalence(bboxes[5], [50, 340], "right axis bbox");
-    assertBBoxEquivalence(bboxes[4], [300, 340], "plot bbox");
+    assertBBoxEquivalence(bboxes[0], [300, 30], "top axis bbox");
+    assertBBoxEquivalence(bboxes[4], [300, 30], "bottom axis bbox");
+    assertBBoxEquivalence(bboxes[1], [50, 340], "left axis bbox");
+    assertBBoxEquivalence(bboxes[3], [50, 340], "right axis bbox");
+    assertBBoxEquivalence(bboxes[2], [300, 340], "plot bbox");
     svg.remove();
-  });
-
-  it("you can't set minimumWidth or minimumHeight on tables directly", () => {
-    var table = new Plottable.Table();
-    assert.throws(() => table.minimumHeight(3), Error, "cannot be directly set");
-    assert.throws(() => table.minimumWidth(3), Error, "cannot be directly set");
   });
 
   it("table space fixity calculates properly", () => {
     var tableAndcomponents = generateBasicTable(3,3);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
+    components.forEach((c) => fixComponentSize(c, 10, 10));
     assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
     assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
-    components[0]._fixedWidth = false;
+    fixComponentSize(components[0], null, 10);
     assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
     assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
-    components[8]._fixedHeight = false;
-    components[0]._fixedWidth = true;
+    fixComponentSize(components[8], 10, null);
+    fixComponentSize(components[0], 10, 10);
     assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
     assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+  });
+
+  it("table._requestedSpace works properly", () => {
+    // [0 1]
+    // [2 3]
+    var c0 = new Plottable.Component();
+    var c1 = makeFixedSizeComponent(50, 50);
+    var c2 = makeFixedSizeComponent(20, 50);
+    var c3 = makeFixedSizeComponent(20, 20);
+
+    function verifySpaceRequest(sr: Plottable.ISpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
+      assert.equal(sr.width, w, "width requested is as expected #" + id);
+      assert.equal(sr.height, h, "height requested is as expected #" + id);
+      assert.equal(sr.wantsWidth, ww, "needs more width is as expected #" + id);
+      assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+    }
+
+    var table = new Plottable.Table([[c0, c1], [c2, c3]]);
+
+    var spaceRequest = table._requestedSpace(30, 30);
+    verifySpaceRequest(spaceRequest, 30, 30, true, true, "1");
+
+    spaceRequest = table._requestedSpace(50, 50);
+    verifySpaceRequest(spaceRequest, 50, 50, true, true, "2");
+
+    spaceRequest = table._requestedSpace(90, 90);
+    verifySpaceRequest(spaceRequest, 70, 90, false, true, "3");
+
+    spaceRequest = table._requestedSpace(200, 200);
+    verifySpaceRequest(spaceRequest, 70, 100, false, false, "4");
+  });
+
+  describe("table.iterateLayout works properly", () => {
+    // This test battery would have caught #405
+    function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
+      assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
+      assert.deepEqual(result.rowProportionalSpace, rPS, "rowProportionalSpace:" + id);
+      assert.deepEqual(result.guaranteedWidths, gW, "guaranteedWidths:" + id);
+      assert.deepEqual(result.guaranteedHeights, gH, "guaranteedHeights:" + id);
+      assert.deepEqual(result.wantsWidth, wW, "wantsWidth:" + id);
+      assert.deepEqual(result.wantsHeight, wH, "wantsHeight:" + id);
+    }
+
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+    var c4 = new Plottable.Component();
+    var table = new Plottable.Table([
+      [c1, c2],
+      [c3, c4]]);
+
+    it("iterateLayout works in the easy case where there is plenty of space and everything is satisfied on first go", () => {
+      fixComponentSize(c1, 50, 50);
+      fixComponentSize(c4, 20, 10);
+      var result = (<any> table).iterateLayout(500, 500);
+      verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
+    });
+
+    it("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", () => {
+      fixComponentSize(c1, 490, 50);
+      var result = (<any> table).iterateLayout(500, 500);
+      verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
+    });
+
+    it("iterateLayout works in the case where all components are fixed-size", () => {
+      fixComponentSize(c1, 50, 50);
+      fixComponentSize(c2, 50, 50);
+      fixComponentSize(c3, 50, 50);
+      fixComponentSize(c4, 50, 50);
+      var result = (<any> table).iterateLayout(100, 100);
+      verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's exactly enough space");
+
+      result = (<any> table).iterateLayout(80, 80);
+      verifyLayoutResult(result, [0, 0], [0, 0], [40, 40], [40, 40], true, true, "..when there's not enough space");
+
+      result = (<any> table).iterateLayout(120, 120);
+      // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
+      verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
+    });
+
+    it("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {
+      table = new Plottable.Table([[c1, c2]]);
+      fixComponentSize(c1, null, null);
+      c2._requestedSpace = (w: number, h: number) => {
+        return {
+          width: w >= 200 ? 200 : 0,
+          height: h >= 200 ? 200 : 0,
+          wantsWidth: w < 200,
+          wantsHeight: h < 200
+        };
+      };
+      var result = (<any> table).iterateLayout(200, 200);
+      verifyLayoutResult(result, [0, 0], [0], [0, 200], [200], false, false, "when there's sufficient space");
+      result = (<any> table).iterateLayout(150, 200);
+      verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
+    });
   });
 });

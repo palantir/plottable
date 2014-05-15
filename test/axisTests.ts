@@ -8,15 +8,35 @@ describe("Axes", () => {
     var xScale = new Plottable.LinearScale();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
-    var formatter = function(d: number) { return String(d); };
-    var axis = new Plottable.XAxis(xScale, "bottom", formatter);
+    var axis = new Plottable.XAxis(xScale, "bottom");
     axis.renderTo(svg);
     var ticks = svg.selectAll(".tick");
     assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
 
     var tickTexts = ticks.select("text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
-    var generatedTicks = xScale.ticks().map(formatter);
+    var generatedTicks = xScale.ticks().map(axis.tickFormat());
     assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
+    svg.remove();
+  });
+
+  it("formatter can be changed", () => {
+    var svg = generateSVG(500, 100);
+    var xScale = new Plottable.LinearScale();
+    xScale.domain([0, 10]);
+    xScale.range([0, 500]);
+    var axis = new Plottable.XAxis(xScale, "bottom");
+    axis.renderTo(svg);
+
+    var tickTexts = svg.selectAll(".tick text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
+    var generatedTicks = xScale.ticks().map(axis.tickFormat());
+    assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
+
+    var blarghFormatter = (d: any) => "blargh";
+    axis.tickFormat(blarghFormatter);
+    tickTexts = svg.selectAll(".tick text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
+    generatedTicks = xScale.ticks().map(axis.tickFormat());
+    assert.deepEqual(tickTexts, generatedTicks, "Tick texts updated based on new formatter");
+
     svg.remove();
   });
 
@@ -95,13 +115,13 @@ describe("Axes", () => {
     var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
     xAxis.renderTo(svg);
 
-    var oldHeight = xAxis.minimumHeight();
+    var oldHeight = xAxis._requestedSpace(500, 100).height;
     var axisBBoxBefore = (<any> xAxis.element.node()).getBBox();
     var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
     assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
 
     var newHeight = 60;
-    xAxis.minimumHeight(newHeight);
+    xAxis.height(newHeight);
     xAxis.renderTo(svg);
     var axisBBoxAfter = (<any> xAxis.element.node()).getBBox();
     var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
@@ -159,13 +179,13 @@ describe("Axes", () => {
     var yAxis = new Plottable.YAxis(yScale, "left");
     yAxis.renderTo(svg);
 
-    var oldWidth = yAxis.minimumWidth();
+    var oldWidth = yAxis._requestedSpace(100, 500).width;
     var axisBBoxBefore = (<any> yAxis.element.node()).getBBox();
     var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
     assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
 
     var newWidth = 80;
-    yAxis.minimumWidth(newWidth);
+    yAxis.width(newWidth);
     yAxis.renderTo(svg);
     var axisBBoxAfter = (<any> yAxis.element.node()).getBBox();
     var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
@@ -231,7 +251,7 @@ describe("Axes", () => {
     ordinalScale.range([0, 300]);
 
     var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
-    xAxis.minimumHeight(60);
+    xAxis.height(60);
     xAxis.renderTo(svg);
 
     var tickTexts = svg.selectAll(".tick text");
@@ -251,7 +271,7 @@ describe("Axes", () => {
     var allTopsEqual = clientRects.map((r) => r.top).every((t: number) => t === clientRects[0].top);
     assert.isTrue(allTopsEqual, "tops of labels align");
 
-    assert.isTrue(clientRects.every((rect) => rect.height < xAxis.minimumHeight() - xAxis.tickSize()),
+    assert.isTrue(clientRects.every((rect) => rect.height < (<any> xAxis)._height - xAxis.tickSize()),
                   "all labels fit within the available space");
     svg.remove();
   });
@@ -263,7 +283,7 @@ describe("Axes", () => {
     ordinalScale.range([0, 300]);
 
     var yAxis = new Plottable.YAxis(ordinalScale, "left");
-    yAxis.minimumWidth(100);
+    yAxis.width(100);
     yAxis.renderTo(svg);
 
     var tickTexts = svg.selectAll(".tick text");
@@ -283,7 +303,7 @@ describe("Axes", () => {
     var allTopsEqual = clientRects.map((r) => r.right).every((t: number) => t === clientRects[0].right);
     assert.isTrue(allTopsEqual, "right edges of labels align");
 
-    assert.isTrue(clientRects.every((rect) => rect.width < yAxis.minimumWidth() - yAxis.tickSize()),
+    assert.isTrue(clientRects.every((rect) => rect.width < (<any> yAxis)._width - yAxis.tickSize()),
                   "all labels fit within the available space");
     svg.remove();
   });

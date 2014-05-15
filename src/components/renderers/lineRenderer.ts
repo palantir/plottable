@@ -5,7 +5,7 @@ module Plottable {
     private path: D3.Selection;
     private line: D3.Svg.Line;
 
-/**
+    /**
      * Creates a LineRenderer.
      *
      * @constructor

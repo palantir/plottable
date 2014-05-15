@@ -2,11 +2,16 @@
 
 module Plottable {
   export module Utils {
+
     /**
      * Checks if x is between a and b.
      */
     export function inRange(x: number, a: number, b: number) {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
+    }
+
+    export function addArrays(alist: number[], blist: number[]): number[] {
+      return alist.map((_: number, i: number) => alist[i] + blist[i]);
     }
 
     /**
@@ -57,7 +62,7 @@ module Plottable {
       element.text(text);
       var bbox = Utils.getBBox(element);
       var textLength = bbox.width;
-      if (textLength < availableSpace) {
+      if (textLength <= availableSpace) {
         element.text(originalText);
         return text;
       }
@@ -94,12 +99,26 @@ module Plottable {
     }
 
     /**
+     * Gets the width of a text element, as rendered.
+     *
+     * @param {D3.Selection} textElement
+     * @return {number} The width of the text element, in pixels.
+     */
+    export function getTextWidth(textElement: D3.Selection, text: string) {
+      var originalText = textElement.text();
+      textElement.text(text);
+      var width = Utils.getBBox(textElement).width;
+      textElement.text(originalText);
+      return width;
+    }
+
+    /**
      * Converts a string into an array of strings, all of which fit in the available space.
      *
      * @returns {string[]} The input text broken into substrings that fit in the avialable space.
      */
     export function getWrappedText(text: string,
-                                   availableWidth: number,
+                                   availableWidth : number,
                                    availableHeight: number,
                                    textElement: D3.Selection,
                                    cutoffRatio = 0.7) {
@@ -120,7 +139,7 @@ module Plottable {
       var lines: string[] = [];
       var remainingText: string;
 
-      var cutoffEnd = availableWidth - hyphenLength; // room for hyphen
+      var cutoffEnd = availableWidth  - hyphenLength; // room for hyphen
       var cutoffStart = cutoffRatio * cutoffEnd;
 
       var lineStartPosition = 0;
@@ -132,7 +151,7 @@ module Plottable {
           if (testLength > cutoffEnd) {
             if (lines.length + 1 >= linesAvailable) {
               remainingText = text.substring(lineStartPosition, text.length).trim();
-              lines.push(getTruncatedText(remainingText, availableWidth, textElement));
+              lines.push(getTruncatedText(remainingText, availableWidth , textElement));
               break;
             }
             // break line on the previous character to leave room for the hyphen
@@ -141,7 +160,7 @@ module Plottable {
           } else if (currentCharacter === " ") {
             if (lines.length + 1 >= linesAvailable) {
               remainingText = text.substring(lineStartPosition, text.length).trim();
-              lines.push(getTruncatedText(remainingText, availableWidth, textElement));
+              lines.push(getTruncatedText(remainingText, availableWidth , textElement));
               break;
             }
             // break line after the current character
@@ -284,6 +303,21 @@ module Plottable {
         this.setDefault(id);
         return this.counter[id];
       }
+    }
+
+    /**
+     * Creates an array of length `count`, filled with value or (if value is a function), value()
+     *
+     * @param {any} value The value to fill the array with, or, if a function, a generator for values
+     * @param {number} count The length of the array to generate
+     * @return {any[]}
+     */
+    export function createFilledArray(value: any, count: number) {
+      var out: any[] = [];
+      for (var i = 0; i<count; i++) {
+        out[i] = typeof(value) === "function" ? value(i) : value;
+      }
+      return out;
     }
   }
 }

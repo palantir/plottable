@@ -16,6 +16,18 @@ module Plottable {
       this.components = components;
     }
 
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+      var requests = this.components.map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
+      var desiredWidth  = d3.max(requests, (l: ISpaceRequest) => l.width );
+      var desiredHeight = d3.max(requests, (l: ISpaceRequest) => l.height);
+      return {
+        width : Math.min(desiredWidth , offeredWidth ),
+        height: Math.min(desiredHeight, offeredHeight),
+        wantsWidth : desiredWidth  > offeredWidth,
+        wantsHeight: desiredHeight > offeredHeight
+      };
+    }
+
     public _addComponentToGroup(c: Component, prepend = false): ComponentGroup {
       if (prepend) {
         this.components.unshift(c);
@@ -67,9 +79,9 @@ module Plottable {
     }
 
     public _computeLayout(xOrigin?: number,
-                         yOrigin?: number,
-                  availableWidth?: number,
-                 availableHeight?: number): ComponentGroup {
+                          yOrigin?: number,
+                   availableWidth?: number,
+                  availableHeight?: number): ComponentGroup {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       this.components.forEach((c) => {
         c._computeLayout(0, 0, this.availableWidth, this.availableHeight);

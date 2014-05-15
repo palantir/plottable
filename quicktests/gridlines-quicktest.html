@@ -2,7 +2,7 @@
   <head>
     <title>Gridlines Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../../build/plottable.js"></script>
     <script src="../../build/exampleUtil.js"></script>
 
@@ -15,6 +15,8 @@
 
         var yScale = new Plottable.LinearScale();
         var yAxis = new Plottable.YAxis(yScale, "left");
+        window.yAxis = yAxis;
+        yAxis.debug = true;
 
         var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
         var gridlines = new Plottable.Gridlines(xScale, yScale);

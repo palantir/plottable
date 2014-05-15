@@ -11,7 +11,7 @@
         font-size: 14pt !important;
       }
     </style>
-    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../../build/plottable.js"></script>
 
     <script>
@@ -46,9 +46,6 @@
           var gridRenderer = new Plottable.GridRenderer(data,
             xScale, yScale, colorScale,
             "day", "category", "awesomeness");
-
-          xAxis.minimumHeight(40);
-          yAxis.minimumWidth(80);
 
           new Plottable.Table()
             .addComponent(0, 1, yAxis)
