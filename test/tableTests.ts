@@ -87,16 +87,6 @@ describe("Tables", () => {
     svg.remove();
   });
 
-
-  // it("tables with insufficient space throw Insufficient Space", () => {
-  //   var svg = generateSVG(200, 200);
-  //   var c = new Plottable.Component().minimumHeight(300).minimumWidth(300);
-  //   var t = new Plottable.Table().addComponent(0, 0, c);
-  //   t._anchor(svg);
-  //   assert.throws(() => t._computeLayout(), Error, "Insufficient Space");
-  //   svg.remove();
-  // });
-
   it("basic table with 2 rows 2 cols lays out properly", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;

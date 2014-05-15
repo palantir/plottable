@@ -224,67 +224,67 @@ describe("Axes", () => {
     svg.remove();
   });
 
-  // it("XAxis wraps long tick label texts so they don't overlap", () => {
-  //   var svg = generateSVG(300, 60);
-  //   var ordinalScale = new Plottable.OrdinalScale();
-  //   ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
-  //   ordinalScale.range([0, 300]);
+  it("XAxis wraps long tick label texts so they don't overlap", () => {
+    var svg = generateSVG(300, 60);
+    var ordinalScale = new Plottable.OrdinalScale();
+    ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
+    ordinalScale.range([0, 300]);
 
-  //   var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
-  //   xAxis.minimumHeight(60);
-  //   xAxis.renderTo(svg);
+    var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
+    xAxis.height(60);
+    xAxis.renderTo(svg);
 
-  //   var tickTexts = svg.selectAll(".tick text");
-  //   assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
+    var tickTexts = svg.selectAll(".tick text");
+    assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
 
-  //   var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
-  //   var labelsOverlap = false;
-  //   clientRects.forEach((rect, i) => {
-  //     if (i > 0) {
-  //       if (rect.left < clientRects[i-1].left) {
-  //         labelsOverlap = true;
-  //       }
-  //     }
-  //   });
-  //   assert.isFalse(labelsOverlap, "labels don't overlap");
+    var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
+    var labelsOverlap = false;
+    clientRects.forEach((rect, i) => {
+      if (i > 0) {
+        if (rect.left < clientRects[i-1].left) {
+          labelsOverlap = true;
+        }
+      }
+    });
+    assert.isFalse(labelsOverlap, "labels don't overlap");
 
-  //   var allTopsEqual = clientRects.map((r) => r.top).every((t: number) => t === clientRects[0].top);
-  //   assert.isTrue(allTopsEqual, "tops of labels align");
+    var allTopsEqual = clientRects.map((r) => r.top).every((t: number) => t === clientRects[0].top);
+    assert.isTrue(allTopsEqual, "tops of labels align");
 
-  //   assert.isTrue(clientRects.every((rect) => rect.height < xAxis.minimumHeight() - xAxis.tickSize()),
-  //                 "all labels fit within the available space");
-  //   svg.remove();
-  // });
+    assert.isTrue(clientRects.every((rect) => rect.height < (<any> xAxis)._height - xAxis.tickSize()),
+                  "all labels fit within the available space");
+    svg.remove();
+  });
 
-  // it("Yaxis wraps long tick label texts so they don't overlap", () => {
-  //   var svg = generateSVG(100, 300);
-  //   var ordinalScale = new Plottable.OrdinalScale();
-  //   ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
-  //   ordinalScale.range([0, 300]);
+  it("Yaxis wraps long tick label texts so they don't overlap", () => {
+    var svg = generateSVG(100, 300);
+    var ordinalScale = new Plottable.OrdinalScale();
+    ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
+    ordinalScale.range([0, 300]);
 
-  //   var yAxis = new Plottable.YAxis(ordinalScale, "left");
-  //   yAxis.minimumWidth(100);
-  //   yAxis.renderTo(svg);
+    var yAxis = new Plottable.YAxis(ordinalScale, "left");
+    yAxis.width(100);
+    yAxis.renderTo(svg);
 
-  //   var tickTexts = svg.selectAll(".tick text");
-  //   assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
+    var tickTexts = svg.selectAll(".tick text");
+    assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
 
-  //   var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
-  //   var labelsOverlap = false;
-  //   clientRects.forEach((rect, i) => {
-  //     if (i > 0) {
-  //       if (rect.top < clientRects[i-1].bottom) {
-  //         labelsOverlap = true;
-  //       }
-  //     }
-  //   });
-  //   assert.isFalse(labelsOverlap, "labels don't overlap");
+    var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
+    var labelsOverlap = false;
+    clientRects.forEach((rect, i) => {
+      if (i > 0) {
+        if (rect.top < clientRects[i-1].bottom) {
+          labelsOverlap = true;
+        }
+      }
+    });
+    assert.isFalse(labelsOverlap, "labels don't overlap");
 
-  //   var allTopsEqual = clientRects.map((r) => r.right).every((t: number) => t === clientRects[0].right);
-  //   assert.isTrue(allTopsEqual, "right edges of labels align");
+    var allTopsEqual = clientRects.map((r) => r.right).every((t: number) => t === clientRects[0].right);
+    assert.isTrue(allTopsEqual, "right edges of labels align");
 
-  //   assert.isTrue(clientRects.every((rect) => rect.width < yAxis.minimumWidth() - yAxis.tickSize()),
-  //                 "all labels fit within the available space");
-  //   svg.remove();
-  // });
+    assert.isTrue(clientRects.every((rect) => rect.width < (<any> yAxis)._width - yAxis.tickSize()),
+                  "all labels fit within the available space");
+    svg.remove();
+  });
 });
