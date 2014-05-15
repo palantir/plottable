@@ -14,7 +14,7 @@ describe("Axes", () => {
     assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
 
     var tickTexts = ticks.select("text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
-    var generatedTicks = xScale.ticks().map(axis.formatter());
+    var generatedTicks = xScale.ticks().map(axis.tickFormat());
     assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
     svg.remove();
   });
@@ -28,13 +28,13 @@ describe("Axes", () => {
     axis.renderTo(svg);
 
     var tickTexts = svg.selectAll(".tick text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
-    var generatedTicks = xScale.ticks().map(axis.formatter());
+    var generatedTicks = xScale.ticks().map(axis.tickFormat());
     assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
 
     var blarghFormatter = (d: any) => "blargh";
-    axis.formatter(blarghFormatter);
+    axis.tickFormat(blarghFormatter);
     tickTexts = svg.selectAll(".tick text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
-    generatedTicks = xScale.ticks().map(axis.formatter());
+    generatedTicks = xScale.ticks().map(axis.tickFormat());
     assert.deepEqual(tickTexts, generatedTicks, "Tick texts updated based on new formatter");
 
     svg.remove();

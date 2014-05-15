@@ -7,7 +7,6 @@ module Plottable {
     public _axisScale: Scale;
     private _showEndTickLabels = false;
     private tickPositioning = "center";
-    private formatFunction: (d: any) =>string;
 
     /**
      * Creates an Axis.
@@ -35,7 +34,7 @@ module Plottable {
           return d;
         };
       }
-      this.formatter(formatter);
+      this.tickFormat(formatter);
       this._registerToBroadcaster(this._axisScale, () => this.rescale());
     }
 
@@ -150,18 +149,6 @@ module Plottable {
       }
     }
 
-    public formatter(): (d: any) => string;
-    public formatter(formatFunction: (d: any) => string): Axis;
-    public formatter(formatFunction?: (d: any) => string): any {
-      if (formatFunction == null) {
-        return this.formatFunction;
-      }
-      this.formatFunction = formatFunction;
-      this.d3Axis.tickFormat(this.formatFunction);
-      this._render();
-      return this;
-    }
-
     /**
      * Sets or gets the tick label position relative to the tick marks.
      * The exact consequences of particular tick label positionings depends on the subclass implementation.
@@ -261,6 +248,12 @@ module Plottable {
       }
     }
 
+    /**
+     * Gets the current tick formatting function, or sets the tick formatting function.
+     *
+     * @param {(value: any) => string} [formatter] The new tick formatting function.
+     * @returns The current tick formatting function, or the calling Axis.
+     */
     public tickFormat(): (value: any) => string;
     public tickFormat(formatter: (value: any) => string): Axis;
     public tickFormat(formatter?: (value: any) => string): any {
@@ -268,6 +261,7 @@ module Plottable {
         return this.d3Axis.tickFormat();
       } else {
         this.d3Axis.tickFormat(formatter);
+        this._render();
         return this;
       }
     }
