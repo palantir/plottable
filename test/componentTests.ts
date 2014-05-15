@@ -334,5 +334,6 @@ it("components can be offset relative to their alignment, and throw errors if th
     c._invalidateLayout();
     assert.equal(cg.availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
     assert.equal(cg.availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
+    svg.remove();
   });
 });
