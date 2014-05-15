@@ -20,8 +20,6 @@ module Plottable {
       super();
       this.classed("legend", true);
       this.scale(colorScale);
-      this._fixedHeight = true;
-      this._fixedWidth = true;
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
     }
@@ -53,10 +51,18 @@ module Plottable {
       }
     }
 
+    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
+      var textHeight = this.measureTextHeight();
+      var totalNumRows = this.colorScale.domain().length;
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
+      return this;
+    }
+
     public _requestedSpace(offeredWidth: number, offeredY: number) {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
+      var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
@@ -66,9 +72,9 @@ module Plottable {
       var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
       return {
         width : Math.min(desiredWidth, offeredWidth),
-        height: this.nRowsDrawn * textHeight,
+        height: rowsICanFit * textHeight,
         wantsWidth: offeredWidth < desiredWidth,
-        wantsHeight: this.nRowsDrawn < totalNumRows
+        wantsHeight: rowsICanFit < totalNumRows
       };
     }
 
@@ -86,7 +92,6 @@ module Plottable {
       var textHeight = this.measureTextHeight();
       var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
-
       this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
       var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
       var legendEnter = legend.enter()

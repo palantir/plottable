@@ -273,8 +273,6 @@ module Plottable {
       if (orientation !== "top" && orientation !== "bottom") {
         throw new Error(orientation + " is not a valid orientation for XAxis");
       }
-      this._fixedWidth = false;
-      this._fixedHeight = true;
       this.tickLabelPosition("center");
     }
 
@@ -406,8 +404,6 @@ module Plottable {
       if (orientation !== "left" && orientation !== "right") {
         throw new Error(orientation + " is not a valid orientation for YAxis");
       }
-      this._fixedHeight = false;
-      this._fixedWidth = true;
       this.tickLabelPosition("middle");
     }
 

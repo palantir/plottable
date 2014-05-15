@@ -14,11 +14,6 @@ module Plottable {
     public clipPathEnabled = false;
     private broadcastersCurrentlyListeningTo: {[key: string]: Broadcaster} = {};
 
-    public _fixedWidth = false;
-    public _fixedHeight = false;
-    private _minimumHeight = 0;
-    private _minimumWidth = 0;
-
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
 
@@ -108,8 +103,8 @@ module Plottable {
      * @param {number} availableHeight
      * @returns {Component} The calling Component.
      */
-    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth ?: number, availableHeight?: number) {
-      if (xOrigin == null || yOrigin == null || availableWidth  == null || availableHeight == null) {
+    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
         if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
         } else if (this.isTopLevelComponent) {
@@ -353,23 +348,27 @@ module Plottable {
     }
 
     /**
-     * Checks if the Component has a fixed width or scales to fill available space.
-     * Returns true by default on the base Component class.
+     * Checks if the Component has a fixed width or false if it grows to fill available space.
+     * Returns false by default on the base Component class.
      *
      * @return {boolean} Whether the component has a fixed width.
      */
     public isFixedWidth(): boolean {
-      return this._fixedWidth;
+      // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
+      // some fixed size you aspire to.
+      // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
+      // For example a label with an empty string.
+      return this._requestedSpace(-1, -1).wantsWidth;
     }
 
     /**
-     * Checks if the Component has a fixed height or scales to fill available space.
-     * Returns true by default on the base Component class.
+     * Checks if the Component has a fixed height or false if it grows to fill available space.
+     * Returns false by default on the base Component class.
      *
      * @return {boolean} Whether the component has a fixed height.
      */
     public isFixedHeight(): boolean {
-      return this._fixedHeight;
+      return this._requestedSpace(-1, -1).wantsHeight;
     }
 
     /**

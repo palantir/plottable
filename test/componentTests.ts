@@ -136,7 +136,7 @@ describe("Component behavior", () => {
   });
 
   it("fixed-width component will align to the right spot", () => {
-    makeComponentFixedSize(c, 100, 100);
+    fixComponentSize(c, 100, 100);
     c._anchor(svg);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
@@ -152,7 +152,7 @@ describe("Component behavior", () => {
   });
 
 it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
-    makeComponentFixedSize(c, 100, 100);
+    fixComponentSize(c, 100, 100);
     c._anchor(svg);
     c.xOffset(20).yOffset(20);
     c._computeLayout();

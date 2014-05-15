@@ -101,11 +101,6 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
-    // force the components to have non-fixed layout; eg. as if they were renderers
-    components.forEach((c) => {
-      c._fixedWidth = false;
-      c._fixedHeight = false;
-    });
 
     var svg = generateSVG();
     table.renderTo(svg);
@@ -128,12 +123,6 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(2,2);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
-    // force the components to have non-fixed layout; eg. as if they were renderers
-    components.forEach((c) => {
-      c._fixedWidth = false;
-      c._fixedHeight = false;
-    });
-
     table.padding(5,5);
 
     var svg = generateSVG(415, 415);
@@ -156,21 +145,17 @@ describe("Tables", () => {
   it("table with fixed-size objects on every side lays out properly", () => {
     var svg = generateSVG();
     var c4 = new Plottable.Component();
-    var c1 = new Plottable.Component();
-    var c7 = new Plottable.Component();
-    var c3 = new Plottable.Component();
-    var c5 = new Plottable.Component();
-    var table = new Plottable.Table([[null, c1, null],
-                                     [c3  , c4, c5  ],
-                                     [null, c7, null]]);
     // [0 1 2] \\
     // [3 4 5] \\
     // [6 7 8] \\
     // give the axis-like objects a minimum
-    makeComponentFixedSize(c1, 0, 30);
-    makeComponentFixedSize(c7, 0, 30);
-    makeComponentFixedSize(c3, 50, 0);
-    makeComponentFixedSize(c5, 50, 0);
+    var c1 = makeFixedSizeComponent(null, 30);
+    var c7 = makeFixedSizeComponent(null, 30);
+    var c3 = makeFixedSizeComponent(50, null);
+    var c5 = makeFixedSizeComponent(50, null);
+    var table = new Plottable.Table([[null, c1, null],
+                                     [c3  , c4, c5  ],
+                                     [null, c7, null]]);
 
     var components = [c1, c3, c4, c5, c7];
 
@@ -198,14 +183,14 @@ describe("Tables", () => {
     var tableAndcomponents = generateBasicTable(3,3);
     var table = tableAndcomponents.table;
     var components = tableAndcomponents.components;
-    components.forEach((c) => {c._fixedWidth = true; c._fixedHeight = true;});
+    components.forEach((c) => fixComponentSize(c, 10, 10));
     assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
     assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
-    components[0]._fixedWidth = false;
+    fixComponentSize(components[0], null, 10);
     assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
     assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
-    components[8]._fixedHeight = false;
-    components[0]._fixedWidth = true;
+    fixComponentSize(components[8], 10, null);
+    fixComponentSize(components[0], 10, 10);
     assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
     assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
@@ -214,12 +199,9 @@ describe("Tables", () => {
     // [0 1]
     // [2 3]
     var c0 = new Plottable.Component();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
-    var c3 = new Plottable.Component();
-    makeComponentFixedSize(c1, 50, 50);
-    makeComponentFixedSize(c2, 20, 50);
-    makeComponentFixedSize(c3, 20, 20);
+    var c1 = makeFixedSizeComponent(50, 50);
+    var c2 = makeFixedSizeComponent(20, 50);
+    var c3 = makeFixedSizeComponent(20, 20);
 
     function verifySpaceRequest(sr: Plottable.ISpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
       assert.equal(sr.width, w, "width requested is as expected #" + id);
@@ -249,8 +231,8 @@ describe("Tables", () => {
     var c2 = new Plottable.Component();
     var c3 = new Plottable.Component();
     var c4 = new Plottable.Component();
-    makeComponentFixedSize(c1, 50, 50);
-    makeComponentFixedSize(c4, 20, 10);
+    fixComponentSize(c1, 50, 50);
+    fixComponentSize(c4, 20, 10);
     var table = new Plottable.Table([
       [c1, c2],
       [c3, c4]]);
@@ -267,7 +249,7 @@ describe("Tables", () => {
     var result = (<any> table).iterateLayout(500, 500);
     verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "1");
 
-    makeComponentFixedSize(c1, 490, 50);
+    fixComponentSize(c1, 490, 50);
     result = (<any> table).iterateLayout(500, 500);
     verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "2");
   });

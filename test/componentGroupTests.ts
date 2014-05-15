@@ -5,8 +5,7 @@ var assert = chai.assert;
 
 describe("ComponentGroups", () => {
   it("components in componentGroups overlap", () => {
-    var c1 = new Plottable.Component();
-    makeComponentFixedSize(c1, 10, 10);
+    var c1 = makeFixedSizeComponent(10, 10);
     var c2 = new Plottable.Component();
     var c3 = new Plottable.Component();
 
@@ -27,10 +26,8 @@ describe("ComponentGroups", () => {
   });
 
   it("components can be added before and after anchoring", () => {
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
-    makeComponentFixedSize(c1, 10, 10);
-    makeComponentFixedSize(c2, 20, 20);
+    var c1 = makeFixedSizeComponent(10, 10);
+    var c2 = makeFixedSizeComponent(20, 20);
     var c3 = new Plottable.Component();
 
     var cg = new Plottable.ComponentGroup([c1]);
@@ -54,23 +51,17 @@ describe("ComponentGroups", () => {
   it("component fixity is computed appropriately", () => {
     var cg = new Plottable.ComponentGroup();
     var c1 = new Plottable.Component();
-    c1._fixedHeight = false;
-    c1._fixedWidth  = false;
     var c2 = new Plottable.Component();
-    c2._fixedHeight = false;
-    c2._fixedWidth  = false;
 
     cg.merge(c1).merge(c2);
     assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
     assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
 
-    c1._fixedHeight = true;
-    c1._fixedWidth = true;
-
+    fixComponentSize(c1, 10, 10);
     assert.isFalse(cg.isFixedHeight(), "height not fixed when one component unfixed");
     assert.isFalse(cg.isFixedWidth(), "width not fixed when one component unfixed");
 
-    c2._fixedHeight = true;
+    fixComponentSize(c2, null, 10);
     assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
     assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
   });
@@ -78,11 +69,7 @@ describe("ComponentGroups", () => {
   it("componentGroup subcomponents have xOffset, yOffset of 0", () => {
     var cg = new Plottable.ComponentGroup();
     var c1 = new Plottable.Component();
-    c1._fixedHeight = false;
-    c1._fixedWidth  = false;
     var c2 = new Plottable.Component();
-    c2._fixedHeight = false;
-    c2._fixedWidth  = false;
     cg.merge(c1).merge(c2);
 
     var svg = generateSVG();
