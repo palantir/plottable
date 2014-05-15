@@ -64,7 +64,7 @@ module Plottable {
       return this;
     }
 
-    public _anchor(element: D3.Selection, parent: Component) {
+    public _anchor(element: D3.Selection, parent?: Component) {
       super._anchor(element, parent);
       // recursively anchor children
       this.rows.forEach((row: Component[], rowIndex: number) => {

@@ -75,7 +75,7 @@ module Plottable {
       return this;
     }
 
-    public _anchor(element: D3.Selection, parent: Component): ComponentGroup {
+    public _anchor(element: D3.Selection, parent?: Component): ComponentGroup {
       super._anchor(element, parent);
       this.components.forEach((c) => c._anchor(this.content, this));
       return this;
