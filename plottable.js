@@ -1,5 +1,5 @@
 /*!
-Plottable 0.12.0 (https://github.com/palantir/plottable)
+Plottable 0.11.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1217,13 +1217,6 @@ var Plottable;
                     break;
                 }
             }
-
-            // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
-            freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
-            freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
-            colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
-            rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
-
             return {
                 colProportionalSpace: colProportionalSpace,
                 rowProportionalSpace: rowProportionalSpace,
@@ -1399,7 +1392,10 @@ var Plottable;
         Table.calcProportionalSpace = function (weights, freeSpace) {
             var weightSum = d3.sum(weights);
             if (weightSum === 0) {
-                return Plottable.Utils.createFilledArray(0, weights.length);
+                var numGroups = weights.length;
+                return weights.map(function (w) {
+                    return freeSpace / numGroups;
+                });
             } else {
                 return weights.map(function (w) {
                     return freeSpace * w / weightSum;
@@ -3668,7 +3664,8 @@ var Plottable;
                     return d;
                 };
             }
-            this.formatter(formatter);
+            this.formatFunction = formatter;
+            this.d3Axis.tickFormat(this.formatFunction);
             this._registerToBroadcaster(this._axisScale, function () {
                 return _this.rescale();
             });
