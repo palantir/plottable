@@ -9,6 +9,7 @@ module Plottable {
     public _axisScale: Scale;
     private _showEndTickLabels = false;
     private tickPositioning = "center";
+    private formatFunction: (d: any) =>string;
 
     /**
      * Creates an Axis.
@@ -28,12 +29,15 @@ module Plottable {
         var numberFormatter = d3.format(".3s");
         formatter = function(d: any) {
           if (typeof d === "number") {
+            if (Math.abs(d) < 1) {
+              return String(Math.round(1000 * d) / 1000); // round to 3 decimal places
+            }
             return numberFormatter(d);
           }
           return d;
         };
       }
-      this.d3Axis.tickFormat(formatter);
+      this.formatter(formatter);
       this._registerToBroadcaster(this._axisScale, () => this.rescale());
     }
 
@@ -148,6 +152,18 @@ module Plottable {
         this.d3Axis.scale(newScale._d3Scale);
         return this;
       }
+    }
+
+    public formatter(): (d: any) => string;
+    public formatter(formatFunction: (d: any) => string): Axis;
+    public formatter(formatFunction?: (d: any) => string): any {
+      if (formatFunction == null) {
+        return this.formatFunction;
+      }
+      this.formatFunction = formatFunction;
+      this.d3Axis.tickFormat(this.formatFunction);
+      this._render();
+      return this;
     }
 
     /**

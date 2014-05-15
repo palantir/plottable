@@ -1114,6 +1114,8 @@ declare module Plottable {
         public showEndTickLabels(show: boolean): Axis;
         public scale(): Scale;
         public scale(newScale: Scale): Axis;
+        public formatter(): (d: any) => string;
+        public formatter(formatFunction: (d: any) => string): Axis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         * The exact consequences of particular tick label positionings depends on the subclass implementation.
