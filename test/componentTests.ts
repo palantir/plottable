@@ -96,7 +96,7 @@ describe("Component behavior", () => {
 
     it("computeLayout will not default when attached to non-root node", () => {
       var g = svg.append("g");
-      c._anchor(g, new Plottable.Component());
+      c._anchor(g, new Plottable.ComponentGroup());
       assert.throws(() => c._computeLayout(), "null arguments");
       svg.remove();
     });
@@ -112,7 +112,7 @@ describe("Component behavior", () => {
       var yOff = 20;
       var width = 100;
       var height = 200;
-      c._anchor(g, new Plottable.Component())._computeLayout(xOff, yOff, width, height);
+      c._anchor(g, new Plottable.ComponentGroup())._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate(c.element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
       assert.equal(c.availableWidth , width, "the width set properly");
@@ -326,7 +326,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   it("_invalidateLayout works as expected", () => {
     var cg = new Plottable.ComponentGroup();
     var c = makeFixedSizeComponent(10, 10);
-    cg._addComponentToGroup(c);
+    cg._addComponent(c);
     cg.renderTo(svg);
     assert.equal(cg.availableHeight, 10, "availableHeight initially 10 for fixed-size component");
     assert.equal(cg.availableWidth, 10, "availableWidth initially 10 for fixed-size component");

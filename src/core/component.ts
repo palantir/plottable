@@ -16,7 +16,7 @@ module Plottable {
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
-    private parent: Component;
+    private parent: AbstractComponentContainer;
 
     public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     public availableHeight: number;
@@ -38,7 +38,7 @@ module Plottable {
      * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
      * @returns {Component} The calling component.
      */
-    public _anchor(element: D3.Selection, parent?: Component) {
+    public _anchor(element: D3.Selection, parent?: AbstractComponentContainer) {
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
         this.rootSVG = element;
@@ -416,7 +416,7 @@ module Plottable {
       }
       if (ComponentGroup.prototype.isPrototypeOf(c)) {
         cg = (<ComponentGroup> c);
-        cg._addComponentToGroup(this, true);
+        cg._addComponent(this, true);
         return cg;
       } else {
         cg = new ComponentGroup([this, c]);
@@ -429,7 +429,9 @@ module Plottable {
      */
     public remove() {
       this.element.remove();
-      this._invalidateLayout();
+      if (this.parent != null) {
+        this.parent._removeComponent(this);
+      }
       this.isAnchored = false;
       this.parent = null;
       return this;
