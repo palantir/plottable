@@ -29,15 +29,28 @@ module Plottable {
     public _paint() {
       super._paint();
       var attrToProjector = this._generateAttrToProjector();
-      this.area = d3.svg.area()
-            .x(attrToProjector["x"])
-            .y0(attrToProjector["y0"])
-            .y1(attrToProjector["y"]);
-      this.dataSelection = this.path.datum(this._dataSource.data());
+      var xFunction = attrToProjector["x"];
+      var y0Function = attrToProjector["y0"];
+      var yFunction = attrToProjector["y"];
       delete attrToProjector["x"];
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
-      this.path.attr("d", this.area).attr(attrToProjector);
+
+      this.dataSelection = this.path.datum(this._dataSource.data());
+      if (this._animate) {
+         var animationStartArea = d3.svg.area()
+                                        .x(xFunction)
+                                        .y0(y0Function)
+                                        .y1(y0Function);
+        this.path.attr("d", animationStartArea).attr(attrToProjector);
+      }
+
+      this.area = d3.svg.area()
+            .x(xFunction)
+            .y0(y0Function)
+            .y1(yFunction);
+      var updateSelection: any = (this._animate) ? this.path.transition().duration(500) : this.path;
+      updateSelection.attr("d", this.area).attr(attrToProjector);
     }
   }
 }

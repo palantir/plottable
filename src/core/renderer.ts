@@ -8,6 +8,7 @@ module Plottable {
 
   export class Renderer extends Component {
     public _dataSource: DataSource;
+    public _dataChanged = false;
 
     public renderArea: D3.Selection;
     public element: D3.Selection;
@@ -70,7 +71,12 @@ module Plottable {
         return this._dataSource;
       } else if (this._dataSource == null) {
         this._dataSource = source;
-        this._registerToBroadcaster(this._dataSource, () => this._render());
+        this._registerToBroadcaster(this._dataSource, () => {
+          this._dataChanged = true;
+          this._render();
+        });
+        this._dataChanged = true;
+        this._render();
         return this;
       } else {
         throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
@@ -114,6 +120,7 @@ module Plottable {
       if (this.element != null) {
         this._hasRendered = true;
         this._paint();
+        this._dataChanged = false;
         this._requireRerender = false;
         this._rerenderUpdateSelection = false;
       }
@@ -130,11 +137,13 @@ module Plottable {
       return this;
     }
 
-    public animate(toggle?: boolean) {
-      if (toggle == null) {
-        toggle = !this._animate;
-      }
-      this._animate = toggle;
+    /**
+     * Enables or disables animation.
+     *
+     * @param {boolean} enabled Whether or not to animate.
+     */
+    public animate(enabled: boolean) {
+      this._animate = enabled;
       return this;
     }
   }
