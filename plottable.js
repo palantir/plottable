@@ -1227,6 +1227,13 @@ var Plottable;
                     break;
                 }
             }
+
+            // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
+            freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
+            freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+            colProportionalSpace = Table.calcProportionalSpace(colWeights, freeWidth);
+            rowProportionalSpace = Table.calcProportionalSpace(rowWeights, freeHeight);
+
             return {
                 colProportionalSpace: colProportionalSpace,
                 rowProportionalSpace: rowProportionalSpace,
@@ -1402,10 +1409,7 @@ var Plottable;
         Table.calcProportionalSpace = function (weights, freeSpace) {
             var weightSum = d3.sum(weights);
             if (weightSum === 0) {
-                var numGroups = weights.length;
-                return weights.map(function (w) {
-                    return freeSpace / numGroups;
-                });
+                return Plottable.Utils.createFilledArray(0, weights.length);
             } else {
                 return weights.map(function (w) {
                     return freeSpace * w / weightSum;
@@ -1564,6 +1568,7 @@ var Plottable;
         __extends(Renderer, _super);
         function Renderer(dataset) {
             _super.call(this);
+            this._dataChanged = false;
             this._animate = false;
             this._hasRendered = false;
             this._projectors = {};
@@ -1596,8 +1601,11 @@ var Plottable;
             } else if (this._dataSource == null) {
                 this._dataSource = source;
                 this._registerToBroadcaster(this._dataSource, function () {
-                    return _this._render();
+                    _this._dataChanged = true;
+                    _this._render();
                 });
+                this._dataChanged = true;
+                this._render();
                 return this;
             } else {
                 throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
@@ -1647,6 +1655,7 @@ var Plottable;
             if (this.element != null) {
                 this._hasRendered = true;
                 this._paint();
+                this._dataChanged = false;
                 this._requireRerender = false;
                 this._rerenderUpdateSelection = false;
             }
@@ -1663,11 +1672,13 @@ var Plottable;
             return this;
         };
 
-        Renderer.prototype.animate = function (toggle) {
-            if (toggle == null) {
-                toggle = !this._animate;
-            }
-            this._animate = toggle;
+        /**
+        * Enables or disables animation.
+        *
+        * @param {boolean} enabled Whether or not to animate.
+        */
+        Renderer.prototype.animate = function (enabled) {
+            this._animate = enabled;
             return this;
         };
         Renderer.DEFAULT_COLOR_ACCESSOR = function (d) {
@@ -2103,8 +2114,9 @@ var Plottable;
                     scale = d3.scale.pow();
                     break;
             }
-            if (scale == null)
+            if (scale == null) {
                 throw new Error("unknown quantitive scale type " + scaleType);
+            }
             return scale.range([0, 1]).interpolate(InterpolatedColorScale.interpolateColors(colors));
         };
 
@@ -2120,8 +2132,10 @@ var Plottable;
         *     values in hex ("#FFFFFF") or keywords ("white").
         */
         InterpolatedColorScale.interpolateColors = function (colors) {
-            if (colors.length < 2)
+            if (colors.length < 2) {
                 throw new Error("Color scale arrays must have at least two elements.");
+            }
+            ;
             return function (ignored) {
                 return function (t) {
                     // Clamp t parameter to [0,1]
@@ -2140,23 +2154,26 @@ var Plottable;
         };
 
         InterpolatedColorScale.prototype.colorRange = function (colorRange) {
-            if (colorRange == null)
+            if (colorRange == null) {
                 return this._colorRange;
+            }
             this._colorRange = this._resolveColorValues(colorRange);
             this._resetScale();
         };
 
         InterpolatedColorScale.prototype.scaleType = function (scaleType) {
-            if (scaleType == null)
+            if (scaleType == null) {
                 return this._scaleType;
+            }
             this._scaleType = scaleType;
             this._resetScale();
         };
 
         InterpolatedColorScale.prototype._resetScale = function () {
             this._d3Scale = InterpolatedColorScale.getD3InterpolatedScale(this._colorRange, this._scaleType);
-            if (this._autoDomain)
+            if (this._autoDomain) {
                 this.autoDomain();
+            }
             this._broadcast();
         };
 
@@ -2580,9 +2597,24 @@ var Plottable;
             delete attrToProjector["x"];
             delete attrToProjector["y"];
 
+            var rFunction = attrToProjector["r"];
+            attrToProjector["r"] = function () {
+                return 0;
+            };
+
             this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
             this.dataSelection.enter().append("circle");
             this.dataSelection.attr(attrToProjector);
+
+            var updateSelection = this.dataSelection;
+            if (this._animate) {
+                var n = this.dataSource().data().length;
+                updateSelection = updateSelection.transition().delay(function (d, i) {
+                    return i * 250 / n;
+                });
+            }
+            updateSelection.attr("r", rFunction);
+
             this.dataSelection.exit().remove();
         };
         return CircleRenderer;
@@ -2618,11 +2650,21 @@ var Plottable;
         LineRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
             var attrToProjector = this._generateAttrToProjector();
-            this.line = d3.svg.line().x(attrToProjector["x"]).y(attrToProjector["y"]);
-            this.dataSelection = this.path.datum(this._dataSource.data());
+            var scaledZero = this.yScale.scale(0);
+            var xFunction = attrToProjector["x"];
+            var yFunction = attrToProjector["y"];
             delete attrToProjector["x"];
             delete attrToProjector["y"];
-            this.path.attr("d", this.line).attr(attrToProjector);
+
+            this.dataSelection = this.path.datum(this._dataSource.data());
+            if (this._animate) {
+                var animationStartLine = d3.svg.line().x(xFunction).y(scaledZero);
+                this.path.attr("d", animationStartLine).attr(attrToProjector);
+            }
+
+            this.line = d3.svg.line().x(xFunction).y(yFunction);
+            var updateSelection = (this._animate) ? this.path.transition().duration(500) : this.path;
+            updateSelection.attr("d", this.line).attr(attrToProjector);
         };
         return LineRenderer;
     })(Plottable.XYRenderer);
@@ -2746,6 +2788,12 @@ var Plottable;
             this.classed("bar-renderer", true);
             this.project("width", 10);
         }
+        AbstractBarRenderer.prototype._setup = function () {
+            _super.prototype._setup.call(this);
+            this._baseline = this.renderArea.append("line").classed("baseline", true);
+            return this;
+        };
+
         /**
         * Sets the baseline for the bars to the specified value.
         *
@@ -2863,6 +2911,16 @@ var Plottable;
 
             var yFunction = attrToProjector["y"];
 
+            if (this._animate) {
+                attrToProjector["y"] = function () {
+                    return scaledBaseline;
+                };
+                attrToProjector["height"] = function () {
+                    return 0;
+                };
+                this.dataSelection.attr(attrToProjector);
+            }
+
             attrToProjector["y"] = function (d, i) {
                 var originalY = yFunction(d, i);
                 return (originalY > scaledBaseline) ? scaledBaseline : originalY;
@@ -2877,21 +2935,18 @@ var Plottable;
                 this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
             }
 
-            if (this._baseline == null) {
-                this._baseline = this.renderArea.append("line").classed("baseline", true);
-            }
-
             var updateSelection = this.dataSelection;
-            var baselineSelection = this._baseline;
             if (this._animate) {
-                updateSelection = updateSelection.transition();
-                baselineSelection = baselineSelection.transition();
+                var n = this.dataSource().data().length;
+                updateSelection = updateSelection.transition().delay(function (d, i) {
+                    return i * 250 / n;
+                });
             }
 
             updateSelection.attr(attrToProjector);
             this.dataSelection.exit().remove();
 
-            baselineSelection.attr({
+            this._baseline.attr({
                 "x1": 0,
                 "y1": scaledBaseline,
                 "x2": this.availableWidth,
@@ -2974,6 +3029,16 @@ var Plottable;
 
             var xFunction = attrToProjector["x"];
 
+            if (this._animate) {
+                attrToProjector["x"] = function () {
+                    return scaledBaseline;
+                };
+                attrToProjector["width"] = function () {
+                    return 0;
+                };
+                this.dataSelection.attr(attrToProjector);
+            }
+
             attrToProjector["x"] = function (d, i) {
                 var originalX = xFunction(d, i);
                 return (originalX > scaledBaseline) ? scaledBaseline : originalX;
@@ -2988,21 +3053,18 @@ var Plottable;
                 this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
             }
 
-            if (this._baseline == null) {
-                this._baseline = this.renderArea.append("line").classed("baseline", true);
-            }
-
             var updateSelection = this.dataSelection;
-            var baselineSelection = this._baseline;
             if (this._animate) {
-                updateSelection = updateSelection.transition();
-                baselineSelection = baselineSelection.transition();
+                var n = this.dataSource().data().length;
+                updateSelection = updateSelection.transition().delay(function (d, i) {
+                    return i * 250 / n;
+                });
             }
 
             updateSelection.attr(attrToProjector);
             this.dataSelection.exit().remove();
 
-            baselineSelection.attr({
+            this._baseline.attr({
                 "x1": scaledBaseline,
                 "y1": 0,
                 "x2": scaledBaseline,
@@ -3674,8 +3736,7 @@ var Plottable;
                     return d;
                 };
             }
-            this.formatFunction = formatter;
-            this.d3Axis.tickFormat(this.formatFunction);
+            this.tickFormat(formatter);
             this._registerToBroadcaster(this._axisScale, function () {
                 return _this.rescale();
             });
@@ -3795,16 +3856,6 @@ var Plottable;
             }
         };
 
-        Axis.prototype.formatter = function (formatFunction) {
-            if (formatFunction == null) {
-                return this.formatFunction;
-            }
-            this.formatFunction = formatFunction;
-            this.d3Axis.tickFormat(this.formatFunction);
-            this._render();
-            return this;
-        };
-
         Axis.prototype.tickLabelPosition = function (position) {
             if (position == null) {
                 return this.tickPositioning;
@@ -3893,6 +3944,7 @@ var Plottable;
                 return this.d3Axis.tickFormat();
             } else {
                 this.d3Axis.tickFormat(formatter);
+                this._render();
                 return this;
             }
         };
@@ -4302,12 +4354,22 @@ var Plottable;
         AreaRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
             var attrToProjector = this._generateAttrToProjector();
-            this.area = d3.svg.area().x(attrToProjector["x"]).y0(attrToProjector["y0"]).y1(attrToProjector["y"]);
-            this.dataSelection = this.path.datum(this._dataSource.data());
+            var xFunction = attrToProjector["x"];
+            var y0Function = attrToProjector["y0"];
+            var yFunction = attrToProjector["y"];
             delete attrToProjector["x"];
             delete attrToProjector["y0"];
             delete attrToProjector["y"];
-            this.path.attr("d", this.area).attr(attrToProjector);
+
+            this.dataSelection = this.path.datum(this._dataSource.data());
+            if (this._animate) {
+                var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
+                this.path.attr("d", animationStartArea).attr(attrToProjector);
+            }
+
+            this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+            var updateSelection = (this._animate) ? this.path.transition().duration(500) : this.path;
+            updateSelection.attr("d", this.area).attr(attrToProjector);
         };
         return AreaRenderer;
     })(Plottable.XYRenderer);

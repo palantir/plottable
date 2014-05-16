@@ -467,7 +467,12 @@ declare module Plottable {
         public dataSource(): DataSource;
         public dataSource(source: DataSource): Renderer;
         public project(attrToSet: string, accessor: any, scale?: Scale): Renderer;
-        public animate(toggle?: boolean): Renderer;
+        /**
+        * Enables or disables animation.
+        *
+        * @param {boolean} enabled Whether or not to animate.
+        */
+        public animate(enabled: boolean): Renderer;
     }
 }
 declare module Plottable {
@@ -1114,8 +1119,6 @@ declare module Plottable {
         public showEndTickLabels(show: boolean): Axis;
         public scale(): Scale;
         public scale(newScale: Scale): Axis;
-        public formatter(): (d: any) => string;
-        public formatter(formatFunction: (d: any) => string): Axis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         * The exact consequences of particular tick label positionings depends on the subclass implementation.
@@ -1140,6 +1143,12 @@ declare module Plottable {
         public outerTickSize(val: number): Axis;
         public tickPadding(): number;
         public tickPadding(val: number): Axis;
+        /**
+        * Gets the current tick formatting function, or sets the tick formatting function.
+        *
+        * @param {(value: any) => string} [formatter] The new tick formatting function.
+        * @returns The current tick formatting function, or the calling Axis.
+        */
         public tickFormat(): (value: any) => string;
         public tickFormat(formatter: (value: any) => string): Axis;
     }
