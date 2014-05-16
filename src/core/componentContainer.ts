@@ -1,7 +1,11 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class AbstractComponentContainer extends Component {
+  export class ComponentContainer extends Component {
+    /*
+     * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
+     * It will not do anything if instantiated directly.
+     */
     public _components: Component[] = [];
     public _removeComponent(c: Component) {
       var removeIndex = this._components.indexOf(c);
@@ -39,7 +43,7 @@ module Plottable {
     /**
      * Remove all components contained in the  ComponentContainer
      *
-     * @returns {AbstractComponentContainer} The calling ComponentContainer
+     * @returns {ComponentContainer} The calling ComponentContainer
      */
     public removeAll() {
       this._components.forEach((c: Component) => c.remove());
