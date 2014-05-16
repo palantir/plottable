@@ -314,7 +314,29 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class ComponentGroup extends Component {
+    class ComponentContainer extends Component {
+        /**
+        * Returns a list of components in the ComponentContainer
+        *
+        * @returns{Component[]} the contained Components
+        */
+        public getComponents(): Component[];
+        /**
+        * Returns true iff the ComponentContainer is empty.
+        *
+        * @returns {boolean} Whether the calling ComponentContainer is empty.
+        */
+        public empty(): boolean;
+        /**
+        * Remove all components contained in the  ComponentContainer
+        *
+        * @returns {ComponentContainer} The calling ComponentContainer
+        */
+        public removeAll(): ComponentContainer;
+    }
+}
+declare module Plottable {
+    class ComponentGroup extends ComponentContainer {
         /**
         * Creates a ComponentGroup.
         *
@@ -323,26 +345,12 @@ declare module Plottable {
         */
         constructor(components?: Component[]);
         public merge(c: Component): ComponentGroup;
-        /**
-        * If the given component exists in the ComponentGroup, removes it from the
-        * group and the DOM.
-        *
-        * @param {Component} c The component to be removed.
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        public removeComponent(c: Component): ComponentGroup;
-        /**
-        * Removes all Components in the ComponentGroup from the group and the DOM.
-        *
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        public empty(): ComponentGroup;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
     }
 }
 declare module Plottable {
-    class Table extends Component {
+    class Table extends ComponentContainer {
         /**
         * Creates a Table.
         *
@@ -479,6 +487,7 @@ declare module Plottable {
     class RenderController {
         static enabled: boolean;
         static registerToRender(c: Component): void;
+        static registerToComputeLayout(c: Component): void;
         static doRender(): void;
     }
 }

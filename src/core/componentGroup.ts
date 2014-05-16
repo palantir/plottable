@@ -1,8 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class ComponentGroup extends Component {
-    private components: Component[];
+  export class ComponentGroup extends ComponentContainer {
 
     /**
      * Creates a ComponentGroup.
@@ -13,68 +12,43 @@ module Plottable {
     constructor(components: Component[] = []){
       super();
       this.classed("component-group", true);
-      this.components = components;
+      components.forEach((c: Component) => this._addComponent(c));
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var requests = this.components.map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
-      var desiredWidth  = d3.max(requests, (l: ISpaceRequest) => l.width );
-      var desiredHeight = d3.max(requests, (l: ISpaceRequest) => l.height);
+      var requests = this._components.map((c: Component) => c._requestedSpace(offeredWidth, offeredHeight));
+      var isEmpty = this.empty();
+      var desiredWidth  = isEmpty ? 0 : d3.max(requests, (l: ISpaceRequest) => l.width );
+      var desiredHeight = isEmpty ? 0 : d3.max(requests, (l: ISpaceRequest) => l.height);
       return {
         width : Math.min(desiredWidth , offeredWidth ),
         height: Math.min(desiredHeight, offeredHeight),
-        wantsWidth : desiredWidth  > offeredWidth,
-        wantsHeight: desiredHeight > offeredHeight
+        wantsWidth : isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
+        wantsHeight: isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };
     }
 
-    public _addComponentToGroup(c: Component, prepend = false): ComponentGroup {
+    public _addComponent(c: Component, prepend = false): ComponentGroup {
       if (prepend) {
-        this.components.unshift(c);
+        this._components.unshift(c);
       } else {
-        this.components.push(c);
+        this._components.push(c);
       }
       if (this.element != null) {
-        c._anchor(this.content);
+        c._anchor(this.content, this);
       }
+      this._invalidateLayout();
       return this;
     }
 
     public merge(c: Component): ComponentGroup {
-      this._addComponentToGroup(c);
+      this._addComponent(c);
       return this;
     }
 
-    /**
-     * If the given component exists in the ComponentGroup, removes it from the
-     * group and the DOM.
-     *
-     * @param {Component} c The component to be removed.
-     * @returns {ComponentGroup} The calling ComponentGroup.
-     */
-    public removeComponent(c: Component): ComponentGroup {
-      var removeIndex = this.components.indexOf(c);
-      if (removeIndex >= 0) {
-        this.components.splice(removeIndex, 1);
-        c.remove();
-      }
-      return this;
-    }
-
-    /**
-     * Removes all Components in the ComponentGroup from the group and the DOM.
-     *
-     * @returns {ComponentGroup} The calling ComponentGroup.
-     */
-    public empty(): ComponentGroup {
-      this.components.forEach((c: Component) => c.remove());
-      this.components = [];
-      return this;
-    }
-
-    public _anchor(element: D3.Selection): ComponentGroup {
-      super._anchor(element);
-      this.components.forEach((c) => c._anchor(this.content));
+    public _anchor(element: D3.Selection, parent?: ComponentContainer): ComponentGroup {
+      super._anchor(element, parent);
+      this._components.forEach((c) => c._anchor(this.content, this));
       return this;
     }
 
@@ -83,7 +57,7 @@ module Plottable {
                    availableWidth?: number,
                   availableHeight?: number): ComponentGroup {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
-      this.components.forEach((c) => {
+      this._components.forEach((c) => {
         c._computeLayout(0, 0, this.availableWidth, this.availableHeight);
       });
       return this;
@@ -91,16 +65,16 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      this.components.forEach((c) => c._doRender());
+      this._components.forEach((c) => c._doRender());
       return this;
     }
 
     public isFixedWidth(): boolean {
-      return this.components.every((c) => c.isFixedWidth());
+      return this._components.every((c) => c.isFixedWidth());
     }
 
     public isFixedHeight(): boolean {
-      return this.components.every((c) => c.isFixedHeight());
+      return this._components.every((c) => c.isFixedHeight());
     }
   }
 }

@@ -16,6 +16,13 @@ function getSVGParent(): D3.Selection {
   }
 }
 
+function verifySpaceRequest(sr: Plottable.ISpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
+  assert.equal(sr.width,  w, "width requested is as expected #"  + id);
+  assert.equal(sr.height, h, "height requested is as expected #" + id);
+  assert.equal(sr.wantsWidth , ww, "needs more width is as expected #"  + id);
+  assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+}
+
 function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
   c._requestedSpace = function(w, h) {
     return {

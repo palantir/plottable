@@ -64,13 +64,14 @@ module Plottable {
         this.textElement.text(text);
         this.measureAndSetTextSize();
       }
+      this._invalidateLayout();
       return this;
     }
 
     private measureAndSetTextSize() {
       var bbox = Utils.getBBox(this.textElement);
       this.textHeight = bbox.height;
-      this.textLength = bbox.width;
+      this.textLength = this.text === "" ? 0 : bbox.width;
     }
 
     private truncateTextAndRemeasure(availableLength: number) {
