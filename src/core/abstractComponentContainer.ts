@@ -18,16 +18,32 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Returns a list of components in the ComponentContainer
+     *
+     * @returns{Component[]} the contained Components
+     */
     public getComponents(): Component[] {
       return this._components;
     }
 
+    /**
+     * Returns true iff the ComponentContainer is empty.
+     *
+     * @returns {boolean} Whether the calling ComponentContainer is empty.
+     */
     public empty() {
       return this._components.length === 0;
     }
 
+    /**
+     * Remove all components contained in the  ComponentContainer
+     *
+     * @returns {AbstractComponentContainer} The calling ComponentContainer
+     */
     public removeAll() {
       this._components.forEach((c: Component) => c.remove());
+      return this;
     }
   }
 }
