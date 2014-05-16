@@ -193,13 +193,6 @@ describe("Tables", () => {
     var c2 = makeFixedSizeComponent(20, 50);
     var c3 = makeFixedSizeComponent(20, 20);
 
-    function verifySpaceRequest(sr: Plottable.ISpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
-      assert.equal(sr.width, w, "width requested is as expected #" + id);
-      assert.equal(sr.height, h, "height requested is as expected #" + id);
-      assert.equal(sr.wantsWidth, ww, "needs more width is as expected #" + id);
-      assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
-    }
-
     var table = new Plottable.Table([[c0, c1], [c2, c3]]);
 
     var spaceRequest = table._requestedSpace(30, 30);

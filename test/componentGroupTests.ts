@@ -127,6 +127,35 @@ describe("ComponentGroups", () => {
     svg.remove();
   });
 
+  describe("ComponentGroup._requestedSpace works as expected", () => {
+    it("_works for an empty ComponentGroup", () => {
+        var cg = new Plottable.ComponentGroup();
+        var request = cg._requestedSpace(10, 10);
+        verifySpaceRequest(request, 0, 0, false, false, "");
+    });
+
+    it("works for a ComponentGroup with only proportional-size components", () => {
+      var cg = new Plottable.ComponentGroup();
+      var c1 = new Plottable.Component();
+      var c2 = new Plottable.Component();
+      cg.merge(c1).merge(c2);
+      var request = cg._requestedSpace(10, 10);
+      verifySpaceRequest(request, 0, 0, false, false, "");
+    });
+
+    it("works when there are fixed-size components", () => {
+      var cg = new Plottable.ComponentGroup();
+      var c1 = new Plottable.Component();
+      var c2 = new Plottable.Component();
+      var c3 = new Plottable.Component();
+      cg.merge(c1).merge(c2).merge(c3);
+      fixComponentSize(c1, null, 10);
+      fixComponentSize(c2, null, 50);
+      var request = cg._requestedSpace(10, 10);
+      verifySpaceRequest(request, 0, 10, false, true, "");
+    });
+  });
+
     describe("Component.merge works as expected", () => {
       var c1 = new Plottable.Component();
       var c2 = new Plottable.Component();
