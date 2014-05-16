@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class ComponentGroup extends AbstractComponentContainer {
+  export class ComponentGroup extends ComponentContainer {
 
     /**
      * Creates a ComponentGroup.
@@ -46,7 +46,7 @@ module Plottable {
       return this;
     }
 
-    public _anchor(element: D3.Selection, parent?: AbstractComponentContainer): ComponentGroup {
+    public _anchor(element: D3.Selection, parent?: ComponentContainer): ComponentGroup {
       super._anchor(element, parent);
       this._components.forEach((c) => c._anchor(this.content, this));
       return this;

@@ -8,7 +8,7 @@ module Plottable {
     wantsWidthArr : boolean[];
     wantsHeightArr: boolean[];
   }
-  export class Table extends AbstractComponentContainer {
+  export class Table extends ComponentContainer {
     private rowPadding = 0;
     private colPadding = 0;
 
@@ -72,7 +72,7 @@ module Plottable {
       /* tslint:enable:no-unreachable */
     }
 
-    public _anchor(element: D3.Selection, parent?: AbstractComponentContainer) {
+    public _anchor(element: D3.Selection, parent?: ComponentContainer) {
       super._anchor(element, parent);
       // recursively anchor children
       this.rows.forEach((row: Component[], rowIndex: number) => {
