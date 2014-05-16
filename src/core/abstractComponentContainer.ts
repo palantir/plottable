@@ -5,11 +5,10 @@ module Plottable {
     public _components: Component[] = [];
     public _removeComponent(c: Component) {
       var removeIndex = this._components.indexOf(c);
-      if (removeIndex < 0) {
-        throw new Error("Attempt to remove component, but component not found");
+      if (removeIndex >= 0) {
+        this._components.splice(removeIndex, 1);
+        this._invalidateLayout();
       }
-      this._components.splice(removeIndex, 1);
-      this._invalidateLayout();
       return this;
     }
 
