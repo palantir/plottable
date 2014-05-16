@@ -314,13 +314,29 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class AbstractComponentContainer extends Component {
+    class ComponentContainer extends Component {
+        /**
+        * Returns a list of components in the ComponentContainer
+        *
+        * @returns{Component[]} the contained Components
+        */
         public getComponents(): Component[];
-        public empty(): void;
+        /**
+        * Returns true iff the ComponentContainer is empty.
+        *
+        * @returns {boolean} Whether the calling ComponentContainer is empty.
+        */
+        public empty(): boolean;
+        /**
+        * Remove all components contained in the  ComponentContainer
+        *
+        * @returns {ComponentContainer} The calling ComponentContainer
+        */
+        public removeAll(): ComponentContainer;
     }
 }
 declare module Plottable {
-    class ComponentGroup extends AbstractComponentContainer {
+    class ComponentGroup extends ComponentContainer {
         /**
         * Creates a ComponentGroup.
         *
@@ -334,7 +350,7 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class Table extends AbstractComponentContainer {
+    class Table extends ComponentContainer {
         /**
         * Creates a Table.
         *

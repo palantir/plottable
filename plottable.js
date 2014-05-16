@@ -966,41 +966,63 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var AbstractComponentContainer = (function (_super) {
-        __extends(AbstractComponentContainer, _super);
-        function AbstractComponentContainer() {
+    var ComponentContainer = (function (_super) {
+        __extends(ComponentContainer, _super);
+        function ComponentContainer() {
             _super.apply(this, arguments);
+            /*
+            * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
+            * It will not do anything if instantiated directly.
+            */
             this._components = [];
         }
-        AbstractComponentContainer.prototype._removeComponent = function (c) {
+        ComponentContainer.prototype._removeComponent = function (c) {
             var removeIndex = this._components.indexOf(c);
-            if (removeIndex < 0) {
-                throw new Error("Attempt to remove component, but component not found");
+            if (removeIndex >= 0) {
+                this._components.splice(removeIndex, 1);
+                this._invalidateLayout();
             }
-            this._components.splice(removeIndex, 1);
-            this._invalidateLayout();
             return this;
         };
 
-        AbstractComponentContainer.prototype._addComponent = function (c) {
+        ComponentContainer.prototype._addComponent = function (c) {
             this._components.push(c);
             this._invalidateLayout();
             return this;
         };
 
-        AbstractComponentContainer.prototype.getComponents = function () {
+        /**
+        * Returns a list of components in the ComponentContainer
+        *
+        * @returns{Component[]} the contained Components
+        */
+        ComponentContainer.prototype.getComponents = function () {
             return this._components;
         };
 
-        AbstractComponentContainer.prototype.empty = function () {
-            var _this = this;
-            this._components.forEach(function (c) {
-                return _this._removeComponent(c);
-            });
+        /**
+        * Returns true iff the ComponentContainer is empty.
+        *
+        * @returns {boolean} Whether the calling ComponentContainer is empty.
+        */
+        ComponentContainer.prototype.empty = function () {
+            return this._components.length === 0;
         };
-        return AbstractComponentContainer;
+
+        /**
+        * Remove all components contained in the  ComponentContainer
+        *
+        * @returns {ComponentContainer} The calling ComponentContainer
+        */
+        ComponentContainer.prototype.removeAll = function () {
+            this._components.forEach(function (c) {
+                return c.remove();
+            });
+            return this;
+        };
+        return ComponentContainer;
     })(Plottable.Component);
-    Plottable.AbstractComponentContainer = AbstractComponentContainer;
+    Plottable.ComponentContainer = ComponentContainer;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -1026,17 +1048,26 @@ var Plottable;
             var requests = this._components.map(function (c) {
                 return c._requestedSpace(offeredWidth, offeredHeight);
             });
-            var desiredWidth = d3.max(requests, function (l) {
+            var isEmpty = this.empty();
+            var desiredWidth = isEmpty ? 0 : d3.max(requests, function (l) {
                 return l.width;
             });
-            var desiredHeight = d3.max(requests, function (l) {
+            var desiredHeight = isEmpty ? 0 : d3.max(requests, function (l) {
                 return l.height;
             });
             return {
                 width: Math.min(desiredWidth, offeredWidth),
                 height: Math.min(desiredHeight, offeredHeight),
-                wantsWidth: desiredWidth > offeredWidth,
-                wantsHeight: desiredHeight > offeredHeight
+                wantsWidth: isEmpty ? false : requests.map(function (r) {
+                    return r.wantsWidth;
+                }).some(function (x) {
+                    return x;
+                }),
+                wantsHeight: isEmpty ? false : requests.map(function (r) {
+                    return r.wantsHeight;
+                }).some(function (x) {
+                    return x;
+                })
             };
         };
 
@@ -1097,7 +1128,7 @@ var Plottable;
             });
         };
         return ComponentGroup;
-    })(Plottable.AbstractComponentContainer);
+    })(Plottable.ComponentContainer);
     Plottable.ComponentGroup = ComponentGroup;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
@@ -1487,7 +1518,7 @@ var Plottable;
             return all(componentGroup.map(groupIsFixed));
         };
         return Table;
-    })(Plottable.AbstractComponentContainer);
+    })(Plottable.ComponentContainer);
     Plottable.Table = Table;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
@@ -3693,7 +3724,7 @@ var Plottable;
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
 /// <reference path="core/component.ts" />
-/// <reference path="core/abstractComponentContainer.ts" />
+/// <reference path="core/componentContainer.ts" />
 /// <reference path="core/componentGroup.ts" />
 /// <reference path="core/table.ts" />
 /// <reference path="core/scale.ts" />

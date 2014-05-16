@@ -17,6 +17,13 @@ function getSVGParent() {
     }
 }
 
+function verifySpaceRequest(sr, w, h, ww, wh, id) {
+    assert.equal(sr.width, w, "width requested is as expected #" + id);
+    assert.equal(sr.height, h, "height requested is as expected #" + id);
+    assert.equal(sr.wantsWidth, ww, "needs more width is as expected #" + id);
+    assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+}
+
 function fixComponentSize(c, fixedWidth, fixedHeight) {
     c._requestedSpace = function (w, h) {
         return {
@@ -608,6 +615,35 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
 
+    describe("ComponentGroup._requestedSpace works as expected", function () {
+        it("_works for an empty ComponentGroup", function () {
+            var cg = new Plottable.ComponentGroup();
+            var request = cg._requestedSpace(10, 10);
+            verifySpaceRequest(request, 0, 0, false, false, "");
+        });
+
+        it("works for a ComponentGroup with only proportional-size components", function () {
+            var cg = new Plottable.ComponentGroup();
+            var c1 = new Plottable.Component();
+            var c2 = new Plottable.Component();
+            cg.merge(c1).merge(c2);
+            var request = cg._requestedSpace(10, 10);
+            verifySpaceRequest(request, 0, 0, false, false, "");
+        });
+
+        it("works when there are fixed-size components", function () {
+            var cg = new Plottable.ComponentGroup();
+            var c1 = new Plottable.Component();
+            var c2 = new Plottable.Component();
+            var c3 = new Plottable.Component();
+            cg.merge(c1).merge(c2).merge(c3);
+            fixComponentSize(c1, null, 10);
+            fixComponentSize(c2, null, 50);
+            var request = cg._requestedSpace(10, 10);
+            verifySpaceRequest(request, 0, 10, false, true, "");
+        });
+    });
+
     describe("Component.merge works as expected", function () {
         var c1 = new Plottable.Component();
         var c2 = new Plottable.Component();
@@ -725,13 +761,7 @@ describe("Component behavior", function () {
 
             // Remove width/height attributes and style with CSS
             svg.attr("width", null).attr("height", null);
-<<<<<<< HEAD
-            svg.style("width", "50%");
-            svg.style("height", "50%");
-
             c._anchor(svg, null)._computeLayout();
-=======
-            c._anchor(svg)._computeLayout();
             assert.equal(c.availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
             assert.equal(c.availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
@@ -739,7 +769,6 @@ describe("Component behavior", function () {
 
             svg.style("width", "50%").style("height", "50%");
             c._computeLayout();
->>>>>>> master
 
             assert.equal(c.availableWidth, 200, "computeLayout defaulted width to svg width");
             assert.equal(c.availableHeight, 100, "computeLayout defaulted height to svg height");
@@ -2750,13 +2779,6 @@ describe("Tables", function () {
         var c1 = makeFixedSizeComponent(50, 50);
         var c2 = makeFixedSizeComponent(20, 50);
         var c3 = makeFixedSizeComponent(20, 20);
-
-        function verifySpaceRequest(sr, w, h, ww, wh, id) {
-            assert.equal(sr.width, w, "width requested is as expected #" + id);
-            assert.equal(sr.height, h, "height requested is as expected #" + id);
-            assert.equal(sr.wantsWidth, ww, "needs more width is as expected #" + id);
-            assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
-        }
 
         var table = new Plottable.Table([[c0, c1], [c2, c3]]);
 
