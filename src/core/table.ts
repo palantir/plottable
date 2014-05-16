@@ -8,7 +8,7 @@ module Plottable {
     wantsWidthArr : boolean[];
     wantsHeightArr: boolean[];
   }
-  export class Table extends Component {
+  export class Table extends ComponentContainer {
     private rowPadding = 0;
     private colPadding = 0;
 
@@ -48,7 +48,7 @@ module Plottable {
      */
     public addComponent(row: number, col: number, component: Component): Table {
       if (this.element != null) {
-        throw new Error("addComponent cannot be called after anchoring (for the moment)");
+        throw new Error("Table.addComponent cannot be called after anchoring (for the moment)");
       }
 
       this.nRows = Math.max(row + 1, this.nRows);
@@ -57,20 +57,28 @@ module Plottable {
 
       var currentComponent = this.rows[row][col];
       if (currentComponent != null) {
-        throw new Error("addComponent cannot be called on a cell where a component already exists (for the moment)");
+        throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
       }
 
       this.rows[row][col] = component;
+      this._addComponent(component);
       return this;
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public _removeComponent(c: Component) {
+      throw new Error("_removeComponent not yet implemented on Table");
+      /* tslint:disable:no-unreachable */
+      return this;
+      /* tslint:enable:no-unreachable */
+    }
+
+    public _anchor(element: D3.Selection, parent?: ComponentContainer) {
+      super._anchor(element, parent);
       // recursively anchor children
       this.rows.forEach((row: Component[], rowIndex: number) => {
         row.forEach((component: Component, colIndex: number) => {
           if (component != null) {
-            component._anchor(this.content);
+            component._anchor(this.content, this);
           }
         });
       });
@@ -261,6 +269,7 @@ module Plottable {
     public padding(rowPadding: number, colPadding: number) {
       this.rowPadding = rowPadding;
       this.colPadding = colPadding;
+      this._invalidateLayout();
       return this;
     }
 
@@ -274,6 +283,7 @@ module Plottable {
      */
     public rowWeight(index: number, weight: number) {
       this.rowWeights[index] = weight;
+      this._invalidateLayout();
       return this;
     }
 
@@ -287,6 +297,7 @@ module Plottable {
      */
     public colWeight(index: number, weight: number) {
       this.colWeights[index] = weight;
+      this._invalidateLayout();
       return this;
     }
 

@@ -24,14 +24,14 @@ describe("Component behavior", () => {
 
   describe("anchor", () => {
     it("anchoring works as expected", () => {
-      c._anchor(svg);
+      c._anchor(svg, null);
       assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
 
     it("can re-anchor to a different element", () => {
-      c._anchor(svg);
+      c._anchor(svg, null);
 
       var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c._anchor(svg2);
@@ -45,7 +45,7 @@ describe("Component behavior", () => {
 
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
-      c._anchor(svg)._computeLayout();
+      c._anchor(svg, null)._computeLayout();
       assert.equal(c.availableWidth , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
@@ -69,7 +69,7 @@ describe("Component behavior", () => {
 
       // Remove width/height attributes and style with CSS
       svg.attr("width", null).attr("height", null);
-      c._anchor(svg)._computeLayout();
+      c._anchor(svg, null)._computeLayout();
       assert.equal(c.availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c.availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
@@ -101,7 +101,7 @@ describe("Component behavior", () => {
 
     it("computeLayout will not default when attached to non-root node", () => {
       var g = svg.append("g");
-      c._anchor(g);
+      c._anchor(g, new Plottable.ComponentGroup());
       assert.throws(() => c._computeLayout(), "null arguments");
       svg.remove();
     });
@@ -117,7 +117,7 @@ describe("Component behavior", () => {
       var yOff = 20;
       var width = 100;
       var height = 200;
-      c._anchor(g)._computeLayout(xOff, yOff, width, height);
+      c._anchor(g, new Plottable.ComponentGroup())._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate(c.element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
       assert.equal(c.availableWidth , width, "the width set properly");
@@ -142,7 +142,7 @@ describe("Component behavior", () => {
 
   it("fixed-width component will align to the right spot", () => {
     fixComponentSize(c, 100, 100);
-    c._anchor(svg);
+    c._anchor(svg, null);
     c._computeLayout();
     assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
@@ -158,7 +158,7 @@ describe("Component behavior", () => {
 
 it("components can be offset relative to their alignment, and throw errors if there is insufficient space", () => {
     fixComponentSize(c, 100, 100);
-    c._anchor(svg);
+    c._anchor(svg, null);
     c.xOffset(20).yOffset(20);
     c._computeLayout();
     assertComponentXY(c, 20, 20, "top-left component offsets correctly");
@@ -199,7 +199,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
     var expectedClipPathID = c._plottableID;
-    c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
+    c._anchor(svg, null)._computeLayout(0, 0, 100, 100)._render();
     var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
     assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
     var clipRect = (<any> c).boxContainer.select(".clip-rect");
@@ -245,20 +245,20 @@ it("components can be offset relative to their alignment, and throw errors if th
       assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
     }
 
-    c._anchor(svg);
+    c._anchor(svg, null);
     assert.isUndefined((<any> c).hitBox, "no hitBox was created when there were no registered interactions");
     svg.remove();
     svg = generateSVG();
 
     c = new Plottable.Component();
     var i = new Plottable.Interaction(c).registerWithComponent();
-    c._anchor(svg);
+    c._anchor(svg, null);
     verifyHitbox(c);
     svg.remove();
     svg = generateSVG();
 
     c = new Plottable.Component();
-    c._anchor(svg);
+    c._anchor(svg, null);
     i = new Plottable.Interaction(c).registerWithComponent();
     verifyHitbox(c);
     svg.remove();
@@ -293,7 +293,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     c.classed("CSS-PREANCHOR-REMOVE", false);
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
 
-    c._anchor(svg);
+    c._anchor(svg, null);
     assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
     assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
     assert.isFalse(c.classed("CSS-POSTANCHOR"));
@@ -325,6 +325,20 @@ it("components can be offset relative to their alignment, and throw errors if th
     assert.equal(cbCalled, 2, "the callback is still attached to the component");
     assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
+    svg.remove();
+  });
+
+  it("_invalidateLayout works as expected", () => {
+    var cg = new Plottable.ComponentGroup();
+    var c = makeFixedSizeComponent(10, 10);
+    cg._addComponent(c);
+    cg.renderTo(svg);
+    assert.equal(cg.availableHeight, 10, "availableHeight initially 10 for fixed-size component");
+    assert.equal(cg.availableWidth, 10, "availableWidth initially 10 for fixed-size component");
+    fixComponentSize(c, 50, 50);
+    c._invalidateLayout();
+    assert.equal(cg.availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
+    assert.equal(cg.availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
     svg.remove();
   });
 });

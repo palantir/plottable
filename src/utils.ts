@@ -107,7 +107,7 @@ module Plottable {
     export function getTextWidth(textElement: D3.Selection, text: string) {
       var originalText = textElement.text();
       textElement.text(text);
-      var width = Utils.getBBox(textElement).width;
+      var width = text === "" ? 0 : Utils.getBBox(textElement).width;
       textElement.text(originalText);
       return width;
     }

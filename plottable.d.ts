@@ -314,7 +314,29 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class ComponentGroup extends Component {
+    class ComponentContainer extends Component {
+        /**
+        * Returns a list of components in the ComponentContainer
+        *
+        * @returns{Component[]} the contained Components
+        */
+        public getComponents(): Component[];
+        /**
+        * Returns true iff the ComponentContainer is empty.
+        *
+        * @returns {boolean} Whether the calling ComponentContainer is empty.
+        */
+        public empty(): boolean;
+        /**
+        * Remove all components contained in the  ComponentContainer
+        *
+        * @returns {ComponentContainer} The calling ComponentContainer
+        */
+        public removeAll(): ComponentContainer;
+    }
+}
+declare module Plottable {
+    class ComponentGroup extends ComponentContainer {
         /**
         * Creates a ComponentGroup.
         *
@@ -323,26 +345,12 @@ declare module Plottable {
         */
         constructor(components?: Component[]);
         public merge(c: Component): ComponentGroup;
-        /**
-        * If the given component exists in the ComponentGroup, removes it from the
-        * group and the DOM.
-        *
-        * @param {Component} c The component to be removed.
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        public removeComponent(c: Component): ComponentGroup;
-        /**
-        * Removes all Components in the ComponentGroup from the group and the DOM.
-        *
-        * @returns {ComponentGroup} The calling ComponentGroup.
-        */
-        public empty(): ComponentGroup;
         public isFixedWidth(): boolean;
         public isFixedHeight(): boolean;
     }
 }
 declare module Plottable {
-    class Table extends Component {
+    class Table extends ComponentContainer {
         /**
         * Creates a Table.
         *
@@ -474,6 +482,7 @@ declare module Plottable {
     class RenderController {
         static enabled: boolean;
         static registerToRender(c: Component): void;
+        static registerToComputeLayout(c: Component): void;
         static doRender(): void;
     }
 }
@@ -1114,8 +1123,6 @@ declare module Plottable {
         public showEndTickLabels(show: boolean): Axis;
         public scale(): Scale;
         public scale(newScale: Scale): Axis;
-        public formatter(): (d: any) => string;
-        public formatter(formatFunction: (d: any) => string): Axis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         * The exact consequences of particular tick label positionings depends on the subclass implementation.
@@ -1140,6 +1147,12 @@ declare module Plottable {
         public outerTickSize(val: number): Axis;
         public tickPadding(): number;
         public tickPadding(val: number): Axis;
+        /**
+        * Gets the current tick formatting function, or sets the tick formatting function.
+        *
+        * @param {(value: any) => string} [formatter] The new tick formatting function.
+        * @returns The current tick formatting function, or the calling Axis.
+        */
         public tickFormat(): (value: any) => string;
         public tickFormat(formatter: (value: any) => string): Axis;
     }
