@@ -23,7 +23,11 @@ module Plottable {
     }
 
     public empty() {
-      this._components.forEach((c) => this._removeComponent(c));
+      return this._components.length === 0;
+    }
+
+    public removeAll() {
+      this._components.forEach((c: Component) => c.remove());
     }
   }
 }
