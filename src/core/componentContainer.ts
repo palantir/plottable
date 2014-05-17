@@ -27,7 +27,7 @@ module Plottable {
      *
      * @returns{Component[]} the contained Components
      */
-    public getComponents(): Component[] {
+    public components(): Component[] {
       return this._components;
     }
 
@@ -46,7 +46,9 @@ module Plottable {
      * @returns {ComponentContainer} The calling ComponentContainer
      */
     public removeAll() {
-      this._components.forEach((c: Component) => c.remove());
+      // It's not safe to iterate over the list of components, because removing them will modify the list during iteration
+      // So get all the functions to call, and then call them all
+      this._components.map((c: Component) => (() => c.remove())).forEach((f) => f());
       return this;
     }
   }

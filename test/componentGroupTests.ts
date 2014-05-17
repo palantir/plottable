@@ -127,6 +127,22 @@ describe("ComponentGroups", () => {
     svg.remove();
   });
 
+  it("removeAll() works as expected", () => {
+    var cg = new Plottable.ComponentGroup();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+    assert.isTrue(cg.empty(), "cg initially empty");
+    cg.merge(c1).merge(c2).merge(c3);
+    assert.isFalse(cg.empty(), "cg not empty after merging components");
+    cg.removeAll();
+    assert.isTrue(cg.empty(), "cg empty after removing components");
+    assert.isFalse((<any> c1).isAnchored, "c1 was removed");
+    assert.isFalse((<any> c2).isAnchored, "c2 was removed");
+    assert.isFalse((<any> c3).isAnchored, "c3 was removed");
+    assert.lengthOf(cg.components(), 0, "cg has no components");
+  });
+
   describe("ComponentGroup._requestedSpace works as expected", () => {
     it("_works for an empty ComponentGroup", () => {
         var cg = new Plottable.ComponentGroup();
