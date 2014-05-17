@@ -35,7 +35,7 @@ module Plottable {
       delete attrToProjector["y"];
 
       this.dataSelection = this.path.datum(this._dataSource.data());
-      if (this._animate) {
+      if (this._animate && this._dataChanged) {
         var animationStartLine = d3.svg.line()
                                        .x(xFunction)
                                        .y(scaledZero);

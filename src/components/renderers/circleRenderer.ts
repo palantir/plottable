@@ -41,7 +41,7 @@ module Plottable {
       this.dataSelection.attr(attrToProjector);
 
       var updateSelection: any = this.dataSelection;
-      if (this._animate) {
+      if (this._animate && this._dataChanged) {
         var n = this.dataSource().data().length;
         updateSelection = updateSelection.transition()
                                          .delay((d: any, i: number) => i * 250 / n);

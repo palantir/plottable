@@ -58,6 +58,12 @@ module Plottable {
       this.dataSource(dataSource);
     }
 
+    public _anchor(element: D3.Selection, parent?: ComponentContainer) {
+      super._anchor(element, parent);
+      this._dataChanged = true;
+      return this;
+    }
+
     /**
      * Retrieves the current DataSource, or sets a DataSource if the Renderer doesn't yet have one.
      *

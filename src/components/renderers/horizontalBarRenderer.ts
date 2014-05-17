@@ -46,7 +46,7 @@ module Plottable {
 
       var xFunction = attrToProjector["x"];
 
-      if (this._animate) {
+      if (this._animate && this._dataChanged) {
         attrToProjector["x"] = function() { return scaledBaseline; };
         attrToProjector["width"] = function() { return 0; };
         this.dataSelection.attr(attrToProjector);
