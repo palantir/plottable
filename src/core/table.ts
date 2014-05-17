@@ -47,10 +47,6 @@ module Plottable {
      * @param {Component} component The Component to be added.
      */
     public addComponent(row: number, col: number, component: Component): Table {
-      if (this.element != null) {
-        throw new Error("Table.addComponent cannot be called after anchoring (for the moment)");
-      }
-
       this.nRows = Math.max(row + 1, this.nRows);
       this.nCols = Math.max(col + 1, this.nCols);
       this.padTableToSize(this.nRows, this.nCols);
@@ -70,19 +66,6 @@ module Plottable {
       /* tslint:disable:no-unreachable */
       return this;
       /* tslint:enable:no-unreachable */
-    }
-
-    public _anchor(element: D3.Selection, parent?: ComponentContainer) {
-      super._anchor(element, parent);
-      // recursively anchor children
-      this.rows.forEach((row: Component[], rowIndex: number) => {
-        row.forEach((component: Component, colIndex: number) => {
-          if (component != null) {
-            component._anchor(this.content, this);
-          }
-        });
-      });
-      return this;
     }
 
     private iterateLayout(availableWidth : number, availableHeight: number) {

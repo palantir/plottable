@@ -8,7 +8,7 @@ describe("Labels", () => {
   it("Standard text title label generates properly", () => {
     var svg = generateSVG(400, 80);
     var label = new Plottable.TitleLabel("A CHART TITLE");
-    label._anchor(svg, null);
+    label._anchor(svg);
     label._computeLayout();
 
     var content = label.content;
@@ -27,7 +27,7 @@ describe("Labels", () => {
   it("Left-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
-    label._anchor(svg, null);
+    label._anchor(svg);
     var content = label.content;
     var text = content.select("text");
     label._computeLayout();
@@ -42,7 +42,7 @@ describe("Labels", () => {
   it("Right-rotated text is handled properly", () => {
     var svg = generateSVG(100, 400);
     var label = new Plottable.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
-    label._anchor(svg, null);
+    label._anchor(svg);
     var content = label.content;
     var text = content.select("text");
     label._computeLayout();
@@ -72,7 +72,7 @@ describe("Labels", () => {
     var svgWidth = 400;
     var svg = generateSVG(svgWidth, 80);
     var label = new Plottable.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-    label._anchor(svg, null);
+    label._anchor(svg);
     var content = label.content;
     var text = content.select("text");
     label._computeLayout();

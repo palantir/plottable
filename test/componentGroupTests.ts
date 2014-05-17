@@ -11,7 +11,7 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.ComponentGroup([c1, c2, c3]);
     var svg = generateSVG(400, 400);
-    cg._anchor(svg, null);
+    cg._anchor(svg);
     (<any> c1).addBox("test-box1");
     (<any> c2).addBox("test-box2");
     (<any> c3).addBox("test-box3");
@@ -32,7 +32,7 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.ComponentGroup([c1]);
     var svg = generateSVG(400, 400);
-    cg.merge(c2)._anchor(svg, null);
+    cg.merge(c2)._anchor(svg);
     (<any> c1).addBox("test-box1");
     (<any> c2).addBox("test-box2");
     cg._computeLayout()._render();
@@ -73,7 +73,7 @@ describe("ComponentGroups", () => {
     cg.merge(c1).merge(c2);
 
     var svg = generateSVG();
-    cg._anchor(svg, null);
+    cg._anchor(svg);
     cg._computeLayout(50, 50, 350, 350);
 
     var cgTranslate = d3.transform(cg.element.attr("transform")).translate;

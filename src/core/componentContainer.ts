@@ -7,6 +7,13 @@ module Plottable {
      * It will not do anything if instantiated directly.
      */
     public _components: Component[] = [];
+
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+      this._components.forEach((c) => c._anchor(this.content));
+      return this;
+    }
+
     public _removeComponent(c: Component) {
       var removeIndex = this._components.indexOf(c);
       if (removeIndex >= 0) {
@@ -18,6 +25,10 @@ module Plottable {
 
     public _addComponent(c: Component) {
       this._components.push(c);
+      c._parent = this;
+      if (this.element != null) {
+        c._anchor(this.content);
+      }
       this._invalidateLayout();
       return this;
     }
@@ -46,9 +57,8 @@ module Plottable {
      * @returns {ComponentContainer} The calling ComponentContainer
      */
     public removeAll() {
-      // It's not safe to iterate over the list of components, because removing them will modify the list during iteration
-      // So get all the functions to call, and then call them all
-      this._components.map((c: Component) => (() => c.remove())).forEach((f) => f());
+      // Iterate over a copy, not the array directly, since remove mutates this._components
+      this._components.slice().forEach((c: Component) => c.remove());
       return this;
     }
   }
