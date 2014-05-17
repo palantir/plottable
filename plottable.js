@@ -356,7 +356,7 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (OSUtils) {
-
+        
 
         function sortedIndex(val, arr, accessor) {
             var low = 0;
@@ -1683,6 +1683,12 @@ var Plottable;
             }
             this.dataSource(dataSource);
         }
+        Renderer.prototype._anchor = function (element, parent) {
+            _super.prototype._anchor.call(this, element, parent);
+            this._dataChanged = true;
+            return this;
+        };
+
         Renderer.prototype.dataSource = function (source) {
             var _this = this;
             if (source == null) {
@@ -2717,7 +2723,7 @@ var Plottable;
             this.dataSelection.attr(attrToProjector);
 
             var updateSelection = this.dataSelection;
-            if (this._animate) {
+            if (this._animate && this._dataChanged) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().delay(function (d, i) {
                     return i * 250 / n;
@@ -2767,7 +2773,7 @@ var Plottable;
             delete attrToProjector["y"];
 
             this.dataSelection = this.path.datum(this._dataSource.data());
-            if (this._animate) {
+            if (this._animate && this._dataChanged) {
                 var animationStartLine = d3.svg.line().x(xFunction).y(scaledZero);
                 this.path.attr("d", animationStartLine).attr(attrToProjector);
             }
@@ -3021,7 +3027,7 @@ var Plottable;
 
             var yFunction = attrToProjector["y"];
 
-            if (this._animate) {
+            if (this._animate && this._dataChanged) {
                 attrToProjector["y"] = function () {
                     return scaledBaseline;
                 };
@@ -3139,7 +3145,7 @@ var Plottable;
 
             var xFunction = attrToProjector["x"];
 
-            if (this._animate) {
+            if (this._animate && this._dataChanged) {
                 attrToProjector["x"] = function () {
                     return scaledBaseline;
                 };
@@ -4475,7 +4481,7 @@ var Plottable;
             delete attrToProjector["y"];
 
             this.dataSelection = this.path.datum(this._dataSource.data());
-            if (this._animate) {
+            if (this._animate && this._dataChanged) {
                 var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
                 this.path.attr("d", animationStartArea).attr(attrToProjector);
             }
