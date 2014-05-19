@@ -320,7 +320,7 @@ declare module Plottable {
         *
         * @returns{Component[]} the contained Components
         */
-        public getComponents(): Component[];
+        public components(): Component[];
         /**
         * Returns true iff the ComponentContainer is empty.
         *

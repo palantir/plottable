@@ -542,8 +542,8 @@ var Plottable;
             this._xAlignProportion = 0;
             this._yAlignProportion = 0;
             this.cssClasses = ["component"];
-            this.isSetup = false;
-            this.isAnchored = false;
+            this._isSetup = false;
+            this._isAnchored = false;
         }
         /**
         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -551,7 +551,7 @@ var Plottable;
         * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
         * @returns {Component} The calling component.
         */
-        Component.prototype._anchor = function (element, parent) {
+        Component.prototype._anchor = function (element) {
             if (element.node().nodeName === "svg") {
                 // svg node gets the "plottable" CSS class
                 this.rootSVG = element;
@@ -561,10 +561,6 @@ var Plottable;
                 this.rootSVG.style("overflow", "visible");
                 this.isTopLevelComponent = true;
             }
-            if (parent == null && !this.isTopLevelComponent) {
-                throw new Error("Components must be top-level or have a parent");
-            }
-            this.parent = parent;
 
             if (this.element != null) {
                 // reattach existing element
@@ -573,7 +569,7 @@ var Plottable;
                 this.element = element.append("g");
                 this._setup();
             }
-            this.isAnchored = true;
+            this._isAnchored = true;
             return this;
         };
 
@@ -607,7 +603,7 @@ var Plottable;
                 return _this.registerInteraction(r);
             });
             this.interactionsToRegister = null;
-            this.isSetup = true;
+            this._isSetup = true;
             return this;
         };
 
@@ -688,14 +684,14 @@ var Plottable;
         * @returns {Component} The calling Component.
         */
         Component.prototype._render = function () {
-            if (this.isAnchored && this.isSetup) {
+            if (this._isAnchored && this._isSetup) {
                 Plottable.RenderController.registerToRender(this);
             }
             return this;
         };
 
         Component.prototype._scheduleComputeLayout = function () {
-            if (this.isAnchored && this.isSetup) {
+            if (this._isAnchored && this._isSetup) {
                 Plottable.RenderController.registerToComputeLayout(this);
             }
             return this;
@@ -706,11 +702,11 @@ var Plottable;
         };
 
         Component.prototype._invalidateLayout = function () {
-            if (this.isAnchored && this.isSetup) {
+            if (this._isAnchored && this._isSetup) {
                 if (this.isTopLevelComponent) {
                     this._scheduleComputeLayout();
                 } else {
-                    this.parent._invalidateLayout();
+                    this._parent._invalidateLayout();
                 }
             }
         };
@@ -729,7 +725,7 @@ var Plottable;
                 } else {
                     selection = d3.select(element);
                 }
-                this._anchor(selection, null);
+                this._anchor(selection);
             }
             this._computeLayout()._render();
             return this;
@@ -934,7 +930,7 @@ var Plottable;
         */
         Component.prototype.merge = function (c) {
             var cg;
-            if (this.isSetup || this.isAnchored) {
+            if (this._isSetup || this._isAnchored) {
                 throw new Error("Can't presently merge a component that's already been anchored");
             }
             if (Plottable.ComponentGroup.prototype.isPrototypeOf(c)) {
@@ -951,12 +947,14 @@ var Plottable;
         * Removes a Component from the DOM.
         */
         Component.prototype.remove = function () {
-            this.element.remove();
-            if (this.parent != null) {
-                this.parent._removeComponent(this);
+            if (this._isAnchored) {
+                this.element.remove();
             }
-            this.isAnchored = false;
-            this.parent = null;
+            if (this._parent != null) {
+                this._parent._removeComponent(this);
+            }
+            this._isAnchored = false;
+            this._parent = null;
             return this;
         };
         return Component;
@@ -976,6 +974,15 @@ var Plottable;
             */
             this._components = [];
         }
+        ComponentContainer.prototype._anchor = function (element) {
+            var _this = this;
+            _super.prototype._anchor.call(this, element);
+            this._components.forEach(function (c) {
+                return c._anchor(_this.content);
+            });
+            return this;
+        };
+
         ComponentContainer.prototype._removeComponent = function (c) {
             var removeIndex = this._components.indexOf(c);
             if (removeIndex >= 0) {
@@ -985,8 +992,20 @@ var Plottable;
             return this;
         };
 
-        ComponentContainer.prototype._addComponent = function (c) {
-            this._components.push(c);
+        ComponentContainer.prototype._addComponent = function (c, prepend) {
+            if (typeof prepend === "undefined") { prepend = false; }
+            if (c == null) {
+                return this;
+            }
+            if (prepend) {
+                this._components.unshift(c);
+            } else {
+                this._components.push(c);
+            }
+            c._parent = this;
+            if (this._isAnchored) {
+                c._anchor(this.content);
+            }
             this._invalidateLayout();
             return this;
         };
@@ -996,7 +1015,7 @@ var Plottable;
         *
         * @returns{Component[]} the contained Components
         */
-        ComponentContainer.prototype.getComponents = function () {
+        ComponentContainer.prototype.components = function () {
             return this._components;
         };
 
@@ -1015,7 +1034,9 @@ var Plottable;
         * @returns {ComponentContainer} The calling ComponentContainer
         */
         ComponentContainer.prototype.removeAll = function () {
-            this._components.forEach(function (c) {
+            // Calling c.remove() will mutate this._components because the component will call this._parent._removeComponent(this)
+            // Since mutating an array while iterating over it is dangerous, we instead iterate over a copy generated by Arr.slice()
+            this._components.slice().forEach(function (c) {
                 return c.remove();
             });
             return this;
@@ -1071,31 +1092,8 @@ var Plottable;
             };
         };
 
-        ComponentGroup.prototype._addComponent = function (c, prepend) {
-            if (typeof prepend === "undefined") { prepend = false; }
-            if (prepend) {
-                this._components.unshift(c);
-            } else {
-                this._components.push(c);
-            }
-            if (this.element != null) {
-                c._anchor(this.content, this);
-            }
-            this._invalidateLayout();
-            return this;
-        };
-
         ComponentGroup.prototype.merge = function (c) {
             this._addComponent(c);
-            return this;
-        };
-
-        ComponentGroup.prototype._anchor = function (element, parent) {
-            var _this = this;
-            _super.prototype._anchor.call(this, element, parent);
-            this._components.forEach(function (c) {
-                return c._anchor(_this.content, _this);
-            });
             return this;
         };
 
@@ -1145,20 +1143,20 @@ var Plottable;
         */
         function Table(rows) {
             if (typeof rows === "undefined") { rows = []; }
+            var _this = this;
             _super.call(this);
             this.rowPadding = 0;
             this.colPadding = 0;
+            this.rows = [];
+            this.rowWeights = [];
+            this.colWeights = [];
+            this.nRows = 0;
+            this.nCols = 0;
             this.classed("table", true);
-            this.rows = rows;
-            this.nRows = rows.length;
-            this.nCols = rows.length > 0 ? d3.max(rows, function (r) {
-                return r.length;
-            }) : 0;
-            this.rowWeights = this.rows.map(function () {
-                return null;
-            });
-            this.colWeights = d3.transpose(this.rows).map(function () {
-                return null;
+            rows.forEach(function (row, rowIndex) {
+                row.forEach(function (component, colIndex) {
+                    _this.addComponent(rowIndex, colIndex, component);
+                });
             });
         }
         /**
@@ -1169,10 +1167,6 @@ var Plottable;
         * @param {Component} component The Component to be added.
         */
         Table.prototype.addComponent = function (row, col, component) {
-            if (this.element != null) {
-                throw new Error("Table.addComponent cannot be called after anchoring (for the moment)");
-            }
-
             this.nRows = Math.max(row + 1, this.nRows);
             this.nCols = Math.max(col + 1, this.nCols);
             this.padTableToSize(this.nRows, this.nCols);
@@ -1189,25 +1183,6 @@ var Plottable;
 
         Table.prototype._removeComponent = function (c) {
             throw new Error("_removeComponent not yet implemented on Table");
-
-            /* tslint:disable:no-unreachable */
-            return this;
-            /* tslint:enable:no-unreachable */
-        };
-
-        Table.prototype._anchor = function (element, parent) {
-            var _this = this;
-            _super.prototype._anchor.call(this, element, parent);
-
-            // recursively anchor children
-            this.rows.forEach(function (row, rowIndex) {
-                row.forEach(function (component, colIndex) {
-                    if (component != null) {
-                        component._anchor(_this.content, _this);
-                    }
-                });
-            });
-            return this;
         };
 
         Table.prototype.iterateLayout = function (availableWidth, availableHeight) {

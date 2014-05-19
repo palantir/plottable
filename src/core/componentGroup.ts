@@ -28,27 +28,8 @@ module Plottable {
       };
     }
 
-    public _addComponent(c: Component, prepend = false): ComponentGroup {
-      if (prepend) {
-        this._components.unshift(c);
-      } else {
-        this._components.push(c);
-      }
-      if (this.element != null) {
-        c._anchor(this.content, this);
-      }
-      this._invalidateLayout();
-      return this;
-    }
-
     public merge(c: Component): ComponentGroup {
       this._addComponent(c);
-      return this;
-    }
-
-    public _anchor(element: D3.Selection, parent?: ComponentContainer): ComponentGroup {
-      super._anchor(element, parent);
-      this._components.forEach((c) => c._anchor(this.content, this));
       return this;
     }
 
