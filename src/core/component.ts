@@ -29,8 +29,8 @@ module Plottable {
 
     private cssClasses: string[] = ["component"];
 
-    public isSetup = false;
-    public isAnchored = false;
+    public _isSetup = false;
+    public _isAnchored = false;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -55,7 +55,7 @@ module Plottable {
         this.element = element.append("g");
         this._setup();
       }
-      this.isAnchored = true;
+      this._isAnchored = true;
       return this;
     }
 
@@ -85,7 +85,7 @@ module Plottable {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
-      this.isSetup = true;
+      this._isSetup = true;
       return this;
     }
 
@@ -163,14 +163,14 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public _render() {
-      if (this.isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         RenderController.registerToRender(this);
       }
       return this;
     }
 
     public _scheduleComputeLayout() {
-      if (this.isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         RenderController.registerToComputeLayout(this);
       }
       return this;
@@ -182,7 +182,7 @@ module Plottable {
 
 
     public _invalidateLayout() {
-      if (this.isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         if (this.isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
@@ -417,7 +417,7 @@ module Plottable {
      */
     public merge(c: Component): ComponentGroup {
       var cg: ComponentGroup;
-      if (this.isSetup || this.isAnchored) {
+      if (this._isSetup || this._isAnchored) {
         throw new Error("Can't presently merge a component that's already been anchored");
       }
       if (ComponentGroup.prototype.isPrototypeOf(c)) {
@@ -434,13 +434,13 @@ module Plottable {
      * Removes a Component from the DOM.
      */
     public remove() {
-      if (this.isAnchored) {
+      if (this._isAnchored) {
         this.element.remove();
       }
       if (this._parent != null) {
         this._parent._removeComponent(this);
       }
-      this.isAnchored = false;
+      this._isAnchored = false;
       this._parent = null;
       return this;
     }

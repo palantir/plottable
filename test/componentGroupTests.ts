@@ -137,9 +137,9 @@ describe("ComponentGroups", () => {
     assert.isFalse(cg.empty(), "cg not empty after merging components");
     cg.removeAll();
     assert.isTrue(cg.empty(), "cg empty after removing components");
-    assert.isFalse((<any> c1).isAnchored, "c1 was removed");
-    assert.isFalse((<any> c2).isAnchored, "c2 was removed");
-    assert.isFalse((<any> c3).isAnchored, "c3 was removed");
+    assert.isFalse(c1._isAnchored, "c1 was removed");
+    assert.isFalse(c2._isAnchored, "c2 was removed");
+    assert.isFalse(c3._isAnchored, "c3 was removed");
     assert.lengthOf(cg.components(), 0, "cg has no components");
   });
 
