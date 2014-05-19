@@ -2458,8 +2458,11 @@ var Plottable;
         function RectRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
             this.classed("rect-renderer", true);
-            this.project("width", 3); // default
-            this.project("height", 3); // default
+            this.project("width", 4); // default
+            this.project("height", 4); // default
+            this.project("fill", function () {
+                return "steelblue";
+            });
         }
         RectRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
