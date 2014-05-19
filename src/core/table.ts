@@ -12,15 +12,15 @@ module Plottable {
     private rowPadding = 0;
     private colPadding = 0;
 
-    private rows: Component[][];
+    private rows: Component[][] = [];
     private minimumHeights: number[];
     private minimumWidths: number[];
 
-    private rowWeights: number[];
-    private colWeights: number[];
+    private rowWeights: number[] = [];
+    private colWeights: number[] = [];
 
-    private nRows: number;
-    private nCols: number;
+    private nRows = 0;
+    private nCols = 0;
 
     /**
      * Creates a Table.
@@ -32,11 +32,11 @@ module Plottable {
     constructor(rows: Component[][] = []) {
       super();
       this.classed("table", true);
-      this.rows = rows;
-      this.nRows = rows.length;
-      this.nCols = rows.length > 0 ? d3.max(rows, (r) => r.length) : 0;
-      this.rowWeights = this.rows.map((): any => null);
-      this.colWeights = d3.transpose(this.rows).map((): any => null);
+      rows.forEach((row, rowIndex) => {
+        row.forEach((component, colIndex) => {
+          this.addComponent(rowIndex, colIndex, component);
+        });
+      });
     }
 
     /**
@@ -47,10 +47,6 @@ module Plottable {
      * @param {Component} component The Component to be added.
      */
     public addComponent(row: number, col: number, component: Component): Table {
-      if (this.element != null) {
-        throw new Error("Table.addComponent cannot be called after anchoring (for the moment)");
-      }
-
       this.nRows = Math.max(row + 1, this.nRows);
       this.nCols = Math.max(col + 1, this.nCols);
       this.padTableToSize(this.nRows, this.nCols);
@@ -65,24 +61,8 @@ module Plottable {
       return this;
     }
 
-    public _removeComponent(c: Component) {
+    public _removeComponent(c: Component): Table {
       throw new Error("_removeComponent not yet implemented on Table");
-      /* tslint:disable:no-unreachable */
-      return this;
-      /* tslint:enable:no-unreachable */
-    }
-
-    public _anchor(element: D3.Selection, parent?: ComponentContainer) {
-      super._anchor(element, parent);
-      // recursively anchor children
-      this.rows.forEach((row: Component[], rowIndex: number) => {
-        row.forEach((component: Component, colIndex: number) => {
-          if (component != null) {
-            component._anchor(this.content, this);
-          }
-        });
-      });
-      return this;
     }
 
     private iterateLayout(availableWidth : number, availableHeight: number) {

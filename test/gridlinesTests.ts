@@ -19,7 +19,7 @@ describe("Gridlines", () => {
                                           .addComponent(0, 1, gridlines)
                                           .addComponent(1, 1, xAxis);
 
-    basicTable._anchor(svg, null);
+    basicTable._anchor(svg);
     basicTable._computeLayout();
     xScale.range([0, xAxis.availableWidth ]); // manually set range since we don't have a renderer
     yScale.range([yAxis.availableHeight, 0]);
