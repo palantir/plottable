@@ -34,7 +34,7 @@ module Plottable {
       delete attrToProjector["y"];
 
       var rFunction = attrToProjector["r"];
-      attrToProjector["r"] = function() { return 0; };
+      attrToProjector["r"] = () => 0;
 
       this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
       this.dataSelection.enter().append("circle");
@@ -44,7 +44,7 @@ module Plottable {
       if (this._animate && this._dataChanged) {
         var n = this.dataSource().data().length;
         updateSelection = updateSelection.transition()
-                                         .delay((d: any, i: number) => i * 250 / n);
+                                         .delay((d: any, i: number) => i * this._ANIMATION_DURATION / n);
       }
       updateSelection.attr("r", rFunction);
 

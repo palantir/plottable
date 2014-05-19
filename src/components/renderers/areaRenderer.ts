@@ -4,6 +4,7 @@ module Plottable {
   export class AreaRenderer extends XYRenderer {
     private path: D3.Selection;
     private area: D3.Svg.Area;
+    public _ANIMATION_DURATION = 500; //milliseconds
 
     /**
      * Creates an AreaRenderer.
@@ -49,7 +50,7 @@ module Plottable {
             .x(xFunction)
             .y0(y0Function)
             .y1(yFunction);
-      var updateSelection: any = (this._animate) ? this.path.transition().duration(500) : this.path;
+      var updateSelection: any = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
       updateSelection.attr("d", this.area).attr(attrToProjector);
     }
   }

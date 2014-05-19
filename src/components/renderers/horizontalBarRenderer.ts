@@ -47,8 +47,8 @@ module Plottable {
       var xFunction = attrToProjector["x"];
 
       if (this._animate && this._dataChanged) {
-        attrToProjector["x"] = function() { return scaledBaseline; };
-        attrToProjector["width"] = function() { return 0; };
+        attrToProjector["x"] = () => scaledBaseline;
+        attrToProjector["width"] = () => 0;
         this.dataSelection.attr(attrToProjector);
       }
 
@@ -70,7 +70,7 @@ module Plottable {
       if (this._animate) {
         var n = this.dataSource().data().length;
         updateSelection = updateSelection.transition()
-                                         .delay((d: any, i: number) => i * 250 / n);
+                                         .delay((d: any, i: number) => i * this._ANIMATION_DURATION / n);
       }
 
       updateSelection.attr(attrToProjector);
