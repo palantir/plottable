@@ -13,8 +13,9 @@ module Plottable {
     constructor(dataset: any, xScale: Scale, yScale: Scale) {
       super(dataset, xScale, yScale);
       this.classed("rect-renderer", true);
-      this.project("width" , 3); // default
-      this.project("height", 3); // default
+      this.project("width" , 4); // default
+      this.project("height", 4); // default
+      this.project("fill", () => "steelblue");
     }
 
     public _paint() {
