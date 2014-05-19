@@ -499,7 +499,7 @@ describe("ComponentGroups", function () {
 
         var cg = new Plottable.ComponentGroup([c1, c2, c3]);
         var svg = generateSVG(400, 400);
-        cg._anchor(svg, null);
+        cg._anchor(svg);
         c1.addBox("test-box1");
         c2.addBox("test-box2");
         c3.addBox("test-box3");
@@ -520,7 +520,7 @@ describe("ComponentGroups", function () {
 
         var cg = new Plottable.ComponentGroup([c1]);
         var svg = generateSVG(400, 400);
-        cg.merge(c2)._anchor(svg, null);
+        cg.merge(c2)._anchor(svg);
         c1.addBox("test-box1");
         c2.addBox("test-box2");
         cg._computeLayout()._render();
@@ -561,7 +561,7 @@ describe("ComponentGroups", function () {
         cg.merge(c1).merge(c2);
 
         var svg = generateSVG();
-        cg._anchor(svg, null);
+        cg._anchor(svg);
         cg._computeLayout(50, 50, 350, 350);
 
         var cgTranslate = d3.transform(cg.element.attr("transform")).translate;
@@ -613,6 +613,22 @@ describe("ComponentGroups", function () {
         assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
 
         svg.remove();
+    });
+
+    it("removeAll() works as expected", function () {
+        var cg = new Plottable.ComponentGroup();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        assert.isTrue(cg.empty(), "cg initially empty");
+        cg.merge(c1).merge(c2).merge(c3);
+        assert.isFalse(cg.empty(), "cg not empty after merging components");
+        cg.removeAll();
+        assert.isTrue(cg.empty(), "cg empty after removing components");
+        assert.isFalse(c1._isAnchored, "c1 was removed");
+        assert.isFalse(c2._isAnchored, "c2 was removed");
+        assert.isFalse(c3._isAnchored, "c3 was removed");
+        assert.lengthOf(cg.components(), 0, "cg has no components");
     });
 
     describe("ComponentGroup._requestedSpace works as expected", function () {
@@ -716,14 +732,14 @@ describe("Component behavior", function () {
 
     describe("anchor", function () {
         it("anchoring works as expected", function () {
-            c._anchor(svg, null);
+            c._anchor(svg);
             assert.equal(c.element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
             assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
             svg.remove();
         });
 
         it("can re-anchor to a different element", function () {
-            c._anchor(svg, null);
+            c._anchor(svg);
 
             var svg2 = generateSVG(SVG_WIDTH, SVG_HEIGHT);
             c._anchor(svg2);
@@ -737,7 +753,7 @@ describe("Component behavior", function () {
 
     describe("computeLayout", function () {
         it("computeLayout defaults and updates intelligently", function () {
-            c._anchor(svg, null)._computeLayout();
+            c._anchor(svg)._computeLayout();
             assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
@@ -761,7 +777,7 @@ describe("Component behavior", function () {
 
             // Remove width/height attributes and style with CSS
             svg.attr("width", null).attr("height", null);
-            c._anchor(svg, null)._computeLayout();
+            c._anchor(svg)._computeLayout();
             assert.equal(c.availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
             assert.equal(c.availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
@@ -792,7 +808,7 @@ describe("Component behavior", function () {
 
         it("computeLayout will not default when attached to non-root node", function () {
             var g = svg.append("g");
-            c._anchor(g, new Plottable.ComponentGroup());
+            c._anchor(g);
             assert.throws(function () {
                 return c._computeLayout();
             }, "null arguments");
@@ -812,7 +828,7 @@ describe("Component behavior", function () {
             var yOff = 20;
             var width = 100;
             var height = 200;
-            c._anchor(g, new Plottable.ComponentGroup())._computeLayout(xOff, yOff, width, height);
+            c._anchor(svg)._computeLayout(xOff, yOff, width, height);
             var translate = getTranslate(c.element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
             assert.equal(c.availableWidth, width, "the width set properly");
@@ -837,7 +853,7 @@ describe("Component behavior", function () {
 
     it("fixed-width component will align to the right spot", function () {
         fixComponentSize(c, 100, 100);
-        c._anchor(svg, null);
+        c._anchor(svg);
         c._computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
 
@@ -853,7 +869,7 @@ describe("Component behavior", function () {
 
     it("components can be offset relative to their alignment, and throw errors if there is insufficient space", function () {
         fixComponentSize(c, 100, 100);
-        c._anchor(svg, null);
+        c._anchor(svg);
         c.xOffset(20).yOffset(20);
         c._computeLayout();
         assertComponentXY(c, 20, 20, "top-left component offsets correctly");
@@ -894,7 +910,7 @@ describe("Component behavior", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
         var expectedClipPathID = c._plottableID;
-        c._anchor(svg, null)._computeLayout(0, 0, 100, 100)._render();
+        c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
         var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
         assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");
@@ -942,20 +958,20 @@ describe("Component behavior", function () {
             assert.equal(hitBox.style("opacity"), "0", "the hitBox is transparent, otherwise it would look weird");
         }
 
-        c._anchor(svg, null);
+        c._anchor(svg);
         assert.isUndefined(c.hitBox, "no hitBox was created when there were no registered interactions");
         svg.remove();
         svg = generateSVG();
 
         c = new Plottable.Component();
         var i = new Plottable.Interaction(c).registerWithComponent();
-        c._anchor(svg, null);
+        c._anchor(svg);
         verifyHitbox(c);
         svg.remove();
         svg = generateSVG();
 
         c = new Plottable.Component();
-        c._anchor(svg, null);
+        c._anchor(svg);
         i = new Plottable.Interaction(c).registerWithComponent();
         verifyHitbox(c);
         svg.remove();
@@ -998,7 +1014,7 @@ describe("Component behavior", function () {
         c.classed("CSS-PREANCHOR-REMOVE", false);
         assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
 
-        c._anchor(svg, null);
+        c._anchor(svg);
         assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
         assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
         assert.isFalse(c.classed("CSS-POSTANCHOR"));
@@ -1046,6 +1062,12 @@ describe("Component behavior", function () {
         c._invalidateLayout();
         assert.equal(cg.availableHeight, 50, "invalidateLayout propagated to parent and caused resized height");
         assert.equal(cg.availableWidth, 50, "invalidateLayout propagated to parent and caused resized width");
+        svg.remove();
+    });
+
+    it("components can be removed even if not anchored", function () {
+        var c = new Plottable.Component();
+        c.remove(); // no error thrown
         svg.remove();
     });
 });
@@ -1146,7 +1168,7 @@ describe("Gridlines", function () {
         var gridlines = new Plottable.Gridlines(xScale, yScale);
         var basicTable = new Plottable.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
 
-        basicTable._anchor(svg, null);
+        basicTable._anchor(svg);
         basicTable._computeLayout();
         xScale.range([0, xAxis.availableWidth]); // manually set range since we don't have a renderer
         yScale.range([yAxis.availableHeight, 0]);
@@ -1386,7 +1408,7 @@ describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.TitleLabel("A CHART TITLE");
-        label._anchor(svg, null);
+        label._anchor(svg);
         label._computeLayout();
 
         var content = label.content;
@@ -1405,7 +1427,7 @@ describe("Labels", function () {
     it("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
-        label._anchor(svg, null);
+        label._anchor(svg);
         var content = label.content;
         var text = content.select("text");
         label._computeLayout();
@@ -1420,7 +1442,7 @@ describe("Labels", function () {
     it("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
-        label._anchor(svg, null);
+        label._anchor(svg);
         var content = label.content;
         var text = content.select("text");
         label._computeLayout();
@@ -1450,7 +1472,7 @@ describe("Labels", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
         var label = new Plottable.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label._anchor(svg, null);
+        label._anchor(svg);
         var content = label.content;
         var text = content.select("text");
         label._computeLayout();
