@@ -29,8 +29,8 @@ module Plottable {
 
     private cssClasses: string[] = ["component"];
 
-    private isSetup = false;
-    private isAnchored = false;
+    public isSetup = false;
+    public isAnchored = false;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -205,7 +205,7 @@ module Plottable {
         } else {
           selection = d3.select(element);
         }
-        this._anchor(element);
+        this._anchor(selection);
       }
       this._computeLayout()._render();
       return this;

@@ -28,21 +28,6 @@ module Plottable {
       };
     }
 
-    public _addComponent(c: Component, prepend = false): ComponentGroup {
-      super._addComponent(c);
-      if (prepend) {
-        this._components.pop();
-        this._components.unshift(c);
-        if (this.element != null) {
-          c.element.remove();
-          var firstChild = this.content.select("g").node();
-          var insertChild = c.element.node();
-          this.content.node().insertBefore(insertChild, firstChild);
-        }
-      }
-      return this;
-    }
-
     public merge(c: Component): ComponentGroup {
       this._addComponent(c);
       return this;

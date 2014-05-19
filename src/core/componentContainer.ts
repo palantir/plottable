@@ -23,10 +23,17 @@ module Plottable {
       return this;
     }
 
-    public _addComponent(c: Component) {
-      this._components.push(c);
+    public _addComponent(c: Component, prepend = false) {
+      if (c == null) {
+        return this;
+      }
+      if (prepend) {
+        this._components.unshift(c);
+      } else {
+        this._components.push(c);
+      }
       c._parent = this;
-      if (this.element != null) {
+      if (this.isAnchored) {
         c._anchor(this.content);
       }
       this._invalidateLayout();
