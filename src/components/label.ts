@@ -28,7 +28,7 @@ module Plottable {
       this.xAlign("CENTER").yAlign("CENTER"); // the defaults
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number) {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var desiredWidth : number;
       var desiredHeight: number;
       if (this.orientation === "horizontal") {
@@ -42,7 +42,8 @@ module Plottable {
         width : Math.min(desiredWidth , offeredWidth),
         height: Math.min(desiredHeight, offeredHeight),
         wantsWidth : desiredWidth  > offeredWidth,
-        wantsHeight: desiredHeight > offeredHeight};
+        wantsHeight: desiredHeight > offeredHeight
+      };
     }
 
     public _setup() {
