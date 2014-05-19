@@ -1,5 +1,5 @@
-/// <reference path="utils.ts" />
-/// <reference path="osUtils.ts" />
+/// <reference path="utils/utils.ts" />
+/// <reference path="utils/osUtils.ts" />
 
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
