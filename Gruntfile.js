@@ -57,10 +57,10 @@ module.exports = function(grunt) {
     }
   }
 
-  var prefixMatch = "\n *"
-  var varNameMatch = "[^:;]*"
-  var nestedBraceMatch = ": {[^{}]*}"
-  var typeNameMatch = ": [^;]*"
+  var prefixMatch = "\n *";
+  var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
+  var nestedBraceMatch = ": \\{[^{}]*\\}";
+  var typeNameMatch = ": [^;]*";
   var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?;"
 
   var sedJSON = {
