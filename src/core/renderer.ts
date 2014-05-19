@@ -68,13 +68,27 @@ module Plottable {
     public dataSource(source?: DataSource): any {
       if (source == null) {
         return this._dataSource;
-      } else if (this._dataSource == null) {
-        this._dataSource = source;
-        this._registerToBroadcaster(this._dataSource, () => this._render());
-        return this;
-      } else {
-        throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
       }
+      var oldSource = this._dataSource;
+      if (oldSource != null) {
+        this._deregisterFromBroadcaster(this._dataSource);
+        this._requireRerender = true;
+        this._rerenderUpdateSelection = true;
+
+        // point all scales at the new datasource
+        d3.keys(this._projectors).forEach((attrToSet: string) => {
+          var projector = this._projectors[attrToSet];
+          if (projector.scale != null) {
+            var rendererIDAttr = this._plottableID + attrToSet;
+            projector.scale._removePerspective(rendererIDAttr);
+            projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
+          }
+        });
+      }
+      this._dataSource = source;
+      this._registerToBroadcaster(this._dataSource, () => this._render());
+      this._render();
+      return this;
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {
