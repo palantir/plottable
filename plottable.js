@@ -2726,32 +2726,37 @@ var Plottable;
 ///<reference path="../../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var SquareRenderer = (function (_super) {
-        __extends(SquareRenderer, _super);
+    var RectRenderer = (function (_super) {
+        __extends(RectRenderer, _super);
         /**
-        * Creates a SquareRenderer.
+        * Creates a RectRenderer.
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
         * @param {Scale} xScale The x scale to use.
         * @param {Scale} yScale The y scale to use.
         */
-        function SquareRenderer(dataset, xScale, yScale) {
+        function RectRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
-            this.classed("square-renderer", true);
-            this.project("r", 3); // default
+            this.classed("rect-renderer", true);
+            this.project("width", 4); // default
+            this.project("height", 4); // default
+            this.project("fill", function () {
+                return "steelblue";
+            });
         }
-        SquareRenderer.prototype._paint = function () {
+        RectRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
             var attrToProjector = this._generateAttrToProjector();
             var xF = attrToProjector["x"];
             var yF = attrToProjector["y"];
-            var rF = attrToProjector["r"];
+            var widthF = attrToProjector["width"];
+            var heightF = attrToProjector["height"];
             attrToProjector["x"] = function (d, i) {
-                return xF(d, i) - rF(d, i);
+                return xF(d, i) - widthF(d, i) / 2;
             };
             attrToProjector["y"] = function (d, i) {
-                return yF(d, i) - rF(d, i);
+                return yF(d, i) - heightF(d, i) / 2;
             };
 
             this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
@@ -2759,10 +2764,9 @@ var Plottable;
             this.dataSelection.attr(attrToProjector);
             this.dataSelection.exit().remove();
         };
-        SquareRenderer.DEFAULT_R_ACCESSOR = 3;
-        return SquareRenderer;
+        return RectRenderer;
     })(Plottable.XYRenderer);
-    Plottable.SquareRenderer = SquareRenderer;
+    Plottable.RectRenderer = RectRenderer;
 })(Plottable || (Plottable = {}));
 ///<reference path="../../reference.ts" />
 var Plottable;
@@ -3719,7 +3723,7 @@ var Plottable;
 /// <reference path="components/renderers/xyRenderer.ts" />
 /// <reference path="components/renderers/circleRenderer.ts" />
 /// <reference path="components/renderers/lineRenderer.ts" />
-/// <reference path="components/renderers/squareRenderer.ts" />
+/// <reference path="components/renderers/rectRenderer.ts" />
 /// <reference path="components/renderers/gridRenderer.ts" />
 /// <reference path="components/renderers/abstractBarRenderer.ts" />
 /// <reference path="components/renderers/barRenderer.ts" />
