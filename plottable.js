@@ -1,5 +1,5 @@
 /*!
-Plottable 0.12.3 (https://github.com/palantir/plottable)
+Plottable 0.12.4 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -2389,7 +2389,8 @@ var Plottable;
                 width: Math.min(desiredWidth, offeredWidth),
                 height: Math.min(desiredHeight, offeredHeight),
                 wantsWidth: desiredWidth > offeredWidth,
-                wantsHeight: desiredHeight > offeredHeight };
+                wantsHeight: desiredHeight > offeredHeight
+            };
         };
 
         Label.prototype._setup = function () {

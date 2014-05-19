@@ -753,10 +753,6 @@ declare module Plottable {
         * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
         */
         constructor(text?: string, orientation?: string);
-            height: number;
-            wantsWidth: boolean;
-            wantsHeight: boolean;
-        };
         /**
         * Sets the text on the Label.
         *
@@ -789,10 +785,6 @@ declare module Plottable {
         */
         public scale(scale: ColorScale): Legend;
         public scale(): ColorScale;
-            height: number;
-            wantsWidth: boolean;
-            wantsHeight: boolean;
-        };
     }
 }
 declare module Plottable {
