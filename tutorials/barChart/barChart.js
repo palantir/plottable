@@ -8,7 +8,6 @@ function makeBarChart() {
                               .project("x", "category", xScale)
                               .project("y", "value", yScale)
                               .project("fill", function() { return "steelblue"; } );
-  yScale.padDomain();
 
   var chart = new Plottable.Table([
                     [yAxis, renderer],
