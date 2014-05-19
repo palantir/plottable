@@ -59,8 +59,8 @@ module Plottable {
       this.dataSource(dataSource);
     }
 
-    public _anchor(element: D3.Selection, parent?: ComponentContainer) {
-      super._anchor(element, parent);
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
       this._dataChanged = true;
       return this;
     }
