@@ -58,5 +58,22 @@ module Plottable {
       }
       return low;
     };
+
+    /**
+     * Returns whether a string is blank.
+     *
+     * Taken from underscore.string.js
+     * https://github.com/epeli/underscore.string
+     * Licensed under the MIT License
+     *
+     * @param {string} str: The string to test for blank-ness
+     * @returns {boolean} Whether the string is blank
+     */
+    export function isBlank(str: string) {
+        if (str == null) {
+            str = "";
+        }
+        return (/^\s*$/).test(str);
+    }
   }
 }
