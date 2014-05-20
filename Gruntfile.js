@@ -108,10 +108,6 @@ module.exports = function(grunt) {
       "tests": {
         "tasks": ["ts:test", "tslint"],
         "files": ["test/**.ts"]
-      },
-      "examples": {
-        "tasks": ["ts:examples", "tslint"],
-        "files": ["examples/**.ts"]
       }
     },
     blanket_mocha: {
@@ -176,7 +172,6 @@ module.exports = function(grunt) {
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
                                   "ts:test",
-                                  "ts:examples",
                                   "tslint",
                                   "clean:tscommand"]);
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
