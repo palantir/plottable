@@ -307,7 +307,7 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.OrdinalScale().domain(["A", "B"]);
+        xScale = new Plottable.OrdinalScale().domain(["A", "B"]).rangeType("points");
         yScale = new Plottable.LinearScale();
         var data = [
           {x: "A", y: 1},
@@ -427,7 +427,7 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.OrdinalScale().domain(["A", "B"]);
+        yScale = new Plottable.OrdinalScale().domain(["A", "B"]).rangeType("points");
         xScale = new Plottable.LinearScale();
 
         var data = [
