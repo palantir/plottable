@@ -44,12 +44,6 @@ module Plottable {
       return this;
     }
 
-    public _doRender() {
-      super._doRender();
-      this._components.forEach((c) => c._doRender());
-      return this;
-    }
-
     public isFixedWidth(): boolean {
       return this._components.every((c) => c.isFixedWidth());
     }

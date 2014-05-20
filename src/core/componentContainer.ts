@@ -14,6 +14,11 @@ module Plottable {
       return this;
     }
 
+    public _render() {
+      this._components.forEach((c) => c._render());
+      return this;
+    }
+
     public _removeComponent(c: Component) {
       var removeIndex = this._components.indexOf(c);
       if (removeIndex >= 0) {
