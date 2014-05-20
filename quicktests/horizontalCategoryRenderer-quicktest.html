@@ -26,13 +26,13 @@
       var barRenderer = new Plottable.HorizontalBarRenderer(ds, xScale, yScale)
                               .project("x", "age", xScale)
                               .project("y", "name", yScale)
-                              .project("fill", function() {return "steelblue"});
+                              .project("fill", function() {return "steelblue"})
+                              .animate(true);
 
       var chart = new Plottable.Table([
         [yAxis, barRenderer],
         [null, xAxis]
       ]);
-      // barRenderer._animate = false;
 
       window.onload = function() {
         chart.renderTo("#meow");
