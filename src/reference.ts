@@ -1,5 +1,8 @@
 /// <reference path="utils/utils.ts" />
 /// <reference path="utils/osUtils.ts" />
+/// <reference path="utils/idCounter.ts" />
+/// <reference path="utils/strictEqualityAssociativeArray.ts" />
+/// <reference path="utils/textUtils.ts" />
 
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />

@@ -66,7 +66,7 @@ module Plottable {
 
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
-      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Utils.getTextWidth(fakeText, d));
+      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => TextUtils.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
@@ -81,7 +81,7 @@ module Plottable {
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var textHeight = Utils.getTextHeight(fakeLegendEl.append("text"));
+      var textHeight = TextUtils.getTextHeight(fakeLegendEl.append("text"));
       fakeLegendEl.remove();
       return textHeight;
     }
@@ -106,7 +106,7 @@ module Plottable {
           .attr("y", Legend.MARGIN + textHeight / 2);
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: any, i: number) {return Utils.getTruncatedText(d, availableWidth , d3.select(this));});
+            .text(function(d: any, i: number) {return TextUtils.getTruncatedText(d, availableWidth , d3.select(this));});
       return this;
     }
   }

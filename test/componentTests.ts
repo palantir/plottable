@@ -228,7 +228,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     boxStrings.forEach((s) => {
       var box = boxContainer.select(s);
       assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-      var bb = Plottable.Utils.getBBox(box);
+      var bb = Plottable.DOMUtils.getBBox(box);
       assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
       assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
     });
