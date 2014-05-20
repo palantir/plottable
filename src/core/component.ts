@@ -124,8 +124,8 @@ module Plottable {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth  = Utils.getElementWidth(elem);
-          availableHeight = Utils.getElementHeight(elem);
+          availableWidth  = DOMUtils.getElementWidth(elem);
+          availableHeight = DOMUtils.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }

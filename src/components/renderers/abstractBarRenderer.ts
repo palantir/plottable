@@ -20,6 +20,12 @@ module Plottable {
       this.project("width", 10);
     }
 
+    public _setup() {
+      super._setup();
+      this._baseline = this.renderArea.append("line").classed("baseline", true);
+      return this;
+    }
+
     /**
      * Sets the baseline for the bars to the specified value.
      *

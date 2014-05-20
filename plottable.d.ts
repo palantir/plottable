@@ -475,7 +475,12 @@ declare module Plottable {
         public dataSource(): DataSource;
         public dataSource(source: DataSource): Renderer;
         public project(attrToSet: string, accessor: any, scale?: Scale): Renderer;
-        public animate(toggle?: boolean): Renderer;
+        /**
+        * Enables or disables animation.
+        *
+        * @param {boolean} enabled Whether or not to animate.
+        */
+        public animate(enabled: boolean): Renderer;
     }
 }
 declare module Plottable {

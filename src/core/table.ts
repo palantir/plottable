@@ -227,18 +227,6 @@ module Plottable {
       return this;
     }
 
-    public _doRender() {
-      // recursively render children
-      this.rows.forEach((row: Component[], rowIndex: number) => {
-        row.forEach((component: Component, colIndex: number) => {
-          if (component != null) {
-            component._doRender();
-          }
-        });
-      });
-      return this;
-    }
-
     /**
      * Sets the row and column padding on the Table.
      *
