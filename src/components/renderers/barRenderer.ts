@@ -45,6 +45,12 @@ module Plottable {
 
       var yFunction = attrToProjector["y"];
 
+      if (this._animate && this._dataChanged) {
+        attrToProjector["y"] = () => scaledBaseline;
+        attrToProjector["height"] = () => 0;
+        this.dataSelection.attr(attrToProjector);
+      }
+
       attrToProjector["y"] = (d: any, i: number) => {
         var originalY = yFunction(d, i);
         return (originalY > scaledBaseline) ? scaledBaseline : originalY;
@@ -59,21 +65,17 @@ module Plottable {
         this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
 
-      if (this._baseline == null) {
-        this._baseline = this.renderArea.append("line").classed("baseline", true);
-      }
-
       var updateSelection: any = this.dataSelection;
-      var baselineSelection: any = this._baseline;
       if (this._animate) {
-        updateSelection = updateSelection.transition();
-        baselineSelection = baselineSelection.transition();
+        var n = this.dataSource().data().length;
+        updateSelection = updateSelection.transition()
+                                         .delay((d: any, i: number) => i * this._ANIMATION_DURATION / n);
       }
 
       updateSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
 
-      baselineSelection.attr({
+      this._baseline.attr({
         "x1": 0,
         "y1": scaledBaseline,
         "x2": this.availableWidth,

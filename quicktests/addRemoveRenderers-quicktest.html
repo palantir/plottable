@@ -18,7 +18,7 @@
 
       for (var i=0; i<numRenderers; i++) {
         var data = makeRandomData(20);
-        var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+        var renderer = new Plottable.LineRenderer(data, xScale, yScale).animate(true);
         renderers.push(renderer);
       }
 
@@ -46,7 +46,7 @@
 
       function removeRenderer() {
         if (numRenderers > 0) {
-          cg.removeComponent(renderers[numRenderers - 1]);
+          (renderers[numRenderers - 1]).remove();
           numRenderers--;
         }
       }
@@ -54,14 +54,13 @@
       function addRenderer() {
         if (numRenderers >= renderers.length) {
           var data = makeRandomData(20);
-          var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+          var renderer = new Plottable.LineRenderer(data, xScale, yScale).animate(true);
           var nextColor = colors[numRenderers]
           renderer.project("stroke", function() { return nextColor; });
           renderers.push(renderer);
         }
         cg.merge(renderers[numRenderers]);
         numRenderers++;
-        chart.renderTo();
       }
     </script>
   </head>

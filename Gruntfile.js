@@ -57,10 +57,10 @@ module.exports = function(grunt) {
     }
   }
 
-  var prefixMatch = "\n *"
-  var varNameMatch = "[^:;]*"
-  var nestedBraceMatch = ": {[^{}]*}"
-  var typeNameMatch = ": [^;]*"
+  var prefixMatch = "\n *";
+  var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
+  var nestedBraceMatch = ": \\{[^{}]*\\}";
+  var typeNameMatch = ": [^;]*";
   var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?;"
 
   var sedJSON = {
@@ -108,10 +108,6 @@ module.exports = function(grunt) {
       "tests": {
         "tasks": ["ts:test", "tslint"],
         "files": ["test/**.ts"]
-      },
-      "examples": {
-        "tasks": ["ts:examples", "tslint"],
-        "files": ["examples/**.ts"]
       }
     },
     blanket_mocha: {
@@ -176,7 +172,6 @@ module.exports = function(grunt) {
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
                                   "ts:test",
-                                  "ts:examples",
                                   "tslint",
                                   "clean:tscommand"]);
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);

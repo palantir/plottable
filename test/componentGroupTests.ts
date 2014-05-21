@@ -11,7 +11,7 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.ComponentGroup([c1, c2, c3]);
     var svg = generateSVG(400, 400);
-    cg._anchor(svg, null);
+    cg._anchor(svg);
     (<any> c1).addBox("test-box1");
     (<any> c2).addBox("test-box2");
     (<any> c3).addBox("test-box3");
@@ -32,7 +32,7 @@ describe("ComponentGroups", () => {
 
     var cg = new Plottable.ComponentGroup([c1]);
     var svg = generateSVG(400, 400);
-    cg.merge(c2)._anchor(svg, null);
+    cg.merge(c2)._anchor(svg);
     (<any> c1).addBox("test-box1");
     (<any> c2).addBox("test-box2");
     cg._computeLayout()._render();
@@ -73,7 +73,7 @@ describe("ComponentGroups", () => {
     cg.merge(c1).merge(c2);
 
     var svg = generateSVG();
-    cg._anchor(svg, null);
+    cg._anchor(svg);
     cg._computeLayout(50, 50, 350, 350);
 
     var cgTranslate = d3.transform(cg.element.attr("transform")).translate;
@@ -125,6 +125,22 @@ describe("ComponentGroups", () => {
     assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
 
     svg.remove();
+  });
+
+  it("removeAll() works as expected", () => {
+    var cg = new Plottable.ComponentGroup();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
+    assert.isTrue(cg.empty(), "cg initially empty");
+    cg.merge(c1).merge(c2).merge(c3);
+    assert.isFalse(cg.empty(), "cg not empty after merging components");
+    cg.removeAll();
+    assert.isTrue(cg.empty(), "cg empty after removing components");
+    assert.isFalse(c1._isAnchored, "c1 was removed");
+    assert.isFalse(c2._isAnchored, "c2 was removed");
+    assert.isFalse(c3._isAnchored, "c3 was removed");
+    assert.lengthOf(cg.components(), 0, "cg has no components");
   });
 
   describe("ComponentGroup._requestedSpace works as expected", () => {

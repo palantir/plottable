@@ -8,12 +8,14 @@ module Plottable {
 
   export class Renderer extends Component {
     public _dataSource: DataSource;
+    public _dataChanged = false;
 
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
     public _animate = false;
+    public _ANIMATION_DURATION = 250; // milliseconds
     public _hasRendered = false;
     private static DEFAULT_COLOR_ACCESSOR = (d: any) => "#1f77b4";
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
@@ -57,6 +59,12 @@ module Plottable {
       this.dataSource(dataSource);
     }
 
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+      this._dataChanged = true;
+      return this;
+    }
+
     /**
      * Retrieves the current DataSource, or sets a DataSource if the Renderer doesn't yet have one.
      *
@@ -86,7 +94,11 @@ module Plottable {
         });
       }
       this._dataSource = source;
-      this._registerToBroadcaster(this._dataSource, () => this._render());
+      this._registerToBroadcaster(this._dataSource, () => {
+        this._dataChanged = true;
+        this._render();
+      });
+      this._dataChanged = true;
       this._render();
       return this;
     }
@@ -128,6 +140,7 @@ module Plottable {
       if (this.element != null) {
         this._hasRendered = true;
         this._paint();
+        this._dataChanged = false;
         this._requireRerender = false;
         this._rerenderUpdateSelection = false;
       }
@@ -144,11 +157,13 @@ module Plottable {
       return this;
     }
 
-    public animate(toggle?: boolean) {
-      if (toggle == null) {
-        toggle = !this._animate;
-      }
-      this._animate = toggle;
+    /**
+     * Enables or disables animation.
+     *
+     * @param {boolean} enabled Whether or not to animate.
+     */
+    public animate(enabled: boolean) {
+      this._animate = enabled;
       return this;
     }
   }

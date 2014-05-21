@@ -1,4 +1,4 @@
-///<reference path="reference.ts" />
+///<reference path="../reference.ts" />
 
 // This file contains open source utilities, along with their copyright notices
 

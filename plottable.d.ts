@@ -320,7 +320,7 @@ declare module Plottable {
         *
         * @returns{Component[]} the contained Components
         */
-        public getComponents(): Component[];
+        public components(): Component[];
         /**
         * Returns true iff the ComponentContainer is empty.
         *
@@ -475,7 +475,12 @@ declare module Plottable {
         public dataSource(): DataSource;
         public dataSource(source: DataSource): Renderer;
         public project(attrToSet: string, accessor: any, scale?: Scale): Renderer;
-        public animate(toggle?: boolean): Renderer;
+        /**
+        * Enables or disables animation.
+        *
+        * @param {boolean} enabled Whether or not to animate.
+        */
+        public animate(enabled: boolean): Renderer;
     }
 }
 declare module Plottable {
@@ -753,10 +758,6 @@ declare module Plottable {
         * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
         */
         constructor(text?: string, orientation?: string);
-            height: number;
-            wantsWidth: boolean;
-            wantsHeight: boolean;
-        };
         /**
         * Sets the text on the Label.
         *
@@ -789,10 +790,6 @@ declare module Plottable {
         */
         public scale(scale: ColorScale): Legend;
         public scale(): ColorScale;
-            height: number;
-            wantsWidth: boolean;
-            wantsHeight: boolean;
-        };
     }
 }
 declare module Plottable {
@@ -840,9 +837,9 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class SquareRenderer extends XYRenderer {
+    class RectRenderer extends XYRenderer {
         /**
-        * Creates a SquareRenderer.
+        * Creates a RectRenderer.
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.

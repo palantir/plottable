@@ -16,7 +16,7 @@ module Plottable {
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
-    private parent: ComponentContainer;
+    public _parent: ComponentContainer;
 
     public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     public availableHeight: number;
@@ -29,8 +29,8 @@ module Plottable {
 
     private cssClasses: string[] = ["component"];
 
-    private isSetup = false;
-    private isAnchored = false;
+    public _isSetup = false;
+    public _isAnchored = false;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -38,7 +38,7 @@ module Plottable {
      * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
      * @returns {Component} The calling component.
      */
-    public _anchor(element: D3.Selection, parent?: ComponentContainer) {
+    public _anchor(element: D3.Selection) {
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
         this.rootSVG = element;
@@ -47,10 +47,6 @@ module Plottable {
         this.rootSVG.style("overflow", "visible");
         this.isTopLevelComponent = true;
       }
-      if (parent == null && !this.isTopLevelComponent) {
-        throw new Error("Components must be top-level or have a parent");
-      }
-      this.parent = parent;
 
       if (this.element != null) {
         // reattach existing element
@@ -59,7 +55,7 @@ module Plottable {
         this.element = element.append("g");
         this._setup();
       }
-      this.isAnchored = true;
+      this._isAnchored = true;
       return this;
     }
 
@@ -89,7 +85,7 @@ module Plottable {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
-      this.isSetup = true;
+      this._isSetup = true;
       return this;
     }
 
@@ -128,8 +124,8 @@ module Plottable {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth  = Utils.getElementWidth(elem);
-          availableHeight = Utils.getElementHeight(elem);
+          availableWidth  = DOMUtils.getElementWidth(elem);
+          availableHeight = DOMUtils.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
@@ -167,14 +163,14 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public _render() {
-      if (this.isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         RenderController.registerToRender(this);
       }
       return this;
     }
 
     public _scheduleComputeLayout() {
-      if (this.isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         RenderController.registerToComputeLayout(this);
       }
       return this;
@@ -186,11 +182,11 @@ module Plottable {
 
 
     public _invalidateLayout() {
-      if (this.isAnchored && this.isSetup) {
+      if (this._isAnchored && this._isSetup) {
         if (this.isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
-          this.parent._invalidateLayout();
+          this._parent._invalidateLayout();
         }
       }
     }
@@ -209,7 +205,7 @@ module Plottable {
         } else {
           selection = d3.select(element);
         }
-        this._anchor(selection, null);
+        this._anchor(selection);
       }
       this._computeLayout()._render();
       return this;
@@ -421,7 +417,7 @@ module Plottable {
      */
     public merge(c: Component): ComponentGroup {
       var cg: ComponentGroup;
-      if (this.isSetup || this.isAnchored) {
+      if (this._isSetup || this._isAnchored) {
         throw new Error("Can't presently merge a component that's already been anchored");
       }
       if (ComponentGroup.prototype.isPrototypeOf(c)) {
@@ -438,12 +434,14 @@ module Plottable {
      * Removes a Component from the DOM.
      */
     public remove() {
-      this.element.remove();
-      if (this.parent != null) {
-        this.parent._removeComponent(this);
+      if (this._isAnchored) {
+        this.element.remove();
       }
-      this.isAnchored = false;
-      this.parent = null;
+      if (this._parent != null) {
+        this._parent._removeComponent(this);
+      }
+      this._isAnchored = false;
+      this._parent = null;
       return this;
     }
   }

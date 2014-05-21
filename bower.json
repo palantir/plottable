@@ -1,6 +1,6 @@
 {
   "name": "plottable",
-  "version": "0.12.2",
+  "version": "0.12.4",
   "ignore": [
     "**/*",
     "!plottable.js",
