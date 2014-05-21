@@ -130,14 +130,11 @@ module Plottable {
       return lines;
     }
 
-    export function writeTextHorizontally(text: string,
+    export function writeTextHorizontally(brokenText: string[],
                                           g: D3.Selection,
                                           width: number,
                                           height: number,
                                           anchor = "middle") {
-      var tmpText = g.append("text");
-      var brokenText = getWrappedText(text, width, height, tmpText);
-      tmpText.remove();
       var textEls = g.selectAll("text").data(brokenText);
       textEls.enter().append("text");
       textEls.exit().remove();
@@ -147,16 +144,27 @@ module Plottable {
       return textEls;
     }
 
-    export function writeTextVertically(text: string, g: D3.Selection, width: number, height: number, orient="left") {
+    export function writeTextVertically(brokenText: string[],
+                                        g: D3.Selection,
+                                        width: number,
+                                        height: number,
+                                        orient = "left") {
       var orientLC = orient.toLowerCase();
       if (orientLC !== "left" && orientLC !== "right") {
         throw new Error(orient + " is not a valid vertical text orientation");
       }
 
-      var textEls = writeTextHorizontally(text, g, height, width, orientLC);
+      var textEls = writeTextHorizontally(brokenText, g, height, width, orientLC);
       var xform = orientLC === "right" ? "rotate(90)" : "rotate(-90)";
       g.attr("transform", xform);
       return textEls;
+    }
+
+    function getWrappedTextFromG(text: string, width: number, height: number, g: D3.Selection) {
+      var tmpText = g.append("text");
+      var brokenText = getWrappedText(text, width, height, tmpText);
+      tmpText.remove();
+      return brokenText;
     }
 
     export function writeText(text: string, g: D3.Selection, width: number, height: number,
@@ -168,7 +176,11 @@ module Plottable {
       if (!orientHorizontally) {
         throw new Error("vertical text writing not yet implemented");
       }
-      writeTextHorizontally(text, innerG, width, height, xOrient);
+      var primaryDimension = orientHorizontally ? width : height;
+      var secondaryDimension = orientHorizontally ? height : width;
+      var wrappedText = getWrappedTextFromG(text, primaryDimension, secondaryDimension, innerG);
+
+      writeTextHorizontally(wrappedText, innerG, width, height, xOrient);
       var bandWidthConverter: {[key: string]: number} = {left: 0, right: 1, middle: 0.5};
       var offset = bandWidthConverter[xOrient] * width;
       innerG.attr("transform", "translate(" + offset + ", 0)");

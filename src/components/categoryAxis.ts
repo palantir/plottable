@@ -62,9 +62,9 @@ module Plottable {
         g.attr("transform", "translate(" + x + "," + y + ")");
         var o = this.orientation;
         var anchor = (o === "top" || o === "bottom") ? "middle" : o;
-        var width  = this.isVertical ? this._width : bandWidth;
-        var height = this.isVertical ? bandWidth : this._height;
-        TextUtils.writeTextHorizontally(s, g, width, height, anchor);
+        var width  = this.isVertical ? this.availableWidth : bandWidth;
+        var height = this.isVertical ? bandWidth : this.availableHeight;
+        TextUtils.writeText(s, g, width, height, anchor);
       });
       return this;
     }
