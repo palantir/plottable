@@ -178,7 +178,7 @@ describe("ComponentGroups", () => {
       var c3 = new Plottable.Component();
       var c4 = new Plottable.Component();
 
-    it("Component.merge works as expected (Component.merge Component)", () => {
+      it("Component.merge works as expected (Component.merge Component)", () => {
         var cg: Plottable.ComponentGroup = c1.merge(c2);
         var innerComponents: Plottable.Component[] = cg._components;
         assert.lengthOf(innerComponents, 2, "There are two components");

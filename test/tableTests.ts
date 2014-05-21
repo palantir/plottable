@@ -69,12 +69,13 @@ describe("Tables", () => {
   });
 
   it("can't add a component where one already exists", () => {
-    var c1 = new Plottable.Table();
-    var c2 = new Plottable.Table();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
     var t = new Plottable.Table();
     t.addComponent(0, 2, c1);
     t.addComponent(0, 0, c2);
-    assert.throws(() => t.addComponent(0, 2, c2), Error, "component already exists");
+    assert.throws(() => t.addComponent(0, 2, c3), Error, "component already exists");
   });
 
   it("addComponent works even if a component is added with a high column and low row index", () => {

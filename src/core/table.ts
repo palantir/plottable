@@ -47,17 +47,18 @@ module Plottable {
      * @param {Component} component The Component to be added.
      */
     public addComponent(row: number, col: number, component: Component): Table {
-      this.nRows = Math.max(row + 1, this.nRows);
-      this.nCols = Math.max(col + 1, this.nCols);
-      this.padTableToSize(this.nRows, this.nCols);
+      if (this._addComponent(component)) {
+        this.nRows = Math.max(row + 1, this.nRows);
+        this.nCols = Math.max(col + 1, this.nCols);
+        this.padTableToSize(this.nRows, this.nCols);
 
-      var currentComponent = this.rows[row][col];
-      if (currentComponent != null) {
-        throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+        var currentComponent = this.rows[row][col];
+        if (currentComponent != null) {
+          throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+        }
+
+        this.rows[row][col] = component;
       }
-
-      this.rows[row][col] = component;
-      this._addComponent(component);
       return this;
     }
 
