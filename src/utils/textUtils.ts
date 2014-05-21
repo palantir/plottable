@@ -70,11 +70,16 @@ module Plottable {
      *
      * @returns {string[]} The input text broken into substrings that fit in the avialable space.
      */
+    export interface IWrappedText {
+      originalText: string;
+      lines: string[];
+      textFits: boolean;
+    };
     export function getWrappedText(text: string,
                                    availableWidth : number,
                                    availableHeight: number,
                                    textElement: D3.Selection,
-                                   cutoffRatio = 0.7) {
+                                   cutoffRatio = 0.7): IWrappedText {
       var originalText = textElement.text();
       var textNode = <SVGTextElement> textElement.node();
 
@@ -95,6 +100,8 @@ module Plottable {
       var cutoffEnd = availableWidth  - hyphenLength; // room for hyphen
       var cutoffStart = cutoffRatio * cutoffEnd;
 
+      var textFits = true;
+
       var lineStartPosition = 0;
       for (var i = 1; i < numChars; i++) {
         var testLength = textNode.getSubStringLength(lineStartPosition, i-lineStartPosition);
@@ -105,6 +112,7 @@ module Plottable {
             if (lines.length + 1 >= linesAvailable) {
               remainingText = text.substring(lineStartPosition, text.length).trim();
               lines.push(getTruncatedText(remainingText, availableWidth , textElement));
+              textFits = false;
               break;
             }
             // break line on the previous character to leave room for the hyphen
@@ -114,6 +122,7 @@ module Plottable {
             if (lines.length + 1 >= linesAvailable) {
               remainingText = text.substring(lineStartPosition, text.length).trim();
               lines.push(getTruncatedText(remainingText, availableWidth , textElement));
+              textFits = false;
               break;
             }
             // break line after the current character
@@ -127,7 +136,11 @@ module Plottable {
       }
 
       textElement.text(originalText);
-      return lines;
+      return {
+        originalText: originalText,
+        lines: lines,
+        textFits: textFits
+      };
     }
 
     export function writeTextHorizontally(brokenText: string[],
@@ -160,30 +173,57 @@ module Plottable {
       return textEls;
     }
 
-    function getWrappedTextFromG(text: string, width: number, height: number, g: D3.Selection) {
+    function getWrappedTextFromG(text: string, width: number, height: number, g: D3.Selection): IWrappedText {
       var tmpText = g.append("text");
-      var brokenText = getWrappedText(text, width, height, tmpText);
+      var wrappedText = getWrappedText(text, width, height, tmpText);
       tmpText.remove();
-      return brokenText;
+      return wrappedText;
     }
 
+    export interface IWriteTextResult {
+      textFits: boolean;
+      usedWidth: number;
+      usedHeight: number;
+    };
+
+    /**
+     * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
+     * Contains the text within a rectangle with dimensions width, height. Tries to
+     * orient the text using xOrient and yOrient parameters.
+     * Will align the text vertically if it seems like that is appropriate.
+     * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
+     */
     export function writeText(text: string, g: D3.Selection, width: number, height: number,
-                              xOrient = "middle", yOrient = "middle") {
+                              xOrient = "middle", yOrient = "middle"): IWriteTextResult {
+      xOrient = (<any> window).xOrient != null ? (<any> window).xOrient : xOrient;
+      yOrient = (<any> window).yOrient != null ? (<any> window).yOrient : yOrient;
       var orientHorizontally = width * 1.4 > height;
       var innerG = g.append("g"); // unleash your inner G
       // the outerG contains general transforms for positining the whole block, the inner g
       // will contain transforms specific to orienting the text properly within the block.
       if (!orientHorizontally) {
-        throw new Error("vertical text writing not yet implemented");
+        // throw new Error("vertical text writing not yet implemented");
+        orientHorizontally = true;
       }
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
       var wrappedText = getWrappedTextFromG(text, primaryDimension, secondaryDimension, innerG);
 
-      writeTextHorizontally(wrappedText, innerG, width, height, xOrient);
+      writeTextHorizontally(wrappedText.lines, innerG, width, height, xOrient);
       var bandWidthConverter: {[key: string]: number} = {left: 0, right: 1, middle: 0.5};
       var offset = bandWidthConverter[xOrient] * width;
       innerG.attr("transform", "translate(" + offset + ", 0)");
+      var bboxes: SVGRect[] = [];
+      innerG.selectAll("text").each(function(d, i) {
+        bboxes.push(this.getBBox());
+      });
+      var primaryUsed = d3.max(bboxes, (b: SVGRect) => b.width);
+      var secondaryUsed = d3.sum(bboxes, (b: SVGRect) => b.height);
+      return {
+        textFits: wrappedText.textFits,
+        usedWidth: orientHorizontally ? primaryUsed : secondaryUsed,
+        usedHeight: orientHorizontally ? secondaryUsed: primaryUsed
+      };
     }
   }
 }

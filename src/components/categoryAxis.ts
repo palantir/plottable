@@ -41,31 +41,68 @@ module Plottable {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number) {
-      var desiredWidth  = this.isVertical ? this._width : 0;
-      var desiredHeight = this.isVertical ? 0 : this._height;
+      if (offeredWidth < 0 || offeredHeight < 0) {
+        return {
+          width: 0,
+          height: 0,
+          wantsWidth: this.isVertical,
+          wantsHeight: !this.isVertical
+        };
+      }
+      if (this.isVertical) {
+        this._scale.range([offeredHeight, 0]);
+      } else {
+        this._scale.range([0, offeredWidth]);
+      }
+      var bandWidth: number = this._scale.rangeBand();
+      var width  = this.isVertical ? offeredWidth : bandWidth;
+      var height = this.isVertical ? bandWidth : offeredHeight;
+      var textResult = this.writeText(width, height);
+      this.content.selectAll(".tick").remove();
+
       return {
-        width : Math.min(offeredWidth , desiredWidth ),
-        height: Math.min(offeredHeight, desiredHeight),
-        wantsWidth : offeredWidth  < desiredWidth,
-        wantsHeight: offeredHeight < desiredHeight
+        width : this.isVertical ? textResult.usedWidth : 0,
+        height: this.isVertical ? 0 : textResult.usedHeight,
+        wantsWidth : this.isVertical ? !textResult.textFits : false,
+        wantsHeight: this.isVertical ? false : !textResult.textFits
       };
     }
 
-    public _doRender() {
+    private writeText(axisWidth: number, axisHeight: number): TextUtils.IWriteTextResult {
       var bandWidth: number = this._scale.rangeBand();
-      this._scale.domain().forEach((s: string) => {
-        var bandStartPosition: number = this._scale.scale(s);
-        var g = this.content.append("g");
+      var ticks = this.content.selectAll(".tick").data(this._scale.domain());
+      ticks.enter().append("g").classed("tick", true);
+      ticks.exit().remove();
+      var width  = this.isVertical ? axisWidth : bandWidth;
+      var height = this.isVertical ? bandWidth : axisHeight;
+      var self = this;
+      var textWriteResults: TextUtils.IWriteTextResult[] = [];
+      ticks.each(function (d: string, i: number) {
+        var bandStartPosition: number = self._scale.scale(d);
+        d3.select(this).selectAll("g").remove();
+        var g = d3.select(this).append("g");
 
-        var x = this.isVertical ? 0 : bandStartPosition;
-        var y = this.isVertical ? bandStartPosition : 0;
+        var x = self.isVertical ? 0 : bandStartPosition;
+        var y = self.isVertical ? bandStartPosition : 0;
         g.attr("transform", "translate(" + x + "," + y + ")");
-        var o = this.orientation;
+        var o = self.orientation;
         var anchor = (o === "top" || o === "bottom") ? "middle" : o;
-        var width  = this.isVertical ? this.availableWidth : bandWidth;
-        var height = this.isVertical ? bandWidth : this.availableHeight;
-        TextUtils.writeText(s, g, width, height, anchor);
+        var xOrient = this.isVertical ? "left" : "middle";
+        var yOrient = "middle";
+        var textWriteResult = TextUtils.writeText(d, g, width, height, xOrient, yOrient);
+        textWriteResults.push(textWriteResult);
       });
+
+      return {
+        textFits: textWriteResults.every((t: TextUtils.IWriteTextResult) => t.textFits),
+        usedWidth : d3.max(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedWidth),
+        usedHeight: d3.max(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedHeight)
+      };
+
+    }
+
+    public _doRender() {
+      this.writeText(this.availableWidth, this.availableHeight);
       return this;
     }
   }

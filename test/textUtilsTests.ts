@@ -46,19 +46,19 @@ describe("TextUtils", () => {
 
     textEl.text("foobar");
     var textWithSpaces = "012345 6 789";
-    var wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 100, 100, textEl);
+    var wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 100, 100, textEl).lines;
     assert.deepEqual(wrappedLines, ["012345 6", "789"], "Wraps at first space after the cutoff");
     assert.equal(textEl.text(), "foobar", "getWrappedText did not modify the text in the element");
 
-    wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 100, 100, textEl, 0.5);
+    wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 100, 100, textEl, 0.5).lines;
     assert.deepEqual(wrappedLines, ["012345", "6 789"], "reducing the cutoff ratio causes text to wrap at an earlier space");
 
     var shortText = "a";
-    wrappedLines = Plottable.TextUtils.getWrappedText(shortText, 100, 100, textEl);
+    wrappedLines = Plottable.TextUtils.getWrappedText(shortText, 100, 100, textEl).lines;
     assert.deepEqual(wrappedLines, ["a"], "short text is unchanged");
 
     var longTextNoSpaces = "Supercalifragilisticexpialidocious";
-    wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 100, 100, textEl);
+    wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 100, 100, textEl).lines;
     assert.operator(wrappedLines.length, ">=", 2, "long text with no spaces gets wrapped");
     wrappedLines.forEach((line: string, i: number) => {
       if (i < wrappedLines.length - 1) {
@@ -66,7 +66,7 @@ describe("TextUtils", () => {
       }
     });
 
-    wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 100, 20, textEl);
+    wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 100, 20, textEl).lines;
     assert.equal(wrappedLines[0].substr(wrappedLines[0].length-3, 3), "...",
               "text gets truncated if there's not enough height for all lines");
 
