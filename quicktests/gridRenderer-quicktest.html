@@ -19,6 +19,8 @@
     <script src="../../build/plottable.js"></script>
 
     <script>
+    Plottable.RenderController.enabled = false;
+    var c1, c2, c3;
       function randomData() {
         var data = [];
         ["Work", "Food Is Tasty And I like it", "Sex", "Sleep"].forEach(function(category) {
@@ -54,7 +56,7 @@
                                   .project("y", "day")
                                   .project("fill", "awesomeness");
 
-          new Plottable.Table()
+          return new Plottable.Table()
             .addComponent(1, 0, yAxisL)
             .addComponent(1, 2, yAxisR)
             .addComponent(1, 1, gridRenderer)
@@ -64,10 +66,25 @@
       };
 
       window.onload = function() {
-        makeChart("#life0", "reds", randomData());
-        makeChart("#life1", "blues", randomData());
-        makeChart("#life2", ["dodgerblue", "white", "lime"], staticData());
+        c1 = makeChart("#life0", "reds", randomData());
+        c2 = makeChart("#life1", "blues", randomData());
+        c3 = makeChart("#life2", ["dodgerblue", "white", "lime"], staticData());
       };
+
+      function x(align) {
+        window.xOrient = align;
+        c1._invalidateLayout();
+        c2._invalidateLayout();
+        c3._invalidateLayout();
+      }
+
+      function y(align) {
+        window.yOrient = align;
+        c1._invalidateLayout();
+        c2._invalidateLayout();
+        c3._invalidateLayout();
+      }
+
     </script>
   </head>
 
@@ -75,6 +92,19 @@
     <div><svg id="life0" width="600" height="300"></svg></div>
     <div><svg id="life1" width="600" height="300"></svg></div>
     <div><svg id="life2" width="600" height="300"></svg></div>
+
+    <button onclick='x("right")'>x: right</button> <br>
+    <button onclick='x("middle")'>x: middle</button> <br>
+    <button onclick='x("left")'>x: left</button> <br>
+
+<br><br>
+
+    <button onclick='y("top")'>y: top</button> <br>
+    <button onclick='y("middle")'>y: middle</button> <br>
+    <button onclick='y("bottom")'>y: bottom</button> <br>
+
+
+
   </body>
 
 </html>
