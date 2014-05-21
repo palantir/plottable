@@ -39,7 +39,7 @@
           { category: "Sex",   day : "May the Fourth Be With You", awesomeness: 16 },
           { category: "Sleep", day : "May-05", awesomeness: 8 }
         ];
-      }
+    }
 
       function makeChart(selector, colors, data) {
           var xScale       = new Plottable.OrdinalScale().rangeType("bands");
@@ -57,18 +57,18 @@
                                   .project("fill", "awesomeness");
 
           return new Plottable.Table()
-            .addComponent(1, 0, yAxisL)
-            .addComponent(1, 2, yAxisR)
-            .addComponent(1, 1, gridRenderer)
-            .addComponent(0, 1, xAxisT)
-            .addComponent(2, 1, xAxisB)
+            .addComponent(0, 1, yAxisR)
+            // .addComponent(1, 2, yAxisR)
+            .addComponent(0, 0, gridRenderer)
+            .addComponent(1, 0, xAxisB)
+            // .addComponent(2, 1, xAxisB)
             .renderTo(selector);
       };
 
       window.onload = function() {
         c1 = makeChart("#life0", "reds", randomData());
-        c2 = makeChart("#life1", "blues", randomData());
-        c3 = makeChart("#life2", ["dodgerblue", "white", "lime"], staticData());
+        // c2 = makeChart("#life1", "blues", randomData());
+        // c3 = makeChart("#life2", ["dodgerblue", "white", "lime"], staticData());
       };
 
       function x(align) {

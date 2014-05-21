@@ -5,14 +5,19 @@
     <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../../build/plottable.js"></script>
     <script src="../../build/exampleUtil.js"></script>
+    <style>
+      svg {
+        background-color: #EEE;
+      }
 
+    </style>
     <script>
       var data = [
           { name: "S", age: 8 },
           { name: "Poptart", age: 1 },
           { name: "Budoka", age: 3 },
           { name: "Sugar Daddy", age: 14 },
-          { name: "Temporal Asynchronous Cat", age: -5 }
+          { name: "Temporal Async Cat Tiger Man", age: -5 }
         ];
 
       var cuteFormatter = function(d) { return d + " is a pretty darn cute cat"; } ;
@@ -40,6 +45,7 @@
 
       var yScale2 = new Plottable.OrdinalScale().rangeType("bands");
       var yAxis2 = new Plottable.CategoryAxis(yScale2, "left");
+      window.yAxis = yAxis2;
 
       var horizBarRenderer = new Plottable.HorizontalBarRenderer(ds, xScale2, yScale2)
                               .project("x", "age", xScale2)
@@ -53,7 +59,7 @@
       ]);
 
       window.onload = function() {
-        chart.renderTo("#meow");
+        // chart.renderTo("#meow");
         horizChart.renderTo("#nya");
       }
 

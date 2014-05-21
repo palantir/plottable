@@ -58,13 +58,19 @@ module Plottable {
       var width  = this.isVertical ? offeredWidth : bandWidth;
       var height = this.isVertical ? bandWidth : offeredHeight;
       var textResult = this.writeText(width, height);
+
+      var desiredWidth  = this.isVertical ? textResult.usedWidth : 0;
+      var desiredHeight = this.isVertical ? 0 : textResult.usedHeight;
+      var wantsWidth    = this.isVertical ? !textResult.textFits : false;
+      var wantsHeight   = this.isVertical ? false : !textResult.textFits;
+      console.log("OW:" + offeredWidth + ", " + ", OH:" + offeredHeight + ", DW:" + desiredWidth + ", DH:" + desiredHeight);
       this.content.selectAll(".tick").remove();
 
       return {
-        width : this.isVertical ? textResult.usedWidth : 0,
-        height: this.isVertical ? 0 : textResult.usedHeight,
-        wantsWidth : this.isVertical ? !textResult.textFits : false,
-        wantsHeight: this.isVertical ? false : !textResult.textFits
+        width : desiredWidth,
+        height: desiredHeight,
+        wantsWidth : wantsWidth,
+        wantsHeight: wantsHeight
       };
     }
 
