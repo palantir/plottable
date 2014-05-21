@@ -19,7 +19,7 @@
 
       var ds = new Plottable.DataSource(data);
       var xScale = new Plottable.OrdinalScale().rangeType("bands");
-      var xAxis = new Plottable.XAxis(xScale, "bottom", cuteFormatter).height(60);
+      var xAxis = new Plottable.CategoryAxis(xScale).height(60);
 
       var yScale = new Plottable.LinearScale();
       var yAxis = new Plottable.YAxis(yScale, "left");

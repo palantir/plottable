@@ -130,5 +130,33 @@ module Plottable {
       return lines;
     }
 
+    export function writeTextHorizontally(text: string,
+                                          g: D3.Selection,
+                                          width: number,
+                                          height: number,
+                                          anchor = "middle") {
+      var tmpText = g.append("text");
+      var brokenText = getWrappedText(text, width, height, tmpText);
+      tmpText.remove();
+      var textEls = g.selectAll("text").data(brokenText);
+      textEls.enter().append("text");
+      textEls.exit().remove();
+      textEls.text((x: string) => x)
+             .attr("y", (d: string, i: number) => i + 0.75 + "em")
+             .style("text-anchor", anchor);
+      return textEls;
+    }
+
+    export function writeTextVertically(text: string, g: D3.Selection, width: number, height: number, orient="left") {
+      var orientLC = orient.toLowerCase();
+      if (orientLC !== "left" && orientLC !== "right") {
+        throw new Error(orient + " is not a valid vertical text orientation");
+      }
+
+      var textEls = writeTextHorizontally(text, g, height, width, orientLC);
+      var xform = orientLC === "right" ? "rotate(90)" : "rotate(-90)";
+      g.attr("transform", xform);
+      return textEls;
+    }
   }
 }
