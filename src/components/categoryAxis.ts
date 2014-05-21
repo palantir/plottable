@@ -41,11 +41,13 @@ module Plottable {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number) {
+      var desiredWidth  = this.isVertical ? this._width : 0;
+      var desiredHeight = this.isVertical ? 0 : this._height;
       return {
-        width: 0,
-        height: Math.min(offeredHeight, this._height),
-        wantsWidth: false,
-        wantsHeight: offeredHeight < this._height
+        width : Math.min(offeredWidth , desiredWidth ),
+        height: Math.min(offeredHeight, desiredHeight),
+        wantsWidth : offeredWidth  < desiredWidth,
+        wantsHeight: offeredHeight < desiredHeight
       };
     }
 
@@ -54,12 +56,15 @@ module Plottable {
       this._scale.domain().forEach((s: string) => {
         var bandStartPosition: number = this._scale.scale(s);
         var g = this.content.append("g");
-        var bandWidthConverter = {"left": 0, "right": 1, "top": 0.5, "bottom": 0.5};
-        var bandOffset = bandWidth * bandWidthConverter[this.orientation];
-        var anchorConverter = {left: "left", right: "right", top: "middle", bottom: "middle"};
-        var anchor = anchorConverter[this.orientation];
-        g.attr("transform", "translate(" + (bandStartPosition + bandWidthOffset) + ",0)");
-        TextUtils.writeTextHorizontally(s, g, bandWidth, this._height, anchor);
+
+        var x = this.isVertical ? 0 : bandStartPosition;
+        var y = this.isVertical ? bandStartPosition : 0;
+        g.attr("transform", "translate(" + x + "," + y + ")");
+        var o = this.orientation;
+        var anchor = (o === "top" || o === "bottom") ? "middle" : o;
+        var width  = this.isVertical ? this._width : bandWidth;
+        var height = this.isVertical ? bandWidth : this._height;
+        TextUtils.writeTextHorizontally(s, g, width, height, anchor);
       });
       return this;
     }

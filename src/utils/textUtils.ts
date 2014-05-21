@@ -158,5 +158,20 @@ module Plottable {
       g.attr("transform", xform);
       return textEls;
     }
+
+    export function writeText(text: string, g: D3.Selection, width: number, height: number,
+                              xOrient = "middle", yOrient = "middle") {
+      var orientHorizontally = width * 1.4 > height;
+      var innerG = g.append("g"); // unleash your inner G
+      // the outerG contains general transforms for positining the whole block, the inner g
+      // will contain transforms specific to orienting the text properly within the block.
+      if (!orientHorizontally) {
+        throw new Error("vertical text writing not yet implemented");
+      }
+      writeTextHorizontally(text, innerG, width, height, xOrient);
+      var bandWidthConverter: {[key: string]: number} = {left: 0, right: 1, middle: 0.5};
+      var offset = bandWidthConverter[xOrient] * width;
+      innerG.attr("transform", "translate(" + offset + ", 0)");
+    }
   }
 }
