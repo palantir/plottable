@@ -4,7 +4,7 @@ Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
-///<reference path="reference.ts" />
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     (function (Utils) {
@@ -351,7 +351,7 @@ var Plottable;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
-///<reference path="reference.ts" />
+///<reference path="../reference.ts" />
 // This file contains open source utilities, along with their copyright notices
 var Plottable;
 (function (Plottable) {
@@ -983,6 +983,13 @@ var Plottable;
             return this;
         };
 
+        ComponentContainer.prototype._render = function () {
+            this._components.forEach(function (c) {
+                return c._render();
+            });
+            return this;
+        };
+
         ComponentContainer.prototype._removeComponent = function (c) {
             var removeIndex = this._components.indexOf(c);
             if (removeIndex >= 0) {
@@ -1102,14 +1109,6 @@ var Plottable;
             _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             this._components.forEach(function (c) {
                 c._computeLayout(0, 0, _this.availableWidth, _this.availableHeight);
-            });
-            return this;
-        };
-
-        ComponentGroup.prototype._doRender = function () {
-            _super.prototype._doRender.call(this);
-            this._components.forEach(function (c) {
-                return c._doRender();
             });
             return this;
         };
@@ -1368,18 +1367,6 @@ var Plottable;
             return this;
         };
 
-        Table.prototype._doRender = function () {
-            // recursively render children
-            this.rows.forEach(function (row, rowIndex) {
-                row.forEach(function (component, colIndex) {
-                    if (component != null) {
-                        component._doRender();
-                    }
-                });
-            });
-            return this;
-        };
-
         /**
         * Sets the row and column padding on the Table.
         *
@@ -1634,6 +1621,7 @@ var Plottable;
             _super.call(this);
             this._dataChanged = false;
             this._animate = false;
+            this._ANIMATION_DURATION = 250;
             this._hasRendered = false;
             this._projectors = {};
             this._rerenderUpdateSelection = false;
@@ -1658,8 +1646,8 @@ var Plottable;
             }
             this.dataSource(dataSource);
         }
-        Renderer.prototype._anchor = function (element, parent) {
-            _super.prototype._anchor.call(this, element, parent);
+        Renderer.prototype._anchor = function (element) {
+            _super.prototype._anchor.call(this, element);
             this._dataChanged = true;
             return this;
         };
@@ -2682,6 +2670,7 @@ var Plottable;
         };
 
         CircleRenderer.prototype._paint = function () {
+            var _this = this;
             _super.prototype._paint.call(this);
             var attrToProjector = this._generateAttrToProjector();
             attrToProjector["cx"] = attrToProjector["x"];
@@ -2702,7 +2691,7 @@ var Plottable;
             if (this._animate && this._dataChanged) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * 250 / n;
+                    return i * _this._ANIMATION_DURATION / n;
                 });
             }
             updateSelection.attr("r", rFunction);
@@ -2728,6 +2717,7 @@ var Plottable;
         */
         function LineRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
+            this._ANIMATION_DURATION = 500;
             this.classed("line-renderer", true);
             this.project("stroke", function () {
                 return "steelblue";
@@ -2755,7 +2745,7 @@ var Plottable;
             }
 
             this.line = d3.svg.line().x(xFunction).y(yFunction);
-            var updateSelection = (this._animate) ? this.path.transition().duration(500) : this.path;
+            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
             updateSelection.attr("d", this.line).attr(attrToProjector);
         };
         return LineRenderer;
@@ -2883,6 +2873,9 @@ var Plottable;
             this._baselineValue = 0;
             this.classed("bar-renderer", true);
             this.project("width", 10);
+            this.project("fill", function () {
+                return "steelblue";
+            });
         }
         AbstractBarRenderer.prototype._setup = function () {
             _super.prototype._setup.call(this);
@@ -2973,6 +2966,7 @@ var Plottable;
             this._barAlignment = "left";
         }
         BarRenderer.prototype._paint = function () {
+            var _this = this;
             _super.prototype._paint.call(this);
             var scaledBaseline = this.yScale.scale(this._baselineValue);
 
@@ -3035,7 +3029,7 @@ var Plottable;
             if (this._animate) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * 250 / n;
+                    return i * _this._ANIMATION_DURATION / n;
                 });
             }
 
@@ -3090,6 +3084,7 @@ var Plottable;
             this._barAlignment = "top";
         }
         HorizontalBarRenderer.prototype._paint = function () {
+            var _this = this;
             _super.prototype._paint.call(this);
             var yA = Plottable.Utils.applyAccessor(this._yAccessor, this.dataSource());
 
@@ -3153,7 +3148,7 @@ var Plottable;
             if (this._animate) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * 250 / n;
+                    return i * _this._ANIMATION_DURATION / n;
                 });
             }
 
@@ -3756,8 +3751,8 @@ var Plottable;
     })(Plottable.Table);
     Plottable.StandardChart = StandardChart;
 })(Plottable || (Plottable = {}));
-/// <reference path="utils.ts" />
-/// <reference path="osUtils.ts" />
+/// <reference path="utils/utils.ts" />
+/// <reference path="utils/osUtils.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
@@ -4068,6 +4063,12 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for XAxis");
             }
             this.tickLabelPosition("center");
+            this._yAlignProportion = .5;
+            if (orientation === "top") {
+                this._yAlignProportion = 0;
+            } else if (orientation === "bottom") {
+                this._yAlignProportion = 1;
+            }
         }
         XAxis.prototype.height = function (h) {
             this._height = h;
@@ -4200,6 +4201,12 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for YAxis");
             }
             this.tickLabelPosition("middle");
+            this._xAlignProportion = .5;
+            if (orientation === "left") {
+                this._xAlignProportion = 0;
+            } else if (orientation === "right") {
+                this._xAlignProportion = 1;
+            }
         }
         YAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
@@ -4438,6 +4445,7 @@ var Plottable;
         */
         function AreaRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
+            this._ANIMATION_DURATION = 500;
             this.classed("area-renderer", true);
             this.project("y0", 0, yScale); // default
             this.project("fill", function () {
@@ -4467,7 +4475,7 @@ var Plottable;
             }
 
             this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-            var updateSelection = (this._animate) ? this.path.transition().duration(500) : this.path;
+            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
             updateSelection.attr("d", this.area).attr(attrToProjector);
         };
         return AreaRenderer;
