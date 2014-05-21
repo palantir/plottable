@@ -2,74 +2,24 @@ declare module Plottable {
     module Utils {
         /**
         * Checks if x is between a and b.
+        *
+        * @param {number} x The value to test if in range
+        * @param {number} a The beginning of the (inclusive) range
+        * @param {number} b The ending of the (inclusive) range
+        * @return {boolean} Whether x is in [a, b]
         */
         function inRange(x: number, a: number, b: number): boolean;
+        /**
+        * Takes two arrays of numbers and adds them together
+        *
+        * @param {number[]} alist The first array of numbers
+        * @param {number[]} blist The second array of numbers
+        * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
+        */
         function addArrays(alist: number[], blist: number[]): number[];
-        /**
-        * Gets the bounding box of an element.
-        * @param {D3.Selection} element
-        * @returns {SVGRed} The bounding box.
-        */
-        function getBBox(element: D3.Selection): SVGRect;
-        function getElementWidth(elem: HTMLScriptElement): number;
-        function getElementHeight(elem: HTMLScriptElement): number;
-        /**
-        * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
-        *
-        * @param {string} text: The string to be truncated
-        * @param {number} availableSpace: The avialable space, in pixels
-        * @param {D3.Selection} element: The text element used to measure the text
-        * @returns {string} text - the shortened text
-        */
-        function getTruncatedText(text: string, availableSpace: number, element: D3.Selection): string;
-        /**
-        * Gets the height of a text element, as rendered.
-        *
-        * @param {D3.Selection} textElement
-        * @return {number} The height of the text element, in pixels.
-        */
-        function getTextHeight(textElement: D3.Selection): number;
-        /**
-        * Gets the width of a text element, as rendered.
-        *
-        * @param {D3.Selection} textElement
-        * @return {number} The width of the text element, in pixels.
-        */
-        function getTextWidth(textElement: D3.Selection, text: string): number;
-        /**
-        * Converts a string into an array of strings, all of which fit in the available space.
-        *
-        * @returns {string[]} The input text broken into substrings that fit in the avialable space.
-        */
-        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): string[];
-        function getSVGPixelWidth(svg: D3.Selection): number;
         function accessorize(accessor: any): IAccessor;
         function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
         function uniq(strings: string[]): string[];
-        /**
-        * An associative array that can be keyed by anything (inc objects).
-        * Uses pointer equality checks which is why this works.
-        * This power has a price: everything is linear time since it is actually backed by an array...
-        */
-        class StrictEqualityAssociativeArray {
-            /**
-            * Set a new key/value pair in the store.
-            *
-            * @param {any} Key to set in the store
-            * @param {any} Value to set in the store
-            * @return {boolean} True if key already in store, false otherwise
-            */
-            public set(key: any, value: any): boolean;
-            public get(key: any): any;
-            public has(key: any): boolean;
-            public values(): any[];
-            public delete(key: any): boolean;
-        }
-        class IDCounter {
-            public increment(id: any): number;
-            public decrement(id: any): number;
-            public get(id: any): number;
-        }
         /**
         * Creates an array of length `count`, filled with value or (if value is a function), value()
         *
@@ -120,6 +70,67 @@ declare module Plottable {
         */
         function sortedIndex(val: number, arr: number[]): number;
         function sortedIndex(val: number, arr: any[], accessor: IAccessor): number;
+    }
+}
+declare module Plottable {
+    class IDCounter {
+        public increment(id: any): number;
+        public decrement(id: any): number;
+        public get(id: any): number;
+    }
+}
+declare module Plottable {
+    /**
+    * An associative array that can be keyed by anything (inc objects).
+    * Uses pointer equality checks which is why this works.
+    * This power has a price: everything is linear time since it is actually backed by an array...
+    */
+    class StrictEqualityAssociativeArray {
+        /**
+        * Set a new key/value pair in the store.
+        *
+        * @param {any} Key to set in the store
+        * @param {any} Value to set in the store
+        * @return {boolean} True if key already in store, false otherwise
+        */
+        public set(key: any, value: any): boolean;
+        public get(key: any): any;
+        public has(key: any): boolean;
+        public values(): any[];
+        public delete(key: any): boolean;
+    }
+}
+declare module Plottable {
+    module TextUtils {
+        /**
+        * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
+        *
+        * @param {string} text: The string to be truncated
+        * @param {number} availableSpace: The avialable space, in pixels
+        * @param {D3.Selection} element: The text element used to measure the text
+        * @returns {string} text - the shortened text
+        */
+        function getTruncatedText(text: string, availableSpace: number, element: D3.Selection): string;
+        /**
+        * Gets the height of a text element, as rendered.
+        *
+        * @param {D3.Selection} textElement
+        * @return {number} The height of the text element, in pixels.
+        */
+        function getTextHeight(textElement: D3.Selection): number;
+        /**
+        * Gets the width of a text element, as rendered.
+        *
+        * @param {D3.Selection} textElement
+        * @return {number} The width of the text element, in pixels.
+        */
+        function getTextWidth(textElement: D3.Selection, text: string): number;
+        /**
+        * Converts a string into an array of strings, all of which fit in the available space.
+        *
+        * @returns {string[]} The input text broken into substrings that fit in the avialable space.
+        */
+        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): string[];
     }
 }
 declare module Plottable {
@@ -1265,5 +1276,18 @@ declare module Plottable {
         height: number;
         wantsWidth: boolean;
         wantsHeight: boolean;
+    }
+}
+declare module Plottable {
+    module DOMUtils {
+        /**
+        * Gets the bounding box of an element.
+        * @param {D3.Selection} element
+        * @returns {SVGRed} The bounding box.
+        */
+        function getBBox(element: D3.Selection): SVGRect;
+        function getElementWidth(elem: HTMLScriptElement): number;
+        function getElementHeight(elem: HTMLScriptElement): number;
+        function getSVGPixelWidth(svg: D3.Selection): number;
     }
 }
