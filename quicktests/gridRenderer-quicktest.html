@@ -36,16 +36,17 @@
       }
 
       function makeChart(selector, colors, data) {
-          var xScale       = new Plottable.OrdinalScale();
-          var yScale       = new Plottable.OrdinalScale();
+          var xScale       = new Plottable.OrdinalScale().rangeType("bands");
+          var yScale       = new Plottable.OrdinalScale().rangeType("bands");
           var colorScale   = new Plottable.InterpolatedColorScale(colors);
 
           var identity     = function(d){return d;};
-          var xAxis        = new Plottable.XAxis(xScale, "bottom", identity);
-          var yAxis        = new Plottable.YAxis(yScale, "right", identity);
-          var gridRenderer = new Plottable.GridRenderer(data,
-            xScale, yScale, colorScale,
-            "day", "category", "awesomeness");
+          var xAxis        = new Plottable.CategoryAxis(xScale, "bottom");
+          var yAxis        = new Plottable.CategoryAxis(yScale, "right");
+          var gridRenderer = new Plottable.GridRenderer(data, xScale, yScale, colorScale)
+                                  .project("x", "category")
+                                  .project("y", "day")
+                                  .project("fill", "awesomeness");
 
           new Plottable.Table()
             .addComponent(0, 1, yAxis)
