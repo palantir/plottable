@@ -29,7 +29,6 @@ module Plottable {
     }
 
     public _addComponent(c: Component, prepend = false): boolean {
-      // returns true if the component was added, false if it was already there
       if (c == null || this._components.indexOf(c) >= 0) {
         return false;
       }
@@ -53,7 +52,7 @@ module Plottable {
      * @returns{Component[]} the contained Components
      */
     public components(): Component[] {
-      return this._components;
+      return this._components.slice(); // return a shallow copy
     }
 
     /**
