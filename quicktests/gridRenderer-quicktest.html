@@ -58,11 +58,11 @@
                                   .project("fill", "awesomeness");
 
           return new Plottable.Table()
-            .addComponent(0, 0, yAxisL)
-            // .addComponent(0, 2, yAxisR)
-            .addComponent(0, 1, gridRenderer)
-            .addComponent(1, 1, xAxisB)
-            // .addComponent(2, 1, xAxisB)
+            .addComponent(1, 0, yAxisL)
+            .addComponent(1, 2, yAxisR)
+            .addComponent(1, 1, gridRenderer)
+            .addComponent(0, 1, xAxisT)
+            .addComponent(2, 1, xAxisB)
             .renderTo(selector);
       };
 
