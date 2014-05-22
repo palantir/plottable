@@ -151,6 +151,12 @@ module Plottable {
                                           height: number,
                                           xAlign = "left",
                                           yAlign = "top") {
+      var xOffsetFactor: {[s: string]: number} = {left: 0, center: 0.5, right: 1};
+      var yOffsetFactor: {[s: string]: number} = {top: 0, center: 0.5, bottom: 1};
+      if (xOffsetFactor[xAlign] === undefined || yOffsetFactor[yAlign] === undefined) {
+        throw new Error("unrecognized alignment x:" + xAlign + ", y:" + yAlign);
+      }
+
       var textEl = g.append("text");
       textEl.text(line);
       var bb = DOMUtils.getBBox(textEl);
@@ -161,14 +167,32 @@ module Plottable {
       }
       var anchorConverter: {[s: string]: string} = {left: "start", center: "middle", right: "end"};
       var anchor: string = anchorConverter[xAlign];
-      var xOffsetFactor: {[s: string]: number} = {left: 0, center: 0.5, right: 1};
-      var yOffsetFactor: {[s: string]: number} = {top: 0, center: 0.5, bottom: 1};
       var xOff = width * xOffsetFactor[xAlign];
       var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
       textEl.attr("text-anchor", anchor);
       Utils.translate(g, xOff, yOff);
       return [w, h];
+    }
 
+    export function writeLineVertically(line: string, g: D3.Selection,
+                                        width: number, height: number,
+                                        rotation = "right", xAlign = "left", yAlign = "top") {
+
+      if (rotation !== "right" && rotation !== "left") {
+        throw new Error("unreckognized rotation: " + rotation);
+      }
+      var isRight = rotation === "right";
+      var rightTranslator: {[s: string]: string} = {left: "bottom", right: "top", center: "center", top: "left", bottom: "right"};
+      var leftTranslator : {[s: string]: string} = {left: "top", right: "bottom", center: "center", top: "right", bottom: "left"};
+      var alignTranslator = isRight ? rightTranslator : leftTranslator;
+      var innerG = g.append("g");
+      var wh = writeLineHorizontally(line, innerG, height, width, alignTranslator[yAlign], alignTranslator[xAlign]);
+      var xForm = d3.transform("");
+      xForm.rotate = rotation === "right" ? 90 : -90;
+      xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
+      g.attr("transform", xForm.toString());
+
+      return [wh[1], wh[0]];
     }
 
     export function writeTextHorizontally(brokenText: string[],
