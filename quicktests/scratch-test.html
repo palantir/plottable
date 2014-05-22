@@ -1,0 +1,111 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script>
+
+var xAxis;
+var yAxis;
+var renderAreaD1;
+var renderAreaD2;
+var renderAreaD3;
+var renderAreaD4;
+var renderGroup;
+
+window.onload = function () {
+    var svg = d3.select("#chart");
+    svg.attr("width", 300).attr("height", 300);
+
+    var dataseries1 = makeRandomData(5);
+    var dataseries2 = makeRandomData(5);
+    var dataseries3 = makeRandomData(5);
+    var dataseries4 = makeRandomData(5);
+
+    var xScale = new Plottable.LinearScale();
+    var yScale = new Plottable.LinearScale();
+
+    xAxis = new Plottable.XAxis(xScale, "bottom");
+    yAxis = new Plottable.YAxis(yScale, "left");
+
+    renderAreaD1 = new Plottable.LineRenderer(dataseries1, xScale, yScale).animate(true);
+    renderAreaD2 = new Plottable.LineRenderer(dataseries2, xScale, yScale)
+        .project("stroke", function(){ return "pink"}).animate(true);
+    renderAreaD3 = new Plottable.LineRenderer(dataseries3, xScale, yScale)
+        .project("stroke", function(){ return "green"}).animate(true);
+    renderAreaD4 = new Plottable.LineRenderer(dataseries4, xScale, yScale)
+        .project("stroke", function(){ return "purple"}).animate(true);
+
+    renderGroup = new Plottable.ComponentGroup();
+
+    var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
+                                          .addComponent(0, 1, renderGroup)
+                                          .addComponent(1, 1, xAxis);
+
+
+
+    basicTable.renderTo(svg);
+
+
+};
+
+function button1Callback() {
+   renderGroup.merge(renderAreaD1);
+}
+function button2Callback() {
+       renderGroup.merge(renderAreaD2);
+}
+
+function button3Callback() {
+       renderGroup.merge(renderAreaD3);
+}
+function button4Callback() {
+       renderGroup.merge(renderAreaD4);
+}
+
+function button5Callback() {
+    renderAreaD1.remove();
+}
+function button6Callback() {
+    renderAreaD2.remove();
+}
+
+function button7Callback() {
+    renderAreaD3.remove();
+}
+function button8Callback() {
+    renderAreaD4.remove();
+}
+function button9Callback(){
+     renderGroup.removeAll();
+}
+
+
+
+
+    </script>
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script></head>
+<body>
+<div class="demo-title">Simple Chart</div>
+<br>
+
+
+<br>
+<svg id="chart"></svg>
+
+
+<button onclick="button1Callback()">add D1</button>
+<button onclick="button2Callback()">add D2</button>
+<button onclick="button3Callback()">add D3</button>
+<button onclick="button4Callback()">add D4</button>
+    <br>
+<button onclick="button5Callback()">remove D1</button>
+<button onclick="button6Callback()">remove D2</button>
+<button onclick="button7Callback()">remove D3</button>
+<button onclick="button8Callback()">remove D4</button>
+<br>
+    <button onclick="button9Callback()">remove all</button>
+
+<p />
+</body>
+</html>

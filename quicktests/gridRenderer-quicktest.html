@@ -21,6 +21,7 @@
     <script>
     Plottable.RenderController.enabled = false;
     var c1, c2, c3;
+    var xScale, yScale, colorScale, xAxisB, xAxisT, yAxisL, yAxisR, gridRenderer;
       function randomData() {
         var data = [];
         ["Work", "Food Is Tasty And I like it", "Sex", "Sleep"].forEach(function(category) {
@@ -42,25 +43,25 @@
     }
 
       function makeChart(selector, colors, data) {
-          var xScale       = new Plottable.OrdinalScale().rangeType("bands");
-          var yScale       = new Plottable.OrdinalScale().rangeType("bands");
-          var colorScale   = new Plottable.InterpolatedColorScale(colors);
+          xScale       = new Plottable.OrdinalScale().rangeType("bands");
+          yScale       = new Plottable.OrdinalScale().rangeType("bands");
+          colorScale   = new Plottable.InterpolatedColorScale(colors);
 
-          var identity     = function(d){return d;};
-          var xAxisB        = new Plottable.CategoryAxis(xScale, "bottom");
-          var xAxisT        = new Plottable.CategoryAxis(xScale, "top");
-          var yAxisL        = new Plottable.CategoryAxis(yScale, "left");
-          var yAxisR        = new Plottable.CategoryAxis(yScale, "right");
-          var gridRenderer = new Plottable.GridRenderer(data, xScale, yScale, colorScale)
+          identity     = function(d){return d;};
+          xAxisB        = new Plottable.CategoryAxis(xScale, "bottom");
+          xAxisT        = new Plottable.CategoryAxis(xScale, "top");
+          yAxisL        = new Plottable.CategoryAxis(yScale, "left");
+          yAxisR        = new Plottable.CategoryAxis(yScale, "right");
+          gridRenderer = new Plottable.GridRenderer(data, xScale, yScale, colorScale)
                                   .project("x", "category")
                                   .project("y", "day")
                                   .project("fill", "awesomeness");
 
           return new Plottable.Table()
-            .addComponent(0, 1, yAxisR)
-            // .addComponent(1, 2, yAxisR)
-            .addComponent(0, 0, gridRenderer)
-            .addComponent(1, 0, xAxisB)
+            .addComponent(0, 0, yAxisL)
+            .addComponent(0, 2, yAxisR)
+            .addComponent(0, 1, gridRenderer)
+            .addComponent(1, 1, xAxisB)
             // .addComponent(2, 1, xAxisB)
             .renderTo(selector);
       };
