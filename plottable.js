@@ -2845,6 +2845,9 @@ var Plottable;
             this._baselineValue = 0;
             this.classed("bar-renderer", true);
             this.project("width", 10);
+            this.project("fill", function () {
+                return "steelblue";
+            });
         }
         AbstractBarRenderer.prototype._setup = function () {
             _super.prototype._setup.call(this);

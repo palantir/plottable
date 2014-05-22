@@ -18,6 +18,7 @@ module Plottable {
       super(dataset, xScale, yScale);
       this.classed("bar-renderer", true);
       this.project("width", 10);
+      this.project("fill", () => "steelblue");
     }
 
     public _setup() {
