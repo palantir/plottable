@@ -4081,8 +4081,9 @@ var Plottable;
             _super.prototype._doRender.call(this);
             if (this.orient() === "top") {
                 this.axisElement.attr("transform", "translate(0," + this._height + ")");
+            } else if (this.orient() === "bottom") {
+                this.axisElement.attr("transform", null);
             }
-            ;
 
             var tickTextLabels = this.axisElement.selectAll("text");
             if (tickTextLabels[0].length > 0) {
@@ -4213,8 +4214,9 @@ var Plottable;
             _super.prototype._doRender.call(this);
             if (this.orient() === "left") {
                 this.axisElement.attr("transform", "translate(" + this._width + ", 0)");
+            } else if (this.orient() === "right") {
+                this.axisElement.attr("transform", null);
             }
-            ;
 
             var tickTextLabels = this.axisElement.selectAll("text");
             if (tickTextLabels[0].length > 0) {
