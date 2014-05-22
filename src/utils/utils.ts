@@ -23,6 +23,9 @@ module Plottable {
      * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
      */
     export function addArrays(alist: number[], blist: number[]): number[] {
+      if (alist.length !== blist.length) {
+        throw new Error("attempted to add arrays of unequal length");
+      }
       return alist.map((_: number, i: number) => alist[i] + blist[i]);
     }
 
