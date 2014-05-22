@@ -1118,6 +1118,7 @@ declare module Plottable {
 declare module Plottable {
     class Axis extends Component {
         public axisElement: D3.Selection;
+        static _DEFAULT_TICK_SIZE: number;
         /**
         * Creates an Axis.
         *
