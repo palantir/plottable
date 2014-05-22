@@ -95,8 +95,8 @@ describe("TextUtils", () => {
         var bb = Plottable.DOMUtils.getBBox(textEl);
         assert.equal(bb.width, wh[0], "width measurement is as expected");
         assert.equal(bb.height, wh[1], "height measurement is as expected");
-        var x = bb.x + Plottable.DOMUtils.translate(g)[0];
-        var y = bb.y + Plottable.DOMUtils.translate(g)[1];
+        var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0];
+        var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1];
         assert.equal(x, 0, "the x position is zero");
         assert.closeTo(y, 0, 5, "the y position is close to zero");
         if (hideResults) {
@@ -111,8 +111,8 @@ describe("TextUtils", () => {
         var bb = Plottable.DOMUtils.getBBox(textEl);
         assert.equal(bb.width, wh[0], "width measurement is as expected");
         assert.equal(bb.height, wh[1], "height measurement is as expected");
-        var x = bb.x + Plottable.DOMUtils.translate(g)[0] + bb.width/2;
-        var y = bb.y + Plottable.DOMUtils.translate(g)[1] + bb.height/2;
+        var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0] + bb.width/2;
+        var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1] + bb.height/2;
 
         assert.equal(x, 200, "the x position is 200");
         assert.closeTo(y, 200, 5, "the y position is close to 200");
@@ -128,8 +128,8 @@ describe("TextUtils", () => {
         var bb = Plottable.DOMUtils.getBBox(textEl);
         assert.equal(bb.width, wh[0], "width measurement is as expected");
         assert.equal(bb.height, wh[1], "height measurement is as expected");
-        var x = bb.x + Plottable.DOMUtils.translate(g)[0] + bb.width;
-        var y = bb.y + Plottable.DOMUtils.translate(g)[1] + bb.height;
+        var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0] + bb.width;
+        var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1] + bb.height;
 
         assert.equal(x, 400, "the right edge of the box is at 400");
         assert.closeTo(y, 400, 5, "the bottom of the y box is close to 400");
@@ -153,7 +153,7 @@ describe("TextUtils", () => {
         svg = generateSVG(100, 400);
         g = svg.append("g");
         var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400);
-        var bb = Plottable.DOMUtils.getBBox(g);
+        var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         assert.equal(bb.x, 0, "x position correct");
         // assert.closeTo(bb.y, 0, 5, "y position correct"); -- TODO: figure out how to test the y position here
         assert.deepEqual(wh, [bb.height, bb.width], "width and height as expected");
@@ -166,7 +166,7 @@ describe("TextUtils", () => {
         svg = generateSVG(100, 400);
         g = svg.append("g");
         var wh = Plottable.TextUtils.writeLineVertically("x", g, 100, 400, "center", "center", "right");
-        var bb = Plottable.DOMUtils.getBBox(g);
+        var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         assert.equal(bb.x + bb.width/2, 200, "x position correct");
         assert.closeTo(bb.y + bb.height/2, 50, 5, "y position correct");
         if (hideResults) {
@@ -177,7 +177,7 @@ describe("TextUtils", () => {
         svg = generateSVG(100, 400);
         g = svg.append("g");
         var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "right", "bottom", "right");
-        var bb = Plottable.DOMUtils.getBBox(g);
+        var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         // assert.equal(bb.x + bb.width, 400, "x position correct");
         // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
         if (hideResults) {
@@ -188,7 +188,7 @@ describe("TextUtils", () => {
         svg = generateSVG(100, 400);
         g = svg.append("g");
         var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "left", "top", "left");
-        var bb = Plottable.DOMUtils.getBBox(g);
+        var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         // assert.equal(bb.x + bb.width, 400, "x position correct");
         // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
         if (hideResults) {
@@ -200,7 +200,7 @@ describe("TextUtils", () => {
         svg = generateSVG(100, 400);
         g = svg.append("g");
         var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "center", "center", "left");
-        // var bb = Plottable.DOMUtils.getBBox(g);
+        // var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         // assert.equal(bb.x + bb.width, 400, "x position correct");
         // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
         if (hideResults) {
@@ -212,7 +212,7 @@ describe("TextUtils", () => {
         svg = generateSVG(100, 400);
         g = svg.append("g");
         var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "right", "bottom", "left");
-        // var bb = Plottable.DOMUtils.getBBox(g);
+        // var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         // assert.equal(bb.x + bb.width, 400, "x position correct");
         // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
         if (hideResults) {
