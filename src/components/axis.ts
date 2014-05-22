@@ -284,6 +284,7 @@ module Plottable {
         throw new Error(orientation + " is not a valid orientation for XAxis");
       }
       this.tickLabelPosition("center");
+      this.yAlign(orientation);
     }
 
     public height(h: number) {
@@ -416,6 +417,7 @@ module Plottable {
         throw new Error(orientation + " is not a valid orientation for YAxis");
       }
       this.tickLabelPosition("middle");
+      this.xAlign(orientation);
     }
 
     public _setup() {
