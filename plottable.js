@@ -1,5 +1,5 @@
 /*!
-Plottable 0.12.4 (https://github.com/palantir/plottable)
+Plottable 0.13.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -971,7 +971,6 @@ var Plottable;
 
         ComponentContainer.prototype._addComponent = function (c, prepend) {
             if (typeof prepend === "undefined") { prepend = false; }
-            // returns true if the component was added, false if it was already there
             if (c == null || this._components.indexOf(c) >= 0) {
                 return false;
             }
@@ -995,7 +994,7 @@ var Plottable;
         * @returns{Component[]} the contained Components
         */
         ComponentContainer.prototype.components = function () {
-            return this._components;
+            return this._components.slice();
         };
 
         /**
