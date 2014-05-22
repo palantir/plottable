@@ -163,12 +163,12 @@ module Plottable {
       var anchor: string = anchorConverter[xAlign];
       var xOffsetFactor: {[s: string]: number} = {left: 0, center: 0.5, right: 1};
       var yOffsetFactor: {[s: string]: number} = {top: 0, center: 0.5, bottom: 1};
-      var yEmsOffset = (s: string) => 1 - yOffsetFactor[s];
       var xOff = width * xOffsetFactor[xAlign];
       var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
       textEl.attr("text-anchor", anchor);
-      g.attr("transform", "translate(" + xOff + "," + yOff + ")");
+      Utils.translate(g, xOff, yOff);
       return [w, h];
+
     }
 
     export function writeTextHorizontally(brokenText: string[],

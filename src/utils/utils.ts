@@ -47,6 +47,19 @@ module Plottable {
       return d3.keys(seen);
     }
 
+    export function translate(s: D3.Selection, x?: number, y?: number) {
+      var xform = d3.transform(s.attr("transform"));
+      if (x == null) {
+        return xform.translate;
+      } else {
+        y = (y == null) ? 0 : y;
+        xform.translate[0] = x;
+        xform.translate[1] = y;
+        s.attr("transform", xform.toString());
+        return s;
+      }
+    }
+
     /**
      * Creates an array of length `count`, filled with value or (if value is a function), value()
      *

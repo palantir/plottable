@@ -91,8 +91,10 @@ describe("TextUtils", () => {
       var bb = Plottable.DOMUtils.getBBox(textEl);
       assert.equal(bb.width, wh[0], "width measurement is as expected");
       assert.equal(bb.height, wh[1], "height measurement is as expected");
-      assert.equal(bb.x, 0, "the x position is zero");
-      assert.closeTo(bb.y, 0, 10, "the y position is close to zero");
+      var x = bb.x + Plottable.Utils.translate(g)[0];
+      var y = bb.y + Plottable.Utils.translate(g)[1];
+      assert.equal(x, 0, "the x position is zero");
+      assert.closeTo(y, 0, 5, "the y position is close to zero");
       svg.remove();
     });
     it("center, center alignment works", () => {
@@ -103,11 +105,29 @@ describe("TextUtils", () => {
       var bb = Plottable.DOMUtils.getBBox(textEl);
       assert.equal(bb.width, wh[0], "width measurement is as expected");
       assert.equal(bb.height, wh[1], "height measurement is as expected");
-      assert.equal(bb.x, bb.w/ -2, "the x position is zero");
-      assert.closeTo(bb.y, 0, 10, "the y position is close to zero");
+      var x = bb.x + Plottable.Utils.translate(g)[0] + bb.width/2;
+      var y = bb.y + Plottable.Utils.translate(g)[1] + bb.height/2;
 
+      assert.equal(x, 200, "the x position is 200");
+      assert.closeTo(y, 200, 5, "the y position is close to 200");
+      svg.remove();
+    });
+    it("right, bottom alignment works", () => {
+      svg = generateSVG(400, 400);
+      g = svg.append("g");
+      var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "right", "bottom");
+      var textEl = g.select("text");
+      var bb = Plottable.DOMUtils.getBBox(textEl);
+      assert.equal(bb.width, wh[0], "width measurement is as expected");
+      assert.equal(bb.height, wh[1], "height measurement is as expected");
+      var x = bb.x + Plottable.Utils.translate(g)[0] + bb.width;
+      var y = bb.y + Plottable.Utils.translate(g)[1] + bb.height;
 
-      })
+      assert.equal(x, 400, "the right edge of the box is at 400");
+      assert.closeTo(y, 400, 5, "the bottom of the y box is close to 400");
+      svg.remove();
+
+    });
   });
 });
   // describe("writeTextHorizontally", () => {
