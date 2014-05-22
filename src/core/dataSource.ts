@@ -8,7 +8,7 @@ module Plottable {
   export class DataSource extends Broadcaster {
     private _data: any[];
     private _metadata: any;
-    private accessor2cachedExtent: Utils.StrictEqualityAssociativeArray;
+    private accessor2cachedExtent: StrictEqualityAssociativeArray;
     /**
      * Creates a new DataSource.
      *
@@ -20,7 +20,7 @@ module Plottable {
       super();
       this._data = data;
       this._metadata = metadata;
-      this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+      this.accessor2cachedExtent = new StrictEqualityAssociativeArray();
     }
 
     /**
@@ -36,7 +36,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+        this.accessor2cachedExtent = new StrictEqualityAssociativeArray();
         this._broadcast();
         return this;
       }
@@ -55,7 +55,7 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this.accessor2cachedExtent = new Utils.StrictEqualityAssociativeArray();
+        this.accessor2cachedExtent = new StrictEqualityAssociativeArray();
         this._broadcast();
         return this;
       }

@@ -69,12 +69,13 @@ describe("Tables", () => {
   });
 
   it("can't add a component where one already exists", () => {
-    var c1 = new Plottable.Table();
-    var c2 = new Plottable.Table();
+    var c1 = new Plottable.Component();
+    var c2 = new Plottable.Component();
+    var c3 = new Plottable.Component();
     var t = new Plottable.Table();
     t.addComponent(0, 2, c1);
     t.addComponent(0, 0, c2);
-    assert.throws(() => t.addComponent(0, 2, c2), Error, "component already exists");
+    assert.throws(() => t.addComponent(0, 2, c3), Error, "component already exists");
   });
 
   it("addComponent works even if a component is added with a high column and low row index", () => {
@@ -101,7 +102,7 @@ describe("Tables", () => {
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 200], "third element is located properly");
     assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-    var bboxes = elements.map((e) => Plottable.Utils.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.DOMUtils.getBBox(e));
     bboxes.forEach((b) => {
       assert.equal(b.width, 200, "bbox is 200 pixels wide");
       assert.equal(b.height, 200, "bbox is 200 pixels tall");
@@ -120,7 +121,7 @@ describe("Tables", () => {
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
-    var bboxes = elements.map((e) => Plottable.Utils.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.DOMUtils.getBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
     assert.deepEqual(translates[1], [210, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 210], "third element is located properly");
@@ -153,7 +154,7 @@ describe("Tables", () => {
 
     var elements = components.map((r) => r.element);
     var translates = elements.map((e) => getTranslate(e));
-    var bboxes = elements.map((e) => Plottable.Utils.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.DOMUtils.getBBox(e));
     // test the translates
     assert.deepEqual(translates[0], [50, 0]  , "top axis translate");
     assert.deepEqual(translates[4], [50, 370], "bottom axis translate");

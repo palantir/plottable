@@ -373,9 +373,9 @@ module Plottable {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var wrappedLines = Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+            var wrappedLines = TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
             if (wrappedLines.length === 1) {
-              textEl.text(Utils.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(TextUtils.getTruncatedText(currentText, availableWidth, textEl));
             } else {
               textEl.text("");
               var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -504,9 +504,9 @@ module Plottable {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var wrappedLines = Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+            var wrappedLines = TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
             if (wrappedLines.length === 1) {
-              textEl.text(Utils.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(TextUtils.getTruncatedText(currentText, availableWidth, textEl));
             } else {
               var baseY = 0; // measured in ems
               if (tickLabelPosition === "top") {

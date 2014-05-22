@@ -55,7 +55,7 @@ describe("Legends", () => {
     var totalHeight = 0;
     var legends = legend.content.selectAll(".legend-row");
     legends.each(function(d, i) {
-      totalHeight += Plottable.Utils.getBBox(d3.select(this).select("text")).height;
+      totalHeight += Plottable.DOMUtils.getBBox(d3.select(this).select("text")).height;
     });
     assert.lengthOf(legends[0], 8, "there were 8 legends");
     assert.operator(totalHeight, "<=", legend.availableHeight, "the legend did not overflow its space");

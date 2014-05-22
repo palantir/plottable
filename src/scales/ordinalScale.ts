@@ -4,7 +4,7 @@ module Plottable {
   export class OrdinalScale extends Scale {
     public _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
-    private _rangeType: string = "points";
+    private _rangeType: string = "bands";
 
     // Padding as a proportion of the spacing between domain values
     private _innerPadding: number = 0.3;
