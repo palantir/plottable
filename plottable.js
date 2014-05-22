@@ -346,203 +346,9 @@ var Plottable;
             textElement.text(originalText);
             return lines;
         }
-        Utils.getWrappedText = getWrappedText;
-
-        function getSVGPixelWidth(svg) {
-            var width = svg.node().clientWidth;
-
-            if (width === 0) {
-                var widthAttr = svg.attr("width");
-
-                if (widthAttr.indexOf("%") !== -1) {
-                    var ancestorNode = svg.node().parentNode;
-                    while (ancestorNode != null && ancestorNode.clientWidth === 0) {
-                        ancestorNode = ancestorNode.parentNode;
-                    }
-                    if (ancestorNode == null) {
-                        throw new Error("Could not compute width of element");
-                    }
-                    width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
-                } else {
-                    width = parseFloat(widthAttr);
-                }
-            }
-
-            return width;
-        }
-        Utils.getSVGPixelWidth = getSVGPixelWidth;
-
-        function accessorize(accessor) {
-            if (typeof (accessor) === "function") {
-                return accessor;
-            } else if (typeof (accessor) === "string" && accessor[0] !== "#") {
-                return function (d, i, s) {
-                    return d[accessor];
-                };
-            } else {
-                return function (d, i, s) {
-                    return accessor;
-                };
-            }
-            ;
-        }
-        Utils.accessorize = accessorize;
-
-        function applyAccessor(accessor, dataSource) {
-            var activatedAccessor = accessorize(accessor);
-            return function (d, i) {
-                return activatedAccessor(d, i, dataSource.metadata());
-            };
-        }
-        Utils.applyAccessor = applyAccessor;
-
-        function uniq(strings) {
-            var seen = {};
-            strings.forEach(function (s) {
-                return seen[s] = true;
-            });
-            return d3.keys(seen);
-        }
-        Utils.uniq = uniq;
-
-        /**
-        * An associative array that can be keyed by anything (inc objects).
-        * Uses pointer equality checks which is why this works.
-        * This power has a price: everything is linear time since it is actually backed by an array...
-        */
-        var StrictEqualityAssociativeArray = (function () {
-            function StrictEqualityAssociativeArray() {
-                this.keyValuePairs = [];
-            }
-            /**
-            * Set a new key/value pair in the store.
-            *
-            * @param {any} Key to set in the store
-            * @param {any} Value to set in the store
-            * @return {boolean} True if key already in store, false otherwise
-            */
-            StrictEqualityAssociativeArray.prototype.set = function (key, value) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        this.keyValuePairs[i][1] = value;
-                        return true;
-                    }
-                }
-                this.keyValuePairs.push([key, value]);
-                return false;
-            };
-
-            StrictEqualityAssociativeArray.prototype.get = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        return this.keyValuePairs[i][1];
-                    }
-                }
-                return undefined;
-            };
-
-            StrictEqualityAssociativeArray.prototype.has = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-
-            StrictEqualityAssociativeArray.prototype.values = function () {
-                return this.keyValuePairs.map(function (x) {
-                    return x[1];
-                });
-            };
-
-            StrictEqualityAssociativeArray.prototype.delete = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        this.keyValuePairs.splice(i, 1);
-                        return true;
-                    }
-                }
-                return false;
-            };
-            return StrictEqualityAssociativeArray;
-        })();
-        Utils.StrictEqualityAssociativeArray = StrictEqualityAssociativeArray;
-
-        var IDCounter = (function () {
-            function IDCounter() {
-                this.counter = {};
-            }
-            IDCounter.prototype.setDefault = function (id) {
-                if (this.counter[id] == null) {
-                    this.counter[id] = 0;
-                }
-            };
-
-            IDCounter.prototype.increment = function (id) {
-                this.setDefault(id);
-                return ++this.counter[id];
-            };
-
-            IDCounter.prototype.decrement = function (id) {
-                this.setDefault(id);
-                return --this.counter[id];
-            };
-
-            IDCounter.prototype.get = function (id) {
-                this.setDefault(id);
-                return this.counter[id];
-            };
-            return IDCounter;
-        })();
-        Utils.IDCounter = IDCounter;
-
-        /**
-        * Creates an array of length `count`, filled with value or (if value is a function), value()
-        *
-        * @param {any} value The value to fill the array with, or, if a function, a generator for values
-        * @param {number} count The length of the array to generate
-        * @return {any[]}
-        */
-        function createFilledArray(value, count) {
-            var out = [];
-            for (var i = 0; i < count; i++) {
-                out[i] = typeof (value) === "function" ? value(i) : value;
-            }
-            return out;
-        }
-        Utils.createFilledArray = createFilledArray;
-    })(Plottable.Utils || (Plottable.Utils = {}));
-    var Utils = Plottable.Utils;
-})(Plottable || (Plottable = {}));
-///<reference path="../reference.ts" />
-// This file contains open source utilities, along with their copyright notices
-var Plottable;
-(function (Plottable) {
-    (function (OSUtils) {
-        
-
-        function sortedIndex(val, arr, accessor) {
-            var low = 0;
-            var high = arr.length;
-            while (low < high) {
-                /* tslint:disable:no-bitwise */
-                var mid = (low + high) >>> 1;
-
-                /* tslint:enable:no-bitwise */
-                var x = accessor == null ? arr[mid] : accessor(arr[mid]);
-                if (x < val) {
-                    low = mid + 1;
-                } else {
-                    high = mid;
-                }
-            }
-            return low;
-        }
-        OSUtils.sortedIndex = sortedIndex;
-        ;
-    })(Plottable.OSUtils || (Plottable.OSUtils = {}));
-    var OSUtils = Plottable.OSUtils;
+        TextUtils.getWrappedText = getWrappedText;
+    })(Plottable.TextUtils || (Plottable.TextUtils = {}));
+    var TextUtils = Plottable.TextUtils;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -4232,12 +4038,6 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for XAxis");
             }
             this.tickLabelPosition("center");
-            this._yAlignProportion = .5;
-            if (orientation === "top") {
-                this._yAlignProportion = 0;
-            } else if (orientation === "bottom") {
-                this._yAlignProportion = 1;
-            }
         }
         XAxis.prototype.height = function (h) {
             this._height = h;
@@ -4370,12 +4170,6 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for YAxis");
             }
             this.tickLabelPosition("middle");
-            this._xAlignProportion = .5;
-            if (orientation === "left") {
-                this._xAlignProportion = 0;
-            } else if (orientation === "right") {
-                this._xAlignProportion = 1;
-            }
         }
         YAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
