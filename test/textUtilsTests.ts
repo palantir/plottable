@@ -126,7 +126,13 @@ describe("TextUtils", () => {
       assert.equal(x, 400, "the right edge of the box is at 400");
       assert.closeTo(y, 400, 5, "the bottom of the y box is close to 400");
       svg.remove();
+    });
 
+    it("throws an error if there's too little space", () => {
+      svg = generateSVG(20, 20);
+      g = svg.append("g");
+      assert.throws(() => Plottable.TextUtils.writeLineHorizontally(text, g, 20, 20) ,"space");
+      svg.remove();
     });
   });
 });
