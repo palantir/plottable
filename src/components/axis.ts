@@ -321,7 +321,9 @@ module Plottable {
       } else {
         var positionLC = position.toLowerCase();
         if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
-          if (positionLC !== "center") {
+          if (positionLC === "center") {
+            this.tickSize(6); // default tick size
+          } else {
             this.tickSize(12); // longer than default tick size
           }
           return super.tickLabelPosition(positionLC);
@@ -453,7 +455,9 @@ module Plottable {
       } else {
         var positionLC = position.toLowerCase();
         if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
-          if (positionLC !== "middle") {
+          if (positionLC === "middle") {
+            this.tickSize(6); // default tick size
+          } else {
             this.tickSize(30); // longer than default tick size
           }
           return super.tickLabelPosition(positionLC);
