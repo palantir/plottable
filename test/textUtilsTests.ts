@@ -95,8 +95,8 @@ describe("TextUtils", () => {
         var bb = Plottable.DOMUtils.getBBox(textEl);
         assert.equal(bb.width, wh[0], "width measurement is as expected");
         assert.equal(bb.height, wh[1], "height measurement is as expected");
-        var x = bb.x + Plottable.Utils.translate(g)[0];
-        var y = bb.y + Plottable.Utils.translate(g)[1];
+        var x = bb.x + Plottable.DOMUtils.translate(g)[0];
+        var y = bb.y + Plottable.DOMUtils.translate(g)[1];
         assert.equal(x, 0, "the x position is zero");
         assert.closeTo(y, 0, 5, "the y position is close to zero");
         if (hideResults) {
@@ -111,8 +111,8 @@ describe("TextUtils", () => {
         var bb = Plottable.DOMUtils.getBBox(textEl);
         assert.equal(bb.width, wh[0], "width measurement is as expected");
         assert.equal(bb.height, wh[1], "height measurement is as expected");
-        var x = bb.x + Plottable.Utils.translate(g)[0] + bb.width/2;
-        var y = bb.y + Plottable.Utils.translate(g)[1] + bb.height/2;
+        var x = bb.x + Plottable.DOMUtils.translate(g)[0] + bb.width/2;
+        var y = bb.y + Plottable.DOMUtils.translate(g)[1] + bb.height/2;
 
         assert.equal(x, 200, "the x position is 200");
         assert.closeTo(y, 200, 5, "the y position is close to 200");
@@ -128,8 +128,8 @@ describe("TextUtils", () => {
         var bb = Plottable.DOMUtils.getBBox(textEl);
         assert.equal(bb.width, wh[0], "width measurement is as expected");
         assert.equal(bb.height, wh[1], "height measurement is as expected");
-        var x = bb.x + Plottable.Utils.translate(g)[0] + bb.width;
-        var y = bb.y + Plottable.Utils.translate(g)[1] + bb.height;
+        var x = bb.x + Plottable.DOMUtils.translate(g)[0] + bb.width;
+        var y = bb.y + Plottable.DOMUtils.translate(g)[1] + bb.height;
 
         assert.equal(x, 400, "the right edge of the box is at 400");
         assert.closeTo(y, 400, 5, "the bottom of the y box is close to 400");

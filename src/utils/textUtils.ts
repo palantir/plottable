@@ -43,11 +43,19 @@ module Plottable {
      * @param {D3.Selection} textElement
      * @return {number} The height of the text element, in pixels.
      */
-    export function getTextHeight(textElement: D3.Selection) {
-      var originalText = textElement.text();
-      textElement.text("bqpdl");
-      var height = DOMUtils.getBBox(textElement).height;
-      textElement.text(originalText);
+    export function getTextHeight(selection: D3.Selection) {
+      var height: number;
+      if (selection.node().nodeName === "text") {
+        var originalText = selection.text();
+        selection.text("bqpdl");
+        height = DOMUtils.getBBox(selection).height;
+        selection.text(originalText);
+      } else {
+        var text = selection.append("text");
+        text.text("bqpdl");
+        height = DOMUtils.getBBox(text).height;
+        text.remove();
+      }
       return height;
     }
 
@@ -139,7 +147,7 @@ module Plottable {
 
       textElement.text(originalText);
       return {
-        originalText: originalText,
+        originalText: text,
         lines: lines,
         textFits: textFits
       };
@@ -153,8 +161,8 @@ module Plottable {
       if (xOffsetFactor[xAlign] === undefined || yOffsetFactor[yAlign] === undefined) {
         throw new Error("unrecognized alignment x:" + xAlign + ", y:" + yAlign);
       }
-
-      var textEl = g.append("text");
+      var innerG = g.append("g");
+      var textEl = innerG.append("text");
       textEl.text(line);
       var bb = DOMUtils.getBBox(textEl);
       var h = bb.height;
@@ -167,7 +175,7 @@ module Plottable {
       var xOff = width * xOffsetFactor[xAlign];
       var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
       textEl.attr("text-anchor", anchor);
-      Utils.translate(g, xOff, yOff);
+      DOMUtils.translate(innerG, xOff, yOff);
       return [w, h];
     }
 
@@ -187,40 +195,41 @@ module Plottable {
       var xForm = d3.transform("");
       xForm.rotate = rotation === "right" ? 90 : -90;
       xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
-      g.attr("transform", xForm.toString());
+      innerG.attr("transform", xForm.toString());
 
       return [wh[1], wh[0]];
     }
 
-    export function writeTextHorizontally(brokenText: string[],
-                                          g: D3.Selection,
-                                          width: number,
-                                          height: number,
-                                          xAlign = "left",
-                                          yAlign = "top") {
-      var textEls = g.selectAll("text").data(brokenText);
-      textEls.enter().append("text");
-      textEls.exit().remove();
-      textEls.text((x: string) => x)
-             .attr("y", (d: string, i: number) => i + 0.75 + "em");
-      return textEls;
+    export function writeTextHorizontally(brokenText: string[], g: D3.Selection,
+                                          width: number, height: number,
+                                          xAlign = "left", yAlign = "top") {
+      var h = getTextHeight(g);
+      var maxWidth = 0;
+      brokenText.forEach((line: string, i: number) => {
+        var innerG = g.append("g");
+        DOMUtils.translate(innerG, 0, i*h);
+        var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
+        if (wh[0] > maxWidth) {
+          maxWidth = wh[0];
+        }
+      });
+      return [maxWidth, h * brokenText.length];
     }
 
-    export function writeTextVertically(brokenText: string[],
-                                        g: D3.Selection,
-                                        width: number,
-                                        height: number,
-                                        anchor = "middle",
-                                        orient = "right") {
-      var orientLC = orient.toLowerCase();
-      if (orientLC !== "left" && orientLC !== "right") {
-        throw new Error(orient + " is not a valid vertical text orientation");
-      }
-
-      var textEls = writeTextHorizontally(brokenText, g, height, width, orientLC);
-      var xform = orientLC === "right" ? "rotate(-90)" : "rotate(90)";
-      g.attr("transform", xform);
-      return textEls;
+    export function writeTextVertically(brokenText: string[], g: D3.Selection,
+                                          width: number, height: number,
+                                          xAlign = "left", yAlign = "top", rotation = "left") {
+      var h = getTextHeight(g);
+      var maxHeight = 0;
+      brokenText.forEach((line: string, i: number) => {
+        var innerG = g.append("g");
+        DOMUtils.translate(innerG, i*h, 0);
+        var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
+        if (wh[1] > maxHeight) {
+          maxHeight = wh[1];
+        }
+      });
+      return [h * brokenText.length, maxHeight];
     }
 
     function getWrappedTextFromG(text: string, width: number, height: number, g: D3.Selection): IWrappedText {
@@ -255,13 +264,11 @@ module Plottable {
       var wrappedText = getWrappedTextFromG(text, primaryDimension, secondaryDimension, innerG);
 
       var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-      wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
-      var primaryUsed = 0;
-      var secondaryUsed = 0;
+      var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
       return {
         textFits: wrappedText.textFits,
-        usedWidth: orientHorizontally ? primaryUsed : secondaryUsed,
-        usedHeight: orientHorizontally ? secondaryUsed: primaryUsed
+        usedWidth: wh[0],
+        usedHeight: wh[1]
       };
     }
   }
