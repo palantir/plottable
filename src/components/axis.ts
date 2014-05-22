@@ -7,6 +7,7 @@ module Plottable {
     public _axisScale: Scale;
     private _showEndTickLabels = false;
     private tickPositioning = "center";
+    public static _DEFAULT_TICK_SIZE = 6;
 
     /**
      * Creates an Axis.
@@ -322,7 +323,7 @@ module Plottable {
         var positionLC = position.toLowerCase();
         if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
           if (positionLC === "center") {
-            this.tickSize(6); // default tick size
+            this.tickSize(XAxis._DEFAULT_TICK_SIZE);
           } else {
             this.tickSize(12); // longer than default tick size
           }
@@ -456,7 +457,7 @@ module Plottable {
         var positionLC = position.toLowerCase();
         if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
           if (positionLC === "middle") {
-            this.tickSize(6); // default tick size
+            this.tickSize(YAxis._DEFAULT_TICK_SIZE);
           } else {
             this.tickSize(30); // longer than default tick size
           }
