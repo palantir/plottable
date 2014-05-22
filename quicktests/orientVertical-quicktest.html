@@ -1,0 +1,73 @@
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../plottable.js"></script>
+<script src="../examples/exampleUtil.js"></script>
+<script type="text/javascript">
+var format = function (d) {
+                    if (typeof d === "number") {
+                        if (Math.abs(d) < 1) {
+                            return String(Math.round(1000 * d) / 1000);
+                        }
+                        return numberFormatter(d);
+                    }
+                    return d;
+                } 
+var format_frac = function (d) {
+                    if (typeof d === "number") {
+                        if (Math.abs(d) < 1) {
+                            return String(Math.round(1000 * d) + "/1000");
+                        }
+                        return numberFormatter(d);
+                    }
+                    return d;
+                } 
+
+var xAxis;
+var yAxis;
+var basicTable;
+
+window.onload = function() {
+    var data = makeRandomData(20);
+
+    var svg = d3.select("#chart");
+    svg.attr("width", 480).attr("height", 320);
+
+    var xScale = new Plottable.LinearScale();
+    xAxis = new Plottable.XAxis(xScale, "bottom");
+
+    var yScale = new Plottable.LinearScale();
+    yAxis = new Plottable.YAxis(yScale, "left");
+
+    var renderAreaD1 = new Plottable.CircleRenderer(data, xScale, yScale);
+    basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
+                                          .addComponent(0, 1, renderAreaD1)
+                                          .addComponent(1, 1, xAxis);
+
+    basicTable.renderTo(svg);    
+};
+
+function button1Callback() {
+    console.log(yAxis.orient());
+}
+function button2Callback() {
+    yAxis.orient("left");
+    basicTable.renderTo();
+}
+function button3Callback() {
+    yAxis.orient("right");
+    basicTable.renderTo();
+}
+</script>
+<link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css">
+<style type="text/css">
+/*-- Add custom styles after this line --*/
+.demo-title { font-size: 24pt; }
+ .plottable .axis .tick line { opacity: 1; }
+</style>
+<div class="demo-title">Simple Chart</div>
+<br>
+<svg id="chart"></svg>
+<p />
+    <button onclick="button1Callback()">print yAxis orient</button>
+    <button onclick="button2Callback()"> yAxis orient left</button>
+    <button onclick="button3Callback()"> yAxis orient right</button>
+
