@@ -346,7 +346,6 @@ var Plottable;
             textElement.text(originalText);
             return lines;
         }
-<<<<<<< HEAD
         Utils.getWrappedText = getWrappedText;
 
         function getSVGPixelWidth(svg) {
@@ -544,11 +543,6 @@ var Plottable;
         ;
     })(Plottable.OSUtils || (Plottable.OSUtils = {}));
     var OSUtils = Plottable.OSUtils;
-=======
-        TextUtils.getWrappedText = getWrappedText;
-    })(Plottable.TextUtils || (Plottable.TextUtils = {}));
-    var TextUtils = Plottable.TextUtils;
->>>>>>> master
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -3926,12 +3920,9 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 /// <reference path="utils/utils.ts" />
 /// <reference path="utils/osUtils.ts" />
-<<<<<<< HEAD
-=======
 /// <reference path="utils/idCounter.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/textUtils.ts" />
->>>>>>> master
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
