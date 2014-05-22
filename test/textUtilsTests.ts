@@ -1,7 +1,7 @@
 ///<reference path="testReference.ts" />
 
 var assert = chai.assert;
-
+var tu = Plottable.TextUtils;
 describe("TextUtils", () => {
   it("getTruncatedText works properly", () => {
     var svg = generateSVG();
@@ -78,4 +78,69 @@ describe("TextUtils", () => {
 
     svg.remove();
   });
+  describe("writeLineHorizontally", () => {
+    var svg: D3.Selection;
+    var g: D3.Selection;
+    var text = "hello world";
+    it("performs basic functionality and defaults to left, top", () => {
+      svg = generateSVG(400, 400);
+      g = svg.append("g");
+      var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400);
+      var textEl = g.select("text");
+      assert.equal(textEl.text(), text, "it wrote text as expected");
+      var bb = Plottable.DOMUtils.getBBox(textEl);
+      assert.equal(bb.width, wh[0], "width measurement is as expected");
+      assert.equal(bb.height, wh[1], "height measurement is as expected");
+      assert.equal(bb.x, 0, "the x position is zero");
+      assert.closeTo(bb.y, 0, 10, "the y position is close to zero");
+      svg.remove();
+    });
+    it("center, center alignment works", () => {
+      svg = generateSVG(400, 400);
+      g = svg.append("g");
+      var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "center", "center");
+      var textEl = g.select("text");
+      var bb = Plottable.DOMUtils.getBBox(textEl);
+      assert.equal(bb.width, wh[0], "width measurement is as expected");
+      assert.equal(bb.height, wh[1], "height measurement is as expected");
+      assert.equal(bb.x, bb.w/ -2, "the x position is zero");
+      assert.closeTo(bb.y, 0, 10, "the y position is close to zero");
+
+
+      })
+  });
 });
+  // describe("writeTextHorizontally", () => {
+  //   it("works for single lines of text", () => {
+  //     var svg = generateSVG(200, 50);
+  //     var textEls = Plottable.TextUtils.writeTextHorizontally(["hello world"], svg, 200, 50, "left");
+  //     assert.lengthOf(textEls[0], 1, "there is one text element");
+  //     assert.equal(textEls.text(), "hello world", "the whole text was written");
+  //     assert.equal(textEls.node().getBBox().x, 0, "the x aligns with the left edge")
+  //     // svg.remove();
+  //   });
+
+  //   it("works for multiple lines of text", () => {
+  //     var svg = generateSVG(200, 50);
+  //     var textEls = Plottable.TextUtils.writeTextHorizontally(["hello", "world"], svg, 200, 50, "left");
+  //     assert.lengthOf(textEls[0], 2, "there are two text elements");
+  //     assert.equal(d3.select(textEls[0][0]).text(), "hello");
+  //     assert.equal(d3.select(textEls[0][1]).text(), "world");
+  //     assert.deepEqual(textEls[0][0].getBBox().x, 0, "x aligned left");
+  //     assert.deepEqual(textEls[0][1].getBBox().x, 0, "x aligned left");
+  //     // svg.remove();
+  //   });
+  // });
+  // describe("writeTextVertically", () => {
+  //   it("works for multiple lines", () => {
+  //     var svg = generateSVG(50, 300);
+  //     var g = svg.append("g");
+  //     var strings = ["hello", "world"];
+  //     var textEls = Plottable.TextUtils.writeTextVertically(strings, g, 50, 300, "left", "left");
+  //     assert.lengthOf(textEls[0], 2, "there are two text elements");
+  //     assert.equal(d3.select(textEls[0][0]).text(), "hello");
+  //     assert.equal(d3.select(textEls[0][1]).text(), "world");
+
+  //   });
+//   });
+// });

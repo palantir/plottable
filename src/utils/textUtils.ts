@@ -145,17 +145,43 @@ module Plottable {
       };
     }
 
+    export function writeLineHorizontally(line: string,
+                                          g: D3.Selection,
+                                          width: number,
+                                          height: number,
+                                          xAlign = "left",
+                                          yAlign = "top") {
+      var textEl = g.append("text");
+      textEl.text(line);
+      var bb = DOMUtils.getBBox(textEl);
+      var h = bb.height;
+      var w = bb.width;
+      if (w > width || h > height) {
+        throw new Error("Insufficient space to fit text");
+      }
+      var anchorConverter: {[s: string]: string} = {left: "start", center: "middle", right: "end"};
+      var anchor: string = anchorConverter[xAlign];
+      var xOffsetFactor: {[s: string]: number} = {left: 0, center: 0.5, right: 1};
+      var yOffsetFactor: {[s: string]: number} = {top: 0, center: 0.5, bottom: 1};
+      var yEmsOffset = (s: string) => 1 - yOffsetFactor[s];
+      var xOff = width * xOffsetFactor[xAlign];
+      var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
+      textEl.attr("text-anchor", anchor);
+      g.attr("transform", "translate(" + xOff + "," + yOff + ")");
+      return [w, h];
+    }
+
     export function writeTextHorizontally(brokenText: string[],
                                           g: D3.Selection,
                                           width: number,
                                           height: number,
-                                          anchor = "middle") {
+                                          xAlign = "left",
+                                          yAlign = "top") {
       var textEls = g.selectAll("text").data(brokenText);
       textEls.enter().append("text");
       textEls.exit().remove();
       textEls.text((x: string) => x)
-             .attr("y", (d: string, i: number) => i + 0.75 + "em")
-             .style("text-anchor", anchor);
+             .attr("y", (d: string, i: number) => i + 0.75 + "em");
       return textEls;
     }
 
@@ -163,14 +189,15 @@ module Plottable {
                                         g: D3.Selection,
                                         width: number,
                                         height: number,
-                                        orient = "left") {
+                                        anchor = "middle",
+                                        orient = "right") {
       var orientLC = orient.toLowerCase();
       if (orientLC !== "left" && orientLC !== "right") {
         throw new Error(orient + " is not a valid vertical text orientation");
       }
 
       var textEls = writeTextHorizontally(brokenText, g, height, width, orientLC);
-      var xform = orientLC === "right" ? "rotate(90)" : "rotate(-90)";
+      var xform = orientLC === "right" ? "rotate(-90)" : "rotate(90)";
       g.attr("transform", xform);
       return textEls;
     }
@@ -203,15 +230,13 @@ module Plottable {
       var innerG = g.append("g"); // unleash your inner G
       // the outerG contains general transforms for positining the whole block, the inner g
       // will contain transforms specific to orienting the text properly within the block.
-      if (!orientHorizontally) {
-        // throw new Error("vertical text writing not yet implemented");
-        orientHorizontally = true;
-      }
+
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
       var wrappedText = getWrappedTextFromG(text, primaryDimension, secondaryDimension, innerG);
 
-      writeTextHorizontally(wrappedText.lines, innerG, width, height, xOrient);
+      var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+      wTF(wrappedText.lines, innerG, width, height, xOrient);
       var bandWidthConverter: {[key: string]: number} = {left: 0, right: 1, middle: 0.5};
       var offset = bandWidthConverter[xOrient] * width;
       innerG.attr("transform", "translate(" + offset + ", 0)");
