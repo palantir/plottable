@@ -1844,7 +1844,34 @@ var PerfDiagnostics;
 })(PerfDiagnostics || (PerfDiagnostics = {}));
 window.report = PerfDiagnostics.logResults;
 ///<reference path="testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var assert = chai.assert;
+
+var Plottable;
+(function (Plottable) {
+    /**
+    * A mock that keeps track of how many times _render() was
+    * called - useful for checking DataSource callbacks.
+    */
+    var CountingRenderer = (function (_super) {
+        __extends(CountingRenderer, _super);
+        function CountingRenderer(dataset) {
+            _super.call(this, dataset);
+            this.renders = 0;
+        }
+        CountingRenderer.prototype._render = function () {
+            ++this.renders;
+            return _super.prototype._render.call(this);
+        };
+        return CountingRenderer;
+    })(Plottable.Renderer);
+    Plottable.CountingRenderer = CountingRenderer;
+})(Plottable || (Plottable = {}));
 
 var quadraticDataset = makeQuadraticSeries(10);
 
@@ -1862,13 +1889,80 @@ describe("Renderers", function () {
             r._anchor(svg)._computeLayout();
             var renderArea = r.content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
+            svg.remove();
+        });
+
+        it("Allows the DataSource to be changed", function () {
+            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+            var r = new Plottable.Renderer(d1);
+            assert.equal(d1, r.dataSource(), "returns the original");
 
             var d2 = new Plottable.DataSource(["bar"], { cssClass: "boo" });
-            assert.throws(function () {
-                return r.dataSource(d2);
-            }, Error);
+            r.dataSource(d2);
+            assert.equal(d2, r.dataSource(), "returns new datasource");
+        });
 
-            svg.remove();
+        it("Changes DataSource listeners when the DataSource is changed", function () {
+            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+            var r = new Plottable.CountingRenderer(d1);
+
+            assert.equal(0, r.renders, "initially hasn't rendered anything");
+
+            d1._broadcast();
+            assert.equal(1, r.renders, "we re-render when our datasource changes");
+
+            r.dataSource();
+            assert.equal(1, r.renders, "we shouldn't redraw when querying the datasource");
+
+            var d2 = new Plottable.DataSource(["bar"], { cssClass: "boo" });
+            r.dataSource(d2);
+            assert.equal(2, r.renders, "we should redraw when we change datasource");
+
+            d1._broadcast();
+            assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
+
+            d2._broadcast();
+            assert.equal(3, r.renders, "we should listen to the new datasource");
+        });
+
+        it("Updates its projectors when the DataSource is changed", function () {
+            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+            var r = new Plottable.Renderer(d1);
+
+            var xScaleCalls = 0;
+            var yScaleCalls = 0;
+            var xScale = new Plottable.LinearScale();
+            var yScale = new Plottable.LinearScale();
+            r.project("x", null, xScale);
+            r.project("y", null, yScale);
+            xScale.registerListener(null, function (broadcaster) {
+                assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
+                ++xScaleCalls;
+            });
+            yScale.registerListener(null, function (broadcaster) {
+                assert.equal(broadcaster, yScale, "Callback received the calling scale as the first argument");
+                ++yScaleCalls;
+            });
+
+            assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
+            assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
+
+            d1._broadcast();
+            assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
+            assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
+
+            var d2 = new Plottable.DataSource(["bar"], { cssClass: "boo" });
+            r.dataSource(d2);
+            assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
+            assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
+
+            d1._broadcast();
+            assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
+            assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
+
+            d2._broadcast();
+            assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
+            assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
         });
 
         it("Renderer automatically generates a DataSource if only data is provided", function () {

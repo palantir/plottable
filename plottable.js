@@ -1628,18 +1628,31 @@ var Plottable;
             var _this = this;
             if (source == null) {
                 return this._dataSource;
-            } else if (this._dataSource == null) {
-                this._dataSource = source;
-                this._registerToBroadcaster(this._dataSource, function () {
-                    _this._dataChanged = true;
-                    _this._render();
-                });
-                this._dataChanged = true;
-                this._render();
-                return this;
-            } else {
-                throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
             }
+            var oldSource = this._dataSource;
+            if (oldSource != null) {
+                this._deregisterFromBroadcaster(this._dataSource);
+                this._requireRerender = true;
+                this._rerenderUpdateSelection = true;
+
+                // point all scales at the new datasource
+                d3.keys(this._projectors).forEach(function (attrToSet) {
+                    var projector = _this._projectors[attrToSet];
+                    if (projector.scale != null) {
+                        var rendererIDAttr = _this._plottableID + attrToSet;
+                        projector.scale._removePerspective(rendererIDAttr);
+                        projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
+                    }
+                });
+            }
+            this._dataSource = source;
+            this._registerToBroadcaster(this._dataSource, function () {
+                _this._dataChanged = true;
+                _this._render();
+            });
+            this._dataChanged = true;
+            this._render();
+            return this;
         };
 
         Renderer.prototype.project = function (attrToSet, accessor, scale) {
