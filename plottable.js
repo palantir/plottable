@@ -1757,6 +1757,10 @@ var Plottable;
             });
             var toRender = d3.values(RenderController.componentsNeedingRender);
             toRender.forEach(function (c) {
+                return c._render();
+            }); // call _render on everything, so that containers will put their children in the toRender queue
+            toRender = d3.values(RenderController.componentsNeedingRender);
+            toRender.forEach(function (c) {
                 return c._doRender();
             });
             RenderController.componentsNeedingComputeLayout = {};
