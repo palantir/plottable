@@ -87,15 +87,13 @@ module Plottable {
         var bandStartPosition: number = self._scale.scale(d);
         d3.select(this).selectAll("g").remove();
         var g = d3.select(this).append("g");
-
         var x = self.isVertical ? 0 : bandStartPosition;
         var y = self.isVertical ? bandStartPosition : 0;
         g.attr("transform", "translate(" + x + "," + y + ")");
-        var o = self.orientation;
-        var anchor = (o === "top" || o === "bottom") ? "middle" : o;
-        var xOrient = this.isVertical ? "left" : "middle";
-        var yOrient = "middle";
-        var textWriteResult = TextUtils.writeText(d, g, width, height, xOrient, yOrient);
+        var xAlign: {[s: string]: string} = {left: "right", right: "left", top: "center", bottom: "center"};
+        var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
+
+        var textWriteResult = TextUtils.writeText(d, g, width, height, xAlign[self.orientation], yAlign[self.orientation]);
         textWriteResults.push(textWriteResult);
       });
 

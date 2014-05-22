@@ -145,12 +145,9 @@ module Plottable {
       };
     }
 
-    export function writeLineHorizontally(line: string,
-                                          g: D3.Selection,
-                                          width: number,
-                                          height: number,
-                                          xAlign = "left",
-                                          yAlign = "top") {
+    export function writeLineHorizontally(line: string, g: D3.Selection,
+                                          width: number, height: number,
+                                          xAlign = "left", yAlign = "top") {
       var xOffsetFactor: {[s: string]: number} = {left: 0, center: 0.5, right: 1};
       var yOffsetFactor: {[s: string]: number} = {top: 0, center: 0.5, bottom: 1};
       if (xOffsetFactor[xAlign] === undefined || yOffsetFactor[yAlign] === undefined) {
@@ -247,9 +244,7 @@ module Plottable {
      * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
     export function writeText(text: string, g: D3.Selection, width: number, height: number,
-                              xOrient = "middle", yOrient = "middle"): IWriteTextResult {
-      xOrient = (<any> window).xOrient != null ? (<any> window).xOrient : xOrient;
-      yOrient = (<any> window).yOrient != null ? (<any> window).yOrient : yOrient;
+                              xAlign: string, yAlign: string): IWriteTextResult {
       var orientHorizontally = width * 1.4 > height;
       var innerG = g.append("g"); // unleash your inner G
       // the outerG contains general transforms for positining the whole block, the inner g
