@@ -103,31 +103,33 @@ module Plottable {
       var textFits = true;
 
       var lineStartPosition = 0;
-      for (var i = 1; i < numChars; i++) {
-        var testLength = textNode.getSubStringLength(lineStartPosition, i-lineStartPosition);
+      if (textNode.getComputedTextLength() > availableWidth) { // won't fit
+        for (var i = 1; i < numChars; i++) {
+          var testLength = textNode.getSubStringLength(lineStartPosition, i-lineStartPosition);
 
-        if (testLength > cutoffStart) {
-          var currentCharacter = text.charAt(i);
-          if (testLength > cutoffEnd) {
-            if (lines.length + 1 >= linesAvailable) {
-              remainingText = text.substring(lineStartPosition, text.length).trim();
-              lines.push(getTruncatedText(remainingText, availableWidth , textElement));
-              textFits = false;
-              break;
+          if (testLength > cutoffStart) {
+            var currentCharacter = text.charAt(i);
+            if (testLength > cutoffEnd) {
+              if (lines.length + 1 >= linesAvailable) {
+                remainingText = text.substring(lineStartPosition, text.length).trim();
+                lines.push(getTruncatedText(remainingText, availableWidth , textElement));
+                textFits = false;
+                break;
+              }
+              // break line on the previous character to leave room for the hyphen
+              lines.push(text.substring(lineStartPosition, i-1).trim() + "-");
+              lineStartPosition = i-1;
+            } else if (currentCharacter === " ") {
+              if (lines.length + 1 >= linesAvailable) {
+                remainingText = text.substring(lineStartPosition, text.length).trim();
+                lines.push(getTruncatedText(remainingText, availableWidth , textElement));
+                textFits = false;
+                break;
+              }
+              // break line after the current character
+              lines.push(text.substring(lineStartPosition, i+1).trim());
+              lineStartPosition = i+1;
             }
-            // break line on the previous character to leave room for the hyphen
-            lines.push(text.substring(lineStartPosition, i-1).trim() + "-");
-            lineStartPosition = i-1;
-          } else if (currentCharacter === " ") {
-            if (lines.length + 1 >= linesAvailable) {
-              remainingText = text.substring(lineStartPosition, text.length).trim();
-              lines.push(getTruncatedText(remainingText, availableWidth , textElement));
-              textFits = false;
-              break;
-            }
-            // break line after the current character
-            lines.push(text.substring(lineStartPosition, i+1).trim());
-            lineStartPosition = i+1;
           }
         }
       }
