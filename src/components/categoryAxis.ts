@@ -59,18 +59,13 @@ module Plottable {
       var height = this.isVertical ? bandWidth : offeredHeight;
       var textResult = this.writeText(width, height);
 
-      var desiredWidth  = this.isVertical ? textResult.usedWidth : 0;
-      var desiredHeight = this.isVertical ? 0 : textResult.usedHeight;
-      var wantsWidth    = this.isVertical ? !textResult.textFits : false;
-      var wantsHeight   = this.isVertical ? false : !textResult.textFits;
-      console.log("OW:" + offeredWidth + ", " + ", OH:" + offeredHeight + ", DW:" + desiredWidth + ", DH:" + desiredHeight);
       this.content.selectAll(".tick").remove();
 
       return {
-        width : desiredWidth,
-        height: desiredHeight,
-        wantsWidth : wantsWidth,
-        wantsHeight: wantsHeight
+        width : textResult.usedWidth,
+        height: textResult.usedHeight,
+        wantsWidth : !textResult.textFits,
+        wantsHeight: !textResult.textFits
       };
     }
 
@@ -97,10 +92,12 @@ module Plottable {
         textWriteResults.push(textWriteResult);
       });
 
+      var widthFn = this.isVertical ? d3.max : d3.sum;
+      var heightFn = this.isVertical ? d3.sum : d3.max;
       return {
         textFits: textWriteResults.every((t: TextUtils.IWriteTextResult) => t.textFits),
-        usedWidth : d3.max(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedWidth),
-        usedHeight: d3.max(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedHeight)
+        usedWidth : widthFn(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedWidth),
+        usedHeight: heightFn(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedHeight)
       };
 
     }
