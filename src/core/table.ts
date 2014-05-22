@@ -133,7 +133,7 @@ module Plottable {
         var yWeights: number[];
         if (wantsHeight) {
           yWeights = guarantees.wantsHeightArr.map((x) => x ? 0.2 : 0);
-          yWeights = Utils.addArrays(xWeights, rowWeights);
+          yWeights = Utils.addArrays(yWeights, rowWeights);
         } else {
           yWeights = rowWeights;
         }
