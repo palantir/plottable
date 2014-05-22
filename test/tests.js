@@ -546,6 +546,18 @@ describe("ComponentContainer", function () {
 
         assert.deepEqual(container.components(), [], "all components were removed");
     });
+
+    it("components() returns a shallow copy", function () {
+        var container = new Plottable.ComponentContainer();
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        container._addComponent(c1);
+        container._addComponent(c2);
+
+        var componentList = container.components();
+        componentList.pop();
+        assert.deepEqual(container.components(), [c1, c2], "internal list of components was not changed");
+    });
 });
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
