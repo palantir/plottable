@@ -173,7 +173,7 @@ module Plottable {
 
     export function writeLineVertically(line: string, g: D3.Selection,
                                         width: number, height: number,
-                                        rotation = "right", xAlign = "left", yAlign = "top") {
+                                        xAlign = "left", yAlign = "top", rotation = "right") {
 
       if (rotation !== "right" && rotation !== "left") {
         throw new Error("unreckognized rotation: " + rotation);
@@ -255,16 +255,9 @@ module Plottable {
       var wrappedText = getWrappedTextFromG(text, primaryDimension, secondaryDimension, innerG);
 
       var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-      wTF(wrappedText.lines, innerG, width, height, xOrient);
-      var bandWidthConverter: {[key: string]: number} = {left: 0, right: 1, middle: 0.5};
-      var offset = bandWidthConverter[xOrient] * width;
-      innerG.attr("transform", "translate(" + offset + ", 0)");
-      var bboxes: SVGRect[] = [];
-      innerG.selectAll("text").each(function(d, i) {
-        bboxes.push(this.getBBox());
-      });
-      var primaryUsed = d3.max(bboxes, (b: SVGRect) => b.width);
-      var secondaryUsed = d3.sum(bboxes, (b: SVGRect) => b.height);
+      wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
+      var primaryUsed = 0;
+      var secondaryUsed = 0;
       return {
         textFits: wrappedText.textFits,
         usedWidth: orientHorizontally ? primaryUsed : secondaryUsed,
