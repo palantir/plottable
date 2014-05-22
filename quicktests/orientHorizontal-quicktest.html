@@ -10,7 +10,7 @@ var format = function (d) {
                         return numberFormatter(d);
                     }
                     return d;
-                } 
+                }
 var format_frac = function (d) {
                     if (typeof d === "number") {
                         if (Math.abs(d) < 1) {
@@ -19,7 +19,7 @@ var format_frac = function (d) {
                         return numberFormatter(d);
                     }
                     return d;
-                } 
+                }
 
 var xAxis;
 var yAxis;
@@ -42,7 +42,7 @@ window.onload = function() {
                                           .addComponent(0, 1, renderAreaD1)
                                           .addComponent(1, 1, xAxis);
 
-    basicTable.renderTo(svg);    
+    basicTable.renderTo(svg);
 };
 
 function button1Callback() {

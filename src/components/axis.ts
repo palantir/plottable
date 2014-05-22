@@ -333,7 +333,6 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      console.log(this._height);
       if (this.orient() === "top")  {
         this.axisElement.attr("transform", "translate(0," + this._height + ")");
       } else if (this.orient() === "bottom") {
