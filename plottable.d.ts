@@ -196,15 +196,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Component extends PlottableObject {
-        public element: D3.Selection;
-        public content: D3.Selection;
-        public backgroundContainer: D3.Selection;
-        public foregroundContainer: D3.Selection;
-        public clipPathEnabled: boolean;
-        public availableWidth: number;
-        public availableHeight: number;
-        public xOrigin: number;
-        public yOrigin: number;
         /**
         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
         *
@@ -459,9 +450,6 @@ declare module Plottable {
         scale?: Scale;
     }
     class Renderer extends Component {
-        public renderArea: D3.Selection;
-        public element: D3.Selection;
-        public scales: Scale[];
         /**
         * Creates a Renderer.
         *
@@ -799,9 +787,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class XYRenderer extends Renderer {
-        public dataSelection: D3.UpdateSelection;
-        public xScale: Scale;
-        public yScale: Scale;
         /**
         * Creates an XYRenderer.
         *
@@ -856,9 +841,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class GridRenderer extends XYRenderer {
-        public colorScale: Scale;
-        public xScale: OrdinalScale;
-        public yScale: OrdinalScale;
         /**
         * Creates a GridRenderer.
         *
@@ -966,8 +948,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Interaction {
-        public hitBox: D3.Selection;
-        public componentToListenTo: Component;
         /**
         * Creates an Interaction.
         *
@@ -1025,8 +1005,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class PanZoomInteraction extends Interaction {
-        public xScale: QuantitiveScale;
-        public yScale: QuantitiveScale;
         /**
         * Creates a PanZoomInteraction.
         *
@@ -1041,8 +1019,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class DragInteraction extends Interaction {
-        public origin: number[];
-        public location: number[];
         public callbackToCall: (dragInfo: any) => any;
         /**
         * Creates a DragInteraction.
@@ -1061,8 +1037,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class DragBoxInteraction extends DragInteraction {
-        public dragBox: D3.Selection;
-        public boxIsDrawn: boolean;
         /**
         * Clears the highlighted drag-selection box drawn by the AreaInteraction.
         *
@@ -1111,7 +1085,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Axis extends Component {
-        public axisElement: D3.Selection;
         /**
         * Creates an Axis.
         *
