@@ -1,5 +1,5 @@
 /*!
-Plottable 0.12.4 (https://github.com/palantir/plottable)
+Plottable 0.13.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -175,6 +175,7 @@ var Plottable;
             this.keyValuePairs.push([key, value]);
             return false;
         };
+<<<<<<< HEAD
 
         StrictEqualityAssociativeArray.prototype.get = function (key) {
             for (var i = 0; i < this.keyValuePairs.length; i++) {
@@ -200,6 +201,33 @@ var Plottable;
             });
         };
 
+=======
+
+        StrictEqualityAssociativeArray.prototype.get = function (key) {
+            for (var i = 0; i < this.keyValuePairs.length; i++) {
+                if (this.keyValuePairs[i][0] === key) {
+                    return this.keyValuePairs[i][1];
+                }
+            }
+            return undefined;
+        };
+
+        StrictEqualityAssociativeArray.prototype.has = function (key) {
+            for (var i = 0; i < this.keyValuePairs.length; i++) {
+                if (this.keyValuePairs[i][0] === key) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        StrictEqualityAssociativeArray.prototype.values = function () {
+            return this.keyValuePairs.map(function (x) {
+                return x[1];
+            });
+        };
+
+>>>>>>> master
         StrictEqualityAssociativeArray.prototype.delete = function (key) {
             for (var i = 0; i < this.keyValuePairs.length; i++) {
                 if (this.keyValuePairs[i][0] === key) {
@@ -628,14 +656,14 @@ var Plottable;
 
             xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
             xPosition += this._xOffset;
-            if (this.isFixedWidth()) {
+            if (this._isFixedWidth()) {
                 // Decrease size so hitbox / bounding box and children are sized correctly
                 availableWidth = Math.min(availableWidth, requestedSpace.width);
             }
 
             yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
             yPosition += this._yOffset;
-            if (this.isFixedHeight()) {
+            if (this._isFixedHeight()) {
                 availableHeight = Math.min(availableHeight, requestedSpace.height);
             }
 
@@ -869,7 +897,7 @@ var Plottable;
         *
         * @return {boolean} Whether the component has a fixed width.
         */
-        Component.prototype.isFixedWidth = function () {
+        Component.prototype._isFixedWidth = function () {
             // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
             // some fixed size you aspire to.
             // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
@@ -883,7 +911,7 @@ var Plottable;
         *
         * @return {boolean} Whether the component has a fixed height.
         */
-        Component.prototype.isFixedHeight = function () {
+        Component.prototype._isFixedHeight = function () {
             return this._requestedSpace(-1, -1).wantsHeight;
         };
 
@@ -971,9 +999,10 @@ var Plottable;
 
         ComponentContainer.prototype._addComponent = function (c, prepend) {
             if (typeof prepend === "undefined") { prepend = false; }
-            if (c == null) {
-                return this;
+            if (c == null || this._components.indexOf(c) >= 0) {
+                return false;
             }
+
             if (prepend) {
                 this._components.unshift(c);
             } else {
@@ -984,7 +1013,7 @@ var Plottable;
                 c._anchor(this.content);
             }
             this._invalidateLayout();
-            return this;
+            return true;
         };
 
         /**
@@ -993,7 +1022,7 @@ var Plottable;
         * @returns{Component[]} the contained Components
         */
         ComponentContainer.prototype.components = function () {
-            return this._components;
+            return this._components.slice();
         };
 
         /**
@@ -1083,15 +1112,19 @@ var Plottable;
             return this;
         };
 
+<<<<<<< HEAD
         ComponentGroup.prototype.isFixedWidth = function () {
+=======
+        ComponentGroup.prototype._isFixedWidth = function () {
+>>>>>>> master
             return this._components.every(function (c) {
-                return c.isFixedWidth();
+                return c._isFixedWidth();
             });
         };
 
-        ComponentGroup.prototype.isFixedHeight = function () {
+        ComponentGroup.prototype._isFixedHeight = function () {
             return this._components.every(function (c) {
-                return c.isFixedHeight();
+                return c._isFixedHeight();
             });
         };
         return ComponentGroup;
@@ -1136,17 +1169,18 @@ var Plottable;
         * @param {Component} component The Component to be added.
         */
         Table.prototype.addComponent = function (row, col, component) {
-            this.nRows = Math.max(row + 1, this.nRows);
-            this.nCols = Math.max(col + 1, this.nCols);
-            this.padTableToSize(this.nRows, this.nCols);
+            if (this._addComponent(component)) {
+                this.nRows = Math.max(row + 1, this.nRows);
+                this.nCols = Math.max(col + 1, this.nCols);
+                this.padTableToSize(this.nRows, this.nCols);
 
-            var currentComponent = this.rows[row][col];
-            if (currentComponent != null) {
-                throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+                var currentComponent = this.rows[row][col];
+                if (currentComponent != null) {
+                    throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+                }
+
+                this.rows[row][col] = component;
             }
-
-            this.rows[row][col] = component;
-            this._addComponent(component);
             return this;
         };
 
@@ -1181,10 +1215,10 @@ var Plottable;
             var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
 
             var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, function (c) {
-                return (c == null) || c.isFixedHeight();
+                return (c == null) || c._isFixedHeight();
             });
             var colWeights = Table.calcComponentWeights(this.colWeights, cols, function (c) {
-                return (c == null) || c.isFixedWidth();
+                return (c == null) || c._isFixedWidth();
             });
 
             // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
@@ -1379,16 +1413,16 @@ var Plottable;
             return this;
         };
 
-        Table.prototype.isFixedWidth = function () {
+        Table.prototype._isFixedWidth = function () {
             var cols = d3.transpose(this.rows);
             return Table.fixedSpace(cols, function (c) {
-                return (c == null) || c.isFixedWidth();
+                return (c == null) || c._isFixedWidth();
             });
         };
 
-        Table.prototype.isFixedHeight = function () {
+        Table.prototype._isFixedHeight = function () {
             return Table.fixedSpace(this.rows, function (c) {
-                return (c == null) || c.isFixedHeight();
+                return (c == null) || c._isFixedHeight();
             });
         };
 
@@ -1444,10 +1478,10 @@ var Plottable;
                     return a && b;
                 });
             };
-            var groupIsFixed = function (components) {
+            var group_isFixed = function (components) {
                 return all(components.map(fixityAccessor));
             };
-            return all(componentGroup.map(groupIsFixed));
+            return all(componentGroup.map(group_isFixed));
         };
         return Table;
     })(Plottable.ComponentContainer);
@@ -1626,18 +1660,31 @@ var Plottable;
             var _this = this;
             if (source == null) {
                 return this._dataSource;
-            } else if (this._dataSource == null) {
-                this._dataSource = source;
-                this._registerToBroadcaster(this._dataSource, function () {
-                    _this._dataChanged = true;
-                    _this._render();
-                });
-                this._dataChanged = true;
-                this._render();
-                return this;
-            } else {
-                throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
             }
+            var oldSource = this._dataSource;
+            if (oldSource != null) {
+                this._deregisterFromBroadcaster(this._dataSource);
+                this._requireRerender = true;
+                this._rerenderUpdateSelection = true;
+
+                // point all scales at the new datasource
+                d3.keys(this._projectors).forEach(function (attrToSet) {
+                    var projector = _this._projectors[attrToSet];
+                    if (projector.scale != null) {
+                        var rendererIDAttr = _this._plottableID + attrToSet;
+                        projector.scale._removePerspective(rendererIDAttr);
+                        projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
+                    }
+                });
+            }
+            this._dataSource = source;
+            this._registerToBroadcaster(this._dataSource, function () {
+                _this._dataChanged = true;
+                _this._render();
+            });
+            this._dataChanged = true;
+            this._render();
+            return this;
         };
 
         Renderer.prototype.project = function (attrToSet, accessor, scale) {
@@ -1754,6 +1801,10 @@ var Plottable;
                 return c._computeLayout();
             });
             var toRender = d3.values(RenderController.componentsNeedingRender);
+            toRender.forEach(function (c) {
+                return c._render();
+            }); // call _render on everything, so that containers will put their children in the toRender queue
+            toRender = d3.values(RenderController.componentsNeedingRender);
             toRender.forEach(function (c) {
                 return c._doRender();
             });
@@ -2843,6 +2894,9 @@ var Plottable;
             this._baselineValue = 0;
             this.classed("bar-renderer", true);
             this.project("width", 10);
+            this.project("fill", function () {
+                return "steelblue";
+            });
         }
         AbstractBarRenderer.prototype._setup = function () {
             _super.prototype._setup.call(this);
@@ -4072,8 +4126,9 @@ var Plottable;
             _super.prototype._doRender.call(this);
             if (this.orient() === "top") {
                 this.axisElement.attr("transform", "translate(0," + this._height + ")");
+            } else if (this.orient() === "bottom") {
+                this.axisElement.attr("transform", "");
             }
-            ;
 
             var tickTextLabels = this.axisElement.selectAll("text");
             if (tickTextLabels[0].length > 0) {
@@ -4204,8 +4259,9 @@ var Plottable;
             _super.prototype._doRender.call(this);
             if (this.orient() === "left") {
                 this.axisElement.attr("transform", "translate(" + this._width + ", 0)");
+            } else if (this.orient() === "right") {
+                this.axisElement.attr("transform", "");
             }
-            ;
 
             var tickTextLabels = this.axisElement.selectAll("text");
             if (tickTextLabels[0].length > 0) {
