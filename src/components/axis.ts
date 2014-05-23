@@ -278,7 +278,7 @@ module Plottable {
      * @param {string} orientation The orientation of the Axis (top/bottom)
      * @param {any} [formatter] a D3 formatter
      */
-    constructor(scale: Scale, orientation: string, formatter: any = null) {
+    constructor(scale: Scale, orientation = "bottom", formatter: any = null) {
       super(scale, orientation, formatter);
       var orientation = orientation.toLowerCase();
       if (orientation !== "top" && orientation !== "bottom") {
@@ -415,7 +415,7 @@ module Plottable {
      * @param {string} orientation The orientation of the Axis (left/right)
      * @param {any} [formatter] a D3 formatter
      */
-    constructor(scale: Scale, orientation: string, formatter: any = null) {
+    constructor(scale: Scale, orientation = "left", formatter: any = null) {
       super(scale, orientation, formatter);
       orientation = orientation.toLowerCase();
       if (orientation !== "left" && orientation !== "right") {
