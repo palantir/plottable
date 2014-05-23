@@ -4082,7 +4082,7 @@ var Plottable;
             if (this.orient() === "top") {
                 this.axisElement.attr("transform", "translate(0," + this._height + ")");
             } else if (this.orient() === "bottom") {
-                this.axisElement.attr("transform", null);
+                this.axisElement.attr("transform", "");
             }
 
             var tickTextLabels = this.axisElement.selectAll("text");
@@ -4215,7 +4215,7 @@ var Plottable;
             if (this.orient() === "left") {
                 this.axisElement.attr("transform", "translate(" + this._width + ", 0)");
             } else if (this.orient() === "right") {
-                this.axisElement.attr("transform", null);
+                this.axisElement.attr("transform", "");
             }
 
             var tickTextLabels = this.axisElement.selectAll("text");
