@@ -142,8 +142,8 @@ describe("Renderers", () => {
       yScale.domain([400, 0]);
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var metadata = {foo: 10, bar: 20};
-      var xAccessor = (d, i?, m?) => d.x + i * m.foo;
-      var yAccessor = (d, i?, m?) => m.bar;
+      var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
+      var yAccessor = (d: any, i?: number, m?: any) => m.bar;
       var dataSource = new Plottable.DataSource(data, metadata);
       var renderer = new Plottable.CircleRenderer(dataSource, xScale, yScale)
                                   .project("x", xAccessor)
@@ -178,24 +178,21 @@ describe("Renderers", () => {
       // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
       // draws properly for the LineRenderer
       var svg: D3.Selection;
-      var xScale;
-      var yScale;
-      var lineRenderer;
+      var xScale = new Plottable.LinearScale().domain([0, 1]);
+      var yScale = new Plottable.LinearScale().domain([0, 1]);
+      var xAccessor = (d: any) => d.foo;
+      var yAccessor = (d: any) => d.bar;
+      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      var renderArea;
+      var lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale)
+                                      .project("x", xAccessor)
+                                      .project("y", yAccessor)
+                                      .project("stroke", colorAccessor);
+      var renderArea: D3.Selection;
       var verifier = new MultiTestVerifier();
 
       before(() => {
         svg = generateSVG(500, 500);
-        xScale = new Plottable.LinearScale().domain([0, 1]);
-        yScale = new Plottable.LinearScale().domain([0, 1]);
-        var xAccessor = (d) => d.foo;
-        var yAccessor = (d) => d.bar;
-        var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
-        lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale)
-                                    .project("x", xAccessor)
-                                    .project("y", yAccessor);
-        lineRenderer.project("stroke", colorAccessor);
         lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
       });
@@ -233,28 +230,25 @@ describe("Renderers", () => {
 
     describe("Basic AreaRenderer functionality", () => {
       var svg: D3.Selection;
-      var xScale;
-      var yScale;
-      var areaRenderer;
+      var xScale = new Plottable.LinearScale().domain([0, 1]);
+      var yScale = new Plottable.LinearScale().domain([0, 1]);
+      var xAccessor = (d: any) => d.foo;
+      var yAccessor = (d: any) => d.bar;
+      var y0Accessor = () => 0;
+      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
+      var fillAccessor = () => "steelblue";
       var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      var renderArea;
+      var areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale)
+                                  .project("x", xAccessor)
+                                  .project("y", yAccessor)
+                                  .project("y0", y0Accessor)
+                                  .project("fill", fillAccessor)
+                                  .project("stroke", colorAccessor);
+      var renderArea: D3.Selection;
       var verifier = new MultiTestVerifier();
 
       before(() => {
         svg = generateSVG(500, 500);
-        xScale = new Plottable.LinearScale().domain([0, 1]);
-        yScale = new Plottable.LinearScale().domain([0, 1]);
-        var xAccessor = (d) => d.foo;
-        var yAccessor = (d) => d.bar;
-        var y0Accessor = () => 0;
-        var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
-        var fillAccessor = () => "steelblue";
-        areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale)
-                                    .project("x", xAccessor)
-                                    .project("y", yAccessor)
-                                    .project("y0", y0Accessor);
-        areaRenderer.project("fill", fillAccessor)
-                    .project("stroke", colorAccessor);
         areaRenderer.renderTo(svg);
         renderArea = areaRenderer.renderArea;
       });
@@ -280,7 +274,7 @@ describe("Renderers", () => {
       });
 
       it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-        areaRenderer.project("y0", (d) => d.bar/2);
+        areaRenderer.project("y0", (d: any) => d.bar/2);
         areaRenderer.renderTo(svg);
         renderArea = areaRenderer.renderArea;
         var path = renderArea.select("path");
@@ -305,8 +299,8 @@ describe("Renderers", () => {
       var pixelAreaPart = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
       var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
       var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
-      var colorAccessor = (d, i, m) => d3.rgb(d.x, d.y ,i).toString();
-      var circlesInArea;
+      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y ,i).toString();
+      var circlesInArea: number;
 
       function getCircleRendererVerifier() {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
@@ -316,7 +310,7 @@ describe("Renderers", () => {
         var renderAreaTransform = d3.transform(renderArea.attr("transform"));
         var translate = renderAreaTransform.translate;
         var scale     = renderAreaTransform.scale;
-        return function (datum, index) {
+        return function (datum: any, index: number) {
           // This function takes special care to compute the position of circles after taking svg transformation
           // into account.
           var selection = d3.select(this);

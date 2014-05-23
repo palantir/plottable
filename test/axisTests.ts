@@ -257,9 +257,9 @@ describe("Axes", () => {
     var tickTexts = svg.selectAll(".tick text");
     assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
 
-    var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
+    var clientRects = tickTexts[0].map((t: Element) => t.getBoundingClientRect());
     var labelsOverlap = false;
-    clientRects.forEach((rect, i) => {
+    clientRects.forEach((rect: ClientRect, i: number) => {
       if (i > 0) {
         if (rect.left < clientRects[i-1].left) {
           labelsOverlap = true;
@@ -268,10 +268,10 @@ describe("Axes", () => {
     });
     assert.isFalse(labelsOverlap, "labels don't overlap");
 
-    var allTopsEqual = clientRects.map((r) => r.top).every((t: number) => t === clientRects[0].top);
+    var allTopsEqual = clientRects.map((r: ClientRect) => r.top).every((t: number) => t === clientRects[0].top);
     assert.isTrue(allTopsEqual, "tops of labels align");
 
-    assert.isTrue(clientRects.every((rect) => rect.height < (<any> xAxis)._height - xAxis.tickSize()),
+    assert.isTrue(clientRects.every((rect: ClientRect) => rect.height < (<any> xAxis)._height - xAxis.tickSize()),
                   "all labels fit within the available space");
     svg.remove();
   });
@@ -289,9 +289,9 @@ describe("Axes", () => {
     var tickTexts = svg.selectAll(".tick text");
     assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
 
-    var clientRects = tickTexts[0].map((t) => t.getBoundingClientRect());
+    var clientRects = tickTexts[0].map((t: Element) => t.getBoundingClientRect());
     var labelsOverlap = false;
-    clientRects.forEach((rect, i) => {
+    clientRects.forEach((rect: ClientRect, i: number) => {
       if (i > 0) {
         if (rect.top < clientRects[i-1].bottom) {
           labelsOverlap = true;
@@ -300,10 +300,10 @@ describe("Axes", () => {
     });
     assert.isFalse(labelsOverlap, "labels don't overlap");
 
-    var allTopsEqual = clientRects.map((r) => r.right).every((t: number) => t === clientRects[0].right);
+    var allTopsEqual = clientRects.map((r: ClientRect) => r.right).every((t: number) => t === clientRects[0].right);
     assert.isTrue(allTopsEqual, "right edges of labels align");
 
-    assert.isTrue(clientRects.every((rect) => rect.width < (<any> yAxis)._width - yAxis.tickSize()),
+    assert.isTrue(clientRects.every((rect: ClientRect) => rect.width < (<any> yAxis)._width - yAxis.tickSize()),
                   "all labels fit within the available space");
     svg.remove();
   });

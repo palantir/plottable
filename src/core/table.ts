@@ -8,6 +8,16 @@ module Plottable {
     wantsWidthArr : boolean[];
     wantsHeightArr: boolean[];
   }
+
+  export interface IterateLayoutResult {
+    colProportionalSpace: number[];
+    rowProportionalSpace: number[];
+    guaranteedWidths    : number[];
+    guaranteedHeights   : number[];
+    wantsWidth          : boolean;
+    wantsHeight         : boolean;
+  };
+
   export class Table extends ComponentContainer {
     private rowPadding = 0;
     private colPadding = 0;
@@ -66,7 +76,7 @@ module Plottable {
       throw new Error("_removeComponent not yet implemented on Table");
     }
 
-    private iterateLayout(availableWidth : number, availableHeight: number) {
+    private iterateLayout(availableWidth : number, availableHeight: number): IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *

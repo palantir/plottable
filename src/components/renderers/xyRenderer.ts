@@ -2,7 +2,6 @@
 
 module Plottable {
   export class XYRenderer extends Renderer {
-    public dataSelection: D3.UpdateSelection;
     public xScale: Scale;
     public yScale: Scale;
     public _xAccessor: any;

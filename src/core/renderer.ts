@@ -10,6 +10,7 @@ module Plottable {
     public _dataSource: DataSource;
     public _dataChanged = false;
 
+    public dataSelection: D3.UpdateSelection;
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
