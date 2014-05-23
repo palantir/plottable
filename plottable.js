@@ -1,5 +1,5 @@
 /*!
-Plottable 0.13.0 (https://github.com/palantir/plottable)
+Plottable 0.13.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1756,6 +1756,10 @@ var Plottable;
                 return c._computeLayout();
             });
             var toRender = d3.values(RenderController.componentsNeedingRender);
+            toRender.forEach(function (c) {
+                return c._render();
+            }); // call _render on everything, so that containers will put their children in the toRender queue
+            toRender = d3.values(RenderController.componentsNeedingRender);
             toRender.forEach(function (c) {
                 return c._doRender();
             });
