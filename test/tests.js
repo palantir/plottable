@@ -2725,6 +2725,18 @@ describe("Scales", function () {
             scale.domain([1, 2, 3, 4, 5]);
             assert.deepEqual(scale.rangeBand(), 329);
         });
+
+        it("rangeType triggers broadcast", function () {
+            var scale = new Plottable.OrdinalScale();
+            var callbackWasCalled = false;
+            var testCallback = function (broadcaster) {
+                assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+                callbackWasCalled = true;
+            };
+            scale.registerListener(null, testCallback);
+            scale.rangeType("points");
+            assert.isTrue(callbackWasCalled, "The registered callback was called");
+        });
     });
 
     describe("Color Scales", function () {
@@ -3136,7 +3148,7 @@ describe("Tables", function () {
 });
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
-
+var tu = Plottable.TextUtils;
 describe("TextUtils", function () {
     it("getTruncatedText works properly", function () {
         var svg = generateSVG();
@@ -3179,20 +3191,24 @@ describe("TextUtils", function () {
         textEl.style("font-size", "12pt").style("font-family", "sans-serif");
 
         textEl.text("foobar");
-        var textWithSpaces = "012345 6 789";
-        var wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 100, 100, textEl);
-        assert.deepEqual(wrappedLines, ["012345 6", "789"], "Wraps at first space after the cutoff");
+        var textWithSpaces = "01234 56 789";
+
+        var wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 80, 100, textEl).lines;
+        assert.deepEqual(wrappedLines, ["01234 56", "789"], "Wraps at first space after the cutoff");
         assert.equal(textEl.text(), "foobar", "getWrappedText did not modify the text in the element");
 
-        wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 100, 100, textEl, 0.5);
-        assert.deepEqual(wrappedLines, ["012345", "6 789"], "reducing the cutoff ratio causes text to wrap at an earlier space");
+        wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 80, 100, textEl, 0.5).lines;
+        assert.deepEqual(wrappedLines, ["01234", "56 789"], "reducing the cutoff ratio causes text to wrap at an earlier space");
+
+        wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 999, 20, textEl).lines;
+        assert.deepEqual(wrappedLines, [textWithSpaces], "does not wrap text if it would fit in the available space");
 
         var shortText = "a";
-        wrappedLines = Plottable.TextUtils.getWrappedText(shortText, 100, 100, textEl);
+        wrappedLines = Plottable.TextUtils.getWrappedText(shortText, 80, 100, textEl).lines;
         assert.deepEqual(wrappedLines, ["a"], "short text is unchanged");
 
         var longTextNoSpaces = "Supercalifragilisticexpialidocious";
-        wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 100, 100, textEl);
+        wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 80, 100, textEl).lines;
         assert.operator(wrappedLines.length, ">=", 2, "long text with no spaces gets wrapped");
         wrappedLines.forEach(function (line, i) {
             if (i < wrappedLines.length - 1) {
@@ -3200,12 +3216,204 @@ describe("TextUtils", function () {
             }
         });
 
-        wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 100, 20, textEl);
+        wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 80, 20, textEl).lines;
         assert.equal(wrappedLines[0].substr(wrappedLines[0].length - 3, 3), "...", "text gets truncated if there's not enough height for all lines");
 
         svg.remove();
     });
+
+    describe("writeLine", function () {
+        var svg;
+        var g;
+        var text = "hello world";
+        var hideResults = true;
+
+        describe("writeLineHorizontally", function () {
+            it("performs basic functionality and defaults to left, top", function () {
+                svg = generateSVG(400, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400);
+                var textEl = g.select("text");
+                assert.equal(textEl.text(), text, "it wrote text as expected");
+                var bb = Plottable.DOMUtils.getBBox(textEl);
+                assert.equal(bb.width, wh[0], "width measurement is as expected");
+                assert.equal(bb.height, wh[1], "height measurement is as expected");
+                var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0];
+                var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1];
+                assert.equal(x, 0, "the x position is zero");
+                assert.closeTo(y, 0, 5, "the y position is close to zero");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("center, center alignment works", function () {
+                svg = generateSVG(400, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "center", "center");
+                var textEl = g.select("text");
+                var bb = Plottable.DOMUtils.getBBox(textEl);
+                assert.equal(bb.width, wh[0], "width measurement is as expected");
+                assert.equal(bb.height, wh[1], "height measurement is as expected");
+                var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0] + bb.width / 2;
+                var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1] + bb.height / 2;
+
+                assert.equal(x, 200, "the x position is 200");
+                assert.closeTo(y, 200, 5, "the y position is close to 200");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("right, bottom alignment works", function () {
+                svg = generateSVG(400, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "right", "bottom");
+                var textEl = g.select("text");
+                var bb = Plottable.DOMUtils.getBBox(textEl);
+                assert.equal(bb.width, wh[0], "width measurement is as expected");
+                assert.equal(bb.height, wh[1], "height measurement is as expected");
+                var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0] + bb.width;
+                var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1] + bb.height;
+
+                assert.equal(x, 400, "the right edge of the box is at 400");
+                assert.closeTo(y, 400, 5, "the bottom of the y box is close to 400");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+
+            it("throws an error if there's too little space", function () {
+                svg = generateSVG(20, 20);
+                g = svg.append("g");
+                assert.throws(function () {
+                    return Plottable.TextUtils.writeLineHorizontally(text, g, 20, 20);
+                }, "space");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+        });
+
+        describe("writeLineVertically", function () {
+            it("performs basic functionality and defaults to right, left, top", function () {
+                svg = generateSVG(100, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400);
+                var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+                assert.equal(bb.x, 0, "x position correct");
+
+                // assert.closeTo(bb.y, 0, 5, "y position correct"); -- TODO: figure out how to test the y position here
+                assert.deepEqual(wh, [bb.height, bb.width], "width and height as expected");
+
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("right, center, center", function () {
+                svg = generateSVG(100, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically("x", g, 100, 400, "center", "center", "right");
+                var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+                assert.equal(bb.x + bb.width / 2, 200, "x position correct");
+                assert.closeTo(bb.y + bb.height / 2, 50, 5, "y position correct");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("right, right, bottom", function () {
+                svg = generateSVG(100, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "right", "bottom", "right");
+                var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+
+                // assert.equal(bb.x + bb.width, 400, "x position correct");
+                // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("left, left, top", function () {
+                svg = generateSVG(100, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "left", "top", "left");
+                var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+
+                // assert.equal(bb.x + bb.width, 400, "x position correct");
+                // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+
+            it("left, center, center", function () {
+                svg = generateSVG(100, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "center", "center", "left");
+
+                // var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+                // assert.equal(bb.x + bb.width, 400, "x position correct");
+                // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+
+            it("left, right, bottom", function () {
+                svg = generateSVG(100, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "right", "bottom", "left");
+
+                // var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+                // assert.equal(bb.x + bb.width, 400, "x position correct");
+                // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+        });
+    });
 });
+// describe("writeTextHorizontally", () => {
+//   it("works for single lines of text", () => {
+//     var svg = generateSVG(200, 50);
+//     var textEls = Plottable.TextUtils.writeTextHorizontally(["hello world"], svg, 200, 50, "left");
+//     assert.lengthOf(textEls[0], 1, "there is one text element");
+//     assert.equal(textEls.text(), "hello world", "the whole text was written");
+//     assert.equal(textEls.node().getBBox().x, 0, "the x aligns with the left edge")
+//     // svg.remove();
+//   });
+//   it("works for multiple lines of text", () => {
+//     var svg = generateSVG(200, 50);
+//     var textEls = Plottable.TextUtils.writeTextHorizontally(["hello", "world"], svg, 200, 50, "left");
+//     assert.lengthOf(textEls[0], 2, "there are two text elements");
+//     assert.equal(d3.select(textEls[0][0]).text(), "hello");
+//     assert.equal(d3.select(textEls[0][1]).text(), "world");
+//     assert.deepEqual(textEls[0][0].getBBox().x, 0, "x aligned left");
+//     assert.deepEqual(textEls[0][1].getBBox().x, 0, "x aligned left");
+//     // svg.remove();
+//   });
+// });
+// describe("writeTextVertically", () => {
+//   it("works for multiple lines", () => {
+//     var svg = generateSVG(50, 300);
+//     var g = svg.append("g");
+//     var strings = ["hello", "world"];
+//     var textEls = Plottable.TextUtils.writeTextVertically(strings, g, 50, 300, "left", "left");
+//     assert.lengthOf(textEls[0], 2, "there are two text elements");
+//     assert.equal(d3.select(textEls[0][0]).text(), "hello");
+//     assert.equal(d3.select(textEls[0][1]).text(), "world");
+//   });
+//   });
+// });
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -3249,5 +3457,88 @@ describe("Utils", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Utils.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+});
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("Word Wrap Utilities", function () {
+    it("properly wraps a short sentence", function () {
+        var text = "All work and no play makes Jack a dull boy.";
+        var width = 200;
+        var wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
+            return text.length * 10;
+        });
+
+        assert.lengthOf(wrappedText, 3);
+        assert.equal(wrappedText[0], "All work and no play ");
+        assert.equal(wrappedText[1], "makes Jack a dull ");
+        assert.equal(wrappedText[2], "boy.");
+    });
+
+    it("properly breaks a long word", function () {
+        var text = "Supercalifragilisticexpialidocious";
+        var width = 100;
+        var wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
+            return text.length * 10;
+        });
+
+        assert.lengthOf(wrappedText, 4);
+        assert.equal(wrappedText[0], "Supercalif");
+        assert.equal(wrappedText[1], "ragilistic");
+        assert.equal(wrappedText[2], "expialidoc");
+        assert.equal(wrappedText[3], "ious");
+    });
+
+    it("breaks on line break characters", function () {
+        var text = "Hello:World";
+        var width = 70;
+        var wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
+            return text.length * 10;
+        });
+
+        assert.lengthOf(wrappedText, 2);
+        assert.equal(wrappedText[0], "Hello:");
+        assert.equal(wrappedText[1], "World");
+    });
+
+    it("breaks on line break characters in the correct place", function () {
+        var width = 80;
+
+        // should line break after these characters: ! " % ) , - . : ; ? ] }
+        var text = "||||| d!d";
+        var wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
+            return text.length * 10;
+        });
+
+        assert.lengthOf(wrappedText, 2);
+        assert.equal(wrappedText[0], "||||| d!");
+        assert.equal(wrappedText[1], "d");
+
+        // should line break before these characters: { [
+        text = "||||| d[d";
+        wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
+            return text.length * 10;
+        });
+
+        assert.lengthOf(wrappedText, 2);
+        assert.equal(wrappedText[0], "||||| d");
+        assert.equal(wrappedText[1], "[d");
+    });
+
+    it("can predict when it will and won't break", function () {
+        var text1 = "Hello:World";
+        var text2 = "Hello World";
+        var text3 = "HelloYWorld";
+        var measureText = function (text) {
+            return text.length * 10;
+        };
+        var canBreak = function (text) {
+            return Plottable.WordWrapUtils.canWrapWithoutBreakingWords(text, 70, measureText);
+        };
+
+        assert.isTrue(canBreak(text1), "It can break \"Hello:World\"");
+        assert.isTrue(canBreak(text2), "It can break \"Hello World\"");
+        assert.isFalse(canBreak(text3), "It can't break \"HelloYWorld\"");
     });
 });

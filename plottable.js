@@ -29,6 +29,9 @@ var Plottable;
         * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
         */
         function addArrays(alist, blist) {
+            if (alist.length !== blist.length) {
+                throw new Error("attempted to add arrays of unequal length");
+            }
             return alist.map(function (_, i) {
                 return alist[i] + blist[i];
             });
@@ -259,11 +262,19 @@ var Plottable;
         * @param {D3.Selection} textElement
         * @return {number} The height of the text element, in pixels.
         */
-        function getTextHeight(textElement) {
-            var originalText = textElement.text();
-            textElement.text("bqpdl");
-            var height = Plottable.DOMUtils.getBBox(textElement).height;
-            textElement.text(originalText);
+        function getTextHeight(selection) {
+            var height;
+            if (selection.node().nodeName === "text") {
+                var originalText = selection.text();
+                selection.text("bqpdl");
+                height = Plottable.DOMUtils.getBBox(selection).height;
+                selection.text(originalText);
+            } else {
+                var text = selection.append("text");
+                text.text("bqpdl");
+                height = Plottable.DOMUtils.getBBox(text).height;
+                text.remove();
+            }
             return height;
         }
         TextUtils.getTextHeight = getTextHeight;
@@ -283,11 +294,8 @@ var Plottable;
         }
         TextUtils.getTextWidth = getTextWidth;
 
-        /**
-        * Converts a string into an array of strings, all of which fit in the available space.
-        *
-        * @returns {string[]} The input text broken into substrings that fit in the avialable space.
-        */
+        
+        ;
         function getWrappedText(text, availableWidth, availableHeight, textElement, cutoffRatio) {
             if (typeof cutoffRatio === "undefined") { cutoffRatio = 0.7; }
             var originalText = textElement.text();
@@ -310,32 +318,38 @@ var Plottable;
             var cutoffEnd = availableWidth - hyphenLength;
             var cutoffStart = cutoffRatio * cutoffEnd;
 
+            var textFits = true;
+
             var lineStartPosition = 0;
-            for (var i = 1; i < numChars; i++) {
-                var testLength = textNode.getSubStringLength(lineStartPosition, i - lineStartPosition);
+            if (textNode.getComputedTextLength() > availableWidth) {
+                for (var i = 1; i < numChars; i++) {
+                    var testLength = textNode.getSubStringLength(lineStartPosition, i - lineStartPosition);
 
-                if (testLength > cutoffStart) {
-                    var currentCharacter = text.charAt(i);
-                    if (testLength > cutoffEnd) {
-                        if (lines.length + 1 >= linesAvailable) {
-                            remainingText = text.substring(lineStartPosition, text.length).trim();
-                            lines.push(getTruncatedText(remainingText, availableWidth, textElement));
-                            break;
+                    if (testLength > cutoffStart) {
+                        var currentCharacter = text.charAt(i);
+                        if (testLength > cutoffEnd) {
+                            if (lines.length + 1 >= linesAvailable) {
+                                remainingText = text.substring(lineStartPosition, text.length).trim();
+                                lines.push(getTruncatedText(remainingText, availableWidth, textElement));
+                                textFits = false;
+                                break;
+                            }
+
+                            // break line on the previous character to leave room for the hyphen
+                            lines.push(text.substring(lineStartPosition, i - 1).trim() + "-");
+                            lineStartPosition = i - 1;
+                        } else if (currentCharacter === " ") {
+                            if (lines.length + 1 >= linesAvailable) {
+                                remainingText = text.substring(lineStartPosition, text.length).trim();
+                                lines.push(getTruncatedText(remainingText, availableWidth, textElement));
+                                textFits = false;
+                                break;
+                            }
+
+                            // break line after the current character
+                            lines.push(text.substring(lineStartPosition, i + 1).trim());
+                            lineStartPosition = i + 1;
                         }
-
-                        // break line on the previous character to leave room for the hyphen
-                        lines.push(text.substring(lineStartPosition, i - 1).trim() + "-");
-                        lineStartPosition = i - 1;
-                    } else if (currentCharacter === " ") {
-                        if (lines.length + 1 >= linesAvailable) {
-                            remainingText = text.substring(lineStartPosition, text.length).trim();
-                            lines.push(getTruncatedText(remainingText, availableWidth, textElement));
-                            break;
-                        }
-
-                        // break line after the current character
-                        lines.push(text.substring(lineStartPosition, i + 1).trim());
-                        lineStartPosition = i + 1;
                     }
                 }
             }
@@ -344,9 +358,133 @@ var Plottable;
             }
 
             textElement.text(originalText);
-            return lines;
+            return {
+                originalText: text,
+                lines: lines,
+                textFits: textFits
+            };
         }
         TextUtils.getWrappedText = getWrappedText;
+
+        function writeLineHorizontally(line, g, width, height, xAlign, yAlign) {
+            if (typeof xAlign === "undefined") { xAlign = "left"; }
+            if (typeof yAlign === "undefined") { yAlign = "top"; }
+            var xOffsetFactor = { left: 0, center: 0.5, right: 1 };
+            var yOffsetFactor = { top: 0, center: 0.5, bottom: 1 };
+            if (xOffsetFactor[xAlign] === undefined || yOffsetFactor[yAlign] === undefined) {
+                throw new Error("unrecognized alignment x:" + xAlign + ", y:" + yAlign);
+            }
+            var innerG = g.append("g");
+            var textEl = innerG.append("text");
+            textEl.text(line);
+            var bb = Plottable.DOMUtils.getBBox(textEl);
+            var h = bb.height;
+            var w = bb.width;
+            if (w > width || h > height) {
+                throw new Error("Insufficient space to fit text");
+            }
+            var anchorConverter = { left: "start", center: "middle", right: "end" };
+            var anchor = anchorConverter[xAlign];
+            var xOff = width * xOffsetFactor[xAlign];
+            var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
+            textEl.attr("text-anchor", anchor);
+            Plottable.DOMUtils.translate(innerG, xOff, yOff);
+            return [w, h];
+        }
+        TextUtils.writeLineHorizontally = writeLineHorizontally;
+
+        function writeLineVertically(line, g, width, height, xAlign, yAlign, rotation) {
+            if (typeof xAlign === "undefined") { xAlign = "left"; }
+            if (typeof yAlign === "undefined") { yAlign = "top"; }
+            if (typeof rotation === "undefined") { rotation = "right"; }
+            if (rotation !== "right" && rotation !== "left") {
+                throw new Error("unreckognized rotation: " + rotation);
+            }
+            var isRight = rotation === "right";
+            var rightTranslator = { left: "bottom", right: "top", center: "center", top: "left", bottom: "right" };
+            var leftTranslator = { left: "top", right: "bottom", center: "center", top: "right", bottom: "left" };
+            var alignTranslator = isRight ? rightTranslator : leftTranslator;
+            var innerG = g.append("g");
+            var wh = writeLineHorizontally(line, innerG, height, width, alignTranslator[yAlign], alignTranslator[xAlign]);
+            var xForm = d3.transform("");
+            xForm.rotate = rotation === "right" ? 90 : -90;
+            xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
+            innerG.attr("transform", xForm.toString());
+
+            return [wh[1], wh[0]];
+        }
+        TextUtils.writeLineVertically = writeLineVertically;
+
+        function writeTextHorizontally(brokenText, g, width, height, xAlign, yAlign) {
+            if (typeof xAlign === "undefined") { xAlign = "left"; }
+            if (typeof yAlign === "undefined") { yAlign = "top"; }
+            var h = getTextHeight(g);
+            var maxWidth = 0;
+            brokenText.forEach(function (line, i) {
+                var innerG = g.append("g");
+                Plottable.DOMUtils.translate(innerG, 0, i * h);
+                var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
+                if (wh[0] > maxWidth) {
+                    maxWidth = wh[0];
+                }
+            });
+            return [maxWidth, h * brokenText.length];
+        }
+        TextUtils.writeTextHorizontally = writeTextHorizontally;
+
+        function writeTextVertically(brokenText, g, width, height, xAlign, yAlign, rotation) {
+            if (typeof xAlign === "undefined") { xAlign = "left"; }
+            if (typeof yAlign === "undefined") { yAlign = "top"; }
+            if (typeof rotation === "undefined") { rotation = "left"; }
+            var h = getTextHeight(g);
+            var maxHeight = 0;
+            brokenText.forEach(function (line, i) {
+                var innerG = g.append("g");
+                Plottable.DOMUtils.translate(innerG, i * h, 0);
+                var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
+                if (wh[1] > maxHeight) {
+                    maxHeight = wh[1];
+                }
+            });
+            return [h * brokenText.length, maxHeight];
+        }
+        TextUtils.writeTextVertically = writeTextVertically;
+
+        function getWrappedTextFromG(text, width, height, g) {
+            var tmpText = g.append("text");
+            var wrappedText = getWrappedText(text, width, height, tmpText);
+            tmpText.remove();
+            return wrappedText;
+        }
+
+        ;
+
+        /**
+        * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
+        * Contains the text within a rectangle with dimensions width, height. Tries to
+        * orient the text using xOrient and yOrient parameters.
+        * Will align the text vertically if it seems like that is appropriate.
+        * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
+        */
+        function writeText(text, g, width, height, xAlign, yAlign) {
+            var orientHorizontally = width * 1.4 > height;
+            var innerG = g.append("g");
+
+            // the outerG contains general transforms for positining the whole block, the inner g
+            // will contain transforms specific to orienting the text properly within the block.
+            var primaryDimension = orientHorizontally ? width : height;
+            var secondaryDimension = orientHorizontally ? height : width;
+            var wrappedText = getWrappedTextFromG(text, primaryDimension, secondaryDimension, innerG);
+
+            var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+            var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
+            return {
+                textFits: wrappedText.textFits,
+                usedWidth: wh[0],
+                usedHeight: wh[1]
+            };
+        }
+        TextUtils.writeText = writeText;
     })(Plottable.TextUtils || (Plottable.TextUtils = {}));
     var TextUtils = Plottable.TextUtils;
 })(Plottable || (Plottable = {}));
@@ -1230,8 +1368,9 @@ var Plottable;
                 var xWeights;
                 if (wantsWidth) {
                     xWeights = guarantees.wantsWidthArr.map(function (x) {
-                        return x ? 1 : 0;
+                        return x ? 0.2 : 0;
                     });
+                    xWeights = Plottable.Utils.addArrays(xWeights, colWeights);
                 } else {
                     xWeights = colWeights;
                 }
@@ -1239,8 +1378,9 @@ var Plottable;
                 var yWeights;
                 if (wantsHeight) {
                     yWeights = guarantees.wantsHeightArr.map(function (x) {
-                        return x ? 1 : 0;
+                        return x ? 0.2 : 0;
                     });
+                    yWeights = Plottable.Utils.addArrays(yWeights, rowWeights);
                 } else {
                     yWeights = rowWeights;
                 }
@@ -2052,6 +2192,7 @@ var Plottable;
                 if (innerPadding != null) {
                     this._innerPadding = innerPadding;
                 }
+                this._broadcast();
                 return this;
             }
         };
@@ -4046,6 +4187,7 @@ var Plottable;
         * @param {any} [formatter] a D3 formatter
         */
         function XAxis(scale, orientation, formatter) {
+            if (typeof orientation === "undefined") { orientation = "bottom"; }
             if (typeof formatter === "undefined") { formatter = null; }
             _super.call(this, scale, orientation, formatter);
             this._height = 30;
@@ -4142,7 +4284,7 @@ var Plottable;
                     tickTextLabels.each(function (t, i) {
                         var textEl = d3.select(this);
                         var currentText = textEl.text();
-                        var wrappedLines = Plottable.TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+                        var wrappedLines = Plottable.TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl).lines;
                         if (wrappedLines.length === 1) {
                             textEl.text(Plottable.TextUtils.getTruncatedText(currentText, availableWidth, textEl));
                         } else {
@@ -4181,6 +4323,7 @@ var Plottable;
         * @param {any} [formatter] a D3 formatter
         */
         function YAxis(scale, orientation, formatter) {
+            if (typeof orientation === "undefined") { orientation = "left"; }
             if (typeof formatter === "undefined") { formatter = null; }
             _super.call(this, scale, orientation, formatter);
             this._width = 50;
@@ -4276,7 +4419,7 @@ var Plottable;
                     tickTextLabels.each(function (t, i) {
                         var textEl = d3.select(this);
                         var currentText = textEl.text();
-                        var wrappedLines = Plottable.TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+                        var wrappedLines = Plottable.TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl).lines;
                         if (wrappedLines.length === 1) {
                             textEl.text(Plottable.TextUtils.getTruncatedText(currentText, availableWidth, textEl));
                         } else {
@@ -4340,6 +4483,123 @@ var Plottable;
         AxisUtils.generateRelativeDateFormatter = generateRelativeDateFormatter;
     })(Plottable.AxisUtils || (Plottable.AxisUtils = {}));
     var AxisUtils = Plottable.AxisUtils;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var CategoryAxis = (function (_super) {
+        __extends(CategoryAxis, _super);
+        function CategoryAxis(scale, orientation) {
+            if (typeof orientation === "undefined") { orientation = "bottom"; }
+            var _this = this;
+            _super.call(this);
+            this._height = 50;
+            this._width = 80;
+            this.classed("category-axis", true).classed("axis", true);
+            this._scale = scale;
+            var orientLC = orientation.toLowerCase();
+            this.orientation = orientLC;
+            if (["left", "right", "top", "bottom"].indexOf(orientLC) === -1) {
+                throw new Error(orientation + " is not a valid category axis orientation");
+            }
+            this.isVertical = (orientLC === "left" || orientLC === "right");
+            if (scale.rangeType() !== "bands") {
+                throw new Error("Only rangeBands category axes are implemented");
+            }
+            this._registerToBroadcaster(this._scale, function () {
+                return _this._invalidateLayout();
+            });
+        }
+        CategoryAxis.prototype.height = function (newHeight) {
+            if (this.isVertical) {
+                throw new Error("Setting height on a vertical axis is meaningless");
+            }
+            this._height = newHeight;
+            return this;
+        };
+
+        CategoryAxis.prototype.width = function (newWidth) {
+            if (!this.isVertical) {
+                throw new Error("Setting width on a horizontal axis is meaningless");
+            }
+            this._width = newWidth;
+            return this;
+        };
+
+        CategoryAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            if (offeredWidth < 0 || offeredHeight < 0) {
+                return {
+                    width: 0,
+                    height: 0,
+                    wantsWidth: this.isVertical,
+                    wantsHeight: !this.isVertical
+                };
+            }
+            if (this.isVertical) {
+                this._scale.range([offeredHeight, 0]);
+            } else {
+                this._scale.range([0, offeredWidth]);
+            }
+            var bandWidth = this._scale.rangeBand();
+            var width = this.isVertical ? offeredWidth : bandWidth;
+            var height = this.isVertical ? bandWidth : offeredHeight;
+            var textResult = this.writeText(width, height);
+
+            this.content.selectAll(".tick").remove();
+
+            return {
+                width: textResult.usedWidth,
+                height: textResult.usedHeight,
+                wantsWidth: !textResult.textFits,
+                wantsHeight: !textResult.textFits
+            };
+        };
+
+        CategoryAxis.prototype.writeText = function (axisWidth, axisHeight) {
+            var bandWidth = this._scale.rangeBand();
+            var ticks = this.content.selectAll(".tick").data(this._scale.domain());
+            ticks.enter().append("g").classed("tick", true);
+            ticks.exit().remove();
+            var width = this.isVertical ? axisWidth : bandWidth;
+            var height = this.isVertical ? bandWidth : axisHeight;
+            var self = this;
+            var textWriteResults = [];
+            ticks.each(function (d, i) {
+                var bandStartPosition = self._scale.scale(d);
+                d3.select(this).selectAll("g").remove();
+                var g = d3.select(this).append("g");
+                var x = self.isVertical ? 0 : bandStartPosition;
+                var y = self.isVertical ? bandStartPosition : 0;
+                g.attr("transform", "translate(" + x + "," + y + ")");
+                var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+
+                var textWriteResult = Plottable.TextUtils.writeText(d, g, width, height, xAlign[self.orientation], yAlign[self.orientation]);
+                textWriteResults.push(textWriteResult);
+            });
+
+            var widthFn = this.isVertical ? d3.max : d3.sum;
+            var heightFn = this.isVertical ? d3.sum : d3.max;
+            return {
+                textFits: textWriteResults.every(function (t) {
+                    return t.textFits;
+                }),
+                usedWidth: widthFn(textWriteResults, function (t) {
+                    return t.usedWidth;
+                }),
+                usedHeight: heightFn(textWriteResults, function (t) {
+                    return t.usedHeight;
+                })
+            };
+        };
+
+        CategoryAxis.prototype._doRender = function () {
+            this.writeText(this.availableWidth, this.availableHeight);
+            return this;
+        };
+        return CategoryAxis;
+    })(Plottable.Component);
+    Plottable.CategoryAxis = CategoryAxis;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -4527,6 +4787,190 @@ var Plottable;
             return width;
         }
         DOMUtils.getSVGPixelWidth = getSVGPixelWidth;
+
+        function translate(s, x, y) {
+            var xform = d3.transform(s.attr("transform"));
+            if (x == null) {
+                return xform.translate;
+            } else {
+                y = (y == null) ? 0 : y;
+                xform.translate[0] = x;
+                xform.translate[1] = y;
+                s.attr("transform", xform.toString());
+                return s;
+            }
+        }
+        DOMUtils.translate = translate;
     })(Plottable.DOMUtils || (Plottable.DOMUtils = {}));
     var DOMUtils = Plottable.DOMUtils;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var LINE_BREAKS_BEFORE = /[{\[]/;
+var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
+var SPACES = /^\s+$/;
+var Plottable;
+(function (Plottable) {
+    (function (WordWrapUtils) {
+        /**
+        * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
+        * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
+        * the word is too big to fit within width on its own.
+        */
+        function breakTextToFitWidth(text, width, measureText) {
+            var ret = [];
+            var paragraphs = text.split("\n");
+            for (var i = 0, len = paragraphs.length; i < len; i++) {
+                var paragraph = paragraphs[i];
+                if (paragraph !== null) {
+                    ret = ret.concat(breakParagraphToFitWidth(paragraph, width, measureText));
+                } else {
+                    ret.push("");
+                }
+            }
+            return ret;
+        }
+        WordWrapUtils.breakTextToFitWidth = breakTextToFitWidth;
+
+        /**
+        * Determines if it is possible to fit a given text within width without breaking any of the words.
+        * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
+        * allowed width.
+        */
+        function canWrapWithoutBreakingWords(text, width, measureText) {
+            var tokens = tokenize(text);
+            var widths = tokens.map(measureText);
+            var maxWidth = d3.max(widths);
+            return maxWidth <= width;
+        }
+        WordWrapUtils.canWrapWithoutBreakingWords = canWrapWithoutBreakingWords;
+
+        /**
+        * A paragraph is a string of text containing no newlines.
+        * Given a paragraph, break it up into lines that are no
+        * wider than width.  measureText is a function that takes
+        * text as input, and returns the width of the text in pixels.
+        */
+        function breakParagraphToFitWidth(text, width, measureText) {
+            var lines = [];
+            var tokens = tokenize(text);
+            var curLine = "";
+            var i = 0;
+            var nextToken;
+            while (nextToken || i < tokens.length) {
+                if (typeof nextToken === "undefined" || nextToken === null) {
+                    nextToken = tokens[i++];
+                }
+                var brokenToken = breakNextTokenToFitInWidth(curLine, nextToken, width, measureText);
+
+                var canAdd = brokenToken[0];
+                var leftOver = brokenToken[1];
+
+                if (canAdd !== null) {
+                    curLine += canAdd;
+                }
+                nextToken = leftOver;
+                if (leftOver) {
+                    lines.push(curLine);
+                    curLine = "";
+                }
+            }
+            if (curLine) {
+                lines.push(curLine);
+            }
+            return lines;
+        }
+
+        /**
+        * Breaks up the next token and so that some part of it can be
+        * added to curLine and fits in the width. the return value
+        * is an array with 2 elements, the part that can be added
+        * and the left over part of the token
+        * measureText is a function that takes text as input,
+        * and returns the width of the text in pixels.
+        */
+        function breakNextTokenToFitInWidth(curLine, nextToken, width, measureText) {
+            if (isBlank(nextToken)) {
+                return [nextToken, null];
+            }
+            if (measureText(curLine + nextToken) <= width) {
+                return [nextToken, null];
+            }
+            if (!isBlank(curLine)) {
+                return [null, nextToken];
+            }
+            var i = 0;
+            while (i < nextToken.length) {
+                if (measureText(curLine + nextToken[i]) <= width) {
+                    curLine += nextToken[i++];
+                } else {
+                    break;
+                }
+            }
+            if (isBlank(curLine) && i === 0) {
+                i = 1;
+            }
+            return [nextToken.substring(0, i), nextToken.substring(i)];
+        }
+
+        /**
+        * Breaks up into tokens for word wrapping
+        * Each token is comprised of either:
+        *  1) Only word and non line break characters
+        *  2) Only spaces characters
+        *  3) Line break characters such as ":" or ";" or ","
+        *  (will be single character token, unless there is a repeated linebreak character)
+        */
+        function tokenize(text) {
+            var ret = [];
+            var token = "";
+            var lastChar = "";
+            for (var i = 0, len = text.length; i < len; i++) {
+                var curChar = text[i];
+                if (token === "" || isTokenizedTogether(token[0], curChar, lastChar)) {
+                    token += curChar;
+                } else {
+                    ret.push(token);
+                    token = curChar;
+                }
+                lastChar = curChar;
+            }
+            if (token) {
+                ret.push(token);
+            }
+            return ret;
+        }
+
+        /**
+        * Returns whether a string is blank.
+        *
+        * @param {string} str: The string to test for blank-ness
+        * @returns {boolean} Whether the string is blank
+        */
+        function isBlank(text) {
+            return text == null ? true : text.trim() === "";
+        }
+
+        /**
+        * Given a token (ie a string of characters that are similar and shouldn't be broken up) and a character, determine
+        * whether that character should be added to the token. Groups of characters that don't match the space or line break
+        * regex are always tokenzied together. Spaces are always tokenized together. Line break characters are almost always
+        * split into their own token, except that two subsequent identical line break characters are put into the same token.
+        * For isTokenizedTogether(":", ",") == False but isTokenizedTogether("::") == True.
+        */
+        function isTokenizedTogether(text, nextChar, lastChar) {
+            if (!(text && nextChar)) {
+                false;
+            }
+            if (SPACES.test(text) && SPACES.test(nextChar)) {
+                return true;
+            } else if (SPACES.test(text) || SPACES.test(nextChar)) {
+                return false;
+            }
+            if (LINE_BREAKS_AFTER.test(lastChar) || LINE_BREAKS_BEFORE.test(nextChar)) {
+                return false;
+            }
+            return true;
+        }
+    })(Plottable.WordWrapUtils || (Plottable.WordWrapUtils = {}));
+    var WordWrapUtils = Plottable.WordWrapUtils;
 })(Plottable || (Plottable = {}));

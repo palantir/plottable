@@ -117,7 +117,7 @@ declare module Plottable {
         * @param {D3.Selection} textElement
         * @return {number} The height of the text element, in pixels.
         */
-        function getTextHeight(textElement: D3.Selection): number;
+        function getTextHeight(selection: D3.Selection): number;
         /**
         * Gets the width of a text element, as rendered.
         *
@@ -130,7 +130,29 @@ declare module Plottable {
         *
         * @returns {string[]} The input text broken into substrings that fit in the avialable space.
         */
-        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): string[];
+        interface IWrappedText {
+            originalText: string;
+            lines: string[];
+            textFits: boolean;
+        }
+        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): IWrappedText;
+        function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
+        function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
+        function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
+        function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
+        interface IWriteTextResult {
+            textFits: boolean;
+            usedWidth: number;
+            usedHeight: number;
+        }
+        /**
+        * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
+        * Contains the text within a rectangle with dimensions width, height. Tries to
+        * orient the text using xOrient and yOrient parameters.
+        * Will align the text vertically if it seems like that is appropriate.
+        * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
+        */
+        function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string): IWriteTextResult;
     }
 }
 declare module Plottable {
@@ -1149,7 +1171,7 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (top/bottom)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Scale, orientation: string, formatter?: any);
+        constructor(scale: Scale, orientation?: string, formatter?: any);
         public height(h: number): XAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
@@ -1169,7 +1191,7 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Scale, orientation: string, formatter?: any);
+        constructor(scale: Scale, orientation?: string, formatter?: any);
         public width(w: number): YAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
@@ -1192,6 +1214,13 @@ declare module Plottable {
         * @param {string} label The label to append to tick values
         */
         function generateRelativeDateFormatter(baseValue: number, increment?: number, label?: string): (tickValue: any) => string;
+    }
+}
+declare module Plottable {
+    class CategoryAxis extends Component {
+        constructor(scale: OrdinalScale, orientation?: string);
+        public height(newHeight: number): CategoryAxis;
+        public width(newWidth: number): CategoryAxis;
     }
 }
 declare module Plottable {
@@ -1265,5 +1294,25 @@ declare module Plottable {
         function getElementWidth(elem: HTMLScriptElement): number;
         function getElementHeight(elem: HTMLScriptElement): number;
         function getSVGPixelWidth(svg: D3.Selection): number;
+        function translate(s: D3.Selection, x?: number, y?: number): any;
+    }
+}
+declare var LINE_BREAKS_BEFORE: RegExp;
+declare var LINE_BREAKS_AFTER: RegExp;
+declare var SPACES: RegExp;
+declare module Plottable {
+    module WordWrapUtils {
+        /**
+        * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
+        * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
+        * the word is too big to fit within width on its own.
+        */
+        function breakTextToFitWidth(text: string, width: number, measureText: (s: string) => number): string[];
+        /**
+        * Determines if it is possible to fit a given text within width without breaking any of the words.
+        * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
+        * allowed width.
+        */
+        function canWrapWithoutBreakingWords(text: string, width: number, measureText: (s: string) => number): boolean;
     }
 }
