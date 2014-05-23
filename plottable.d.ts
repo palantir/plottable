@@ -152,12 +152,6 @@ declare module Plottable {
         */
         public registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
         /**
-        * Call all listening callbacks, optionally with arguments passed through.
-        *
-        * @param ...args A variable number of optional arguments
-        * @returns {Broadcaster} this object
-        */
-        /**
         * Registers deregister the callback associated with a listener.
         *
         * @param listener The listener to deregister.
@@ -196,35 +190,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Component extends PlottableObject {
-        /**
-        * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
-        *
-        * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
-        * @returns {Component} The calling component.
-        */
-        /**
-        * Creates additional elements as necessary for the Component to function.
-        * Called during _anchor() if the Component's element has not been created yet.
-        * Override in subclasses to provide additional functionality.
-        *
-        * @returns {Component} The calling Component.
-        */
-        /**
-        * Computes the size, position, and alignment from the specified values.
-        * If no parameters are supplied and the component is a root node,
-        * they are inferred from the size of the component's element.
-        *
-        * @param {number} xOrigin
-        * @param {number} yOrigin
-        * @param {number} availableWidth
-        * @param {number} availableHeight
-        * @returns {Component} The calling Component.
-        */
-        /**
-        * Renders the component.
-        *
-        * @returns {Component} The calling Component.
-        */
         /**
         * Renders the Component into a given DOM element.
         *
@@ -283,18 +248,6 @@ declare module Plottable {
         */
         public classed(cssClass: string): boolean;
         public classed(cssClass: string, addClass: boolean): Component;
-        /**
-        * Checks if the Component has a fixed width or false if it grows to fill available space.
-        * Returns false by default on the base Component class.
-        *
-        * @return {boolean} Whether the component has a fixed width.
-        */
-        /**
-        * Checks if the Component has a fixed height or false if it grows to fill available space.
-        * Returns false by default on the base Component class.
-        *
-        * @return {boolean} Whether the component has a fixed height.
-        */
         /**
         * Merges this Component with another Component, returning a ComponentGroup.
         * There are four cases:
@@ -676,26 +629,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class InterpolatedColorScale extends QuantitiveScale {
-        /**
-        * Converts the string array into a d3 scale.
-        *
-        * @param {string[]} colors an array of strings representing color
-        *     values in hex ("#FFFFFF") or keywords ("white").
-        * @param {string} scaleType a string representing the underlying scale
-        *     type (linear/log/sqrt/pow)
-        * @returns a quantitive d3 scale.
-        */
-        /**
-        * Creates a d3 interpolator given the color array.
-        *
-        * d3 doesn't accept more than 2 range values unless we use a ordinal
-        * scale. So, in order to interpolate smoothly between the full color
-        * range, we must override the interpolator and compute the color values
-        * manually.
-        *
-        * @param {string[]} colors an array of strings representing color
-        *     values in hex ("#FFFFFF") or keywords ("white").
-        */
         /**
         * Creates a InterpolatedColorScale.
         *
