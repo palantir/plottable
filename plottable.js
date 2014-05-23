@@ -628,14 +628,14 @@ var Plottable;
 
             xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
             xPosition += this._xOffset;
-            if (this.isFixedWidth()) {
+            if (this._isFixedWidth()) {
                 // Decrease size so hitbox / bounding box and children are sized correctly
                 availableWidth = Math.min(availableWidth, requestedSpace.width);
             }
 
             yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
             yPosition += this._yOffset;
-            if (this.isFixedHeight()) {
+            if (this._isFixedHeight()) {
                 availableHeight = Math.min(availableHeight, requestedSpace.height);
             }
 
@@ -869,7 +869,7 @@ var Plottable;
         *
         * @return {boolean} Whether the component has a fixed width.
         */
-        Component.prototype.isFixedWidth = function () {
+        Component.prototype._isFixedWidth = function () {
             // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
             // some fixed size you aspire to.
             // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
@@ -883,7 +883,7 @@ var Plottable;
         *
         * @return {boolean} Whether the component has a fixed height.
         */
-        Component.prototype.isFixedHeight = function () {
+        Component.prototype._isFixedHeight = function () {
             return this._requestedSpace(-1, -1).wantsHeight;
         };
 
@@ -1084,15 +1084,15 @@ var Plottable;
             return this;
         };
 
-        ComponentGroup.prototype.isFixedWidth = function () {
+        ComponentGroup.prototype._isFixedWidth = function () {
             return this._components.every(function (c) {
-                return c.isFixedWidth();
+                return c._isFixedWidth();
             });
         };
 
-        ComponentGroup.prototype.isFixedHeight = function () {
+        ComponentGroup.prototype._isFixedHeight = function () {
             return this._components.every(function (c) {
-                return c.isFixedHeight();
+                return c._isFixedHeight();
             });
         };
         return ComponentGroup;
@@ -1183,10 +1183,10 @@ var Plottable;
             var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
 
             var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, function (c) {
-                return (c == null) || c.isFixedHeight();
+                return (c == null) || c._isFixedHeight();
             });
             var colWeights = Table.calcComponentWeights(this.colWeights, cols, function (c) {
-                return (c == null) || c.isFixedWidth();
+                return (c == null) || c._isFixedWidth();
             });
 
             // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
@@ -1381,16 +1381,16 @@ var Plottable;
             return this;
         };
 
-        Table.prototype.isFixedWidth = function () {
+        Table.prototype._isFixedWidth = function () {
             var cols = d3.transpose(this.rows);
             return Table.fixedSpace(cols, function (c) {
-                return (c == null) || c.isFixedWidth();
+                return (c == null) || c._isFixedWidth();
             });
         };
 
-        Table.prototype.isFixedHeight = function () {
+        Table.prototype._isFixedHeight = function () {
             return Table.fixedSpace(this.rows, function (c) {
-                return (c == null) || c.isFixedHeight();
+                return (c == null) || c._isFixedHeight();
             });
         };
 
@@ -1446,10 +1446,10 @@ var Plottable;
                     return a && b;
                 });
             };
-            var groupIsFixed = function (components) {
+            var group_isFixed = function (components) {
                 return all(components.map(fixityAccessor));
             };
-            return all(componentGroup.map(groupIsFixed));
+            return all(componentGroup.map(group_isFixed));
         };
         return Table;
     })(Plottable.ComponentContainer);

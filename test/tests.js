@@ -613,16 +613,16 @@ describe("ComponentGroups", function () {
         var c2 = new Plottable.Component();
 
         cg.merge(c1).merge(c2);
-        assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
-        assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
+        assert.isFalse(cg._isFixedHeight(), "height not fixed when both components unfixed");
+        assert.isFalse(cg._isFixedWidth(), "width not fixed when both components unfixed");
 
         fixComponentSize(c1, 10, 10);
-        assert.isFalse(cg.isFixedHeight(), "height not fixed when one component unfixed");
-        assert.isFalse(cg.isFixedWidth(), "width not fixed when one component unfixed");
+        assert.isFalse(cg._isFixedHeight(), "height not fixed when one component unfixed");
+        assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
 
         fixComponentSize(c2, null, 10);
-        assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
-        assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
+        assert.isTrue(cg._isFixedHeight(), "height fixed when both components fixed");
+        assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
     });
 
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
@@ -2943,15 +2943,15 @@ describe("Tables", function () {
         components.forEach(function (c) {
             return fixComponentSize(c, 10, 10);
         });
-        assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
-        assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+        assert.isTrue(table._isFixedWidth(), "fixed width when all subcomponents fixed width");
+        assert.isTrue(table._isFixedHeight(), "fixedHeight when all subcomponents fixed height");
         fixComponentSize(components[0], null, 10);
-        assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
-        assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+        assert.isFalse(table._isFixedWidth(), "width not fixed when some subcomponent width not fixed");
+        assert.isTrue(table._isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
         fixComponentSize(components[8], 10, null);
         fixComponentSize(components[0], 10, 10);
-        assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
-        assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+        assert.isTrue(table._isFixedWidth(), "width fixed again once no subcomponent width not fixed");
+        assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });
 
     it("table._requestedSpace works properly", function () {

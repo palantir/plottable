@@ -298,14 +298,12 @@ declare module Plottable {
         *
         * @return {boolean} Whether the component has a fixed width.
         */
-        public isFixedWidth(): boolean;
         /**
         * Checks if the Component has a fixed height or false if it grows to fill available space.
         * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed height.
         */
-        public isFixedHeight(): boolean;
         /**
         * Merges this Component with another Component, returning a ComponentGroup.
         * There are four cases:
@@ -356,8 +354,6 @@ declare module Plottable {
         */
         constructor(components?: Component[]);
         public merge(c: Component): ComponentGroup;
-        public isFixedWidth(): boolean;
-        public isFixedHeight(): boolean;
     }
 }
 declare module Plottable {
@@ -404,8 +400,6 @@ declare module Plottable {
         * @returns {Table} The calling Table.
         */
         public colWeight(index: number, weight: number): Table;
-        public isFixedWidth(): boolean;
-        public isFixedHeight(): boolean;
     }
 }
 declare module Plottable {
