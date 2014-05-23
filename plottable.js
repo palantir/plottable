@@ -3787,6 +3787,7 @@ var Plottable;
             _super.call(this);
             this._showEndTickLabels = false;
             this.tickPositioning = "center";
+            this.orientToAlign = { left: "right", right: "left", top: "bottom", bottom: "top" };
             this._axisScale = axisScale;
             orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
@@ -4038,7 +4039,8 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for XAxis");
             }
             this.tickLabelPosition("center");
-            this.yAlign(orientation);
+            var desiredAlignment = this.orientToAlign[orientation];
+            this.yAlign(desiredAlignment);
         }
         XAxis.prototype.height = function (h) {
             this._height = h;
@@ -4171,7 +4173,8 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for YAxis");
             }
             this.tickLabelPosition("middle");
-            this.xAlign(orientation);
+            var desiredAlignment = this.orientToAlign[orientation];
+            this.xAlign(desiredAlignment);
         }
         YAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);

@@ -1118,6 +1118,9 @@ declare module Plottable {
 declare module Plottable {
     class Axis extends Component {
         public axisElement: D3.Selection;
+        public orientToAlign: {
+            [s: string]: string;
+        };
         /**
         * Creates an Axis.
         *
