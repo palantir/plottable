@@ -54,16 +54,16 @@ describe("ComponentGroups", () => {
     var c2 = new Plottable.Component();
 
     cg.merge(c1).merge(c2);
-    assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
-    assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
+    assert.isFalse(cg._isFixedHeight(), "height not fixed when both components unfixed");
+    assert.isFalse(cg._isFixedWidth(), "width not fixed when both components unfixed");
 
     fixComponentSize(c1, 10, 10);
-    assert.isFalse(cg.isFixedHeight(), "height not fixed when one component unfixed");
-    assert.isFalse(cg.isFixedWidth(), "width not fixed when one component unfixed");
+    assert.isFalse(cg._isFixedHeight(), "height not fixed when one component unfixed");
+    assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
 
     fixComponentSize(c2, null, 10);
-    assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
-    assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
+    assert.isTrue(cg._isFixedHeight(), "height fixed when both components fixed");
+    assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
   });
 
   it("componentGroup subcomponents have xOffset, yOffset of 0", () => {
