@@ -58,20 +58,24 @@ module.exports = function(grunt) {
     }
   }
 
-  var prefixMatch = "\n *";
-  var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
-  var nestedBraceMatch = ": \\{[^{}]*\\}";
-  var typeNameMatch = ": [^;]*";
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?;"
+  var prefixMatch = /\n */;
+  var varNameMatch = /[^(:;]*(\([^)]*\))?/; // catch function args too
+  var nestedBraceMatch = ": \{[^{}]*\}";
+  var typeNameMatch = /: [^;]*/;
+  var finalMatch = new RegExp("((" + nestedBraceMatch.source + ")|(" + typeNameMatch.source + "))?;")
+  var jsdoc_init = / *\/\*\* *\n/;
+  var jsdoc_mid = /( *\*[^\n]*\n)+/;
+  var jsdoc_end = / *\*\/ *\n/;
+  var jsdoc = new RegExp("(" + jsdoc_init.source + jsdoc_mid.source + jsdoc_end.source + ")?");
 
   var sedJSON = {
     private_definitions: {
-      pattern: prefixMatch + "private " + varNameMatch + finalMatch,
+      pattern: new RegExp(jsdoc.source + prefixMatch.source + "private " + varNameMatch.source + finalMatch.source),
       replacement: "",
       path: "build/plottable.d.ts",
     },
     protected_definitions: {
-      pattern: prefixMatch + "public _" + varNameMatch + finalMatch,
+      pattern: new RegExp(jsdoc.source + prefixMatch.source + "public _" + varNameMatch.source + finalMatch.source),
       replacement: "",
       path: "plottable.d.ts",
     },
@@ -81,7 +85,7 @@ module.exports = function(grunt) {
       path: "license_header.tmp",
     },
     public_member_vars: {
-      pattern: prefixMatch + "public " + "[^(;]*;",
+      pattern: new RegExp(jsdoc.source + prefixMatch.source + "public " + "[^(;]*;"),
       replacement: "",
       path: "plottable.d.ts",
     },
