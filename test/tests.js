@@ -2030,28 +2030,24 @@ describe("Renderers", function () {
             // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
             // draws properly for the LineRenderer
             var svg;
-            var xScale;
-            var yScale;
-            var lineRenderer;
+            var xScale = new Plottable.LinearScale().domain([0, 1]);
+            var yScale = new Plottable.LinearScale().domain([0, 1]);
+            var xAccessor = function (d) {
+                return d.foo;
+            };
+            var yAccessor = function (d) {
+                return d.bar;
+            };
+            var colorAccessor = function (d, i, m) {
+                return d3.rgb(d.foo, d.bar, i).toString();
+            };
             var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            var lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("stroke", colorAccessor);
             var renderArea;
             var verifier = new MultiTestVerifier();
 
             before(function () {
                 svg = generateSVG(500, 500);
-                xScale = new Plottable.LinearScale().domain([0, 1]);
-                yScale = new Plottable.LinearScale().domain([0, 1]);
-                var xAccessor = function (d) {
-                    return d.foo;
-                };
-                var yAccessor = function (d) {
-                    return d.bar;
-                };
-                var colorAccessor = function (d, i, m) {
-                    return d3.rgb(d.foo, d.bar, i).toString();
-                };
-                lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-                lineRenderer.project("stroke", colorAccessor);
                 lineRenderer.renderTo(svg);
                 renderArea = lineRenderer.renderArea;
             });
@@ -2092,34 +2088,30 @@ describe("Renderers", function () {
 
         describe("Basic AreaRenderer functionality", function () {
             var svg;
-            var xScale;
-            var yScale;
-            var areaRenderer;
+            var xScale = new Plottable.LinearScale().domain([0, 1]);
+            var yScale = new Plottable.LinearScale().domain([0, 1]);
+            var xAccessor = function (d) {
+                return d.foo;
+            };
+            var yAccessor = function (d) {
+                return d.bar;
+            };
+            var y0Accessor = function () {
+                return 0;
+            };
+            var colorAccessor = function (d, i, m) {
+                return d3.rgb(d.foo, d.bar, i).toString();
+            };
+            var fillAccessor = function () {
+                return "steelblue";
+            };
             var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            var areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("y0", y0Accessor).project("fill", fillAccessor).project("stroke", colorAccessor);
             var renderArea;
             var verifier = new MultiTestVerifier();
 
             before(function () {
                 svg = generateSVG(500, 500);
-                xScale = new Plottable.LinearScale().domain([0, 1]);
-                yScale = new Plottable.LinearScale().domain([0, 1]);
-                var xAccessor = function (d) {
-                    return d.foo;
-                };
-                var yAccessor = function (d) {
-                    return d.bar;
-                };
-                var y0Accessor = function () {
-                    return 0;
-                };
-                var colorAccessor = function (d, i, m) {
-                    return d3.rgb(d.foo, d.bar, i).toString();
-                };
-                var fillAccessor = function () {
-                    return "steelblue";
-                };
-                areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("y0", y0Accessor);
-                areaRenderer.project("fill", fillAccessor).project("stroke", colorAccessor);
                 areaRenderer.renderTo(svg);
                 renderArea = areaRenderer.renderArea;
             });

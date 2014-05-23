@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-function generateBasicTable(nRows, nCols) {
+function generateBasicTable(nRows: number, nCols: number) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component
   var table = new Plottable.Table();
@@ -37,7 +37,7 @@ describe("Tables", () => {
 
     (<any> t).padTableToSize(5,2);
     assert.lengthOf(rows, 5, "there are five rows");
-    rows.forEach((r) => assert.lengthOf(r, 2, "there are two columsn per row"));
+    rows.forEach((r: Plottable.Component[]) => assert.lengthOf(r, 2, "there are two columsn per row"));
     assert.equal(rows[0][0], firstComponent, "the first component is unchanged");
   });
 
@@ -211,7 +211,9 @@ describe("Tables", () => {
 
   describe("table.iterateLayout works properly", () => {
     // This test battery would have caught #405
-    function verifyLayoutResult(result, cPS, rPS, gW, gH, wW, wH, id) {
+    function verifyLayoutResult(result: Plottable.IterateLayoutResult,
+                                cPS: number[], rPS: number[], gW: number[], gH: number[],
+                                wW: boolean, wH: boolean, id: string) {
       assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);
       assert.deepEqual(result.rowProportionalSpace, rPS, "rowProportionalSpace:" + id);
       assert.deepEqual(result.guaranteedWidths, gW, "guaranteedWidths:" + id);
