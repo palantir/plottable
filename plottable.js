@@ -2959,9 +2959,7 @@ var Plottable;
             _super.prototype._paint.call(this);
             var scaledBaseline = this.yScale.scale(this._baselineValue);
 
-            var xA = Plottable.Utils.applyAccessor(this._xAccessor, this.dataSource());
-
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
             this.dataSelection.enter().append("rect");
 
             var attrToProjector = this._generateAttrToProjector();
@@ -3075,9 +3073,7 @@ var Plottable;
         HorizontalBarRenderer.prototype._paint = function () {
             var _this = this;
             _super.prototype._paint.call(this);
-            var yA = Plottable.Utils.applyAccessor(this._yAccessor, this.dataSource());
-
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), yA);
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
             this.dataSelection.enter().append("rect");
 
             var attrToProjector = this._generateAttrToProjector();

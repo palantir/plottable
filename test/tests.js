@@ -2278,7 +2278,8 @@ describe("Renderers", function () {
                 yScale = new Plottable.LinearScale();
                 var data = [
                     { x: "A", y: 1 },
-                    { x: "B", y: -1.5 }
+                    { x: "B", y: -1.5 },
+                    { x: "B", y: 1 }
                 ];
                 dataset = new Plottable.DataSource(data);
 
@@ -2296,6 +2297,7 @@ describe("Renderers", function () {
             it("renders correctly", function () {
                 var renderArea = renderer.renderArea;
                 var bars = renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
@@ -2404,7 +2406,8 @@ describe("Renderers", function () {
 
                 var data = [
                     { y: "A", x: 1 },
-                    { y: "B", x: -1.5 }
+                    { y: "B", x: -1.5 },
+                    { y: "B", x: 1 }
                 ];
                 dataset = new Plottable.DataSource(data);
 
@@ -2422,6 +2425,7 @@ describe("Renderers", function () {
             it("renders correctly", function () {
                 var renderArea = renderer.renderArea;
                 var bars = renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
