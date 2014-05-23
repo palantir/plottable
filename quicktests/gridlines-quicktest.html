@@ -8,20 +8,20 @@
 
     <script>
       window.onload = function() {
-        var dataseries = makeRandomData(20);
+        dataseries = makeRandomData(20);
 
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        xScale = new Plottable.LinearScale();
+        xAxis = new Plottable.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        yScale = new Plottable.LinearScale();
+        yAxis = new Plottable.YAxis(yScale, "left");
         window.yAxis = yAxis;
         yAxis.debug = true;
 
-        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
-        var gridlines = new Plottable.Gridlines(xScale, yScale);
-        var renderGroup = renderAreaD1.merge(gridlines);
-        var chart = new Plottable.Table([[yAxis, renderGroup],
+        renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+        gridlines = new Plottable.Gridlines(xScale, yScale);
+        renderGroup = renderAreaD1.merge(gridlines);
+        chart = new Plottable.Table([[yAxis, renderGroup],
                                          [null,  xAxis]]);
         chart.renderTo("#gridlines-test");
       }
