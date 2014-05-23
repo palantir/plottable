@@ -194,7 +194,7 @@ describe("TextUtils", () => {
         if (hideResults) {
           svg.remove();
         };
-      })
+      });
 
       it("left, center, center", () => {
         svg = generateSVG(100, 400);
