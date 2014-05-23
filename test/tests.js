@@ -613,16 +613,16 @@ describe("ComponentGroups", function () {
         var c2 = new Plottable.Component();
 
         cg.merge(c1).merge(c2);
-        assert.isFalse(cg.isFixedHeight(), "height not fixed when both components unfixed");
-        assert.isFalse(cg.isFixedWidth(), "width not fixed when both components unfixed");
+        assert.isFalse(cg._isFixedHeight(), "height not fixed when both components unfixed");
+        assert.isFalse(cg._isFixedWidth(), "width not fixed when both components unfixed");
 
         fixComponentSize(c1, 10, 10);
-        assert.isFalse(cg.isFixedHeight(), "height not fixed when one component unfixed");
-        assert.isFalse(cg.isFixedWidth(), "width not fixed when one component unfixed");
+        assert.isFalse(cg._isFixedHeight(), "height not fixed when one component unfixed");
+        assert.isFalse(cg._isFixedWidth(), "width not fixed when one component unfixed");
 
         fixComponentSize(c2, null, 10);
-        assert.isTrue(cg.isFixedHeight(), "height fixed when both components fixed");
-        assert.isFalse(cg.isFixedWidth(), "width unfixed when one component unfixed");
+        assert.isTrue(cg._isFixedHeight(), "height fixed when both components fixed");
+        assert.isFalse(cg._isFixedWidth(), "width unfixed when one component unfixed");
     });
 
     it("componentGroup subcomponents have xOffset, yOffset of 0", function () {
@@ -1844,7 +1844,34 @@ var PerfDiagnostics;
 })(PerfDiagnostics || (PerfDiagnostics = {}));
 window.report = PerfDiagnostics.logResults;
 ///<reference path="testReference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var assert = chai.assert;
+
+var Plottable;
+(function (Plottable) {
+    /**
+    * A mock that keeps track of how many times _render() was
+    * called - useful for checking DataSource callbacks.
+    */
+    var CountingRenderer = (function (_super) {
+        __extends(CountingRenderer, _super);
+        function CountingRenderer(dataset) {
+            _super.call(this, dataset);
+            this.renders = 0;
+        }
+        CountingRenderer.prototype._render = function () {
+            ++this.renders;
+            return _super.prototype._render.call(this);
+        };
+        return CountingRenderer;
+    })(Plottable.Renderer);
+    Plottable.CountingRenderer = CountingRenderer;
+})(Plottable || (Plottable = {}));
 
 var quadraticDataset = makeQuadraticSeries(10);
 
@@ -1862,13 +1889,80 @@ describe("Renderers", function () {
             r._anchor(svg)._computeLayout();
             var renderArea = r.content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
+            svg.remove();
+        });
+
+        it("Allows the DataSource to be changed", function () {
+            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+            var r = new Plottable.Renderer(d1);
+            assert.equal(d1, r.dataSource(), "returns the original");
 
             var d2 = new Plottable.DataSource(["bar"], { cssClass: "boo" });
-            assert.throws(function () {
-                return r.dataSource(d2);
-            }, Error);
+            r.dataSource(d2);
+            assert.equal(d2, r.dataSource(), "returns new datasource");
+        });
 
-            svg.remove();
+        it("Changes DataSource listeners when the DataSource is changed", function () {
+            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+            var r = new Plottable.CountingRenderer(d1);
+
+            assert.equal(0, r.renders, "initially hasn't rendered anything");
+
+            d1._broadcast();
+            assert.equal(1, r.renders, "we re-render when our datasource changes");
+
+            r.dataSource();
+            assert.equal(1, r.renders, "we shouldn't redraw when querying the datasource");
+
+            var d2 = new Plottable.DataSource(["bar"], { cssClass: "boo" });
+            r.dataSource(d2);
+            assert.equal(2, r.renders, "we should redraw when we change datasource");
+
+            d1._broadcast();
+            assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
+
+            d2._broadcast();
+            assert.equal(3, r.renders, "we should listen to the new datasource");
+        });
+
+        it("Updates its projectors when the DataSource is changed", function () {
+            var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
+            var r = new Plottable.Renderer(d1);
+
+            var xScaleCalls = 0;
+            var yScaleCalls = 0;
+            var xScale = new Plottable.LinearScale();
+            var yScale = new Plottable.LinearScale();
+            r.project("x", null, xScale);
+            r.project("y", null, yScale);
+            xScale.registerListener(null, function (broadcaster) {
+                assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
+                ++xScaleCalls;
+            });
+            yScale.registerListener(null, function (broadcaster) {
+                assert.equal(broadcaster, yScale, "Callback received the calling scale as the first argument");
+                ++yScaleCalls;
+            });
+
+            assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
+            assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
+
+            d1._broadcast();
+            assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
+            assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
+
+            var d2 = new Plottable.DataSource(["bar"], { cssClass: "boo" });
+            r.dataSource(d2);
+            assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
+            assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
+
+            d1._broadcast();
+            assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
+            assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
+
+            d2._broadcast();
+            assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
+            assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
         });
 
         it("Renderer automatically generates a DataSource if only data is provided", function () {
@@ -1936,28 +2030,24 @@ describe("Renderers", function () {
             // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
             // draws properly for the LineRenderer
             var svg;
-            var xScale;
-            var yScale;
-            var lineRenderer;
+            var xScale = new Plottable.LinearScale().domain([0, 1]);
+            var yScale = new Plottable.LinearScale().domain([0, 1]);
+            var xAccessor = function (d) {
+                return d.foo;
+            };
+            var yAccessor = function (d) {
+                return d.bar;
+            };
+            var colorAccessor = function (d, i, m) {
+                return d3.rgb(d.foo, d.bar, i).toString();
+            };
             var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            var lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("stroke", colorAccessor);
             var renderArea;
             var verifier = new MultiTestVerifier();
 
             before(function () {
                 svg = generateSVG(500, 500);
-                xScale = new Plottable.LinearScale().domain([0, 1]);
-                yScale = new Plottable.LinearScale().domain([0, 1]);
-                var xAccessor = function (d) {
-                    return d.foo;
-                };
-                var yAccessor = function (d) {
-                    return d.bar;
-                };
-                var colorAccessor = function (d, i, m) {
-                    return d3.rgb(d.foo, d.bar, i).toString();
-                };
-                lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor);
-                lineRenderer.project("stroke", colorAccessor);
                 lineRenderer.renderTo(svg);
                 renderArea = lineRenderer.renderArea;
             });
@@ -1998,34 +2088,30 @@ describe("Renderers", function () {
 
         describe("Basic AreaRenderer functionality", function () {
             var svg;
-            var xScale;
-            var yScale;
-            var areaRenderer;
+            var xScale = new Plottable.LinearScale().domain([0, 1]);
+            var yScale = new Plottable.LinearScale().domain([0, 1]);
+            var xAccessor = function (d) {
+                return d.foo;
+            };
+            var yAccessor = function (d) {
+                return d.bar;
+            };
+            var y0Accessor = function () {
+                return 0;
+            };
+            var colorAccessor = function (d, i, m) {
+                return d3.rgb(d.foo, d.bar, i).toString();
+            };
+            var fillAccessor = function () {
+                return "steelblue";
+            };
             var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            var areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("y0", y0Accessor).project("fill", fillAccessor).project("stroke", colorAccessor);
             var renderArea;
             var verifier = new MultiTestVerifier();
 
             before(function () {
                 svg = generateSVG(500, 500);
-                xScale = new Plottable.LinearScale().domain([0, 1]);
-                yScale = new Plottable.LinearScale().domain([0, 1]);
-                var xAccessor = function (d) {
-                    return d.foo;
-                };
-                var yAccessor = function (d) {
-                    return d.bar;
-                };
-                var y0Accessor = function () {
-                    return 0;
-                };
-                var colorAccessor = function (d, i, m) {
-                    return d3.rgb(d.foo, d.bar, i).toString();
-                };
-                var fillAccessor = function () {
-                    return "steelblue";
-                };
-                areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("y0", y0Accessor);
-                areaRenderer.project("fill", fillAccessor).project("stroke", colorAccessor);
                 areaRenderer.renderTo(svg);
                 renderArea = areaRenderer.renderArea;
             });
@@ -2184,7 +2270,8 @@ describe("Renderers", function () {
                 yScale = new Plottable.LinearScale();
                 var data = [
                     { x: "A", y: 1 },
-                    { x: "B", y: -1.5 }
+                    { x: "B", y: -1.5 },
+                    { x: "B", y: 1 }
                 ];
                 dataset = new Plottable.DataSource(data);
 
@@ -2202,6 +2289,7 @@ describe("Renderers", function () {
             it("renders correctly", function () {
                 var renderArea = renderer.renderArea;
                 var bars = renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
@@ -2310,7 +2398,8 @@ describe("Renderers", function () {
 
                 var data = [
                     { y: "A", x: 1 },
-                    { y: "B", x: -1.5 }
+                    { y: "B", x: -1.5 },
+                    { y: "B", x: 1 }
                 ];
                 dataset = new Plottable.DataSource(data);
 
@@ -2328,6 +2417,7 @@ describe("Renderers", function () {
             it("renders correctly", function () {
                 var renderArea = renderer.renderArea;
                 var bars = renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 3, "One bar was created per data point");
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
@@ -2943,15 +3033,15 @@ describe("Tables", function () {
         components.forEach(function (c) {
             return fixComponentSize(c, 10, 10);
         });
-        assert.isTrue(table.isFixedWidth(), "fixed width when all subcomponents fixed width");
-        assert.isTrue(table.isFixedHeight(), "fixedHeight when all subcomponents fixed height");
+        assert.isTrue(table._isFixedWidth(), "fixed width when all subcomponents fixed width");
+        assert.isTrue(table._isFixedHeight(), "fixedHeight when all subcomponents fixed height");
         fixComponentSize(components[0], null, 10);
-        assert.isFalse(table.isFixedWidth(), "width not fixed when some subcomponent width not fixed");
-        assert.isTrue(table.isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+        assert.isFalse(table._isFixedWidth(), "width not fixed when some subcomponent width not fixed");
+        assert.isTrue(table._isFixedHeight(), "the height is still fixed when some subcomponent width not fixed");
         fixComponentSize(components[8], 10, null);
         fixComponentSize(components[0], 10, 10);
-        assert.isTrue(table.isFixedWidth(), "width fixed again once no subcomponent width not fixed");
-        assert.isFalse(table.isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+        assert.isTrue(table._isFixedWidth(), "width fixed again once no subcomponent width not fixed");
+        assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });
 
     it("table._requestedSpace works properly", function () {

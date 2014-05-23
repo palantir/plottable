@@ -30,6 +30,7 @@ module.exports = function(grunt) {
       options: {
         target: 'es5',
         sourceMap: false,
+        noImplicitAny: true,
         declaration: false,
         removeComments: false
       }
@@ -67,18 +68,23 @@ module.exports = function(grunt) {
     private_definitions: {
       pattern: prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts"
+      path: "build/plottable.d.ts",
     },
     protected_definitions: {
       pattern: prefixMatch + "public _" + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts"
+      path: "plottable.d.ts",
     },
     header: {
       pattern: "VERSION",
       replacement: "<%= pkg.version %>",
       path: "license_header.tmp",
-    }
+    },
+    public_member_vars: {
+      pattern: prefixMatch + "public " + "[^(;]*;",
+      replacement: "",
+      path: "plottable.d.ts",
+    },
   };
 
   var configJSON = {
@@ -171,6 +177,7 @@ module.exports = function(grunt) {
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
+                                  "sed:private_definitions",
                                   "ts:test",
                                   "tslint",
                                   "clean:tscommand"]);
@@ -183,8 +190,8 @@ module.exports = function(grunt) {
                                   "blanket_mocha",
                                   "copy:dist",
                                   "handle-header",
-                                  "sed:private_definitions",
-                                  "sed:protected_definitions"]);
+                                  "sed:protected_definitions",
+                                  "sed:public_member_vars"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 

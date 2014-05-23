@@ -196,15 +196,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Component extends PlottableObject {
-        public element: D3.Selection;
-        public content: D3.Selection;
-        public backgroundContainer: D3.Selection;
-        public foregroundContainer: D3.Selection;
-        public clipPathEnabled: boolean;
-        public availableWidth: number;
-        public availableHeight: number;
-        public xOrigin: number;
-        public yOrigin: number;
         /**
         * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
         *
@@ -298,14 +289,12 @@ declare module Plottable {
         *
         * @return {boolean} Whether the component has a fixed width.
         */
-        public isFixedWidth(): boolean;
         /**
         * Checks if the Component has a fixed height or false if it grows to fill available space.
         * Returns false by default on the base Component class.
         *
         * @return {boolean} Whether the component has a fixed height.
         */
-        public isFixedHeight(): boolean;
         /**
         * Merges this Component with another Component, returning a ComponentGroup.
         * There are four cases:
@@ -356,11 +345,17 @@ declare module Plottable {
         */
         constructor(components?: Component[]);
         public merge(c: Component): ComponentGroup;
-        public isFixedWidth(): boolean;
-        public isFixedHeight(): boolean;
     }
 }
 declare module Plottable {
+    interface IterateLayoutResult {
+        colProportionalSpace: number[];
+        rowProportionalSpace: number[];
+        guaranteedWidths: number[];
+        guaranteedHeights: number[];
+        wantsWidth: boolean;
+        wantsHeight: boolean;
+    }
     class Table extends ComponentContainer {
         /**
         * Creates a Table.
@@ -404,8 +399,6 @@ declare module Plottable {
         * @returns {Table} The calling Table.
         */
         public colWeight(index: number, weight: number): Table;
-        public isFixedWidth(): boolean;
-        public isFixedHeight(): boolean;
     }
 }
 declare module Plottable {
@@ -465,9 +458,6 @@ declare module Plottable {
         scale?: Scale;
     }
     class Renderer extends Component {
-        public renderArea: D3.Selection;
-        public element: D3.Selection;
-        public scales: Scale[];
         /**
         * Creates a Renderer.
         *
@@ -805,9 +795,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class XYRenderer extends Renderer {
-        public dataSelection: D3.UpdateSelection;
-        public xScale: Scale;
-        public yScale: Scale;
         /**
         * Creates an XYRenderer.
         *
@@ -862,9 +849,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class GridRenderer extends XYRenderer {
-        public colorScale: Scale;
-        public xScale: OrdinalScale;
-        public yScale: OrdinalScale;
         /**
         * Creates a GridRenderer.
         *
@@ -972,8 +956,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Interaction {
-        public hitBox: D3.Selection;
-        public componentToListenTo: Component;
         /**
         * Creates an Interaction.
         *
@@ -1031,8 +1013,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class PanZoomInteraction extends Interaction {
-        public xScale: QuantitiveScale;
-        public yScale: QuantitiveScale;
         /**
         * Creates a PanZoomInteraction.
         *
@@ -1047,8 +1027,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class DragInteraction extends Interaction {
-        public origin: number[];
-        public location: number[];
         public callbackToCall: (dragInfo: any) => any;
         /**
         * Creates a DragInteraction.
@@ -1067,8 +1045,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class DragBoxInteraction extends DragInteraction {
-        public dragBox: D3.Selection;
-        public boxIsDrawn: boolean;
         /**
         * Clears the highlighted drag-selection box drawn by the AreaInteraction.
         *
@@ -1117,7 +1093,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Axis extends Component {
-        public axisElement: D3.Selection;
         static _DEFAULT_TICK_SIZE: number;
         /**
         * Creates an Axis.

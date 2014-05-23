@@ -18,9 +18,7 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      var yA = Utils.applyAccessor(this._yAccessor, this.dataSource());
-
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), yA);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this.dataSelection.enter().append("rect");
 
       var attrToProjector = this._generateAttrToProjector();

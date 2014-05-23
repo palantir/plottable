@@ -336,8 +336,11 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this._height + ")");};
-
+      if (this.orient() === "top")  {
+        this.axisElement.attr("transform", "translate(0," + this._height + ")");
+      } else if (this.orient() === "bottom") {
+        this.axisElement.attr("transform", "");
+      }
 
       var tickTextLabels = this.axisElement.selectAll("text");
       if (tickTextLabels[0].length > 0) { // at least one tick label
@@ -470,8 +473,11 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + this._width + ", 0)");};
-
+      if (this.orient() === "left") {
+        this.axisElement.attr("transform", "translate(" + this._width + ", 0)");
+      } else if (this.orient() === "right") {
+        this.axisElement.attr("transform", "");
+      }
 
       var tickTextLabels = this.axisElement.selectAll("text");
       if (tickTextLabels[0].length > 0) { // at least one tick label

@@ -44,12 +44,12 @@ module Plottable {
       return this;
     }
 
-    public isFixedWidth(): boolean {
-      return this._components.every((c) => c.isFixedWidth());
+    public _isFixedWidth(): boolean {
+      return this._components.every((c) => c._isFixedWidth());
     }
 
-    public isFixedHeight(): boolean {
-      return this._components.every((c) => c.isFixedHeight());
+    public _isFixedHeight(): boolean {
+      return this._components.every((c) => c._isFixedHeight());
     }
   }
 }
