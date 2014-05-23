@@ -108,14 +108,14 @@ describe("Axes", () => {
   });
 
   it("X Axis height can be changed", () => {
-    var svg = generateSVG(500, 100);
+    var svg = generateSVG(500, 30);
     var xScale = new Plottable.LinearScale();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
     var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
     xAxis.renderTo(svg);
 
-    var oldHeight = xAxis._requestedSpace(500, 100).height;
+    var oldHeight = xAxis._requestedSpace(500, 30).height;
     var axisBBoxBefore = (<any> xAxis.element.node()).getBBox();
     var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
     assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
@@ -172,14 +172,14 @@ describe("Axes", () => {
   });
 
   it("Y Axis width can be changed", () => {
-    var svg = generateSVG(100, 500);
+    var svg = generateSVG(50, 500);
     var yScale = new Plottable.LinearScale();
     yScale.domain([0, 10]);
     yScale.range([500, 0]);
     var yAxis = new Plottable.YAxis(yScale, "left");
     yAxis.renderTo(svg);
 
-    var oldWidth = yAxis._requestedSpace(100, 500).width;
+    var oldWidth = yAxis._requestedSpace(50, 500).width;
     var axisBBoxBefore = (<any> yAxis.element.node()).getBBox();
     var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
     assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
