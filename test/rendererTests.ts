@@ -3,6 +3,25 @@
 var assert = chai.assert;
 
 
+module Plottable {
+  /**
+   * A mock that keeps track of how many times _render() was
+   * called - useful for checking DataSource callbacks.
+   */
+  export class CountingRenderer extends Renderer {
+    public renders: number = 0;
+
+    constructor(dataset: any) {
+      super(dataset);
+    }
+
+    public _render() {
+      ++this.renders;
+      return super._render();
+    }
+  }
+}
+
 var quadraticDataset = makeQuadraticSeries(10);
 
 describe("Renderers", () => {
@@ -20,11 +39,80 @@ describe("Renderers", () => {
       r._anchor(svg)._computeLayout();
       var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
+      svg.remove();
+    });
+
+    it("Allows the DataSource to be changed", () => {
+      var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
+      var r = new Plottable.Renderer(d1);
+      assert.equal(d1, r.dataSource(), "returns the original");
 
       var d2 = new Plottable.DataSource(["bar"], {cssClass: "boo"});
-      assert.throws(() => r.dataSource(d2), Error);
+      r.dataSource(d2);
+      assert.equal(d2, r.dataSource(), "returns new datasource");
+    });
 
-      svg.remove();
+    it("Changes DataSource listeners when the DataSource is changed", () => {
+      var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
+      var r = new Plottable.CountingRenderer(d1);
+
+      assert.equal(0, r.renders, "initially hasn't rendered anything");
+
+      d1._broadcast();
+      assert.equal(1, r.renders, "we re-render when our datasource changes");
+
+      r.dataSource();
+      assert.equal(1, r.renders, "we shouldn't redraw when querying the datasource");
+
+      var d2 = new Plottable.DataSource(["bar"], {cssClass: "boo"});
+      r.dataSource(d2);
+      assert.equal(2, r.renders, "we should redraw when we change datasource");
+
+      d1._broadcast();
+      assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
+
+      d2._broadcast();
+      assert.equal(3, r.renders, "we should listen to the new datasource");
+    });
+
+    it("Updates its projectors when the DataSource is changed", () => {
+      var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
+      var r = new Plottable.Renderer(d1);
+
+      var xScaleCalls: number = 0;
+      var yScaleCalls: number = 0;
+      var xScale = new Plottable.LinearScale();
+      var yScale = new Plottable.LinearScale();
+      r.project("x", null, xScale);
+      r.project("y", null, yScale);
+      xScale.registerListener(null, (broadcaster: Plottable.Broadcaster) => {
+        assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
+        ++xScaleCalls;
+      });
+      yScale.registerListener(null, (broadcaster: Plottable.Broadcaster) => {
+        assert.equal(broadcaster, yScale, "Callback received the calling scale as the first argument");
+        ++yScaleCalls;
+      });
+
+      assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
+      assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
+
+      d1._broadcast();
+      assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
+      assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
+
+      var d2 = new Plottable.DataSource(["bar"], {cssClass: "boo"});
+      r.dataSource(d2);
+      assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
+      assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
+
+      d1._broadcast();
+      assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
+      assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
+
+      d2._broadcast();
+      assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
+      assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
     });
 
     it("Renderer automatically generates a DataSource if only data is provided", () => {
@@ -54,8 +142,8 @@ describe("Renderers", () => {
       yScale.domain([400, 0]);
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var metadata = {foo: 10, bar: 20};
-      var xAccessor = (d, i?, m?) => d.x + i * m.foo;
-      var yAccessor = (d, i?, m?) => m.bar;
+      var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
+      var yAccessor = (d: any, i?: number, m?: any) => m.bar;
       var dataSource = new Plottable.DataSource(data, metadata);
       var renderer = new Plottable.CircleRenderer(dataSource, xScale, yScale)
                                   .project("x", xAccessor)
@@ -90,24 +178,21 @@ describe("Renderers", () => {
       // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
       // draws properly for the LineRenderer
       var svg: D3.Selection;
-      var xScale;
-      var yScale;
-      var lineRenderer;
+      var xScale = new Plottable.LinearScale().domain([0, 1]);
+      var yScale = new Plottable.LinearScale().domain([0, 1]);
+      var xAccessor = (d: any) => d.foo;
+      var yAccessor = (d: any) => d.bar;
+      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      var renderArea;
+      var lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale)
+                                      .project("x", xAccessor)
+                                      .project("y", yAccessor)
+                                      .project("stroke", colorAccessor);
+      var renderArea: D3.Selection;
       var verifier = new MultiTestVerifier();
 
       before(() => {
         svg = generateSVG(500, 500);
-        xScale = new Plottable.LinearScale().domain([0, 1]);
-        yScale = new Plottable.LinearScale().domain([0, 1]);
-        var xAccessor = (d) => d.foo;
-        var yAccessor = (d) => d.bar;
-        var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
-        lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale)
-                                    .project("x", xAccessor)
-                                    .project("y", yAccessor);
-        lineRenderer.project("stroke", colorAccessor);
         lineRenderer.renderTo(svg);
         renderArea = lineRenderer.renderArea;
       });
@@ -145,28 +230,25 @@ describe("Renderers", () => {
 
     describe("Basic AreaRenderer functionality", () => {
       var svg: D3.Selection;
-      var xScale;
-      var yScale;
-      var areaRenderer;
+      var xScale = new Plottable.LinearScale().domain([0, 1]);
+      var yScale = new Plottable.LinearScale().domain([0, 1]);
+      var xAccessor = (d: any) => d.foo;
+      var yAccessor = (d: any) => d.bar;
+      var y0Accessor = () => 0;
+      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
+      var fillAccessor = () => "steelblue";
       var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      var renderArea;
+      var areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale)
+                                  .project("x", xAccessor)
+                                  .project("y", yAccessor)
+                                  .project("y0", y0Accessor)
+                                  .project("fill", fillAccessor)
+                                  .project("stroke", colorAccessor);
+      var renderArea: D3.Selection;
       var verifier = new MultiTestVerifier();
 
       before(() => {
         svg = generateSVG(500, 500);
-        xScale = new Plottable.LinearScale().domain([0, 1]);
-        yScale = new Plottable.LinearScale().domain([0, 1]);
-        var xAccessor = (d) => d.foo;
-        var yAccessor = (d) => d.bar;
-        var y0Accessor = () => 0;
-        var colorAccessor = (d, i, m) => d3.rgb(d.foo, d.bar, i).toString();
-        var fillAccessor = () => "steelblue";
-        areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale)
-                                    .project("x", xAccessor)
-                                    .project("y", yAccessor)
-                                    .project("y0", y0Accessor);
-        areaRenderer.project("fill", fillAccessor)
-                    .project("stroke", colorAccessor);
         areaRenderer.renderTo(svg);
         renderArea = areaRenderer.renderArea;
       });
@@ -192,7 +274,7 @@ describe("Renderers", () => {
       });
 
       it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-        areaRenderer.project("y0", (d) => d.bar/2);
+        areaRenderer.project("y0", (d: any) => d.bar/2);
         areaRenderer.renderTo(svg);
         renderArea = areaRenderer.renderArea;
         var path = renderArea.select("path");
@@ -217,8 +299,8 @@ describe("Renderers", () => {
       var pixelAreaPart = {xMin: 200, xMax: 600, yMin: 100, yMax: 200};
       var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
       var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
-      var colorAccessor = (d, i, m) => d3.rgb(d.x, d.y ,i).toString();
-      var circlesInArea;
+      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y ,i).toString();
+      var circlesInArea: number;
 
       function getCircleRendererVerifier() {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
@@ -228,7 +310,7 @@ describe("Renderers", () => {
         var renderAreaTransform = d3.transform(renderArea.attr("transform"));
         var translate = renderAreaTransform.translate;
         var scale     = renderAreaTransform.scale;
-        return function (datum, index) {
+        return function (datum: any, index: number) {
           // This function takes special care to compute the position of circles after taking svg transformation
           // into account.
           var selection = d3.select(this);
@@ -307,11 +389,12 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.OrdinalScale().domain(["A", "B"]);
+        xScale = new Plottable.OrdinalScale().domain(["A", "B"]).rangeType("points");
         yScale = new Plottable.LinearScale();
         var data = [
           {x: "A", y: 1},
-          {x: "B", y: -1.5}
+          {x: "B", y: -1.5},
+          {x: "B", y: 1} // duplicate X-value
         ];
         dataset = new Plottable.DataSource(data);
 
@@ -329,6 +412,7 @@ describe("Renderers", () => {
       it("renders correctly", () => {
         var renderArea = renderer.renderArea;
         var bars = renderArea.selectAll("rect");
+        assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
@@ -427,12 +511,13 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.OrdinalScale().domain(["A", "B"]);
+        yScale = new Plottable.OrdinalScale().domain(["A", "B"]).rangeType("points");
         xScale = new Plottable.LinearScale();
 
         var data = [
           {y: "A", x: 1},
-          {y: "B", x: -1.5}
+          {y: "B", x: -1.5},
+          {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.DataSource(data);
 
@@ -450,6 +535,7 @@ describe("Renderers", () => {
       it("renders correctly", () => {
         var renderArea = renderer.renderArea;
         var bars = renderArea.selectAll("rect");
+        assert.lengthOf(bars[0], 3, "One bar was created per data point");
         var bar0 = d3.select(bars[0][0]);
         var bar1 = d3.select(bars[0][1]);
         assert.equal(bar0.attr("height"), "10", "bar0 height is correct");

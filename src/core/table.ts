@@ -8,6 +8,16 @@ module Plottable {
     wantsWidthArr : boolean[];
     wantsHeightArr: boolean[];
   }
+
+  export interface IterateLayoutResult {
+    colProportionalSpace: number[];
+    rowProportionalSpace: number[];
+    guaranteedWidths    : number[];
+    guaranteedHeights   : number[];
+    wantsWidth          : boolean;
+    wantsHeight         : boolean;
+  };
+
   export class Table extends ComponentContainer {
     private rowPadding = 0;
     private colPadding = 0;
@@ -47,17 +57,18 @@ module Plottable {
      * @param {Component} component The Component to be added.
      */
     public addComponent(row: number, col: number, component: Component): Table {
-      this.nRows = Math.max(row + 1, this.nRows);
-      this.nCols = Math.max(col + 1, this.nCols);
-      this.padTableToSize(this.nRows, this.nCols);
+      if (this._addComponent(component)) {
+        this.nRows = Math.max(row + 1, this.nRows);
+        this.nCols = Math.max(col + 1, this.nCols);
+        this.padTableToSize(this.nRows, this.nCols);
 
-      var currentComponent = this.rows[row][col];
-      if (currentComponent != null) {
-        throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+        var currentComponent = this.rows[row][col];
+        if (currentComponent != null) {
+          throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+        }
+
+        this.rows[row][col] = component;
       }
-
-      this.rows[row][col] = component;
-      this._addComponent(component);
       return this;
     }
 
@@ -65,7 +76,7 @@ module Plottable {
       throw new Error("_removeComponent not yet implemented on Table");
     }
 
-    private iterateLayout(availableWidth : number, availableHeight: number) {
+    private iterateLayout(availableWidth : number, availableHeight: number): IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
      *
@@ -91,8 +102,8 @@ module Plottable {
       var availableWidthAfterPadding  = availableWidth  - this.colPadding * (this.nCols - 1);
       var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
 
-      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
-      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c.isFixedWidth());
+      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c._isFixedHeight());
+      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c._isFixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -271,13 +282,13 @@ module Plottable {
       return this;
     }
 
-    public isFixedWidth(): boolean {
+    public _isFixedWidth(): boolean {
       var cols = d3.transpose(this.rows);
-      return Table.fixedSpace(cols, (c: Component) => (c == null) || c.isFixedWidth());
+      return Table.fixedSpace(cols, (c: Component) => (c == null) || c._isFixedWidth());
     }
 
-    public isFixedHeight(): boolean {
-      return Table.fixedSpace(this.rows, (c: Component) => (c == null) || c.isFixedHeight());
+    public _isFixedHeight(): boolean {
+      return Table.fixedSpace(this.rows, (c: Component) => (c == null) || c._isFixedHeight());
     }
 
     private padTableToSize(nRows: number, nCols: number) {
@@ -326,8 +337,8 @@ module Plottable {
 
     private static fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
       var all = (bools: boolean[]) => bools.reduce((a, b) => a && b);
-      var groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
-      return all(componentGroup.map(groupIsFixed));
+      var group_isFixed = (components: Component[]) => all(components.map(fixityAccessor));
+      return all(componentGroup.map(group_isFixed));
     }
   }
 }

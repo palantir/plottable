@@ -267,8 +267,8 @@ it("components can be offset relative to their alignment, and throw errors if th
   it("interaction registration works properly", () => {
     var hitBox1: Element = null;
     var hitBox2: Element = null;
-    var interaction1: any = {_anchor: (hb) => hitBox1 = hb.node()};
-    var interaction2: any = {_anchor: (hb) => hitBox2 = hb.node()};
+    var interaction1: any = {_anchor: (hb: D3.Selection) => hitBox1 = hb.node()};
+    var interaction2: any = {_anchor: (hb: D3.Selection) => hitBox2 = hb.node()};
     c.registerInteraction(interaction1);
     c.renderTo(svg);
     c.registerInteraction(interaction2);

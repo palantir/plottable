@@ -1,21 +1,33 @@
 /*!
-Plottable 0.12.4 (https://github.com/palantir/plottable)
+Plottable 0.13.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
-///<reference path="reference.ts" />
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     (function (Utils) {
         /**
         * Checks if x is between a and b.
+        *
+        * @param {number} x The value to test if in range
+        * @param {number} a The beginning of the (inclusive) range
+        * @param {number} b The ending of the (inclusive) range
+        * @return {boolean} Whether x is in [a, b]
         */
         function inRange(x, a, b) {
             return (Math.min(a, b) <= x && x <= Math.max(a, b));
         }
         Utils.inRange = inRange;
 
+        /**
+        * Takes two arrays of numbers and adds them together
+        *
+        * @param {number[]} alist The first array of numbers
+        * @param {number[]} blist The second array of numbers
+        * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
+        */
         function addArrays(alist, blist) {
             return alist.map(function (_, i) {
                 return alist[i] + blist[i];
@@ -23,36 +35,188 @@ var Plottable;
         }
         Utils.addArrays = addArrays;
 
-        /**
-        * Gets the bounding box of an element.
-        * @param {D3.Selection} element
-        * @returns {SVGRed} The bounding box.
-        */
-        function getBBox(element) {
-            return element.node().getBBox();
-        }
-        Utils.getBBox = getBBox;
-
-        function _getParsedStyleValue(style, prop) {
-            var value = style.getPropertyValue(prop);
-            if (value == null) {
-                return 0;
+        function accessorize(accessor) {
+            if (typeof (accessor) === "function") {
+                return accessor;
+            } else if (typeof (accessor) === "string" && accessor[0] !== "#") {
+                return function (d, i, s) {
+                    return d[accessor];
+                };
+            } else {
+                return function (d, i, s) {
+                    return accessor;
+                };
             }
-            return parseFloat(value);
+            ;
         }
+        Utils.accessorize = accessorize;
 
-        function getElementWidth(elem) {
-            var style = window.getComputedStyle(elem);
-            return _getParsedStyleValue(style, "width") + _getParsedStyleValue(style, "padding-left") + _getParsedStyleValue(style, "padding-right") + _getParsedStyleValue(style, "border-left-width") + _getParsedStyleValue(style, "border-right-width");
+        function applyAccessor(accessor, dataSource) {
+            var activatedAccessor = accessorize(accessor);
+            return function (d, i) {
+                return activatedAccessor(d, i, dataSource.metadata());
+            };
         }
-        Utils.getElementWidth = getElementWidth;
+        Utils.applyAccessor = applyAccessor;
 
-        function getElementHeight(elem) {
-            var style = window.getComputedStyle(elem);
-            return _getParsedStyleValue(style, "height") + _getParsedStyleValue(style, "padding-top") + _getParsedStyleValue(style, "padding-bottom") + _getParsedStyleValue(style, "border-top-width") + _getParsedStyleValue(style, "border-bottom-width");
+        function uniq(strings) {
+            var seen = {};
+            strings.forEach(function (s) {
+                return seen[s] = true;
+            });
+            return d3.keys(seen);
         }
-        Utils.getElementHeight = getElementHeight;
+        Utils.uniq = uniq;
 
+        /**
+        * Creates an array of length `count`, filled with value or (if value is a function), value()
+        *
+        * @param {any} value The value to fill the array with, or, if a function, a generator for values
+        * @param {number} count The length of the array to generate
+        * @return {any[]}
+        */
+        function createFilledArray(value, count) {
+            var out = [];
+            for (var i = 0; i < count; i++) {
+                out[i] = typeof (value) === "function" ? value(i) : value;
+            }
+            return out;
+        }
+        Utils.createFilledArray = createFilledArray;
+    })(Plottable.Utils || (Plottable.Utils = {}));
+    var Utils = Plottable.Utils;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+// This file contains open source utilities, along with their copyright notices
+var Plottable;
+(function (Plottable) {
+    (function (OSUtils) {
+        
+
+        function sortedIndex(val, arr, accessor) {
+            var low = 0;
+            var high = arr.length;
+            while (low < high) {
+                /* tslint:disable:no-bitwise */
+                var mid = (low + high) >>> 1;
+
+                /* tslint:enable:no-bitwise */
+                var x = accessor == null ? arr[mid] : accessor(arr[mid]);
+                if (x < val) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+            return low;
+        }
+        OSUtils.sortedIndex = sortedIndex;
+        ;
+    })(Plottable.OSUtils || (Plottable.OSUtils = {}));
+    var OSUtils = Plottable.OSUtils;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var IDCounter = (function () {
+        function IDCounter() {
+            this.counter = {};
+        }
+        IDCounter.prototype.setDefault = function (id) {
+            if (this.counter[id] == null) {
+                this.counter[id] = 0;
+            }
+        };
+
+        IDCounter.prototype.increment = function (id) {
+            this.setDefault(id);
+            return ++this.counter[id];
+        };
+
+        IDCounter.prototype.decrement = function (id) {
+            this.setDefault(id);
+            return --this.counter[id];
+        };
+
+        IDCounter.prototype.get = function (id) {
+            this.setDefault(id);
+            return this.counter[id];
+        };
+        return IDCounter;
+    })();
+    Plottable.IDCounter = IDCounter;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    /**
+    * An associative array that can be keyed by anything (inc objects).
+    * Uses pointer equality checks which is why this works.
+    * This power has a price: everything is linear time since it is actually backed by an array...
+    */
+    var StrictEqualityAssociativeArray = (function () {
+        function StrictEqualityAssociativeArray() {
+            this.keyValuePairs = [];
+        }
+        /**
+        * Set a new key/value pair in the store.
+        *
+        * @param {any} Key to set in the store
+        * @param {any} Value to set in the store
+        * @return {boolean} True if key already in store, false otherwise
+        */
+        StrictEqualityAssociativeArray.prototype.set = function (key, value) {
+            for (var i = 0; i < this.keyValuePairs.length; i++) {
+                if (this.keyValuePairs[i][0] === key) {
+                    this.keyValuePairs[i][1] = value;
+                    return true;
+                }
+            }
+            this.keyValuePairs.push([key, value]);
+            return false;
+        };
+
+        StrictEqualityAssociativeArray.prototype.get = function (key) {
+            for (var i = 0; i < this.keyValuePairs.length; i++) {
+                if (this.keyValuePairs[i][0] === key) {
+                    return this.keyValuePairs[i][1];
+                }
+            }
+            return undefined;
+        };
+
+        StrictEqualityAssociativeArray.prototype.has = function (key) {
+            for (var i = 0; i < this.keyValuePairs.length; i++) {
+                if (this.keyValuePairs[i][0] === key) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        StrictEqualityAssociativeArray.prototype.values = function () {
+            return this.keyValuePairs.map(function (x) {
+                return x[1];
+            });
+        };
+
+        StrictEqualityAssociativeArray.prototype.delete = function (key) {
+            for (var i = 0; i < this.keyValuePairs.length; i++) {
+                if (this.keyValuePairs[i][0] === key) {
+                    this.keyValuePairs.splice(i, 1);
+                    return true;
+                }
+            }
+            return false;
+        };
+        return StrictEqualityAssociativeArray;
+    })();
+    Plottable.StrictEqualityAssociativeArray = StrictEqualityAssociativeArray;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (TextUtils) {
         /**
         * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
         *
@@ -64,7 +228,7 @@ var Plottable;
         function getTruncatedText(text, availableSpace, element) {
             var originalText = element.text();
             element.text(text);
-            var bbox = Utils.getBBox(element);
+            var bbox = Plottable.DOMUtils.getBBox(element);
             var textLength = bbox.width;
             if (textLength <= availableSpace) {
                 element.text(originalText);
@@ -87,7 +251,7 @@ var Plottable;
                 }
             }
         }
-        Utils.getTruncatedText = getTruncatedText;
+        TextUtils.getTruncatedText = getTruncatedText;
 
         /**
         * Gets the height of a text element, as rendered.
@@ -98,11 +262,11 @@ var Plottable;
         function getTextHeight(textElement) {
             var originalText = textElement.text();
             textElement.text("bqpdl");
-            var height = Utils.getBBox(textElement).height;
+            var height = Plottable.DOMUtils.getBBox(textElement).height;
             textElement.text(originalText);
             return height;
         }
-        Utils.getTextHeight = getTextHeight;
+        TextUtils.getTextHeight = getTextHeight;
 
         /**
         * Gets the width of a text element, as rendered.
@@ -113,11 +277,11 @@ var Plottable;
         function getTextWidth(textElement, text) {
             var originalText = textElement.text();
             textElement.text(text);
-            var width = text === "" ? 0 : Utils.getBBox(textElement).width;
+            var width = text === "" ? 0 : Plottable.DOMUtils.getBBox(textElement).width;
             textElement.text(originalText);
             return width;
         }
-        Utils.getTextWidth = getTextWidth;
+        TextUtils.getTextWidth = getTextWidth;
 
         /**
         * Converts a string into an array of strings, all of which fit in the available space.
@@ -133,7 +297,7 @@ var Plottable;
             var hyphenLength = textNode.getSubStringLength(0, 1);
 
             textElement.text(text);
-            var bbox = Utils.getBBox(textElement);
+            var bbox = Plottable.DOMUtils.getBBox(textElement);
             var textLength = bbox.width;
             var textHeight = bbox.height;
 
@@ -182,203 +346,9 @@ var Plottable;
             textElement.text(originalText);
             return lines;
         }
-        Utils.getWrappedText = getWrappedText;
-
-        function getSVGPixelWidth(svg) {
-            var width = svg.node().clientWidth;
-
-            if (width === 0) {
-                var widthAttr = svg.attr("width");
-
-                if (widthAttr.indexOf("%") !== -1) {
-                    var ancestorNode = svg.node().parentNode;
-                    while (ancestorNode != null && ancestorNode.clientWidth === 0) {
-                        ancestorNode = ancestorNode.parentNode;
-                    }
-                    if (ancestorNode == null) {
-                        throw new Error("Could not compute width of element");
-                    }
-                    width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
-                } else {
-                    width = parseFloat(widthAttr);
-                }
-            }
-
-            return width;
-        }
-        Utils.getSVGPixelWidth = getSVGPixelWidth;
-
-        function accessorize(accessor) {
-            if (typeof (accessor) === "function") {
-                return accessor;
-            } else if (typeof (accessor) === "string" && accessor[0] !== "#") {
-                return function (d, i, s) {
-                    return d[accessor];
-                };
-            } else {
-                return function (d, i, s) {
-                    return accessor;
-                };
-            }
-            ;
-        }
-        Utils.accessorize = accessorize;
-
-        function applyAccessor(accessor, dataSource) {
-            var activatedAccessor = accessorize(accessor);
-            return function (d, i) {
-                return activatedAccessor(d, i, dataSource.metadata());
-            };
-        }
-        Utils.applyAccessor = applyAccessor;
-
-        function uniq(strings) {
-            var seen = {};
-            strings.forEach(function (s) {
-                return seen[s] = true;
-            });
-            return d3.keys(seen);
-        }
-        Utils.uniq = uniq;
-
-        /**
-        * An associative array that can be keyed by anything (inc objects).
-        * Uses pointer equality checks which is why this works.
-        * This power has a price: everything is linear time since it is actually backed by an array...
-        */
-        var StrictEqualityAssociativeArray = (function () {
-            function StrictEqualityAssociativeArray() {
-                this.keyValuePairs = [];
-            }
-            /**
-            * Set a new key/value pair in the store.
-            *
-            * @param {any} Key to set in the store
-            * @param {any} Value to set in the store
-            * @return {boolean} True if key already in store, false otherwise
-            */
-            StrictEqualityAssociativeArray.prototype.set = function (key, value) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        this.keyValuePairs[i][1] = value;
-                        return true;
-                    }
-                }
-                this.keyValuePairs.push([key, value]);
-                return false;
-            };
-
-            StrictEqualityAssociativeArray.prototype.get = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        return this.keyValuePairs[i][1];
-                    }
-                }
-                return undefined;
-            };
-
-            StrictEqualityAssociativeArray.prototype.has = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-
-            StrictEqualityAssociativeArray.prototype.values = function () {
-                return this.keyValuePairs.map(function (x) {
-                    return x[1];
-                });
-            };
-
-            StrictEqualityAssociativeArray.prototype.delete = function (key) {
-                for (var i = 0; i < this.keyValuePairs.length; i++) {
-                    if (this.keyValuePairs[i][0] === key) {
-                        this.keyValuePairs.splice(i, 1);
-                        return true;
-                    }
-                }
-                return false;
-            };
-            return StrictEqualityAssociativeArray;
-        })();
-        Utils.StrictEqualityAssociativeArray = StrictEqualityAssociativeArray;
-
-        var IDCounter = (function () {
-            function IDCounter() {
-                this.counter = {};
-            }
-            IDCounter.prototype.setDefault = function (id) {
-                if (this.counter[id] == null) {
-                    this.counter[id] = 0;
-                }
-            };
-
-            IDCounter.prototype.increment = function (id) {
-                this.setDefault(id);
-                return ++this.counter[id];
-            };
-
-            IDCounter.prototype.decrement = function (id) {
-                this.setDefault(id);
-                return --this.counter[id];
-            };
-
-            IDCounter.prototype.get = function (id) {
-                this.setDefault(id);
-                return this.counter[id];
-            };
-            return IDCounter;
-        })();
-        Utils.IDCounter = IDCounter;
-
-        /**
-        * Creates an array of length `count`, filled with value or (if value is a function), value()
-        *
-        * @param {any} value The value to fill the array with, or, if a function, a generator for values
-        * @param {number} count The length of the array to generate
-        * @return {any[]}
-        */
-        function createFilledArray(value, count) {
-            var out = [];
-            for (var i = 0; i < count; i++) {
-                out[i] = typeof (value) === "function" ? value(i) : value;
-            }
-            return out;
-        }
-        Utils.createFilledArray = createFilledArray;
-    })(Plottable.Utils || (Plottable.Utils = {}));
-    var Utils = Plottable.Utils;
-})(Plottable || (Plottable = {}));
-///<reference path="reference.ts" />
-// This file contains open source utilities, along with their copyright notices
-var Plottable;
-(function (Plottable) {
-    (function (OSUtils) {
-        
-
-        function sortedIndex(val, arr, accessor) {
-            var low = 0;
-            var high = arr.length;
-            while (low < high) {
-                /* tslint:disable:no-bitwise */
-                var mid = (low + high) >>> 1;
-
-                /* tslint:enable:no-bitwise */
-                var x = accessor == null ? arr[mid] : accessor(arr[mid]);
-                if (x < val) {
-                    low = mid + 1;
-                } else {
-                    high = mid;
-                }
-            }
-            return low;
-        }
-        OSUtils.sortedIndex = sortedIndex;
-        ;
-    })(Plottable.OSUtils || (Plottable.OSUtils = {}));
-    var OSUtils = Plottable.OSUtils;
+        TextUtils.getWrappedText = getWrappedText;
+    })(Plottable.TextUtils || (Plottable.TextUtils = {}));
+    var TextUtils = Plottable.TextUtils;
 })(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -405,7 +375,7 @@ var Plottable;
         __extends(Broadcaster, _super);
         function Broadcaster() {
             _super.apply(this, arguments);
-            this.listener2Callback = new Plottable.Utils.StrictEqualityAssociativeArray();
+            this.listener2Callback = new Plottable.StrictEqualityAssociativeArray();
         }
         /**
         * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -477,14 +447,14 @@ var Plottable;
             _super.call(this);
             this._data = data;
             this._metadata = metadata;
-            this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+            this.accessor2cachedExtent = new Plottable.StrictEqualityAssociativeArray();
         }
         DataSource.prototype.data = function (data) {
             if (data == null) {
                 return this._data;
             } else {
                 this._data = data;
-                this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.accessor2cachedExtent = new Plottable.StrictEqualityAssociativeArray();
                 this._broadcast();
                 return this;
             }
@@ -495,7 +465,7 @@ var Plottable;
                 return this._metadata;
             } else {
                 this._metadata = metadata;
-                this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.accessor2cachedExtent = new Plottable.StrictEqualityAssociativeArray();
                 this._broadcast();
                 return this;
             }
@@ -643,8 +613,8 @@ var Plottable;
                     }
 
                     var elem = this.rootSVG.node();
-                    availableWidth = Plottable.Utils.getElementWidth(elem);
-                    availableHeight = Plottable.Utils.getElementHeight(elem);
+                    availableWidth = Plottable.DOMUtils.getElementWidth(elem);
+                    availableHeight = Plottable.DOMUtils.getElementHeight(elem);
                 } else {
                     throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                 }
@@ -658,14 +628,14 @@ var Plottable;
 
             xPosition += (availableWidth - requestedSpace.width) * this._xAlignProportion;
             xPosition += this._xOffset;
-            if (this.isFixedWidth()) {
+            if (this._isFixedWidth()) {
                 // Decrease size so hitbox / bounding box and children are sized correctly
                 availableWidth = Math.min(availableWidth, requestedSpace.width);
             }
 
             yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
             yPosition += this._yOffset;
-            if (this.isFixedHeight()) {
+            if (this._isFixedHeight()) {
                 availableHeight = Math.min(availableHeight, requestedSpace.height);
             }
 
@@ -899,7 +869,7 @@ var Plottable;
         *
         * @return {boolean} Whether the component has a fixed width.
         */
-        Component.prototype.isFixedWidth = function () {
+        Component.prototype._isFixedWidth = function () {
             // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
             // some fixed size you aspire to.
             // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
@@ -913,7 +883,7 @@ var Plottable;
         *
         * @return {boolean} Whether the component has a fixed height.
         */
-        Component.prototype.isFixedHeight = function () {
+        Component.prototype._isFixedHeight = function () {
             return this._requestedSpace(-1, -1).wantsHeight;
         };
 
@@ -983,6 +953,13 @@ var Plottable;
             return this;
         };
 
+        ComponentContainer.prototype._render = function () {
+            this._components.forEach(function (c) {
+                return c._render();
+            });
+            return this;
+        };
+
         ComponentContainer.prototype._removeComponent = function (c) {
             var removeIndex = this._components.indexOf(c);
             if (removeIndex >= 0) {
@@ -994,9 +971,10 @@ var Plottable;
 
         ComponentContainer.prototype._addComponent = function (c, prepend) {
             if (typeof prepend === "undefined") { prepend = false; }
-            if (c == null) {
-                return this;
+            if (c == null || this._components.indexOf(c) >= 0) {
+                return false;
             }
+
             if (prepend) {
                 this._components.unshift(c);
             } else {
@@ -1007,7 +985,7 @@ var Plottable;
                 c._anchor(this.content);
             }
             this._invalidateLayout();
-            return this;
+            return true;
         };
 
         /**
@@ -1016,7 +994,7 @@ var Plottable;
         * @returns{Component[]} the contained Components
         */
         ComponentContainer.prototype.components = function () {
-            return this._components;
+            return this._components.slice();
         };
 
         /**
@@ -1106,23 +1084,15 @@ var Plottable;
             return this;
         };
 
-        ComponentGroup.prototype._doRender = function () {
-            _super.prototype._doRender.call(this);
-            this._components.forEach(function (c) {
-                return c._doRender();
-            });
-            return this;
-        };
-
-        ComponentGroup.prototype.isFixedWidth = function () {
+        ComponentGroup.prototype._isFixedWidth = function () {
             return this._components.every(function (c) {
-                return c.isFixedWidth();
+                return c._isFixedWidth();
             });
         };
 
-        ComponentGroup.prototype.isFixedHeight = function () {
+        ComponentGroup.prototype._isFixedHeight = function () {
             return this._components.every(function (c) {
-                return c.isFixedHeight();
+                return c._isFixedHeight();
             });
         };
         return ComponentGroup;
@@ -1132,6 +1102,8 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    ;
+
     var Table = (function (_super) {
         __extends(Table, _super);
         /**
@@ -1167,17 +1139,18 @@ var Plottable;
         * @param {Component} component The Component to be added.
         */
         Table.prototype.addComponent = function (row, col, component) {
-            this.nRows = Math.max(row + 1, this.nRows);
-            this.nCols = Math.max(col + 1, this.nCols);
-            this.padTableToSize(this.nRows, this.nCols);
+            if (this._addComponent(component)) {
+                this.nRows = Math.max(row + 1, this.nRows);
+                this.nCols = Math.max(col + 1, this.nCols);
+                this.padTableToSize(this.nRows, this.nCols);
 
-            var currentComponent = this.rows[row][col];
-            if (currentComponent != null) {
-                throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+                var currentComponent = this.rows[row][col];
+                if (currentComponent != null) {
+                    throw new Error("Table.addComponent cannot be called on a cell where a component already exists (for the moment)");
+                }
+
+                this.rows[row][col] = component;
             }
-
-            this.rows[row][col] = component;
-            this._addComponent(component);
             return this;
         };
 
@@ -1212,10 +1185,10 @@ var Plottable;
             var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
 
             var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, function (c) {
-                return (c == null) || c.isFixedHeight();
+                return (c == null) || c._isFixedHeight();
             });
             var colWeights = Table.calcComponentWeights(this.colWeights, cols, function (c) {
-                return (c == null) || c.isFixedWidth();
+                return (c == null) || c._isFixedWidth();
             });
 
             // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
@@ -1368,18 +1341,6 @@ var Plottable;
             return this;
         };
 
-        Table.prototype._doRender = function () {
-            // recursively render children
-            this.rows.forEach(function (row, rowIndex) {
-                row.forEach(function (component, colIndex) {
-                    if (component != null) {
-                        component._doRender();
-                    }
-                });
-            });
-            return this;
-        };
-
         /**
         * Sets the row and column padding on the Table.
         *
@@ -1422,16 +1383,16 @@ var Plottable;
             return this;
         };
 
-        Table.prototype.isFixedWidth = function () {
+        Table.prototype._isFixedWidth = function () {
             var cols = d3.transpose(this.rows);
             return Table.fixedSpace(cols, function (c) {
-                return (c == null) || c.isFixedWidth();
+                return (c == null) || c._isFixedWidth();
             });
         };
 
-        Table.prototype.isFixedHeight = function () {
+        Table.prototype._isFixedHeight = function () {
             return Table.fixedSpace(this.rows, function (c) {
-                return (c == null) || c.isFixedHeight();
+                return (c == null) || c._isFixedHeight();
             });
         };
 
@@ -1487,10 +1448,10 @@ var Plottable;
                     return a && b;
                 });
             };
-            var groupIsFixed = function (components) {
+            var group_isFixed = function (components) {
                 return all(components.map(fixityAccessor));
             };
-            return all(componentGroup.map(groupIsFixed));
+            return all(componentGroup.map(group_isFixed));
         };
         return Table;
     })(Plottable.ComponentContainer);
@@ -1511,7 +1472,7 @@ var Plottable;
             _super.call(this);
             this._autoDomain = true;
             this.rendererID2Perspective = {};
-            this.dataSourceReferenceCounter = new Plottable.Utils.IDCounter();
+            this.dataSourceReferenceCounter = new Plottable.IDCounter();
             this._autoNice = false;
             this._autoPad = false;
             this._d3Scale = scale;
@@ -1634,6 +1595,7 @@ var Plottable;
             _super.call(this);
             this._dataChanged = false;
             this._animate = false;
+            this._ANIMATION_DURATION = 250;
             this._hasRendered = false;
             this._projectors = {};
             this._rerenderUpdateSelection = false;
@@ -1658,8 +1620,8 @@ var Plottable;
             }
             this.dataSource(dataSource);
         }
-        Renderer.prototype._anchor = function (element, parent) {
-            _super.prototype._anchor.call(this, element, parent);
+        Renderer.prototype._anchor = function (element) {
+            _super.prototype._anchor.call(this, element);
             this._dataChanged = true;
             return this;
         };
@@ -1668,18 +1630,31 @@ var Plottable;
             var _this = this;
             if (source == null) {
                 return this._dataSource;
-            } else if (this._dataSource == null) {
-                this._dataSource = source;
-                this._registerToBroadcaster(this._dataSource, function () {
-                    _this._dataChanged = true;
-                    _this._render();
-                });
-                this._dataChanged = true;
-                this._render();
-                return this;
-            } else {
-                throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
             }
+            var oldSource = this._dataSource;
+            if (oldSource != null) {
+                this._deregisterFromBroadcaster(this._dataSource);
+                this._requireRerender = true;
+                this._rerenderUpdateSelection = true;
+
+                // point all scales at the new datasource
+                d3.keys(this._projectors).forEach(function (attrToSet) {
+                    var projector = _this._projectors[attrToSet];
+                    if (projector.scale != null) {
+                        var rendererIDAttr = _this._plottableID + attrToSet;
+                        projector.scale._removePerspective(rendererIDAttr);
+                        projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
+                    }
+                });
+            }
+            this._dataSource = source;
+            this._registerToBroadcaster(this._dataSource, function () {
+                _this._dataChanged = true;
+                _this._render();
+            });
+            this._dataChanged = true;
+            this._render();
+            return this;
         };
 
         Renderer.prototype.project = function (attrToSet, accessor, scale) {
@@ -1796,6 +1771,10 @@ var Plottable;
                 return c._computeLayout();
             });
             var toRender = d3.values(RenderController.componentsNeedingRender);
+            toRender.forEach(function (c) {
+                return c._render();
+            }); // call _render on everything, so that containers will put their children in the toRender queue
+            toRender = d3.values(RenderController.componentsNeedingRender);
             toRender.forEach(function (c) {
                 return c._doRender();
             });
@@ -2013,7 +1992,7 @@ var Plottable;
         function OrdinalScale(scale) {
             _super.call(this, scale == null ? d3.scale.ordinal() : scale);
             this._range = [0, 1];
-            this._rangeType = "points";
+            this._rangeType = "bands";
             // Padding as a proportion of the spacing between domain values
             this._innerPadding = 0.3;
             this._outerPadding = 0.5;
@@ -2430,13 +2409,13 @@ var Plottable;
         };
 
         Label.prototype.measureAndSetTextSize = function () {
-            var bbox = Plottable.Utils.getBBox(this.textElement);
+            var bbox = Plottable.DOMUtils.getBBox(this.textElement);
             this.textHeight = bbox.height;
             this.textLength = this.text === "" ? 0 : bbox.width;
         };
 
         Label.prototype.truncateTextAndRemeasure = function (availableLength) {
-            var shortText = Plottable.Utils.getTruncatedText(this.text, availableLength, this.textElement);
+            var shortText = Plottable.TextUtils.getTruncatedText(this.text, availableLength, this.textElement);
             this.textElement.text(shortText);
             this.measureAndSetTextSize();
         };
@@ -2444,7 +2423,7 @@ var Plottable;
         Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
             _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
             this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-            var bbox = Plottable.Utils.getBBox(this.textElement);
+            var bbox = Plottable.DOMUtils.getBBox(this.textElement);
             this.textElement.attr("dy", -bbox.y);
 
             var xShift = 0;
@@ -2550,7 +2529,7 @@ var Plottable;
             var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
             var fakeText = fakeLegendEl.append("text");
             var maxWidth = d3.max(this.colorScale.domain(), function (d) {
-                return Plottable.Utils.getTextWidth(fakeText, d);
+                return Plottable.TextUtils.getTextWidth(fakeText, d);
             });
             fakeLegendEl.remove();
             maxWidth = maxWidth === undefined ? 0 : maxWidth;
@@ -2566,7 +2545,7 @@ var Plottable;
         Legend.prototype.measureTextHeight = function () {
             // note: can't be called before anchoring atm
             var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-            var textHeight = Plottable.Utils.getTextHeight(fakeLegendEl.append("text"));
+            var textHeight = Plottable.TextUtils.getTextHeight(fakeLegendEl.append("text"));
             fakeLegendEl.remove();
             return textHeight;
         };
@@ -2586,7 +2565,7 @@ var Plottable;
             legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
             legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
             legend.selectAll("text").text(function (d, i) {
-                return Plottable.Utils.getTruncatedText(d, availableWidth, d3.select(this));
+                return Plottable.TextUtils.getTruncatedText(d, availableWidth, d3.select(this));
             });
             return this;
         };
@@ -2682,6 +2661,7 @@ var Plottable;
         };
 
         CircleRenderer.prototype._paint = function () {
+            var _this = this;
             _super.prototype._paint.call(this);
             var attrToProjector = this._generateAttrToProjector();
             attrToProjector["cx"] = attrToProjector["x"];
@@ -2702,7 +2682,7 @@ var Plottable;
             if (this._animate && this._dataChanged) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * 250 / n;
+                    return i * _this._ANIMATION_DURATION / n;
                 });
             }
             updateSelection.attr("r", rFunction);
@@ -2728,6 +2708,7 @@ var Plottable;
         */
         function LineRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
+            this._ANIMATION_DURATION = 500;
             this.classed("line-renderer", true);
             this.project("stroke", function () {
                 return "steelblue";
@@ -2755,7 +2736,7 @@ var Plottable;
             }
 
             this.line = d3.svg.line().x(xFunction).y(yFunction);
-            var updateSelection = (this._animate) ? this.path.transition().duration(500) : this.path;
+            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
             updateSelection.attr("d", this.line).attr(attrToProjector);
         };
         return LineRenderer;
@@ -2883,6 +2864,9 @@ var Plottable;
             this._baselineValue = 0;
             this.classed("bar-renderer", true);
             this.project("width", 10);
+            this.project("fill", function () {
+                return "steelblue";
+            });
         }
         AbstractBarRenderer.prototype._setup = function () {
             _super.prototype._setup.call(this);
@@ -2973,12 +2957,11 @@ var Plottable;
             this._barAlignment = "left";
         }
         BarRenderer.prototype._paint = function () {
+            var _this = this;
             _super.prototype._paint.call(this);
             var scaledBaseline = this.yScale.scale(this._baselineValue);
 
-            var xA = Plottable.Utils.applyAccessor(this._xAccessor, this.dataSource());
-
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
             this.dataSelection.enter().append("rect");
 
             var attrToProjector = this._generateAttrToProjector();
@@ -3035,7 +3018,7 @@ var Plottable;
             if (this._animate) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * 250 / n;
+                    return i * _this._ANIMATION_DURATION / n;
                 });
             }
 
@@ -3090,10 +3073,9 @@ var Plottable;
             this._barAlignment = "top";
         }
         HorizontalBarRenderer.prototype._paint = function () {
+            var _this = this;
             _super.prototype._paint.call(this);
-            var yA = Plottable.Utils.applyAccessor(this._yAccessor, this.dataSource());
-
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), yA);
+            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
             this.dataSelection.enter().append("rect");
 
             var attrToProjector = this._generateAttrToProjector();
@@ -3153,7 +3135,7 @@ var Plottable;
             if (this._animate) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * 250 / n;
+                    return i * _this._ANIMATION_DURATION / n;
                 });
             }
 
@@ -3756,8 +3738,11 @@ var Plottable;
     })(Plottable.Table);
     Plottable.StandardChart = StandardChart;
 })(Plottable || (Plottable = {}));
-/// <reference path="utils.ts" />
-/// <reference path="osUtils.ts" />
+/// <reference path="utils/utils.ts" />
+/// <reference path="utils/osUtils.ts" />
+/// <reference path="utils/idCounter.ts" />
+/// <reference path="utils/strictEqualityAssociativeArray.ts" />
+/// <reference path="utils/textUtils.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
@@ -4045,6 +4030,7 @@ var Plottable;
                 return this;
             }
         };
+        Axis._DEFAULT_TICK_SIZE = 6;
         return Axis;
     })(Plottable.Component);
     Plottable.Axis = Axis;
@@ -4096,7 +4082,9 @@ var Plottable;
             } else {
                 var positionLC = position.toLowerCase();
                 if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
-                    if (positionLC !== "center") {
+                    if (positionLC === "center") {
+                        this.tickSize(XAxis._DEFAULT_TICK_SIZE);
+                    } else {
                         this.tickSize(12); // longer than default tick size
                     }
                     return _super.prototype.tickLabelPosition.call(this, positionLC);
@@ -4111,8 +4099,9 @@ var Plottable;
             _super.prototype._doRender.call(this);
             if (this.orient() === "top") {
                 this.axisElement.attr("transform", "translate(0," + this._height + ")");
+            } else if (this.orient() === "bottom") {
+                this.axisElement.attr("transform", "");
             }
-            ;
 
             var tickTextLabels = this.axisElement.selectAll("text");
             if (tickTextLabels[0].length > 0) {
@@ -4153,9 +4142,9 @@ var Plottable;
                     tickTextLabels.each(function (t, i) {
                         var textEl = d3.select(this);
                         var currentText = textEl.text();
-                        var wrappedLines = Plottable.Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+                        var wrappedLines = Plottable.TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
                         if (wrappedLines.length === 1) {
-                            textEl.text(Plottable.Utils.getTruncatedText(currentText, availableWidth, textEl));
+                            textEl.text(Plottable.TextUtils.getTruncatedText(currentText, availableWidth, textEl));
                         } else {
                             textEl.text("");
                             var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -4228,7 +4217,9 @@ var Plottable;
             } else {
                 var positionLC = position.toLowerCase();
                 if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
-                    if (positionLC !== "middle") {
+                    if (positionLC === "middle") {
+                        this.tickSize(YAxis._DEFAULT_TICK_SIZE);
+                    } else {
                         this.tickSize(30); // longer than default tick size
                     }
                     return _super.prototype.tickLabelPosition.call(this, positionLC);
@@ -4243,8 +4234,9 @@ var Plottable;
             _super.prototype._doRender.call(this);
             if (this.orient() === "left") {
                 this.axisElement.attr("transform", "translate(" + this._width + ", 0)");
+            } else if (this.orient() === "right") {
+                this.axisElement.attr("transform", "");
             }
-            ;
 
             var tickTextLabels = this.axisElement.selectAll("text");
             if (tickTextLabels[0].length > 0) {
@@ -4284,9 +4276,9 @@ var Plottable;
                     tickTextLabels.each(function (t, i) {
                         var textEl = d3.select(this);
                         var currentText = textEl.text();
-                        var wrappedLines = Plottable.Utils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+                        var wrappedLines = Plottable.TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
                         if (wrappedLines.length === 1) {
-                            textEl.text(Plottable.Utils.getTruncatedText(currentText, availableWidth, textEl));
+                            textEl.text(Plottable.TextUtils.getTruncatedText(currentText, availableWidth, textEl));
                         } else {
                             var baseY = 0;
                             if (tickLabelPosition === "top") {
@@ -4438,6 +4430,7 @@ var Plottable;
         */
         function AreaRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
+            this._ANIMATION_DURATION = 500;
             this.classed("area-renderer", true);
             this.project("y0", 0, yScale); // default
             this.project("fill", function () {
@@ -4467,7 +4460,7 @@ var Plottable;
             }
 
             this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-            var updateSelection = (this._animate) ? this.path.transition().duration(500) : this.path;
+            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
             updateSelection.attr("d", this.area).attr(attrToProjector);
         };
         return AreaRenderer;
@@ -4477,4 +4470,63 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     ;
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
+    (function (DOMUtils) {
+        /**
+        * Gets the bounding box of an element.
+        * @param {D3.Selection} element
+        * @returns {SVGRed} The bounding box.
+        */
+        function getBBox(element) {
+            return element.node().getBBox();
+        }
+        DOMUtils.getBBox = getBBox;
+
+        function _getParsedStyleValue(style, prop) {
+            var value = style.getPropertyValue(prop);
+            if (value == null) {
+                return 0;
+            }
+            return parseFloat(value);
+        }
+
+        function getElementWidth(elem) {
+            var style = window.getComputedStyle(elem);
+            return _getParsedStyleValue(style, "width") + _getParsedStyleValue(style, "padding-left") + _getParsedStyleValue(style, "padding-right") + _getParsedStyleValue(style, "border-left-width") + _getParsedStyleValue(style, "border-right-width");
+        }
+        DOMUtils.getElementWidth = getElementWidth;
+
+        function getElementHeight(elem) {
+            var style = window.getComputedStyle(elem);
+            return _getParsedStyleValue(style, "height") + _getParsedStyleValue(style, "padding-top") + _getParsedStyleValue(style, "padding-bottom") + _getParsedStyleValue(style, "border-top-width") + _getParsedStyleValue(style, "border-bottom-width");
+        }
+        DOMUtils.getElementHeight = getElementHeight;
+
+        function getSVGPixelWidth(svg) {
+            var width = svg.node().clientWidth;
+
+            if (width === 0) {
+                var widthAttr = svg.attr("width");
+
+                if (widthAttr.indexOf("%") !== -1) {
+                    var ancestorNode = svg.node().parentNode;
+                    while (ancestorNode != null && ancestorNode.clientWidth === 0) {
+                        ancestorNode = ancestorNode.parentNode;
+                    }
+                    if (ancestorNode == null) {
+                        throw new Error("Could not compute width of element");
+                    }
+                    width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
+                } else {
+                    width = parseFloat(widthAttr);
+                }
+            }
+
+            return width;
+        }
+        DOMUtils.getSVGPixelWidth = getSVGPixelWidth;
+    })(Plottable.DOMUtils || (Plottable.DOMUtils = {}));
+    var DOMUtils = Plottable.DOMUtils;
 })(Plottable || (Plottable = {}));

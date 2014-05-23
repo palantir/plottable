@@ -101,18 +101,18 @@ describe("Scales", () => {
   });
 
   describe("Ordinal Scales", () => {
-    it("defaults to \"points\" range type", () => {
+    it("defaults to \"bands\" range type", () => {
       var scale = new Plottable.OrdinalScale();
-      assert.deepEqual(scale.rangeType(), "points");
+      assert.deepEqual(scale.rangeType(), "bands");
     });
 
     it("rangeBand returns 0 when in \"points\" mode", () => {
-      var scale = new Plottable.OrdinalScale();
+      var scale = new Plottable.OrdinalScale().rangeType("points");
       assert.deepEqual(scale.rangeType(), "points");
       assert.deepEqual(scale.rangeBand(), 0);
     });
 
-    it("rangeBands are updated when we switch to \"bands\" mode", () => {
+    it("rangeBand is updated when domain changes in \"bands\" mode", () => {
       var scale = new Plottable.OrdinalScale();
       scale.rangeType("bands");
       assert.deepEqual(scale.rangeType(), "bands");
@@ -123,6 +123,18 @@ describe("Scales", () => {
 
       scale.domain([1,2,3,4,5]);
       assert.deepEqual(scale.rangeBand(), 329);
+    });
+
+    it("rangeType triggers broadcast", () => {
+      var scale = new Plottable.OrdinalScale();
+      var callbackWasCalled = false;
+      var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Broadcaster) => {
+        assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+        callbackWasCalled = true;
+      };
+      scale.registerListener(null, testCallback);
+      scale.rangeType("points");
+      assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
   });
 
@@ -197,32 +209,6 @@ describe("Scales", () => {
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
       assert.equal("#e3e3e3", scale.scale(8));
-    });
-  });
-
-  describe("Ordinal Scales", () => {
-    it("defaults to \"points\" range type", () => {
-      var scale = new Plottable.OrdinalScale();
-      assert.deepEqual(scale.rangeType(), "points");
-    });
-
-    it("rangeBand returns 0 when in \"points\" mode", () => {
-      var scale = new Plottable.OrdinalScale();
-      assert.deepEqual(scale.rangeType(), "points");
-      assert.deepEqual(scale.rangeBand(), 0);
-    });
-
-    it("rangeBands are updated when we switch to \"bands\" mode", () => {
-      var scale = new Plottable.OrdinalScale();
-      scale.rangeType("bands");
-      assert.deepEqual(scale.rangeType(), "bands");
-      scale.range([0, 2679]);
-
-      scale.domain([1,2,3,4]);
-      assert.deepEqual(scale.rangeBand(), 399);
-
-      scale.domain([1,2,3,4,5]);
-      assert.deepEqual(scale.rangeBand(), 329);
     });
   });
 });

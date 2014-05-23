@@ -139,14 +139,14 @@ module Plottable {
 
       xPosition += (availableWidth  - requestedSpace.width) * this._xAlignProportion;
       xPosition += this._xOffset;
-      if (this.isFixedWidth()) {
+      if (this._isFixedWidth()) {
         // Decrease size so hitbox / bounding box and children are sized correctly
         availableWidth  = Math.min(availableWidth , requestedSpace.width);
       }
 
       yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
       yPosition += this._yOffset;
-      if (this.isFixedHeight()) {
+      if (this._isFixedHeight()) {
         availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
@@ -386,7 +386,7 @@ module Plottable {
      *
      * @return {boolean} Whether the component has a fixed width.
      */
-    public isFixedWidth(): boolean {
+    public _isFixedWidth(): boolean {
       // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
       // some fixed size you aspire to.
       // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
@@ -400,7 +400,7 @@ module Plottable {
      *
      * @return {boolean} Whether the component has a fixed height.
      */
-    public isFixedHeight(): boolean {
+    public _isFixedHeight(): boolean {
       return this._requestedSpace(-1, -1).wantsHeight;
     }
 

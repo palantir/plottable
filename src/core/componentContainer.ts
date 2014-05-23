@@ -28,10 +28,11 @@ module Plottable {
       return this;
     }
 
-    public _addComponent(c: Component, prepend = false) {
-      if (c == null) {
-        return this;
+    public _addComponent(c: Component, prepend = false): boolean {
+      if (c == null || this._components.indexOf(c) >= 0) {
+        return false;
       }
+
       if (prepend) {
         this._components.unshift(c);
       } else {
@@ -42,7 +43,7 @@ module Plottable {
         c._anchor(this.content);
       }
       this._invalidateLayout();
-      return this;
+      return true;
     }
 
     /**
@@ -51,7 +52,7 @@ module Plottable {
      * @returns{Component[]} the contained Components
      */
     public components(): Component[] {
-      return this._components;
+      return this._components.slice(); // return a shallow copy
     }
 
     /**
