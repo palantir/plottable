@@ -2725,6 +2725,18 @@ describe("Scales", function () {
             scale.domain([1, 2, 3, 4, 5]);
             assert.deepEqual(scale.rangeBand(), 329);
         });
+
+        it("rangeType triggers broadcast", function () {
+            var scale = new Plottable.OrdinalScale();
+            var callbackWasCalled = false;
+            var testCallback = function (broadcaster) {
+                assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+                callbackWasCalled = true;
+            };
+            scale.registerListener(null, testCallback);
+            scale.rangeType("points");
+            assert.isTrue(callbackWasCalled, "The registered callback was called");
+        });
     });
 
     describe("Color Scales", function () {

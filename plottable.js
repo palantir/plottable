@@ -2052,6 +2052,7 @@ var Plottable;
                 if (innerPadding != null) {
                     this._innerPadding = innerPadding;
                 }
+                this._broadcast();
                 return this;
             }
         };
@@ -3820,7 +3821,7 @@ var Plottable;
             }
             this.tickFormat(formatter);
             this._registerToBroadcaster(this._axisScale, function () {
-                return _this.rescale();
+                return _this._render();
             });
         }
         Axis.prototype._setup = function () {
@@ -3921,11 +3922,6 @@ var Plottable;
                     d3.select(this).style("visibility", "visible");
                 }
             });
-        };
-
-        Axis.prototype.rescale = function () {
-            return (this.element != null) ? this._render() : null;
-            // short circuit, we don't care about perf.
         };
 
         Axis.prototype.scale = function (newScale) {
@@ -4046,6 +4042,7 @@ var Plottable;
         * @param {any} [formatter] a D3 formatter
         */
         function XAxis(scale, orientation, formatter) {
+            if (typeof orientation === "undefined") { orientation = "bottom"; }
             if (typeof formatter === "undefined") { formatter = null; }
             _super.call(this, scale, orientation, formatter);
             this._height = 30;
@@ -4181,6 +4178,7 @@ var Plottable;
         * @param {any} [formatter] a D3 formatter
         */
         function YAxis(scale, orientation, formatter) {
+            if (typeof orientation === "undefined") { orientation = "left"; }
             if (typeof formatter === "undefined") { formatter = null; }
             _super.call(this, scale, orientation, formatter);
             this._width = 50;
@@ -4361,12 +4359,12 @@ var Plottable;
             this.yScale = yScale;
             if (this.xScale != null) {
                 this._registerToBroadcaster(this.xScale, function () {
-                    return _this.redrawXLines();
+                    return _this._render();
                 });
             }
             if (this.yScale != null) {
                 this._registerToBroadcaster(this.yScale, function () {
-                    return _this.redrawYLines();
+                    return _this._render();
                 });
             }
         }
@@ -4386,7 +4384,7 @@ var Plottable;
 
         Gridlines.prototype.redrawXLines = function () {
             var _this = this;
-            if (this.xScale != null && this.element != null) {
+            if (this.xScale != null) {
                 var xTicks = this.xScale.ticks();
                 var getScaledXValue = function (tickVal) {
                     return _this.xScale.scale(tickVal);
@@ -4400,7 +4398,7 @@ var Plottable;
 
         Gridlines.prototype.redrawYLines = function () {
             var _this = this;
-            if (this.yScale != null && this.element != null) {
+            if (this.yScale != null) {
                 var yTicks = this.yScale.ticks();
                 var getScaledYValue = function (tickVal) {
                     return _this.yScale.scale(tickVal);

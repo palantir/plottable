@@ -1149,7 +1149,7 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (top/bottom)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Scale, orientation: string, formatter?: any);
+        constructor(scale: Scale, orientation?: string, formatter?: any);
         public height(h: number): XAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
@@ -1169,7 +1169,7 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Scale, orientation: string, formatter?: any);
+        constructor(scale: Scale, orientation?: string, formatter?: any);
         public width(w: number): YAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
