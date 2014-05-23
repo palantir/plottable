@@ -91,11 +91,11 @@ module Plottable {
       var yShift = 0;
 
       if (this.orientation === "horizontal") {
-        this.truncateTextAndRemeasure(this._availableWidth );
-        xShift = (this._availableWidth   - this.textLength) * this._xAlignProportion;
+        this.truncateTextAndRemeasure(this.availableWidth );
+        xShift = (this.availableWidth   - this.textLength) * this._xAlignProportion;
       } else {
-        this.truncateTextAndRemeasure(this._availableHeight);
-        xShift = (this._availableHeight - this.textLength) * this._yAlignProportion;
+        this.truncateTextAndRemeasure(this.availableHeight);
+        xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
 
         if (this.orientation === "vertical-right") {
           this.textElement.attr("transform", "rotate(90)");

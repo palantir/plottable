@@ -80,7 +80,7 @@ module Plottable {
         "x1": scaledBaseline,
         "y1": 0,
         "x2": scaledBaseline,
-        "y2": this._availableHeight
+        "y2": this.availableHeight
       });
     }
 

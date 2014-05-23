@@ -208,7 +208,7 @@ module Plottable {
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
-      var layout = this.iterateLayout(this._availableWidth , this._availableHeight);
+      var layout = this.iterateLayout(this.availableWidth , this.availableHeight);
 
       var sumPair = (p: number[]) => p[0] + p[1];
       var rowHeights = Utils.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);

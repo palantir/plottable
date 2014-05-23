@@ -87,8 +87,8 @@ module Plottable {
     }
 
     public _hideCutOffTickLabels() {
-      var availableWidth  = this._availableWidth ;
-      var availableHeight = this._availableHeight;
+      var availableWidth  = this.availableWidth ;
+      var availableHeight = this.availableHeight;
       var tickLabels = this.axisElement.selectAll(".tick").select("text");
 
       var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
@@ -96,8 +96,8 @@ module Plottable {
       var isInsideBBox = (tickBox: ClientRect) => {
         return (boundingBox.left <= tickBox.left &&
                 boundingBox.top  <= tickBox.top  &&
-                tickBox.right  <= boundingBox.left + this._availableWidth &&
-                tickBox.bottom <= boundingBox.top  + this._availableHeight);
+                tickBox.right  <= boundingBox.left + this.availableWidth &&
+                tickBox.bottom <= boundingBox.top  + this.availableHeight);
       };
 
       tickLabels.each(function (d: any){
@@ -356,9 +356,9 @@ module Plottable {
 
         if ((<OrdinalScale> this._axisScale).rangeType != null) { // ordinal scale
           var scaleRange = this._axisScale.range();
-          var availableWidth = this._availableWidth;
+          var availableWidth = this.availableWidth;
           var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
-          var availableHeight = this._availableHeight - tickLengthWithPadding;
+          var availableHeight = this.availableHeight - tickLengthWithPadding;
           if (tickTextLabels[0].length > 1) { // more than one label
             var tickValues = tickTextLabels.data();
             var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
@@ -489,8 +489,8 @@ module Plottable {
         if ((<OrdinalScale> this._axisScale).rangeType != null) { // ordinal scale
           var scaleRange = this._axisScale.range();
           var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
-          var availableWidth = this._availableWidth - tickLengthWithPadding;
-          var availableHeight = this._availableHeight;
+          var availableWidth = this.availableWidth - tickLengthWithPadding;
+          var availableHeight = this.availableHeight;
           if (tickTextLabels[0].length > 1) { // more than one label
             var tickValues = tickTextLabels.data();
             var tickPositions = tickValues.map((v: any) => this._axisScale.scale(v));
