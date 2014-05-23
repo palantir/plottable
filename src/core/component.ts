@@ -18,8 +18,8 @@ module Plottable {
     private isTopLevelComponent = false;
     public _parent: ComponentContainer;
 
-    public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
-    public availableHeight: number;
+    public _availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    public _availableHeight: number;
     public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
     public yOrigin: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
@@ -150,10 +150,10 @@ module Plottable {
         availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
-      this.availableWidth   = availableWidth ;
-      this.availableHeight = availableHeight;
+      this._availableWidth   = availableWidth ;
+      this._availableHeight = availableHeight;
       this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth ).attr("height", this.availableHeight));
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this._availableWidth ).attr("height", this._availableHeight));
       return this;
     }
 
@@ -298,8 +298,8 @@ module Plottable {
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
       this.boxes.push(box);
-      if (this.availableWidth  != null && this.availableHeight != null) {
-        box.attr("width", this.availableWidth ).attr("height", this.availableHeight);
+      if (this._availableWidth  != null && this._availableHeight != null) {
+        box.attr("width", this._availableWidth ).attr("height", this._availableHeight);
       }
       return box;
     }

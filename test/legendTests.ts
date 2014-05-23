@@ -37,11 +37,11 @@ describe("Legends", () => {
     assert.equal(legend._requestedSpace(200, 200).height, 0, "there is no requested height when domain is empty");
     color.domain(["foo", "bar"]);
     var height1 = legend._requestedSpace(400, 400).height;
-    var actualHeight1 = legend.availableHeight;
+    var actualHeight1 = legend._availableHeight;
     assert.operator(height1, ">", 0, "changing the domain gives a positive height");
     color.domain(["foo", "bar", "baz"]);
     assert.operator(legend._requestedSpace(400, 400).height, ">", height1, "adding to the domain increases the height requested");
-    var actualHeight2 = legend.availableHeight;
+    var actualHeight2 = legend._availableHeight;
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
     var numRows = legend.content.selectAll(".legend-row")[0].length;
     assert.equal(numRows, 3, "there are 3 rows");
@@ -58,7 +58,7 @@ describe("Legends", () => {
       totalHeight += Plottable.DOMUtils.getBBox(d3.select(this).select("text")).height;
     });
     assert.lengthOf(legends[0], 8, "there were 8 legends");
-    assert.operator(totalHeight, "<=", legend.availableHeight, "the legend did not overflow its space");
+    assert.operator(totalHeight, "<=", legend._availableHeight, "the legend did not overflow its space");
     svg.remove();
   });
 

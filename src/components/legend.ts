@@ -55,7 +55,7 @@ module Plottable {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
+      this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this._availableHeight / textHeight));
       return this;
     }
 
@@ -90,7 +90,7 @@ module Plottable {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
-      var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
+      var availableWidth  = this._availableWidth  - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
       this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
       var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);

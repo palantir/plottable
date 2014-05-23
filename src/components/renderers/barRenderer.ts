@@ -78,7 +78,7 @@ module Plottable {
       this._baseline.attr({
         "x1": 0,
         "y1": scaledBaseline,
-        "x2": this.availableWidth,
+        "x2": this._availableWidth,
         "y2": scaledBaseline
       });
     }

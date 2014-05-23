@@ -39,7 +39,7 @@ module Plottable {
                   availableHeight?: number): ComponentGroup {
       super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
       this._components.forEach((c) => {
-        c._computeLayout(0, 0, this.availableWidth, this.availableHeight);
+        c._computeLayout(0, 0, this._availableWidth, this._availableHeight);
       });
       return this;
     }
