@@ -348,6 +348,14 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    interface IterateLayoutResult {
+        colProportionalSpace: number[];
+        rowProportionalSpace: number[];
+        guaranteedWidths: number[];
+        guaranteedHeights: number[];
+        wantsWidth: boolean;
+        wantsHeight: boolean;
+    }
     class Table extends ComponentContainer {
         /**
         * Creates a Table.

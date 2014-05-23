@@ -1102,6 +1102,8 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    ;
+
     var Table = (function (_super) {
         __extends(Table, _super);
         /**
