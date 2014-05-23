@@ -702,15 +702,19 @@ var Plottable;
         };
 
         /**
-        * Cause the Component to recompute layout and redraw. Useful if the window resized.
+        * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
         *
         * @param {number} [availableWidth]  - the width of the container element
         * @param {number} [availableHeight] - the height of the container element
         */
         Component.prototype.resize = function (width, height) {
-            if (this.element != null) {
-                this._computeLayout(width, height)._render();
+            if (!this.isTopLevelComponent) {
+                throw new Error("Cannot resize on non top-level component");
             }
+            if (width != null && height != null && this._isAnchored) {
+                this.rootSVG.attr({ width: width, height: height });
+            }
+            this._invalidateLayout();
             return this;
         };
 
@@ -2052,6 +2056,7 @@ var Plottable;
                 if (innerPadding != null) {
                     this._innerPadding = innerPadding;
                 }
+                this._broadcast();
                 return this;
             }
         };
@@ -4046,6 +4051,7 @@ var Plottable;
         * @param {any} [formatter] a D3 formatter
         */
         function XAxis(scale, orientation, formatter) {
+            if (typeof orientation === "undefined") { orientation = "bottom"; }
             if (typeof formatter === "undefined") { formatter = null; }
             _super.call(this, scale, orientation, formatter);
             this._height = 30;
@@ -4181,6 +4187,7 @@ var Plottable;
         * @param {any} [formatter] a D3 formatter
         */
         function YAxis(scale, orientation, formatter) {
+            if (typeof orientation === "undefined") { orientation = "left"; }
             if (typeof formatter === "undefined") { formatter = null; }
             _super.call(this, scale, orientation, formatter);
             this._width = 50;
