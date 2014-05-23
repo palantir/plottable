@@ -7,6 +7,7 @@ module Plottable {
     public _axisScale: Scale;
     private _showEndTickLabels = false;
     private tickPositioning = "center";
+    public orientToAlign: {[s: string]: string} = {left: "right", right: "left", top: "bottom", bottom: "top"};
 
     /**
      * Creates an Axis.
@@ -284,7 +285,8 @@ module Plottable {
         throw new Error(orientation + " is not a valid orientation for XAxis");
       }
       this.tickLabelPosition("center");
-      this.yAlign(orientation);
+      var desiredAlignment = this.orientToAlign[orientation];
+      this.yAlign(desiredAlignment);
     }
 
     public height(h: number) {
@@ -417,7 +419,8 @@ module Plottable {
         throw new Error(orientation + " is not a valid orientation for YAxis");
       }
       this.tickLabelPosition("middle");
-      this.xAlign(orientation);
+      var desiredAlignment = this.orientToAlign[orientation];
+      this.xAlign(desiredAlignment);
     }
 
     public _setup() {
