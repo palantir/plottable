@@ -175,7 +175,6 @@ var Plottable;
             this.keyValuePairs.push([key, value]);
             return false;
         };
-<<<<<<< HEAD
 
         StrictEqualityAssociativeArray.prototype.get = function (key) {
             for (var i = 0; i < this.keyValuePairs.length; i++) {
@@ -201,33 +200,6 @@ var Plottable;
             });
         };
 
-=======
-
-        StrictEqualityAssociativeArray.prototype.get = function (key) {
-            for (var i = 0; i < this.keyValuePairs.length; i++) {
-                if (this.keyValuePairs[i][0] === key) {
-                    return this.keyValuePairs[i][1];
-                }
-            }
-            return undefined;
-        };
-
-        StrictEqualityAssociativeArray.prototype.has = function (key) {
-            for (var i = 0; i < this.keyValuePairs.length; i++) {
-                if (this.keyValuePairs[i][0] === key) {
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        StrictEqualityAssociativeArray.prototype.values = function () {
-            return this.keyValuePairs.map(function (x) {
-                return x[1];
-            });
-        };
-
->>>>>>> master
         StrictEqualityAssociativeArray.prototype.delete = function (key) {
             for (var i = 0; i < this.keyValuePairs.length; i++) {
                 if (this.keyValuePairs[i][0] === key) {
@@ -1112,11 +1084,7 @@ var Plottable;
             return this;
         };
 
-<<<<<<< HEAD
-        ComponentGroup.prototype.isFixedWidth = function () {
-=======
         ComponentGroup.prototype._isFixedWidth = function () {
->>>>>>> master
             return this._components.every(function (c) {
                 return c._isFixedWidth();
             });
