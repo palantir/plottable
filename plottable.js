@@ -4030,6 +4030,7 @@ var Plottable;
                 return this;
             }
         };
+        Axis._DEFAULT_TICK_SIZE = 6;
         return Axis;
     })(Plottable.Component);
     Plottable.Axis = Axis;
@@ -4081,7 +4082,9 @@ var Plottable;
             } else {
                 var positionLC = position.toLowerCase();
                 if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
-                    if (positionLC !== "center") {
+                    if (positionLC === "center") {
+                        this.tickSize(XAxis._DEFAULT_TICK_SIZE);
+                    } else {
                         this.tickSize(12); // longer than default tick size
                     }
                     return _super.prototype.tickLabelPosition.call(this, positionLC);
@@ -4214,7 +4217,9 @@ var Plottable;
             } else {
                 var positionLC = position.toLowerCase();
                 if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
-                    if (positionLC !== "middle") {
+                    if (positionLC === "middle") {
+                        this.tickSize(YAxis._DEFAULT_TICK_SIZE);
+                    } else {
                         this.tickSize(30); // longer than default tick size
                     }
                     return _super.prototype.tickLabelPosition.call(this, positionLC);
