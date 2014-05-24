@@ -148,6 +148,9 @@ module Plottable {
     public padDomain(padProportion = 0.05): QuantitiveScale {
       var currentDomain = this.domain();
       var extent = currentDomain[1]-currentDomain[0];
+      if (extent === 0) {
+        extent = 1;
+      }
       var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1] + padProportion/2 * extent];
       if (currentDomain[0] === 0) {
         newDomain[0] = 0;
