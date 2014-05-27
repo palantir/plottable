@@ -1122,6 +1122,8 @@ var Plottable;
             this.rows = [];
             this.rowWeights = [];
             this.colWeights = [];
+            this._rowCount = [];
+            this._colCount = [];
             this.nRows = 0;
             this.nCols = 0;
             this.classed("table", true);
