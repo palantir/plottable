@@ -1155,7 +1155,44 @@ var Plottable;
         };
 
         Table.prototype._removeComponent = function (c) {
-            throw new Error("_removeComponent not yet implemented on Table");
+            _super.prototype._removeComponent.call(this, c);
+            var rowpos = -1, colpos = -1;
+            outer:
+            for (var i = 0; i < this.nRows; i++) {
+                for (var j = 0; j < this.nCols; j++) {
+                    if (this.rows[i][j] === c) {
+                        rowpos = i;
+                        colpos = j;
+                        break outer;
+                    }
+                }
+            }
+
+            if (rowpos === -1) {
+                return this;
+            }
+
+            this.rows[rowpos][colpos] = null;
+
+            // check if can splice out row
+            if (this.rows[rowpos].every(function (v) {
+                return v === null;
+            })) {
+                this.rows.splice(rowpos, 1);
+                this.nRows--;
+            }
+
+            // check if can splice out column
+            if (this.rows.every(function (v) {
+                return v[colpos] === null;
+            })) {
+                this.rows.forEach(function (r) {
+                    return r.splice(colpos, 1);
+                });
+                this.nCols--;
+            }
+
+            return this;
         };
 
         Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
