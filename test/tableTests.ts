@@ -332,5 +332,29 @@ describe("Tables", () => {
 
       assert.deepEqual((<any> table).rows, [], "remove entire table");
     });
+
+    it("table._removeComponent does nothing when component is not found", () =>  {
+      table = new Plottable.Table([[c1, c2], [c3, c4]]);
+      table._removeComponent (c5);
+
+      assert.deepEqual((<any> table).rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
+    });
+
+    it("table._removeComponent removing component twice should have same effect as removing it once", () =>  {
+      table = new Plottable.Table([[c1, c2, c3], [c4, c5, c6]]);
+
+      table._removeComponent(c1);
+      assert.deepEqual((<any> table).rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+
+      table._removeComponent(c1);
+      assert.deepEqual((<any> table).rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+    });
+
+    it("table._removeComponent for multiple copies of the same item", () => {
+      table = new Plottable.Table([[c1, c1], [c2, c1]]);
+
+      table._removeComponent(c1);
+      assert.deepEqual((<any> table).rows, [[c2]], "remove once");
+    });
   });
 });
