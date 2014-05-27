@@ -105,6 +105,7 @@ module Plottable {
         if (innerPadding != null) {
           this._innerPadding = innerPadding;
         }
+        this._broadcast();
         return this;
       }
     }

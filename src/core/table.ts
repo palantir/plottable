@@ -8,6 +8,16 @@ module Plottable {
     wantsWidthArr : boolean[];
     wantsHeightArr: boolean[];
   }
+
+  export interface IterateLayoutResult {
+    colProportionalSpace: number[];
+    rowProportionalSpace: number[];
+    guaranteedWidths    : number[];
+    guaranteedHeights   : number[];
+    wantsWidth          : boolean;
+    wantsHeight         : boolean;
+  };
+
   export class Table extends ComponentContainer {
     private rowPadding = 0;
     private colPadding = 0;
@@ -66,34 +76,34 @@ module Plottable {
       throw new Error("_removeComponent not yet implemented on Table");
     }
 
-    private iterateLayout(availableWidth : number, availableHeight: number) {
-      /*
-       * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
-       *
-       * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
-       * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
-       * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
-       * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
-       * offered its column's width and may request some amount of it, which increases that column's guaranteed
-       * width. If there are some components that were not satisfied with the width they were offered, and there is free
-       * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
-       * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
-       * according to the colWeights.
-       *
-       * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
-       * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
-       * is possible, so the algorithm will not continue iterating on that dimension's account.
-       *
-       * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
-       * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
-       *
-       */
+    private iterateLayout(availableWidth : number, availableHeight: number): IterateLayoutResult {
+    /*
+     * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
+     *
+     * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
+     * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
+     * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
+     * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
+     * offered its column's width and may request some amount of it, which increases that column's guaranteed
+     * width. If there are some components that were not satisfied with the width they were offered, and there is free
+     * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
+     * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
+     * according to the colWeights.
+     *
+     * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
+     * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
+     * is possible, so the algorithm will not continue iterating on that dimension's account.
+     *
+     * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
+     * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
+     *
+     */
       var cols = d3.transpose(this.rows);
       var availableWidthAfterPadding  = availableWidth  - this.colPadding * (this.nCols - 1);
       var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
 
-      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c.isFixedHeight());
-      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c.isFixedWidth());
+      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c._isFixedHeight());
+      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c._isFixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -270,13 +280,13 @@ module Plottable {
       return this;
     }
 
-    public isFixedWidth(): boolean {
+    public _isFixedWidth(): boolean {
       var cols = d3.transpose(this.rows);
-      return Table.fixedSpace(cols, (c: Component) => (c == null) || c.isFixedWidth());
+      return Table.fixedSpace(cols, (c: Component) => (c == null) || c._isFixedWidth());
     }
 
-    public isFixedHeight(): boolean {
-      return Table.fixedSpace(this.rows, (c: Component) => (c == null) || c.isFixedHeight());
+    public _isFixedHeight(): boolean {
+      return Table.fixedSpace(this.rows, (c: Component) => (c == null) || c._isFixedHeight());
     }
 
     private padTableToSize(nRows: number, nCols: number) {
@@ -325,8 +335,8 @@ module Plottable {
 
     private static fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
       var all = (bools: boolean[]) => bools.reduce((a, b) => a && b);
-      var groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
-      return all(componentGroup.map(groupIsFixed));
+      var group_isFixed = (components: Component[]) => all(components.map(fixityAccessor));
+      return all(componentGroup.map(group_isFixed));
     }
   }
 }
