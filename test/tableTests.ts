@@ -275,5 +275,62 @@ describe("Tables", () => {
       result = (<any> table).iterateLayout(150, 200);
       verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
     });
+
+    describe("table._removeComponent works properly", () => {
+      var c1 = new Plottable.Component();
+      var c2 = new Plottable.Component();
+      var c3 = new Plottable.Component();
+      var c4 = new Plottable.Component();
+      var c5 = new Plottable.Component();
+      var c6 = new Plottable.Component();
+      var table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+      it("table._removeComponent works in easy case with no splicing", () => {
+        table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+        table._removeComponent(c4);
+        assert.deepEqual(table._getRows(), [[c1, c2], [c3, null], [c5, c6]], "remove one element");
+      });
+
+      it("table._removeComponent works for row splicing", () => {
+        table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+        table._removeComponent(c4);
+        table._removeComponent(c3);
+        assert.deepEqual(table._getRows(), [[c1, c2], [c5, c6]], "remove one row");
+      });
+
+      it("table._removeComponent works for column splicing", () => {
+        table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+        table._removeComponent(c2);
+        table._removeComponent(c4);
+        table._removeComponent(c6);
+
+        assert.deepEqual(table._getRows(), [[c1], [c3], [c5]], "remove one column");
+      });
+
+      it("table._removeComponent only splices when row or column is completely empty", () => {
+        table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+        table._removeComponent(c2);
+        table._removeComponent(c3);
+        table._removeComponent(c6);
+
+        assert.deepEqual(table._getRows(), [[c1, null], [null, c4], [c5, null]]);
+      });
+
+      it("table._removeComponent works for splicing out row and column simultaneously", () => {
+        table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+        table._removeComponent(c2);
+        table._removeComponent(c3);
+        table._removeComponent(c6);
+        table._removeComponent(c4); // this should kill the row and column at the same time
+
+        assert.deepEqual(table._getRows(), [[c1], [c5]]);
+      });
+
+      it ("table._removeComponenet works for single row and column", () => {
+        table = new Plottable.Table([[c1]]);
+        table._removeComponent(c1);
+
+        assert.deepEqual(table._getRows(), []);
+      });
+    });
   });
 });

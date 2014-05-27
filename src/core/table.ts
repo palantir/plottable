@@ -104,6 +104,10 @@ module Plottable {
       return this;
     }
 
+    public _getRows(): Component[][] {
+      return this.rows;
+    }
+
     private iterateLayout(availableWidth : number, availableHeight: number): IterateLayoutResult {
     /*
      * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
