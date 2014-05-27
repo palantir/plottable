@@ -1184,6 +1184,7 @@ var Plottable;
                 return v === null;
             })) {
                 this.rows.splice(rowpos, 1);
+                this.rowWeights.splice(rowpos, 1);
                 this.nRows--;
             }
 
@@ -1194,6 +1195,7 @@ var Plottable;
                 this.rows.forEach(function (r) {
                     return r.splice(colpos, 1);
                 });
+                this.colWeights.splice(colpos, 1);
                 this.nCols--;
             }
 
