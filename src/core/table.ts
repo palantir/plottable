@@ -63,7 +63,48 @@ module Plottable {
     }
 
     public _removeComponent(c: Component): Table {
-      throw new Error("_removeComponent not yet implemented on Table");
+      var rowpos = -1, colpos = -1, i = 0, j = 0;
+      outer : for (i = 0; i < this.nRows; i++) {
+        for (j = 0; j < this.nCols; j++) {
+          if (this.rows[i][j] === c) {
+            rowpos = i;
+            colpos = j;
+            break outer;
+          }
+        }
+      }
+
+      if (rowpos === -1) {
+        throw new Error ("could not find component");
+      }
+
+      this.rows[rowpos][colpos] = null;
+      // now check if can splice out row or column
+      var rowsplice = true;
+      for (j = 0; j < this.nCols; j++) {
+        if (this.rows[rowpos][j] !== null) {
+          rowsplice = false;
+        }
+      }
+      var colsplice = true;
+      for (i = 0; i < this.nRows; i++) {
+        if (this.rows[i][colpos] !== null) {
+          colsplice = false;
+        }
+      }
+
+      if (rowsplice) {
+        this.rows.splice(rowpos, 1);
+        this.nRows--;
+      }
+      if (colsplice) {
+        for (i = 0; i < this.nRows; i++) {
+          this.rows[i].splice(colpos, 1);
+        }
+        this.nCols--;
+      }
+
+      return this;
     }
 
     private iterateLayout(availableWidth : number, availableHeight: number) {
