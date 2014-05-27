@@ -74,7 +74,8 @@ module Plottable {
 
     public _removeComponent(c: Component): Table {
       super._removeComponent(c);
-      var rowpos = -1, colpos = -1;
+      var rowpos: number;
+      var colpos: number;
       outer : for (var i = 0; i < this.nRows; i++) {
         for (var j = 0; j < this.nCols; j++) {
           if (this.rows[i][j] === c) {
@@ -85,7 +86,7 @@ module Plottable {
         }
       }
 
-      if (rowpos === -1) {
+      if (rowpos === undefined) {
         return this;
       }
 
