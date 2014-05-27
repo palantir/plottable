@@ -73,9 +73,10 @@ module Plottable {
     }
 
     public _removeComponent(c: Component): Table {
-      var rowpos = -1, colpos = -1, i = 0, j = 0;
-      outer : for (i = 0; i < this.nRows; i++) {
-        for (j = 0; j < this.nCols; j++) {
+      super._removeComponent(c);
+      var rowpos = -1, colpos = -1;
+      outer : for (var i = 0; i < this.nRows; i++) {
+        for (var j = 0; j < this.nCols; j++) {
           if (this.rows[i][j] === c) {
             rowpos = i;
             colpos = j;
@@ -85,32 +86,18 @@ module Plottable {
       }
 
       if (rowpos === -1) {
-        throw new Error ("could not find component");
+        return this;
       }
 
       this.rows[rowpos][colpos] = null;
-      // now check if can splice out row or column
-      var rowsplice = true;
-      for (j = 0; j < this.nCols; j++) {
-        if (this.rows[rowpos][j] !== null) {
-          rowsplice = false;
-        }
-      }
-      var colsplice = true;
-      for (i = 0; i < this.nRows; i++) {
-        if (this.rows[i][colpos] !== null) {
-          colsplice = false;
-        }
-      }
-
-      if (rowsplice) {
+      // check if can splice out row
+      if (this.rows[rowpos].every((v) => v === null)) {
         this.rows.splice(rowpos, 1);
         this.nRows--;
       }
-      if (colsplice) {
-        for (i = 0; i < this.nRows; i++) {
-          this.rows[i].splice(colpos, 1);
-        }
+      // check if can splice out column
+      if (this.rows.every((v) => v[colpos] === null)) {
+        this.rows.forEach((r) => r.splice(colpos, 1));
         this.nCols--;
       }
 
