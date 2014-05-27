@@ -284,7 +284,7 @@ describe("Tables", () => {
     var c4 = new Plottable.Component();
     var c5 = new Plottable.Component();
     var c6 = new Plottable.Component();
-    var table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+    var table: Plottable.Table;
     it("table._removeComponent works in easy case with no splicing", () => {
       table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
       table._removeComponent(c4);
