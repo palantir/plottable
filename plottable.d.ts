@@ -442,7 +442,7 @@ declare module Plottable {
         static enabled: boolean;
         static registerToRender(c: Component): void;
         static registerToComputeLayout(c: Component): void;
-        static doRender(): void;
+        static flush(): void;
     }
 }
 declare module Plottable {
