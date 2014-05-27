@@ -1156,7 +1156,8 @@ var Plottable;
 
         Table.prototype._removeComponent = function (c) {
             _super.prototype._removeComponent.call(this, c);
-            var rowpos = -1, colpos = -1;
+            var rowpos;
+            var colpos;
             outer:
             for (var i = 0; i < this.nRows; i++) {
                 for (var j = 0; j < this.nCols; j++) {
@@ -1168,7 +1169,7 @@ var Plottable;
                 }
             }
 
-            if (rowpos === -1) {
+            if (rowpos === undefined) {
                 return this;
             }
 
