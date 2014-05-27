@@ -20,9 +20,7 @@ module Plottable {
       super._paint();
       var scaledBaseline = this.yScale.scale(this._baselineValue);
 
-      var xA = Utils.applyAccessor(this._xAccessor, this.dataSource());
-
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this.dataSelection.enter().append("rect");
 
       var attrToProjector = this._generateAttrToProjector();

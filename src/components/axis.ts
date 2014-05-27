@@ -7,6 +7,7 @@ module Plottable {
     public _axisScale: Scale;
     private _showEndTickLabels = false;
     private tickPositioning = "center";
+    public static _DEFAULT_TICK_SIZE = 6;
 
     /**
      * Creates an Axis.
@@ -35,7 +36,7 @@ module Plottable {
         };
       }
       this.tickFormat(formatter);
-      this._registerToBroadcaster(this._axisScale, () => this.rescale());
+      this._registerToBroadcaster(this._axisScale, () => this._render());
     }
 
     public _setup() {
@@ -130,11 +131,6 @@ module Plottable {
           d3.select(this).style("visibility", "visible");
         }
       });
-    }
-
-    private rescale() {
-      return (this.element != null) ? this._render() : null;
-      // short circuit, we don't care about perf.
     }
 
     public scale(): Scale;
@@ -277,7 +273,7 @@ module Plottable {
      * @param {string} orientation The orientation of the Axis (top/bottom)
      * @param {any} [formatter] a D3 formatter
      */
-    constructor(scale: Scale, orientation: string, formatter: any = null) {
+    constructor(scale: Scale, orientation = "bottom", formatter: any = null) {
       super(scale, orientation, formatter);
       var orientation = orientation.toLowerCase();
       if (orientation !== "top" && orientation !== "bottom") {
@@ -321,7 +317,9 @@ module Plottable {
       } else {
         var positionLC = position.toLowerCase();
         if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
-          if (positionLC !== "center") {
+          if (positionLC === "center") {
+            this.tickSize(XAxis._DEFAULT_TICK_SIZE);
+          } else {
             this.tickSize(12); // longer than default tick size
           }
           return super.tickLabelPosition(positionLC);
@@ -333,8 +331,11 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      if (this.orient() === "top")  {this.axisElement.attr("transform", "translate(0," + this._height + ")");};
-
+      if (this.orient() === "top")  {
+        this.axisElement.attr("transform", "translate(0," + this._height + ")");
+      } else if (this.orient() === "bottom") {
+        this.axisElement.attr("transform", "");
+      }
 
       var tickTextLabels = this.axisElement.selectAll("text");
       if (tickTextLabels[0].length > 0) { // at least one tick label
@@ -409,7 +410,7 @@ module Plottable {
      * @param {string} orientation The orientation of the Axis (left/right)
      * @param {any} [formatter] a D3 formatter
      */
-    constructor(scale: Scale, orientation: string, formatter: any = null) {
+    constructor(scale: Scale, orientation = "left", formatter: any = null) {
       super(scale, orientation, formatter);
       orientation = orientation.toLowerCase();
       if (orientation !== "left" && orientation !== "right") {
@@ -453,7 +454,9 @@ module Plottable {
       } else {
         var positionLC = position.toLowerCase();
         if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
-          if (positionLC !== "middle") {
+          if (positionLC === "middle") {
+            this.tickSize(YAxis._DEFAULT_TICK_SIZE);
+          } else {
             this.tickSize(30); // longer than default tick size
           }
           return super.tickLabelPosition(positionLC);
@@ -465,8 +468,11 @@ module Plottable {
 
     public _doRender() {
       super._doRender();
-      if (this.orient() === "left") {this.axisElement.attr("transform", "translate(" + this._width + ", 0)");};
-
+      if (this.orient() === "left") {
+        this.axisElement.attr("transform", "translate(" + this._width + ", 0)");
+      } else if (this.orient() === "right") {
+        this.axisElement.attr("transform", "");
+      }
 
       var tickTextLabels = this.axisElement.selectAll("text");
       if (tickTextLabels[0].length > 0) { // at least one tick label

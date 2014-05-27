@@ -30,6 +30,7 @@ module.exports = function(grunt) {
       options: {
         target: 'es5',
         sourceMap: false,
+        noImplicitAny: true,
         declaration: false,
         removeComments: false
       }
@@ -57,28 +58,37 @@ module.exports = function(grunt) {
     }
   }
 
-  var prefixMatch = "\n *";
+  var prefixMatch = "\\n *";
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
   var nestedBraceMatch = ": \\{[^{}]*\\}";
   var typeNameMatch = ": [^;]*";
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?;"
+  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;"
+  var jsdoc_init = "\\n *\\/\\*\\* *\\n";
+  var jsdoc_mid = "( *\\*[^\\n]*\\n)+";
+  var jsdoc_end = " *\\*\\/ *";
+  var jsdoc = "(" + jsdoc_init + jsdoc_mid + jsdoc_end + ")?";
 
   var sedJSON = {
     private_definitions: {
-      pattern: prefixMatch + "private " + varNameMatch + finalMatch,
+      pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts"
+      path: "build/plottable.d.ts",
     },
     protected_definitions: {
-      pattern: prefixMatch + "public _" + varNameMatch + finalMatch,
+      pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts"
+      path: "plottable.d.ts",
     },
     header: {
       pattern: "VERSION",
       replacement: "<%= pkg.version %>",
       path: "license_header.tmp",
-    }
+    },
+    public_member_vars: {
+      pattern: jsdoc + prefixMatch + "public " + "[^(;]*;",
+      replacement: "",
+      path: "plottable.d.ts",
+    },
   };
 
   var configJSON = {
@@ -171,6 +181,7 @@ module.exports = function(grunt) {
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
+                                  "sed:private_definitions",
                                   "ts:test",
                                   "tslint",
                                   "clean:tscommand"]);
@@ -183,8 +194,8 @@ module.exports = function(grunt) {
                                   "blanket_mocha",
                                   "copy:dist",
                                   "handle-header",
-                                  "sed:private_definitions",
-                                  "sed:protected_definitions"]);
+                                  "sed:protected_definitions",
+                                  "sed:public_member_vars"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
