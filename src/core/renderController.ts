@@ -37,6 +37,8 @@ module Plottable {
       var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
       toCompute.forEach((c) => c._computeLayout());
       var toRender = d3.values(RenderController.componentsNeedingRender);
+      toRender.forEach((c) => c._render()); // call _render on everything, so that containers will put their children in the toRender queue
+      toRender = d3.values(RenderController.componentsNeedingRender);
       toRender.forEach((c) => c._doRender());
       RenderController.componentsNeedingComputeLayout = {};
       RenderController.componentsNeedingRender = {};
