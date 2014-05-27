@@ -1126,8 +1126,6 @@ var Plottable;
             this.rows = [];
             this.rowWeights = [];
             this.colWeights = [];
-            this._rowCount = [];
-            this._colCount = [];
             this.nRows = 0;
             this.nCols = 0;
             this.classed("table", true);
@@ -1766,27 +1764,32 @@ var Plottable;
 
         RenderController.requestFrame = function () {
             if (!RenderController.animationRequested) {
-                requestAnimationFrame(RenderController.doRender);
+                requestAnimationFrame(RenderController.flush);
                 RenderController.animationRequested = true;
             }
         };
 
-        RenderController.doRender = function () {
-            var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
-            toCompute.forEach(function (c) {
-                return c._computeLayout();
-            });
-            var toRender = d3.values(RenderController.componentsNeedingRender);
-            toRender.forEach(function (c) {
-                return c._render();
-            }); // call _render on everything, so that containers will put their children in the toRender queue
-            toRender = d3.values(RenderController.componentsNeedingRender);
-            toRender.forEach(function (c) {
-                return c._doRender();
-            });
-            RenderController.componentsNeedingComputeLayout = {};
-            RenderController.componentsNeedingRender = {};
-            RenderController.animationRequested = false;
+        RenderController.flush = function () {
+            if (RenderController.animationRequested) {
+                var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
+                toCompute.forEach(function (c) {
+                    return c._computeLayout();
+                });
+                var toRender = d3.values(RenderController.componentsNeedingRender);
+
+                // call _render on everything, so that containers will put their children in the toRender queue
+                toRender.forEach(function (c) {
+                    return c._render();
+                });
+
+                toRender = d3.values(RenderController.componentsNeedingRender);
+                toRender.forEach(function (c) {
+                    return c._doRender();
+                });
+                RenderController.componentsNeedingComputeLayout = {};
+                RenderController.componentsNeedingRender = {};
+                RenderController.animationRequested = false;
+            }
         };
         RenderController.componentsNeedingRender = {};
         RenderController.componentsNeedingComputeLayout = {};
