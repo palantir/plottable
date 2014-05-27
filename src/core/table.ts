@@ -350,7 +350,7 @@ module Plottable {
           return w;
         }
         var fixities = componentGroups[i].map(fixityAccessor);
-        var allFixed = fixities.reduce((a, b) => a && b);
+        var allFixed = fixities.reduce((a, b) => a && b, true);
         return allFixed ? 0 : 1;
       });
     }
@@ -365,7 +365,7 @@ module Plottable {
     }
 
     private static fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
-      var all = (bools: boolean[]) => bools.reduce((a, b) => a && b);
+      var all = (bools: boolean[]) => bools.reduce((a, b) => a && b, true);
       var group_isFixed = (components: Component[]) => all(components.map(fixityAccessor));
       return all(componentGroup.map(group_isFixed));
     }
