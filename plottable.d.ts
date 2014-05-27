@@ -198,7 +198,7 @@ declare module Plottable {
         */
         public renderTo(element: any): Component;
         /**
-        * Cause the Component to recompute layout and redraw. Useful if the window resized.
+        * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
         *
         * @param {number} [availableWidth]  - the width of the container element
         * @param {number} [availableHeight] - the height of the container element

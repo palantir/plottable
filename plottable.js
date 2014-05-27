@@ -702,15 +702,19 @@ var Plottable;
         };
 
         /**
-        * Cause the Component to recompute layout and redraw. Useful if the window resized.
+        * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
         *
         * @param {number} [availableWidth]  - the width of the container element
         * @param {number} [availableHeight] - the height of the container element
         */
         Component.prototype.resize = function (width, height) {
-            if (this.element != null) {
-                this._computeLayout(width, height)._render();
+            if (!this.isTopLevelComponent) {
+                throw new Error("Cannot resize on non top-level component");
             }
+            if (width != null && height != null && this._isAnchored) {
+                this.rootSVG.attr({ width: width, height: height });
+            }
+            this._invalidateLayout();
             return this;
         };
 
