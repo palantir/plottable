@@ -350,11 +350,11 @@ describe("Tables", () => {
       assert.deepEqual((<any> table).rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
     });
 
-    it("table._removeComponent for multiple copies of the same item", () => {
-      table = new Plottable.Table([[c1, c1], [c2, c1]]);
+    it("table._removeComponent doesn't do anything weird when called with null", () => {
+      table = new Plottable.Table([[c1, null], [c2, c3]]);
 
-      table._removeComponent(c1);
-      assert.deepEqual((<any> table).rows, [[c2]], "remove once");
+      table._removeComponent(null);
+      assert.deepEqual((<any> table).rows, [[c1, null], [c2, c3]]);
     });
   });
 });
