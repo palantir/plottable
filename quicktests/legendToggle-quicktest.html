@@ -22,15 +22,12 @@
         var numRenderers = 5;
         var names = ["bat", "cat", "mat", "rat", "pat"];
         var toggledOn = [];
-        for (var i = 0; i < numRenderers; i++) {
-          toggledOn[i] = true;
-        }
 
         var xScale = new Plottable.LinearScale();
         var yScale = new Plottable.LinearScale();
 
         for (var i=0; i<numRenderers; i++) {
-        var data = makeRandomData(100);
+        var data = makeRandomData(20);
         var renderer = new Plottable.LineRenderer(data, xScale, yScale);
             renderers.push(renderer);
         }
@@ -40,6 +37,7 @@
         renderers.forEach(function(renderer, i) {
             renderer.project("stroke", function() { return colors[i]; });
             cg.merge(renderer);
+            toggledOn[i] = true;
         })
 
         var xAxis = new Plottable.XAxis(xScale, "bottom");
@@ -50,7 +48,6 @@
                                   [null,  xAxis]
                                 ]);
 
-        chart.name = "INNER_CHART"
         var colorScale = new Plottable.ColorScale();
         colorScale.range(colors);
         colorScale.domain(names);
@@ -58,8 +55,6 @@
         var legendLabel = new Plottable.TitleLabel("fat");
         var legendTable = new Plottable.Table([[legendLabel], [legend]]);
         var outerTable = new Plottable.Table([[chart, legendTable]]);
-        outerTable.name = "OUTER_TABLE";
-        legendTable.name = "LEGEND_TABLE";
         outerTable.renderTo("#legend-toggle-test");
 
         cb = function(x,y) {
