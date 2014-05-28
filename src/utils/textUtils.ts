@@ -174,7 +174,8 @@ module Plottable {
       var anchor: string = anchorConverter[xAlign];
       var xOff = width * xOffsetFactor[xAlign];
       var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
-      textEl.attr("text-anchor", anchor);
+      var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
+      textEl.attr("text-anchor", anchor).attr("y", ems + "em");
       DOMUtils.translate(innerG, xOff, yOff);
       return [w, h];
     }
@@ -184,7 +185,7 @@ module Plottable {
                                         xAlign = "left", yAlign = "top", rotation = "right") {
 
       if (rotation !== "right" && rotation !== "left") {
-        throw new Error("unreckognized rotation: " + rotation);
+        throw new Error("unrecognized rotation: " + rotation);
       }
       var isRight = rotation === "right";
       var rightTranslator: {[s: string]: string} = {left: "bottom", right: "top", center: "center", top: "left", bottom: "right"};
@@ -205,15 +206,20 @@ module Plottable {
                                           xAlign = "left", yAlign = "top") {
       var h = getTextHeight(g);
       var maxWidth = 0;
+      var blockG = g.append("g");
       brokenText.forEach((line: string, i: number) => {
-        var innerG = g.append("g");
+        var innerG = blockG.append("g");
         DOMUtils.translate(innerG, 0, i*h);
         var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
         if (wh[0] > maxWidth) {
           maxWidth = wh[0];
         }
       });
-      return [maxWidth, h * brokenText.length];
+      var usedSpace = h * brokenText.length;
+      var freeSpace = height - usedSpace;
+      var translator: {[s: string]: number} = {center: 0.5, top: 0, bottom: 1};
+      DOMUtils.translate(blockG, 0, freeSpace * translator[yAlign]);
+      return [maxWidth, usedSpace];
     }
 
     export function writeTextVertically(brokenText: string[], g: D3.Selection,
@@ -221,15 +227,21 @@ module Plottable {
                                           xAlign = "left", yAlign = "top", rotation = "left") {
       var h = getTextHeight(g);
       var maxHeight = 0;
+      var blockG = g.append("g");
       brokenText.forEach((line: string, i: number) => {
-        var innerG = g.append("g");
+        var innerG = blockG.append("g");
         DOMUtils.translate(innerG, i*h, 0);
         var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
         if (wh[1] > maxHeight) {
           maxHeight = wh[1];
         }
       });
-      return [h * brokenText.length, maxHeight];
+      var usedSpace = h * brokenText.length;
+      var freeSpace = width - usedSpace;
+      var translator: {[s: string]: number} = {center: 0.5, left: 0, right: 1};
+      DOMUtils.translate(blockG, freeSpace * translator[xAlign], 0);
+
+      return [usedSpace, maxHeight];
     }
 
     function getWrappedTextFromG(text: string, width: number, height: number, g: D3.Selection): IWrappedText {

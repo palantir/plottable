@@ -82,8 +82,8 @@ describe("TextUtils", () => {
   describe("writeLine", () => {
     var svg: D3.Selection;
     var g: D3.Selection;
-    var text = "hello world";
-    var hideResults = true;
+    var text = "hello world ARE YOU THERE?";
+    var hideResults = false;
 
     describe("writeLineHorizontally", () => {
       it("performs basic functionality and defaults to left, top", () => {
@@ -107,6 +107,7 @@ describe("TextUtils", () => {
         svg = generateSVG(400, 400);
         g = svg.append("g");
         var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "center", "center");
+        svg.append("circle").attr({cx: 200, cy: 200, r: 5});
         var textEl = g.select("text");
         var bb = Plottable.DOMUtils.getBBox(textEl);
         assert.equal(bb.width, wh[0], "width measurement is as expected");
@@ -150,9 +151,9 @@ describe("TextUtils", () => {
 
     describe("writeLineVertically", () => {
       it("performs basic functionality and defaults to right, left, top", () => {
-        svg = generateSVG(100, 400);
+        svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400);
+        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400);
         var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         assert.equal(bb.x, 0, "x position correct");
         // assert.closeTo(bb.y, 0, 5, "y position correct"); -- TODO: figure out how to test the y position here
@@ -163,9 +164,9 @@ describe("TextUtils", () => {
         };
       });
       it("right, center, center", () => {
-        svg = generateSVG(100, 400);
+        svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically("x", g, 100, 400, "center", "center", "right");
+        var wh = Plottable.TextUtils.writeLineVertically("x", g, 60, 400, "center", "center", "right");
         var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         assert.equal(bb.x + bb.width/2, 200, "x position correct");
         assert.closeTo(bb.y + bb.height/2, 50, 5, "y position correct");
@@ -174,44 +175,44 @@ describe("TextUtils", () => {
         };
       });
       it("right, right, bottom", () => {
-        svg = generateSVG(100, 400);
+        svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "right", "bottom", "right");
+        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "right", "bottom", "right");
         var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         // assert.equal(bb.x + bb.width, 400, "x position correct");
-        // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+        // assert.closeTo(bb.y + bb.width, 60, 5, "y position correct");
         if (hideResults) {
           svg.remove();
         };
       });
       it("left, left, top", () => {
-        svg = generateSVG(100, 400);
+        svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "left", "top", "left");
+        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "left", "top", "left");
         var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         // assert.equal(bb.x + bb.width, 400, "x position correct");
-        // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+        // assert.closeTo(bb.y + bb.width, 60, 5, "y position correct");
         if (hideResults) {
           svg.remove();
         };
       });
 
       it("left, center, center", () => {
-        svg = generateSVG(100, 400);
+        svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "center", "center", "left");
+        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "center", "center", "left");
         // var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         // assert.equal(bb.x + bb.width, 400, "x position correct");
-        // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+        // assert.closeTo(bb.y + bb.width, 60, 5, "y position correct");
         if (hideResults) {
           svg.remove();
         };
       });
 
       it("left, right, bottom", () => {
-        svg = generateSVG(100, 400);
+        svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "right", "bottom", "left");
+        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "right", "bottom", "left");
         // var bb = Plottable.DOMUtils.getBBox(g.select("g"));
         // assert.equal(bb.x + bb.width, 400, "x position correct");
         // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
