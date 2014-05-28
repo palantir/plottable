@@ -58,6 +58,16 @@ module.exports = function(grunt) {
     }
   }
 
+  var FILES_TO_COMMIT = ['plottable.js',
+                         'plottable.min.js',
+                         'plottable.d.ts',
+                         'examples/exampleUtil.js',
+                         'test/tests.js',
+                         "plottable.css",
+                         "plottable.zip",
+                         "bower.json",
+                         "package.json"];
+
   var prefixMatch = "\\n *";
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
   var nestedBraceMatch = ": \\{[^{}]*\\}";
@@ -139,10 +149,10 @@ module.exports = function(grunt) {
     copy: {
       dist: {
         files: [
-          {src: "build/plottable.js",   dest:"plottable.js"            },
-          {src: "build/plottable.d.ts", dest:"plottable.d.ts"          },
-          {src: "build/tests.js",       dest: "test/tests.js"          },
-          {src: "build/exampleUtil.js", dest: "examples/exampleUtil.js"}
+          {src: "build/plottable.js",   dest: "plottable.js"            },
+          {src: "build/plottable.d.ts", dest: "plottable.d.ts"          },
+          {src: "build/tests.js",       dest: "test/tests.js"           },
+          {src: "build/exampleUtil.js", dest: "examples/exampleUtil.js" }
         ]
       },
       header: {
@@ -155,7 +165,7 @@ module.exports = function(grunt) {
           message: "Release version <%= pkg.version %>"
         },
         files: {
-          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json"]
+          src: FILES_TO_COMMIT
         }
       },
       built: {
@@ -163,9 +173,28 @@ module.exports = function(grunt) {
           message: "Update built files"
         },
         files: {
-          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js']
+          src: FILES_TO_COMMIT
         }
-    }
+      }
+    },
+    compress: {
+      main: {
+        options: {
+          archive: 'plottable.zip'
+        },
+        files: [
+        {src: 'plottable.js'  , dest: '.'},
+        {src: 'plottable.min.js', dest: '.'},
+        {src: 'plottable.d.ts', dest: '.'},
+        {src: 'plottable.css' , dest: '.'},
+        {src: 'README.md'     , dest: '.'},
+        {src: 'LICENSE'       , dest: '.'}]
+      }
+    },
+    uglify: {
+      main: {
+        files: {'plottable.min.js': ['plottable.js']}
+      }
     }
   };
 
@@ -195,7 +224,10 @@ module.exports = function(grunt) {
                                   "copy:dist",
                                   "handle-header",
                                   "sed:protected_definitions",
-                                  "sed:public_member_vars"]);
+                                  "sed:public_member_vars",
+                                  "uglify",
+                                  "compress"
+                                  ]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
