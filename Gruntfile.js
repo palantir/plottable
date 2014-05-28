@@ -13,7 +13,7 @@ module.exports = function(grunt) {
   var tsJSON = {
     dev: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
-      out: "build/plottable.js",
+      out: "plottable.js",
       // watch: "src",
       options: {
         target: 'es5',
@@ -24,24 +24,13 @@ module.exports = function(grunt) {
       }
     },
     test: {
-      src: ["test/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
-      out: "build/tests.js",
+      src: ["test/*.ts", "typings/**/*.d.ts", "plottable.d.ts"],
+      out: "test/tests.js",
       // watch: "test",
       options: {
         target: 'es5',
         sourceMap: false,
         noImplicitAny: true,
-        declaration: false,
-        removeComments: false
-      }
-    },
-    examples: {
-      src: ["examples/*.ts", "typings/**/*.d.ts"],
-      outDir: "build",
-      // watch: "examples",
-      options: {
-        target: 'es5',
-        sourceMap: false,
         declaration: false,
         removeComments: false
       }
@@ -82,7 +71,7 @@ module.exports = function(grunt) {
     private_definitions: {
       pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
-      path: "build/plottable.d.ts",
+      path: "plottable.d.ts",
     },
     protected_definitions: {
       pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
@@ -147,14 +136,6 @@ module.exports = function(grunt) {
     clean: {tscommand: ["tscommand*.tmp.txt"], header: ["license_header.tmp"]},
     sed: sedJSON,
     copy: {
-      dist: {
-        files: [
-          {src: "build/plottable.js",   dest: "plottable.js"            },
-          {src: "build/plottable.d.ts", dest: "plottable.d.ts"          },
-          {src: "build/tests.js",       dest: "test/tests.js"           },
-          {src: "build/exampleUtil.js", dest: "examples/exampleUtil.js" }
-        ]
-      },
       header: {
         files: [{src: "license_header.txt", dest: "license_header.tmp"}]
       }
@@ -213,6 +194,9 @@ module.exports = function(grunt) {
                                   "sed:private_definitions",
                                   "ts:test",
                                   "tslint",
+                                  "handle-header",
+                                  "sed:protected_definitions",
+                                  "sed:public_member_vars",
                                   "clean:tscommand"]);
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
@@ -221,10 +205,6 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
                                   "blanket_mocha",
-                                  "copy:dist",
-                                  "handle-header",
-                                  "sed:protected_definitions",
-                                  "sed:public_member_vars",
                                   "uglify",
                                   "compress"
                                   ]);

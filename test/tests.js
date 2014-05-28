@@ -108,7 +108,7 @@ var MultiTestVerifier = (function () {
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
 ///<reference path="testUtils.ts" />
-///<reference path="../build/plottable.d.ts" />
+///<reference path="../plottable.d.ts" />
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
