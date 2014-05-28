@@ -5,8 +5,6 @@ module Plottable {
     private _scale: OrdinalScale;
     private orientation: string;
     private isVertical: boolean;
-    private _height = 50;
-    private _width = 80;
 
     constructor(scale: OrdinalScale, orientation = "bottom") {
       super();
@@ -22,22 +20,6 @@ module Plottable {
         throw new Error("Only rangeBands category axes are implemented");
       }
       this._registerToBroadcaster(this._scale, () => this._invalidateLayout());
-    }
-
-    public height(newHeight: number) {
-      if (this.isVertical) {
-        throw new Error("Setting height on a vertical axis is meaningless");
-      }
-      this._height = newHeight;
-      return this;
-    }
-
-    public width(newWidth: number) {
-      if (!this.isVertical) {
-        throw new Error("Setting width on a horizontal axis is meaningless");
-      }
-      this._width = newWidth;
-      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number) {
