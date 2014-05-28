@@ -13,6 +13,7 @@
     </style>
 
     <script>
+
       window.onload = function() {
         var renderers = [];
 
@@ -21,7 +22,13 @@
         var activeColors = colors.slice();
         var numRenderers = 5;
         var names = ["bat", "cat", "mat", "rat", "pat"];
-        var toggledOn = [];
+
+        var colorScale = new Plottable.ColorScale();
+        colorScale.range(colors);
+        colorScale.domain(names);
+        var legend = new Plottable.ToggleLegend(colorScale);
+        var legendLabel = new Plottable.TitleLabel("fat");
+        var legendTable = new Plottable.Table([[legendLabel], [legend]]);
 
         var xScale = new Plottable.LinearScale();
         var yScale = new Plottable.LinearScale();
@@ -37,7 +44,7 @@
         renderers.forEach(function(renderer, i) {
             renderer.project("stroke", function() { return colors[i]; });
             cg.merge(renderer);
-            toggledOn[i] = true;
+            legend.init(i);
         })
 
         var xAxis = new Plottable.XAxis(xScale, "bottom");
@@ -48,12 +55,7 @@
                                   [null,  xAxis]
                                 ]);
 
-        var colorScale = new Plottable.ColorScale();
-        colorScale.range(colors);
-        colorScale.domain(names);
-        var legend = new Plottable.Legend(colorScale);
-        var legendLabel = new Plottable.TitleLabel("fat");
-        var legendTable = new Plottable.Table([[legendLabel], [legend]]);
+        
         var outerTable = new Plottable.Table([[chart, legendTable]]);
         outerTable.renderTo("#legend-toggle-test");
 
@@ -62,17 +64,15 @@
             var height = legend.availableHeight;
             var entries = legend.colorScale.domain().length;
             var idx = Math.floor(y / (height / entries));
-            if (toggledOn[idx]) {
-                toggledOn[idx] = false;
+            if (legend.getState(idx)) {
                 activeColors[idx] = "#d3d3d3";
                 renderers[idx].remove();
             } else {
-                toggledOn[idx] = true;
                 activeColors[idx] = colors[idx];
                 cg.merge(renderers[idx]);
             }
-            console.log(toggledOn);
-            console.log(activeColors);
+            legend.toggleState(idx);
+
             var colorScale = new Plottable.ColorScale();
             colorScale.range(activeColors);
             colorScale.domain(names);
