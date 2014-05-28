@@ -139,10 +139,10 @@ module.exports = function(grunt) {
     copy: {
       dist: {
         files: [
-          {src: "build/plottable.js",   dest:"plottable.js"            },
-          {src: "build/plottable.d.ts", dest:"plottable.d.ts"          },
-          {src: "build/tests.js",       dest: "test/tests.js"          },
-          {src: "build/exampleUtil.js", dest: "examples/exampleUtil.js"}
+          {src: "build/plottable.js",   dest: "plottable.js"            },
+          {src: "build/plottable.d.ts", dest: "plottable.d.ts"          },
+          {src: "build/tests.js",       dest: "test/tests.js"           },
+          {src: "build/exampleUtil.js", dest: "examples/exampleUtil.js" }
         ]
       },
       header: {
@@ -172,7 +172,12 @@ module.exports = function(grunt) {
         options: {
           archive: 'plottable.zip'
         },
-        files: ['plottable.js', 'plottable.d.ts', 'plottable.css', 'README.md', 'LICENSE']
+        files: [
+        {src: 'plottable.js'  , dest: '.'},
+        {src: 'plottable.d.ts', dest: '.'},
+        {src: 'plottable.css' , dest: '.'},
+        {src: 'README.md'     , dest: '.'},
+        {src: 'LICENSE'       , dest: '.'}]
       }
     }
   };
@@ -203,7 +208,9 @@ module.exports = function(grunt) {
                                   "copy:dist",
                                   "handle-header",
                                   "sed:protected_definitions",
-                                  "sed:public_member_vars"]);
+                                  "sed:public_member_vars",
+                                  "compress"
+                                  ]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
