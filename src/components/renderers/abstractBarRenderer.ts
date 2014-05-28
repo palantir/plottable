@@ -18,6 +18,13 @@ module Plottable {
       super(dataset, xScale, yScale);
       this.classed("bar-renderer", true);
       this.project("width", 10);
+      this.project("fill", () => "steelblue");
+    }
+
+    public _setup() {
+      super._setup();
+      this._baseline = this.renderArea.append("line").classed("baseline", true);
+      return this;
     }
 
     /**

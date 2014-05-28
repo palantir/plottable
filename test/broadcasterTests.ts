@@ -40,7 +40,7 @@ describe("Broadcasters", () => {
   it("arguments are passed through to callback", () => {
     var g2 = {};
     var g3 = "foo";
-    var cb = (a1, rest) => {
+    var cb = (a1: Plottable.Broadcaster, rest: any[]) => {
       assert.equal(b, a1, "broadcaster passed through");
       assert.equal(g2, rest[0], "arg1 passed through");
       assert.equal(g3, rest[1], "arg2 passed through");

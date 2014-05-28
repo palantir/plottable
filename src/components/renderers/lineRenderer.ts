@@ -4,8 +4,9 @@ module Plottable {
   export class LineRenderer extends XYRenderer {
     private path: D3.Selection;
     private line: D3.Svg.Line;
+    public _ANIMATION_DURATION = 500; //milliseconds
 
-/**
+    /**
      * Creates a LineRenderer.
      *
      * @constructor
@@ -19,8 +20,8 @@ module Plottable {
       this.project("stroke", () => "steelblue");
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.path = this.renderArea.append("path").classed("line", true);
       return this;
     }
@@ -28,13 +29,25 @@ module Plottable {
     public _paint() {
       super._paint();
       var attrToProjector = this._generateAttrToProjector();
-      this.line = d3.svg.line()
-            .x(attrToProjector["x"])
-            .y(attrToProjector["y"]);
-      this.dataSelection = this.path.datum(this._dataSource.data());
+      var scaledZero = this.yScale.scale(0);
+      var xFunction = attrToProjector["x"];
+      var yFunction = attrToProjector["y"];
       delete attrToProjector["x"];
       delete attrToProjector["y"];
-      this.path.attr("d", this.line).attr(attrToProjector);
+
+      this.dataSelection = this.path.datum(this._dataSource.data());
+      if (this._animate && this._dataChanged) {
+        var animationStartLine = d3.svg.line()
+                                       .x(xFunction)
+                                       .y(scaledZero);
+        this.path.attr("d", animationStartLine).attr(attrToProjector);
+      }
+
+      this.line = d3.svg.line()
+            .x(xFunction)
+            .y(yFunction);
+      var updateSelection: any = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
+      updateSelection.attr("d", this.line).attr(attrToProjector);
     }
   }
 }

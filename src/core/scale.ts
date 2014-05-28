@@ -9,7 +9,7 @@ module Plottable {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomain = true;
     private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
-    private dataSourceReferenceCounter = new Utils.IDCounter();
+    private dataSourceReferenceCounter = new IDCounter();
     public _autoNice = false;
     public _autoPad  = false;
     /**
@@ -34,16 +34,16 @@ module Plottable {
     }
 
     public _getExtent(): any[] {
-      return [] // this should be overwritten
+      return []; // this should be overwritten
     }
 
     /**
-    * Modify the domain on the scale so that it includes the extent of all
-    * perspectives it depends on. Extent: The (min, max) pair for a
-    * QuantitiativeScale, all covered strings for an OrdinalScale.
-    * Perspective: A combination of a DataSource and an Accessor that
-    * represents a view in to the data.
-    */
+     * Modify the domain on the scale so that it includes the extent of all
+     * perspectives it depends on. Extent: The (min, max) pair for a
+     * QuantitiativeScale, all covered strings for an OrdinalScale.
+     * Perspective: A combination of a DataSource and an Accessor that
+     * represents a view in to the data.
+     */
     public autoDomain() {
       this._setDomain(this._getExtent());
       return this;

@@ -16,18 +16,41 @@ function getSVGParent(): D3.Selection {
   }
 }
 
+function verifySpaceRequest(sr: Plottable.ISpaceRequest, w: number, h: number, ww: boolean, wh: boolean, id: string) {
+  assert.equal(sr.width,  w, "width requested is as expected #"  + id);
+  assert.equal(sr.height, h, "height requested is as expected #" + id);
+  assert.equal(sr.wantsWidth , ww, "needs more width is as expected #"  + id);
+  assert.equal(sr.wantsHeight, wh, "needs more height is as expected #" + id);
+}
+
+function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
+  c._requestedSpace = function(w, h) {
+    return {
+      width:  fixedWidth  == null ? 0 : Math.min(w, fixedWidth) ,
+      height: fixedHeight == null ? 0 : Math.min(h, fixedHeight),
+      wantsWidth : fixedWidth  == null ? false : w < fixedWidth ,
+      wantsHeight: fixedHeight == null ? false : h < fixedHeight
+    };
+  };
+  return c;
+}
+
+function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number) {
+  return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
+}
+
 function getTranslate(element: D3.Selection) {
   return d3.transform(element.attr("transform")).translate;
 }
 
-function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
+function assertBBoxEquivalence(bbox: SVGRect, widthAndHeightPair: number[], message: string) {
   var width = widthAndHeightPair[0];
   var height = widthAndHeightPair[1];
   assert.equal(bbox.width, width, "width: " + message);
   assert.equal(bbox.height, height, "height: " + message);
 }
 
-function assertBBoxInclusion(outerEl, innerEl) {
+function assertBBoxInclusion(outerEl: D3.Selection, innerEl: D3.Selection) {
   var outerBox = outerEl.node().getBoundingClientRect();
   var innerBox = innerEl.node().getBoundingClientRect();
   assert.operator(outerBox.left,   "<=", innerBox.left + 0.5,   "bounding rect left included"  );
@@ -36,14 +59,14 @@ function assertBBoxInclusion(outerEl, innerEl) {
   assert.operator(outerBox.bottom + 0.5, ">=", innerBox.bottom, "bounding rect bottom included");
 }
 
-function assertXY(el: D3.Selection, xExpected, yExpected, message) {
+function assertXY(el: D3.Selection, xExpected: number, yExpected: number, message: string) {
   var x = el.attr("x");
   var y = el.attr("y");
   assert.equal(x, xExpected, "x: " + message);
   assert.equal(y, yExpected, "y: " + message);
 }
 
-function assertWidthHeight(el: D3.Selection, widthExpected, heightExpected, message) {
+function assertWidthHeight(el: D3.Selection, widthExpected: number, heightExpected: number, message: string) {
   var width = el.attr("width");
   var height = el.attr("height");
   assert.equal(width, widthExpected, "width: " + message);

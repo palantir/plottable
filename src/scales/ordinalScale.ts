@@ -4,7 +4,7 @@ module Plottable {
   export class OrdinalScale extends Scale {
     public _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
-    private _rangeType: string = "points";
+    private _rangeType: string = "bands";
 
     // Padding as a proportion of the spacing between domain values
     private _innerPadding: number = 0.3;
@@ -15,8 +15,8 @@ module Plottable {
      *
      * @constructor
      */
-    constructor() {
-      super(d3.scale.ordinal());
+    constructor(scale?: D3.Scale.OrdinalScale) {
+      super(scale == null ? d3.scale.ordinal() : scale);
     }
 
     public _getExtent(): any[] {
@@ -99,8 +99,13 @@ module Plottable {
           throw new Error("Unsupported range type: " + rangeType);
         }
         this._rangeType = rangeType;
-        if(outerPadding != null) this._outerPadding = outerPadding;
-        if(innerPadding != null) this._innerPadding = innerPadding;
+        if (outerPadding != null) {
+          this._outerPadding = outerPadding;
+        }
+        if (innerPadding != null) {
+          this._innerPadding = innerPadding;
+        }
+        this._broadcast();
         return this;
       }
     }

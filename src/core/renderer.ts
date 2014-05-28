@@ -8,12 +8,15 @@ module Plottable {
 
   export class Renderer extends Component {
     public _dataSource: DataSource;
+    public _dataChanged = false;
 
+    public dataSelection: D3.UpdateSelection;
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
     public _animate = false;
+    public _ANIMATION_DURATION = 250; // milliseconds
     public _hasRendered = false;
     private static DEFAULT_COLOR_ACCESSOR = (d: any) => "#1f77b4";
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
@@ -42,8 +45,6 @@ module Plottable {
     constructor(dataset?: any) {
       super();
       this.clipPathEnabled = true;
-      this._fixedWidth = false;
-      this._fixedHeight = false;
       this.classed("renderer", true);
 
       var dataSource: DataSource;
@@ -59,6 +60,12 @@ module Plottable {
       this.dataSource(dataSource);
     }
 
+    public _anchor(element: D3.Selection) {
+      super._anchor(element);
+      this._dataChanged = true;
+      return this;
+    }
+
     /**
      * Retrieves the current DataSource, or sets a DataSource if the Renderer doesn't yet have one.
      *
@@ -70,13 +77,31 @@ module Plottable {
     public dataSource(source?: DataSource): any {
       if (source == null) {
         return this._dataSource;
-      } else if (this._dataSource == null) {
-        this._dataSource = source;
-        this._registerToBroadcaster(this._dataSource, () => this._render());
-        return this;
-      } else {
-        throw new Error("Can't set a new DataSource on the Renderer if it already has one.");
       }
+      var oldSource = this._dataSource;
+      if (oldSource != null) {
+        this._deregisterFromBroadcaster(this._dataSource);
+        this._requireRerender = true;
+        this._rerenderUpdateSelection = true;
+
+        // point all scales at the new datasource
+        d3.keys(this._projectors).forEach((attrToSet: string) => {
+          var projector = this._projectors[attrToSet];
+          if (projector.scale != null) {
+            var rendererIDAttr = this._plottableID + attrToSet;
+            projector.scale._removePerspective(rendererIDAttr);
+            projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
+          }
+        });
+      }
+      this._dataSource = source;
+      this._registerToBroadcaster(this._dataSource, () => {
+        this._dataChanged = true;
+        this._render();
+      });
+      this._dataChanged = true;
+      this._render();
+      return this;
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {
@@ -116,6 +141,7 @@ module Plottable {
       if (this.element != null) {
         this._hasRendered = true;
         this._paint();
+        this._dataChanged = false;
         this._requireRerender = false;
         this._rerenderUpdateSelection = false;
       }
@@ -126,17 +152,19 @@ module Plottable {
       // no-op
     }
 
-    public _anchor(element: D3.Selection) {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.renderArea = this.content.append("g").classed("render-area", true);
       return this;
     }
 
-    public animate(toggle?: boolean) {
-      if (toggle == null) {
-        toggle = !this._animate;
-      }
-      this._animate = toggle;
+    /**
+     * Enables or disables animation.
+     *
+     * @param {boolean} enabled Whether or not to animate.
+     */
+    public animate(enabled: boolean) {
+      this._animate = enabled;
       return this;
     }
   }

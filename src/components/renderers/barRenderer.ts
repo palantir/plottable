@@ -20,9 +20,7 @@ module Plottable {
       super._paint();
       var scaledBaseline = this.yScale.scale(this._baselineValue);
 
-      var xA = Utils.applyAccessor(this._xAccessor, this.dataSource());
-
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data(), xA);
+      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this.dataSelection.enter().append("rect");
 
       var attrToProjector = this._generateAttrToProjector();
@@ -45,10 +43,16 @@ module Plottable {
 
       var yFunction = attrToProjector["y"];
 
+      if (this._animate && this._dataChanged) {
+        attrToProjector["y"] = () => scaledBaseline;
+        attrToProjector["height"] = () => 0;
+        this.dataSelection.attr(attrToProjector);
+      }
+
       attrToProjector["y"] = (d: any, i: number) => {
         var originalY = yFunction(d, i);
         return (originalY > scaledBaseline) ? scaledBaseline : originalY;
-      }
+      };
 
       var heightFunction = (d: any, i: number) => {
         return Math.abs(scaledBaseline - yFunction(d, i));
@@ -59,21 +63,17 @@ module Plottable {
         this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
 
-      if (this._baseline == null) {
-        this._baseline = this.renderArea.append("line").classed("baseline", true);
-      }
-
       var updateSelection: any = this.dataSelection;
-      var baselineSelection: any = this._baseline;
       if (this._animate) {
-        updateSelection = updateSelection.transition();
-        baselineSelection = baselineSelection.transition();
+        var n = this.dataSource().data().length;
+        updateSelection = updateSelection.transition()
+                                         .delay((d: any, i: number) => i * this._ANIMATION_DURATION / n);
       }
 
       updateSelection.attr(attrToProjector);
       this.dataSelection.exit().remove();
 
-      baselineSelection.attr({
+      this._baseline.attr({
         "x1": 0,
         "y1": scaledBaseline,
         "x2": this.availableWidth,

@@ -30,6 +30,7 @@ module.exports = function(grunt) {
       options: {
         target: 'es5',
         sourceMap: false,
+        noImplicitAny: true,
         declaration: false,
         removeComments: false
       }
@@ -47,29 +48,55 @@ module.exports = function(grunt) {
     }
   };
 
-  var prefixMatch = "\n *"
-  var varNameMatch = "[^:;]*"
-  var nestedBraceMatch = ": {[^{}]*}"
-  var typeNameMatch = ": [^;]*"
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?;"
+  var bumpJSON = {
+    options: {
+      files: ['package.json', 'bower.json'],
+      updateConfigs: ['pkg'],
+      commit: false,
+      createTag: false,
+      push: false
+    }
+  }
+
+  var prefixMatch = "\\n *";
+  var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
+  var nestedBraceMatch = ": \\{[^{}]*\\}";
+  var typeNameMatch = ": [^;]*";
+  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;"
+  var jsdoc_init = "\\n *\\/\\*\\* *\\n";
+  var jsdoc_mid = "( *\\*[^\\n]*\\n)+";
+  var jsdoc_end = " *\\*\\/ *";
+  var jsdoc = "(" + jsdoc_init + jsdoc_mid + jsdoc_end + ")?";
 
   var sedJSON = {
     private_definitions: {
-      pattern: prefixMatch + "private " + varNameMatch + finalMatch,
+      pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts"
+      path: "build/plottable.d.ts",
     },
     protected_definitions: {
-      pattern: prefixMatch + "public _" + varNameMatch + finalMatch,
+      pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts"
+      path: "plottable.d.ts",
+    },
+    header: {
+      pattern: "VERSION",
+      replacement: "<%= pkg.version %>",
+      path: "license_header.tmp",
+    },
+    public_member_vars: {
+      pattern: jsdoc + prefixMatch + "public " + "[^(;]*;",
+      replacement: "",
+      path: "plottable.d.ts",
     },
   };
 
   var configJSON = {
+    pkg: grunt.file.readJSON("package.json"),
+    bump: bumpJSON,
     concat: {
-      license: {
-        src: ["license_header.txt", "plottable.js"],
+      header: {
+        src: ["license_header.tmp", "plottable.js"],
         dest: "plottable.js",
       },
     },
@@ -78,7 +105,7 @@ module.exports = function(grunt) {
       options: {
         configuration: grunt.file.readJSON("tslint.json")
       },
-      files: ["src/*.ts", "test/*.ts"]
+      files: ["src/**/*.ts", "test/**.ts"]
     },
     watch: {
       "options": {
@@ -91,10 +118,6 @@ module.exports = function(grunt) {
       "tests": {
         "tasks": ["ts:test", "tslint"],
         "files": ["test/**.ts"]
-      },
-      "examples": {
-        "tasks": ["ts:examples", "tslint"],
-        "files": ["examples/**.ts"]
       }
     },
     blanket_mocha: {
@@ -111,27 +134,38 @@ module.exports = function(grunt) {
         }
       }
     },
-    clean: {tscommand: ["tscommand*.tmp.txt"]},
+    clean: {tscommand: ["tscommand*.tmp.txt"], header: ["license_header.tmp"]},
     sed: sedJSON,
     copy: {
       dist: {
         files: [
-          {src: "build/plottable.js", dest:"plottable.js"},
-          {src: "build/plottable.d.ts", dest:"plottable.d.ts"},
-          {src: "build/tests.js", dest: "test/tests.js"},
+          {src: "build/plottable.js",   dest:"plottable.js"            },
+          {src: "build/plottable.d.ts", dest:"plottable.d.ts"          },
+          {src: "build/tests.js",       dest: "test/tests.js"          },
           {src: "build/exampleUtil.js", dest: "examples/exampleUtil.js"}
         ]
+      },
+      header: {
+        files: [{src: "license_header.txt", dest: "license_header.tmp"}]
       }
     },
     gitcommit: {
-      task: {
+      version: {
         options: {
-          message: "Update plottable.js, plottable.d.ts, and other build artefacts"
+          message: "Release version <%= pkg.version %>"
+        },
+        files: {
+          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json"]
+        }
+      },
+      built: {
+        options: {
+          message: "Update built files"
         },
         files: {
           src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js']
         }
-      }
+    }
     }
   };
 
@@ -142,23 +176,28 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   // default task (this is what runs when a task isn't specified)
+  grunt.registerTask("handle-header",
+            ["copy:header", "sed:header", "concat:header", "clean:header"]);
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
+                                  "sed:private_definitions",
                                   "ts:test",
-                                  "ts:examples",
                                   "tslint",
                                   "clean:tscommand"]);
+  grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
+  grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
+  grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
+                                  "blanket_mocha",
                                   "copy:dist",
-                                  "concat:license",
-                                  "sed:private_definitions",
-                                  "sed:protected_definitions"]);
+                                  "handle-header",
+                                  "sed:protected_definitions",
+                                  "sed:public_member_vars"]);
 
-  grunt.registerTask("commitjs", ["dist-compile", "gitcommit"]);
-  grunt.registerTask("commit-js", ["dist-compile", "gitcommit"]);
+  grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);

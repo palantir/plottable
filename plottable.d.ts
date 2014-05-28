@@ -2,60 +2,32 @@ declare module Plottable {
     module Utils {
         /**
         * Checks if x is between a and b.
+        *
+        * @param {number} x The value to test if in range
+        * @param {number} a The beginning of the (inclusive) range
+        * @param {number} b The ending of the (inclusive) range
+        * @return {boolean} Whether x is in [a, b]
         */
         function inRange(x: number, a: number, b: number): boolean;
         /**
-        * Gets the bounding box of an element.
-        * @param {D3.Selection} element
-        * @returns {SVGRed} The bounding box.
-        */
-        function getBBox(element: D3.Selection): SVGRect;
-        function getElementWidth(elem: HTMLScriptElement): number;
-        function getElementHeight(elem: HTMLScriptElement): number;
-        /**
-        * Truncates a text string to a max length, given the element in which to draw the text
+        * Takes two arrays of numbers and adds them together
         *
-        * @param {string} text: The string to put in the text element, and truncate
-        * @param {D3.Selection} element: The element in which to measure and place the text
-        * @param {number} length: How much space to truncate text into
-        * @returns {string} text - the shortened text
+        * @param {number[]} alist The first array of numbers
+        * @param {number[]} blist The second array of numbers
+        * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
         */
-        function truncateTextToLength(text: string, length: number, element: D3.Selection): string;
-        /**
-        * Gets the height of a text element, as rendered.
-        *
-        * @param {D3.Selection} textElement
-        * @return {number} The height of the text element, in pixels.
-        */
-        function getTextHeight(textElement: D3.Selection): number;
-        function getSVGPixelWidth(svg: D3.Selection): number;
+        function addArrays(alist: number[], blist: number[]): number[];
         function accessorize(accessor: any): IAccessor;
         function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
         function uniq(strings: string[]): string[];
         /**
-        * An associative array that can be keyed by anything (inc objects).
-        * Uses pointer equality checks which is why this works.
-        * This power has a price: everything is linear time since it is actually backed by an array...
+        * Creates an array of length `count`, filled with value or (if value is a function), value()
+        *
+        * @param {any} value The value to fill the array with, or, if a function, a generator for values
+        * @param {number} count The length of the array to generate
+        * @return {any[]}
         */
-        class StrictEqualityAssociativeArray {
-            /**
-            * Set a new key/value pair in the store.
-            *
-            * @param {any} Key to set in the store
-            * @param {any} Value to set in the store
-            * @return {boolean} True if key already in store, false otherwise
-            */
-            public set(key: any, value: any): boolean;
-            public get(key: any): any;
-            public has(key: any): boolean;
-            public values(): any[];
-            public delete(key: any): boolean;
-        }
-        class IDCounter {
-            public increment(id: any): number;
-            public decrement(id: any): number;
-            public get(id: any): number;
-        }
+        function createFilledArray(value: any, count: number): any[];
     }
 }
 declare module Plottable {
@@ -101,6 +73,67 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    class IDCounter {
+        public increment(id: any): number;
+        public decrement(id: any): number;
+        public get(id: any): number;
+    }
+}
+declare module Plottable {
+    /**
+    * An associative array that can be keyed by anything (inc objects).
+    * Uses pointer equality checks which is why this works.
+    * This power has a price: everything is linear time since it is actually backed by an array...
+    */
+    class StrictEqualityAssociativeArray {
+        /**
+        * Set a new key/value pair in the store.
+        *
+        * @param {any} Key to set in the store
+        * @param {any} Value to set in the store
+        * @return {boolean} True if key already in store, false otherwise
+        */
+        public set(key: any, value: any): boolean;
+        public get(key: any): any;
+        public has(key: any): boolean;
+        public values(): any[];
+        public delete(key: any): boolean;
+    }
+}
+declare module Plottable {
+    module TextUtils {
+        /**
+        * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
+        *
+        * @param {string} text: The string to be truncated
+        * @param {number} availableSpace: The avialable space, in pixels
+        * @param {D3.Selection} element: The text element used to measure the text
+        * @returns {string} text - the shortened text
+        */
+        function getTruncatedText(text: string, availableSpace: number, element: D3.Selection): string;
+        /**
+        * Gets the height of a text element, as rendered.
+        *
+        * @param {D3.Selection} textElement
+        * @return {number} The height of the text element, in pixels.
+        */
+        function getTextHeight(textElement: D3.Selection): number;
+        /**
+        * Gets the width of a text element, as rendered.
+        *
+        * @param {D3.Selection} textElement
+        * @return {number} The width of the text element, in pixels.
+        */
+        function getTextWidth(textElement: D3.Selection, text: string): number;
+        /**
+        * Converts a string into an array of strings, all of which fit in the available space.
+        *
+        * @returns {string[]} The input text broken into substrings that fit in the avialable space.
+        */
+        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): string[];
+    }
+}
+declare module Plottable {
     class PlottableObject {
     }
 }
@@ -118,12 +151,6 @@ declare module Plottable {
         * @returns {Broadcaster} this object
         */
         public registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
-        /**
-        * Call all listening callbacks, optionally with arguments passed through.
-        *
-        * @param ...args A variable number of optional arguments
-        * @returns {Broadcaster} this object
-        */
         /**
         * Registers deregister the callback associated with a listener.
         *
@@ -163,40 +190,15 @@ declare module Plottable {
 }
 declare module Plottable {
     class Component extends PlottableObject {
-        public element: D3.Selection;
-        public content: D3.Selection;
-        public backgroundContainer: D3.Selection;
-        public foregroundContainer: D3.Selection;
-        public clipPathEnabled: boolean;
-        public availableWidth: number;
-        public availableHeight: number;
-        public xOrigin: number;
-        public yOrigin: number;
         /**
-        * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+        * Renders the Component into a given DOM element.
         *
-        * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
-        * @returns {Component} The calling component.
-        */
-        /**
-        * Computes the size, position, and alignment from the specified values.
-        * If no parameters are supplied and the component is a root node,
-        * they are inferred from the size of the component's element.
-        *
-        * @param {number} xOrigin
-        * @param {number} yOrigin
-        * @param {number} availableWidth
-        * @param {number} availableHeight
-        * @returns {Component} The calling Component.
-        */
-        /**
-        * Renders the component.
-        *
-        * @returns {Component} The calling Component.
+        * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+        * @return {Component} The calling component.
         */
         public renderTo(element: any): Component;
         /**
-        * Cause the Component to recompute layout and redraw. Useful if the window resized.
+        * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
         *
         * @param {number} [availableWidth]  - the width of the container element
         * @param {number} [availableHeight] - the height of the container element
@@ -247,36 +249,6 @@ declare module Plottable {
         public classed(cssClass: string): boolean;
         public classed(cssClass: string, addClass: boolean): Component;
         /**
-        * Sets or retrieves the Component's minimum height.
-        *
-        * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
-        * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
-        */
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Component;
-        /**
-        * Sets or retrieves the Component's minimum width.
-        *
-        * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
-        * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
-        */
-        public minimumWidth(): number;
-        public minimumWidth(newVal: number): Component;
-        /**
-        * Checks if the Component has a fixed width or scales to fill available space.
-        * Returns true by default on the base Component class.
-        *
-        * @return {boolean} Whether the component has a fixed width.
-        */
-        public isFixedWidth(): boolean;
-        /**
-        * Checks if the Component has a fixed height or scales to fill available space.
-        * Returns true by default on the base Component class.
-        *
-        * @return {boolean} Whether the component has a fixed height.
-        */
-        public isFixedHeight(): boolean;
-        /**
         * Merges this Component with another Component, returning a ComponentGroup.
         * There are four cases:
         * Component + Component: Returns a ComponentGroup with both components inside it.
@@ -289,13 +261,35 @@ declare module Plottable {
         */
         public merge(c: Component): ComponentGroup;
         /**
-        * Blow up a component and its DOM, so it can be safely removed
+        * Removes a Component from the DOM.
         */
-        public remove(): void;
+        public remove(): Component;
     }
 }
 declare module Plottable {
-    class ComponentGroup extends Component {
+    class ComponentContainer extends Component {
+        /**
+        * Returns a list of components in the ComponentContainer
+        *
+        * @returns{Component[]} the contained Components
+        */
+        public components(): Component[];
+        /**
+        * Returns true iff the ComponentContainer is empty.
+        *
+        * @returns {boolean} Whether the calling ComponentContainer is empty.
+        */
+        public empty(): boolean;
+        /**
+        * Remove all components contained in the  ComponentContainer
+        *
+        * @returns {ComponentContainer} The calling ComponentContainer
+        */
+        public removeAll(): ComponentContainer;
+    }
+}
+declare module Plottable {
+    class ComponentGroup extends ComponentContainer {
         /**
         * Creates a ComponentGroup.
         *
@@ -304,13 +298,18 @@ declare module Plottable {
         */
         constructor(components?: Component[]);
         public merge(c: Component): ComponentGroup;
-        public isFixedWidth(): boolean;
-        public isFixedHeight(): boolean;
-        public remove(): void;
     }
 }
 declare module Plottable {
-    class Table extends Component {
+    interface IterateLayoutResult {
+        colProportionalSpace: number[];
+        rowProportionalSpace: number[];
+        guaranteedWidths: number[];
+        guaranteedHeights: number[];
+        wantsWidth: boolean;
+        wantsHeight: boolean;
+    }
+    class Table extends ComponentContainer {
         /**
         * Creates a Table.
         *
@@ -353,13 +352,6 @@ declare module Plottable {
         * @returns {Table} The calling Table.
         */
         public colWeight(index: number, weight: number): Table;
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Table;
-        public minimumWidth(): number;
-        public minimumWidth(newVal: number): Table;
-        public isFixedWidth(): boolean;
-        public isFixedHeight(): boolean;
-        public remove(): void;
     }
 }
 declare module Plottable {
@@ -419,9 +411,6 @@ declare module Plottable {
         scale?: Scale;
     }
     class Renderer extends Component {
-        public renderArea: D3.Selection;
-        public element: D3.Selection;
-        public scales: Scale[];
         /**
         * Creates a Renderer.
         *
@@ -440,14 +429,20 @@ declare module Plottable {
         public dataSource(): DataSource;
         public dataSource(source: DataSource): Renderer;
         public project(attrToSet: string, accessor: any, scale?: Scale): Renderer;
-        public animate(toggle?: boolean): Renderer;
+        /**
+        * Enables or disables animation.
+        *
+        * @param {boolean} enabled Whether or not to animate.
+        */
+        public animate(enabled: boolean): Renderer;
     }
 }
 declare module Plottable {
     class RenderController {
         static enabled: boolean;
         static registerToRender(c: Component): void;
-        static doRender(): void;
+        static registerToComputeLayout(c: Component): void;
+        static flush(): void;
     }
 }
 declare module Plottable {
@@ -570,7 +565,7 @@ declare module Plottable {
         *
         * @constructor
         */
-        constructor();
+        constructor(scale?: D3.Scale.OrdinalScale);
         /**
         * Retrieves the current domain, or sets the Scale's domain to the specified values.
         *
@@ -634,26 +629,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class InterpolatedColorScale extends QuantitiveScale {
-        /**
-        * Converts the string array into a d3 scale.
-        *
-        * @param {string[]} colors an array of strings representing color
-        *     values in hex ("#FFFFFF") or keywords ("white").
-        * @param {string} scaleType a string representing the underlying scale
-        *     type (linear/log/sqrt/pow)
-        * @returns a quantitive d3 scale.
-        */
-        /**
-        * Creates a d3 interpolator given the color array.
-        *
-        * d3 doesn't accept more than 2 range values unless we use a ordinal
-        * scale. So, in order to interpolate smoothly between the full color
-        * range, we must override the interpolator and compute the color values
-        * manually.
-        *
-        * @param {string[]} colors an array of strings representing color
-        *     values in hex ("#FFFFFF") or keywords ("white").
-        */
         /**
         * Creates a InterpolatedColorScale.
         *
@@ -748,15 +723,11 @@ declare module Plottable {
         * @returns {Legend} The calling Legend.
         */
         public scale(scale: ColorScale): Legend;
-        public minimumHeight(): number;
-        public minimumHeight(newVal: number): Legend;
+        public scale(): ColorScale;
     }
 }
 declare module Plottable {
     class XYRenderer extends Renderer {
-        public dataSelection: D3.UpdateSelection;
-        public xScale: Scale;
-        public yScale: Scale;
         /**
         * Creates an XYRenderer.
         *
@@ -797,9 +768,9 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class SquareRenderer extends XYRenderer {
+    class RectRenderer extends XYRenderer {
         /**
-        * Creates a SquareRenderer.
+        * Creates a RectRenderer.
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
@@ -811,9 +782,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class GridRenderer extends XYRenderer {
-        public colorScale: Scale;
-        public xScale: OrdinalScale;
-        public yScale: OrdinalScale;
         /**
         * Creates a GridRenderer.
         *
@@ -921,8 +889,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class Interaction {
-        public hitBox: D3.Selection;
-        public componentToListenTo: Component;
         /**
         * Creates an Interaction.
         *
@@ -980,8 +946,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class PanZoomInteraction extends Interaction {
-        public xScale: QuantitiveScale;
-        public yScale: QuantitiveScale;
         /**
         * Creates a PanZoomInteraction.
         *
@@ -996,8 +960,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class DragInteraction extends Interaction {
-        public origin: number[];
-        public location: number[];
         public callbackToCall: (dragInfo: any) => any;
         /**
         * Creates a DragInteraction.
@@ -1016,8 +978,6 @@ declare module Plottable {
 }
 declare module Plottable {
     class DragBoxInteraction extends DragInteraction {
-        public dragBox: D3.Selection;
-        public boxIsDrawn: boolean;
         /**
         * Clears the highlighted drag-selection box drawn by the AreaInteraction.
         *
@@ -1066,9 +1026,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class Axis extends Component {
-        static Y_WIDTH: number;
-        static X_HEIGHT: number;
-        public axisElement: D3.Selection;
+        static _DEFAULT_TICK_SIZE: number;
         /**
         * Creates an Axis.
         *
@@ -1106,6 +1064,12 @@ declare module Plottable {
         public outerTickSize(val: number): Axis;
         public tickPadding(): number;
         public tickPadding(val: number): Axis;
+        /**
+        * Gets the current tick formatting function, or sets the tick formatting function.
+        *
+        * @param {(value: any) => string} [formatter] The new tick formatting function.
+        * @returns The current tick formatting function, or the calling Axis.
+        */
         public tickFormat(): (value: any) => string;
         public tickFormat(formatter: (value: any) => string): Axis;
     }
@@ -1118,7 +1082,8 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (top/bottom)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Scale, orientation: string, formatter?: any);
+        constructor(scale: Scale, orientation?: string, formatter?: any);
+        public height(h: number): XAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -1137,7 +1102,8 @@ declare module Plottable {
         * @param {string} orientation The orientation of the Axis (left/right)
         * @param {any} [formatter] a D3 formatter
         */
-        constructor(scale: Scale, orientation: string, formatter?: any);
+        constructor(scale: Scale, orientation?: string, formatter?: any);
+        public width(w: number): YAxis;
         /**
         * Sets or gets the tick label position relative to the tick marks.
         *
@@ -1213,5 +1179,24 @@ declare module Plottable {
     }
     interface IBroadcasterCallback {
         (broadcaster: Broadcaster, ...args: any[]): any;
+    }
+    interface ISpaceRequest {
+        width: number;
+        height: number;
+        wantsWidth: boolean;
+        wantsHeight: boolean;
+    }
+}
+declare module Plottable {
+    module DOMUtils {
+        /**
+        * Gets the bounding box of an element.
+        * @param {D3.Selection} element
+        * @returns {SVGRed} The bounding box.
+        */
+        function getBBox(element: D3.Selection): SVGRect;
+        function getElementWidth(elem: HTMLScriptElement): number;
+        function getElementHeight(elem: HTMLScriptElement): number;
+        function getSVGPixelWidth(svg: D3.Selection): number;
     }
 }

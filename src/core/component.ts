@@ -2,6 +2,7 @@
 
 module Plottable {
   export class Component extends PlottableObject {
+
     public element: D3.Selection;
     public content: D3.Selection;
     private hitBox: D3.Selection;
@@ -12,20 +13,15 @@ module Plottable {
     public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
     private broadcastersCurrentlyListeningTo: {[key: string]: Broadcaster} = {};
-    private hasBeenRemoved = false;
-
-    public _fixedWidth = true;
-    public _fixedHeight = true;
-    private _minimumHeight = 0;
-    private _minimumWidth = 0;
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
+    public _parent: ComponentContainer;
 
     public availableWidth : number; // Width and height of the component. Used to size the hitbox, bounding box, etc
     public availableHeight: number;
-    public xOrigin        : number; // Origin of the coordinate space for the component. Passed down from parent
-    public yOrigin        : number;
+    public xOrigin: number; // Origin of the coordinate space for the component. Passed down from parent
+    public yOrigin: number;
     private _xOffset = 0; // Offset from Origin, used for alignment and floating positioning
     private _yOffset = 0;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
@@ -33,35 +29,44 @@ module Plottable {
 
     private cssClasses: string[] = ["component"];
 
+    public _isSetup = false;
+    public _isAnchored = false;
+
     /**
-     * Attaches the Component to a DOM element. Usually only directly invoked on root-level Components.
+     * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
      *
-     * @param {D3.Selection} element A D3 selection consisting of the element to anchor to.
+     * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
      * @returns {Component} The calling component.
      */
     public _anchor(element: D3.Selection) {
-      if (element.node().childNodes.length > 0) {
-        throw new Error("Can't anchor to a non-empty element");
-      }
-      if (this.hasBeenRemoved) {
-        // Since we deregister all the model bindings, this would be dangerous
-        throw new Error("Cannot reuse a component after removing it");
-      }
-      if (this.element != null) {
-        throw new Error("Cannot re-anchor a component after it is already anchored");
-      }
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
         this.rootSVG = element;
         this.rootSVG.classed("plottable", true);
         // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
         this.rootSVG.style("overflow", "visible");
-        this.element = element.append("g");
         this.isTopLevelComponent = true;
-      } else {
-        this.element = element;
       }
 
+      if (this.element != null) {
+        // reattach existing element
+        element.node().appendChild(this.element.node());
+      } else {
+        this.element = element.append("g");
+        this._setup();
+      }
+      this._isAnchored = true;
+      return this;
+    }
+
+    /**
+     * Creates additional elements as necessary for the Component to function.
+     * Called during _anchor() if the Component's element has not been created yet.
+     * Override in subclasses to provide additional functionality.
+     *
+     * @returns {Component} The calling Component.
+     */
+    public _setup() {
       this.cssClasses.forEach((cssClass: string) => {
         this.element.classed(cssClass, true);
       });
@@ -80,7 +85,12 @@ module Plottable {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
+      this._isSetup = true;
       return this;
+    }
+
+    public _requestedSpace(availableWidth : number, availableHeight: number): ISpaceRequest {
+      return {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
     }
 
     /**
@@ -103,9 +113,19 @@ module Plottable {
           xOrigin = 0;
           yOrigin = 0;
 
+          // Set width/height to 100% if not specified, to allow accurate size calculation
+          // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
+          // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
+          if (this.rootSVG.attr("width") == null) {
+            this.rootSVG.attr("width", "100%");
+          }
+          if (this.rootSVG.attr("height") == null) {
+            this.rootSVG.attr("height", "100%");
+          }
+
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth  = Utils.getElementWidth(elem);
-          availableHeight = Utils.getElementHeight(elem);
+          availableWidth  = DOMUtils.getElementWidth(elem);
+          availableHeight = DOMUtils.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
@@ -115,23 +135,25 @@ module Plottable {
       var xPosition = this.xOrigin;
       var yPosition = this.yOrigin;
 
-      xPosition += (availableWidth - this.minimumWidth()) * this._xAlignProportion;
+      var requestedSpace = this._requestedSpace(availableWidth , availableHeight);
+
+      xPosition += (availableWidth  - requestedSpace.width) * this._xAlignProportion;
       xPosition += this._xOffset;
-      if (this.minimumWidth() !== 0 && this.isFixedWidth()) {
+      if (this._isFixedWidth()) {
         // Decrease size so hitbox / bounding box and children are sized correctly
-        availableWidth = availableWidth > this.minimumWidth() ? this.minimumWidth() : availableWidth;
+        availableWidth  = Math.min(availableWidth , requestedSpace.width);
       }
 
-      yPosition += (availableHeight - this.minimumHeight()) * this._yAlignProportion;
+      yPosition += (availableHeight - requestedSpace.height) * this._yAlignProportion;
       yPosition += this._yOffset;
-      if (this.minimumHeight() !== 0 && this.isFixedHeight()) {
-        availableHeight = availableHeight > this.minimumHeight() ? this.minimumHeight() : availableHeight;
+      if (this._isFixedHeight()) {
+        availableHeight = Math.min(availableHeight, requestedSpace.height);
       }
 
-      this.availableWidth  = availableWidth;
+      this.availableWidth   = availableWidth ;
       this.availableHeight = availableHeight;
       this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
-      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth).attr("height", this.availableHeight));
+      this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth ).attr("height", this.availableHeight));
       return this;
     }
 
@@ -141,7 +163,16 @@ module Plottable {
      * @returns {Component} The calling Component.
      */
     public _render() {
-      RenderController.registerToRender(this);
+      if (this._isAnchored && this._isSetup) {
+        RenderController.registerToRender(this);
+      }
+      return this;
+    }
+
+    public _scheduleComputeLayout() {
+      if (this._isAnchored && this._isSetup) {
+        RenderController.registerToComputeLayout(this);
+      }
       return this;
     }
 
@@ -149,9 +180,25 @@ module Plottable {
       return this; //no-op
     }
 
+
+    public _invalidateLayout() {
+      if (this._isAnchored && this._isSetup) {
+        if (this.isTopLevelComponent) {
+          this._scheduleComputeLayout();
+        } else {
+          this._parent._invalidateLayout();
+        }
+      }
+    }
+
+    /**
+     * Renders the Component into a given DOM element.
+     *
+     * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+     * @return {Component} The calling component.
+     */
     public renderTo(element: any): Component {
-      // When called on top-level-component, a shortcut for component._anchor(svg)._computeLayout()._render()
-      if (this.element == null) {
+      if (element != null) {
         var selection: D3.Selection;
         if (typeof(element.node) === "function") {
           selection = (<D3.Selection> element);
@@ -165,15 +212,19 @@ module Plottable {
     }
 
     /**
-     * Cause the Component to recompute layout and redraw. Useful if the window resized.
+     * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
      *
      * @param {number} [availableWidth]  - the width of the container element
      * @param {number} [availableHeight] - the height of the container element
      */
     public resize(width?: number, height?: number): Component {
-      if (this.element != null) {
-        this._computeLayout(width, height)._render();
+      if (!this.isTopLevelComponent) {
+        throw new Error("Cannot resize on non top-level component");
       }
+      if (width != null && height != null && this._isAnchored) {
+        this.rootSVG.attr({width: width, height: height});
+      }
+      this._invalidateLayout();
       return this;
     }
 
@@ -194,6 +245,7 @@ module Plottable {
       } else {
         throw new Error("Unsupported alignment");
       }
+      this._invalidateLayout();
       return this;
     }
 
@@ -214,6 +266,7 @@ module Plottable {
       } else {
         throw new Error("Unsupported alignment");
       }
+      this._invalidateLayout();
       return this;
     }
 
@@ -225,6 +278,7 @@ module Plottable {
      */
     public xOffset(offset: number): Component {
       this._xOffset = offset;
+      this._invalidateLayout();
       return this;
     }
 
@@ -236,6 +290,7 @@ module Plottable {
      */
     public yOffset(offset: number): Component {
       this._yOffset = offset;
+      this._invalidateLayout();
       return this;
     }
 
@@ -247,8 +302,8 @@ module Plottable {
       var box = parentElement.append("rect");
       if (className != null) {box.classed(className, true);};
       this.boxes.push(box);
-      if (this.availableWidth != null && this.availableHeight != null) {
-        box.attr("width", this.availableWidth).attr("height", this.availableHeight);
+      if (this.availableWidth  != null && this.availableHeight != null) {
+        box.attr("width", this.availableWidth ).attr("height", this.availableHeight);
       }
       return box;
     }
@@ -330,57 +385,27 @@ module Plottable {
     }
 
     /**
-     * Sets or retrieves the Component's minimum height.
-     *
-     * @param {number} [newVal] The new value for the Component's minimum height, in pixels.
-     * @return {number|Component} The current minimum height, or the calling Component (if newVal is not supplied).
-     */
-    public minimumHeight(): number;
-    public minimumHeight(newVal: number): Component;
-    public minimumHeight(newVal?: number): any {
-      if (newVal != null) {
-        this._minimumHeight = newVal;
-        return this;
-      } else {
-        return this._minimumHeight;
-      }
-    }
-
-    /**
-     * Sets or retrieves the Component's minimum width.
-     *
-     * @param {number} [newVal] The new value for the Component's minimum width, in pixels.
-     * @return {number|Component} The current minimum width, or the calling Component (if newVal is not supplied).
-     */
-    public minimumWidth(): number;
-    public minimumWidth(newVal: number): Component;
-    public minimumWidth(newVal?: number): any {
-      if (newVal != null) {
-        this._minimumWidth = newVal;
-        return this;
-      } else {
-        return this._minimumWidth;
-      }
-    }
-
-    /**
-     * Checks if the Component has a fixed width or scales to fill available space.
-     * Returns true by default on the base Component class.
+     * Checks if the Component has a fixed width or false if it grows to fill available space.
+     * Returns false by default on the base Component class.
      *
      * @return {boolean} Whether the component has a fixed width.
      */
-    public isFixedWidth(): boolean {
-      return this._fixedWidth;
+    public _isFixedWidth(): boolean {
+      // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
+      // some fixed size you aspire to.
+      // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
+      // For example a label with an empty string.
+      return this._requestedSpace(-1, -1).wantsWidth;
     }
 
     /**
-     * Checks if the Component has a fixed height or scales to fill available space.
-     * Returns true by default on the base Component class.
+     * Checks if the Component has a fixed height or false if it grows to fill available space.
+     * Returns false by default on the base Component class.
      *
      * @return {boolean} Whether the component has a fixed height.
      */
-    public isFixedHeight(): boolean {
-      return this._fixedHeight;
+    public _isFixedHeight(): boolean {
+      return this._requestedSpace(-1, -1).wantsHeight;
     }
 
     /**
@@ -396,9 +421,12 @@ module Plottable {
      */
     public merge(c: Component): ComponentGroup {
       var cg: ComponentGroup;
+      if (this._isSetup || this._isAnchored) {
+        throw new Error("Can't presently merge a component that's already been anchored");
+      }
       if (ComponentGroup.prototype.isPrototypeOf(c)) {
         cg = (<ComponentGroup> c);
-        cg._addComponentToGroup(this, true);
+        cg._addComponent(this, true);
         return cg;
       } else {
         cg = new ComponentGroup([this, c]);
@@ -407,15 +435,18 @@ module Plottable {
     }
 
     /**
-     * Blow up a component and its DOM, so it can be safely removed
+     * Removes a Component from the DOM.
      */
     public remove() {
-      d3.values(this.broadcastersCurrentlyListeningTo).forEach((b) => {
-        b.deregisterListener(this);
-      });
-      this.hasBeenRemoved = true;
-      this.element.remove();
-      this.element = null;
+      if (this._isAnchored) {
+        this.element.remove();
+      }
+      if (this._parent != null) {
+        this._parent._removeComponent(this);
+      }
+      this._isAnchored = false;
+      this._parent = null;
+      return this;
     }
   }
 }

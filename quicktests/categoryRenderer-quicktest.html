@@ -2,7 +2,7 @@
   <head>
     <title>Bar Renderer Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../../build/plottable.js"></script>
     <script src="../../build/exampleUtil.js"></script>
 
@@ -27,8 +27,10 @@
                               .project("x", "name", xScale)
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"});
-      var chart = new Plottable.StandardChart().center(barRenderer).xAxis(xAxis).yAxis(yAxis);
-      // barRenderer._animate = false;
+      barRenderer.animate(true);
+      var chart = new Plottable.Table([[yAxis, barRenderer],
+                                       [null,  xAxis]]);
+
 
       window.onload = function() { chart.renderTo("#meow"); }
 

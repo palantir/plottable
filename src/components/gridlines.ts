@@ -20,15 +20,15 @@ module Plottable {
       this.xScale = xScale;
       this.yScale = yScale;
       if (this.xScale != null) {
-        this._registerToBroadcaster(this.xScale, () => this.redrawXLines());
+        this._registerToBroadcaster(this.xScale, () => this._render());
       }
       if (this.yScale != null) {
-        this._registerToBroadcaster(this.yScale, () => this.redrawYLines());
+        this._registerToBroadcaster(this.yScale, () => this._render());
       }
     }
 
-    public _anchor(element: D3.Selection): Gridlines {
-      super._anchor(element);
+    public _setup() {
+      super._setup();
       this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
       this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
       return this;
@@ -42,7 +42,7 @@ module Plottable {
     }
 
     private redrawXLines() {
-      if (this.xScale != null && this.element != null) {
+      if (this.xScale != null) {
         var xTicks = this.xScale.ticks();
         var getScaledXValue = (tickVal: number) => this.xScale.scale(tickVal);
         var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
@@ -56,7 +56,7 @@ module Plottable {
     }
 
     private redrawYLines() {
-      if (this.yScale != null && this.element != null) {
+      if (this.yScale != null) {
         var yTicks = this.yScale.ticks();
         var getScaledYValue = (tickVal: number) => this.yScale.scale(tickVal);
         var yLines = this.yLinesContainer.selectAll("line").data(yTicks);

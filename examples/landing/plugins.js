@@ -18,7 +18,7 @@ function pluginsChart(gitData) {
                                .project("y", linesChanged, yScale)
                                .project("fill", "name", colorScale)
   var gridlines = new Plottable.Gridlines(xScale, yScale);
-  var legend    = new Plottable.Legend(colorScale).xOffset(-80).minimumWidth(200);
+  var legend    = new Plottable.Legend(colorScale).xOffset(-80);
   var center = renderer.merge(gridlines).merge(legend);
 
   if (!window.mobilecheck()) {
