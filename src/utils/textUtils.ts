@@ -3,13 +3,17 @@
 module Plottable {
   export module TextUtils {
 
+    export interface TextMeasurer {
+      (s: string): number[];
+    };
+
     /**
      * Returns a quasi-pure function of typesignature (t: string) => number[] which measures height and width of text
      *
      * @param {D3.Selection} selection: The selection in which text will be drawn and measured
      * @returns {number[]} width and height of the text
      */
-    export function getTextMeasure(selection: D3.Selection): (s: string) => number[] {
+    export function getTextMeasure(selection: D3.Selection): TextMeasurer {
       return (s: string) => {
         if (s.trim() === "") {
           return [0, 0];
@@ -33,34 +37,16 @@ module Plottable {
      * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
      *
      * @param {string} text: The string to be truncated
-     * @param {number} availableSpace: The avialable space, in pixels
+     * @param {number} availableWidth: The available width, in pixels
      * @param {D3.Selection} element: The text element used to measure the text
      * @returns {string} text - the shortened text
      */
-    export function getTruncatedText(text: string, availableSpace: number, element: D3.Selection) {
-      var originalText = element.text();
-      element.text(text);
-      var bbox = DOMUtils.getBBox(element);
-      var textLength = bbox.width;
-      if (textLength <= availableSpace) {
-        element.text(originalText);
+    export function getTruncatedText(text: string, availableWidth: number, element: D3.Selection) {
+      var measurer = getTextMeasure(element);
+      if (measurer(text)[0] <= availableWidth) {
         return text;
-      }
-      element.text(text + "...");
-      var textNode = <SVGTextElement> element.node();
-      var dotLength = textNode.getSubStringLength(textNode.textContent.length-3, 3);
-      if (dotLength > availableSpace) {
-        element.text(originalText);
-        return ""; // no room even for ellipsis
-      }
-
-      var numChars = text.length;
-      for (var i = 1; i<numChars; i++) {
-        var testLength = textNode.getSubStringLength(0, i);
-        if (testLength + dotLength > availableSpace) {
-          element.text(originalText);
-          return text.substr(0, i-1).trim() + "...";
-        }
+      } else {
+        return addEllipsesToLine(text, availableWidth, measurer);
       }
     }
 
@@ -71,19 +57,7 @@ module Plottable {
      * @return {number} The height of the text element, in pixels.
      */
     export function getTextHeight(selection: D3.Selection) {
-      var height: number;
-      if (selection.node().nodeName === "text") {
-        var originalText = selection.text();
-        selection.text("bqpdl");
-        height = DOMUtils.getBBox(selection).height;
-        selection.text(originalText);
-      } else {
-        var text = selection.append("text");
-        text.text("bqpdl");
-        height = DOMUtils.getBBox(text).height;
-        text.remove();
-      }
-      return height;
+      return getTextMeasure(selection)("bqpdl")[1];
     }
 
     /**
@@ -93,11 +67,7 @@ module Plottable {
      * @return {number} The width of the text element, in pixels.
      */
     export function getTextWidth(textElement: D3.Selection, text: string) {
-      var originalText = textElement.text();
-      textElement.text(text);
-      var width = text === "" ? 0 : DOMUtils.getBBox(textElement).width;
-      textElement.text(originalText);
-      return width;
+      return getTextMeasure(textElement)(text)[0];
     }
 
     export interface IWrappedText {
@@ -178,6 +148,29 @@ module Plottable {
         lines: lines,
         textFits: textFits
       };
+    }
+
+    /**
+     * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
+     * shortening the line as required to ensure that it fits within width.
+     */
+    export function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
+      var widthMeasure = (s: string) => measureText(s)[0];
+      var lineWidth = widthMeasure(line);
+      var ellipsesWidth = widthMeasure("...");
+      if (width < ellipsesWidth) {
+        var periodWidth = widthMeasure(".");
+        var numPeriodsThatFit = Math.floor(width / periodWidth);
+        return "...".substr(0, numPeriodsThatFit);
+      }
+      while (lineWidth + ellipsesWidth > width) {
+        line = line.substr(0, line.length-1);
+        lineWidth = widthMeasure(line);
+      }
+      if (widthMeasure(line + "...") > width) {
+        throw new Error("addEllipsesToLine failed :(");
+      }
+      return line + "...";
     }
 
     export function writeLineHorizontally(line: string, g: D3.Selection,

@@ -5,18 +5,38 @@ var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
 var SPACES = /^\s+$/;
 module Plottable {
   export module WordWrapUtils {
+
+    /**
+     * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
+     * Wraps words and fits as much of the text as possible into the given width and height.
+     */
+    export function breakTextToFitRect(text: string, width: number, height: number, measureText: TextUtils.TextMeasurer): string[] {
+      var widthMeasure = (s: string) => measureText(s)[0];
+      var lines = breakTextToFitWidth(text, width, widthMeasure);
+      var textHeight = measureText("hello world")[1];
+      var nLinesThatFit = Math.floor(height / textHeight);
+      if (nLinesThatFit < lines.length) {
+        lines = lines.splice(0, nLinesThatFit);
+        if (nLinesThatFit > 0) {
+          // Overwrite the last line to one that has had a ... appended to the end
+          lines[nLinesThatFit-1] = TextUtils.addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
+        }
+      }
+      return lines;
+    }
+
     /**
      * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
      * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
      * the word is too big to fit within width on its own.
      */
-    export function breakTextToFitWidth(text: string, width: number, measureText: (s: string) => number): string[] {
+    export function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[] {
       var ret: string[] = [];
       var paragraphs = text.split("\n");
       for (var i = 0, len = paragraphs.length; i < len; i++) {
         var paragraph = paragraphs[i];
         if (paragraph !== null) {
-          ret = ret.concat(breakParagraphToFitWidth(paragraph, width, measureText));
+          ret = ret.concat(breakParagraphToFitWidth(paragraph, width, widthMeasure));
         } else {
           ret.push("");
         }
@@ -29,9 +49,9 @@ module Plottable {
      * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
      * allowed width.
      */
-    export function canWrapWithoutBreakingWords(text: string, width: number, measureText: (s: string) => number): boolean {
+    export function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean {
       var tokens = tokenize(text);
-      var widths = tokens.map(measureText);
+      var widths = tokens.map(widthMeasure);
       var maxWidth = d3.max(widths);
       return maxWidth <= width;
     }
@@ -39,10 +59,10 @@ module Plottable {
     /**
      * A paragraph is a string of text containing no newlines.
      * Given a paragraph, break it up into lines that are no
-     * wider than width.  measureText is a function that takes
+     * wider than width.  widthMeasure is a function that takes
      * text as input, and returns the width of the text in pixels.
      */
-    function breakParagraphToFitWidth(text: string, width: number, measureText: (s: string) => number): string[] {
+    function breakParagraphToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[] {
       var lines: string[] = [];
       var tokens = tokenize(text);
       var curLine = "";
@@ -52,7 +72,7 @@ module Plottable {
         if (typeof nextToken === "undefined" || nextToken === null) {
           nextToken = tokens[i++];
         }
-        var brokenToken = breakNextTokenToFitInWidth(curLine, nextToken, width, measureText);
+        var brokenToken = breakNextTokenToFitInWidth(curLine, nextToken, width, widthMeasure);
 
         var canAdd = brokenToken[0];
         var leftOver = brokenToken[1];
@@ -77,15 +97,15 @@ module Plottable {
      * added to curLine and fits in the width. the return value
      * is an array with 2 elements, the part that can be added
      * and the left over part of the token
-     * measureText is a function that takes text as input,
+     * widthMeasure is a function that takes text as input,
      * and returns the width of the text in pixels.
      */
-    function breakNextTokenToFitInWidth(curLine: string, nextToken: string, width: number, measureText: (s: string) => number): string[] {
+    function breakNextTokenToFitInWidth(curLine: string, nextToken: string, width: number, widthMeasure: (s: string) => number): string[] {
 
       if (isBlank(nextToken)) {
         return [nextToken, null];
       }
-      if (measureText(curLine + nextToken) <= width) {
+      if (widthMeasure(curLine + nextToken) <= width) {
         return [nextToken, null];
       }
       if (!isBlank(curLine)) {
@@ -93,7 +113,7 @@ module Plottable {
       }
       var i = 0;
       while (i < nextToken.length) {
-        if (measureText(curLine + nextToken[i]) <= width) {
+        if (widthMeasure(curLine + nextToken[i]) <= width) {
           curLine += nextToken[i++];
         } else {
           break;
