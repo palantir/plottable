@@ -1,5 +1,5 @@
 /*!
-Plottable 0.13.1 (https://github.com/palantir/plottable)
+Plottable 0.13.4 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1126,8 +1126,6 @@ var Plottable;
             this.rows = [];
             this.rowWeights = [];
             this.colWeights = [];
-            this._rowCount = [];
-            this._colCount = [];
             this.nRows = 0;
             this.nCols = 0;
             this.classed("table", true);
@@ -1161,7 +1159,47 @@ var Plottable;
         };
 
         Table.prototype._removeComponent = function (c) {
-            throw new Error("_removeComponent not yet implemented on Table");
+            _super.prototype._removeComponent.call(this, c);
+            var rowpos;
+            var colpos;
+            outer:
+            for (var i = 0; i < this.nRows; i++) {
+                for (var j = 0; j < this.nCols; j++) {
+                    if (this.rows[i][j] === c) {
+                        rowpos = i;
+                        colpos = j;
+                        break outer;
+                    }
+                }
+            }
+
+            if (rowpos === undefined) {
+                return this;
+            }
+
+            this.rows[rowpos][colpos] = null;
+
+            // check if can splice out row
+            if (this.rows[rowpos].every(function (v) {
+                return v === null;
+            })) {
+                this.rows.splice(rowpos, 1);
+                this.rowWeights.splice(rowpos, 1);
+                this.nRows--;
+            }
+
+            // check if can splice out column
+            if (this.rows.every(function (v) {
+                return v[colpos] === null;
+            })) {
+                this.rows.forEach(function (r) {
+                    return r.splice(colpos, 1);
+                });
+                this.colWeights.splice(colpos, 1);
+                this.nCols--;
+            }
+
+            return this;
         };
 
         Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
@@ -1432,7 +1470,7 @@ var Plottable;
                 var fixities = componentGroups[i].map(fixityAccessor);
                 var allFixed = fixities.reduce(function (a, b) {
                     return a && b;
-                });
+                }, true);
                 return allFixed ? 0 : 1;
             });
         };
@@ -1452,7 +1490,7 @@ var Plottable;
             var all = function (bools) {
                 return bools.reduce(function (a, b) {
                     return a && b;
-                });
+                }, true);
             };
             var group_isFixed = function (components) {
                 return all(components.map(fixityAccessor));
@@ -1766,27 +1804,32 @@ var Plottable;
 
         RenderController.requestFrame = function () {
             if (!RenderController.animationRequested) {
-                requestAnimationFrame(RenderController.doRender);
+                requestAnimationFrame(RenderController.flush);
                 RenderController.animationRequested = true;
             }
         };
 
-        RenderController.doRender = function () {
-            var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
-            toCompute.forEach(function (c) {
-                return c._computeLayout();
-            });
-            var toRender = d3.values(RenderController.componentsNeedingRender);
-            toRender.forEach(function (c) {
-                return c._render();
-            }); // call _render on everything, so that containers will put their children in the toRender queue
-            toRender = d3.values(RenderController.componentsNeedingRender);
-            toRender.forEach(function (c) {
-                return c._doRender();
-            });
-            RenderController.componentsNeedingComputeLayout = {};
-            RenderController.componentsNeedingRender = {};
-            RenderController.animationRequested = false;
+        RenderController.flush = function () {
+            if (RenderController.animationRequested) {
+                var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
+                toCompute.forEach(function (c) {
+                    return c._computeLayout();
+                });
+                var toRender = d3.values(RenderController.componentsNeedingRender);
+
+                // call _render on everything, so that containers will put their children in the toRender queue
+                toRender.forEach(function (c) {
+                    return c._render();
+                });
+
+                toRender = d3.values(RenderController.componentsNeedingRender);
+                toRender.forEach(function (c) {
+                    return c._doRender();
+                });
+                RenderController.componentsNeedingComputeLayout = {};
+                RenderController.componentsNeedingRender = {};
+                RenderController.animationRequested = false;
+            }
         };
         RenderController.componentsNeedingRender = {};
         RenderController.componentsNeedingComputeLayout = {};

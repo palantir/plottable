@@ -3145,6 +3145,87 @@ describe("Tables", function () {
             verifyLayoutResult(result, [150, 0], [0], [0, 0], [200], true, false, "when there's insufficient space");
         });
     });
+
+    describe("table._removeComponent works properly", function () {
+        var c1 = new Plottable.Component();
+        var c2 = new Plottable.Component();
+        var c3 = new Plottable.Component();
+        var c4 = new Plottable.Component();
+        var c5 = new Plottable.Component();
+        var c6 = new Plottable.Component();
+        var table;
+        it("table._removeComponent works in easy case with no splicing", function () {
+            table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+            table._removeComponent(c4);
+            assert.deepEqual(table.rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
+        });
+
+        it("table._removeComponent works for row splicing", function () {
+            table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+            table._removeComponent(c4);
+            table._removeComponent(c3);
+            assert.deepEqual(table.rows, [[c1, c2], [c5, c6]], "remove one row");
+        });
+
+        it("table._removeComponent works for column splicing", function () {
+            table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+            table._removeComponent(c2);
+            table._removeComponent(c4);
+            table._removeComponent(c6);
+
+            assert.deepEqual(table.rows, [[c1], [c3], [c5]], "remove one column");
+        });
+
+        it("table._removeComponent only splices when row or column is completely empty", function () {
+            table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+            table._removeComponent(c2);
+            table._removeComponent(c3);
+            table._removeComponent(c6);
+
+            assert.deepEqual(table.rows, [[c1, null], [null, c4], [c5, null]], "remove multiple items");
+        });
+
+        it("table._removeComponent works for splicing out row and column simultaneously", function () {
+            table = new Plottable.Table([[c1, c2], [c3, c4], [c5, c6]]);
+            table._removeComponent(c2);
+            table._removeComponent(c3);
+            table._removeComponent(c6);
+            table._removeComponent(c4); // this should kill the row and column at the same time
+
+            assert.deepEqual(table.rows, [[c1], [c5]], "remove row and column");
+        });
+
+        it("table._removeComponent works for single row and column", function () {
+            table = new Plottable.Table([[c1]]);
+            table._removeComponent(c1);
+
+            assert.deepEqual(table.rows, [], "remove entire table");
+        });
+
+        it("table._removeComponent does nothing when component is not found", function () {
+            table = new Plottable.Table([[c1, c2], [c3, c4]]);
+            table._removeComponent(c5);
+
+            assert.deepEqual(table.rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
+        });
+
+        it("table._removeComponent removing component twice should have same effect as removing it once", function () {
+            table = new Plottable.Table([[c1, c2, c3], [c4, c5, c6]]);
+
+            table._removeComponent(c1);
+            assert.deepEqual(table.rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+
+            table._removeComponent(c1);
+            assert.deepEqual(table.rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+        });
+
+        it("table._removeComponent doesn't do anything weird when called with null", function () {
+            table = new Plottable.Table([[c1, null], [c2, c3]]);
+
+            table._removeComponent(null);
+            assert.deepEqual(table.rows, [[c1, null], [c2, c3]]);
+        });
+    });
 });
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
