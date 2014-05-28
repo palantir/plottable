@@ -58,6 +58,16 @@ module.exports = function(grunt) {
     }
   }
 
+  var FILES_TO_COMMIT = ['plottable.js',
+                         'plottable.min.js',
+                         'plottable.d.ts',
+                         'examples/exampleUtil.js',
+                         'test/tests.js',
+                         "plottable.css",
+                         "plottable.zip",
+                         "bower.json",
+                         "package.json"];
+
   var prefixMatch = "\\n *";
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
   var nestedBraceMatch = ": \\{[^{}]*\\}";
@@ -155,7 +165,7 @@ module.exports = function(grunt) {
           message: "Release version <%= pkg.version %>"
         },
         files: {
-          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json", "plottable.css", "plottable.zip"]
+          src: FILES_TO_COMMIT
         }
       },
       built: {
@@ -163,7 +173,7 @@ module.exports = function(grunt) {
           message: "Update built files"
         },
         files: {
-          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "plottable.css", "plottable.zip"]
+          src: FILES_TO_COMMIT
         }
       }
     },
@@ -174,10 +184,16 @@ module.exports = function(grunt) {
         },
         files: [
         {src: 'plottable.js'  , dest: '.'},
+        {src: 'plottable.min.js', dest: '.'},
         {src: 'plottable.d.ts', dest: '.'},
         {src: 'plottable.css' , dest: '.'},
         {src: 'README.md'     , dest: '.'},
         {src: 'LICENSE'       , dest: '.'}]
+      }
+    },
+    uglify: {
+      main: {
+        files: {'plottable.min.js': ['plottable.js']}
       }
     }
   };
@@ -209,6 +225,7 @@ module.exports = function(grunt) {
                                   "handle-header",
                                   "sed:protected_definitions",
                                   "sed:public_member_vars",
+                                  "uglify",
                                   "compress"
                                   ]);
 
