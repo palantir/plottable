@@ -15,7 +15,7 @@
     <!-- plottable and dependencies -->
     <script src="bower_components/d3/d3.min.js"></script>
     <link href="plottable.css" type="text/css" rel="stylesheet" />
-    <script src="build/plottable.js"></script>
+    <script src="plottable.js"></script>
 
     <script src="examples/main-page/commit-chart-shared.js"></script>
     <script src="examples/main-page/commit-chart.js"></script>
@@ -59,6 +59,11 @@
           layoutChart(data);
           pluginsChart(data);
         });
+        d3.json("bower.json", function(json) {
+          var v = json.version;
+          var button = d3.select("h2 a .plottable-dl");
+          button.text("plottable.zip - v" + v);
+        })
       }
     </script>
 
@@ -94,6 +99,23 @@
         border: 25px solid #fff;
       }
 
+      .button.primary {
+        color: #fff;
+        /*text-shadow: 0 -1px 0;*/
+        background-color: #60b044;
+        background-image: linear-gradient(#8add6d, #60b044);
+        background-repeat: repeat-x;
+        border-color: #5ca941;
+        position: relative;
+        display: inline-block;
+        padding: 7px 12px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 3px;
+        border: 1px solid #d5d5d5;
+        font: Helvetica;
+      }
+
     </style>
   <link rel="stylesheet" type="text/css" href="examples/landing/desktop.css" />
   <link rel="stylesheet" type="text/css" media="only screen and (max-device-width: 480px)" href="examples/landing/mobile.css" />
@@ -106,15 +128,12 @@
 
 
     <div class="container">
-      <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="#">Plottable.js</a>
-          </div>
-        </div>
-      </nav>
       <div class="internal">
       <h1>Plottable.js</h1>
+      <h2><a href="plottable.zip" rel="nofollow" class="button primary">
+                <span class="octicon octicon-arrow-down"></span>
+                <span class="tooltipped tooltipped-s plottable-dl" aria-label="68.8 KB">plottable.zip - vx.xx.x</span>
+      </a></h2>
       <h2>What is Plottable?</h2>
       <p>
         Plottable.js is a library for data visualization and charting, under development by Palantir Technologies.
