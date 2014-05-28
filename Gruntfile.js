@@ -194,6 +194,9 @@ module.exports = function(grunt) {
                                   "sed:private_definitions",
                                   "ts:test",
                                   "tslint",
+                                  "handle-header",
+                                  "sed:protected_definitions",
+                                  "sed:public_member_vars",
                                   "clean:tscommand"]);
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
@@ -202,10 +205,6 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
                                   "blanket_mocha",
-                                  "copy:dist",
-                                  "handle-header",
-                                  "sed:protected_definitions",
-                                  "sed:public_member_vars",
                                   "uglify",
                                   "compress"
                                   ]);
