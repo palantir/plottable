@@ -155,7 +155,7 @@ module.exports = function(grunt) {
           message: "Release version <%= pkg.version %>"
         },
         files: {
-          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json"]
+          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "package.json", "bower.json", "plottable.css", "plottable.zip"]
         }
       },
       built: {
@@ -163,9 +163,17 @@ module.exports = function(grunt) {
           message: "Update built files"
         },
         files: {
-          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js']
+          src: ['plottable.js', 'plottable.d.ts', 'examples/exampleUtil.js', 'test/tests.js', "plottable.css", "plottable.zip"]
         }
-    }
+      }
+    },
+    compress: {
+      main: {
+        options: {
+          archive: 'plottable.zip'
+        },
+        files: ['plottable.js', 'plottable.d.ts', 'plottable.css', 'README.md', 'LICENSE']
+      }
     }
   };
 
