@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <title>Legend Toggle Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../build/plottable.js"></script>
+    <script src="../../build/exampleUtil.js"></script>
+    <style>
+      .plottable .axis line {
+/*        stroke: black;
+        opacity: 1;*/
+      }
+    </style>
+
+    <script>
+      window.onload = function() {
+        var renderers = [];
+
+
+        var colors = new Plottable.ColorScale("10").range();
+        var activeColors = colors.slice();
+        var numRenderers = 5;
+        var names = ["bat", "cat", "mat", "rat", "pat"];
+        var toggledOn = [];
+        for (var i = 0; i < numRenderers; i++) {
+          toggledOn[i] = true;
+        }
+
+        var xScale = new Plottable.LinearScale();
+        var yScale = new Plottable.LinearScale();
+
+        for (var i=0; i<numRenderers; i++) {
+        var data = makeRandomData(100);
+        var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+            renderers.push(renderer);
+        }
+
+        var cg = new Plottable.ComponentGroup();
+
+        renderers.forEach(function(renderer, i) {
+            renderer.project("stroke", function() { return colors[i]; });
+            cg.merge(renderer);
+        })
+
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var chart = new Plottable.Table([
+                                  [yAxis, cg],
+                                  [null,  xAxis]
+                                ]);
+
+        chart.name = "INNER_CHART"
+        var colorScale = new Plottable.ColorScale();
+        colorScale.range(colors);
+        colorScale.domain(names);
+        var legend = new Plottable.Legend(colorScale);
+        var legendLabel = new Plottable.TitleLabel("fat");
+        var legendTable = new Plottable.Table([[legendLabel], [legend]]);
+        var outerTable = new Plottable.Table([[chart, legendTable]]);
+        outerTable.name = "OUTER_TABLE";
+        legendTable.name = "LEGEND_TABLE";
+        outerTable.renderTo("#legend-toggle-test");
+
+        cb = function(x,y) {
+            var legend = this.componentToListenTo;
+            var height = legend.availableHeight;
+            var entries = legend.colorScale.domain().length;
+            var idx = Math.floor(y / (height / entries));
+            if (toggledOn[idx]) {
+                toggledOn[idx] = false;
+                activeColors[idx] = "#d3d3d3";
+                renderers[idx].remove();
+            } else {
+                toggledOn[idx] = true;
+                activeColors[idx] = colors[idx];
+                cg.merge(renderers[idx]);
+            }
+            console.log(toggledOn);
+            console.log(activeColors);
+            var colorScale = new Plottable.ColorScale();
+            colorScale.range(activeColors);
+            colorScale.domain(names);
+            legend.scale(colorScale);
+        }
+        var click = new Plottable.ClickInteraction(legend).callback(cb).registerWithComponent();
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="legend-toggle-test" width="480" height="320"></svg>
+  </body>
+
+</html>
