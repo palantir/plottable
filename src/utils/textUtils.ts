@@ -2,6 +2,33 @@
 
 module Plottable {
   export module TextUtils {
+
+    /**
+     * Returns a quasi-pure function of typesignature (t: string) => number[] which measures height and width of text
+     *
+     * @param {D3.Selection} selection: The selection in which text will be drawn and measured
+     * @returns {number[]} width and height of the text
+     */
+    export function getTextMeasure(selection: D3.Selection): (s: string) => number[] {
+      return (s: string) => {
+        if (s.trim() === "") {
+          return [0, 0];
+        }
+        if (selection.node().nodeName === "text") {
+          var originalText = selection.text();
+          selection.text(s);
+          var bb = DOMUtils.getBBox(selection);
+          selection.text(originalText);
+          return [bb.width, bb.height];
+        } else {
+          var t = selection.append("text").text(s);
+          var bb = DOMUtils.getBBox(t);
+          t.remove();
+          return [bb.width, bb.height];
+        }
+      }
+    }
+
     /**
      * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
      *
@@ -73,16 +100,16 @@ module Plottable {
       return width;
     }
 
-    /**
-     * Converts a string into an array of strings, all of which fit in the available space.
-     *
-     * @returns {string[]} The input text broken into substrings that fit in the avialable space.
-     */
     export interface IWrappedText {
       originalText: string;
       lines: string[];
       textFits: boolean;
     };
+    /**
+     * Converts a string into an array of strings, all of which fit in the available space.
+     *
+     * @returns {string[]} The input text broken into substrings that fit in the avialable space.
+     */
     export function getWrappedText(text: string,
                                    availableWidth : number,
                                    availableHeight: number,

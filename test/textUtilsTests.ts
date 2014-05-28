@@ -78,6 +78,36 @@ describe("TextUtils", () => {
 
     svg.remove();
   });
+  describe("getTextMeasure", () => {
+    var svg = generateSVG(200, 200);
+    var t = svg.append("text");
+    t.text("hi there");
+    var canonicalBB = Plottable.DOMUtils.getBBox(t);
+    var canonicalResult = [canonicalBB.width, canonicalBB.height];
+    t.text("bla bla bla")
+
+    it("works on empty string", () => {
+      var measure = Plottable.TextUtils.getTextMeasure(t);
+      var result = measure("");
+      assert.deepEqual(result, [0, 0], "empty string has 0 width and height");
+    });
+    it("works on non-empty string and has no side effects", () => {
+      var measure = Plottable.TextUtils.getTextMeasure(t);
+      var result2 = measure("hi there");
+      assert.deepEqual(result2, canonicalResult, "measurement is as expected");
+      assert.equal(t.text(), "bla bla bla", "the text was unchanged");
+    });
+
+    it("works when operating on the top svg instead of text selection, and has no side effects", () => {
+      var measure2 = Plottable.TextUtils.getTextMeasure(svg);
+      var result3 = measure2("hi there");
+      assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
+      assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
+    });
+    after(() => {
+      svg.remove();
+    });
+  });
 
   describe("writeLine", () => {
     var svg: D3.Selection;
