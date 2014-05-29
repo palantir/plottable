@@ -102,15 +102,25 @@ declare module Plottable {
 }
 declare module Plottable {
     module TextUtils {
+        interface TextMeasurer {
+            (s: string): number[];
+        }
+        /**
+        * Returns a quasi-pure function of typesignature (t: string) => number[] which measures height and width of text
+        *
+        * @param {D3.Selection} selection: The selection in which text will be drawn and measured
+        * @returns {number[]} width and height of the text
+        */
+        function getTextMeasure(selection: D3.Selection): TextMeasurer;
         /**
         * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
         *
         * @param {string} text: The string to be truncated
-        * @param {number} availableSpace: The avialable space, in pixels
+        * @param {number} availableWidth: The available width, in pixels
         * @param {D3.Selection} element: The text element used to measure the text
         * @returns {string} text - the shortened text
         */
-        function getTruncatedText(text: string, availableSpace: number, element: D3.Selection): string;
+        function getTruncatedText(text: string, availableWidth: number, element: D3.Selection): string;
         /**
         * Gets the height of a text element, as rendered.
         *
@@ -126,16 +136,10 @@ declare module Plottable {
         */
         function getTextWidth(textElement: D3.Selection, text: string): number;
         /**
-        * Converts a string into an array of strings, all of which fit in the available space.
-        *
-        * @returns {string[]} The input text broken into substrings that fit in the avialable space.
+        * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
+        * shortening the line as required to ensure that it fits within width.
         */
-        interface IWrappedText {
-            originalText: string;
-            lines: string[];
-            textFits: boolean;
-        }
-        function getWrappedText(text: string, availableWidth: number, availableHeight: number, textElement: D3.Selection, cutoffRatio?: number): IWrappedText;
+        function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
         function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
         function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
         function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
@@ -1219,8 +1223,6 @@ declare module Plottable {
 declare module Plottable {
     class CategoryAxis extends Component {
         constructor(scale: OrdinalScale, orientation?: string);
-        public height(newHeight: number): CategoryAxis;
-        public width(newWidth: number): CategoryAxis;
     }
 }
 declare module Plottable {
@@ -1302,17 +1304,27 @@ declare var LINE_BREAKS_AFTER: RegExp;
 declare var SPACES: RegExp;
 declare module Plottable {
     module WordWrapUtils {
+        interface IWrappedText {
+            originalText: string;
+            lines: string[];
+            textFits: boolean;
+        }
+        /**
+        * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
+        * Wraps words and fits as much of the text as possible into the given width and height.
+        */
+        function breakTextToFitRect(text: string, width: number, height: number, measureText: TextUtils.TextMeasurer): IWrappedText;
         /**
         * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
         * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
         * the word is too big to fit within width on its own.
         */
-        function breakTextToFitWidth(text: string, width: number, measureText: (s: string) => number): string[];
+        function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[];
         /**
         * Determines if it is possible to fit a given text within width without breaking any of the words.
         * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
         * allowed width.
         */
-        function canWrapWithoutBreakingWords(text: string, width: number, measureText: (s: string) => number): boolean;
+        function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean;
     }
 }

@@ -3185,47 +3185,88 @@ describe("TextUtils", function () {
         svg.remove();
     });
 
-    it("getWrappedText works properly", function () {
+    describe("addEllipsesToLine", function () {
         var svg = generateSVG();
-        var textEl = svg.append("text").attr("x", 20).attr("y", 50);
-        textEl.style("font-size", "12pt").style("font-family", "sans-serif");
-
-        textEl.text("foobar");
-        var textWithSpaces = "01234 56 789";
-
-        var wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 80, 100, textEl).lines;
-        assert.deepEqual(wrappedLines, ["01234 56", "789"], "Wraps at first space after the cutoff");
-        assert.equal(textEl.text(), "foobar", "getWrappedText did not modify the text in the element");
-
-        wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 80, 100, textEl, 0.5).lines;
-        assert.deepEqual(wrappedLines, ["01234", "56 789"], "reducing the cutoff ratio causes text to wrap at an earlier space");
-
-        wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 999, 20, textEl).lines;
-        assert.deepEqual(wrappedLines, [textWithSpaces], "does not wrap text if it would fit in the available space");
-
-        var shortText = "a";
-        wrappedLines = Plottable.TextUtils.getWrappedText(shortText, 80, 100, textEl).lines;
-        assert.deepEqual(wrappedLines, ["a"], "short text is unchanged");
-
-        var longTextNoSpaces = "Supercalifragilisticexpialidocious";
-        wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 80, 100, textEl).lines;
-        assert.operator(wrappedLines.length, ">=", 2, "long text with no spaces gets wrapped");
-        wrappedLines.forEach(function (line, i) {
-            if (i < wrappedLines.length - 1) {
-                assert.equal(line.charAt(line.length - 1), "-", "long text with no spaces gets hyphenated");
-            }
+        var measure = Plottable.TextUtils.getTextMeasure(svg);
+        var e = function (text, width) {
+            return Plottable.TextUtils.addEllipsesToLine(text, width, measure);
+        };
+        it("works on an empty string", function () {
+            assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");
         });
 
-        wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 80, 20, textEl).lines;
-        assert.equal(wrappedLines[0].substr(wrappedLines[0].length - 3, 3), "...", "text gets truncated if there's not enough height for all lines");
+        it("works as expected when given no width", function () {
+            assert.equal(e("this wont fit", 0), "", "returned empty string when width is 0");
+        });
 
-        svg.remove();
+        it("works as expected when given only one periods worth of space", function () {
+            var w = measure(".")[0];
+            assert.equal(e("this won't fit", w), ".", "returned a single period");
+        });
+
+        it("works as expected with plenty of space", function () {
+            assert.equal(e("this will fit", 400), "this will fit...");
+        });
+
+        it("works as expected with insufficient space", function () {
+            var w = measure("this won't fit")[0];
+            assert.equal(e("this won't fit", w), "this won't...");
+        });
+
+        it("handles spaces intelligently", function () {
+            var spacey = "this            xx";
+            var w = measure(spacey)[0] - 1;
+            assert.equal(e(spacey, w), "this...");
+        });
+
+        after(function () {
+            assert.lengthOf(svg.node().childNodes, 0, "this was all without side-effects");
+            svg.remove();
+        });
+    });
+
+    describe("getTextMeasure", function () {
+        var svg;
+        var t;
+        var canonicalBB;
+        var canonicalResult;
+
+        before(function () {
+            svg = generateSVG(200, 200);
+            t = svg.append("text");
+            t.text("hi there");
+            canonicalBB = Plottable.DOMUtils.getBBox(t);
+            canonicalResult = [canonicalBB.width, canonicalBB.height];
+            t.text("bla bla bla");
+        });
+
+        it("works on empty string", function () {
+            var measure = Plottable.TextUtils.getTextMeasure(t);
+            var result = measure("");
+            assert.deepEqual(result, [0, 0], "empty string has 0 width and height");
+        });
+        it("works on non-empty string and has no side effects", function () {
+            var measure = Plottable.TextUtils.getTextMeasure(t);
+            var result2 = measure("hi there");
+            assert.deepEqual(result2, canonicalResult, "measurement is as expected");
+            assert.equal(t.text(), "bla bla bla", "the text was unchanged");
+        });
+
+        it("works when operating on the top svg instead of text selection, and has no side effects", function () {
+            var measure2 = Plottable.TextUtils.getTextMeasure(svg);
+            var result3 = measure2("hi there");
+            assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
+            assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
+        });
+        after(function () {
+            svg.remove();
+        });
     });
 
     describe("writeLine", function () {
         var svg;
         var g;
-        var text = "hello world";
+        var text = "hello world ARE YOU THERE?";
         var hideResults = true;
 
         describe("writeLineHorizontally", function () {
@@ -3251,6 +3292,7 @@ describe("TextUtils", function () {
                 svg = generateSVG(400, 400);
                 g = svg.append("g");
                 var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "center", "center");
+                svg.append("circle").attr({ cx: 200, cy: 200, r: 5 });
                 var textEl = g.select("text");
                 var bb = Plottable.DOMUtils.getBBox(textEl);
                 assert.equal(bb.width, wh[0], "width measurement is as expected");
@@ -3299,9 +3341,9 @@ describe("TextUtils", function () {
 
         describe("writeLineVertically", function () {
             it("performs basic functionality and defaults to right, left, top", function () {
-                svg = generateSVG(100, 400);
+                svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400);
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400);
                 var bb = Plottable.DOMUtils.getBBox(g.select("g"));
                 assert.equal(bb.x, 0, "x position correct");
 
@@ -3314,9 +3356,9 @@ describe("TextUtils", function () {
                 ;
             });
             it("right, center, center", function () {
-                svg = generateSVG(100, 400);
+                svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.TextUtils.writeLineVertically("x", g, 100, 400, "center", "center", "right");
+                var wh = Plottable.TextUtils.writeLineVertically("x", g, 60, 400, "center", "center", "right");
                 var bb = Plottable.DOMUtils.getBBox(g.select("g"));
                 assert.equal(bb.x + bb.width / 2, 200, "x position correct");
                 assert.closeTo(bb.y + bb.height / 2, 50, 5, "y position correct");
@@ -3326,26 +3368,26 @@ describe("TextUtils", function () {
                 ;
             });
             it("right, right, bottom", function () {
-                svg = generateSVG(100, 400);
+                svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "right", "bottom", "right");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "right", "bottom", "right");
                 var bb = Plottable.DOMUtils.getBBox(g.select("g"));
 
                 // assert.equal(bb.x + bb.width, 400, "x position correct");
-                // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+                // assert.closeTo(bb.y + bb.width, 60, 5, "y position correct");
                 if (hideResults) {
                     svg.remove();
                 }
                 ;
             });
             it("left, left, top", function () {
-                svg = generateSVG(100, 400);
+                svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "left", "top", "left");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "left", "top", "left");
                 var bb = Plottable.DOMUtils.getBBox(g.select("g"));
 
                 // assert.equal(bb.x + bb.width, 400, "x position correct");
-                // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+                // assert.closeTo(bb.y + bb.width, 60, 5, "y position correct");
                 if (hideResults) {
                     svg.remove();
                 }
@@ -3353,13 +3395,13 @@ describe("TextUtils", function () {
             });
 
             it("left, center, center", function () {
-                svg = generateSVG(100, 400);
+                svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "center", "center", "left");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "center", "center", "left");
 
                 // var bb = Plottable.DOMUtils.getBBox(g.select("g"));
                 // assert.equal(bb.x + bb.width, 400, "x position correct");
-                // assert.closeTo(bb.y + bb.width, 100, 5, "y position correct");
+                // assert.closeTo(bb.y + bb.width, 60, 5, "y position correct");
                 if (hideResults) {
                     svg.remove();
                 }
@@ -3367,9 +3409,9 @@ describe("TextUtils", function () {
             });
 
             it("left, right, bottom", function () {
-                svg = generateSVG(100, 400);
+                svg = generateSVG(60, 400);
                 g = svg.append("g");
-                var wh = Plottable.TextUtils.writeLineVertically(text, g, 100, 400, "right", "bottom", "left");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "right", "bottom", "left");
 
                 // var bb = Plottable.DOMUtils.getBBox(g.select("g"));
                 // assert.equal(bb.x + bb.width, 400, "x position correct");
