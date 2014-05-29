@@ -28,21 +28,25 @@ module Plottable {
 
     private static requestFrame() {
       if (!RenderController.animationRequested) {
-        requestAnimationFrame(RenderController.doRender);
+        requestAnimationFrame(RenderController.flush);
         RenderController.animationRequested = true;
       }
     }
 
-    public static doRender() {
-      var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
-      toCompute.forEach((c) => c._computeLayout());
-      var toRender = d3.values(RenderController.componentsNeedingRender);
-      toRender.forEach((c) => c._render()); // call _render on everything, so that containers will put their children in the toRender queue
-      toRender = d3.values(RenderController.componentsNeedingRender);
-      toRender.forEach((c) => c._doRender());
-      RenderController.componentsNeedingComputeLayout = {};
-      RenderController.componentsNeedingRender = {};
-      RenderController.animationRequested = false;
+    public static flush() {
+      if (RenderController.animationRequested) {
+        var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
+        toCompute.forEach((c) => c._computeLayout());
+        var toRender = d3.values(RenderController.componentsNeedingRender);
+        // call _render on everything, so that containers will put their children in the toRender queue
+        toRender.forEach((c) => c._render());
+
+        toRender = d3.values(RenderController.componentsNeedingRender);
+        toRender.forEach((c) => c._doRender());
+        RenderController.componentsNeedingComputeLayout = {};
+        RenderController.componentsNeedingRender = {};
+        RenderController.animationRequested = false;
+      }
     }
   }
 }

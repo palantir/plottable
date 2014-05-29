@@ -73,7 +73,38 @@ module Plottable {
     }
 
     public _removeComponent(c: Component): Table {
-      throw new Error("_removeComponent not yet implemented on Table");
+      super._removeComponent(c);
+      var rowpos: number;
+      var colpos: number;
+      outer : for (var i = 0; i < this.nRows; i++) {
+        for (var j = 0; j < this.nCols; j++) {
+          if (this.rows[i][j] === c) {
+            rowpos = i;
+            colpos = j;
+            break outer;
+          }
+        }
+      }
+
+      if (rowpos === undefined) {
+        return this;
+      }
+
+      this.rows[rowpos][colpos] = null;
+      // check if can splice out row
+      if (this.rows[rowpos].every((v) => v === null)) {
+        this.rows.splice(rowpos, 1);
+        this.rowWeights.splice(rowpos, 1);
+        this.nRows--;
+      }
+      // check if can splice out column
+      if (this.rows.every((v) => v[colpos] === null)) {
+        this.rows.forEach((r) => r.splice(colpos, 1));
+        this.colWeights.splice(colpos, 1);
+        this.nCols--;
+      }
+
+      return this;
     }
 
     private iterateLayout(availableWidth : number, availableHeight: number): IterateLayoutResult {
@@ -321,7 +352,7 @@ module Plottable {
           return w;
         }
         var fixities = componentGroups[i].map(fixityAccessor);
-        var allFixed = fixities.reduce((a, b) => a && b);
+        var allFixed = fixities.reduce((a, b) => a && b, true);
         return allFixed ? 0 : 1;
       });
     }
@@ -336,7 +367,7 @@ module Plottable {
     }
 
     private static fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
-      var all = (bools: boolean[]) => bools.reduce((a, b) => a && b);
+      var all = (bools: boolean[]) => bools.reduce((a, b) => a && b, true);
       var group_isFixed = (components: Component[]) => all(components.map(fixityAccessor));
       return all(componentGroup.map(group_isFixed));
     }

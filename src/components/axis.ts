@@ -36,7 +36,7 @@ module Plottable {
         };
       }
       this.tickFormat(formatter);
-      this._registerToBroadcaster(this._axisScale, () => this.rescale());
+      this._registerToBroadcaster(this._axisScale, () => this._render());
     }
 
     public _setup() {
@@ -131,11 +131,6 @@ module Plottable {
           d3.select(this).style("visibility", "visible");
         }
       });
-    }
-
-    private rescale() {
-      return (this.element != null) ? this._render() : null;
-      // short circuit, we don't care about perf.
     }
 
     public scale(): Scale;

@@ -1,5 +1,5 @@
 /*!
-Plottable 0.13.1 (https://github.com/palantir/plottable)
+Plottable 0.13.6 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -797,15 +797,19 @@ var Plottable;
         };
 
         /**
-        * Cause the Component to recompute layout and redraw. Useful if the window resized.
+        * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
         *
         * @param {number} [availableWidth]  - the width of the container element
         * @param {number} [availableHeight] - the height of the container element
         */
         Component.prototype.resize = function (width, height) {
-            if (this.element != null) {
-                this._computeLayout(width, height)._render();
+            if (!this.isTopLevelComponent) {
+                throw new Error("Cannot resize on non top-level component");
             }
+            if (width != null && height != null && this._isAnchored) {
+                this.rootSVG.attr({ width: width, height: height });
+            }
+            this._invalidateLayout();
             return this;
         };
 
@@ -1250,7 +1254,47 @@ var Plottable;
         };
 
         Table.prototype._removeComponent = function (c) {
-            throw new Error("_removeComponent not yet implemented on Table");
+            _super.prototype._removeComponent.call(this, c);
+            var rowpos;
+            var colpos;
+            outer:
+            for (var i = 0; i < this.nRows; i++) {
+                for (var j = 0; j < this.nCols; j++) {
+                    if (this.rows[i][j] === c) {
+                        rowpos = i;
+                        colpos = j;
+                        break outer;
+                    }
+                }
+            }
+
+            if (rowpos === undefined) {
+                return this;
+            }
+
+            this.rows[rowpos][colpos] = null;
+
+            // check if can splice out row
+            if (this.rows[rowpos].every(function (v) {
+                return v === null;
+            })) {
+                this.rows.splice(rowpos, 1);
+                this.rowWeights.splice(rowpos, 1);
+                this.nRows--;
+            }
+
+            // check if can splice out column
+            if (this.rows.every(function (v) {
+                return v[colpos] === null;
+            })) {
+                this.rows.forEach(function (r) {
+                    return r.splice(colpos, 1);
+                });
+                this.colWeights.splice(colpos, 1);
+                this.nCols--;
+            }
+
+            return this;
         };
 
         Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
@@ -1523,7 +1567,7 @@ var Plottable;
                 var fixities = componentGroups[i].map(fixityAccessor);
                 var allFixed = fixities.reduce(function (a, b) {
                     return a && b;
-                });
+                }, true);
                 return allFixed ? 0 : 1;
             });
         };
@@ -1543,7 +1587,7 @@ var Plottable;
             var all = function (bools) {
                 return bools.reduce(function (a, b) {
                     return a && b;
-                });
+                }, true);
             };
             var group_isFixed = function (components) {
                 return all(components.map(fixityAccessor));
@@ -1857,27 +1901,32 @@ var Plottable;
 
         RenderController.requestFrame = function () {
             if (!RenderController.animationRequested) {
-                requestAnimationFrame(RenderController.doRender);
+                requestAnimationFrame(RenderController.flush);
                 RenderController.animationRequested = true;
             }
         };
 
-        RenderController.doRender = function () {
-            var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
-            toCompute.forEach(function (c) {
-                return c._computeLayout();
-            });
-            var toRender = d3.values(RenderController.componentsNeedingRender);
-            toRender.forEach(function (c) {
-                return c._render();
-            }); // call _render on everything, so that containers will put their children in the toRender queue
-            toRender = d3.values(RenderController.componentsNeedingRender);
-            toRender.forEach(function (c) {
-                return c._doRender();
-            });
-            RenderController.componentsNeedingComputeLayout = {};
-            RenderController.componentsNeedingRender = {};
-            RenderController.animationRequested = false;
+        RenderController.flush = function () {
+            if (RenderController.animationRequested) {
+                var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
+                toCompute.forEach(function (c) {
+                    return c._computeLayout();
+                });
+                var toRender = d3.values(RenderController.componentsNeedingRender);
+
+                // call _render on everything, so that containers will put their children in the toRender queue
+                toRender.forEach(function (c) {
+                    return c._render();
+                });
+
+                toRender = d3.values(RenderController.componentsNeedingRender);
+                toRender.forEach(function (c) {
+                    return c._doRender();
+                });
+                RenderController.componentsNeedingComputeLayout = {};
+                RenderController.componentsNeedingRender = {};
+                RenderController.animationRequested = false;
+            }
         };
         RenderController.componentsNeedingRender = {};
         RenderController.componentsNeedingComputeLayout = {};
@@ -2021,6 +2070,11 @@ var Plottable;
         QuantitiveScale.prototype.padDomain = function (padProportion) {
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
             var currentDomain = this.domain();
+            if (currentDomain[0] === currentDomain[1]) {
+                this._setDomain([currentDomain[0] - 1, currentDomain[0] + 1]);
+                return this;
+            }
+
             var extent = currentDomain[1] - currentDomain[0];
             var newDomain = [currentDomain[0] - padProportion / 2 * extent, currentDomain[1] + padProportion / 2 * extent];
             if (currentDomain[0] === 0) {
@@ -2694,22 +2748,22 @@ var Plottable;
             this.project("y", "y", yScale); // default accessor
         }
         XYRenderer.prototype.project = function (attrToSet, accessor, scale) {
-            _super.prototype.project.call(this, attrToSet, accessor, scale);
-
             // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
             // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
             if (attrToSet === "x") {
-                this._xAccessor = this._projectors["x"].accessor;
-                this.xScale = this._projectors["x"].scale;
+                this.xScale = scale != null ? scale : this.xScale;
+                this._xAccessor = accessor;
                 this.xScale._autoNice = true;
                 this.xScale._autoPad = true;
             }
             if (attrToSet === "y") {
-                this._yAccessor = this._projectors["y"].accessor;
-                this.yScale = this._projectors["y"].scale;
+                this.yScale = scale != null ? scale : this.yScale;
+                this._yAccessor = accessor;
                 this.yScale._autoNice = true;
                 this.yScale._autoPad = true;
             }
+            _super.prototype.project.call(this, attrToSet, accessor, scale);
+
             return this;
         };
 
@@ -3918,7 +3972,7 @@ var Plottable;
             }
             this.tickFormat(formatter);
             this._registerToBroadcaster(this._axisScale, function () {
-                return _this.rescale();
+                return _this._render();
             });
         }
         Axis.prototype._setup = function () {
@@ -4019,11 +4073,6 @@ var Plottable;
                     d3.select(this).style("visibility", "visible");
                 }
             });
-        };
-
-        Axis.prototype.rescale = function () {
-            return (this.element != null) ? this._render() : null;
-            // short circuit, we don't care about perf.
         };
 
         Axis.prototype.scale = function (newScale) {
@@ -4566,12 +4615,12 @@ var Plottable;
             this.yScale = yScale;
             if (this.xScale != null) {
                 this._registerToBroadcaster(this.xScale, function () {
-                    return _this.redrawXLines();
+                    return _this._render();
                 });
             }
             if (this.yScale != null) {
                 this._registerToBroadcaster(this.yScale, function () {
-                    return _this.redrawYLines();
+                    return _this._render();
                 });
             }
         }
@@ -4591,7 +4640,7 @@ var Plottable;
 
         Gridlines.prototype.redrawXLines = function () {
             var _this = this;
-            if (this.xScale != null && this.element != null) {
+            if (this.xScale != null) {
                 var xTicks = this.xScale.ticks();
                 var getScaledXValue = function (tickVal) {
                     return _this.xScale.scale(tickVal);
@@ -4605,7 +4654,7 @@ var Plottable;
 
         Gridlines.prototype.redrawYLines = function () {
             var _this = this;
-            if (this.yScale != null && this.element != null) {
+            if (this.yScale != null) {
                 var yTicks = this.yScale.ticks();
                 var getScaledYValue = function (tickVal) {
                     return _this.yScale.scale(tickVal);

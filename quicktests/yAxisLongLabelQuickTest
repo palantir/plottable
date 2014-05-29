@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <title>Horizontal Category Renderer Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+
+    <script>
+var renderGroup;
+var renderArea1;
+var renderArea2;
+
+var Data = function(){
+     var array;
+     a0 = {
+        y: "cats",
+        x: 30
+     }
+     a1 = {
+        y: "dogs",
+        x: 80
+     }
+     a2 = {
+        y: "snakes eat people sometimes (if they're really big snakes) sometimes they eat rats and birds and eggs and cows and who knows, maybe even other snakes",
+        x: 10
+     }
+     a3 = {
+        y: "rats",
+        x: 2
+     }
+     a4 = {
+        y: "birds",
+        x: 7
+     }
+    array = [a0, a1, a2, a3, a4];
+    return array;
+}
+
+window.onload = function () {
+    var svg = d3.select("#chart");
+    svg.attr("width", 500).attr("height", 300);
+
+    //data
+    var dataseries = new Plottable.DataSource(Data());
+
+    //Axis
+    var xScale = new Plottable.LinearScale().domain([0, 90]);
+    var yScale = new Plottable.OrdinalScale();
+    var xAxis = new Plottable.XAxis(xScale, "bottom");
+    var yAxis = new Plottable.CategoryAxis(yScale, "left");
+
+    //rendering
+    renderArea1 = new Plottable.HorizontalBarRenderer(dataseries, xScale, yScale);
+
+
+    var basicTable = new Plottable.Table()
+                .addComponent(0, 0, yAxis)
+                .addComponent(0, 1, renderArea1)
+                .addComponent(1, 1, xAxis);
+
+
+    basicTable.renderTo(svg);
+};
+    </script>
+  </head>
+  <body>
+<svg id="chart"></svg>
+    <p />
+  </body>
+</html>
