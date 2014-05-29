@@ -18,19 +18,20 @@ module Plottable {
         if (s.trim() === "") {
           return [0, 0];
         }
+        var bb: SVGRect;
         if (selection.node().nodeName === "text") {
           var originalText = selection.text();
           selection.text(s);
-          var bb = DOMUtils.getBBox(selection);
+          bb = DOMUtils.getBBox(selection);
           selection.text(originalText);
           return [bb.width, bb.height];
         } else {
           var t = selection.append("text").text(s);
-          var bb = DOMUtils.getBBox(t);
+          bb = DOMUtils.getBBox(t);
           t.remove();
           return [bb.width, bb.height];
         }
-      }
+      };
     }
 
     /**
@@ -76,7 +77,7 @@ module Plottable {
      * shortening the line as required to ensure that it fits within width.
      */
     export function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
-      var mutatedLine = line.trim(); // Not actually possible to mutate the original line since its a literal, but useful to seperate for debugging
+      var mutatedLine = line.trim(); // Leave original around for debugging utility
       var widthMeasure = (s: string) => measureText(s)[0];
       var lineWidth = widthMeasure(line);
       var ellipsesWidth = widthMeasure("...");

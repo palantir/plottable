@@ -88,7 +88,7 @@ describe("TextUtils", () => {
       t.text("hi there");
       canonicalBB = Plottable.DOMUtils.getBBox(t);
       canonicalResult = [canonicalBB.width, canonicalBB.height];
-      t.text("bla bla bla")
+      t.text("bla bla bla");
     });
 
 
