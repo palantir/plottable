@@ -30,7 +30,6 @@ svg.plottable {
   writing-mode: tb;
 }
 
-.plottable .axis path,
 .plottable .axis line {
   stroke: #979797;
   stroke-width: 2px;
@@ -38,8 +37,11 @@ svg.plottable {
 }
 
 .plottable .axis .tick line {
-  opacity: 0;
+  opacity: 0.5;
+  stroke-width: 2px;
+  stroke: #979797;
 }
+
 .plottable .x-axis path {
   fill: none;
   stroke-width: 2px;
