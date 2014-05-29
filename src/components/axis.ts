@@ -19,7 +19,6 @@ module Plottable {
      */
     constructor(axisScale: Scale, orientation: string, formatter?: any) {
       super();
-      console.log("hello from axis.ts!");
       this._axisScale = axisScale;
       orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);

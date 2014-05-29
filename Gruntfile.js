@@ -196,7 +196,7 @@ module.exports = function(grunt) {
       main: {
         files: {'plottable.min.js': ['plottable.js']}
       }
-    },
+    }
   };
 
 
@@ -211,15 +211,15 @@ module.exports = function(grunt) {
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
-                                  "sed:private_definitions",
-                                  // "ts:test",
                                   "tslint",
+                                  "ts:prod",
+                                  "sed:private_definitions",
+                                  "ts:test",
                                   "handle-header",
                                   "sed:protected_definitions",
                                   "sed:public_member_vars",
                                   "concat:plottable_multifile",
                                   "sed:plottable_multifile",
-                                  "ts:prod",
                                   "clean:tscommand"]);
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);

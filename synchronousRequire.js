@@ -6,7 +6,7 @@ synchronousRequire = function synchronousRequire(inFileName) {
         ;
 
     //setup the full relative filename
-    inFileName = 
+    inFileName =
         window.location.protocol + '//'
         + window.location.host + '/'
         + inFileName;

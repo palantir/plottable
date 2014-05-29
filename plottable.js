@@ -1,3 +1,9 @@
+/*!
+Plottable 0.13.6 (https://github.com/palantir/plottable)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -3911,7 +3917,6 @@ var Plottable;
             _super.call(this);
             this._showEndTickLabels = false;
             this.tickPositioning = "center";
-            console.log("hello from axis.ts!");
             this._axisScale = axisScale;
             orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
