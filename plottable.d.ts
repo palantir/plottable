@@ -887,16 +887,20 @@ declare module Plottable {
         constructor(scale: OrdinalScale, orientation?: string);
 =======
     class BaseAxis extends Component {
+<<<<<<< HEAD
         public axisElement: D3.Selection;
         public _ticks: D3.UpdateSelection;
         public _baseline: D3.Selection;
         public _scale: Scale;
         public _formatter: (n: any) => string;
         public _orientation: string;
+=======
+>>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
         /**
         * Creates a BaseAxis.
         *
         * @constructor
+<<<<<<< HEAD
         * @param {Scale} scale The Scale to base the BaseAxis on.
         * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
         * @param {(n: any) => string} [formatter] A function to format tick labels.
@@ -918,6 +922,13 @@ declare module Plottable {
             x2: number;
             y2: number;
         };
+=======
+        * @param {Scale} scale The Scale to base the NumberAxis on.
+        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {(n: any) => string} [formatter] A function to format tick labels.
+        */
+        constructor(scale: Scale, orientation: string, formatter?: (n: any) => string);
+>>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
         /**
         * Sets a new tick formatter.
         *
@@ -942,6 +953,7 @@ declare module Plottable {
         public tickLabelPadding(): number;
         public tickLabelPadding(padding: number): BaseAxis;
 <<<<<<< HEAD
+<<<<<<< HEAD
         /**
         * Gets or sets the maximum width of the BaseAxis.
         *
@@ -961,6 +973,15 @@ declare module Plottable {
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
 =======
 >>>>>>> Remove maximumWidth and maximumHeight calls for API consistency.
+=======
+        public showEndTickLabels(): boolean;
+        public showEndTickLabels(show: boolean): BaseAxis;
+        public maxWidth(): number;
+        public maxWidth(width: number): BaseAxis;
+        public maxHeight(): number;
+        public maxHeight(height: number): BaseAxis;
+>>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+>>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
     }
 }
 declare module Plottable {
@@ -1551,6 +1572,74 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+    module AxisUtils {
+        var ONE_DAY: number;
+        /**
+        * Generates a relative date axis formatter.
+        *
+        * @param {number} baseValue The start date (as epoch time) used in computing relative dates
+        * @param {number} increment The unit used in calculating relative date tick values
+        * @param {string} label The label to append to tick values
+        */
+        function generateRelativeDateFormatter(baseValue: number, increment?: number, label?: string): (tickValue: any) => string;
+    }
+}
+declare module Plottable {
+    class Gridlines extends Component {
+        /**
+        * Creates a set of Gridlines.
+        * @constructor
+        *
+        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+        */
+        constructor(xScale: QuantitiveScale, yScale: QuantitiveScale);
+    }
+}
+declare module Plottable {
+    class NumberAxis extends Component {
+        /**
+        * Creates an NumberAxis.
+        *
+        * @constructor
+        * @param {QuantitiveScale} scale The Scale to base the NumberAxis on.
+        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {any} [(n: any) => string] A function to format tick labels.
+        */
+        constructor(scale: QuantitiveScale, orientation: string, formatter?: (n: any) => string);
+        public formatter(formatFunction: (n: any) => string): NumberAxis;
+        /**
+        * Sets or gets the tick label position relative to the tick marks.
+        * The exact consequences of particular tick label positionings depends on the subclass implementation.
+        *
+        * @param {string} [position] The relative position of the tick label.
+        * @returns {string|NumberAxis} The current tick label position, or the calling NumberAxis.
+        */
+        public tickLabelPosition(): string;
+        public tickLabelPosition(position: string): NumberAxis;
+        public showEndTickLabels(): boolean;
+        public showEndTickLabels(show: boolean): Axis;
+    }
+}
+declare module Plottable {
+    class AreaRenderer extends XYRenderer {
+        /**
+        * Creates an AreaRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
+    }
+}
+declare module Plottable {
+>>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
     interface IDataset {
         data: any[];
