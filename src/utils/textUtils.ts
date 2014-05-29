@@ -76,7 +76,7 @@ module Plottable {
      * shortening the line as required to ensure that it fits within width.
      */
     export function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
-      var mutatedLine = line; // Not actually possible to mutate the original line since its a literal, but useful to seperate for debugging
+      var mutatedLine = line.trim(); // Not actually possible to mutate the original line since its a literal, but useful to seperate for debugging
       var widthMeasure = (s: string) => measureText(s)[0];
       var lineWidth = widthMeasure(line);
       var ellipsesWidth = widthMeasure("...");
