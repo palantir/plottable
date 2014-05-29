@@ -25,8 +25,10 @@
         var colorScale = new Plottable.ColorScale();
         colorScale.range(colors);
         colorScale.domain(names);
+
         var legend = new Plottable.ToggleLegend(colorScale,
             // action to do when turned on
+            // i is the index of the entry that was clicked
             function(i) {
                 activeColors[i] = colors[i];
                 cg.merge(renderers[i]);
@@ -38,12 +40,12 @@
                 renderers[i].remove();
             },
 
-            // function to do always
+            // function to do always after toggling state (i.e. refreshing state)
             function(i) {
                 var colorScale = new Plottable.ColorScale();
                 colorScale.range(activeColors);
                 colorScale.domain(names);
-                legend.scale(colorScale);
+                this.scale(colorScale);
             }
         );
 
@@ -53,16 +55,17 @@
 
         for (var i=0; i<numRenderers; i++) {
         var data = makeRandomData(20);
-        var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+        var renderer = new Plottable.CircleRenderer(data, xScale, yScale);
             renderers.push(renderer);
         }
 
         var cg = new Plottable.ComponentGroup();
         renderers.forEach(function(renderer, i) {
-            renderer.project("stroke", function() { return colors[i]; });
+            renderer.project("fill", function() { return colors[i]; });
             cg.merge(renderer);
             legend.init(i);
         });
+
         var xAxis = new Plottable.XAxis(xScale, "bottom");
         var yAxis = new Plottable.YAxis(yScale, "left");
 
