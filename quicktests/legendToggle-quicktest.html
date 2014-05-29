@@ -26,16 +26,19 @@
         colorScale.range(colors);
         colorScale.domain(names);
         var legend = new Plottable.ToggleLegend(colorScale,
+            // action to do when turned on
             function(i) {
                 activeColors[i] = colors[i];
                 cg.merge(renderers[i]);
             },
 
+            // action to do when turned off
             function(i) {
                 activeColors[i] = "#d3d3d3";
                 renderers[i].remove();
             },
 
+            // function to do always
             function(i) {
                 var colorScale = new Plottable.ColorScale();
                 colorScale.range(activeColors);

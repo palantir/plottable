@@ -23,14 +23,8 @@ module Plottable {
 
       var cb = function(x: number, y: number) {
             var legend = this.componentToListenTo;
-            var height = legend.availableHeight;
-            var entries = legend.colorScale.domain().length;
-            var idx = Math.floor(y / (height / entries));
-            if (legend.getState(idx)) {
-              legend.toggleOff(idx);
-            } else {
-              legend.toggleOn(idx);
-            }
+            var idx = Math.floor(y / (legend.availableHeight / legend.nRowsDrawn));
+            (legend.getState(idx) ? legend.toggleOff : legend.toggleOn)(idx);
             legend.toggleState(idx);
             legend.update(idx);
         };

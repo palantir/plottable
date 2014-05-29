@@ -5,10 +5,10 @@ module Plottable {
     private static SUBELEMENT_CLASS = "legend-row";
     private static MARGIN = 5;
 
-    private colorScale: ColorScale;
-    private maxWidth: number;
     private legendBox: D3.Selection;
-    private nRowsDrawn: number;
+    public colorScale: ColorScale;
+    public maxWidth: number;
+    public nRowsDrawn: number;
 
     /**
      * Creates a Legend.
