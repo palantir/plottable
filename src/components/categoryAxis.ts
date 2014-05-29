@@ -43,6 +43,10 @@ module Plottable {
 
       this.content.selectAll(".tick").remove();
 
+      if (textResult.usedWidth > offeredWidth || textResult.usedHeight > offeredHeight) {
+        debugger;
+      }
+
       return {
         width : textResult.usedWidth,
         height: textResult.usedHeight,
