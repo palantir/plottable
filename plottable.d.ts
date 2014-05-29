@@ -1153,6 +1153,23 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    class ToggleLegend extends Legend {
+        public toggleOn: (i?: number) => any;
+        public toggleOff: (i?: number) => any;
+        public update: (i?: number) => any;
+        /**
+        * Creates a Legend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        */
+        constructor(colorScale: ColorScale, toggleOn: (i?: number) => any, toggleOff: (i?: number) => any, update: (i?: number) => any);
+        public getState(i: number): boolean;
+        public toggleState(i: number): void;
+        public init(i: number): void;
+    }
+}
+declare module Plottable {
     interface IDataset {
         data: any[];
         metadata: IMetadata;

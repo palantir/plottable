@@ -4519,6 +4519,49 @@ var Plottable;
     })(Plottable.XYRenderer);
     Plottable.AreaRenderer = AreaRenderer;
 })(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var ToggleLegend = (function (_super) {
+        __extends(ToggleLegend, _super);
+        /**
+        * Creates a Legend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        */
+        function ToggleLegend(colorScale, toggleOn, toggleOff, update) {
+            _super.call(this, colorScale);
+            this.state = [];
+
+            this.toggleOn = toggleOn;
+            this.toggleOff = toggleOff;
+            this.update = update;
+
+            var cb = function (x, y) {
+                var legend = this.componentToListenTo;
+                var idx = Math.floor(y / (legend.availableHeight / legend.nRowsDrawn));
+                (legend.getState(idx) ? legend.toggleOff : legend.toggleOn)(idx);
+                legend.toggleState(idx);
+                legend.update(idx);
+            };
+            new Plottable.ClickInteraction(this).callback(cb).registerWithComponent();
+        }
+        ToggleLegend.prototype.getState = function (i) {
+            return this.state[i];
+        };
+
+        ToggleLegend.prototype.toggleState = function (i) {
+            this.state[i] = !this.state[i];
+        };
+
+        ToggleLegend.prototype.init = function (i) {
+            this.state[i] = true;
+        };
+        return ToggleLegend;
+    })(Plottable.Legend);
+    Plottable.ToggleLegend = ToggleLegend;
+})(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
     ;
