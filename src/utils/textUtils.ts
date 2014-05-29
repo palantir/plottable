@@ -70,11 +70,7 @@ module Plottable {
       return getTextMeasure(textElement)(text)[0];
     }
 
-    export interface IWrappedText {
-      originalText: string;
-      lines: string[];
-      textFits: boolean;
-    };
+
     /**
      * Converts a string into an array of strings, all of which fit in the available space.
      *
@@ -155,6 +151,7 @@ module Plottable {
      * shortening the line as required to ensure that it fits within width.
      */
     export function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
+      var mutatedLine = line; // Not actually possible to mutate the original line since its a literal, but useful to seperate for debugging
       var widthMeasure = (s: string) => measureText(s)[0];
       var lineWidth = widthMeasure(line);
       var ellipsesWidth = widthMeasure("...");
@@ -164,13 +161,13 @@ module Plottable {
         return "...".substr(0, numPeriodsThatFit);
       }
       while (lineWidth + ellipsesWidth > width) {
-        line = line.substr(0, line.length-1);
-        lineWidth = widthMeasure(line);
+        mutatedLine = mutatedLine.substr(0, mutatedLine.length-1).trim();
+        lineWidth = widthMeasure(mutatedLine);
       }
-      if (widthMeasure(line + "...") > width) {
+      if (widthMeasure(mutatedLine + "...") > width) {
         throw new Error("addEllipsesToLine failed :(");
       }
-      return line + "...";
+      return mutatedLine + "...";
     }
 
     export function writeLineHorizontally(line: string, g: D3.Selection,
@@ -264,13 +261,6 @@ module Plottable {
       return [usedSpace, maxHeight];
     }
 
-    function getWrappedTextFromG(text: string, width: number, height: number, g: D3.Selection): IWrappedText {
-      var tmpText = g.append("text");
-      var wrappedText = getWrappedText(text, width, height, tmpText);
-      tmpText.remove();
-      return wrappedText;
-    }
-
     export interface IWriteTextResult {
       textFits: boolean;
       usedWidth: number;
@@ -293,7 +283,8 @@ module Plottable {
 
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
-      var wrappedText = getWrappedTextFromG(text, primaryDimension, secondaryDimension, innerG);
+      var measureText = getTextMeasure(innerG);
+      var wrappedText = WordWrapUtils.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
 
       var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
       var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);

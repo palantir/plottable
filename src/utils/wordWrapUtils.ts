@@ -6,23 +6,30 @@ var SPACES = /^\s+$/;
 module Plottable {
   export module WordWrapUtils {
 
+    export interface IWrappedText {
+      originalText: string;
+      lines: string[];
+      textFits: boolean;
+    };
+
     /**
      * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
      * Wraps words and fits as much of the text as possible into the given width and height.
      */
-    export function breakTextToFitRect(text: string, width: number, height: number, measureText: TextUtils.TextMeasurer): string[] {
+    export function breakTextToFitRect(text: string, width: number, height: number, measureText: TextUtils.TextMeasurer): IWrappedText {
       var widthMeasure = (s: string) => measureText(s)[0];
       var lines = breakTextToFitWidth(text, width, widthMeasure);
       var textHeight = measureText("hello world")[1];
       var nLinesThatFit = Math.floor(height / textHeight);
-      if (nLinesThatFit < lines.length) {
+      var textFit = nLinesThatFit >= lines.length;
+      if (!textFit) {
         lines = lines.splice(0, nLinesThatFit);
         if (nLinesThatFit > 0) {
           // Overwrite the last line to one that has had a ... appended to the end
           lines[nLinesThatFit-1] = TextUtils.addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
         }
       }
-      return lines;
+      return {originalText: text, lines: lines, textFits: textFit};
     }
 
     /**

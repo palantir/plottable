@@ -38,6 +38,44 @@ describe("TextUtils", () => {
     svg.remove();
   });
 
+  describe("addEllipsesToLine", () => {
+    var svg = generateSVG();
+    var measure = Plottable.TextUtils.getTextMeasure(svg);
+    var e = (text: string, width: number) => Plottable.TextUtils.addEllipsesToLine(text, width, measure);
+    it("works on an empty string" ,() => {
+      assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");
+    });
+
+    it("works as expected when given no width", () => {
+      assert.equal(e("this wont fit", 0), "", "returned empty string when width is 0");
+    });
+
+    it("works as expected when given only one periods worth of space", () => {
+      var w = measure(".")[0];
+      assert.equal(e("this won't fit", w), ".", "returned a single period");
+    });
+
+    it("works as expected with plenty of space", () => {
+      assert.equal(e("this will fit", 400), "this will fit...");
+    });
+
+    it("works as expected with insufficient space", () => {
+      var w = measure("this won't fit")[0];
+      assert.equal(e("this won't fit", w), "this won't...");
+    });
+
+    it("handles spaces intelligently", () => {
+      var spacey = "this            xx";
+      var w = measure(spacey)[0] - 1;
+      assert.equal(e(spacey, w), "this...");
+    });
+
+    after(() => {
+      assert.lengthOf(svg.node().childNodes, 0, "this was all without side-effects");
+      svg.remove();
+    });
+  });
+
   it("getWrappedText works properly", () => {
     var svg = generateSVG();
     var textEl = svg.append("text").attr("x", 20).attr("y", 50);
@@ -79,12 +117,20 @@ describe("TextUtils", () => {
     svg.remove();
   });
   describe("getTextMeasure", () => {
-    var svg = generateSVG(200, 200);
-    var t = svg.append("text");
-    t.text("hi there");
-    var canonicalBB = Plottable.DOMUtils.getBBox(t);
-    var canonicalResult = [canonicalBB.width, canonicalBB.height];
-    t.text("bla bla bla")
+    var svg: D3.Selection;
+    var t: D3.Selection;
+    var canonicalBB: any;
+    var canonicalResult: number[];
+
+    before(() => {
+      svg = generateSVG(200, 200);
+      t = svg.append("text");
+      t.text("hi there");
+      canonicalBB = Plottable.DOMUtils.getBBox(t);
+      canonicalResult = [canonicalBB.width, canonicalBB.height];
+      t.text("bla bla bla")
+    });
+
 
     it("works on empty string", () => {
       var measure = Plottable.TextUtils.getTextMeasure(t);
@@ -113,7 +159,7 @@ describe("TextUtils", () => {
     var svg: D3.Selection;
     var g: D3.Selection;
     var text = "hello world ARE YOU THERE?";
-    var hideResults = false;
+    var hideResults = true;
 
     describe("writeLineHorizontally", () => {
       it("performs basic functionality and defaults to left, top", () => {
