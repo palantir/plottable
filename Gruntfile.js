@@ -13,7 +13,7 @@ module.exports = function(grunt) {
   var tsJSON = {
     dev: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
-      outDir: "out/",
+      outDir: "build/",
       options: {
         target: 'es5',
         noImplicitAny: true,
@@ -25,6 +25,7 @@ module.exports = function(grunt) {
     prod: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
       out: "plottable.js",
+      // watch: "src",
       options: {
         target: 'es5',
         noImplicitAny: true,
@@ -100,7 +101,7 @@ module.exports = function(grunt) {
     },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
-      replacement: 'synchronousRequire("../out/$1.js");',
+      replacement: 'synchronousRequire("../build/$1.js");',
       path: "plottable_multifile.js",
     },
   };
@@ -196,14 +197,6 @@ module.exports = function(grunt) {
         files: {'plottable.min.js': ['plottable.js']}
       }
     },
-    shell: {
-      echo_hello: {
-        command: "echo hello",
-      },
-      find_src: {
-        command: "find src -name '*.ts' >> plottable_multifile.js",
-      },
-    }
   };
 
 
@@ -213,7 +206,8 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   // default task (this is what runs when a task isn't specified)
-  grunt.registerTask("handle-header", ["copy:header", "sed:header", "concat:header", "clean:header"]);
+  grunt.registerTask("handle-header",
+            ["copy:header", "sed:header", "concat:header", "clean:header"]);
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
@@ -225,6 +219,7 @@ module.exports = function(grunt) {
                                   "sed:public_member_vars",
                                   "concat:plottable_multifile",
                                   "sed:plottable_multifile",
+                                  "ts:prod",
                                   "clean:tscommand"]);
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
