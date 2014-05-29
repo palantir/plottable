@@ -6,6 +6,12 @@
     <script src="../../plottable_multifile.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
 
+    <style>
+    .plottable .y-axis .tick line {
+      opacity: 0.5;
+    }
+    </style>
+
     <script>
       window.onload = function() {
         dataseries = makeRandomData(20);
@@ -14,7 +20,8 @@
         xAxis = new Plottable.XAxis(xScale, "bottom");
 
         yScale = new Plottable.LinearScale();
-        yAxis = new Plottable.YAxis(yScale, "left");
+        yAxis = new Plottable.YAxis(yScale, "left").tickLabelPosition("bottom");
+        yAxis.tickFormat(d3.format("g"));
         window.yAxis = yAxis;
         yAxis.debug = true;
 
@@ -24,6 +31,8 @@
         chart = new Plottable.Table([[yAxis, renderGroup],
                                          [null,  xAxis]]);
         chart.renderTo("#gridlines-test");
+        var pzi = new Plottable.PanZoomInteraction(renderGroup, xScale, yScale);
+        pzi.registerWithComponent();
       }
     </script>
   </head>

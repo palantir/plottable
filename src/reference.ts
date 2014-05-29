@@ -28,6 +28,7 @@
 
 /// <reference path="components/axis.ts" />
 /// <reference path="components/categoryAxis.ts" />
+/// <reference path="components/baseAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
 /// <reference path="components/gridlines.ts" />
