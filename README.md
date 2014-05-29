@@ -13,7 +13,7 @@ By virtue of being higher-level than D3, it is often much easier to create chart
 Plottable.js is being developed by Palantir Technologies. It's developed in Typescript, and released in Javascript. Plottable is currently in alpha and the API is not yet stable.
 
 =========
-Setup Instructions:
+Setup Instructions for Development:
 
     npm install
     (if new to nodejs:)
