@@ -39,9 +39,9 @@ module Plottable {
       var bandWidth: number = this._scale.rangeBand();
       var width  = this.isVertical ? offeredWidth : bandWidth;
       var height = this.isVertical ? bandWidth : offeredHeight;
-      var textResult = this.writeText(width, height);
-
-      this.content.selectAll(".tick").remove();
+      var testG = this.content.append("g");
+      var textResult = this.writeText(width, height, testG);
+      testG.remove();
 
       if (textResult.usedWidth > offeredWidth || textResult.usedHeight > offeredHeight) {
         debugger;
@@ -55,9 +55,9 @@ module Plottable {
       };
     }
 
-    private writeText(axisWidth: number, axisHeight: number): TextUtils.IWriteTextResult {
+    private writeText(axisWidth: number, axisHeight: number, targetElement: D3.Selection): TextUtils.IWriteTextResult {
       var bandWidth: number = this._scale.rangeBand();
-      var ticks = this.content.selectAll(".tick").data(this._scale.domain());
+      var ticks = targetElement.selectAll(".tick").data(this._scale.domain());
       ticks.enter().append("g").classed("tick", true);
       ticks.exit().remove();
       var width  = this.isVertical ? axisWidth : bandWidth;
@@ -89,7 +89,7 @@ module Plottable {
     }
 
     public _doRender() {
-      this.writeText(this.availableWidth, this.availableHeight);
+      this.writeText(this.availableWidth, this.availableHeight, this.content);
       return this;
     }
   }
