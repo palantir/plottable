@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <title>Legend Table Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <style>
+      .plottable .axis line {
+/*        stroke: black;
+        opacity: 1;*/
+      }
+    </style>
+
+    <script>
+      window.onload = function() {
+        var dataseries = makeRandomData(20, 0.3);
+        var dataseries_top = makeRandomData(20, 0.3);
+        for (var i = 0; i < 20; ++i) {
+          dataseries_top[i].x = dataseries[i].x;
+          dataseries_top[i].y += dataseries[i].y;
+        }
+
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var y0Accessor = function(d, i) { return dataseries[i].y; }
+
+        var renderArea = new Plottable.AreaRenderer(dataseries, xScale, yScale);
+
+        var fillAccessor = function() { return "steelblue"; }
+        renderArea.project("fill", fillAccessor)
+
+
+        var chart = new Plottable.Table([[yAxis, renderArea], [null, xAxis]]);
+        // var chart = new Plottable.StandardChart()
+        //                 .center(renderGroup).xAxis(xAxis).yAxis(yAxis);
+
+        chart.name = "INNER_CHART"
+        var colorScale = new Plottable.ColorScale("10").domain(["foo", "bar"]);
+        var legend = new Plottable.Legend(colorScale);
+        var legendLabel = new Plottable.TitleLabel("foo");
+        var legendTable = new Plottable.Table([[legendLabel], [legend]]);
+        var outerTable = new Plottable.Table([[chart, legendTable]]);
+        outerTable.name = "OUTER_TABLE";
+        legendTable.name = "LEGEND_TABLE";
+        window.legend = legend;
+        window.legendLabel = legendLabel;
+        window.legendTable = legendTable;
+        window.renderArea = renderArea;
+        window.chart = chart;
+        window.outerTable = outerTable;
+        outerTable.renderTo("#areaRenderer-test");
+
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="areaRenderer-test" width="480" height="320"></svg>
+  </body>
+
+</html>

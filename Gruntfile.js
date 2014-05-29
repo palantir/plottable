@@ -116,6 +116,7 @@ module.exports = function(grunt) {
       },
       plottable_multifile: {
         src: ["synchronousRequire.js", "src/reference.ts"],
+        // src: ["synchronousRequire.js", "build/files.txt"],
         dest: "plottable_multifile.js",
       },
     },

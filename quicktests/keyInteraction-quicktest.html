@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <title>Key Interaction Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <style>
+      .plottable .axis line {
+/*        stroke: black;
+        opacity: 1;*/
+      }
+    </style>
+
+    <script>
+      window.onload = function() {
+        var dataseries = makeRandomData(20);
+
+        var svg = d3.select("#key-test");
+        svg.attr("width", 480).attr("height", 320);
+
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderGroup = gridlines.merge(renderAreaD1);
+
+        var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
+                                              .addComponent(0, 1, renderGroup)
+                                              .addComponent(1, 1, xAxis);
+        basicTable._anchor(svg);
+        basicTable._computeLayout()._render();
+        xScale.padDomain().nice();
+        yScale.padDomain().nice();
+        var initialDomains = {
+          x: xScale.domain(),
+          y: yScale.domain()
+        }
+        var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale).registerWithComponent();
+
+        var ki = new Plottable.KeyInteraction(renderAreaD1, 65);
+        ki.callback(function() {
+          // renderAreaD1.autorange();
+          xScale.domain(initialDomains.x);
+          yScale.domain(initialDomains.y);
+        });
+        ki.registerWithComponent();
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="key-test"></svg>
+  </body>
+
+</html>

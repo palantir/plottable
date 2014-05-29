@@ -1,0 +1,91 @@
+<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+<script src="../plottable_multifile.js"></script>
+<script src="../examples/exampleUtil.js"></script>
+<link rel="stylesheet" type="text/css" href="../plottable.css">
+<script type="text/javascript">
+var format = function (d) {
+    if (typeof d === "number") {
+        if (Math.abs(d) < 1) {
+            return String(Math.round(1000 * d) / 1000);
+        }
+        return numberFormatter(d);
+    }
+    return d;
+}
+
+var format_frac = function (d) {
+    if (typeof d === "number") {
+        if (Math.abs(d) < 1) {
+            return String(Math.round(1000 * d) + "/1000");
+        }
+        return numberFormatter(d);
+    }
+    return d;
+}
+
+var xAxis;
+var yAxis;
+var basicTable;
+
+window.onload = function() {
+    var data = makeRandomData(20);
+
+    var svg = d3.select("#chart");
+    svg.attr("width", 480).attr("height", 320);
+
+    var xScale = new Plottable.LinearScale();
+    xAxis = new Plottable.XAxis(xScale, "bottom");
+
+    var yScale = new Plottable.LinearScale();
+    yAxis = new Plottable.YAxis(yScale, "left");
+    yAxis.aaa = 1;
+
+    var renderAreaD1 = new Plottable.CircleRenderer(data, xScale, yScale);
+    basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
+                                          .addComponent(0, 1, renderAreaD1)
+                                          .addComponent(1, 1, xAxis);
+
+    basicTable.renderTo(svg);
+    window.xAxis = xAxis;
+    window.yAxis = yAxis;
+};
+
+
+function button1Callback() {
+    console.log("x " + xAxis.tickLabelPosition());
+    console.log("y " + yAxis.tickLabelPosition());
+
+}
+function button2Callback() {
+    xAxis.tickLabelPosition("left");
+    yAxis.tickLabelPosition("top");
+    basicTable.renderTo();
+}
+function button3Callback() {
+    xAxis.tickLabelPosition("center");
+    yAxis.tickLabelPosition("middle");
+    basicTable.renderTo();
+}
+function button4Callback() {
+    xAxis.tickLabelPosition("right");
+    yAxis.tickLabelPosition("bottom");
+    basicTable.renderTo();
+}
+
+</script>
+
+<style type="text/css">
+/*-- Add custom styles after this line --*/
+.demo-title { font-size: 24pt; }
+ .plottable .axis .tick line { opacity: 1; }
+</style>
+
+<div class="demo-title">Simple Chart</div>
+<br>
+<svg id="chart"></svg>
+<p />
+    <button onclick="button1Callback()">print tick label position</button>
+    <button onclick="button2Callback()">x left; y top</button>
+    <button onclick="button3Callback()">x center; y middle</button>
+    <button onclick="button4Callback()">x right; y bottom </button>
+

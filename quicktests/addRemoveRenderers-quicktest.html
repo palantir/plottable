@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <title>Add/Remove Renderers Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+
+    <script>
+      var renderers = [];
+
+
+      var colors = new Plottable.ColorScale("20").range();
+
+      var xScale = new Plottable.LinearScale();
+      var yScale = new Plottable.LinearScale();
+      var numRenderers = 4;
+
+      for (var i=0; i<numRenderers; i++) {
+        var data = makeRandomData(20);
+        var renderer = new Plottable.LineRenderer(data, xScale, yScale).animate(true);
+        renderers.push(renderer);
+      }
+
+      var cg = new Plottable.ComponentGroup();
+
+      renderers.forEach(function(renderer, i) {
+        renderer.project("stroke", function() { return colors[i]; });
+        cg.merge(renderer);
+      })
+
+      var xAxis = new Plottable.XAxis(xScale, "bottom");
+      var yAxis = new Plottable.YAxis(yScale, "left");
+
+      var chart = new Plottable.Table([
+                                  [yAxis, cg],
+                                  [null,  xAxis]
+                                ]);
+
+      window.onload = function() {
+        chart.renderTo("#chart");
+        var pzi = new Plottable.PanZoomInteraction(cg, xScale, yScale);
+        pzi.registerWithComponent();
+
+      }
+
+      function removeRenderer() {
+        if (numRenderers > 0) {
+          (renderers[numRenderers - 1]).remove();
+          numRenderers--;
+        }
+      }
+
+      function addRenderer() {
+        if (numRenderers >= renderers.length) {
+          var data = makeRandomData(20);
+          var renderer = new Plottable.LineRenderer(data, xScale, yScale).animate(true);
+          var nextColor = colors[numRenderers]
+          renderer.project("stroke", function() { return nextColor; });
+          renderers.push(renderer);
+        }
+        cg.merge(renderers[numRenderers]);
+        numRenderers++;
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="chart" width="480" height="320"></svg>
+    <p />
+    <button name="remove" onclick="removeRenderer()">Remove</button>
+    <button name="add" onclick="addRenderer()">Add</button>
+  </body>
+
+</html>

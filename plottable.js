@@ -2689,6 +2689,106 @@ var Plottable;
     })(Plottable.Component);
     Plottable.Legend = Legend;
 })(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Gridlines = (function (_super) {
+        __extends(Gridlines, _super);
+        /**
+        * Creates a set of Gridlines.
+        * @constructor
+        *
+        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+        */
+        function Gridlines(xScale, yScale) {
+            var _this = this;
+            _super.call(this);
+            this.classed("gridlines", true);
+            this.xScale = xScale;
+            this.yScale = yScale;
+            if (this.xScale != null) {
+                this._registerToBroadcaster(this.xScale, function () {
+                    return _this._render();
+                });
+            }
+            if (this.yScale != null) {
+                this._registerToBroadcaster(this.yScale, function () {
+                    return _this._render();
+                });
+            }
+        }
+        Gridlines.prototype._setup = function () {
+            _super.prototype._setup.call(this);
+            this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
+            this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
+            return this;
+        };
+
+        Gridlines.prototype._doRender = function () {
+            _super.prototype._doRender.call(this);
+            this.redrawXLines();
+            this.redrawYLines();
+            return this;
+        };
+
+        Gridlines.prototype.redrawXLines = function () {
+            var _this = this;
+            if (this.xScale != null) {
+                var xTicks = this.xScale.ticks();
+                var getScaledXValue = function (tickVal) {
+                    return _this.xScale.scale(tickVal);
+                };
+                var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
+                xLines.enter().append("line");
+                xLines.attr("x1", getScaledXValue).attr("y1", 0).attr("x2", getScaledXValue).attr("y2", this.availableHeight);
+                xLines.exit().remove();
+            }
+        };
+
+        Gridlines.prototype.redrawYLines = function () {
+            var _this = this;
+            if (this.yScale != null) {
+                var yTicks = this.yScale.ticks();
+                var getScaledYValue = function (tickVal) {
+                    return _this.yScale.scale(tickVal);
+                };
+                var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
+                yLines.enter().append("line");
+                yLines.attr("x1", 0).attr("y1", getScaledYValue).attr("x2", this.availableWidth).attr("y2", getScaledYValue);
+                yLines.exit().remove();
+            }
+        };
+        return Gridlines;
+    })(Plottable.Component);
+    Plottable.Gridlines = Gridlines;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (AxisUtils) {
+        AxisUtils.ONE_DAY = 24 * 60 * 60 * 1000;
+
+        /**
+        * Generates a relative date axis formatter.
+        *
+        * @param {number} baseValue The start date (as epoch time) used in computing relative dates
+        * @param {number} increment The unit used in calculating relative date tick values
+        * @param {string} label The label to append to tick values
+        */
+        function generateRelativeDateFormatter(baseValue, increment, label) {
+            if (typeof increment === "undefined") { increment = AxisUtils.ONE_DAY; }
+            if (typeof label === "undefined") { label = ""; }
+            var formatter = function (tickValue) {
+                var relativeDate = Math.round((tickValue.valueOf() - baseValue) / increment);
+                return relativeDate.toString() + label;
+            };
+            return formatter;
+        }
+        AxisUtils.generateRelativeDateFormatter = generateRelativeDateFormatter;
+    })(Plottable.AxisUtils || (Plottable.AxisUtils = {}));
+    var AxisUtils = Plottable.AxisUtils;
+})(Plottable || (Plottable = {}));
 ///<reference path="../../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -3286,6 +3386,58 @@ var Plottable;
     })(Plottable.AbstractBarRenderer);
     Plottable.HorizontalBarRenderer = HorizontalBarRenderer;
 })(Plottable || (Plottable = {}));
+///<reference path="../../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var AreaRenderer = (function (_super) {
+        __extends(AreaRenderer, _super);
+        /**
+        * Creates an AreaRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        function AreaRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
+            this._ANIMATION_DURATION = 500;
+            this.classed("area-renderer", true);
+            this.project("y0", 0, yScale); // default
+            this.project("fill", function () {
+                return "steelblue";
+            }); // default
+        }
+        AreaRenderer.prototype._setup = function () {
+            _super.prototype._setup.call(this);
+            this.path = this.renderArea.append("path").classed("area", true);
+            return this;
+        };
+
+        AreaRenderer.prototype._paint = function () {
+            _super.prototype._paint.call(this);
+            var attrToProjector = this._generateAttrToProjector();
+            var xFunction = attrToProjector["x"];
+            var y0Function = attrToProjector["y0"];
+            var yFunction = attrToProjector["y"];
+            delete attrToProjector["x"];
+            delete attrToProjector["y0"];
+            delete attrToProjector["y"];
+
+            this.dataSelection = this.path.datum(this._dataSource.data());
+            if (this._animate && this._dataChanged) {
+                var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
+                this.path.attr("d", animationStartArea).attr(attrToProjector);
+            }
+
+            this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
+            updateSelection.attr("d", this.area).attr(attrToProjector);
+        };
+        return AreaRenderer;
+    })(Plottable.XYRenderer);
+    Plottable.AreaRenderer = AreaRenderer;
+})(Plottable || (Plottable = {}));
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -3879,6 +4031,8 @@ var Plottable;
 /// <reference path="components/axis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
+/// <reference path="components/gridlines.ts" />
+/// <reference path="components/axisUtils.ts" />
 /// <reference path="components/renderers/xyRenderer.ts" />
 /// <reference path="components/renderers/circleRenderer.ts" />
 /// <reference path="components/renderers/lineRenderer.ts" />
@@ -3887,6 +4041,7 @@ var Plottable;
 /// <reference path="components/renderers/abstractBarRenderer.ts" />
 /// <reference path="components/renderers/barRenderer.ts" />
 /// <reference path="components/renderers/horizontalBarRenderer.ts" />
+/// <reference path="components/renderers/areaRenderer.ts" />
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
 /// <reference path="interactions/clickInteraction.ts" />
@@ -4426,158 +4581,6 @@ var Plottable;
         return YAxis;
     })(Axis);
     Plottable.YAxis = YAxis;
-})(Plottable || (Plottable = {}));
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    (function (AxisUtils) {
-        AxisUtils.ONE_DAY = 24 * 60 * 60 * 1000;
-
-        /**
-        * Generates a relative date axis formatter.
-        *
-        * @param {number} baseValue The start date (as epoch time) used in computing relative dates
-        * @param {number} increment The unit used in calculating relative date tick values
-        * @param {string} label The label to append to tick values
-        */
-        function generateRelativeDateFormatter(baseValue, increment, label) {
-            if (typeof increment === "undefined") { increment = AxisUtils.ONE_DAY; }
-            if (typeof label === "undefined") { label = ""; }
-            var formatter = function (tickValue) {
-                var relativeDate = Math.round((tickValue.valueOf() - baseValue) / increment);
-                return relativeDate.toString() + label;
-            };
-            return formatter;
-        }
-        AxisUtils.generateRelativeDateFormatter = generateRelativeDateFormatter;
-    })(Plottable.AxisUtils || (Plottable.AxisUtils = {}));
-    var AxisUtils = Plottable.AxisUtils;
-})(Plottable || (Plottable = {}));
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var Gridlines = (function (_super) {
-        __extends(Gridlines, _super);
-        /**
-        * Creates a set of Gridlines.
-        * @constructor
-        *
-        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
-        */
-        function Gridlines(xScale, yScale) {
-            var _this = this;
-            _super.call(this);
-            this.classed("gridlines", true);
-            this.xScale = xScale;
-            this.yScale = yScale;
-            if (this.xScale != null) {
-                this._registerToBroadcaster(this.xScale, function () {
-                    return _this._render();
-                });
-            }
-            if (this.yScale != null) {
-                this._registerToBroadcaster(this.yScale, function () {
-                    return _this._render();
-                });
-            }
-        }
-        Gridlines.prototype._setup = function () {
-            _super.prototype._setup.call(this);
-            this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
-            this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
-            return this;
-        };
-
-        Gridlines.prototype._doRender = function () {
-            _super.prototype._doRender.call(this);
-            this.redrawXLines();
-            this.redrawYLines();
-            return this;
-        };
-
-        Gridlines.prototype.redrawXLines = function () {
-            var _this = this;
-            if (this.xScale != null) {
-                var xTicks = this.xScale.ticks();
-                var getScaledXValue = function (tickVal) {
-                    return _this.xScale.scale(tickVal);
-                };
-                var xLines = this.xLinesContainer.selectAll("line").data(xTicks);
-                xLines.enter().append("line");
-                xLines.attr("x1", getScaledXValue).attr("y1", 0).attr("x2", getScaledXValue).attr("y2", this.availableHeight);
-                xLines.exit().remove();
-            }
-        };
-
-        Gridlines.prototype.redrawYLines = function () {
-            var _this = this;
-            if (this.yScale != null) {
-                var yTicks = this.yScale.ticks();
-                var getScaledYValue = function (tickVal) {
-                    return _this.yScale.scale(tickVal);
-                };
-                var yLines = this.yLinesContainer.selectAll("line").data(yTicks);
-                yLines.enter().append("line");
-                yLines.attr("x1", 0).attr("y1", getScaledYValue).attr("x2", this.availableWidth).attr("y2", getScaledYValue);
-                yLines.exit().remove();
-            }
-        };
-        return Gridlines;
-    })(Plottable.Component);
-    Plottable.Gridlines = Gridlines;
-})(Plottable || (Plottable = {}));
-///<reference path="../../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var AreaRenderer = (function (_super) {
-        __extends(AreaRenderer, _super);
-        /**
-        * Creates an AreaRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        function AreaRenderer(dataset, xScale, yScale) {
-            _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 500;
-            this.classed("area-renderer", true);
-            this.project("y0", 0, yScale); // default
-            this.project("fill", function () {
-                return "steelblue";
-            }); // default
-        }
-        AreaRenderer.prototype._setup = function () {
-            _super.prototype._setup.call(this);
-            this.path = this.renderArea.append("path").classed("area", true);
-            return this;
-        };
-
-        AreaRenderer.prototype._paint = function () {
-            _super.prototype._paint.call(this);
-            var attrToProjector = this._generateAttrToProjector();
-            var xFunction = attrToProjector["x"];
-            var y0Function = attrToProjector["y0"];
-            var yFunction = attrToProjector["y"];
-            delete attrToProjector["x"];
-            delete attrToProjector["y0"];
-            delete attrToProjector["y"];
-
-            this.dataSelection = this.path.datum(this._dataSource.data());
-            if (this._animate && this._dataChanged) {
-                var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
-                this.path.attr("d", animationStartArea).attr(attrToProjector);
-            }
-
-            this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
-            updateSelection.attr("d", this.area).attr(attrToProjector);
-        };
-        return AreaRenderer;
-    })(Plottable.XYRenderer);
-    Plottable.AreaRenderer = AreaRenderer;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {

@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <title>Horizontal Category Renderer Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+
+    <script>
+      var data = [
+          { name: "Spot", age: 8 },
+          { name: "Poptart", age: 1 },
+          { name: "Budoka", age: 3 },
+          { name: "Sugar", age: 14 },
+          { name: "Tac", age: -5 }
+        ];
+
+      var ds = new Plottable.DataSource(data);
+      var xScale = new Plottable.LinearScale();
+      var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+      var yScale = new Plottable.OrdinalScale().rangeType("bands");
+      var yAxis = new Plottable.YAxis(yScale, "left", function(d) { return d; } );
+      yAxis.width(60);
+
+      var barRenderer = new Plottable.HorizontalBarRenderer(ds, xScale, yScale)
+                              .project("x", "age", xScale)
+                              .project("y", "name", yScale)
+                              .animate(true);
+
+      var chart = new Plottable.Table([
+        [yAxis, barRenderer],
+        [null, xAxis]
+      ]);
+
+      window.onload = function() {
+        chart.renderTo("#meow");
+      }
+
+      function younger() {
+        var data = ds.data();
+        data.forEach(function(d) { d.age--; });
+        ds.data(data);
+      }
+      function older() {
+        var data = ds.data();
+        data.forEach(function(d) { d.age++; });
+        ds.data(data);
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="meow" width="480" height="320"></svg>
+    <p />
+    <button name="minus-age" onclick="younger()">-1 year</button><button name="plus-age" onclick="older()">+1 year</button>
+  </body>
+</html>
