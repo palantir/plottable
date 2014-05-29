@@ -160,6 +160,20 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    module DOMUtils {
+        /**
+        * Gets the bounding box of an element.
+        * @param {D3.Selection} element
+        * @returns {SVGRed} The bounding box.
+        */
+        function getBBox(element: D3.Selection): SVGRect;
+        function getElementWidth(elem: HTMLScriptElement): number;
+        function getElementHeight(elem: HTMLScriptElement): number;
+        function getSVGPixelWidth(svg: D3.Selection): number;
+        function translate(s: D3.Selection, x?: number, y?: number): any;
+    }
+}
+declare module Plottable {
     class PlottableObject {
     }
 }
@@ -753,6 +767,31 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    class Gridlines extends Component {
+        /**
+        * Creates a set of Gridlines.
+        * @constructor
+        *
+        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+        */
+        constructor(xScale: QuantitiveScale, yScale: QuantitiveScale);
+    }
+}
+declare module Plottable {
+    module AxisUtils {
+        var ONE_DAY: number;
+        /**
+        * Generates a relative date axis formatter.
+        *
+        * @param {number} baseValue The start date (as epoch time) used in computing relative dates
+        * @param {number} increment The unit used in calculating relative date tick values
+        * @param {string} label The label to append to tick values
+        */
+        function generateRelativeDateFormatter(baseValue: number, increment?: number, label?: string): (tickValue: any) => string;
+    }
+}
+declare module Plottable {
     class XYRenderer extends Renderer {
         /**
         * Creates an XYRenderer.
@@ -902,6 +941,19 @@ declare module Plottable {
         * @return {HorizontalBarRenderer} The calling HorizontalBarRenderer.
         */
         public barAlignment(alignment: string): HorizontalBarRenderer;
+    }
+}
+declare module Plottable {
+    class AreaRenderer extends XYRenderer {
+        /**
+        * Creates an AreaRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
     }
 }
 declare module Plottable {
@@ -1141,46 +1193,8 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    module AxisUtils {
-        var ONE_DAY: number;
-        /**
-        * Generates a relative date axis formatter.
-        *
-        * @param {number} baseValue The start date (as epoch time) used in computing relative dates
-        * @param {number} increment The unit used in calculating relative date tick values
-        * @param {string} label The label to append to tick values
-        */
-        function generateRelativeDateFormatter(baseValue: number, increment?: number, label?: string): (tickValue: any) => string;
-    }
-}
-declare module Plottable {
     class CategoryAxis extends Component {
         constructor(scale: OrdinalScale, orientation?: string);
-    }
-}
-declare module Plottable {
-    class Gridlines extends Component {
-        /**
-        * Creates a set of Gridlines.
-        * @constructor
-        *
-        * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-        * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
-        */
-        constructor(xScale: QuantitiveScale, yScale: QuantitiveScale);
-    }
-}
-declare module Plottable {
-    class AreaRenderer extends XYRenderer {
-        /**
-        * Creates an AreaRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        constructor(dataset: any, xScale: Scale, yScale: Scale);
     }
 }
 declare module Plottable {
@@ -1216,20 +1230,6 @@ declare module Plottable {
         height: number;
         wantsWidth: boolean;
         wantsHeight: boolean;
-    }
-}
-declare module Plottable {
-    module DOMUtils {
-        /**
-        * Gets the bounding box of an element.
-        * @param {D3.Selection} element
-        * @returns {SVGRed} The bounding box.
-        */
-        function getBBox(element: D3.Selection): SVGRect;
-        function getElementWidth(elem: HTMLScriptElement): number;
-        function getElementHeight(elem: HTMLScriptElement): number;
-        function getSVGPixelWidth(svg: D3.Selection): number;
-        function translate(s: D3.Selection, x?: number, y?: number): any;
     }
 }
 declare var LINE_BREAKS_BEFORE: RegExp;

@@ -13,6 +13,17 @@ module.exports = function(grunt) {
   var tsJSON = {
     dev: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
+      outDir: "build/",
+      options: {
+        target: 'es5',
+        noImplicitAny: true,
+        sourceMap: false,
+        declaration: true,
+        removeComments: false
+      }
+    },
+    prod: {
+      src: ["src/**/*.ts", "typings/**/*.d.ts"],
       out: "plottable.js",
       // watch: "src",
       options: {
@@ -88,6 +99,11 @@ module.exports = function(grunt) {
       replacement: "",
       path: "plottable.d.ts",
     },
+    plottable_multifile: {
+      pattern: '/// *<reference path="([^."]*).ts" */>',
+      replacement: 'synchronousRequire("../build/$1.js");',
+      path: "plottable_multifile.js",
+    },
   };
 
   var configJSON = {
@@ -97,6 +113,11 @@ module.exports = function(grunt) {
       header: {
         src: ["license_header.tmp", "plottable.js"],
         dest: "plottable.js",
+      },
+      plottable_multifile: {
+        src: ["synchronousRequire.js", "src/reference.ts"],
+        // src: ["synchronousRequire.js", "build/files.txt"],
+        dest: "plottable_multifile.js",
       },
     },
     ts: tsJSON,
@@ -191,12 +212,15 @@ module.exports = function(grunt) {
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
+                                  "tslint",
+                                  "ts:prod",
                                   "sed:private_definitions",
                                   "ts:test",
-                                  "tslint",
                                   "handle-header",
                                   "sed:protected_definitions",
                                   "sed:public_member_vars",
+                                  "concat:plottable_multifile",
+                                  "sed:plottable_multifile",
                                   "clean:tscommand"]);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
