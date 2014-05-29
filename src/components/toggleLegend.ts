@@ -2,7 +2,10 @@
 
 module Plottable {
   export class ToggleLegend extends Legend {
-    private toggledOn: boolean[];
+    private state: boolean[];
+    public toggleOn: (i?: number) => any;
+    public toggleOff: (i?: number) => any;
+    public update: (i?: number) => any;
 
     /**
      * Creates a Legend.
@@ -10,21 +13,40 @@ module Plottable {
      * @constructor
      * @param {ColorScale} colorScale
      */
-    constructor(colorScale?: ColorScale) {
+    constructor(colorScale: ColorScale, toggleOn: (i?: number) => any, toggleOff: (i?: number) => any, update: (i?: number) => any) {
       super(colorScale);
-      this.toggledOn = [];
+      this.state = [];
+
+      this.toggleOn = toggleOn;
+      this.toggleOff = toggleOff;
+      this.update = update;
+
+      var cb = function(x: number, y: number) {
+            var legend = this.componentToListenTo;
+            var height = legend.availableHeight;
+            var entries = legend.colorScale.domain().length;
+            var idx = Math.floor(y / (height / entries));
+            if (legend.getState(idx)) {
+              legend.toggleOff(idx);
+            } else {
+              legend.toggleOn(idx);
+            }
+            legend.toggleState(idx);
+            legend.update(idx);
+        };
+        new Plottable.ClickInteraction(this).callback(cb).registerWithComponent();
     }
 
     public getState(i: number): boolean {
-      return this.toggledOn[i];
+      return this.state[i];
     }
 
     public toggleState(i: number) {
-      this.toggledOn[i] = !this.toggledOn[i];
+      this.state[i] = !this.state[i];
     }
 
     public init(i: number) {
-      this.toggledOn[i] = true;
+      this.state[i] = true;
     }
   }
 }

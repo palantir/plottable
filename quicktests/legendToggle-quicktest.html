@@ -22,13 +22,28 @@
         var activeColors = colors.slice();
         var numRenderers = 5;
         var names = ["bat", "cat", "mat", "rat", "pat"];
-
         var colorScale = new Plottable.ColorScale();
         colorScale.range(colors);
         colorScale.domain(names);
-        var legend = new Plottable.ToggleLegend(colorScale);
-        var legendLabel = new Plottable.TitleLabel("fat");
-        var legendTable = new Plottable.Table([[legendLabel], [legend]]);
+        var legend = new Plottable.ToggleLegend(colorScale,
+            function(i) {
+                activeColors[i] = colors[i];
+                cg.merge(renderers[i]);
+            },
+
+            function(i) {
+                activeColors[i] = "#d3d3d3";
+                renderers[i].remove();
+            },
+
+            function(i) {
+                var colorScale = new Plottable.ColorScale();
+                colorScale.range(activeColors);
+                colorScale.domain(names);
+                legend.scale(colorScale);
+            }
+        );
+
 
         var xScale = new Plottable.LinearScale();
         var yScale = new Plottable.LinearScale();
@@ -40,13 +55,11 @@
         }
 
         var cg = new Plottable.ComponentGroup();
-
         renderers.forEach(function(renderer, i) {
             renderer.project("stroke", function() { return colors[i]; });
             cg.merge(renderer);
             legend.init(i);
-        })
-
+        });
         var xAxis = new Plottable.XAxis(xScale, "bottom");
         var yAxis = new Plottable.YAxis(yScale, "left");
 
@@ -54,31 +67,12 @@
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
-
         
+        var legendLabel = new Plottable.TitleLabel("fat");
+        var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
+
         var outerTable = new Plottable.Table([[chart, legendTable]]);
         outerTable.renderTo("#legend-toggle-test");
-
-        cb = function(x,y) {
-            var legend = this.componentToListenTo;
-            var height = legend.availableHeight;
-            var entries = legend.colorScale.domain().length;
-            var idx = Math.floor(y / (height / entries));
-            if (legend.getState(idx)) {
-                activeColors[idx] = "#d3d3d3";
-                renderers[idx].remove();
-            } else {
-                activeColors[idx] = colors[idx];
-                cg.merge(renderers[idx]);
-            }
-            legend.toggleState(idx);
-
-            var colorScale = new Plottable.ColorScale();
-            colorScale.range(activeColors);
-            colorScale.domain(names);
-            legend.scale(colorScale);
-        }
-        var click = new Plottable.ClickInteraction(legend).callback(cb).registerWithComponent();
       }
     </script>
   </head>
