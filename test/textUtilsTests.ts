@@ -76,46 +76,6 @@ describe("TextUtils", () => {
     });
   });
 
-  it("getWrappedText works properly", () => {
-    var svg = generateSVG();
-    var textEl = svg.append("text").attr("x", 20).attr("y", 50);
-    textEl.style("font-size", "12pt")
-          .style("font-family", "sans-serif");
-
-    textEl.text("foobar");
-    var textWithSpaces = "01234 56 789";
-
-    var wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 80, 100, textEl).lines;
-    assert.deepEqual(wrappedLines, ["01234 56", "789"], "Wraps at first space after the cutoff");
-    assert.equal(textEl.text(), "foobar", "getWrappedText did not modify the text in the element");
-
-    wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 80, 100, textEl, 0.5).lines;
-    assert.deepEqual(wrappedLines, ["01234", "56 789"], "reducing the cutoff ratio causes text to wrap at an earlier space");
-
-    wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 999, 20, textEl).lines;
-    assert.deepEqual(wrappedLines, [textWithSpaces], "does not wrap text if it would fit in the available space");
-
-    var shortText = "a";
-    wrappedLines = Plottable.TextUtils.getWrappedText(shortText, 80, 100, textEl).lines;
-    assert.deepEqual(wrappedLines, ["a"], "short text is unchanged");
-
-    var longTextNoSpaces = "Supercalifragilisticexpialidocious";
-    wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 80, 100, textEl).lines;
-    assert.operator(wrappedLines.length, ">=", 2, "long text with no spaces gets wrapped");
-    wrappedLines.forEach((line: string, i: number) => {
-      if (i < wrappedLines.length - 1) {
-        assert.equal(line.charAt(line.length-1), "-", "long text with no spaces gets hyphenated");
-      }
-    });
-
-    wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 80, 20, textEl).lines;
-    assert.equal(wrappedLines[0].substr(wrappedLines[0].length-3, 3), "...",
-              "text gets truncated if there's not enough height for all lines");
-
-
-
-    svg.remove();
-  });
   describe("getTextMeasure", () => {
     var svg: D3.Selection;
     var t: D3.Selection;
