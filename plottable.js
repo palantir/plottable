@@ -4248,6 +4248,7 @@ var Plottable;
                 var n = this.dataSource().data().length;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
 =======
                 updateSelection = updateSelection.transition().duration(this._ANIMATION_DURATION).delay(function (d, i) {
@@ -4255,6 +4256,9 @@ var Plottable;
 =======
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
 >>>>>>> Add correct easing to HorizontalBarRenderer.
+=======
+                updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
+>>>>>>> master
                     return i * _this._ANIMATION_DELAY;
                 });
             }
@@ -5859,7 +5863,7 @@ var Plottable;
         */
         function AreaRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 500;
+            this._ANIMATION_DURATION = 600;
             this.classed("area-renderer", true);
             this.project("y0", 0, yScale); // default
             this.project("fill", function () {
@@ -5889,7 +5893,10 @@ var Plottable;
             }
 
             this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
+            var updateSelection = this.path;
+            if (this._animate) {
+                updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+            }
             updateSelection.attr("d", this.area).attr(attrToProjector);
         };
         return AreaRenderer;
