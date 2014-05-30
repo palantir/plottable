@@ -872,6 +872,46 @@ declare module Plottable {
 
 
 declare module Plottable {
+    class BaseAxis extends Component {
+        /**
+        * Creates a BaseAxis.
+        *
+        * @constructor
+        * @param {Scale} scale The Scale to base the BaseAxis on.
+        * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
+        * @param {(n: any) => string} [formatter] A function to format tick labels.
+        */
+        constructor(scale: Scale, orientation: string, formatter?: (n: any) => string);
+        /**
+        * Sets a new tick formatter.
+        *
+        * @param {(n: any) => string} formatter A function to format tick labels.
+        * @returns {BaseAxis} The calling BaseAxis.
+        */
+        public formatter(formatFunction: (n: any) => string): BaseAxis;
+        /**
+        * Gets or sets the length of each tick mark.
+        *
+        * @param {number} [length] The length of each tick.
+        * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+        */
+        public tickLength(): number;
+        public tickLength(length: number): BaseAxis;
+        /**
+        * Gets or sets the padding between each tick mark and its associated label.
+        *
+        * @param {number} [length] The length of each tick.
+        * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+        */
+        public tickLabelPadding(): number;
+        public tickLabelPadding(padding: number): BaseAxis;
+        public orient(): string;
+        public orient(newOrientation: string): BaseAxis;
+    }
+}
+
+
+declare module Plottable {
     class Label extends Component {
         /**
         * Creates a Label.

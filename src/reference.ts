@@ -27,6 +27,7 @@
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
 /// <reference path="components/axis.ts" />
+/// <reference path="components/baseAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
 /// <reference path="components/gridlines.ts" />

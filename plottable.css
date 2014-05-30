@@ -30,26 +30,19 @@ svg.plottable {
   writing-mode: tb;
 }
 
-.plottable .axis path,
 .plottable .axis line {
   stroke: #979797;
   stroke-width: 2px;
-  shape-rendering: crispEdges;
 }
 
-.plottable .axis .tick line {
-  opacity: 0;
-}
-.plottable .x-axis path {
+.plottable .axis path {
   fill: none;
   stroke-width: 2px;
   stroke: #979797;
-  opacity: 0.5;
 }
 
 .plottable .y-axis path {
   stroke: none;
-  fill: none;
 }
 
 .plottable .axis text {

@@ -3112,6 +3112,222 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var BaseAxis = (function (_super) {
+        __extends(BaseAxis, _super);
+        /**
+        * Creates a BaseAxis.
+        *
+        * @constructor
+        * @param {Scale} scale The Scale to base the BaseAxis on.
+        * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
+        * @param {(n: any) => string} [formatter] A function to format tick labels.
+        */
+        function BaseAxis(scale, orientation, formatter) {
+            var _this = this;
+            _super.call(this);
+            this._tickLength = 5;
+            this._tickLabelPadding = 3;
+            this._maxWidth = 0;
+            this._maxHeight = 0;
+            this._scale = scale;
+            this.orient(orientation);
+
+            this.classed("axis", true);
+            if (this._isHorizontal()) {
+                this.classed("x-axis", true);
+            } else {
+                this.classed("y-axis", true);
+            }
+
+            this._formatter = (formatter != null) ? formatter : function (n) {
+                return String(n);
+            };
+
+            this._registerToBroadcaster(this._scale, function () {
+                return _this.rescale();
+            });
+        }
+        BaseAxis.prototype._isHorizontal = function () {
+            return this._orientation === "top" || this._orientation === "bottom";
+        };
+
+        BaseAxis.prototype._setup = function () {
+            _super.prototype._setup.call(this);
+            this._baseline = this.content.append("line").classed("baseline", true);
+            return this;
+        };
+
+        /*
+        * Function for generating tick values in data-space (as opposed to pixel values).
+        * To be implemented by subclasses.
+        */
+        BaseAxis.prototype._getTickValues = function () {
+            return [];
+        };
+
+        BaseAxis.prototype._doRender = function () {
+            var _this = this;
+            var tickValues = this._getTickValues();
+            this._ticks = this.content.selectAll(".tick").data(tickValues);
+            var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
+            tickEnterSelection.append("line").classed("tick-mark", true);
+            this._ticks.exit().remove();
+
+            var tickXTransformFunction = this._isHorizontal() ? function (d) {
+                return _this._scale.scale(d);
+            } : function (d) {
+                return 0;
+            };
+            var tickYTransformFunction = this._isHorizontal() ? function (d) {
+                return 0;
+            } : function (d) {
+                return _this._scale.scale(d);
+            };
+
+            var tickTransformGenerator = function (d, i) {
+                return "translate(" + tickXTransformFunction(d) + ", " + tickYTransformFunction(d) + ")";
+            };
+
+            this._baseline.attr(this._generateBaselineAttrHash());
+            this._ticks.select("line").attr(this._generateTickMarkAttrHash());
+            this._ticks.attr("transform", tickTransformGenerator);
+
+            return this;
+        };
+
+        BaseAxis.prototype._generateBaselineAttrHash = function () {
+            var baselineAttrHash = {
+                x1: 0,
+                y1: 0,
+                x2: 0,
+                y2: 0
+            };
+
+            switch (this._orientation) {
+                case "bottom":
+                    baselineAttrHash.x2 = this.availableWidth;
+                    break;
+
+                case "top":
+                    baselineAttrHash.x2 = this.availableWidth;
+                    baselineAttrHash.y1 = this.availableHeight;
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+
+                case "left":
+                    baselineAttrHash.x1 = this.availableWidth;
+                    baselineAttrHash.x2 = this.availableWidth;
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+
+                case "right":
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+            }
+
+            return baselineAttrHash;
+        };
+
+        BaseAxis.prototype._generateTickMarkAttrHash = function () {
+            var tickMarkAttrHash = {
+                x1: 0,
+                y1: 0,
+                x2: 0,
+                y2: 0
+            };
+
+            switch (this._orientation) {
+                case "bottom":
+                    tickMarkAttrHash["y2"] = this._tickLength;
+                    break;
+
+                case "top":
+                    tickMarkAttrHash["y1"] = this.availableHeight;
+                    tickMarkAttrHash["y2"] = this.availableHeight - this._tickLength;
+                    break;
+
+                case "left":
+                    tickMarkAttrHash["x1"] = this.availableWidth;
+                    tickMarkAttrHash["x2"] = this.availableWidth - this._tickLength;
+                    break;
+
+                case "right":
+                    tickMarkAttrHash["x2"] = this._tickLength;
+                    break;
+            }
+
+            return tickMarkAttrHash;
+        };
+
+        BaseAxis.prototype.rescale = function () {
+            return (this.element != null) ? this._render() : null;
+        };
+
+        /**
+        * Sets a new tick formatter.
+        *
+        * @param {(n: any) => string} formatter A function to format tick labels.
+        * @returns {BaseAxis} The calling BaseAxis.
+        */
+        BaseAxis.prototype.formatter = function (formatFunction) {
+            this._formatter = formatFunction;
+            this._render();
+            return this;
+        };
+
+        BaseAxis.prototype.tickLength = function (length) {
+            if (length == null) {
+                return this._tickLength;
+            } else {
+                if (length < 0) {
+                    throw new Error("tick length must be positive");
+                }
+                this._tickLength = length;
+                this._render();
+                return this;
+            }
+        };
+
+        BaseAxis.prototype.tickLabelPadding = function (padding) {
+            if (padding == null) {
+                return this._tickLabelPadding;
+            } else {
+                if (padding < 0) {
+                    throw new Error("tick label padding must be positive");
+                }
+                this._tickLabelPadding = padding;
+                this._render();
+                return this;
+            }
+        };
+
+        BaseAxis.prototype.orient = function (newOrientation) {
+            if (newOrientation == null) {
+                return this._orientation;
+            } else {
+                var newOrientationLC = newOrientation.toLowerCase();
+                if (newOrientationLC !== "top" && newOrientationLC !== "bottom" && newOrientationLC !== "left" && newOrientationLC !== "right") {
+                    throw new Error("unsupported orientation");
+                }
+                this._orientation = newOrientationLC;
+                this._render();
+                return this;
+            }
+        };
+        return BaseAxis;
+    })(Plottable.Component);
+    Plottable.BaseAxis = BaseAxis;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Label = (function (_super) {
         __extends(Label, _super);
         /**
