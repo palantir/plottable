@@ -186,7 +186,7 @@ module.exports = function(grunt) {
         "files": ["src/**/*.ts"]
       },
       "tests": {
-        "tasks": ["ts:test", "tslint"],
+        "tasks": ["test-compile", "tslint"],
         "files": ["test/**.ts"]
       }
     },
@@ -263,7 +263,13 @@ module.exports = function(grunt) {
   grunt.registerTask("update_test_ts_files", updateTestTsFiles);
   grunt.registerTask("definitions_prod", function() {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
-  })
+  });
+  grunt.registerTask("test-compile", [
+                                  "ts:test",
+                                  "concat:tests_multifile",
+                                  "sed:tests_multifile",
+                                  "concat:tests",
+                                  ]);
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
                                   "update_ts_files",
@@ -274,10 +280,7 @@ module.exports = function(grunt) {
                                   "sed:definitions",
                                   "sed:private_definitions",
                                   "definitions_prod",
-                                  "ts:test",
-                                  "concat:tests_multifile",
-                                  "sed:tests_multifile",
-                                  "concat:tests",
+                                  "test-compile",
                                   "tslint",
                                   "handle-header",
                                   "sed:protected_definitions",
