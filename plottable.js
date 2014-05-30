@@ -233,6 +233,9 @@ var Plottable;
                 if (s.trim() === "") {
                     return [0, 0];
                 }
+                if (Plottable.DOMUtils.isSelectionRemoved(selection)) {
+                    throw new Error("Cannot measure text in a removed node");
+                }
                 var bb;
                 if (selection.node().nodeName === "text") {
                     var originalText = selection.text();
@@ -660,6 +663,16 @@ var Plottable;
             }
             return parseFloat(value);
         }
+
+        function isSelectionRemoved(selection) {
+            var e = selection.node();
+            var n = e.parentNode;
+            while (n !== null && n.nodeName !== "#document") {
+                n = n.parentNode;
+            }
+            return (n == null);
+        }
+        DOMUtils.isSelectionRemoved = isSelectionRemoved;
 
         function getElementWidth(elem) {
             var style = window.getComputedStyle(elem);
@@ -2415,6 +2428,9 @@ var Plottable;
             // Padding as a proportion of the spacing between domain values
             this._innerPadding = 0.3;
             this._outerPadding = 0.5;
+            if (this._innerPadding > this._outerPadding) {
+                throw new Error("outerPadding must be >= innerPadding so cat axis bands work out reasonably");
+            }
         }
         OrdinalScale.prototype._getExtent = function () {
             var extents = this._getAllExtents();
@@ -2455,6 +2471,21 @@ var Plottable;
         */
         OrdinalScale.prototype.rangeBand = function () {
             return this._d3Scale.rangeBand();
+        };
+
+        OrdinalScale.prototype.innerPadding = function () {
+            var d = this.domain();
+            if (d.length < 2) {
+                return 0;
+            }
+            var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
+            return step - this.rangeBand();
+        };
+
+        OrdinalScale.prototype.fullBandStartAndWidth = function (v) {
+            var start = this.scale(v) - this.innerPadding() / 2;
+            var width = this.rangeBand() + this.innerPadding();
+            return [start, width];
         };
 
         OrdinalScale.prototype.rangeType = function (rangeType, outerPadding, innerPadding) {
@@ -2799,11 +2830,8 @@ var Plottable;
             } else {
                 this._scale.range([0, offeredWidth]);
             }
-            var bandWidth = this._scale.rangeBand();
-            var width = this.isVertical ? offeredWidth : bandWidth;
-            var height = this.isVertical ? bandWidth : offeredHeight;
             var testG = this.content.append("g");
-            var textResult = this.writeText(width, height, testG);
+            var textResult = this.writeText(offeredWidth, offeredHeight, testG);
             testG.remove();
 
             if (textResult.usedWidth > offeredWidth || textResult.usedHeight > offeredHeight) {
@@ -2819,16 +2847,17 @@ var Plottable;
         };
 
         CategoryAxis.prototype.writeText = function (axisWidth, axisHeight, targetElement) {
-            var bandWidth = this._scale.rangeBand();
             var ticks = targetElement.selectAll(".tick").data(this._scale.domain());
             ticks.enter().append("g").classed("tick", true);
             ticks.exit().remove();
-            var width = this.isVertical ? axisWidth : bandWidth;
-            var height = this.isVertical ? bandWidth : axisHeight;
             var self = this;
             var textWriteResults = [];
             ticks.each(function (d, i) {
-                var bandStartPosition = self._scale.scale(d);
+                var startAndWidth = self._scale.fullBandStartAndWidth(d);
+                var bandWidth = startAndWidth[1];
+                var bandStartPosition = startAndWidth[0];
+                var width = self.isVertical ? axisWidth : bandWidth;
+                var height = self.isVertical ? bandWidth : axisHeight;
                 d3.select(this).selectAll("g").remove();
                 var g = d3.select(this).append("g");
                 var x = self.isVertical ? 0 : bandStartPosition;

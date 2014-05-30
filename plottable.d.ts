@@ -196,6 +196,7 @@ declare module Plottable {
         * @returns {SVGRed} The bounding box.
         */
         function getBBox(element: D3.Selection): SVGRect;
+        function isSelectionRemoved(selection: D3.Selection): boolean;
         function getElementWidth(elem: HTMLScriptElement): number;
         function getElementHeight(elem: HTMLScriptElement): number;
         function getSVGPixelWidth(svg: D3.Selection): number;
@@ -657,6 +658,8 @@ declare module Plottable {
         * @returns {number} The range band width or 0 if rangeType isn't "bands".
         */
         public rangeBand(): number;
+        public innerPadding(): number;
+        public fullBandStartAndWidth(v: any): number[];
         /**
         * Returns the range type, or sets the range type.
         *
