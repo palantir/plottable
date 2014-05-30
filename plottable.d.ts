@@ -1192,31 +1192,6 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class NumberAxis extends Component {
-        /**
-        * Creates an NumberAxis.
-        *
-        * @constructor
-        * @param {QuantitiveScale} scale The Scale to base the NumberAxis on.
-        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-        * @param {any} [(n: any) => string] A function to format tick labels.
-        */
-        constructor(scale: QuantitiveScale, orientation: string, formatter?: (n: any) => string);
-        public formatter(formatFunction: (n: any) => string): NumberAxis;
-        /**
-        * Sets or gets the tick label position relative to the tick marks.
-        * The exact consequences of particular tick label positionings depends on the subclass implementation.
-        *
-        * @param {string} [position] The relative position of the tick label.
-        * @returns {string|NumberAxis} The current tick label position, or the calling NumberAxis.
-        */
-        public tickLabelPosition(): string;
-        public tickLabelPosition(position: string): NumberAxis;
-        public showEndTickLabels(): boolean;
-        public showEndTickLabels(show: boolean): Axis;
-    }
-}
-declare module Plottable {
     class AreaRenderer extends XYRenderer {
         /**
         * Creates an AreaRenderer.
