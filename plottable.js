@@ -4158,7 +4158,11 @@ var Plottable;
             var updateSelection = this.dataSelection;
             if (this._animate) {
                 var n = this.dataSource().data().length;
+<<<<<<< HEAD
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
+=======
+                updateSelection = updateSelection.transition().duration(this._ANIMATION_DURATION).delay(function (d, i) {
+>>>>>>> Adjust animation timings.
                     return i * _this._ANIMATION_DELAY;
                 });
             }
