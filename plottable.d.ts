@@ -905,6 +905,8 @@ declare module Plottable {
         */
         public tickLabelPadding(): number;
         public tickLabelPadding(padding: number): BaseAxis;
+        public orient(): string;
+        public orient(newOrientation: string): BaseAxis;
     }
 }
 
