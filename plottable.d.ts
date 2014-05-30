@@ -901,6 +901,7 @@ declare module Plottable {
         *
         * @constructor
 <<<<<<< HEAD
+<<<<<<< HEAD
         * @param {Scale} scale The Scale to base the BaseAxis on.
         * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
         * @param {(n: any) => string} [formatter] A function to format tick labels.
@@ -925,6 +926,10 @@ declare module Plottable {
 =======
         * @param {Scale} scale The Scale to base the NumberAxis on.
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+=======
+        * @param {Scale} scale The Scale to base the BaseAxis on.
+        * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
+>>>>>>> Add/clean up JSDoc, remove subclass-specific call from BaseAxis.
         * @param {(n: any) => string} [formatter] A function to format tick labels.
         */
         constructor(scale: Scale, orientation: string, formatter?: (n: any) => string);
@@ -954,12 +959,16 @@ declare module Plottable {
         public tickLabelPadding(padding: number): BaseAxis;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Add/clean up JSDoc, remove subclass-specific call from BaseAxis.
         /**
         * Gets or sets the maximum width of the BaseAxis.
         *
         * @param {number} [width] The desired maximum width.
         * @returns {number|BaseAxis} The current maximum width, or the calling BaseAxis.
         */
+<<<<<<< HEAD
         public maxWidth(): number;
         public maxWidth(width: number): BaseAxis;
         /**
@@ -976,8 +985,16 @@ declare module Plottable {
 =======
         public showEndTickLabels(): boolean;
         public showEndTickLabels(show: boolean): BaseAxis;
+=======
+>>>>>>> Add/clean up JSDoc, remove subclass-specific call from BaseAxis.
         public maxWidth(): number;
         public maxWidth(width: number): BaseAxis;
+        /**
+        * Gets or sets the maximum height of the BaseAxis.
+        *
+        * @param {number} [height] The desired maximum height.
+        * @returns {number|BaseAxis} The current maximum height, or the calling BaseAxis.
+        */
         public maxHeight(): number;
         public maxHeight(height: number): BaseAxis;
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.

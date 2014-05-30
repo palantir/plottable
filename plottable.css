@@ -35,13 +35,7 @@ svg.plottable {
   stroke-width: 2px;
 }
 
-.plottable .axis .tick line {
-  opacity: 0.5;
-  stroke-width: 2px;
-  stroke: #979797;
-}
-
-.plottable .x-axis path {
+.plottable .axis path {
   fill: none;
   stroke-width: 2px;
   stroke: #979797;

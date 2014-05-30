@@ -2897,12 +2897,17 @@ var Plottable;
         *
         * @constructor
 <<<<<<< HEAD
+<<<<<<< HEAD
         * @param {Scale} scale The Scale to base the BaseAxis on.
         * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
 =======
         * @param {Scale} scale The Scale to base the NumberAxis on.
         * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+=======
+        * @param {Scale} scale The Scale to base the BaseAxis on.
+        * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
+>>>>>>> Add/clean up JSDoc, remove subclass-specific call from BaseAxis.
         * @param {(n: any) => string} [formatter] A function to format tick labels.
         */
         function BaseAxis(scale, orientation, formatter) {
@@ -2910,6 +2915,7 @@ var Plottable;
             _super.call(this);
             this._tickLength = 5;
             this._tickLabelPadding = 3;
+<<<<<<< HEAD
 <<<<<<< HEAD
             this._maxWidth = 0;
             this._maxHeight = 0;
@@ -2929,23 +2935,23 @@ var Plottable;
 =======
             this.isHorizontal = true;
             this._showEndTickLabels = false;
+=======
+>>>>>>> Add/clean up JSDoc, remove subclass-specific call from BaseAxis.
             this._maxWidth = 0;
             this._maxHeight = 0;
-            this.scale = scale;
+            this._scale = scale;
             var orientationLC = orientation.toLowerCase();
 
             if (orientationLC !== "top" && orientationLC !== "bottom" && orientationLC !== "left" && orientationLC !== "right") {
-                throw new Error("unsupported orientation for Axis");
+                throw new Error("unsupported orientation");
             }
-            this.orientation = orientationLC;
+            this._orientation = orientationLC;
 
             this.classed("axis", true);
-            if (this.orientation === "top" || this.orientation === "bottom") {
-                this.isHorizontal = true;
+            if (this._orientation === "top" || this._orientation === "bottom") {
                 this.classed("x-axis", true);
                 this._maxHeight = 30;
             } else {
-                this.isHorizontal = false;
                 this.classed("y-axis", true);
                 this._maxWidth = 50;
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
@@ -2955,6 +2961,7 @@ var Plottable;
                 return String(n);
             };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
             this._registerToBroadcaster(this._scale, function () {
                 return _this.rescale();
@@ -2977,9 +2984,16 @@ var Plottable;
         BaseAxis.prototype._getTickValues = function () {
 =======
             this._registerToBroadcaster(this.scale, function () {
+=======
+            this._registerToBroadcaster(this._scale, function () {
+>>>>>>> Add/clean up JSDoc, remove subclass-specific call from BaseAxis.
                 return _this.rescale();
             });
         }
+        BaseAxis.prototype._isHorizontal = function () {
+            return this._orientation === "top" || this._orientation === "bottom";
+        };
+
         BaseAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
             this.baseline = this.content.append("line").classed("baseline", true);
@@ -2990,8 +3004,8 @@ var Plottable;
             return {
                 width: Math.min(offeredWidth, this._maxWidth),
                 height: Math.min(offeredHeight, this._maxHeight),
-                wantsWidth: !this.isHorizontal && offeredWidth < this._maxWidth,
-                wantsHeight: this.isHorizontal && offeredHeight < this._maxHeight
+                wantsWidth: !this._isHorizontal() && offeredWidth < this._maxWidth,
+                wantsHeight: this._isHorizontal() && offeredHeight < this._maxHeight
             };
         };
 
@@ -3003,6 +3017,7 @@ var Plottable;
 
         BaseAxis.prototype._doRender = function () {
             var _this = this;
+<<<<<<< HEAD
 <<<<<<< HEAD
             var tickValues = this._getTickValues();
             this._ticks = this.content.selectAll(".tick").data(tickValues);
@@ -3042,6 +3057,8 @@ var Plottable;
 =======
             var domain = this.scale.domain();
 
+=======
+>>>>>>> Add/clean up JSDoc, remove subclass-specific call from BaseAxis.
             var baselineAttributes = {
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
                 x1: 0,
@@ -3094,13 +3111,13 @@ var Plottable;
                 }
             };
 
-            if (this.isHorizontal) {
+            if (this._isHorizontal()) {
                 tickGroupAttrHash["x"] = function (d) {
-                    return _this.scale.scale(d);
+                    return _this._scale.scale(d);
                 };
             } else {
                 tickGroupAttrHash["y"] = function (d) {
-                    return _this.scale.scale(d);
+                    return _this._scale.scale(d);
                 };
             }
 
@@ -3117,10 +3134,14 @@ var Plottable;
             };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             switch (this._orientation) {
                 case "bottom":
 =======
             switch (this.orientation) {
+=======
+            switch (this._orientation) {
+>>>>>>> Add/clean up JSDoc, remove subclass-specific call from BaseAxis.
                 case "bottom":
                     baselineAttributes.x2 = this.availableWidth;
 
@@ -3211,14 +3232,6 @@ var Plottable;
         };
 <<<<<<< HEAD
 =======
-
-        BaseAxis.prototype.showEndTickLabels = function (show) {
-            if (show == null) {
-                return this._showEndTickLabels;
-            }
-            this._showEndTickLabels = show;
-            return this;
-        };
 
         BaseAxis.prototype.maxWidth = function (width) {
             if (width == null) {
