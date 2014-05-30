@@ -36,11 +36,8 @@ module Plottable {
       } else {
         this._scale.range([0, offeredWidth]);
       }
-      var bandWidth: number = this._scale.rangeBand();
-      var width  = this.isVertical ? offeredWidth : bandWidth;
-      var height = this.isVertical ? bandWidth : offeredHeight;
       var testG = this.content.append("g");
-      var textResult = this.writeText(width, height, testG);
+      var textResult = this.writeText(offeredWidth, offeredHeight, testG);
       testG.remove();
 
       if (textResult.usedWidth > offeredWidth || textResult.usedHeight > offeredHeight) {
@@ -56,16 +53,17 @@ module Plottable {
     }
 
     private writeText(axisWidth: number, axisHeight: number, targetElement: D3.Selection): TextUtils.IWriteTextResult {
-      var bandWidth: number = this._scale.rangeBand();
       var ticks = targetElement.selectAll(".tick").data(this._scale.domain());
       ticks.enter().append("g").classed("tick", true);
       ticks.exit().remove();
-      var width  = this.isVertical ? axisWidth : bandWidth;
-      var height = this.isVertical ? bandWidth : axisHeight;
       var self = this;
       var textWriteResults: TextUtils.IWriteTextResult[] = [];
       ticks.each(function (d: string, i: number) {
-        var bandStartPosition: number = self._scale.scale(d);
+        var startAndWidth = self._scale.fullBandStartAndWidth(d);
+        var bandWidth = startAndWidth[1];
+        var bandStartPosition = startAndWidth[0];
+        var width  = self.isVertical ? axisWidth : bandWidth;
+        var height = self.isVertical ? bandWidth : axisHeight;
         d3.select(this).selectAll("g").remove();
         var g = d3.select(this).append("g");
         var x = self.isVertical ? 0 : bandStartPosition;
