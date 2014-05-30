@@ -1,0 +1,137 @@
+<html>
+  <head>
+    <title>writeLineQuicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <style>
+        svg {
+            background-color: lightgray;
+            fill: navy;
+            font-family: sans-serif;
+            font-size: 20px;
+        }
+        p {
+            font-size: 20px;
+        }
+    </style>
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+
+    <script>
+        //------------------------------globals------------------------------
+        var long_side = 300;
+        var med_side = 200;
+        var short_side = 100;
+        var text = "hello world";
+        
+        var svg_array = ["h_1", "v_1", "h_2", "v_2", "h_3", "v_3",
+            "h_4", "v_4", "h_5", "v_5", "h_6", "v_6",
+            "h_7", "v_7", "h_8", "v_8", "h_9", "v_9",
+            "h_10", "v_10", "h_11", "v_11", "h_12", "v_12"];
+        var sel_array = [];
+        sel_array.length = svg_array.length;
+        
+        
+        //------------------------------functions------------------------------
+        var write_horizontal = function (i, xAlign, yAlign) {
+            Plottable.TextUtils.writeLineHorizontally(text, sel_array[i],
+            sel_array[i].attr("width"), sel_array[i].attr("height"),
+            xAlign, yAlign);
+        }
+        
+        var write_horizontal_ = function (i) {
+            Plottable.TextUtils.writeLineHorizontally(text, sel_array[i],
+            sel_array[i].attr("width"), sel_array[i].attr("height"));
+        }
+        
+        var write_vertical = function (i, xAlign, yAlign) {
+            Plottable.TextUtils.writeLineVertically(text, sel_array[i],
+            sel_array[i].attr("width"), sel_array[i].attr("height"),
+            xAlign, yAlign);
+        }
+        
+        var write_vertical_ = function (i) {
+            Plottable.TextUtils.writeLineVertically(text, sel_array[i],
+            sel_array[i].attr("width"), sel_array[i].attr("height"));
+        }
+        
+        
+        //----------------------------------main-----------------------------------
+        window.onload = function () {
+        
+            for (i = 0; i < 24; i++) {
+                sel_array[i] = d3.select("#" + svg_array[i]);
+                var j = i % 6;
+        
+                if (j < 2) {
+                    sel_array[i].attr("width", long_side).attr("height", short_side);
+                } else if (j < 4) {
+                    sel_array[i].attr("width", med_side).attr("height", med_side);
+                } else {
+                    sel_array[i].attr("width", short_side).attr("height", long_side);
+                }
+            }
+        
+            for (i = 0; i < 24; i++) {
+                if (i < 6) {
+                    if (i % 2 == 0) write_horizontal(i, "right", "top");
+                    else write_vertical(i, "right", "top");
+                } else if (i < 12) {
+                    if (i % 2 == 0) write_horizontal(i, "left", "bottom");
+                    else write_vertical(i, "left", "bottom");
+                } else if (i < 18) {
+                    if (i % 2 == 0) write_horizontal(i, "center", "center");
+                    else write_vertical(i, "center", "center");
+                } else {
+                    if (i % 2 == 0) write_horizontal_(i);
+                    else write_vertical_(i);
+                }
+            }
+        
+        }
+    </script>
+  </head>
+  <body>
+    <p>top, right</p>
+    <br>
+    <svg id="h_1"></svg>
+    <svg id="v_1"></svg>
+    <br>
+    <svg id="h_2"></svg>
+    <svg id="v_2"></svg>
+    <br>
+    <svg id="h_3"></svg>
+    <svg id="v_3"></svg>
+    <p>bottom, left</p>
+    <br>
+    <svg id="h_4"></svg>
+    <svg id="v_4"></svg>
+    <br>
+    <svg id="h_5"></svg>
+    <svg id="v_5"></svg>
+    <br>
+    <svg id="h_6"></svg>
+    <svg id="v_6"></svg>
+    <p>center, center</p>
+    <br>
+    <svg id="h_7"></svg>
+    <svg id="v_7"></svg>
+    <br>
+    <svg id="h_8"></svg>
+    <svg id="v_8"></svg>
+    <br>
+    <svg id="h_9"></svg>
+    <svg id="v_9"></svg>
+    <p>no explicit alignment</p>
+    <br>
+    <svg id="h_10"></svg>
+    <svg id="v_10"></svg>
+    <br>
+    <svg id="h_11"></svg>
+    <svg id="v_11"></svg>
+    <br>
+    <svg id="h_12"></svg>
+    <svg id="v_12"></svg>
+  </body>
+
+</html>
