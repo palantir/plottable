@@ -277,6 +277,7 @@ module.exports = function(grunt) {
                                   "ts:test",
                                   "concat:tests_multifile",
                                   "sed:tests_multifile",
+                                  "concat:tests",
                                   "tslint",
                                   "handle-header",
                                   "sed:protected_definitions",
