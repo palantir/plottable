@@ -3,6 +3,7 @@
 /// <reference path="utils/idCounter.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/textUtils.ts" />
+/// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
 
 /// <reference path="core/plottableObject.ts" />
@@ -26,6 +27,7 @@
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
 /// <reference path="components/axis.ts" />
+/// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
 /// <reference path="components/gridlines.ts" />

@@ -445,6 +445,201 @@ var Plottable;
     })(Plottable.TextUtils || (Plottable.TextUtils = {}));
     var TextUtils = Plottable.TextUtils;
 })(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var LINE_BREAKS_BEFORE = /[{\[]/;
+var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
+var SPACES = /^\s+$/;
+var Plottable;
+(function (Plottable) {
+    (function (WordWrapUtils) {
+        ;
+
+        /**
+        * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
+        * Wraps words and fits as much of the text as possible into the given width and height.
+        */
+        function breakTextToFitRect(text, width, height, measureText) {
+            var widthMeasure = function (s) {
+                return measureText(s)[0];
+            };
+            var lines = breakTextToFitWidth(text, width, widthMeasure);
+            var textHeight = measureText("hello world")[1];
+            var nLinesThatFit = Math.floor(height / textHeight);
+            var textFit = nLinesThatFit >= lines.length;
+            if (!textFit) {
+                lines = lines.splice(0, nLinesThatFit);
+                if (nLinesThatFit > 0) {
+                    // Overwrite the last line to one that has had a ... appended to the end
+                    lines[nLinesThatFit - 1] = Plottable.TextUtils.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
+                }
+            }
+            return { originalText: text, lines: lines, textFits: textFit };
+        }
+        WordWrapUtils.breakTextToFitRect = breakTextToFitRect;
+
+        /**
+        * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
+        * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
+        * the word is too big to fit within width on its own.
+        */
+        function breakTextToFitWidth(text, width, widthMeasure) {
+            var ret = [];
+            var paragraphs = text.split("\n");
+            for (var i = 0, len = paragraphs.length; i < len; i++) {
+                var paragraph = paragraphs[i];
+                if (paragraph !== null) {
+                    ret = ret.concat(breakParagraphToFitWidth(paragraph, width, widthMeasure));
+                } else {
+                    ret.push("");
+                }
+            }
+            return ret;
+        }
+        WordWrapUtils.breakTextToFitWidth = breakTextToFitWidth;
+
+        /**
+        * Determines if it is possible to fit a given text within width without breaking any of the words.
+        * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
+        * allowed width.
+        */
+        function canWrapWithoutBreakingWords(text, width, widthMeasure) {
+            var tokens = tokenize(text);
+            var widths = tokens.map(widthMeasure);
+            var maxWidth = d3.max(widths);
+            return maxWidth <= width;
+        }
+        WordWrapUtils.canWrapWithoutBreakingWords = canWrapWithoutBreakingWords;
+
+        /**
+        * A paragraph is a string of text containing no newlines.
+        * Given a paragraph, break it up into lines that are no
+        * wider than width.  widthMeasure is a function that takes
+        * text as input, and returns the width of the text in pixels.
+        */
+        function breakParagraphToFitWidth(text, width, widthMeasure) {
+            var lines = [];
+            var tokens = tokenize(text);
+            var curLine = "";
+            var i = 0;
+            var nextToken;
+            while (nextToken || i < tokens.length) {
+                if (typeof nextToken === "undefined" || nextToken === null) {
+                    nextToken = tokens[i++];
+                }
+                var brokenToken = breakNextTokenToFitInWidth(curLine, nextToken, width, widthMeasure);
+
+                var canAdd = brokenToken[0];
+                var leftOver = brokenToken[1];
+
+                if (canAdd !== null) {
+                    curLine += canAdd;
+                }
+                nextToken = leftOver;
+                if (leftOver) {
+                    lines.push(curLine);
+                    curLine = "";
+                }
+            }
+            if (curLine) {
+                lines.push(curLine);
+            }
+            return lines;
+        }
+
+        /**
+        * Breaks up the next token and so that some part of it can be
+        * added to curLine and fits in the width. the return value
+        * is an array with 2 elements, the part that can be added
+        * and the left over part of the token
+        * widthMeasure is a function that takes text as input,
+        * and returns the width of the text in pixels.
+        */
+        function breakNextTokenToFitInWidth(curLine, nextToken, width, widthMeasure) {
+            if (isBlank(nextToken)) {
+                return [nextToken, null];
+            }
+            if (widthMeasure(curLine + nextToken) <= width) {
+                return [nextToken, null];
+            }
+            if (!isBlank(curLine)) {
+                return [null, nextToken];
+            }
+            var i = 0;
+            while (i < nextToken.length) {
+                if (widthMeasure(curLine + nextToken[i]) <= width) {
+                    curLine += nextToken[i++];
+                } else {
+                    break;
+                }
+            }
+            if (isBlank(curLine) && i === 0) {
+                i = 1;
+            }
+            return [nextToken.substring(0, i), nextToken.substring(i)];
+        }
+
+        /**
+        * Breaks up into tokens for word wrapping
+        * Each token is comprised of either:
+        *  1) Only word and non line break characters
+        *  2) Only spaces characters
+        *  3) Line break characters such as ":" or ";" or ","
+        *  (will be single character token, unless there is a repeated linebreak character)
+        */
+        function tokenize(text) {
+            var ret = [];
+            var token = "";
+            var lastChar = "";
+            for (var i = 0, len = text.length; i < len; i++) {
+                var curChar = text[i];
+                if (token === "" || isTokenizedTogether(token[0], curChar, lastChar)) {
+                    token += curChar;
+                } else {
+                    ret.push(token);
+                    token = curChar;
+                }
+                lastChar = curChar;
+            }
+            if (token) {
+                ret.push(token);
+            }
+            return ret;
+        }
+
+        /**
+        * Returns whether a string is blank.
+        *
+        * @param {string} str: The string to test for blank-ness
+        * @returns {boolean} Whether the string is blank
+        */
+        function isBlank(text) {
+            return text == null ? true : text.trim() === "";
+        }
+
+        /**
+        * Given a token (ie a string of characters that are similar and shouldn't be broken up) and a character, determine
+        * whether that character should be added to the token. Groups of characters that don't match the space or line break
+        * regex are always tokenzied together. Spaces are always tokenized together. Line break characters are almost always
+        * split into their own token, except that two subsequent identical line break characters are put into the same token.
+        * For isTokenizedTogether(":", ",") == False but isTokenizedTogether("::") == True.
+        */
+        function isTokenizedTogether(text, nextChar, lastChar) {
+            if (!(text && nextChar)) {
+                false;
+            }
+            if (SPACES.test(text) && SPACES.test(nextChar)) {
+                return true;
+            } else if (SPACES.test(text) || SPACES.test(nextChar)) {
+                return false;
+            }
+            if (LINE_BREAKS_AFTER.test(lastChar) || LINE_BREAKS_BEFORE.test(nextChar)) {
+                return false;
+            }
+            return true;
+        }
+    })(Plottable.WordWrapUtils || (Plottable.WordWrapUtils = {}));
+    var WordWrapUtils = Plottable.WordWrapUtils;
+})(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
     (function (DOMUtils) {
@@ -2569,6 +2764,109 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var CategoryAxis = (function (_super) {
+        __extends(CategoryAxis, _super);
+        function CategoryAxis(scale, orientation) {
+            if (typeof orientation === "undefined") { orientation = "bottom"; }
+            var _this = this;
+            _super.call(this);
+            this.classed("category-axis", true).classed("axis", true);
+            this._scale = scale;
+            var orientLC = orientation.toLowerCase();
+            this.orientation = orientLC;
+            if (["left", "right", "top", "bottom"].indexOf(orientLC) === -1) {
+                throw new Error(orientation + " is not a valid category axis orientation");
+            }
+            this.isVertical = (orientLC === "left" || orientLC === "right");
+            if (scale.rangeType() !== "bands") {
+                throw new Error("Only rangeBands category axes are implemented");
+            }
+            this._registerToBroadcaster(this._scale, function () {
+                return _this._invalidateLayout();
+            });
+        }
+        CategoryAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            if (offeredWidth < 0 || offeredHeight < 0) {
+                return {
+                    width: 0,
+                    height: 0,
+                    wantsWidth: this.isVertical,
+                    wantsHeight: !this.isVertical
+                };
+            }
+            if (this.isVertical) {
+                this._scale.range([offeredHeight, 0]);
+            } else {
+                this._scale.range([0, offeredWidth]);
+            }
+            var bandWidth = this._scale.rangeBand();
+            var width = this.isVertical ? offeredWidth : bandWidth;
+            var height = this.isVertical ? bandWidth : offeredHeight;
+            var testG = this.content.append("g");
+            var textResult = this.writeText(width, height, testG);
+            testG.remove();
+
+            if (textResult.usedWidth > offeredWidth || textResult.usedHeight > offeredHeight) {
+                debugger;
+            }
+
+            return {
+                width: textResult.usedWidth,
+                height: textResult.usedHeight,
+                wantsWidth: !textResult.textFits,
+                wantsHeight: !textResult.textFits
+            };
+        };
+
+        CategoryAxis.prototype.writeText = function (axisWidth, axisHeight, targetElement) {
+            var bandWidth = this._scale.rangeBand();
+            var ticks = targetElement.selectAll(".tick").data(this._scale.domain());
+            ticks.enter().append("g").classed("tick", true);
+            ticks.exit().remove();
+            var width = this.isVertical ? axisWidth : bandWidth;
+            var height = this.isVertical ? bandWidth : axisHeight;
+            var self = this;
+            var textWriteResults = [];
+            ticks.each(function (d, i) {
+                var bandStartPosition = self._scale.scale(d);
+                d3.select(this).selectAll("g").remove();
+                var g = d3.select(this).append("g");
+                var x = self.isVertical ? 0 : bandStartPosition;
+                var y = self.isVertical ? bandStartPosition : 0;
+                g.attr("transform", "translate(" + x + "," + y + ")");
+                var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+
+                var textWriteResult = Plottable.TextUtils.writeText(d, g, width, height, xAlign[self.orientation], yAlign[self.orientation]);
+                textWriteResults.push(textWriteResult);
+            });
+
+            var widthFn = this.isVertical ? d3.max : d3.sum;
+            var heightFn = this.isVertical ? d3.sum : d3.max;
+            return {
+                textFits: textWriteResults.every(function (t) {
+                    return t.textFits;
+                }),
+                usedWidth: widthFn(textWriteResults, function (t) {
+                    return t.usedWidth;
+                }),
+                usedHeight: heightFn(textWriteResults, function (t) {
+                    return t.usedHeight;
+                })
+            };
+        };
+
+        CategoryAxis.prototype._doRender = function () {
+            this.writeText(this.availableWidth, this.availableHeight, this.content);
+            return this;
+        };
+        return CategoryAxis;
+    })(Plottable.Component);
+    Plottable.CategoryAxis = CategoryAxis;
+})(Plottable || (Plottable = {}));
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     var Label = (function (_super) {
         __extends(Label, _super);
         /**
@@ -4120,6 +4418,7 @@ var Plottable;
 /// <reference path="utils/idCounter.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/textUtils.ts" />
+/// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
@@ -4140,6 +4439,7 @@ var Plottable;
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 /// <reference path="components/axis.ts" />
+/// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
 /// <reference path="components/gridlines.ts" />
@@ -4695,305 +4995,7 @@ var Plottable;
     })(Axis);
     Plottable.YAxis = YAxis;
 })(Plottable || (Plottable = {}));
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var CategoryAxis = (function (_super) {
-        __extends(CategoryAxis, _super);
-        function CategoryAxis(scale, orientation) {
-            if (typeof orientation === "undefined") { orientation = "bottom"; }
-            var _this = this;
-            _super.call(this);
-            this.classed("category-axis", true).classed("axis", true);
-            this._scale = scale;
-            var orientLC = orientation.toLowerCase();
-            this.orientation = orientLC;
-            if (["left", "right", "top", "bottom"].indexOf(orientLC) === -1) {
-                throw new Error(orientation + " is not a valid category axis orientation");
-            }
-            this.isVertical = (orientLC === "left" || orientLC === "right");
-            if (scale.rangeType() !== "bands") {
-                throw new Error("Only rangeBands category axes are implemented");
-            }
-            this._registerToBroadcaster(this._scale, function () {
-                return _this._invalidateLayout();
-            });
-        }
-        CategoryAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-            if (offeredWidth < 0 || offeredHeight < 0) {
-                return {
-                    width: 0,
-                    height: 0,
-                    wantsWidth: this.isVertical,
-                    wantsHeight: !this.isVertical
-                };
-            }
-            if (this.isVertical) {
-                this._scale.range([offeredHeight, 0]);
-            } else {
-                this._scale.range([0, offeredWidth]);
-            }
-            var bandWidth = this._scale.rangeBand();
-            var width = this.isVertical ? offeredWidth : bandWidth;
-            var height = this.isVertical ? bandWidth : offeredHeight;
-            var testG = this.content.append("g");
-            var textResult = this.writeText(width, height, testG);
-            testG.remove();
-
-            if (textResult.usedWidth > offeredWidth || textResult.usedHeight > offeredHeight) {
-                debugger;
-            }
-
-            return {
-                width: textResult.usedWidth,
-                height: textResult.usedHeight,
-                wantsWidth: !textResult.textFits,
-                wantsHeight: !textResult.textFits
-            };
-        };
-
-        CategoryAxis.prototype.writeText = function (axisWidth, axisHeight, targetElement) {
-            var bandWidth = this._scale.rangeBand();
-            var ticks = targetElement.selectAll(".tick").data(this._scale.domain());
-            ticks.enter().append("g").classed("tick", true);
-            ticks.exit().remove();
-            var width = this.isVertical ? axisWidth : bandWidth;
-            var height = this.isVertical ? bandWidth : axisHeight;
-            var self = this;
-            var textWriteResults = [];
-            ticks.each(function (d, i) {
-                var bandStartPosition = self._scale.scale(d);
-                d3.select(this).selectAll("g").remove();
-                var g = d3.select(this).append("g");
-                var x = self.isVertical ? 0 : bandStartPosition;
-                var y = self.isVertical ? bandStartPosition : 0;
-                g.attr("transform", "translate(" + x + "," + y + ")");
-                var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-
-                var textWriteResult = Plottable.TextUtils.writeText(d, g, width, height, xAlign[self.orientation], yAlign[self.orientation]);
-                textWriteResults.push(textWriteResult);
-            });
-
-            var widthFn = this.isVertical ? d3.max : d3.sum;
-            var heightFn = this.isVertical ? d3.sum : d3.max;
-            return {
-                textFits: textWriteResults.every(function (t) {
-                    return t.textFits;
-                }),
-                usedWidth: widthFn(textWriteResults, function (t) {
-                    return t.usedWidth;
-                }),
-                usedHeight: heightFn(textWriteResults, function (t) {
-                    return t.usedHeight;
-                })
-            };
-        };
-
-        CategoryAxis.prototype._doRender = function () {
-            this.writeText(this.availableWidth, this.availableHeight, this.content);
-            return this;
-        };
-        return CategoryAxis;
-    })(Plottable.Component);
-    Plottable.CategoryAxis = CategoryAxis;
-})(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
     ;
-})(Plottable || (Plottable = {}));
-///<reference path="../reference.ts" />
-var LINE_BREAKS_BEFORE = /[{\[]/;
-var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
-var SPACES = /^\s+$/;
-var Plottable;
-(function (Plottable) {
-    (function (WordWrapUtils) {
-        ;
-
-        /**
-        * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
-        * Wraps words and fits as much of the text as possible into the given width and height.
-        */
-        function breakTextToFitRect(text, width, height, measureText) {
-            var widthMeasure = function (s) {
-                return measureText(s)[0];
-            };
-            var lines = breakTextToFitWidth(text, width, widthMeasure);
-            var textHeight = measureText("hello world")[1];
-            var nLinesThatFit = Math.floor(height / textHeight);
-            var textFit = nLinesThatFit >= lines.length;
-            if (!textFit) {
-                lines = lines.splice(0, nLinesThatFit);
-                if (nLinesThatFit > 0) {
-                    // Overwrite the last line to one that has had a ... appended to the end
-                    lines[nLinesThatFit - 1] = Plottable.TextUtils.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
-                }
-            }
-            return { originalText: text, lines: lines, textFits: textFit };
-        }
-        WordWrapUtils.breakTextToFitRect = breakTextToFitRect;
-
-        /**
-        * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
-        * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
-        * the word is too big to fit within width on its own.
-        */
-        function breakTextToFitWidth(text, width, widthMeasure) {
-            var ret = [];
-            var paragraphs = text.split("\n");
-            for (var i = 0, len = paragraphs.length; i < len; i++) {
-                var paragraph = paragraphs[i];
-                if (paragraph !== null) {
-                    ret = ret.concat(breakParagraphToFitWidth(paragraph, width, widthMeasure));
-                } else {
-                    ret.push("");
-                }
-            }
-            return ret;
-        }
-        WordWrapUtils.breakTextToFitWidth = breakTextToFitWidth;
-
-        /**
-        * Determines if it is possible to fit a given text within width without breaking any of the words.
-        * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
-        * allowed width.
-        */
-        function canWrapWithoutBreakingWords(text, width, widthMeasure) {
-            var tokens = tokenize(text);
-            var widths = tokens.map(widthMeasure);
-            var maxWidth = d3.max(widths);
-            return maxWidth <= width;
-        }
-        WordWrapUtils.canWrapWithoutBreakingWords = canWrapWithoutBreakingWords;
-
-        /**
-        * A paragraph is a string of text containing no newlines.
-        * Given a paragraph, break it up into lines that are no
-        * wider than width.  widthMeasure is a function that takes
-        * text as input, and returns the width of the text in pixels.
-        */
-        function breakParagraphToFitWidth(text, width, widthMeasure) {
-            var lines = [];
-            var tokens = tokenize(text);
-            var curLine = "";
-            var i = 0;
-            var nextToken;
-            while (nextToken || i < tokens.length) {
-                if (typeof nextToken === "undefined" || nextToken === null) {
-                    nextToken = tokens[i++];
-                }
-                var brokenToken = breakNextTokenToFitInWidth(curLine, nextToken, width, widthMeasure);
-
-                var canAdd = brokenToken[0];
-                var leftOver = brokenToken[1];
-
-                if (canAdd !== null) {
-                    curLine += canAdd;
-                }
-                nextToken = leftOver;
-                if (leftOver) {
-                    lines.push(curLine);
-                    curLine = "";
-                }
-            }
-            if (curLine) {
-                lines.push(curLine);
-            }
-            return lines;
-        }
-
-        /**
-        * Breaks up the next token and so that some part of it can be
-        * added to curLine and fits in the width. the return value
-        * is an array with 2 elements, the part that can be added
-        * and the left over part of the token
-        * widthMeasure is a function that takes text as input,
-        * and returns the width of the text in pixels.
-        */
-        function breakNextTokenToFitInWidth(curLine, nextToken, width, widthMeasure) {
-            if (isBlank(nextToken)) {
-                return [nextToken, null];
-            }
-            if (widthMeasure(curLine + nextToken) <= width) {
-                return [nextToken, null];
-            }
-            if (!isBlank(curLine)) {
-                return [null, nextToken];
-            }
-            var i = 0;
-            while (i < nextToken.length) {
-                if (widthMeasure(curLine + nextToken[i]) <= width) {
-                    curLine += nextToken[i++];
-                } else {
-                    break;
-                }
-            }
-            if (isBlank(curLine) && i === 0) {
-                i = 1;
-            }
-            return [nextToken.substring(0, i), nextToken.substring(i)];
-        }
-
-        /**
-        * Breaks up into tokens for word wrapping
-        * Each token is comprised of either:
-        *  1) Only word and non line break characters
-        *  2) Only spaces characters
-        *  3) Line break characters such as ":" or ";" or ","
-        *  (will be single character token, unless there is a repeated linebreak character)
-        */
-        function tokenize(text) {
-            var ret = [];
-            var token = "";
-            var lastChar = "";
-            for (var i = 0, len = text.length; i < len; i++) {
-                var curChar = text[i];
-                if (token === "" || isTokenizedTogether(token[0], curChar, lastChar)) {
-                    token += curChar;
-                } else {
-                    ret.push(token);
-                    token = curChar;
-                }
-                lastChar = curChar;
-            }
-            if (token) {
-                ret.push(token);
-            }
-            return ret;
-        }
-
-        /**
-        * Returns whether a string is blank.
-        *
-        * @param {string} str: The string to test for blank-ness
-        * @returns {boolean} Whether the string is blank
-        */
-        function isBlank(text) {
-            return text == null ? true : text.trim() === "";
-        }
-
-        /**
-        * Given a token (ie a string of characters that are similar and shouldn't be broken up) and a character, determine
-        * whether that character should be added to the token. Groups of characters that don't match the space or line break
-        * regex are always tokenzied together. Spaces are always tokenized together. Line break characters are almost always
-        * split into their own token, except that two subsequent identical line break characters are put into the same token.
-        * For isTokenizedTogether(":", ",") == False but isTokenizedTogether("::") == True.
-        */
-        function isTokenizedTogether(text, nextChar, lastChar) {
-            if (!(text && nextChar)) {
-                false;
-            }
-            if (SPACES.test(text) && SPACES.test(nextChar)) {
-                return true;
-            } else if (SPACES.test(text) || SPACES.test(nextChar)) {
-                return false;
-            }
-            if (LINE_BREAKS_AFTER.test(lastChar) || LINE_BREAKS_BEFORE.test(nextChar)) {
-                return false;
-            }
-            return true;
-        }
-    })(Plottable.WordWrapUtils || (Plottable.WordWrapUtils = {}));
-    var WordWrapUtils = Plottable.WordWrapUtils;
 })(Plottable || (Plottable = {}));

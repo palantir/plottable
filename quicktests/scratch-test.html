@@ -1,90 +1,116 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
     <script>
-
-var xAxis;
-var yAxis;
-var renderAreaD1;
-var renderAreaD2;
-var renderAreaD3;
-var renderAreaD4;
 var renderGroup;
+var renderArea1;
+var renderArea2;
+
+var Data = function(){
+     var array;
+     a0 = {
+        y: "cats",
+        x: 30
+     }
+     a1 = {
+        y: "dogs",
+        x: 80
+     }
+     a2 = {
+        y: "snakes",
+        x: 10
+     }
+     a3 = {
+        y: "rats",
+        x: 2
+     }
+     a4 = {
+        y: "birds",
+        x: 7
+     }
+    array = [a0, a1, a2, a3, a4];
+    return array;
+}
+
+var Data2 = function(){
+     var array;
+     a0 = {
+        x: "cats cats catscats cats cats",
+        y: 30
+     }
+     a1 = {
+        x: "dogs dogs dogsdogs dogs dogs",
+        y: 80
+     }
+     a2 = {
+        x: "snakes snakes snakessnakes snakes snakes",
+        y: 10
+     }
+     a3 = {
+        x: "rats rats ratsrats rats rats",
+        y: 2
+     }
+     a4 = {
+        x: "birds bird birdsbirds birds birds",
+        y: 7
+     }
+    array = [a0, a1, a2, a3, a4];
+    return array;
+}
+
 
 window.onload = function () {
-    var svg = d3.select("#chart");
-    svg.attr("width", 300).attr("height", 300);
+    svg = d3.select("#chart");
+    svg.attr("width", 900).attr("height", 300);
 
-    var dataseries1 = makeRandomData(5);
-    var dataseries2 = makeRandomData(5);
-    var dataseries3 = makeRandomData(5);
-    var dataseries4 = makeRandomData(5);
-
-    var xScale = new Plottable.LinearScale();
-    var yScale = new Plottable.LinearScale();
-
+    //HORIZONTAL
+    //data
+    dataseries = new Plottable.DataSource(Data());
+    //Axis
+    xScale = new Plottable.LinearScale().domain([0, 90]);
+    yScale = new Plottable.OrdinalScale();
     xAxis = new Plottable.XAxis(xScale, "bottom");
-    yAxis = new Plottable.YAxis(yScale, "left");
+    yAxis = new Plottable.CategoryAxis(yScale, "left");
+    //rendering
+    renderArea1 = new Plottable.HorizontalBarRenderer(dataseries, xScale, yScale);
+    basicTable = new Plottable.Table()
+                .addComponent(0, 0, yAxis)
+                .addComponent(0, 1, renderArea1)
+                .addComponent(1, 1, xAxis);
 
-    renderAreaD1 = new Plottable.LineRenderer(dataseries1, xScale, yScale).animate(true);
-    renderAreaD2 = new Plottable.LineRenderer(dataseries2, xScale, yScale)
-        .project("stroke", function(){ return "pink"}).animate(true);
-    renderAreaD3 = new Plottable.LineRenderer(dataseries3, xScale, yScale)
-        .project("stroke", function(){ return "green"}).animate(true);
-    renderAreaD4 = new Plottable.LineRenderer(dataseries4, xScale, yScale)
-        .project("stroke", function(){ return "purple"}).animate(true);
-
-    renderGroup = new Plottable.ComponentGroup();
-
-    var basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
-                                          .addComponent(0, 1, renderGroup)
-                                          .addComponent(1, 1, xAxis);
-
-
-
-    basicTable.renderTo(svg);
+    //VERTICAL
+    //data
+    dataseries2 = new Plottable.DataSource(Data2());
+    //Axis
+    xScale2 = new Plottable.OrdinalScale();
+    yScale2 = new Plottable.LinearScale().domain([0, 90]);
+    xAxis2 = new Plottable.CategoryAxis(xScale2, "top");
+    yAxis2 = new Plottable.YAxis(yScale2, "right");
+    //rendering
+    renderArea2 = new Plottable.BarRenderer(dataseries2, xScale2, yScale2);
+    basicTable2 = new Plottable.Table()
+                .addComponent(1, 1, yAxis2)
+                .addComponent(1, 0, renderArea2)
+                .addComponent(0, 0, xAxis2);
 
 
+    bigTable = new Plottable.Table()
+            .addComponent(0,0, basicTable)
+            .addComponent(1,0, basicTable2)
+
+    bigTable.renderTo(svg);
 };
 
-function button1Callback() {
-   renderGroup.merge(renderAreaD1);
-}
-function button2Callback() {
-       renderGroup.merge(renderAreaD2);
-}
-
-function button3Callback() {
-       renderGroup.merge(renderAreaD3);
-}
-function button4Callback() {
-       renderGroup.merge(renderAreaD4);
-}
-
-function button5Callback() {
-    renderAreaD1.remove();
-}
-function button6Callback() {
-    renderAreaD2.remove();
-}
-
-function button7Callback() {
-    renderAreaD3.remove();
-}
-function button8Callback() {
-    renderAreaD4.remove();
-}
-function button9Callback(){
-     renderGroup.removeAll();
-}
 
 
 
 
     </script>
-    <script src="../bower_components/d3/d3.min.js"></script>
-    <script src="../../build/plottable.js"></script>
-    <script src="../../build/exampleUtil.js"></script></head>
+    </head>
+
 <body>
 <div class="demo-title">Simple Chart</div>
 <br>
@@ -94,17 +120,6 @@ function button9Callback(){
 <svg id="chart"></svg>
 
 
-<button onclick="button1Callback()">add D1</button>
-<button onclick="button2Callback()">add D2</button>
-<button onclick="button3Callback()">add D3</button>
-<button onclick="button4Callback()">add D4</button>
-    <br>
-<button onclick="button5Callback()">remove D1</button>
-<button onclick="button6Callback()">remove D2</button>
-<button onclick="button7Callback()">remove D3</button>
-<button onclick="button8Callback()">remove D4</button>
-<br>
-    <button onclick="button9Callback()">remove all</button>
 
 <p />
 </body>

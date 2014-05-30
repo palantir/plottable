@@ -159,6 +159,35 @@ declare module Plottable {
         function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string): IWriteTextResult;
     }
 }
+declare var LINE_BREAKS_BEFORE: RegExp;
+declare var LINE_BREAKS_AFTER: RegExp;
+declare var SPACES: RegExp;
+declare module Plottable {
+    module WordWrapUtils {
+        interface IWrappedText {
+            originalText: string;
+            lines: string[];
+            textFits: boolean;
+        }
+        /**
+        * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
+        * Wraps words and fits as much of the text as possible into the given width and height.
+        */
+        function breakTextToFitRect(text: string, width: number, height: number, measureText: TextUtils.TextMeasurer): IWrappedText;
+        /**
+        * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
+        * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
+        * the word is too big to fit within width on its own.
+        */
+        function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[];
+        /**
+        * Determines if it is possible to fit a given text within width without breaking any of the words.
+        * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
+        * allowed width.
+        */
+        function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean;
+    }
+}
 declare module Plottable {
     module DOMUtils {
         /**
@@ -723,6 +752,11 @@ declare module Plottable {
     }
 }
 declare module Plottable {
+    class CategoryAxis extends Component {
+        constructor(scale: OrdinalScale, orientation?: string);
+    }
+}
+declare module Plottable {
     class Label extends Component {
         /**
         * Creates a Label.
@@ -1193,11 +1227,6 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class CategoryAxis extends Component {
-        constructor(scale: OrdinalScale, orientation?: string);
-    }
-}
-declare module Plottable {
     interface IDataset {
         data: any[];
         metadata: IMetadata;
@@ -1230,34 +1259,5 @@ declare module Plottable {
         height: number;
         wantsWidth: boolean;
         wantsHeight: boolean;
-    }
-}
-declare var LINE_BREAKS_BEFORE: RegExp;
-declare var LINE_BREAKS_AFTER: RegExp;
-declare var SPACES: RegExp;
-declare module Plottable {
-    module WordWrapUtils {
-        interface IWrappedText {
-            originalText: string;
-            lines: string[];
-            textFits: boolean;
-        }
-        /**
-        * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
-        * Wraps words and fits as much of the text as possible into the given width and height.
-        */
-        function breakTextToFitRect(text: string, width: number, height: number, measureText: TextUtils.TextMeasurer): IWrappedText;
-        /**
-        * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
-        * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
-        * the word is too big to fit within width on its own.
-        */
-        function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[];
-        /**
-        * Determines if it is possible to fit a given text within width without breaking any of the words.
-        * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
-        * allowed width.
-        */
-        function canWrapWithoutBreakingWords(text: string, width: number, widthMeasure: (s: string) => number): boolean;
     }
 }
