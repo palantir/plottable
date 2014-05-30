@@ -23,7 +23,7 @@ module.exports = function(grunt) {
       }
     },
     test: {
-      src: ["test/*.ts", "typings/**/*.d.ts", "plottable.d.ts"],
+      src: ["test/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
       outDir: "build/test/",
       // watch: "test",
       options: {
@@ -70,7 +70,7 @@ module.exports = function(grunt) {
     private_definitions: {
       pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts",
+      path: "build/plottable.d.ts",
     },
     protected_definitions: {
       pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
@@ -95,7 +95,7 @@ module.exports = function(grunt) {
     definitions: {
       pattern: '///.*',
       replacement: "",
-      path: "plottable.d.ts",
+      path: "build/plottable.d.ts",
     },
     tests_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
@@ -167,7 +167,7 @@ module.exports = function(grunt) {
         src: tsFiles.map(function(s) {
               return "build/src/" + s.replace(".ts", ".d.ts");
           }),
-        dest: "plottable.d.ts",
+        dest: "build/plottable.d.ts",
       },
     },
     ts: tsJSON,
@@ -247,7 +247,7 @@ module.exports = function(grunt) {
       main: {
         files: {'plottable.min.js': ['plottable.js']}
       }
-    },
+    }
   };
 
 
@@ -259,17 +259,21 @@ module.exports = function(grunt) {
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("handle-header",
             ["copy:header", "sed:header", "concat:header", "clean:header"]);
-  grunt.registerTask("update-ts-files", updateTsFiles);
-  grunt.registerTask("update-test-ts-files", updateTestTsFiles);
+  grunt.registerTask("update_ts_files", updateTsFiles);
+  grunt.registerTask("update_test_ts_files", updateTestTsFiles);
+  grunt.registerTask("definitions_prod", function() {
+    grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
+  })
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
-                                  "update-ts-files",
-                                  "update-test-ts-files",
+                                  "update_ts_files",
+                                  "update_test_ts_files",
                                   "ts:dev",
                                   "concat:plottable",
                                   "concat:definitions",
                                   "sed:definitions",
                                   "sed:private_definitions",
+                                  "definitions_prod",
                                   "ts:test",
                                   "concat:tests_multifile",
                                   "sed:tests_multifile",
