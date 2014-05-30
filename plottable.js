@@ -3360,6 +3360,64 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var ToggleLegend = (function (_super) {
+        __extends(ToggleLegend, _super);
+        /**
+        * Creates a ToggleLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {(d: any, b: boolean) => any} update The callback function for clicking on a legend entry.
+        * @param {any} update.d The legend entry.
+        * @param {boolean} update.b The state that the entry has changed to.
+        */
+        function ToggleLegend(colorScale, update) {
+            var _this = this;
+            _super.call(this, colorScale);
+            this.update = update;
+            this.state = [];
+
+            // initially, everything is toggled on
+            colorScale.domain().forEach(function (d) {
+                return _this.state.splice(0, 0, d);
+            });
+        }
+        ToggleLegend.prototype._doRender = function () {
+            var _this = this;
+            _super.prototype._doRender.call(this);
+            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+            dataSelection.classed("toggled-on", function (d) {
+                return _this.state.indexOf(d) >= 0;
+            });
+            dataSelection.classed("toggled-off", function (d) {
+                return _this.state.indexOf(d) < 0;
+            });
+            dataSelection.on("click", function (d, i) {
+                var index = _this.state.indexOf(d);
+                var isOn = index >= 0;
+                if (isOn) {
+                    _this.state.splice(index, 1);
+                } else {
+                    _this.state.splice(0, 0, d);
+                }
+                _this.update(d, !isOn);
+            });
+            return this;
+        };
+        return ToggleLegend;
+    })(Plottable.Legend);
+    Plottable.ToggleLegend = ToggleLegend;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Gridlines = (function (_super) {
         __extends(Gridlines, _super);
         /**

@@ -921,6 +921,22 @@ declare module Plottable {
 
 
 declare module Plottable {
+    class ToggleLegend extends Legend {
+        /**
+        * Creates a ToggleLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {(d: any, b: boolean) => any} update The callback function for clicking on a legend entry.
+        * @param {any} update.d The legend entry.
+        * @param {boolean} update.b The state that the entry has changed to.
+        */
+        constructor(colorScale: ColorScale, update: (d: any, b: boolean) => any);
+    }
+}
+
+
+declare module Plottable {
     class Gridlines extends Component {
         /**
         * Creates a set of Gridlines.

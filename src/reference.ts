@@ -29,6 +29,7 @@
 /// <reference path="components/axis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
+/// <reference path="components/toggleLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/axisUtils.ts" />
 /// <reference path="components/renderers/xyRenderer.ts" />
