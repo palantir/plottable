@@ -2581,7 +2581,7 @@ var Plottable;
             var totalNumRows = this.colorScale.domain().length;
             var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
-            var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+            var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
             var fakeText = fakeLegendEl.append("text");
             var maxWidth = d3.max(this.colorScale.domain(), function (d) {
                 return Plottable.TextUtils.getTextWidth(fakeText, d);
@@ -2599,7 +2599,7 @@ var Plottable;
 
         Legend.prototype.measureTextHeight = function () {
             // note: can't be called before anchoring atm
-            var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+            var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
             var textHeight = Plottable.TextUtils.getTextHeight(fakeLegendEl.append("text"));
             fakeLegendEl.remove();
             return textHeight;
@@ -2611,9 +2611,9 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-            this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
-            var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
-            var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
+            this.content.selectAll("." + Legend._SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
+            var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain);
+            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
                 return "translate(0," + i * textHeight + ")";
             });
             legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
@@ -2624,7 +2624,7 @@ var Plottable;
             });
             return this;
         };
-        Legend.SUBELEMENT_CLASS = "legend-row";
+        Legend._SUBELEMENT_CLASS = "legend-row";
         Legend.MARGIN = 5;
         return Legend;
     })(Plottable.Component);
@@ -4530,33 +4530,39 @@ var Plottable;
         * @constructor
         * @param {ColorScale} colorScale
         */
-        function ToggleLegend(colorScale, toggleOn, toggleOff, update) {
+        function ToggleLegend(colorScale, update) {
+            var _this = this;
             _super.call(this, colorScale);
+            this.update = update;
             this.state = [];
 
-            this.toggleOn = toggleOn;
-            this.toggleOff = toggleOff;
-            this.update = update;
-
-            var cb = function (x, y) {
-                var legend = this.componentToListenTo;
-                var idx = Math.floor(y / (legend.availableHeight / legend.nRowsDrawn));
-                (legend.getState(idx) ? legend.toggleOff : legend.toggleOn)(idx);
-                legend.toggleState(idx);
-                legend.update(idx);
-            };
-            new Plottable.ClickInteraction(this).callback(cb).registerWithComponent();
+            // initially, everything is toggled on
+            colorScale.domain().forEach(function (d) {
+                return _this.state.splice(0, 0, d);
+            });
         }
-        ToggleLegend.prototype.getState = function (i) {
-            return this.state[i];
-        };
-
-        ToggleLegend.prototype.toggleState = function (i) {
-            this.state[i] = !this.state[i];
-        };
-
-        ToggleLegend.prototype.init = function (i) {
-            this.state[i] = true;
+        ToggleLegend.prototype._doRender = function () {
+            var _this = this;
+            _super.prototype._doRender.call(this);
+            var toggleLegend = this;
+            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+            dataSelection.classed("toggled-on", function (d) {
+                return _this.state.indexOf(d) >= 0;
+            });
+            dataSelection.classed("toggled-off", function (d) {
+                return _this.state.indexOf(d) < 0;
+            });
+            dataSelection.on("click", function (d, i) {
+                var index = toggleLegend.state.indexOf(d);
+                var isOn = index >= 0;
+                if (isOn) {
+                    toggleLegend.state.splice(index, 1);
+                } else {
+                    toggleLegend.state.splice(0, 0, d);
+                }
+                toggleLegend.update(d, !isOn);
+            });
+            return this;
         };
         return ToggleLegend;
     })(Plottable.Legend);

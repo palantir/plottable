@@ -10,6 +10,9 @@
 /*        stroke: black;
         opacity: 1;*/
       }
+      .toggled-off circle {
+        fill:#d3d3d3;
+      }
     </style>
 
     <script>
@@ -19,51 +22,26 @@
 
 
         var colors = new Plottable.ColorScale("10").range();
-        var activeColors = colors.slice();
         var numRenderers = 5;
         var names = ["bat", "cat", "mat", "rat", "pat"];
         var colorScale = new Plottable.ColorScale();
         colorScale.range(colors);
         colorScale.domain(names);
 
-        var legend = new Plottable.ToggleLegend(colorScale,
-            // action to do when turned on
-            // i is the index of the entry that was clicked
-            function(i) {
-                activeColors[i] = colors[i];
-                cg.merge(renderers[i]);
-            },
-
-            // action to do when turned off
-            function(i) {
-                activeColors[i] = "#d3d3d3";
-                renderers[i].remove();
-            },
-
-            // function to do always after toggling state (i.e. refreshing state)
-            function(i) {
-                var colorScale = new Plottable.ColorScale();
-                colorScale.range(activeColors);
-                colorScale.domain(names);
-                this.scale(colorScale);
-            }
-        );
-
 
         var xScale = new Plottable.LinearScale();
         var yScale = new Plottable.LinearScale();
 
         for (var i=0; i<numRenderers; i++) {
-        var data = makeRandomData(20);
-        var renderer = new Plottable.CircleRenderer(data, xScale, yScale);
-            renderers.push(renderer);
+            var data = makeRandomData(20);
+            var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+                renderers.push(renderer);
         }
 
         var cg = new Plottable.ComponentGroup();
         renderers.forEach(function(renderer, i) {
-            renderer.project("fill", function() { return colors[i]; });
+            renderer.project("stroke", function() { return colors[i]; });
             cg.merge(renderer);
-            legend.init(i);
         });
 
         var xAxis = new Plottable.XAxis(xScale, "bottom");
@@ -75,6 +53,16 @@
                                 ]);
         
         var legendLabel = new Plottable.TitleLabel("fat");
+        var legend = new Plottable.ToggleLegend(colorScale,
+            function (d, b) {
+                var index = names.indexOf(d);
+                if (b) {
+                    cg.merge(renderers[index]);
+                } else {
+                    renderers[index].remove();
+                }
+            }
+        );
         var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
 
         var outerTable = new Plottable.Table([[chart, legendTable]]);

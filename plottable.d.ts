@@ -709,6 +709,7 @@ declare module Plottable {
 }
 declare module Plottable {
     class Legend extends Component {
+        static _SUBELEMENT_CLASS: string;
         /**
         * Creates a Legend.
         *
@@ -1154,19 +1155,13 @@ declare module Plottable {
 }
 declare module Plottable {
     class ToggleLegend extends Legend {
-        public toggleOn: (i?: number) => any;
-        public toggleOff: (i?: number) => any;
-        public update: (i?: number) => any;
         /**
         * Creates a Legend.
         *
         * @constructor
         * @param {ColorScale} colorScale
         */
-        constructor(colorScale: ColorScale, toggleOn: (i?: number) => any, toggleOff: (i?: number) => any, update: (i?: number) => any);
-        public getState(i: number): boolean;
-        public toggleState(i: number): void;
-        public init(i: number): void;
+        constructor(colorScale: ColorScale, update: (d: any, b: boolean) => any);
     }
 }
 declare module Plottable {
