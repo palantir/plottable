@@ -22,18 +22,6 @@ module.exports = function(grunt) {
         removeComments: false
       }
     },
-    prod: {
-      src: ["src/**/*.ts", "typings/**/*.d.ts"],
-      out: "plottable.js",
-      // watch: "src",
-      options: {
-        target: 'es5',
-        noImplicitAny: true,
-        sourceMap: false,
-        declaration: true,
-        removeComments: false
-      }
-    },
     test: {
       src: ["test/*.ts", "typings/**/*.d.ts", "plottable.d.ts"],
       out: "test/tests.js",
@@ -104,7 +92,24 @@ module.exports = function(grunt) {
       replacement: 'synchronousRequire("../build/$1.js");',
       path: "plottable_multifile.js",
     },
+    definitions: {
+      pattern: '///.*',
+      replacement: "",
+      path: "plottable.d.ts",
+    },
   };
+
+  // e.g. ["components/foo.ts", ...]
+  // the important thing is that they are sorted by hierarchy,
+  // leaves first, roots last
+  var tsFiles = grunt.file.read("src/reference.ts")
+                  .split("\n")
+                  .filter(function(s) {
+                    return s !== "";
+                  })
+                  .map(function(s) {
+                    return s.match(/"(.*\.ts)"/)[1];
+                  });
 
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
@@ -116,8 +121,19 @@ module.exports = function(grunt) {
       },
       plottable_multifile: {
         src: ["synchronousRequire.js", "src/reference.ts"],
-        // src: ["synchronousRequire.js", "build/files.txt"],
         dest: "plottable_multifile.js",
+      },
+      plottable: {
+        src: tsFiles.map(function(s) {
+              return "build/" + s.replace(".ts", ".js");
+          }),
+        dest: "plottable.js",
+      },
+      definitions: {
+        src: tsFiles.map(function(s) {
+              return "build/" + s.replace(".ts", ".d.ts");
+          }),
+        dest: "plottable.d.ts",
       },
     },
     ts: tsJSON,
@@ -212,10 +228,12 @@ module.exports = function(grunt) {
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
                                   "ts:dev",
-                                  "tslint",
-                                  "ts:prod",
+                                  "concat:plottable",
+                                  "concat:definitions",
+                                  "sed:definitions",
                                   "sed:private_definitions",
                                   "ts:test",
+                                  "tslint",
                                   "handle-header",
                                   "sed:protected_definitions",
                                   "sed:public_member_vars",
