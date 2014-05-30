@@ -3,6 +3,7 @@
 /// <reference path="utils/idCounter.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/textUtils.ts" />
+/// <reference path="utils/domUtils.ts" />
 
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
@@ -14,6 +15,7 @@
 /// <reference path="core/scale.ts" />
 /// <reference path="core/renderer.ts" />
 /// <reference path="core/renderController.ts" />
+/// <reference path="core/interfaces.ts" />
 
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />
@@ -27,6 +29,8 @@
 /// <reference path="components/axis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
+/// <reference path="components/gridlines.ts" />
+/// <reference path="components/axisUtils.ts" />
 /// <reference path="components/renderers/xyRenderer.ts" />
 /// <reference path="components/renderers/circleRenderer.ts" />
 /// <reference path="components/renderers/lineRenderer.ts" />
@@ -35,6 +39,7 @@
 /// <reference path="components/renderers/abstractBarRenderer.ts" />
 /// <reference path="components/renderers/barRenderer.ts" />
 /// <reference path="components/renderers/horizontalBarRenderer.ts" />
+/// <reference path="components/renderers/areaRenderer.ts" />
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
