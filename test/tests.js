@@ -526,7 +526,7 @@ describe("BaseAxis", function () {
 
     it("tickLabelPadding()", function () {
         var scale = new Plottable.LinearScale();
-        var baseAxis = new Plottable.BaseAxis(scale, "blargh");
+        var baseAxis = new Plottable.BaseAxis(scale, "bottom");
 
         assert.throws(function () {
             return baseAxis.tickLabelPadding(-1);
