@@ -2974,6 +2974,7 @@ var Plottable;
         BaseAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
             this._baseline = this.content.append("line").classed("baseline", true);
+<<<<<<< HEAD
             return this;
         };
 
@@ -2997,6 +2998,8 @@ var Plottable;
         BaseAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
             this.baseline = this.content.append("line").classed("baseline", true);
+=======
+>>>>>>> Factor out tick mark and baseline attribute logic
             return this;
         };
 
@@ -3009,14 +3012,22 @@ var Plottable;
             };
         };
 
+<<<<<<< HEAD
         // function for generating ticks; to be overriden by subclasses
         BaseAxis.prototype._getTicks = function () {
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+=======
+        /*
+        * Function for generating tick values in data-space (as opposed to pixel values); to be overriden by subclasses
+        */
+        BaseAxis.prototype._getTickValues = function () {
+>>>>>>> Factor out tick mark and baseline attribute logic
             return [];
         };
 
         BaseAxis.prototype._doRender = function () {
             var _this = this;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
             var tickValues = this._getTickValues();
@@ -3099,8 +3110,13 @@ var Plottable;
 
             var tickSelection = this.content.selectAll(".tick").data(tickValues);
             var tickEnterSelection = tickSelection.enter().append("g").classed("tick", true);
+=======
+            var tickValues = this._getTickValues();
+            this._ticks = this.content.selectAll(".tick").data(tickValues);
+            var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
+>>>>>>> Factor out tick mark and baseline attribute logic
             tickEnterSelection.append("line").classed("tick-mark", true);
-            tickSelection.exit().remove();
+            this._ticks.exit().remove();
 
             var tickGroupAttrHash = {
                 x: function (d) {
@@ -3125,8 +3141,25 @@ var Plottable;
                 return "translate(" + tickGroupAttrHash["x"](d) + ", " + tickGroupAttrHash["y"](d) + ")";
             };
 
+<<<<<<< HEAD
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
             var tickMarkAttrHash = {
+=======
+            var tickMarkAttrHash = this._generateTickMarkAttrHash();
+
+            this._baseline.attr(this._generateBaselineAttrHash());
+            this._ticks.each(function (d) {
+                var tick = d3.select(this);
+                tick.select("line").attr(tickMarkAttrHash);
+            });
+            this._ticks.attr("transform", tickTransformGenerator);
+
+            return this;
+        };
+
+        BaseAxis.prototype._generateBaselineAttrHash = function () {
+            var baselineAttrHash = {
+>>>>>>> Factor out tick mark and baseline attribute logic
                 x1: 0,
                 y1: 0,
                 x2: 0,
@@ -3137,6 +3170,7 @@ var Plottable;
 <<<<<<< HEAD
             switch (this._orientation) {
                 case "bottom":
+<<<<<<< HEAD
 =======
             switch (this.orientation) {
 =======
@@ -3146,10 +3180,46 @@ var Plottable;
                     baselineAttributes.x2 = this.availableWidth;
 
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+=======
+                    baselineAttrHash.x2 = this.availableWidth;
+                    break;
+
+                case "top":
+                    baselineAttrHash.x2 = this.availableWidth;
+                    baselineAttrHash.y1 = this.availableHeight;
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+
+                case "left":
+                    baselineAttrHash.x1 = this.availableWidth;
+                    baselineAttrHash.x2 = this.availableWidth;
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+
+                case "right":
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+            }
+
+            return baselineAttrHash;
+        };
+
+        BaseAxis.prototype._generateTickMarkAttrHash = function () {
+            var tickMarkAttrHash = {
+                x1: 0,
+                y1: 0,
+                x2: 0,
+                y2: 0
+            };
+
+            switch (this._orientation) {
+                case "bottom":
+>>>>>>> Factor out tick mark and baseline attribute logic
                     tickMarkAttrHash["y2"] = this._tickLength;
                     break;
 
                 case "top":
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
                     baselineAttributes.x2 = this.availableWidth;
@@ -3157,11 +3227,14 @@ var Plottable;
                     baselineAttributes.y2 = this.availableHeight;
 
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+=======
+>>>>>>> Factor out tick mark and baseline attribute logic
                     tickMarkAttrHash["y1"] = this.availableHeight;
                     tickMarkAttrHash["y2"] = this.availableHeight - this._tickLength;
                     break;
 
                 case "left":
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
                     baselineAttributes.x1 = this.availableWidth;
@@ -3169,20 +3242,26 @@ var Plottable;
                     baselineAttributes.y2 = this.availableHeight;
 
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+=======
+>>>>>>> Factor out tick mark and baseline attribute logic
                     tickMarkAttrHash["x1"] = this.availableWidth;
                     tickMarkAttrHash["x2"] = this.availableWidth - this._tickLength;
                     break;
 
                 case "right":
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                     baselineAttributes.y2 = this.availableHeight;
 
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+=======
+>>>>>>> Factor out tick mark and baseline attribute logic
                     tickMarkAttrHash["x2"] = this._tickLength;
                     break;
             }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
             return tickMarkAttrHash;
 =======
@@ -3196,6 +3275,9 @@ var Plottable;
 
             return this;
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+=======
+            return tickMarkAttrHash;
+>>>>>>> Factor out tick mark and baseline attribute logic
         };
 
         BaseAxis.prototype.rescale = function () {
@@ -3237,6 +3319,9 @@ var Plottable;
             if (width == null) {
                 return this._maxWidth;
             } else {
+                if (this._isHorizontal()) {
+                    throw new Error("Can't set width on a horizontal axis");
+                }
                 this._maxWidth = width;
                 return this;
             }
@@ -3246,6 +3331,9 @@ var Plottable;
             if (height == null) {
                 return this._maxHeight;
             } else {
+                if (!this._isHorizontal()) {
+                    throw new Error("Can't set height on a vertical axis");
+                }
                 this._maxHeight = height;
                 return this;
             }
