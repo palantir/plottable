@@ -2447,7 +2447,7 @@ var Plottable;
 
         BaseAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
-            this.baseline = this.content.append("line").classed("baseline", true);
+            this._baseline = this.content.append("line").classed("baseline", true);
             return this;
         };
 
@@ -2460,26 +2460,20 @@ var Plottable;
             };
         };
 
-        // function for generating ticks; to be overriden by subclasses
-        BaseAxis.prototype._getTicks = function () {
+        /*
+        * Function for generating tick values in data-space (as opposed to pixel values); to be overriden by subclasses
+        */
+        BaseAxis.prototype._getTickValues = function () {
             return [];
         };
 
         BaseAxis.prototype._doRender = function () {
             var _this = this;
-            var baselineAttributes = {
-                x1: 0,
-                y1: 0,
-                x2: 0,
-                y2: 0
-            };
-
-            var tickValues = this._getTicks();
-
-            var tickSelection = this.content.selectAll(".tick").data(tickValues);
-            var tickEnterSelection = tickSelection.enter().append("g").classed("tick", true);
+            var tickValues = this._getTickValues();
+            this._ticks = this.content.selectAll(".tick").data(tickValues);
+            var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
             tickEnterSelection.append("line").classed("tick-mark", true);
-            tickSelection.exit().remove();
+            this._ticks.exit().remove();
 
             var tickGroupAttrHash = {
                 x: function (d) {
@@ -2504,6 +2498,52 @@ var Plottable;
                 return "translate(" + tickGroupAttrHash["x"](d) + ", " + tickGroupAttrHash["y"](d) + ")";
             };
 
+            var tickMarkAttrHash = this._generateTickMarkAttrHash();
+
+            this._baseline.attr(this._generateBaselineAttrHash());
+            this._ticks.each(function (d) {
+                var tick = d3.select(this);
+                tick.select("line").attr(tickMarkAttrHash);
+            });
+            this._ticks.attr("transform", tickTransformGenerator);
+
+            return this;
+        };
+
+        BaseAxis.prototype._generateBaselineAttrHash = function () {
+            var baselineAttrHash = {
+                x1: 0,
+                y1: 0,
+                x2: 0,
+                y2: 0
+            };
+
+            switch (this._orientation) {
+                case "bottom":
+                    baselineAttrHash.x2 = this.availableWidth;
+                    break;
+
+                case "top":
+                    baselineAttrHash.x2 = this.availableWidth;
+                    baselineAttrHash.y1 = this.availableHeight;
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+
+                case "left":
+                    baselineAttrHash.x1 = this.availableWidth;
+                    baselineAttrHash.x2 = this.availableWidth;
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+
+                case "right":
+                    baselineAttrHash.y2 = this.availableHeight;
+                    break;
+            }
+
+            return baselineAttrHash;
+        };
+
+        BaseAxis.prototype._generateTickMarkAttrHash = function () {
             var tickMarkAttrHash = {
                 x1: 0,
                 y1: 0,
@@ -2513,45 +2553,25 @@ var Plottable;
 
             switch (this._orientation) {
                 case "bottom":
-                    baselineAttributes.x2 = this.availableWidth;
-
                     tickMarkAttrHash["y2"] = this._tickLength;
                     break;
 
                 case "top":
-                    baselineAttributes.x2 = this.availableWidth;
-                    baselineAttributes.y1 = this.availableHeight;
-                    baselineAttributes.y2 = this.availableHeight;
-
                     tickMarkAttrHash["y1"] = this.availableHeight;
                     tickMarkAttrHash["y2"] = this.availableHeight - this._tickLength;
                     break;
 
                 case "left":
-                    baselineAttributes.x1 = this.availableWidth;
-                    baselineAttributes.x2 = this.availableWidth;
-                    baselineAttributes.y2 = this.availableHeight;
-
                     tickMarkAttrHash["x1"] = this.availableWidth;
                     tickMarkAttrHash["x2"] = this.availableWidth - this._tickLength;
                     break;
 
                 case "right":
-                    baselineAttributes.y2 = this.availableHeight;
-
                     tickMarkAttrHash["x2"] = this._tickLength;
                     break;
             }
 
-            this.baseline.attr(baselineAttributes);
-            tickSelection.select("text").text(this._formatter);
-            tickSelection.each(function (d) {
-                var tick = d3.select(this);
-                tick.select("line").attr(tickMarkAttrHash);
-            });
-            tickSelection.attr("transform", tickTransformGenerator);
-
-            return this;
+            return tickMarkAttrHash;
         };
 
         BaseAxis.prototype.rescale = function () {
@@ -2591,6 +2611,9 @@ var Plottable;
             if (width == null) {
                 return this._maxWidth;
             } else {
+                if (this._isHorizontal()) {
+                    throw new Error("Can't set width on a horizontal axis");
+                }
                 this._maxWidth = width;
                 return this;
             }
@@ -2600,6 +2623,9 @@ var Plottable;
             if (height == null) {
                 return this._maxHeight;
             } else {
+                if (!this._isHorizontal()) {
+                    throw new Error("Can't set height on a vertical axis");
+                }
                 this._maxHeight = height;
                 return this;
             }
