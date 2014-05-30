@@ -4159,10 +4159,14 @@ var Plottable;
             if (this._animate) {
                 var n = this.dataSource().data().length;
 <<<<<<< HEAD
+<<<<<<< HEAD
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
 =======
                 updateSelection = updateSelection.transition().duration(this._ANIMATION_DURATION).delay(function (d, i) {
 >>>>>>> Adjust animation timings.
+=======
+                updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
+>>>>>>> Add correct easing to HorizontalBarRenderer.
                     return i * _this._ANIMATION_DELAY;
                 });
             }
