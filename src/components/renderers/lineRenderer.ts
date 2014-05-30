@@ -4,7 +4,7 @@ module Plottable {
   export class LineRenderer extends XYRenderer {
     private path: D3.Selection;
     private line: D3.Svg.Line;
-    public _ANIMATION_DURATION = 500; //milliseconds
+    public _ANIMATION_DURATION = 600; //milliseconds
 
     /**
      * Creates a LineRenderer.
@@ -46,7 +46,10 @@ module Plottable {
       this.line = d3.svg.line()
             .x(xFunction)
             .y(yFunction);
-      var updateSelection: any = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
+      var updateSelection: any = this.path;
+      if (this._animate) {
+        updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+      }
       updateSelection.attr("d", this.line).attr(attrToProjector);
     }
   }

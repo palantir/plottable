@@ -2922,6 +2922,8 @@ var Plottable;
         */
         function CircleRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
+            this._ANIMATION_DURATION = 250;
+            this._ANIMATION_DELAY = 5;
             this.classed("circle-renderer", true);
             this.project("r", 3); // default
             this.project("fill", function () {
@@ -2956,8 +2958,8 @@ var Plottable;
             var updateSelection = this.dataSelection;
             if (this._animate && this._dataChanged) {
                 var n = this.dataSource().data().length;
-                updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * _this._ANIMATION_DURATION / n;
+                updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
+                    return i * _this._ANIMATION_DELAY;
                 });
             }
             updateSelection.attr("r", rFunction);
@@ -2983,7 +2985,7 @@ var Plottable;
         */
         function LineRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 500;
+            this._ANIMATION_DURATION = 600;
             this.classed("line-renderer", true);
             this.project("stroke", function () {
                 return "steelblue";
@@ -3011,7 +3013,10 @@ var Plottable;
             }
 
             this.line = d3.svg.line().x(xFunction).y(yFunction);
-            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
+            var updateSelection = this.path;
+            if (this._animate) {
+                updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+            }
             updateSelection.attr("d", this.line).attr(attrToProjector);
         };
         return LineRenderer;
@@ -3230,6 +3235,8 @@ var Plottable;
         function BarRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
             this._barAlignment = "left";
+            this._ANIMATION_DURATION = 300;
+            this._ANIMATION_DELAY = 15;
         }
         BarRenderer.prototype._paint = function () {
             var _this = this;
@@ -3292,8 +3299,8 @@ var Plottable;
             var updateSelection = this.dataSelection;
             if (this._animate) {
                 var n = this.dataSource().data().length;
-                updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * _this._ANIMATION_DURATION / n;
+                updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
+                    return i * _this._ANIMATION_DELAY;
                 });
             }
 
@@ -3346,6 +3353,8 @@ var Plottable;
         function HorizontalBarRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
             this._barAlignment = "top";
+            this._ANIMATION_DURATION = 300;
+            this._ANIMATION_DELAY = 15;
         }
         HorizontalBarRenderer.prototype._paint = function () {
             var _this = this;
@@ -3409,8 +3418,8 @@ var Plottable;
             var updateSelection = this.dataSelection;
             if (this._animate) {
                 var n = this.dataSource().data().length;
-                updateSelection = updateSelection.transition().delay(function (d, i) {
-                    return i * _this._ANIMATION_DURATION / n;
+                updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
+                    return i * _this._ANIMATION_DELAY;
                 });
             }
 
@@ -4703,7 +4712,7 @@ var Plottable;
         */
         function AreaRenderer(dataset, xScale, yScale) {
             _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 500;
+            this._ANIMATION_DURATION = 600;
             this.classed("area-renderer", true);
             this.project("y0", 0, yScale); // default
             this.project("fill", function () {
@@ -4733,7 +4742,10 @@ var Plottable;
             }
 
             this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-            var updateSelection = (this._animate) ? this.path.transition().duration(this._ANIMATION_DURATION) : this.path;
+            var updateSelection = this.path;
+            if (this._animate) {
+                updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+            }
             updateSelection.attr("d", this.area).attr(attrToProjector);
         };
         return AreaRenderer;
