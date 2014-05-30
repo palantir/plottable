@@ -4,4 +4,25 @@
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
 ///<reference path="testUtils.ts" />
-///<reference path="../plottable.d.ts" />
+///<reference path="../build/plottable.d.ts" />
+
+///<reference path="axisTests.ts" />
+///<reference path="broadcasterTests.ts" />
+///<reference path="componentContainerTests.ts" />
+///<reference path="componentGroupTests.ts" />
+///<reference path="componentTests.ts" />
+///<reference path="coordinatorTests.ts" />
+///<reference path="dataSourceTests.ts" />
+///<reference path="domUtilsTests.ts" />
+///<reference path="gridlinesTests.ts" />
+///<reference path="idCounterTests.ts" />
+///<reference path="interactionTests.ts" />
+///<reference path="labelTests.ts" />
+///<reference path="legendTests.ts" />
+///<reference path="perfdiagnostics.ts" />
+///<reference path="rendererTests.ts" />
+///<reference path="scaleTests.ts" />
+///<reference path="strictEqualityAssociativeArrayTests.ts" />
+///<reference path="tableTests.ts" />
+///<reference path="textUtilsTests.ts" />
+///<reference path="utilsTests.ts" />

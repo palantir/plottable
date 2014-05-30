@@ -102,13 +102,7 @@ var MultiTestVerifier = (function () {
     };
     return MultiTestVerifier;
 })();
-///<reference path="../typings/chai/chai-assert.d.ts" />
-///<reference path="../typings/mocha/mocha.d.ts" />
-///<reference path="../typings/d3/d3.d.ts" />
-///<reference path="../typings/jquery/jquery.d.ts" />
-///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="testUtils.ts" />
-///<reference path="../plottable.d.ts" />
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -426,6 +420,7 @@ describe("Axes", function () {
         svg.remove();
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -488,6 +483,7 @@ describe("Broadcasters", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -559,6 +555,7 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c1, c2], "internal list of components was not changed");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -779,6 +776,7 @@ describe("ComponentGroups", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1142,6 +1140,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1164,6 +1163,7 @@ describe("Coordinators", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1222,6 +1222,7 @@ describe("DataSource", function () {
         assert.deepEqual(dataSource._getExtent(a3), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1292,6 +1293,7 @@ describe("DOMUtils", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1343,6 +1345,7 @@ describe("Gridlines", function () {
         // test passes if error is not thrown.
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1359,6 +1362,7 @@ describe("IDCounter", function () {
         assert.equal(i.decrement(2), -1);
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1558,6 +1562,7 @@ describe("Interactions", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1676,6 +1681,7 @@ describe("Labels", function () {
         }, Error, "not a valid orientation");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1778,6 +1784,7 @@ describe("Legends", function () {
         svg.remove();
     });
 });
+
 var PerfDiagnostics;
 (function (_PerfDiagnostics) {
     var PerfDiagnostics = (function () {
@@ -1843,6 +1850,7 @@ var PerfDiagnostics;
     ;
 })(PerfDiagnostics || (PerfDiagnostics = {}));
 window.report = PerfDiagnostics.logResults;
+
 ///<reference path="testReference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -2598,6 +2606,7 @@ describe("Renderers", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -2813,6 +2822,7 @@ describe("Scales", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -2841,6 +2851,7 @@ describe("StrictEqualityAssociativeArray", function () {
         assert.equal(s.get("3"), "ball");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -3227,6 +3238,7 @@ describe("Tables", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -3299,6 +3311,7 @@ describe("TextUtils", function () {
         svg.remove();
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
