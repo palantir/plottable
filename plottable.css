@@ -127,6 +127,6 @@ svg.plottable {
   opacity: 0;
 }
 
-.plottable .legend .legend-row .toggled-off circle {
+.plottable .legend .toggled-off circle {
   fill: #d3d3d3;
 }
