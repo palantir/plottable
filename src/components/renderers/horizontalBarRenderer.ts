@@ -69,7 +69,7 @@ module Plottable {
       var updateSelection: any = this.dataSelection;
       if (this._animate) {
         var n = this.dataSource().data().length;
-        updateSelection = updateSelection.transition().duration(this._ANIMATION_DURATION)
+        updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION)
                                             .delay((d: any, i: number) => i * this._ANIMATION_DELAY);
       }
 
