@@ -202,46 +202,5 @@ module Plottable {
         return this;
       }
     }
-
-
-    /**
-     * Gets or sets the maximum width of the BaseAxis.
-     *
-     * @param {number} [width] The desired maximum width.
-     * @returns {number|BaseAxis} The current maximum width, or the calling BaseAxis.
-     */
-    public maxWidth(): number;
-    public maxWidth(width: number): BaseAxis;
-    public maxWidth(width?: number): any {
-      if (width == null) {
-        return this._maxWidth;
-      } else {
-        if (this._isHorizontal()) {
-          throw new Error("Can't set width on a horizontal axis");
-        }
-        this._maxWidth = width;
-        return this;
-      }
-    }
-
-    /**
-     * Gets or sets the maximum height of the BaseAxis.
-     *
-     * @param {number} [height] The desired maximum height.
-     * @returns {number|BaseAxis} The current maximum height, or the calling BaseAxis.
-     */
-    public maxHeight(): number;
-    public maxHeight(height: number): BaseAxis;
-    public maxHeight(height?: number): any {
-      if (height == null) {
-        return this._maxHeight;
-      } else {
-        if (!this._isHorizontal()) {
-          throw new Error("Can't set height on a vertical axis");
-        }
-        this._maxHeight = height;
-        return this;
-      }
-    }
   }
 }
