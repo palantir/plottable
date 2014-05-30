@@ -35,12 +35,10 @@ module Plottable {
       this._orientation = orientationLC;
 
       this.classed("axis", true);
-      if (this._orientation === "top" || this._orientation === "bottom") {
+      if (this._isHorizontal()) {
         this.classed("x-axis", true);
-        this._maxHeight = 30;
       } else {
         this.classed("y-axis", true);
-        this._maxWidth = 50;
       }
 
       this._formatter = (formatter != null) ? formatter : (n: any) => String(n);
@@ -58,17 +56,9 @@ module Plottable {
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      return {
-        width : Math.min(offeredWidth, this._maxWidth),
-        height: Math.min(offeredHeight, this._maxHeight),
-        wantsWidth: !this._isHorizontal() && offeredWidth < this._maxWidth,
-        wantsHeight: this._isHorizontal() && offeredHeight < this._maxHeight
-      };
-    }
-
     /*
-     * Function for generating tick values in data-space (as opposed to pixel values); to be overriden by subclasses
+     * Function for generating tick values in data-space (as opposed to pixel values).
+     * To be implemented by subclasses.
      */
     public _getTickValues(): any[] {
       return [];
@@ -81,19 +71,11 @@ module Plottable {
       tickEnterSelection.append("line").classed("tick-mark", true);
       this._ticks.exit().remove();
 
-      var tickGroupAttrHash = {
-        x: (d: any) => 0,
-        y: (d: any) => 0
-      };
-
-      if (this._isHorizontal()) {
-        tickGroupAttrHash["x"] = (d: any) => this._scale.scale(d);
-      } else {
-        tickGroupAttrHash["y"] = (d: any) => this._scale.scale(d);
-      }
+      var tickXTransformFunction = this._isHorizontal() ? (d: any) => this._scale.scale(d) : (d: any) => 0;
+      var tickYTransformFunction = this._isHorizontal() ? (d: any) => 0 : (d: any) => this._scale.scale(d);
 
       var tickTransformGenerator = (d: any, i: number) => {
-        return "translate(" + tickGroupAttrHash["x"](d) + ", " + tickGroupAttrHash["y"](d) + ")";
+        return "translate(" + tickXTransformFunction(d) + ", " + tickYTransformFunction(d) + ")";
       };
 
       var tickMarkAttrHash = this._generateTickMarkAttrHash();

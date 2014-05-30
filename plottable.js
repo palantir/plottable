@@ -2922,12 +2922,10 @@ var Plottable;
             this._orientation = orientationLC;
 
             this.classed("axis", true);
-            if (this._orientation === "top" || this._orientation === "bottom") {
+            if (this._isHorizontal()) {
                 this.classed("x-axis", true);
-                this._maxHeight = 30;
             } else {
                 this.classed("y-axis", true);
-                this._maxWidth = 50;
             }
 
             this._formatter = (formatter != null) ? formatter : function (n) {
@@ -2948,17 +2946,9 @@ var Plottable;
             return this;
         };
 
-        BaseAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-            return {
-                width: Math.min(offeredWidth, this._maxWidth),
-                height: Math.min(offeredHeight, this._maxHeight),
-                wantsWidth: !this._isHorizontal() && offeredWidth < this._maxWidth,
-                wantsHeight: this._isHorizontal() && offeredHeight < this._maxHeight
-            };
-        };
-
         /*
-        * Function for generating tick values in data-space (as opposed to pixel values); to be overriden by subclasses
+        * Function for generating tick values in data-space (as opposed to pixel values).
+        * To be implemented by subclasses.
         */
         BaseAxis.prototype._getTickValues = function () {
             return [];
@@ -2972,27 +2962,19 @@ var Plottable;
             tickEnterSelection.append("line").classed("tick-mark", true);
             this._ticks.exit().remove();
 
-            var tickGroupAttrHash = {
-                x: function (d) {
-                    return 0;
-                },
-                y: function (d) {
-                    return 0;
-                }
+            var tickXTransformFunction = this._isHorizontal() ? function (d) {
+                return _this._scale.scale(d);
+            } : function (d) {
+                return 0;
+            };
+            var tickYTransformFunction = this._isHorizontal() ? function (d) {
+                return 0;
+            } : function (d) {
+                return _this._scale.scale(d);
             };
 
-            if (this._isHorizontal()) {
-                tickGroupAttrHash["x"] = function (d) {
-                    return _this._scale.scale(d);
-                };
-            } else {
-                tickGroupAttrHash["y"] = function (d) {
-                    return _this._scale.scale(d);
-                };
-            }
-
             var tickTransformGenerator = function (d, i) {
-                return "translate(" + tickGroupAttrHash["x"](d) + ", " + tickGroupAttrHash["y"](d) + ")";
+                return "translate(" + tickXTransformFunction(d) + ", " + tickYTransformFunction(d) + ")";
             };
 
             var tickMarkAttrHash = this._generateTickMarkAttrHash();
