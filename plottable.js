@@ -1,9 +1,3 @@
-/*!
-Plottable 0.13.6 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -2585,30 +2579,6 @@ var Plottable;
                 return this._tickLabelPadding;
             } else {
                 this._tickLabelPadding = padding;
-                return this;
-            }
-        };
-
-        BaseAxis.prototype.maxWidth = function (width) {
-            if (width == null) {
-                return this._maxWidth;
-            } else {
-                if (this._isHorizontal()) {
-                    throw new Error("Can't set width on a horizontal axis");
-                }
-                this._maxWidth = width;
-                return this;
-            }
-        };
-
-        BaseAxis.prototype.maxHeight = function (height) {
-            if (height == null) {
-                return this._maxHeight;
-            } else {
-                if (!this._isHorizontal()) {
-                    throw new Error("Can't set height on a vertical axis");
-                }
-                this._maxHeight = height;
                 return this;
             }
         };
