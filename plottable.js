@@ -5506,6 +5506,7 @@ var Plottable;
     Plottable.Gridlines = Gridlines;
 })(Plottable || (Plottable = {}));
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -5745,6 +5746,8 @@ var Plottable;
     Plottable.NumberAxis = NumberAxis;
 })(Plottable || (Plottable = {}));
 >>>>>>> Add in BaseAxis to act as an ancestor to NumberAxis and CategoryAxis.
+=======
+>>>>>>> Remove NumberAxis from commit.
 ///<reference path="../../reference.ts" />
 var Plottable;
 (function (Plottable) {
