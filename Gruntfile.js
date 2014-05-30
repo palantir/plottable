@@ -13,7 +13,7 @@ module.exports = function(grunt) {
   var tsJSON = {
     dev: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
-      outDir: "build/",
+      outDir: "build/src/",
       options: {
         target: 'es5',
         noImplicitAny: true,
@@ -24,7 +24,7 @@ module.exports = function(grunt) {
     },
     test: {
       src: ["test/*.ts", "typings/**/*.d.ts", "plottable.d.ts"],
-      out: "test/tests.js",
+      outDir: "build/test/",
       // watch: "test",
       options: {
         target: 'es5',
@@ -89,7 +89,7 @@ module.exports = function(grunt) {
     },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
-      replacement: 'synchronousRequire("../build/$1.js");',
+      replacement: 'synchronousRequire("/build/src/$1.js");',
       path: "plottable_multifile.js",
     },
     definitions: {
@@ -97,12 +97,21 @@ module.exports = function(grunt) {
       replacement: "",
       path: "plottable.d.ts",
     },
+    tests_multifile: {
+      pattern: '/// *<reference path="([^."]*).ts" */>',
+      replacement: 'synchronousRequire("/build/test/$1.js");',
+      path: "test/tests_multifile.js",
+    },
   };
 
   // e.g. ["components/foo.ts", ...]
   // the important thing is that they are sorted by hierarchy,
   // leaves first, roots last
-  var tsFiles = grunt.file.read("src/reference.ts")
+  var tsFiles;
+  // since src/reference.ts might have changed, I need to update this
+  // on each recompile
+  var updateTsFiles = function() {
+    tsFiles = grunt.file.read("src/reference.ts")
                   .split("\n")
                   .filter(function(s) {
                     return s !== "";
@@ -110,6 +119,21 @@ module.exports = function(grunt) {
                   .map(function(s) {
                     return s.match(/"(.*\.ts)"/)[1];
                   });
+  };
+  updateTsFiles();
+
+  var testTsFiles;
+  var updateTestTsFiles = function() {
+    testTsFiles = grunt.file.read("test/testReference.ts")
+                  .split("\n")
+                  .filter(function(s) {
+                    return s !== "";
+                  })
+                  .map(function(s) {
+                    return s.match(/"(.*\.ts)"/)[1];
+                  });
+  };
+  updateTestTsFiles();
 
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
@@ -123,15 +147,25 @@ module.exports = function(grunt) {
         src: ["synchronousRequire.js", "src/reference.ts"],
         dest: "plottable_multifile.js",
       },
+      tests_multifile: {
+        src: ["synchronousRequire.js", "test/testReference.ts"],
+        dest: "test/tests_multifile.js",
+      },
       plottable: {
         src: tsFiles.map(function(s) {
-              return "build/" + s.replace(".ts", ".js");
+              return "build/src/" + s.replace(".ts", ".js");
           }),
         dest: "plottable.js",
       },
+      tests: {
+        src: testTsFiles.map(function(s) {
+              return "build/test/" + s.replace(".ts", ".js");
+          }),
+        dest: "test/tests.js",
+      },
       definitions: {
         src: tsFiles.map(function(s) {
-              return "build/" + s.replace(".ts", ".d.ts");
+              return "build/src/" + s.replace(".ts", ".d.ts");
           }),
         dest: "plottable.d.ts",
       },
@@ -213,7 +247,7 @@ module.exports = function(grunt) {
       main: {
         files: {'plottable.min.js': ['plottable.js']}
       }
-    }
+    },
   };
 
 
@@ -225,14 +259,20 @@ module.exports = function(grunt) {
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("handle-header",
             ["copy:header", "sed:header", "concat:header", "clean:header"]);
+  grunt.registerTask("update-ts-files", updateTsFiles);
+  grunt.registerTask("update-test-ts-files", updateTestTsFiles);
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
+                                  "update-ts-files",
+                                  "update-test-ts-files",
                                   "ts:dev",
                                   "concat:plottable",
                                   "concat:definitions",
                                   "sed:definitions",
                                   "sed:private_definitions",
                                   "ts:test",
+                                  "concat:tests_multifile",
+                                  "sed:tests_multifile",
                                   "tslint",
                                   "handle-header",
                                   "sed:protected_definitions",
