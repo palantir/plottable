@@ -4537,10 +4537,13 @@ var Plottable;
     var ToggleLegend = (function (_super) {
         __extends(ToggleLegend, _super);
         /**
-        * Creates a Legend.
+        * Creates a ToggleLegend.
         *
         * @constructor
         * @param {ColorScale} colorScale
+        * @param {(d: any, b: boolean) => any} update The callback function for clicking on a legend entry.
+        * @param {any} update.d The legend entry.
+        * @param {boolean} update.b The state that the entry has changed to.
         */
         function ToggleLegend(colorScale, update) {
             var _this = this;
@@ -4556,7 +4559,6 @@ var Plottable;
         ToggleLegend.prototype._doRender = function () {
             var _this = this;
             _super.prototype._doRender.call(this);
-            var toggleLegend = this;
             var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
             dataSelection.classed("toggled-on", function (d) {
                 return _this.state.indexOf(d) >= 0;
@@ -4565,14 +4567,14 @@ var Plottable;
                 return _this.state.indexOf(d) < 0;
             });
             dataSelection.on("click", function (d, i) {
-                var index = toggleLegend.state.indexOf(d);
+                var index = _this.state.indexOf(d);
                 var isOn = index >= 0;
                 if (isOn) {
-                    toggleLegend.state.splice(index, 1);
+                    _this.state.splice(index, 1);
                 } else {
-                    toggleLegend.state.splice(0, 0, d);
+                    _this.state.splice(0, 0, d);
                 }
-                toggleLegend.update(d, !isOn);
+                _this.update(d, !isOn);
             });
             return this;
         };
