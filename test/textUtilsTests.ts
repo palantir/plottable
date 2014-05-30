@@ -129,7 +129,7 @@ describe("TextUtils", () => {
         var textEl = g.select("text");
         assert.equal(textEl.text(), text, "it wrote text as expected");
         var bb = Plottable.DOMUtils.getBBox(textEl);
-        assert.equal(bb.width, wh[0], "width measurement is as expected");
+        assert.closeTo(bb.width, wh[0], 2, "width measurement is as expected");
         assert.equal(bb.height, wh[1], "height measurement is as expected");
         var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0];
         var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1];
