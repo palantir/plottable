@@ -18,6 +18,15 @@ module Plottable {
       return parseFloat(value);
     }
 
+    export function isSelectionRemoved(selection: D3.Selection) {
+      var e = selection.node();
+      var n = e.parentNode;
+      while (n !== null && n.nodeName !== "#document") {
+        n = n.parentNode;
+      }
+      return (n == null);
+    }
+
     export function getElementWidth(elem: HTMLScriptElement): number{
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return _getParsedStyleValue(style, "width")

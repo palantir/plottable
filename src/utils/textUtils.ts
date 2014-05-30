@@ -18,6 +18,9 @@ module Plottable {
         if (s.trim() === "") {
           return [0, 0];
         }
+        if (DOMUtils.isSelectionRemoved(selection)) {
+          throw new Error("Cannot measure text in a removed node");
+        }
         var bb: SVGRect;
         if (selection.node().nodeName === "text") {
           var originalText = selection.text();
