@@ -688,8 +688,8 @@ declare module Plottable {
         * Creates a BaseAxis.
         *
         * @constructor
-        * @param {Scale} scale The Scale to base the NumberAxis on.
-        * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+        * @param {Scale} scale The Scale to base the BaseAxis on.
+        * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
         * @param {(n: any) => string} [formatter] A function to format tick labels.
         */
         constructor(scale: Scale, orientation: string, formatter?: (n: any) => string);
@@ -716,10 +716,20 @@ declare module Plottable {
         */
         public tickLabelPadding(): number;
         public tickLabelPadding(padding: number): BaseAxis;
-        public showEndTickLabels(): boolean;
-        public showEndTickLabels(show: boolean): BaseAxis;
+        /**
+        * Gets or sets the maximum width of the BaseAxis.
+        *
+        * @param {number} [width] The desired maximum width.
+        * @returns {number|BaseAxis} The current maximum width, or the calling BaseAxis.
+        */
         public maxWidth(): number;
         public maxWidth(width: number): BaseAxis;
+        /**
+        * Gets or sets the maximum height of the BaseAxis.
+        *
+        * @param {number} [height] The desired maximum height.
+        * @returns {number|BaseAxis} The current maximum height, or the calling BaseAxis.
+        */
         public maxHeight(): number;
         public maxHeight(height: number): BaseAxis;
     }

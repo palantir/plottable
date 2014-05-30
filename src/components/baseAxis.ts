@@ -4,13 +4,11 @@ module Plottable {
   export class BaseAxis extends Component {
     public axisElement: D3.Selection;
     private baseline: D3.Selection;
-    private scale: Scale;
-    private orientation: string;
+    public _scale: Scale;
     public _formatter: (n: any) => string;
+    public _orientation: string;
     private _tickLength = 5;
     private _tickLabelPadding = 3;
-    private isHorizontal = true;
-    public _showEndTickLabels = false;
     private _maxWidth = 0;
     private _maxHeight = 0;
 
@@ -18,37 +16,39 @@ module Plottable {
      * Creates a BaseAxis.
      *
      * @constructor
-     * @param {Scale} scale The Scale to base the NumberAxis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     * @param {Scale} scale The Scale to base the BaseAxis on.
+     * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
      * @param {(n: any) => string} [formatter] A function to format tick labels.
      */
     constructor(scale: Scale, orientation: string, formatter?: (n: any) => string) {
       super();
-      this.scale = scale;
+      this._scale = scale;
       var orientationLC = orientation.toLowerCase();
 
       if (orientationLC !== "top" &&
           orientationLC !== "bottom" &&
           orientationLC !== "left" &&
           orientationLC !== "right") {
-        throw new Error("unsupported orientation for Axis");
+        throw new Error("unsupported orientation");
       }
-      this.orientation = orientationLC;
+      this._orientation = orientationLC;
 
       this.classed("axis", true);
-      if (this.orientation === "top" || this.orientation === "bottom") {
-        this.isHorizontal = true;
+      if (this._orientation === "top" || this._orientation === "bottom") {
         this.classed("x-axis", true);
         this._maxHeight = 30;
       } else {
-        this.isHorizontal = false;
         this.classed("y-axis", true);
         this._maxWidth = 50;
       }
 
       this._formatter = (formatter != null) ? formatter : (n: any) => String(n);
 
-      this._registerToBroadcaster(this.scale, () => this.rescale());
+      this._registerToBroadcaster(this._scale, () => this.rescale());
+    }
+
+    public _isHorizontal() {
+      return this._orientation === "top" || this._orientation === "bottom";
     }
 
     public _setup() {
@@ -61,8 +61,8 @@ module Plottable {
       return {
         width : Math.min(offeredWidth, this._maxWidth),
         height: Math.min(offeredHeight, this._maxHeight),
-        wantsWidth: !this.isHorizontal && offeredWidth < this._maxWidth,
-        wantsHeight: this.isHorizontal && offeredHeight < this._maxHeight
+        wantsWidth: !this._isHorizontal() && offeredWidth < this._maxWidth,
+        wantsHeight: this._isHorizontal() && offeredHeight < this._maxHeight
       };
     }
 
@@ -72,8 +72,6 @@ module Plottable {
     }
 
     public _doRender() {
-      var domain = this.scale.domain();
-
       var baselineAttributes = {
         x1: 0,
         y1: 0,
@@ -93,10 +91,10 @@ module Plottable {
         y: (d: any) => 0
       };
 
-      if (this.isHorizontal) {
-        tickGroupAttrHash["x"] = (d: any) => this.scale.scale(d);
+      if (this._isHorizontal()) {
+        tickGroupAttrHash["x"] = (d: any) => this._scale.scale(d);
       } else {
-        tickGroupAttrHash["y"] = (d: any) => this.scale.scale(d);
+        tickGroupAttrHash["y"] = (d: any) => this._scale.scale(d);
       }
 
       var tickTransformGenerator = (d: any, i: number) => {
@@ -110,7 +108,7 @@ module Plottable {
         y2: 0
       };
 
-      switch(this.orientation) {
+      switch(this._orientation) {
         case "bottom":
           baselineAttributes.x2 = this.availableWidth;
 
@@ -202,16 +200,13 @@ module Plottable {
       }
     }
 
-    public showEndTickLabels(): boolean;
-    public showEndTickLabels(show: boolean): BaseAxis;
-    public showEndTickLabels(show?: boolean): any {
-      if (show == null) {
-        return this._showEndTickLabels;
-      }
-      this._showEndTickLabels = show;
-      return this;
-    }
 
+    /**
+     * Gets or sets the maximum width of the BaseAxis.
+     *
+     * @param {number} [width] The desired maximum width.
+     * @returns {number|BaseAxis} The current maximum width, or the calling BaseAxis.
+     */
     public maxWidth(): number;
     public maxWidth(width: number): BaseAxis;
     public maxWidth(width?: number): any {
@@ -223,7 +218,12 @@ module Plottable {
       }
     }
 
-
+    /**
+     * Gets or sets the maximum height of the BaseAxis.
+     *
+     * @param {number} [height] The desired maximum height.
+     * @returns {number|BaseAxis} The current maximum height, or the calling BaseAxis.
+     */
     public maxHeight(): number;
     public maxHeight(height: number): BaseAxis;
     public maxHeight(height?: number): any {
