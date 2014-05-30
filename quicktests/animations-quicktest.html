@@ -3,11 +3,12 @@
   <head>
     <title>Animations Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="../bower_components/d3/d3.min.js" charset="utf-8"></script>
     <script src="../../plottable.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
 
     <script>
+
       function randomData(n) {
         var res = [];
         for (var i=0;i++<n;){
@@ -19,13 +20,13 @@
 
       var doAnimate = true;
 
-      var barData = [
-        { x: "A", y: Math.random()*10-2},
-        { x: "B", y: Math.random()*10-2},
-        { x: "C", y: Math.random()*10-2},
-        { x: "D", y: Math.random()*10-2},
-        { x: "E", y: Math.random()*10-2}
-      ];
+      function generate_bar_value() {
+        return Math.random()*10 - 2;
+      }
+      var barData = [];
+      for (var i=0; i<18; i++) {
+        barData.push({ x: String.fromCharCode(65+i), y: generate_bar_value() });
+      }
       var barDataSource = new Plottable.DataSource(barData);
 
       var circleRenderer;
@@ -72,6 +73,7 @@
         var yAxis = new Plottable.YAxis(yScale, "left");
 
         lineRenderer = new Plottable.LineRenderer(xyDataSource, xScale, yScale);
+
         lineRenderer.animate(doAnimate);
         var lineChart = new Plottable.Table([[yAxis, lineRenderer],
                                                [null,  xAxis]]);
@@ -102,7 +104,7 @@
 
       function changeData() {
         xyDataSource.data(makeRandomData(40));
-        barData.forEach(function(d) { d.y = Math.random()*10-2; });
+        barData.forEach(function(d) { d.y = generate_bar_value(); });
         barDataSource.data(barData);
       }
 
