@@ -3546,10 +3546,10 @@ describe("Word Wrap Utilities", function () {
         });
 
         assert.lengthOf(wrappedText, 4);
-        assert.equal(wrappedText[0], "Supercalif");
-        assert.equal(wrappedText[1], "ragilistic");
-        assert.equal(wrappedText[2], "expialidoc");
-        assert.equal(wrappedText[3], "ious");
+        assert.equal(wrappedText[0], "Supercali-");
+        assert.equal(wrappedText[1], "fragilist-");
+        assert.equal(wrappedText[2], "icexpiali-");
+        assert.equal(wrappedText[3], "docious");
     });
 
     it("breaks on line break characters", function () {

@@ -120,16 +120,18 @@ module Plottable {
       }
       var i = 0;
       while (i < nextToken.length) {
-        if (widthMeasure(curLine + nextToken[i]) <= width) {
+        if (widthMeasure(curLine + nextToken[i] + "-") <= width) {
           curLine += nextToken[i++];
         } else {
           break;
         }
       }
+      var append = "-";
       if (isBlank(curLine) && i === 0) {
         i = 1;
+        append = "";
       }
-      return [nextToken.substring(0, i), nextToken.substring(i)];
+      return [nextToken.substring(0, i) + append, nextToken.substring(i)];
     }
 
     /**
