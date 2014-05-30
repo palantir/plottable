@@ -6,7 +6,6 @@ module Plottable {
 
     // if in state array, it is toggled on, otherwise, it is toggled off
     private state: any[];
-    private tempState: any[];
     /**
      * Creates a ToggleLegend.
      *
