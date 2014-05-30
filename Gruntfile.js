@@ -93,7 +93,7 @@ module.exports = function(grunt) {
       path: "plottable_multifile.js",
     },
     definitions: {
-      pattern: '///.*',
+      pattern: '/// *<reference path=".*" */>',
       replacement: "",
       path: "build/plottable.d.ts",
     },
