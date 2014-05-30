@@ -4008,7 +4008,7 @@ var Plottable;
             var updateSelection = this.dataSelection;
             if (this._animate) {
                 var n = this.dataSource().data().length;
-                updateSelection = updateSelection.transition().duration(this._ANIMATION_DURATION).delay(function (d, i) {
+                updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
                     return i * _this._ANIMATION_DELAY;
                 });
             }
