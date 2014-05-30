@@ -94,7 +94,7 @@ describe("BaseAxis", () => {
 
   it("tickLabelPadding()", () => {
     var scale = new Plottable.LinearScale();
-    var baseAxis = new Plottable.BaseAxis(scale, "blargh");
+    var baseAxis = new Plottable.BaseAxis(scale, "bottom");
 
     assert.throws(() => baseAxis.tickLabelPadding(-1), "must be positive");
   });
