@@ -3,6 +3,7 @@
 module Plottable {
   export class BaseAxis extends Component {
     public axisElement: D3.Selection;
+    public _ticksContainer: D3.Selection;
     public _ticks: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _scale: Scale;
@@ -52,6 +53,7 @@ module Plottable {
 
     public _setup() {
       super._setup();
+      this._ticksContainer = this.content.append("g").classed("ticks-container", true);
       this._baseline = this.content.append("line").classed("baseline", true);
       return this;
     }
@@ -66,7 +68,7 @@ module Plottable {
 
     public _doRender() {
       var tickValues = this._getTickValues();
-      this._ticks = this.content.selectAll(".tick").data(tickValues);
+      this._ticks = this._ticksContainer.selectAll(".tick").data(tickValues);
       var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
       tickEnterSelection.append("line").classed("tick-mark", true);
       this._ticks.exit().remove();

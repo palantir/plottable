@@ -1,48 +1,44 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class CategoryAxis extends Component {
-    private _scale: OrdinalScale;
-    private orientation: string;
-    private isVertical: boolean;
+  export class CategoryAxis extends BaseAxis {
+    public _scale: OrdinalScale;
+    public _tickLabelsG: D3.Selection;
 
     constructor(scale: OrdinalScale, orientation = "bottom") {
-      super();
-      this.classed("category-axis", true).classed("axis", true);
-      this._scale = scale;
-      var orientLC = orientation.toLowerCase();
-      this.orientation = orientLC;
-      if (["left", "right", "top", "bottom"].indexOf(orientLC) === -1) {
-        throw new Error(orientation + " is not a valid category axis orientation");
-      }
-      this.isVertical = (orientLC === "left" || orientLC === "right");
+      super(scale, orientation);
+      this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
         throw new Error("Only rangeBands category axes are implemented");
       }
       this._registerToBroadcaster(this._scale, () => this._invalidateLayout());
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number) {
+    public _setup() {
+      super._setup();
+      this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
+      return this;
+    }
+
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       if (offeredWidth < 0 || offeredHeight < 0) {
         return {
           width: 0,
           height: 0,
-          wantsWidth: this.isVertical,
-          wantsHeight: !this.isVertical
+          wantsWidth: !this._isHorizontal(),
+          wantsHeight: this._isHorizontal()
         };
       }
-      if (this.isVertical) {
-        this._scale.range([offeredHeight, 0]);
-      } else {
+      if (this._isHorizontal()) {
         this._scale.range([0, offeredWidth]);
+      } else {
+        this._scale.range([offeredHeight, 0]);
       }
-      var testG = this.content.append("g");
-      var textResult = this.writeText(offeredWidth, offeredHeight, testG);
+      var testG = this._tickLabelsG.append("g");
+      var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
+      fakeTicks.enter().append("g").classed("tick", true);
+      var textResult = this.writeTextToTicks(offeredWidth, offeredHeight, fakeTicks);
       testG.remove();
-
-      if (textResult.usedWidth > offeredWidth || textResult.usedHeight > offeredHeight) {
-        debugger;
-      }
 
       return {
         width : textResult.usedWidth,
@@ -52,32 +48,35 @@ module Plottable {
       };
     }
 
-    private writeText(axisWidth: number, axisHeight: number, targetElement: D3.Selection): TextUtils.IWriteTextResult {
-      var ticks = targetElement.selectAll(".tick").data(this._scale.domain());
-      ticks.enter().append("g").classed("tick", true);
-      ticks.exit().remove();
+    public _getTickValues(): string[] {
+      return this._scale.domain();
+    }
+
+    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): TextUtils.IWriteTextResult {
       var self = this;
       var textWriteResults: TextUtils.IWriteTextResult[] = [];
       ticks.each(function (d: string, i: number) {
+        var d3this = d3.select(this);
         var startAndWidth = self._scale.fullBandStartAndWidth(d);
         var bandWidth = startAndWidth[1];
         var bandStartPosition = startAndWidth[0];
-        var width  = self.isVertical ? axisWidth : bandWidth;
-        var height = self.isVertical ? bandWidth : axisHeight;
-        d3.select(this).selectAll("g").remove();
-        var g = d3.select(this).append("g");
-        var x = self.isVertical ? 0 : bandStartPosition;
-        var y = self.isVertical ? bandStartPosition : 0;
+        var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
+        var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
+
+        d3this.selectAll("g").remove(); //HACKHACK
+        var g = d3this.append("g").classed("tick-label", true);
+        var x = self._isHorizontal() ? bandStartPosition : 0;
+        var y = self._isHorizontal() ? 0 : bandStartPosition;
         g.attr("transform", "translate(" + x + "," + y + ")");
         var xAlign: {[s: string]: string} = {left: "right", right: "left", top: "center", bottom: "center"};
         var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
 
-        var textWriteResult = TextUtils.writeText(d, g, width, height, xAlign[self.orientation], yAlign[self.orientation]);
+        var textWriteResult = TextUtils.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
         textWriteResults.push(textWriteResult);
       });
 
-      var widthFn = this.isVertical ? d3.max : d3.sum;
-      var heightFn = this.isVertical ? d3.sum : d3.max;
+      var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
+      var heightFn = this._isHorizontal() ? d3.max : d3.sum;
       return {
         textFits: textWriteResults.every((t: TextUtils.IWriteTextResult) => t.textFits),
         usedWidth : widthFn(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedWidth),
@@ -87,7 +86,17 @@ module Plottable {
     }
 
     public _doRender() {
-      this.writeText(this.availableWidth, this.availableHeight, this.content);
+      super._doRender();
+      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+      tickLabels.enter().append("g").classed("tick-label", true);
+      tickLabels.exit().remove();
+      this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
+      var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
+
+      var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
+      DOMUtils.translate(this._tickLabelsG, xTranslate, yTranslate);
+      DOMUtils.translate(this._ticksContainer, translate[0], translate[1]);
       return this;
     }
   }
