@@ -937,6 +937,21 @@ declare module Plottable {
 
 
 declare module Plottable {
+    class HoverLegend extends Legend {
+        /**
+        * Creates a HoverLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {(d?: any) => any} callback The callback function for clicking on a legend entry.
+        * @param {any} callback.d The legend entry. No argument corresponds to a mouseout
+        */
+        constructor(colorScale: ColorScale, callback: (d?: any) => any);
+    }
+}
+
+
+declare module Plottable {
     class Gridlines extends Component {
         /**
         * Creates a set of Gridlines.

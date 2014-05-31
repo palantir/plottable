@@ -3419,6 +3419,56 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var HoverLegend = (function (_super) {
+        __extends(HoverLegend, _super);
+        /**
+        * Creates a HoverLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {(d?: any) => any} callback The callback function for clicking on a legend entry.
+        * @param {any} callback.d The legend entry. No argument corresponds to a mouseout
+        */
+        function HoverLegend(colorScale, callback) {
+            _super.call(this, colorScale);
+            this.callback = callback;
+        }
+        HoverLegend.prototype._doRender = function () {
+            var _this = this;
+            _super.prototype._doRender.call(this);
+            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+            dataSelection.classed("selected", function (d) {
+                return _this.selected !== undefined ? _this.selected === d : false;
+            });
+            dataSelection.classed("not-selected", function (d) {
+                return _this.selected !== undefined ? _this.selected !== d : false;
+            });
+            dataSelection.on("mouseover", function (d, i) {
+                console.log("ON: " + d + " " + i);
+                _this.selected = d;
+                _this.callback(d);
+            });
+            dataSelection.on("mouseout", function (d, i) {
+                console.log("OFF: " + d + " " + i);
+                _this.selected = undefined;
+                _this.callback();
+            });
+            return this;
+        };
+        return HoverLegend;
+    })(Plottable.Legend);
+    Plottable.HoverLegend = HoverLegend;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Gridlines = (function (_super) {
         __extends(Gridlines, _super);
         /**
