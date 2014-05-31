@@ -5,9 +5,9 @@ module Plottable {
     public static _SUBELEMENT_CLASS = "legend-row";
     private static MARGIN = 5;
 
-    private legendBox: D3.Selection;
     private colorScale: ColorScale;
     private maxWidth: number;
+    private legendBox: D3.Selection;
     private nRowsDrawn: number;
 
     /**
@@ -92,10 +92,10 @@ module Plottable {
       var textHeight = this.measureTextHeight();
       var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
-      this.content.selectAll("." + Legend._SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
       var legend: D3.UpdateSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain);
       var legendEnter = legend.enter()
           .append("g").classed(Legend._SUBELEMENT_CLASS, true)
+          .sort((a, b) => domain.indexOf(a) - domain.indexOf(b)) // sort items based on their index in domain
           .attr("transform", (d: any, i: number) => "translate(0," + i * textHeight + ")");
       legendEnter.append("circle")
           .attr("cx", Legend.MARGIN + r/2)
