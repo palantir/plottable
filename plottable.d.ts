@@ -900,6 +900,7 @@ declare module Plottable {
 
 declare module Plottable {
     class Legend extends Component {
+        static _SUBELEMENT_CLASS: string;
         /**
         * Creates a Legend.
         *
@@ -915,6 +916,21 @@ declare module Plottable {
         */
         public scale(scale: ColorScale): Legend;
         public scale(): ColorScale;
+    }
+}
+
+
+declare module Plottable {
+    class HoverLegend extends Legend {
+        /**
+        * Creates a HoverLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {(d?: any) => any} update The callback function for clicking on a legend entry.
+        * @param {any} update.d The legend entry. No argument corresponds to a mouseout
+        */
+        constructor(colorScale: ColorScale, update: (d?: any) => any);
     }
 }
 

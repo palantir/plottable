@@ -3301,7 +3301,7 @@ var Plottable;
             var totalNumRows = this.colorScale.domain().length;
             var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
-            var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+            var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
             var fakeText = fakeLegendEl.append("text");
             var maxWidth = d3.max(this.colorScale.domain(), function (d) {
                 return Plottable.TextUtils.getTextWidth(fakeText, d);
@@ -3319,7 +3319,7 @@ var Plottable;
 
         Legend.prototype.measureTextHeight = function () {
             // note: can't be called before anchoring atm
-            var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+            var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
             var textHeight = Plottable.TextUtils.getTextHeight(fakeLegendEl.append("text"));
             fakeLegendEl.remove();
             return textHeight;
@@ -3331,9 +3331,9 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-            this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
-            var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
-            var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
+            this.content.selectAll("." + Legend._SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
+            var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain);
+            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
                 return "translate(0," + i * textHeight + ")";
             });
             legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
@@ -3344,11 +3344,62 @@ var Plottable;
             });
             return this;
         };
-        Legend.SUBELEMENT_CLASS = "legend-row";
+        Legend._SUBELEMENT_CLASS = "legend-row";
         Legend.MARGIN = 5;
         return Legend;
     })(Plottable.Component);
     Plottable.Legend = Legend;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var HoverLegend = (function (_super) {
+        __extends(HoverLegend, _super);
+        /**
+        * Creates a HoverLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {(d?: any) => any} update The callback function for clicking on a legend entry.
+        * @param {any} update.d The legend entry. No argument corresponds to a mouseout
+        */
+        function HoverLegend(colorScale, update) {
+            _super.call(this, colorScale);
+            this.update = update;
+        }
+        HoverLegend.prototype._doRender = function () {
+            var _this = this;
+            _super.prototype._doRender.call(this);
+            console.log("RENDERING");
+            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+            dataSelection.classed("selected", function (d) {
+                return _this.selected !== undefined ? _this.selected === d : false;
+            });
+            dataSelection.classed("not-selected", function (d) {
+                return _this.selected !== undefined ? _this.selected !== d : false;
+            });
+            dataSelection.on("mouseover", function (d, i) {
+                console.log("ON: " + d + " " + i);
+                _this.selected = d;
+                _this.update(d);
+            });
+            dataSelection.on("mouseout", function (d, i) {
+                console.log("OFF: " + d + " " + i);
+                _this.selected = undefined;
+                _this.update();
+            });
+            return this;
+        };
+        return HoverLegend;
+    })(Plottable.Legend);
+    Plottable.HoverLegend = HoverLegend;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
