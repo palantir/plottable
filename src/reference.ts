@@ -16,6 +16,7 @@
 /// <reference path="core/scale.ts" />
 /// <reference path="core/renderer.ts" />
 /// <reference path="core/renderController.ts" />
+/// <reference path="core/interfaces.ts" />
 
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />

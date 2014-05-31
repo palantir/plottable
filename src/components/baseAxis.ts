@@ -25,15 +25,7 @@ module Plottable {
     constructor(scale: Scale, orientation: string, formatter?: (n: any) => string) {
       super();
       this._scale = scale;
-      var orientationLC = orientation.toLowerCase();
-
-      if (orientationLC !== "top" &&
-          orientationLC !== "bottom" &&
-          orientationLC !== "left" &&
-          orientationLC !== "right") {
-        throw new Error("unsupported orientation");
-      }
-      this._orientation = orientationLC;
+      this.orient(orientation);
 
       this.classed("axis", true);
       if (this._isHorizontal()) {
@@ -80,13 +72,8 @@ module Plottable {
         return "translate(" + tickXTransformFunction(d) + ", " + tickYTransformFunction(d) + ")";
       };
 
-      var tickMarkAttrHash = this._generateTickMarkAttrHash();
-
       this._baseline.attr(this._generateBaselineAttrHash());
-      this._ticks.each(function (d: any) {
-        var tick = d3.select(this);
-        tick.select("line").attr(tickMarkAttrHash);
-      });
+      this._ticks.select("line").attr(this._generateTickMarkAttrHash());
       this._ticks.attr("transform", tickTransformGenerator);
 
       return this;
@@ -168,6 +155,7 @@ module Plottable {
      */
     public formatter(formatFunction: (n: any) => string) {
       this._formatter = formatFunction;
+      this._render();
       return this;
     }
 
@@ -183,7 +171,11 @@ module Plottable {
       if (length == null) {
         return this._tickLength;
       } else {
+        if (length < 0) {
+          throw new Error("tick length must be positive");
+        }
         this._tickLength = length;
+        this._invalidateLayout();
         return this;
       }
     }
@@ -200,7 +192,30 @@ module Plottable {
       if (padding == null) {
         return this._tickLabelPadding;
       } else {
+        if (padding < 0) {
+          throw new Error("tick label padding must be positive");
+        }
         this._tickLabelPadding = padding;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    public orient(): string;
+    public orient(newOrientation: string): BaseAxis;
+    public orient(newOrientation?: string): any {
+      if (newOrientation == null) {
+        return this._orientation;
+      } else {
+        var newOrientationLC = newOrientation.toLowerCase();
+        if (newOrientationLC !== "top" &&
+            newOrientationLC !== "bottom" &&
+            newOrientationLC !== "left" &&
+            newOrientationLC !== "right") {
+          throw new Error("unsupported orientation");
+        }
+        this._orientation = newOrientationLC;
+        this._render();
         return this;
       }
     }

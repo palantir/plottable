@@ -102,13 +102,7 @@ var MultiTestVerifier = (function () {
     };
     return MultiTestVerifier;
 })();
-///<reference path="../typings/chai/chai-assert.d.ts" />
-///<reference path="../typings/mocha/mocha.d.ts" />
-///<reference path="../typings/d3/d3.d.ts" />
-///<reference path="../typings/jquery/jquery.d.ts" />
-///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="testUtils.ts" />
-///<reference path="../plottable.d.ts" />
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -426,6 +420,120 @@ describe("Axes", function () {
         svg.remove();
     });
 });
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("BaseAxis", function () {
+    it("orientation", function () {
+        var scale = new Plottable.LinearScale();
+        assert.throws(function () {
+            return new Plottable.BaseAxis(scale, "blargh");
+        }, "unsupported");
+    });
+
+    it("draws ticks and baseline (horizontal)", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.LinearScale();
+        scale.range([0, SVG_WIDTH]);
+        var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+        baseAxis._getTickValues = function () {
+            return scale.ticks(10);
+        };
+        baseAxis.renderTo(svg);
+
+        var ticks = svg.selectAll(".tick");
+        assert.strictEqual(ticks[0].length, scale.ticks(10).length, "A line was drawn for each tick");
+        var baseline = svg.select(".baseline");
+
+        assert.isNotNull(baseline.node(), "baseline was drawn");
+        assert.strictEqual(baseline.attr("x1"), "0");
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("y1"), "0");
+        assert.strictEqual(baseline.attr("y2"), "0");
+
+        baseAxis.orient("top");
+        assert.isNotNull(baseline.node(), "baseline was drawn");
+        assert.strictEqual(baseline.attr("x1"), "0");
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("y1"), String(SVG_HEIGHT));
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+
+        svg.remove();
+    });
+
+    it("draws ticks and baseline (vertical)", function () {
+        var SVG_WIDTH = 100;
+        var SVG_HEIGHT = 500;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.LinearScale();
+        scale.range([0, SVG_WIDTH]);
+        var baseAxis = new Plottable.BaseAxis(scale, "left");
+        baseAxis._getTickValues = function () {
+            return scale.ticks(10);
+        };
+        baseAxis.renderTo(svg);
+
+        var ticks = svg.selectAll(".tick");
+        assert.strictEqual(ticks[0].length, scale.ticks(10).length, "A line was drawn for each tick");
+        var baseline = svg.select(".baseline");
+
+        assert.isNotNull(baseline.node(), "baseline was drawn");
+        assert.strictEqual(baseline.attr("x1"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("y1"), "0");
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+
+        baseAxis.orient("right");
+        assert.isNotNull(baseline.node(), "baseline was drawn");
+        assert.strictEqual(baseline.attr("x1"), "0");
+        assert.strictEqual(baseline.attr("x2"), "0");
+        assert.strictEqual(baseline.attr("y1"), "0");
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+
+        svg.remove();
+    });
+
+    it("tickLength()", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.LinearScale();
+        scale.range([0, SVG_WIDTH]);
+        var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+        baseAxis._getTickValues = function () {
+            return scale.ticks(10);
+        };
+        baseAxis.renderTo(svg);
+
+        var firstTick = svg.select(".tick").select("line");
+        assert.strictEqual(firstTick.attr("x1"), "0");
+        assert.strictEqual(firstTick.attr("x2"), "0");
+        assert.strictEqual(firstTick.attr("y1"), "0");
+        assert.strictEqual(firstTick.attr("y2"), String(baseAxis.tickLength()));
+
+        baseAxis.tickLength(10);
+        assert.strictEqual(firstTick.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
+
+        assert.throws(function () {
+            return baseAxis.tickLength(-1);
+        }, "must be positive");
+
+        svg.remove();
+    });
+
+    it("tickLabelPadding()", function () {
+        var scale = new Plottable.LinearScale();
+        var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+
+        assert.throws(function () {
+            return baseAxis.tickLabelPadding(-1);
+        }, "must be positive");
+    });
+});
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -488,6 +596,7 @@ describe("Broadcasters", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -559,6 +668,7 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c1, c2], "internal list of components was not changed");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -779,6 +889,7 @@ describe("ComponentGroups", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1142,6 +1253,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1164,6 +1276,7 @@ describe("Coordinators", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1222,6 +1335,7 @@ describe("DataSource", function () {
         assert.deepEqual(dataSource._getExtent(a3), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1299,6 +1413,7 @@ describe("DOMUtils", function () {
         assert.isTrue(Plottable.DOMUtils.isSelectionRemoved(svg), "svg is no longer in DOM");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1350,6 +1465,7 @@ describe("Gridlines", function () {
         // test passes if error is not thrown.
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1366,6 +1482,7 @@ describe("IDCounter", function () {
         assert.equal(i.decrement(2), -1);
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1565,6 +1682,7 @@ describe("Interactions", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1683,6 +1801,7 @@ describe("Labels", function () {
         }, Error, "not a valid orientation");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1785,6 +1904,7 @@ describe("Legends", function () {
         svg.remove();
     });
 });
+
 var PerfDiagnostics;
 (function (_PerfDiagnostics) {
     var PerfDiagnostics = (function () {
@@ -1850,6 +1970,7 @@ var PerfDiagnostics;
     ;
 })(PerfDiagnostics || (PerfDiagnostics = {}));
 window.report = PerfDiagnostics.logResults;
+
 ///<reference path="testReference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -2605,6 +2726,7 @@ describe("Renderers", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -2820,6 +2942,7 @@ describe("Scales", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -2848,6 +2971,7 @@ describe("StrictEqualityAssociativeArray", function () {
         assert.equal(s.get("3"), "ball");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -3234,6 +3358,7 @@ describe("Tables", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 var tu = Plottable.TextUtils;
@@ -3476,6 +3601,7 @@ describe("TextUtils", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -3519,88 +3645,5 @@ describe("Utils", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Utils.uniq(strings), ["foo", "bar", "baz", "bam"]);
-    });
-});
-///<reference path="testReference.ts" />
-var assert = chai.assert;
-
-describe("Word Wrap Utilities", function () {
-    it("properly wraps a short sentence", function () {
-        var text = "All work and no play makes Jack a dull boy.";
-        var width = 200;
-        var wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
-            return text.length * 10;
-        });
-
-        assert.lengthOf(wrappedText, 3);
-        assert.equal(wrappedText[0], "All work and no play ");
-        assert.equal(wrappedText[1], "makes Jack a dull ");
-        assert.equal(wrappedText[2], "boy.");
-    });
-
-    it("properly breaks a long word", function () {
-        var text = "Supercalifragilisticexpialidocious";
-        var width = 100;
-        var wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
-            return text.length * 10;
-        });
-
-        assert.lengthOf(wrappedText, 4);
-        assert.equal(wrappedText[0], "Supercali-");
-        assert.equal(wrappedText[1], "fragilist-");
-        assert.equal(wrappedText[2], "icexpiali-");
-        assert.equal(wrappedText[3], "docious");
-    });
-
-    it("breaks on line break characters", function () {
-        var text = "Hello:World";
-        var width = 70;
-        var wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
-            return text.length * 10;
-        });
-
-        assert.lengthOf(wrappedText, 2);
-        assert.equal(wrappedText[0], "Hello:");
-        assert.equal(wrappedText[1], "World");
-    });
-
-    it("breaks on line break characters in the correct place", function () {
-        var width = 80;
-
-        // should line break after these characters: ! " % ) , - . : ; ? ] }
-        var text = "||||| d!d";
-        var wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
-            return text.length * 10;
-        });
-
-        assert.lengthOf(wrappedText, 2);
-        assert.equal(wrappedText[0], "||||| d!");
-        assert.equal(wrappedText[1], "d");
-
-        // should line break before these characters: { [
-        text = "||||| d[d";
-        wrappedText = Plottable.WordWrapUtils.breakTextToFitWidth(text, width, function (text) {
-            return text.length * 10;
-        });
-
-        assert.lengthOf(wrappedText, 2);
-        assert.equal(wrappedText[0], "||||| d");
-        assert.equal(wrappedText[1], "[d");
-    });
-
-    it("can predict when it will and won't break", function () {
-        var text1 = "Hello:World";
-        var text2 = "Hello World";
-        var text3 = "HelloYWorld";
-        var measureText = function (text) {
-            return text.length * 10;
-        };
-        var canBreak = function (text) {
-            return Plottable.WordWrapUtils.canWrapWithoutBreakingWords(text, 70, measureText);
-        };
-
-        assert.isTrue(canBreak(text1), "It can break \"Hello:World\"");
-        assert.isTrue(canBreak(text2), "It can break \"Hello World\"");
-        assert.isFalse(canBreak(text3), "It can't break \"HelloYWorld\"");
     });
 });
