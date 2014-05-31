@@ -21,10 +21,13 @@ module Plottable {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+      var widthRequiredByTicks = this._isHorizontal() ? 0 : this.tickLength() + this.tickLabelPadding();
+      var heightRequiredByTicks = this._isHorizontal() ? this.tickLength() + this.tickLabelPadding() : 0;
+
       if (offeredWidth < 0 || offeredHeight < 0) {
         return {
-          width: 0,
-          height: 0,
+          width:  widthRequiredByTicks,
+          height: heightRequiredByTicks,
           wantsWidth: !this._isHorizontal(),
           wantsHeight: this._isHorizontal()
         };
@@ -41,8 +44,8 @@ module Plottable {
       testG.remove();
 
       return {
-        width : textResult.usedWidth,
-        height: textResult.usedHeight,
+        width : textResult.usedWidth  + widthRequiredByTicks,
+        height: textResult.usedHeight + heightRequiredByTicks,
         wantsWidth : !textResult.textFits,
         wantsHeight: !textResult.textFits
       };
