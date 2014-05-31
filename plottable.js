@@ -3331,9 +3331,10 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-            this.content.selectAll("." + Legend._SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
             var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain);
-            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
+            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true).sort(function (a, b) {
+                return domain.indexOf(a) - domain.indexOf(b);
+            }).attr("transform", function (d, i) {
                 return "translate(0," + i * textHeight + ")";
             });
             legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
@@ -3367,17 +3368,16 @@ var Plottable;
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d?: any) => any} update The callback function for clicking on a legend entry.
-        * @param {any} update.d The legend entry. No argument corresponds to a mouseout
+        * @param {(d?: any) => any} callback The callback function for clicking on a legend entry.
+        * @param {any} callback.d The legend entry. No argument corresponds to a mouseout
         */
-        function HoverLegend(colorScale, update) {
+        function HoverLegend(colorScale, callback) {
             _super.call(this, colorScale);
-            this.update = update;
+            this.callback = callback;
         }
         HoverLegend.prototype._doRender = function () {
             var _this = this;
             _super.prototype._doRender.call(this);
-            console.log("RENDERING");
             var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
             dataSelection.classed("selected", function (d) {
                 return _this.selected !== undefined ? _this.selected === d : false;
@@ -3388,12 +3388,12 @@ var Plottable;
             dataSelection.on("mouseover", function (d, i) {
                 console.log("ON: " + d + " " + i);
                 _this.selected = d;
-                _this.update(d);
+                _this.callback(d);
             });
             dataSelection.on("mouseout", function (d, i) {
                 console.log("OFF: " + d + " " + i);
                 _this.selected = undefined;
-                _this.update();
+                _this.callback();
             });
             return this;
         };

@@ -927,10 +927,10 @@ declare module Plottable {
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d?: any) => any} update The callback function for clicking on a legend entry.
-        * @param {any} update.d The legend entry. No argument corresponds to a mouseout
+        * @param {(d?: any) => any} callback The callback function for clicking on a legend entry.
+        * @param {any} callback.d The legend entry. No argument corresponds to a mouseout
         */
-        constructor(colorScale: ColorScale, update: (d?: any) => any);
+        constructor(colorScale: ColorScale, callback: (d?: any) => any);
     }
 }
 
