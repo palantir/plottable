@@ -3331,9 +3331,10 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-            this.content.selectAll("." + Legend._SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
             var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain);
-            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
+            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true).sort(function (a, b) {
+                return domain.indexOf(a) - domain.indexOf(b);
+            }).attr("transform", function (d, i) {
                 return "translate(0," + i * textHeight + ")";
             });
             legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
