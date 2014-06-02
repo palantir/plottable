@@ -2,7 +2,7 @@
 
 module Plottable {
   export class ToggleLegend extends Legend {
-    private update: (d: any, b: boolean) => any;
+    private callback: (d: any, b: boolean) => any;
 
     // if in state array, it is toggled on, otherwise, it is toggled off
     private state: any[];
@@ -11,13 +11,13 @@ module Plottable {
      *
      * @constructor
      * @param {ColorScale} colorScale
-     * @param {(d: any, b: boolean) => any} update The callback function for clicking on a legend entry.
-     * @param {any} update.d The legend entry.
-     * @param {boolean} update.b The state that the entry has changed to.
+     * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
+     * @param {any} callback.d The legend entry.
+     * @param {boolean} callback.b The state that the entry has changed to.
      */
-    constructor(colorScale: ColorScale, update: (d: any, b: boolean) => any) {
+    constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any) {
       super(colorScale);
-      this.update = update;
+      this.callback = callback;
       this.state = [];
       // initially, everything is toggled on
       colorScale.domain().forEach((d: any) => this.state.splice(0, 0, d));
@@ -36,7 +36,7 @@ module Plottable {
         } else { // otherwise add it back in
           this.state.splice(0, 0, d);
         }
-        this.update(d, !isOn);
+        this.callback(d, !isOn);
       });
       return this;
     }

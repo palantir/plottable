@@ -3331,16 +3331,18 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-            var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain);
-            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true).sort(function (a, b) {
-                return domain.indexOf(a) - domain.indexOf(b);
-            }).attr("transform", function (d, i) {
-                return "translate(0," + i * textHeight + ")";
+            var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain, function (d) {
+                return d;
             });
+            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true);
             legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
             legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
+            legend.exit().remove();
+            legend.attr("transform", function (d) {
+                return "translate(0," + domain.indexOf(d) * textHeight + ")";
+            });
             legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
-            legend.selectAll("text").text(function (d, i) {
+            legend.selectAll("text").text(function (d) {
                 return Plottable.TextUtils.getTruncatedText(d, availableWidth, d3.select(this));
             });
             return this;
@@ -3368,14 +3370,14 @@ var Plottable;
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d: any, b: boolean) => any} update The callback function for clicking on a legend entry.
-        * @param {any} update.d The legend entry.
-        * @param {boolean} update.b The state that the entry has changed to.
+        * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
+        * @param {any} callback.d The legend entry.
+        * @param {boolean} callback.b The state that the entry has changed to.
         */
-        function ToggleLegend(colorScale, update) {
+        function ToggleLegend(colorScale, callback) {
             var _this = this;
             _super.call(this, colorScale);
-            this.update = update;
+            this.callback = callback;
             this.state = [];
 
             // initially, everything is toggled on
@@ -3401,7 +3403,7 @@ var Plottable;
                 } else {
                     _this.state.splice(0, 0, d);
                 }
-                _this.update(d, !isOn);
+                _this.callback(d, !isOn);
             });
             return this;
         };
