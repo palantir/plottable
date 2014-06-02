@@ -18,6 +18,15 @@ module Plottable {
       return parseFloat(value);
     }
 
+    export function isSelectionRemoved(selection: D3.Selection) {
+      var e = selection.node();
+      var n = e.parentNode;
+      while (n !== null && n.nodeName !== "#document") {
+        n = n.parentNode;
+      }
+      return (n == null);
+    }
+
     export function getElementWidth(elem: HTMLScriptElement): number{
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return _getParsedStyleValue(style, "width")
@@ -57,6 +66,19 @@ module Plottable {
       }
 
       return width;
+    }
+
+    export function translate(s: D3.Selection, x?: number, y?: number) {
+      var xform = d3.transform(s.attr("transform"));
+      if (x == null) {
+        return xform.translate;
+      } else {
+        y = (y == null) ? 0 : y;
+        xform.translate[0] = x;
+        xform.translate[1] = y;
+        s.attr("transform", xform.toString());
+        return s;
+      }
     }
   }
 }
