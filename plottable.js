@@ -3372,38 +3372,31 @@ var Plottable;
         * @param {ColorScale} colorScale
         * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
         * @param {any} callback.d The legend entry.
-        * @param {boolean} callback.b The state that the entry has changed to.
+        * @param {boolean} callback.b The isOff that the entry has changed to.
         */
         function ToggleLegend(colorScale, callback) {
-            var _this = this;
             _super.call(this, colorScale);
             this.callback = callback;
-            this.state = [];
-
+            this.isOff = [];
             // initially, everything is toggled on
-            colorScale.domain().forEach(function (d) {
-                return _this.state.splice(0, 0, d);
-            });
         }
         ToggleLegend.prototype.scale = function (scale) {
             var _this = this;
             if (scale != null) {
-                var oldDomain = this.scale() === undefined ? [] : this.scale().domain();
-                var oldState = this.state === undefined ? [] : this.state.slice(0);
-
                 var curLegend = _super.prototype.scale.call(this, scale);
 
-                // hack to make sure broadcaster will update the state array whenever scale gets changed
+                // hack to make sure broadcaster will update the isOff array whenever scale gets changed
                 // first deregister this scale from when we called super.scale
                 curLegend._deregisterFromBroadcaster(scale);
 
                 // now register with our own method
                 curLegend._registerToBroadcaster(scale, function () {
-                    _this.state = [];
+                    var oldState = _this.isOff === undefined ? [] : _this.isOff.slice(0);
+                    _this.isOff = [];
                     scale.domain().forEach(function (d) {
                         // preserves the state of any existing element
-                        if (oldDomain.indexOf(d) < 0 || oldState.indexOf(d) >= 0) {
-                            _this.state.splice(0, 0, d);
+                        if (oldState.indexOf(d) >= 0) {
+                            _this.isOff.splice(0, 0, d);
                         }
                     });
                     _this._invalidateLayout();
@@ -3419,18 +3412,18 @@ var Plottable;
             _super.prototype._doRender.call(this);
             var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
             dataSelection.classed("toggled-on", function (d) {
-                return _this.state.indexOf(d) >= 0;
+                return _this.isOff.indexOf(d) < 0;
             });
             dataSelection.classed("toggled-off", function (d) {
-                return _this.state.indexOf(d) < 0;
+                return _this.isOff.indexOf(d) >= 0;
             });
-            dataSelection.on("click", function (d, i) {
-                var index = _this.state.indexOf(d);
-                var isOn = index >= 0;
+            dataSelection.on("click", function (d) {
+                var index = _this.isOff.indexOf(d);
+                var isOn = index < 0;
                 if (isOn) {
-                    _this.state.splice(index, 1);
+                    _this.isOff.splice(0, 0, d);
                 } else {
-                    _this.state.splice(0, 0, d);
+                    _this.isOff.splice(index, 1);
                 }
                 _this.callback(d, !isOn);
             });
