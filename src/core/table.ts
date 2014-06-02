@@ -166,14 +166,16 @@ module Plottable {
         freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
         var xWeights: number[];
         if (wantsWidth) { // If something wants width, divide free space between components that want more width
-          xWeights = guarantees.wantsWidthArr.map((x) => x ? 1 : 0);
+          xWeights = guarantees.wantsWidthArr.map((x) => x ? 0.1 : 0);
+          xWeights = Utils.addArrays(xWeights, colWeights);
         } else { // Otherwise, divide free space according to the weights
           xWeights = colWeights;
         }
 
         var yWeights: number[];
         if (wantsHeight) {
-          yWeights = guarantees.wantsHeightArr.map((x) => x ? 1 : 0);
+          yWeights = guarantees.wantsHeightArr.map((x) => x ? 0.1 : 0);
+          yWeights = Utils.addArrays(yWeights, rowWeights);
         } else {
           yWeights = rowWeights;
         }
@@ -190,7 +192,6 @@ module Plottable {
         }
 
         if (nIterations > 5) {
-          console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances");
           break;
         }
       }
