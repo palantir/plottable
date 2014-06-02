@@ -4067,13 +4067,9 @@ var Plottable;
 
                 // overwrite our previous listener from when we called super
                 curLegend._registerToBroadcaster(scale, function () {
-                    var oldState = _this.isOff.slice(0);
-                    _this.isOff = [];
-                    scale.domain().forEach(function (d) {
-                        // preserves the state of any previously existing element
-                        if (oldState.indexOf(d) >= 0) {
-                            _this.isOff.push(d);
-                        }
+                    // preserve the state of already existing elements
+                    _this.isOff = _this.isOff.filter(function (d) {
+                        return scale.domain().indexOf(d) >= 0;
                     });
                     _this._invalidateLayout();
                 });

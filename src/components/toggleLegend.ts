@@ -35,14 +35,8 @@ module Plottable {
         var curLegend = super.scale(scale);
         // overwrite our previous listener from when we called super
         curLegend._registerToBroadcaster (scale, () => {
-          var oldState = this.isOff.slice(0);
-          this.isOff = [];
-          scale.domain().forEach((d: any) => {
-            // preserves the state of any previously existing element
-            if (oldState.indexOf(d) >= 0) {
-              this.isOff.push(d);
-            }
-          });
+          // preserve the state of already existing elements
+          this.isOff = this.isOff.filter((d) => scale.domain().indexOf(d) >= 0);
           this._invalidateLayout();
         });
         return curLegend;
