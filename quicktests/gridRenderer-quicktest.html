@@ -7,8 +7,9 @@
         background-color: #EEE;
       }
 
-      svg text {
-        font-size: 14pt !important;
+
+      .demo-title {
+        font-size: 24pt;
       }
 
       div {
@@ -19,7 +20,9 @@
     <script src="../../plottable_multifile.js"></script>
 
     <script>
-    Plottable.RenderController.enabled = false;
+window.onload = function() {
+
+Plottable.RenderController.enabled = false;
     var c1, c2, c3;
     var xScale, yScale, colorScale, xAxisB, xAxisT, yAxisL, yAxisR, gridRenderer;
       function randomData() {
@@ -34,11 +37,26 @@
 
       function staticData() {
         return [
-          { category: "Work",  day : "May-01", awesomeness: 2 },
-          { category: "Work",  day : "May-02", awesomeness: 3.5 },
-          { category: "Food Is Tasty And I like it",  day : "May-03", awesomeness: 9 },
-          { category: "Sex",   day : "May the Fourth Be With You", awesomeness: 16 },
-          { category: "Sleep", day : "May-05", awesomeness: 8 }
+          { category: "Work",  day : "May-01", awesomeness: 0 },
+          { category: "Work",  day : "May-02", awesomeness: 1 },
+          { category: "Work",  day : "May-03", awesomeness: 2 },
+          { category: "Work",  day : "May the Fourth Be With You", awesomeness: 3 },
+          { category: "Work",  day : "May-05", awesomeness: 4 },
+          { category: "Food Is Tasty And I like it",  day : "May-01", awesomeness: 5 },
+          { category: "Food Is Tasty And I like it",  day : "May-02", awesomeness: 6 },
+          { category: "Food Is Tasty And I like it",  day : "May-03", awesomeness: 7 },
+          { category: "Food Is Tasty And I like it",  day : "May the Fourth Be With You", awesomeness: 8 },
+          { category: "Food Is Tasty And I like it",  day : "May-05", awesomeness: 9 },
+          { category: "Sex",   day : "May-01", awesomeness: 10 },
+          { category: "Sex",   day : "May-02", awesomeness: 11 },
+          { category: "Sex",   day : "May-03", awesomeness: 12 },
+          { category: "Sex",   day : "May the Fourth Be With You", awesomeness: 13 },
+          { category: "Sex",   day : "May-05", awesomeness: 14 },
+          { category: "Sleep", day : "May-01", awesomeness: 15 },
+          { category: "Sleep", day : "May-02", awesomeness: 16 },
+          { category: "Sleep", day : "May-03", awesomeness: 17 },
+          { category: "Sleep", day : "May the Fourth Be With You", awesomeness: 18 },
+          { category: "Sleep", day : "May-05", awesomeness: 19 }
         ];
     }
 
@@ -66,11 +84,10 @@
             .renderTo(selector);
       };
 
-      window.onload = function() {
         c1 = makeChart("#life0", "reds", randomData());
-        // c2 = makeChart("#life1", "blues", randomData());
-        // c3 = makeChart("#life2", ["dodgerblue", "white", "lime"], staticData());
-      };
+        c2 = makeChart("#life1", ["red", "orange", "yellow", "green", "blue", "purple", "pink"], staticData());
+        c3 = makeChart("#life2", ["lime", "gray"], randomData());
+
 
       function x(align) {
         window.xOrient = align;
@@ -85,6 +102,7 @@
         c2._invalidateLayout();
         c3._invalidateLayout();
       }
+}
 
     </script>
   </head>

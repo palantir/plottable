@@ -192,7 +192,6 @@ module Plottable {
         }
 
         if (nIterations > 5) {
-          console.log("More than 5 iterations in Table.iterateLayout; please report the circumstances");
           break;
         }
       }
