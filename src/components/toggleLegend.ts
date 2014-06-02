@@ -13,7 +13,7 @@ module Plottable {
      * @param {ColorScale} colorScale
      * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
      * @param {any} callback.d The legend entry.
-     * @param {boolean} callback.b The isOff that the entry has changed to.
+     * @param {boolean} callback.b The state that the entry has changed to.
      */
     constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any) {
       super(colorScale);
