@@ -92,11 +92,9 @@ module Plottable {
       var textHeight = this.measureTextHeight();
       var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
-      var legend: D3.UpdateSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain);
+      var legend: D3.UpdateSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
-          .append("g").classed(Legend._SUBELEMENT_CLASS, true)
-          .sort((a, b) => domain.indexOf(a) - domain.indexOf(b)) // sort items based on their index in domain
-          .attr("transform", (d: any, i: number) => "translate(0," + i * textHeight + ")");
+          .append("g").classed(Legend._SUBELEMENT_CLASS, true);
       legendEnter.append("circle")
           .attr("cx", Legend.MARGIN + r/2)
           .attr("cy", Legend.MARGIN + r/2)
@@ -104,9 +102,11 @@ module Plottable {
       legendEnter.append("text")
           .attr("x", textHeight)
           .attr("y", Legend.MARGIN + textHeight / 2);
+      legend.exit().remove();
+      legend.attr("transform", (d: any) => "translate(0," + domain.indexOf(d) * textHeight + ")");
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: any, i: number) {return TextUtils.getTruncatedText(d, availableWidth , d3.select(this));});
+            .text(function(d: any) {return TextUtils.getTruncatedText(d, availableWidth , d3.select(this));});
       return this;
     }
   }

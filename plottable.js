@@ -3331,16 +3331,18 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-            var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain);
-            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true).sort(function (a, b) {
-                return domain.indexOf(a) - domain.indexOf(b);
-            }).attr("transform", function (d, i) {
-                return "translate(0," + i * textHeight + ")";
+            var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain, function (d) {
+                return d;
             });
+            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true);
             legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
             legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
+            legend.exit().remove();
+            legend.attr("transform", function (d) {
+                return "translate(0," + domain.indexOf(d) * textHeight + ")";
+            });
             legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
-            legend.selectAll("text").text(function (d, i) {
+            legend.selectAll("text").text(function (d) {
                 return Plottable.TextUtils.getTruncatedText(d, availableWidth, d3.select(this));
             });
             return this;
@@ -3368,40 +3370,62 @@ var Plottable;
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d: any, b: boolean) => any} update The callback function for clicking on a legend entry.
-        * @param {any} update.d The legend entry.
-        * @param {boolean} update.b The state that the entry has changed to.
+        * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
+        * @param {any} callback.d The legend entry.
+        * @param {boolean} callback.b The state that the entry has changed to.
         */
-        function ToggleLegend(colorScale, update) {
-            var _this = this;
+        function ToggleLegend(colorScale, callback) {
             _super.call(this, colorScale);
-            this.update = update;
-            this.state = [];
-
+            this.callback = callback;
+            this.isOff = [];
             // initially, everything is toggled on
-            colorScale.domain().forEach(function (d) {
-                return _this.state.splice(0, 0, d);
-            });
         }
+        ToggleLegend.prototype.scale = function (scale) {
+            var _this = this;
+            if (scale != null) {
+                var curLegend = _super.prototype.scale.call(this, scale);
+
+                // hack to make sure broadcaster will update the isOff array whenever scale gets changed
+                // first deregister this scale from when we called super.scale
+                curLegend._deregisterFromBroadcaster(scale);
+
+                // now register with our own method
+                curLegend._registerToBroadcaster(scale, function () {
+                    var oldState = _this.isOff === undefined ? [] : _this.isOff.slice(0);
+                    _this.isOff = [];
+                    scale.domain().forEach(function (d) {
+                        // preserves the state of any existing element
+                        if (oldState.indexOf(d) >= 0) {
+                            _this.isOff.splice(0, 0, d);
+                        }
+                    });
+                    _this._invalidateLayout();
+                });
+                return curLegend;
+            } else {
+                return _super.prototype.scale.call(this);
+            }
+        };
+
         ToggleLegend.prototype._doRender = function () {
             var _this = this;
             _super.prototype._doRender.call(this);
             var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
             dataSelection.classed("toggled-on", function (d) {
-                return _this.state.indexOf(d) >= 0;
+                return _this.isOff.indexOf(d) < 0;
             });
             dataSelection.classed("toggled-off", function (d) {
-                return _this.state.indexOf(d) < 0;
+                return _this.isOff.indexOf(d) >= 0;
             });
-            dataSelection.on("click", function (d, i) {
-                var index = _this.state.indexOf(d);
-                var isOn = index >= 0;
+            dataSelection.on("click", function (d) {
+                var index = _this.isOff.indexOf(d);
+                var isOn = index < 0;
                 if (isOn) {
-                    _this.state.splice(index, 1);
+                    _this.isOff.splice(0, 0, d);
                 } else {
-                    _this.state.splice(0, 0, d);
+                    _this.isOff.splice(index, 1);
                 }
-                _this.update(d, !isOn);
+                _this.callback(d, !isOn);
             });
             return this;
         };

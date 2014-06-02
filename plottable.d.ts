@@ -927,11 +927,12 @@ declare module Plottable {
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d: any, b: boolean) => any} update The callback function for clicking on a legend entry.
-        * @param {any} update.d The legend entry.
-        * @param {boolean} update.b The state that the entry has changed to.
+        * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
+        * @param {any} callback.d The legend entry.
+        * @param {boolean} callback.b The state that the entry has changed to.
         */
-        constructor(colorScale: ColorScale, update: (d: any, b: boolean) => any);
+        constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any);
+        public scale(scale?: ColorScale): any;
     }
 }
 
