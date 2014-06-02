@@ -1,9 +1,3 @@
-/*!
-Plottable 0.13.7 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -339,7 +333,8 @@ var Plottable;
             var h = bb.height;
             var w = bb.width;
             if (w > width || h > height) {
-                throw new Error("Insufficient space to fit text");
+                console.log("Insufficient space to fit text");
+                return [0, 0];
             }
             var anchorConverter = { left: "start", center: "middle", right: "end" };
             var anchor = anchorConverter[xAlign];

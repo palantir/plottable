@@ -114,7 +114,8 @@ module Plottable {
       var h = bb.height;
       var w = bb.width;
       if (w > width || h > height) {
-        throw new Error("Insufficient space to fit text");
+        console.log("Insufficient space to fit text");
+        return [0, 0];
       }
       var anchorConverter: {[s: string]: string} = {left: "start", center: "middle", right: "end"};
       var anchor: string = anchorConverter[xAlign];
