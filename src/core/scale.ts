@@ -37,6 +37,16 @@ module Plottable {
       return []; // this should be overwritten
     }
 
+    public _getAllValues(): number[] {
+      var perspectives: IPerspective[] = d3.values(this.rendererID2Perspective);
+      var extents = perspectives.map((p) => {
+        var source = p.dataSource;
+        var accessor = p.accessor;
+        return source._getValues(accessor);
+      });
+      return Utils.flatten(extents);
+    }
+
     /**
      * Modify the domain on the scale so that it includes the extent of all
      * perspectives it depends on. Extent: The (min, max) pair for a

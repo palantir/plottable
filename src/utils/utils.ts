@@ -61,5 +61,14 @@ module Plottable {
       }
       return out;
     }
+
+    /**
+     * Returns the concatenation of each sub-array in `a`. Note that it isn't
+     * recursive, it only goes "one level down" so that it can have a proper
+     * type signature.
+     */
+    export function flatten(a: any[][]): any[] {
+      return Array.prototype.concat.apply([], a);
+    }
   }
 }
