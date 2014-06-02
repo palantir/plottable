@@ -186,7 +186,7 @@ describe("Tables", () => {
     assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
   });
 
-  it("table._requestedSpace works properly", () => {
+  it.skip("table._requestedSpace works properly", () => {
     // [0 1]
     // [2 3]
     var c0 = new Plottable.Component();
@@ -237,7 +237,7 @@ describe("Tables", () => {
       verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
     });
 
-    it("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", () => {
+    it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", () => {
       fixComponentSize(c1, 490, 50);
       var result = (<any> table).iterateLayout(500, 500);
       verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
@@ -259,7 +259,7 @@ describe("Tables", () => {
       verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
     });
 
-    it("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {
+    it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", () => {
       table = new Plottable.Table([[c1, c2]]);
       fixComponentSize(c1, null, null);
       c2._requestedSpace = (w: number, h: number) => {

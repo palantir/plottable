@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <script>
+var renderGroup;
+var renderArea1;
+var renderArea2;
+
+var Data = function(){
+     var array;
+     a0 = {
+        y: "cats",
+        x: 30
+     }
+     a1 = {
+        y: "dogs",
+        x: 80
+     }
+     a2 = {
+        y: "snakes",
+        x: 10
+     }
+     a3 = {
+        y: "rats",
+        x: 2
+     }
+     a4 = {
+        y: "birds",
+        x: 7
+     }
+    array = [a0, a1, a2, a3, a4];
+    return array;
+}
+
+var Data2 = function(){
+     var array;
+     a0 = {
+        x: "cats cats catscats cats cats",
+        y: 30
+     }
+     a1 = {
+        x: "dogs dogs dogsdogs dogs dogs",
+        y: 80
+     }
+     a2 = {
+        x: "snakes snakes snakessnakes snakes snakes",
+        y: 10
+     }
+     a3 = {
+        x: "rats rats ratsrats rats rats",
+        y: 2
+     }
+     a4 = {
+        x: "birds bird birdsbirds birds birds",
+        y: 7
+     }
+    array = [a0, a1, a2, a3, a4];
+    return array;
+}
+
+
+window.onload = function () {
+    svg = d3.select("#chart");
+    svg.attr("width", 900).attr("height", 300);
+
+    //HORIZONTAL
+    //data
+    dataseries = new Plottable.DataSource(Data());
+    //Axis
+    xScale = new Plottable.LinearScale().domain([0, 90]);
+    yScale = new Plottable.OrdinalScale();
+    xAxis = new Plottable.XAxis(xScale, "bottom");
+    yAxis = new Plottable.CategoryAxis(yScale, "left");
+    //rendering
+    renderArea1 = new Plottable.HorizontalBarRenderer(dataseries, xScale, yScale);
+    basicTable = new Plottable.Table()
+                .addComponent(0, 0, yAxis)
+                .addComponent(0, 1, renderArea1)
+                .addComponent(1, 1, xAxis);
+
+    //VERTICAL
+    //data
+    dataseries2 = new Plottable.DataSource(Data2());
+    //Axis
+    xScale2 = new Plottable.OrdinalScale();
+    yScale2 = new Plottable.LinearScale().domain([0, 90]);
+    xAxis2 = new Plottable.CategoryAxis(xScale2, "top");
+    yAxis2 = new Plottable.YAxis(yScale2, "right");
+    //rendering
+    renderArea2 = new Plottable.BarRenderer(dataseries2, xScale2, yScale2);
+    basicTable2 = new Plottable.Table()
+                .addComponent(1, 1, yAxis2)
+                .addComponent(1, 0, renderArea2)
+                .addComponent(0, 0, xAxis2);
+
+
+    bigTable = new Plottable.Table()
+            .addComponent(0,0, basicTable)
+            .addComponent(1,0, basicTable2)
+
+    bigTable.renderTo(svg);
+};
+
+
+
+
+
+    </script>
+    </head>
+
+<body>
+<div class="demo-title">Simple Chart</div>
+<br>
+
+
+<br>
+<svg id="chart"></svg>
+
+
+
+<p />
+</body>
+</html>
