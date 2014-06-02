@@ -22,21 +22,25 @@ module Plottable {
       // initially, everything is toggled on
     }
 
+    /**
+     * Assigns a new ColorScale to the Legend.
+     *
+     * @param {ColorScale} scale
+     * @returns {ToggleLegend} The calling ToggleLegend.
+     */
+    public scale(scale: ColorScale): ToggleLegend;
+    public scale(): ColorScale;
     public scale(scale?: ColorScale): any {
       if (scale != null) {
-
         var curLegend = super.scale(scale);
-        // hack to make sure broadcaster will update the isOff array whenever scale gets changed
-        // first deregister this scale from when we called super.scale
-        curLegend._deregisterFromBroadcaster(scale);
-        // now register with our own method
+        // overwrite our previous listener from when we called super
         curLegend._registerToBroadcaster (scale, () => {
-          var oldState = this.isOff === undefined ? [] : this.isOff.slice(0);
+          var oldState = this.isOff.slice(0);
           this.isOff = [];
           scale.domain().forEach((d: any) => {
-            // preserves the state of any existing element
+            // preserves the state of any previously existing element
             if (oldState.indexOf(d) >= 0) {
-              this.isOff.splice(0, 0, d);
+              this.isOff.push(d);
             }
           });
           this._invalidateLayout();
@@ -54,13 +58,13 @@ module Plottable {
       dataSelection.classed("toggled-off", (d: any) => this.isOff.indexOf(d) >= 0);
       dataSelection.on("click", (d: any) => {
         var index = this.isOff.indexOf(d);
-        var isOn = index < 0;
-        if (isOn) { // add it into isOff array
-          this.isOff.splice(0, 0, d);
+        var turningOff = index < 0;
+        if (turningOff) { // add it into isOff array
+          this.isOff.push(d);
         } else { // otherwise remove it
           this.isOff.splice(index, 1);
         }
-        this.callback(d, !isOn);
+        this.callback(d, !turningOff);
       });
       return this;
     }

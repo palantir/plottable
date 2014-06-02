@@ -4065,18 +4065,14 @@ var Plottable;
             if (scale != null) {
                 var curLegend = _super.prototype.scale.call(this, scale);
 
-                // hack to make sure broadcaster will update the isOff array whenever scale gets changed
-                // first deregister this scale from when we called super.scale
-                curLegend._deregisterFromBroadcaster(scale);
-
-                // now register with our own method
+                // overwrite our previous listener from when we called super
                 curLegend._registerToBroadcaster(scale, function () {
-                    var oldState = _this.isOff === undefined ? [] : _this.isOff.slice(0);
+                    var oldState = _this.isOff.slice(0);
                     _this.isOff = [];
                     scale.domain().forEach(function (d) {
-                        // preserves the state of any existing element
+                        // preserves the state of any previously existing element
                         if (oldState.indexOf(d) >= 0) {
-                            _this.isOff.splice(0, 0, d);
+                            _this.isOff.push(d);
                         }
                     });
                     _this._invalidateLayout();
@@ -4099,13 +4095,13 @@ var Plottable;
             });
             dataSelection.on("click", function (d) {
                 var index = _this.isOff.indexOf(d);
-                var isOn = index < 0;
-                if (isOn) {
-                    _this.isOff.splice(0, 0, d);
+                var turningOff = index < 0;
+                if (turningOff) {
+                    _this.isOff.push(d);
                 } else {
                     _this.isOff.splice(index, 1);
                 }
-                _this.callback(d, !isOn);
+                _this.callback(d, !turningOff);
             });
             return this;
         };

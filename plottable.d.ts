@@ -1040,7 +1040,14 @@ declare module Plottable {
         * @param {boolean} callback.b The state that the entry has changed to.
         */
         constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any);
-        public scale(scale?: ColorScale): any;
+        /**
+        * Assigns a new ColorScale to the Legend.
+        *
+        * @param {ColorScale} scale
+        * @returns {ToggleLegend} The calling ToggleLegend.
+        */
+        public scale(scale: ColorScale): ToggleLegend;
+        public scale(): ColorScale;
     }
 }
 

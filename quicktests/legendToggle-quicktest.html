@@ -9,17 +9,16 @@
     </style>
 
     <script>
-
-      window.onload = function() {
         var renderers = [];
 
 
         var colors = new Plottable.ColorScale("10").range();
+        var maxRenderers = 10;
         var numRenderers = 5;
-        var names = ["bat", "cat", "mat", "rat", "pat"];
+        var names = ["bat", "cat", "hat", "rat", "pat", "mat", "sat", "vat", "at", "splat"];
         var colorScale = new Plottable.ColorScale();
         colorScale.range(colors);
-        colorScale.domain(names);
+        colorScale.domain(names.slice(0, numRenderers));
 
 
         var xScale = new Plottable.LinearScale();
@@ -59,12 +58,56 @@
         var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
 
         var outerTable = new Plottable.Table([[chart, legendTable]]);
+
+      window.onload = function() {
         outerTable.renderTo("#legend-toggle-test");
+      }
+
+      function shuffle() {
+        for (var i = 1; i < numRenderers; i++) {
+            var j = Math.floor(Math.random() * (i + 1));
+            if (j == i) {
+                continue;
+            }
+            var t = names[i]; names[i] = names[j]; names[j] = t;
+            t = renderers[i]; renderers[i] = renderers[j]; renderers[j] = t;
+            t = colors[i]; colors[i] = colors[j]; colors[j] = t;
+        }
+        renderers.forEach(function(renderer, i) {
+            renderer.project("stroke", function() { return colors[i]; });
+        });
+        colorScale.range(colors);
+        colorScale.domain(names.slice(0, numRenderers));
+      }
+
+      function removeRenderer() {
+        if (numRenderers > 0) {
+          (renderers[numRenderers - 1]).remove();
+          numRenderers--;
+          colorScale.domain(names.slice(0, numRenderers));
+        }
+      }
+
+      function addRenderer() {
+        if (numRenderers < maxRenderers) {
+          var data = makeRandomData(20);
+          var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+          var nextColor = colors[numRenderers]
+          renderer.project("stroke", function() { return nextColor; });
+          renderers.push(renderer);
+          cg.merge(renderers[numRenderers]);
+          numRenderers++;
+          colorScale.domain(names.slice(0, numRenderers));
+        }
       }
     </script>
   </head>
   <body>
     <svg id="legend-toggle-test" width="480" height="320"></svg>
+    <p />
+    <button name="shuffle" onclick="shuffle()">Shuffle</button>
+    <button name="remove" onclick="removeRenderer()">Remove</button>
+    <button name="add" onclick="addRenderer()">Add</button>
   </body>
 
 </html>
