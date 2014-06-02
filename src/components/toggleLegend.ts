@@ -23,6 +23,32 @@ module Plottable {
       colorScale.domain().forEach((d: any) => this.state.splice(0, 0, d));
     }
 
+    public scale(scale?: ColorScale): any {
+      if (scale != null) {
+        var oldDomain = this.scale() === undefined ? [] : this.scale().domain();
+        var oldState = this.state === undefined ? [] : this.state.slice(0);
+
+        var curLegend = super.scale(scale);
+        // hack to make sure broadcaster will update the state array whenever scale gets changed
+        // first deregister this scale from when we called super.scale
+        curLegend._deregisterFromBroadcaster(scale);
+        // now register with our own method
+        curLegend._registerToBroadcaster (scale, () => {
+          this.state = [];
+          scale.domain().forEach((d: any) => {
+            // preserves the state of any existing element
+            if (oldDomain.indexOf(d) < 0 || oldState.indexOf(d) >= 0) {
+              this.state.splice(0, 0, d);
+            }
+          });
+          this._invalidateLayout();
+        });
+        return curLegend;
+      } else {
+        return super.scale();
+      }
+    }
+
     public _doRender(): ToggleLegend {
       super._doRender();
       var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);

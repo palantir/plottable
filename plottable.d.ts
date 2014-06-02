@@ -932,6 +932,7 @@ declare module Plottable {
         * @param {boolean} callback.b The state that the entry has changed to.
         */
         constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any);
+        public scale(scale?: ColorScale): any;
     }
 }
 

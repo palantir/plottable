@@ -101,4 +101,23 @@ describe("Legends", () => {
     assert.lengthOf(legend.content.selectAll(".legend-row")[0], 5, "there are the right number of legend elements");
     svg.remove();
   });
+
+  describe("Legend toggle tests", () => {
+    var toggleLegend: Plottable.ToggleLegend;
+
+    beforeEach(() => {
+      toggleLegend = new Plottable.ToggleLegend(color, (d, b) => d);
+    });
+
+    it("basic initialization tests", () => {
+      color.domain(["a", "b", "c", "d", "e"]);
+      toggleLegend.renderTo(svg);
+      toggleLegend.content.selectAll(".legend-row").each(function(d, i) {
+        var selection = d3.select(this);
+        assert.equal(selection.classed("toggled-on"), true, "should be toggled on");
+        assert.equal(selection.classed("toggled-off"), false, "shouldn't be toggled off");
+      });
+      svg.remove();
+    });
+  });
 });
