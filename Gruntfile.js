@@ -193,7 +193,7 @@ module.exports = function(grunt) {
     blanket_mocha: {
       all: ['test/coverage.html'],
       options: {
-        threshold: 80
+        threshold: 70
       }
     },
     connect: {
@@ -288,12 +288,14 @@ module.exports = function(grunt) {
                                   "concat:plottable_multifile",
                                   "sed:plottable_multifile",
                                   "clean:tscommand"]);
+
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
+                                  "tslint",
                                   "blanket_mocha",
                                   "uglify",
                                   "compress"

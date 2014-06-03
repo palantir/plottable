@@ -3,23 +3,29 @@
     <title>Overlapping Labels</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <script src="../bower_components/d3/d3.min.js"></script>
+    <style>
+      svg {
+        background-color: #EEE;
+      }
+    </style>
     <script src="../../plottable_multifile.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
 
     <script>
       var data = [
-          { name: "Spot", age: 8 },
+          { name: "Supercalifragilisticexpialidocious", age: 8 },
           { name: "Poptart", age: 1 },
           { name: "Budoka", age: 3 },
-          { name: "Sugar", age: 14 },
-          { name: "Temporal Asynchronous Cat", age: -5 }
+          { name: "Sugar Daddy", age: 14 },
+          { name: "Long Naaaaaaaaaaaaaaaaaaaaaaaaaaame", age: 4 },
+          { name: "Temporal Async Cat Tiger Man", age: -5 }
         ];
 
       var cuteFormatter = function(d) { return d + " is a pretty darn cute cat"; } ;
 
       var ds = new Plottable.DataSource(data);
       var xScale = new Plottable.OrdinalScale().rangeType("bands");
-      var xAxis = new Plottable.XAxis(xScale, "bottom", cuteFormatter).height(60);
+      var xAxis = new Plottable.CategoryAxis(xScale);
 
       var yScale = new Plottable.LinearScale();
       var yAxis = new Plottable.YAxis(yScale, "left");
@@ -39,7 +45,8 @@
       var xAxis2 = new Plottable.XAxis(xScale2, "bottom");
 
       var yScale2 = new Plottable.OrdinalScale().rangeType("bands");
-      var yAxis2 = new Plottable.YAxis(yScale2, "left").width(80);//, cuteFormatter);
+      var yAxis2 = new Plottable.CategoryAxis(yScale2, "left");
+      window.yAxis = yAxis2;
 
       var horizBarRenderer = new Plottable.HorizontalBarRenderer(ds, xScale2, yScale2)
                               .project("x", "age", xScale2)
