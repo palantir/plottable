@@ -105,6 +105,7 @@ module Plottable {
     }
 
     public project(attrToSet: string, accessor: any, scale?: Scale) {
+      attrToSet = attrToSet.toLowerCase();
       var rendererIDAttr = this._plottableID + attrToSet;
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
