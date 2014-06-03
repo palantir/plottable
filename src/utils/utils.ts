@@ -36,7 +36,7 @@ module Plottable {
      * @param {D3.Set} set2 The second set
      * @return {D3.Set} A set that contains elements that appear in both set1 and set2
      */
-    export function intersection (set1: D3.Set, set2: D3.Set) {
+    export function intersection(set1: D3.Set, set2: D3.Set) {
       var set = d3.set([]);
       set1.forEach((v) => {
         if(set2.has(v)) {

@@ -2,7 +2,7 @@
 
 module Plottable {
   export class ToggleLegend extends Legend {
-    private callback: (datum: any, setState: boolean) => any;
+    private callback: (datum: any, newState: boolean) => any;
 
     // this is the set of all elements that are currently toggled off
     private isOff: D3.Set;
@@ -12,13 +12,13 @@ module Plottable {
      *
      * @constructor
      * @param {ColorScale} colorScale
-     * @param {(datum: any, setState: boolean) => any} callback The callback function for clicking on a legend entry.
+     * @param {(datum: any, newState: boolean) => any} callback The function to be called when a legend entry is clicked.
      */
-    constructor(colorScale: ColorScale, callback: (datum: any, setState: boolean) => any) {
-      super(colorScale);
+    constructor(colorScale: ColorScale, callback: (datum: any, newState: boolean) => any) {
       this.callback = callback;
-      this.isOff = d3.set([]);
       // initially, everything is toggled on
+      this.isOff = d3.set([]);
+      super(colorScale);
     }
 
     /**
@@ -33,9 +33,11 @@ module Plottable {
         // overwrite our previous listener from when we called super
         this._registerToBroadcaster (scale, () => {
           // preserve the state of already existing elements
-          this.isOff = Utils.intersection(this.isOff, d3.set(scale.domain()));
+          this.isOff = Utils.intersection(this.isOff, d3.set(this.scale().domain()));
           this._invalidateLayout();
         });
+        this.isOff = Utils.intersection(this.isOff, d3.set(this.scale().domain()));
+        this.updateClasses();
         return this;
       } else {
         return super.scale();
@@ -59,9 +61,11 @@ module Plottable {
     }
 
     private updateClasses() {
-      var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
-      dataSelection.classed("toggled-on", (d: any) => !this.isOff.has(d));
-      dataSelection.classed("toggled-off", (d: any) => this.isOff.has(d));
+      if (this.content !== undefined) {
+        var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
+        dataSelection.classed("toggled-on", (d: any) => !this.isOff.has(d));
+        dataSelection.classed("toggled-off", (d: any) => this.isOff.has(d));
+      }
     }
   }
 }

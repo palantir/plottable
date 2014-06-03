@@ -1049,9 +1049,9 @@ declare module Plottable {
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(datum: any, setState: boolean) => any} callback The callback function for clicking on a legend entry.
+        * @param {(datum: any, newState: boolean) => any} callback The function to be called when a legend entry is clicked.
         */
-        constructor(colorScale: ColorScale, callback: (datum: any, setState: boolean) => any);
+        constructor(colorScale: ColorScale, callback: (datum: any, newState: boolean) => any);
         /**
         * Assigns a new ColorScale to the Legend.
         *

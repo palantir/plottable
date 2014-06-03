@@ -3990,6 +3990,7 @@ var Plottable;
                 this._registerToBroadcaster(this.colorScale, function () {
                     return _this._invalidateLayout();
                 });
+                this._invalidateLayout();
                 return this;
             } else {
                 return this.colorScale;
@@ -4078,13 +4079,14 @@ var Plottable;
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(datum: any, setState: boolean) => any} callback The callback function for clicking on a legend entry.
+        * @param {(datum: any, newState: boolean) => any} callback The function to be called when a legend entry is clicked.
         */
         function ToggleLegend(colorScale, callback) {
-            _super.call(this, colorScale);
             this.callback = callback;
-            this.isOff = d3.set([]);
+
             // initially, everything is toggled on
+            this.isOff = d3.set([]);
+            _super.call(this, colorScale);
         }
         /**
         * Assigns a new ColorScale to the Legend.
@@ -4100,9 +4102,11 @@ var Plottable;
                 // overwrite our previous listener from when we called super
                 this._registerToBroadcaster(scale, function () {
                     // preserve the state of already existing elements
-                    _this.isOff = Plottable.Utils.intersection(_this.isOff, d3.set(scale.domain()));
+                    _this.isOff = Plottable.Utils.intersection(_this.isOff, d3.set(_this.scale().domain()));
                     _this._invalidateLayout();
                 });
+                this.isOff = Plottable.Utils.intersection(this.isOff, d3.set(this.scale().domain()));
+                this.updateClasses();
                 return this;
             } else {
                 return _super.prototype.scale.call(this);
@@ -4128,13 +4132,15 @@ var Plottable;
 
         ToggleLegend.prototype.updateClasses = function () {
             var _this = this;
-            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
-            dataSelection.classed("toggled-on", function (d) {
-                return !_this.isOff.has(d);
-            });
-            dataSelection.classed("toggled-off", function (d) {
-                return _this.isOff.has(d);
-            });
+            if (this.content != undefined) {
+                var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+                dataSelection.classed("toggled-on", function (d) {
+                    return !_this.isOff.has(d);
+                });
+                dataSelection.classed("toggled-off", function (d) {
+                    return _this.isOff.has(d);
+                });
+            }
         };
         return ToggleLegend;
     })(Plottable.Legend);

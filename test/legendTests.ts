@@ -90,9 +90,10 @@ describe("Legends", () => {
     legend.renderTo(svg);
     var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
     color.domain(newDomain);
-    legend._computeLayout()._render();
+    // due to how joins work, this is how the elements should be arranged by d3
+    var newDomainActualOrder = ["foo", "baz", "mushu", "persei", "eight"];
     legend.content.selectAll(".legend-row").each(function(d, i) {
-      // assert.equal(d, newDomain[i], "the data was set properly");
+      assert.equal(d, newDomainActualOrder[i], "the data is set correctly");
       var text = d3.select(this).select("text").text();
       assert.equal(text, d, "the text was set properly");
       var fill = d3.select(this).select("circle").attr("fill");
@@ -102,7 +103,48 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  describe("Legend toggle tests", () => {
+  it("legend.scale() replaces domain", () => {
+    color.domain(["foo", "bar", "baz"]);
+    legend.renderTo(svg);
+
+    var newDomain = ["a", "b", "c"];
+    var newColorScale = new Plottable.ColorScale("20");
+    newColorScale.domain(newDomain);
+    legend.scale(newColorScale);
+
+    legend.content.selectAll(".legend-row").each(function(d, i) {
+      assert.equal(d, newDomain[i], "the data is set correctly");
+      var text = d3.select(this).select("text").text();
+      assert.equal(text, d, "the text was set properly");
+      var fill = d3.select(this).select("circle").attr("fill");
+      assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
+    });
+
+    svg.remove();
+  });
+
+  it("legend.scale() correctly reregisters listeners", () => {
+    color.domain(["foo", "bar", "baz"]);
+    legend.renderTo(svg);
+
+    var tempDomain = ["a", "b", "c"];
+    var newColorScale = new Plottable.ColorScale("20");
+    newColorScale.domain(tempDomain);
+    legend.scale(newColorScale);
+
+    var newDomain = ["a", "foo", "d"];
+    newColorScale.domain(newDomain);
+    legend.content.selectAll(".legend-row").each(function(d, i) {
+      assert.equal(d, newDomain[i], "the data is set correctly");
+      var text = d3.select(this).select("text").text();
+      assert.equal(text, d, "the text was set properly");
+      var fill = d3.select(this).select("circle").attr("fill");
+      assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
+    });
+    svg.remove();
+  });
+
+  describe("ToggleLegend tests", () => {
     var toggleLegend: Plottable.ToggleLegend;
 
     beforeEach(() => {
@@ -112,6 +154,20 @@ describe("Legends", () => {
     function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
       assert.equal(selection.classed("toggled-on"), b, msg);
       assert.equal(selection.classed("toggled-off"), !b, msg);
+    }
+
+    function getSelection(datum: any) {
+      var selection = toggleLegend.content.selectAll(".legend-row")
+        .filter((d, i) => d === datum);
+      return selection;
+    }
+
+    function verifyEntry(datum: any, b: boolean, msg?: string) {
+      verifyState(getSelection(datum), b, msg);
+    }
+
+    function toggleEntry(datum: any, index: number) {
+      getSelection(datum).on("click")(datum, index);
     }
 
     it("basic initialization test", () => {
@@ -131,24 +187,46 @@ describe("Legends", () => {
         var selection = d3.select(this);
         selection.on("click")(d, i);
         verifyState(selection, false);
+        selection.on("click")(d, i);
+        verifyState(selection, true);
       });
       svg.remove();
     });
 
-    it("random toggling tests", () => {
-      var numElements = 5;
+    it("toggleLegend.scale() works as intended", () => {
       var domain = ["a", "b", "c", "d", "e"];
       color.domain(domain);
       toggleLegend.renderTo(svg);
-      var state = [true, true, true, true, true];
-      for (var t = 0; t < 20; t++) {
-        var index = Math.floor(Math.random() * numElements);
-        var selection = toggleLegend.content.selectAll(".legend-row")
-          .filter((d, i) => d === domain[index]);
-        selection.on("click")(domain[index], index);
-        state[index] = !state[index];
-        verifyState(selection, state[index]);
-      }
+      toggleEntry("a", 1);
+      toggleEntry("d", 4);
+      toggleEntry("c", 3);
+
+      var newDomain = ["r", "a", "d", "g"];
+      var newColorScale = new Plottable.ColorScale("Category10");
+      newColorScale.domain(newDomain);
+      toggleLegend.scale(newColorScale);
+
+      verifyEntry("r", true);
+      verifyEntry("a", false);
+      verifyEntry("g", true);
+      verifyEntry("d", false);
+
+      svg.remove();
+    });
+
+    it("listeners on scale will correctly update states", () =>  {
+      color.domain(["a", "b", "c", "d", "e"]);
+      toggleLegend.renderTo(svg);
+      toggleEntry("a", 1);
+      toggleEntry("d", 4);
+      toggleEntry("c", 3);
+
+      color.domain(["e", "d", "b", "a", "c"]);
+      verifyEntry("a", false);
+      verifyEntry("b", true);
+      verifyEntry("c", false);
+      verifyEntry("d", false);
+      verifyEntry("e", true);
       svg.remove();
     });
   });

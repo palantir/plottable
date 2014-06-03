@@ -45,6 +45,7 @@ module Plottable {
         }
         this.colorScale = scale;
         this._registerToBroadcaster(this.colorScale, () => this._invalidateLayout());
+        this._invalidateLayout();
         return this;
       } else {
         return this.colorScale;
