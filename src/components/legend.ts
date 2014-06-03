@@ -7,7 +7,6 @@ module Plottable {
 
     private colorScale: ColorScale;
     private maxWidth: number;
-    private legendBox: D3.Selection;
     private nRowsDrawn: number;
 
     /**
@@ -22,12 +21,6 @@ module Plottable {
       this.scale(colorScale);
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
-    }
-
-    public _setup() {
-      super._setup();
-      this.legendBox = this.content.append("rect").classed("legend-box", true);
-      return this;
     }
 
     /**
@@ -45,6 +38,7 @@ module Plottable {
         }
         this.colorScale = scale;
         this._registerToBroadcaster(this.colorScale, () => this._invalidateLayout());
+        this._invalidateLayout();
         return this;
       } else {
         return this.colorScale;

@@ -1,5 +1,5 @@
 /*!
-Plottable 0.14.0 (https://github.com/palantir/plottable)
+Plottable 0.14.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -37,6 +37,24 @@ var Plottable;
             });
         }
         Utils.addArrays = addArrays;
+
+        /**
+        * Takes two sets and returns the intersection
+        *
+        * @param {D3.Set} set1 The first set
+        * @param {D3.Set} set2 The second set
+        * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+        */
+        function intersection(set1, set2) {
+            var set = d3.set();
+            set1.forEach(function (v) {
+                if (set2.has(v)) {
+                    set.add(v);
+                }
+            });
+            return set;
+        }
+        Utils.intersection = intersection;
 
         function accessorize(accessor) {
             if (typeof (accessor) === "function") {
@@ -2140,6 +2158,7 @@ var Plottable;
 
         Renderer.prototype.project = function (attrToSet, accessor, scale) {
             var _this = this;
+            attrToSet = attrToSet.toLowerCase();
             var rendererIDAttr = this._plottableID + attrToSet;
             var currentProjection = this._projectors[attrToSet];
             var existingScale = (currentProjection != null) ? currentProjection.scale : null;
@@ -2303,6 +2322,7 @@ var Plottable;
         function QuantitiveScale(scale) {
             _super.call(this, scale);
             this.lastRequestedTickCount = 10;
+            this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
         }
         QuantitiveScale.prototype._getExtent = function () {
             var extents = this._getAllExtents();
@@ -2424,12 +2444,15 @@ var Plottable;
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
             var currentDomain = this.domain();
             if (currentDomain[0] === currentDomain[1]) {
-                this._setDomain([currentDomain[0] - 1, currentDomain[0] + 1]);
+                var d = currentDomain[0].valueOf();
+                this._setDomain([d - this._PADDING_FOR_IDENTICAL_DOMAIN, d + this._PADDING_FOR_IDENTICAL_DOMAIN]);
                 return this;
             }
 
             var extent = currentDomain[1] - currentDomain[0];
-            var newDomain = [currentDomain[0] - padProportion / 2 * extent, currentDomain[1] + padProportion / 2 * extent];
+
+            // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
+            var newDomain = [currentDomain[0] - padProportion / 2 * extent, currentDomain[1].valueOf() + padProportion / 2 * extent];
             if (currentDomain[0] === 0) {
                 newDomain[0] = 0;
             }
@@ -2686,7 +2709,13 @@ var Plottable;
         */
         function TimeScale() {
             _super.call(this, d3.time.scale());
+            this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
         }
+        TimeScale.prototype._setDomain = function (values) {
+            _super.prototype._setDomain.call(this, values.map(function (d) {
+                return new Date(d);
+            }));
+        };
         return TimeScale;
     })(Plottable.QuantitiveScale);
     Plottable.TimeScale = TimeScale;
@@ -2932,6 +2961,7 @@ var Plottable;
             _super.call(this);
             this._showEndTickLabels = false;
             this.tickPositioning = "center";
+            this.orientToAlign = { left: "right", right: "left", top: "bottom", bottom: "top" };
             this._axisScale = axisScale;
             orientation = orientation.toLowerCase();
             this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
@@ -3180,6 +3210,8 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for XAxis");
             }
             this.tickLabelPosition("center");
+            var desiredAlignment = this.orientToAlign[orientation];
+            this.yAlign(desiredAlignment);
         }
         XAxis.prototype.height = function (h) {
             this._height = h;
@@ -3317,6 +3349,8 @@ var Plottable;
                 throw new Error(orientation + " is not a valid orientation for YAxis");
             }
             this.tickLabelPosition("middle");
+            var desiredAlignment = this.orientToAlign[orientation];
+            this.xAlign(desiredAlignment);
         }
         YAxis.prototype._setup = function () {
             _super.prototype._setup.call(this);
@@ -3946,12 +3980,6 @@ var Plottable;
             this.xAlign("RIGHT").yAlign("TOP");
             this.xOffset(5).yOffset(5);
         }
-        Legend.prototype._setup = function () {
-            _super.prototype._setup.call(this);
-            this.legendBox = this.content.append("rect").classed("legend-box", true);
-            return this;
-        };
-
         Legend.prototype.scale = function (scale) {
             var _this = this;
             if (scale != null) {
@@ -3962,6 +3990,7 @@ var Plottable;
                 this._registerToBroadcaster(this.colorScale, function () {
                     return _this._invalidateLayout();
                 });
+                this._invalidateLayout();
                 return this;
             } else {
                 return this.colorScale;
@@ -4050,38 +4079,44 @@ var Plottable;
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
-        * @param {any} callback.d The legend entry.
-        * @param {boolean} callback.b The state that the entry has changed to.
+        * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
         */
         function ToggleLegend(colorScale, callback) {
-            _super.call(this, colorScale);
             this.callback = callback;
-            this.isOff = [];
-            // initially, everything is toggled on
+            this.isOff = d3.set(); // initially, everything is toggled on
+            _super.call(this, colorScale);
         }
+        /**
+        * Assigns the callback to the ToggleLegend
+        * Call with argument of null to remove the callback
+        *
+        * @param{ToggleCallback} callback The new callback function
+        */
+        ToggleLegend.prototype.setCallback = function (callback) {
+            this.callback = callback;
+            return this;
+        };
+
+        /**
+        * Assigns a new ColorScale to the Legend.
+        *
+        * @param {ColorScale} scale
+        * @returns {ToggleLegend} The calling ToggleLegend.
+        */
         ToggleLegend.prototype.scale = function (scale) {
             var _this = this;
             if (scale != null) {
-                var curLegend = _super.prototype.scale.call(this, scale);
+                _super.prototype.scale.call(this, scale);
 
-                // hack to make sure broadcaster will update the isOff array whenever scale gets changed
-                // first deregister this scale from when we called super.scale
-                curLegend._deregisterFromBroadcaster(scale);
-
-                // now register with our own method
-                curLegend._registerToBroadcaster(scale, function () {
-                    var oldState = _this.isOff === undefined ? [] : _this.isOff.slice(0);
-                    _this.isOff = [];
-                    scale.domain().forEach(function (d) {
-                        // preserves the state of any existing element
-                        if (oldState.indexOf(d) >= 0) {
-                            _this.isOff.splice(0, 0, d);
-                        }
-                    });
+                // overwrite our previous listener from when we called super
+                this._registerToBroadcaster(scale, function () {
+                    // preserve the state of already existing elements
+                    _this.isOff = Plottable.Utils.intersection(_this.isOff, d3.set(_this.scale().domain()));
                     _this._invalidateLayout();
                 });
-                return curLegend;
+                this.isOff = Plottable.Utils.intersection(this.isOff, d3.set(this.scale().domain()));
+                this.updateClasses();
+                return this;
             } else {
                 return _super.prototype.scale.call(this);
             }
@@ -4090,24 +4125,33 @@ var Plottable;
         ToggleLegend.prototype._doRender = function () {
             var _this = this;
             _super.prototype._doRender.call(this);
-            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
-            dataSelection.classed("toggled-on", function (d) {
-                return _this.isOff.indexOf(d) < 0;
-            });
-            dataSelection.classed("toggled-off", function (d) {
-                return _this.isOff.indexOf(d) >= 0;
-            });
-            dataSelection.on("click", function (d) {
-                var index = _this.isOff.indexOf(d);
-                var isOn = index < 0;
-                if (isOn) {
-                    _this.isOff.splice(0, 0, d);
+            this.updateClasses();
+            this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS).on("click", function (d) {
+                var turningOn = _this.isOff.has(d);
+                if (turningOn) {
+                    _this.isOff.remove(d);
                 } else {
-                    _this.isOff.splice(index, 1);
+                    _this.isOff.add(d);
                 }
-                _this.callback(d, !isOn);
+                if (_this.callback != null) {
+                    _this.callback(d, turningOn);
+                }
+                _this.updateClasses();
             });
             return this;
+        };
+
+        ToggleLegend.prototype.updateClasses = function () {
+            var _this = this;
+            if (this._isSetup) {
+                var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+                dataSelection.classed("toggled-on", function (d) {
+                    return !_this.isOff.has(d);
+                });
+                dataSelection.classed("toggled-off", function (d) {
+                    return _this.isOff.has(d);
+                });
+            }
         };
         return ToggleLegend;
     })(Plottable.Legend);
@@ -4966,10 +5010,14 @@ var Plottable;
             this.project("fill", function () {
                 return "steelblue";
             }); // default
+            this.project("stroke", function () {
+                return "steelblue";
+            }); // default
         }
         AreaRenderer.prototype._setup = function () {
             _super.prototype._setup.call(this);
-            this.path = this.renderArea.append("path").classed("area", true);
+            this.areaPath = this.renderArea.append("path").classed("area", true);
+            this.linePath = this.renderArea.append("path").classed("line", true);
             return this;
         };
 
@@ -4983,18 +5031,25 @@ var Plottable;
             delete attrToProjector["y0"];
             delete attrToProjector["y"];
 
-            this.dataSelection = this.path.datum(this._dataSource.data());
+            this.dataSelection = this.areaPath.datum(this._dataSource.data());
+            this.linePath.datum(this._dataSource.data());
             if (this._animate && this._dataChanged) {
                 var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
-                this.path.attr("d", animationStartArea).attr(attrToProjector);
+                this.areaPath.attr("d", animationStartArea).attr(attrToProjector);
+                var animationStartLine = d3.svg.line().x(xFunction).y(y0Function);
+                this.linePath.attr("d", animationStartLine).attr(attrToProjector);
             }
 
             this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-            var updateSelection = this.path;
+            var areaUpdateSelection = this.areaPath;
+            var lineUpdateSelection = this.linePath;
             if (this._animate) {
-                updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+                areaUpdateSelection = this.areaPath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+                lineUpdateSelection = this.linePath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
             }
-            updateSelection.attr("d", this.area).attr(attrToProjector);
+            this.line = d3.svg.line().x(xFunction).y(yFunction);
+            areaUpdateSelection.attr("d", this.area).attr(attrToProjector);
+            lineUpdateSelection.attr("d", this.line).attr(attrToProjector);
         };
         return AreaRenderer;
     })(Plottable.XYRenderer);
@@ -5354,6 +5409,37 @@ var Plottable;
             hitBox.call(this.dragBehavior);
             return this;
         };
+
+        DragInteraction.prototype.setupZoomCallback = function (xScale, yScale) {
+            var xDomainOriginal = xScale != null ? xScale.domain() : null;
+            var yDomainOriginal = yScale != null ? yScale.domain() : null;
+            var resetOnNextClick = false;
+            function callback(pixelArea) {
+                if (pixelArea == null) {
+                    if (resetOnNextClick) {
+                        if (xScale != null) {
+                            xScale.domain(xDomainOriginal);
+                        }
+                        if (yScale != null) {
+                            yScale.domain(yDomainOriginal);
+                        }
+                    }
+                    resetOnNextClick = !resetOnNextClick;
+                    return;
+                }
+                resetOnNextClick = false;
+                if (xScale != null) {
+                    xScale.domain([xScale.invert(pixelArea.xMin), xScale.invert(pixelArea.xMax)]);
+                }
+                if (yScale != null) {
+                    yScale.domain([yScale.invert(pixelArea.yMax), yScale.invert(pixelArea.yMin)]);
+                }
+                this.clearBox();
+                return;
+            }
+            this.callback(callback);
+            return this;
+        };
         return DragInteraction;
     })(Plottable.Interaction);
     Plottable.DragInteraction = DragInteraction;
@@ -5487,33 +5573,6 @@ var Plottable;
         return XYDragBoxInteraction;
     })(Plottable.DragBoxInteraction);
     Plottable.XYDragBoxInteraction = XYDragBoxInteraction;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    function setupDragBoxZoom(dragBox, xScale, yScale) {
-        var xDomainOriginal = xScale.domain();
-        var yDomainOriginal = yScale.domain();
-        var resetOnNextClick = false;
-        function callback(pixelArea) {
-            if (pixelArea == null) {
-                if (resetOnNextClick) {
-                    xScale.domain(xDomainOriginal);
-                    yScale.domain(yDomainOriginal);
-                }
-                resetOnNextClick = !resetOnNextClick;
-                return;
-            }
-            resetOnNextClick = false;
-            xScale.domain([xScale.invert(pixelArea.xMin), xScale.invert(pixelArea.xMax)]);
-            yScale.domain([yScale.invert(pixelArea.yMax), yScale.invert(pixelArea.yMin)]);
-            dragBox.clearBox();
-            return;
-        }
-        dragBox.callback(callback);
-    }
-    Plottable.setupDragBoxZoom = setupDragBoxZoom;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

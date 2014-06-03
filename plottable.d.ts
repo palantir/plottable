@@ -18,6 +18,14 @@ declare module Plottable {
         * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
         */
         function addArrays(alist: number[], blist: number[]): number[];
+        /**
+        * Takes two sets and returns the intersection
+        *
+        * @param {D3.Set} set1 The first set
+        * @param {D3.Set} set2 The second set
+        * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+        */
+        function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
         function accessorize(accessor: any): IAccessor;
         function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
         function uniq(strings: string[]): string[];
@@ -582,6 +590,12 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     }
+    interface IPixelArea {
+        xMin: number;
+        xMax: number;
+        yMin: number;
+        yMax: number;
+    }
 }
 
 
@@ -842,6 +856,7 @@ declare module Plottable {
 
 declare module Plottable {
     class Axis extends Component {
+        };
         static _DEFAULT_TICK_SIZE: number;
         /**
         * Creates an Axis.
@@ -1029,17 +1044,31 @@ declare module Plottable {
 
 
 declare module Plottable {
+    interface ToggleCallback {
+        (datum: any, newState: boolean): any;
+    }
     class ToggleLegend extends Legend {
         /**
         * Creates a ToggleLegend.
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
-        * @param {any} callback.d The legend entry.
-        * @param {boolean} callback.b The state that the entry has changed to.
+        * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
         */
-        constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any);
+        constructor(colorScale: ColorScale, callback?: ToggleCallback);
+        /**
+        * Assigns the callback to the ToggleLegend
+        * Call with argument of null to remove the callback
+        *
+        * @param{ToggleCallback} callback The new callback function
+        */
+        public setCallback(callback: ToggleCallback): ToggleLegend;
+        /**
+        * Assigns a new ColorScale to the Legend.
+        *
+        * @param {ColorScale} scale
+        * @returns {ToggleLegend} The calling ToggleLegend.
+        */
         public scale(scale?: ColorScale): any;
     }
 }
@@ -1380,6 +1409,7 @@ declare module Plottable {
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
         public callback(cb?: (a: any) => any): DragInteraction;
+        public setupZoomCallback(xScale?: QuantitiveScale, yScale?: QuantitiveScale): DragInteraction;
     }
 }
 
@@ -1407,17 +1437,6 @@ declare module Plottable {
 declare module Plottable {
     class XYDragBoxInteraction extends DragBoxInteraction {
     }
-}
-
-
-declare module Plottable {
-    interface IPixelArea {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    }
-    function setupDragBoxZoom(dragBox: XYDragBoxInteraction, xScale: QuantitiveScale, yScale: QuantitiveScale): void;
 }
 
 

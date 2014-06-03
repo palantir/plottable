@@ -4,6 +4,7 @@ module Plottable {
   export class QuantitiveScale extends Scale {
     public _d3Scale: D3.Scale.QuantitiveScale;
     private lastRequestedTickCount = 10;
+    public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
 
     /**
      * Creates a new QuantitiveScale.
@@ -148,12 +149,14 @@ module Plottable {
     public padDomain(padProportion = 0.05): QuantitiveScale {
       var currentDomain = this.domain();
       if (currentDomain[0] === currentDomain[1]) {
-        this._setDomain([currentDomain[0] - 1, currentDomain[0] + 1]);
+        var d = currentDomain[0].valueOf(); // valueOf accounts for dates properly
+        this._setDomain([d - this._PADDING_FOR_IDENTICAL_DOMAIN, d + this._PADDING_FOR_IDENTICAL_DOMAIN]);
         return this;
       }
 
-      var extent = currentDomain[1]-currentDomain[0];
-      var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1] + padProportion/2 * extent];
+      var extent = currentDomain[1] - currentDomain[0];
+      // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
+      var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1].valueOf() + padProportion/2 * extent];
       if (currentDomain[0] === 0) {
         newDomain[0] = 0;
       }

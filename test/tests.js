@@ -213,14 +213,14 @@ describe("Axes", function () {
     });
 
     it("X Axis height can be changed", function () {
-        var svg = generateSVG(500, 100);
+        var svg = generateSVG(500, 30);
         var xScale = new Plottable.LinearScale();
         xScale.domain([0, 10]);
         xScale.range([0, 500]);
         var xAxis = new Plottable.XAxis(xScale, "top");
         xAxis.renderTo(svg);
 
-        var oldHeight = xAxis._requestedSpace(500, 100).height;
+        var oldHeight = xAxis._requestedSpace(500, 30).height;
         var axisBBoxBefore = xAxis.element.node().getBBox();
         var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
         assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
@@ -273,14 +273,14 @@ describe("Axes", function () {
     });
 
     it("Y Axis width can be changed", function () {
-        var svg = generateSVG(100, 500);
+        var svg = generateSVG(50, 500);
         var yScale = new Plottable.LinearScale();
         yScale.domain([0, 10]);
         yScale.range([500, 0]);
         var yAxis = new Plottable.YAxis(yScale, "left");
         yAxis.renderTo(svg);
 
-        var oldWidth = yAxis._requestedSpace(100, 500).width;
+        var oldWidth = yAxis._requestedSpace(50, 500).width;
         var axisBBoxBefore = yAxis.element.node().getBBox();
         var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
         assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
@@ -1892,9 +1892,11 @@ describe("Legends", function () {
         legend.renderTo(svg);
         var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
         color.domain(newDomain);
-        legend._computeLayout()._render();
+
+        // due to how joins work, this is how the elements should be arranged by d3
+        var newDomainActualOrder = ["foo", "baz", "mushu", "persei", "eight"];
         legend.content.selectAll(".legend-row").each(function (d, i) {
-            // assert.equal(d, newDomain[i], "the data was set properly");
+            assert.equal(d, newDomainActualOrder[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
             assert.equal(text, d, "the text was set properly");
             var fill = d3.select(this).select("circle").attr("fill");
@@ -1904,23 +1906,203 @@ describe("Legends", function () {
         svg.remove();
     });
 
-    describe("Legend toggle tests", function () {
+    it("legend.scale() replaces domain", function () {
+        color.domain(["foo", "bar", "baz"]);
+        legend.renderTo(svg);
+
+        var newDomain = ["a", "b", "c"];
+        var newColorScale = new Plottable.ColorScale("20");
+        newColorScale.domain(newDomain);
+        legend.scale(newColorScale);
+
+        legend.content.selectAll(".legend-row").each(function (d, i) {
+            assert.equal(d, newDomain[i], "the data is set correctly");
+            var text = d3.select(this).select("text").text();
+            assert.equal(text, d, "the text was set properly");
+            var fill = d3.select(this).select("circle").attr("fill");
+            assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
+        });
+
+        svg.remove();
+    });
+
+    it("legend.scale() correctly reregisters listeners", function () {
+        color.domain(["foo", "bar", "baz"]);
+        legend.renderTo(svg);
+
+        var tempDomain = ["a", "b", "c"];
+        var newColorScale = new Plottable.ColorScale("20");
+        newColorScale.domain(tempDomain);
+        legend.scale(newColorScale);
+
+        var newDomain = ["a", "foo", "d"];
+        newColorScale.domain(newDomain);
+        legend.content.selectAll(".legend-row").each(function (d, i) {
+            assert.equal(d, newDomain[i], "the data is set correctly");
+            var text = d3.select(this).select("text").text();
+            assert.equal(text, d, "the text was set properly");
+            var fill = d3.select(this).select("circle").attr("fill");
+            assert.equal(fill, newColorScale.scale(d), "the fill was set properly");
+        });
+        svg.remove();
+    });
+
+    describe("ToggleLegend tests", function () {
         var toggleLegend;
 
         beforeEach(function () {
-            toggleLegend = new Plottable.ToggleLegend(color, function (d, b) {
-                return d;
-            });
+            toggleLegend = new Plottable.ToggleLegend(color);
         });
 
-        it("basic initialization tests", function () {
+        function verifyState(selection, b, msg) {
+            assert.equal(selection.classed("toggled-on"), b, msg);
+            assert.equal(selection.classed("toggled-off"), !b, msg);
+        }
+
+        function getSelection(datum) {
+            var selection = toggleLegend.content.selectAll(".legend-row").filter(function (d, i) {
+                return d === datum;
+            });
+            return selection;
+        }
+
+        function verifyEntry(datum, b, msg) {
+            verifyState(getSelection(datum), b, msg);
+        }
+
+        function toggleEntry(datum, index) {
+            getSelection(datum).on("click")(datum, index);
+        }
+
+        it("basic initialization test", function () {
             color.domain(["a", "b", "c", "d", "e"]);
             toggleLegend.renderTo(svg);
             toggleLegend.content.selectAll(".legend-row").each(function (d, i) {
                 var selection = d3.select(this);
-                assert.equal(selection.classed("toggled-on"), true, "should be toggled on");
-                assert.equal(selection.classed("toggled-off"), false, "shouldn't be toggled off");
+                verifyState(selection, true);
             });
+            svg.remove();
+        });
+
+        it("basic toggling test", function () {
+            color.domain(["a"]);
+            toggleLegend.renderTo(svg);
+            toggleLegend.content.selectAll(".legend-row").each(function (d, i) {
+                var selection = d3.select(this);
+                selection.on("click")(d, i);
+                verifyState(selection, false);
+                selection.on("click")(d, i);
+                verifyState(selection, true);
+            });
+            svg.remove();
+        });
+
+        it("toggleLegend.scale() works as intended", function () {
+            var domain = ["a", "b", "c", "d", "e"];
+            color.domain(domain);
+            toggleLegend.renderTo(svg);
+            toggleEntry("a", 0);
+            toggleEntry("d", 3);
+            toggleEntry("c", 2);
+
+            var newDomain = ["r", "a", "d", "g"];
+            var newColorScale = new Plottable.ColorScale("Category10");
+            newColorScale.domain(newDomain);
+            toggleLegend.scale(newColorScale);
+
+            verifyEntry("r", true);
+            verifyEntry("a", false);
+            verifyEntry("g", true);
+            verifyEntry("d", false);
+
+            svg.remove();
+        });
+
+        it("listeners on scale will correctly update states", function () {
+            color.domain(["a", "b", "c", "d", "e"]);
+            toggleLegend.renderTo(svg);
+            toggleEntry("a", 0);
+            toggleEntry("d", 3);
+            toggleEntry("c", 2);
+
+            color.domain(["e", "d", "b", "a", "c"]);
+            verifyEntry("a", false);
+            verifyEntry("b", true);
+            verifyEntry("c", false);
+            verifyEntry("d", false);
+            verifyEntry("e", true);
+            svg.remove();
+        });
+
+        it("Testing callback works correctly", function () {
+            var domain = ["a", "b", "c", "d", "e"];
+            color.domain(domain);
+            var state = [true, true, true, true, true];
+
+            toggleLegend.setCallback(function (d, b) {
+                state[domain.indexOf(d)] = b;
+            });
+            toggleLegend.renderTo(svg);
+
+            toggleEntry("a", 0);
+            verifyEntry("a", false);
+            assert.equal(state[0], false, "callback was successful");
+
+            toggleEntry("d", 3);
+            verifyEntry("d", false);
+            assert.equal(state[3], false, "callback was successful");
+
+            toggleEntry("a", 0);
+            verifyEntry("a", true);
+            assert.equal(state[0], true, "callback was successful");
+
+            toggleEntry("c", 2);
+            verifyEntry("c", false);
+            assert.equal(state[2], false, "callback was successful");
+            svg.remove();
+        });
+
+        it("Overwriting callback is successfull", function () {
+            var domain = ["a"];
+            color.domain(domain);
+            var state = true;
+            toggleLegend.renderTo(svg);
+
+            toggleLegend.setCallback(function (d, b) {
+                state = b;
+            });
+
+            toggleEntry("a", 0);
+            assert.equal(state, false, "callback was successful");
+
+            var count = 0;
+            toggleLegend.setCallback(function (d, b) {
+                count++;
+            });
+
+            toggleEntry("a", 0);
+            assert.equal(state, false, "callback was overwritten");
+            assert.equal(count, 1, "new callback was successfully called");
+            svg.remove();
+        });
+
+        it("Removing callback is successful", function () {
+            var domain = ["a"];
+            color.domain(domain);
+            var state = true;
+            toggleLegend.renderTo(svg);
+
+            toggleLegend.setCallback(function (d, b) {
+                state = b;
+            });
+
+            toggleEntry("a", 0);
+            assert.equal(state, false, "callback was successful");
+
+            toggleLegend.setCallback(null);
+            toggleEntry("a", 0);
+            assert.equal(state, false, "callback was removed");
+
             svg.remove();
         });
     });
@@ -2269,9 +2451,24 @@ describe("Renderers", function () {
                 verifier.start();
             });
 
+            it("draws area and line correctly", function () {
+                var areaPath = renderArea.select(".area");
+                assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+                assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
+                var areaComputedStyle = window.getComputedStyle(areaPath.node());
+                assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
+
+                var linePath = renderArea.select(".line");
+                assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+                assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
+                var lineComputedStyle = window.getComputedStyle(linePath.node());
+                assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+                verifier.end();
+            });
+
             it("fill colors set appropriately from accessor", function () {
-                var path = renderArea.select("path");
-                assert.equal(path.attr("fill"), "steelblue", "fill set correctly");
+                var areaPath = renderArea.select(".area");
+                assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
                 verifier.end();
             });
 
@@ -2282,8 +2479,8 @@ describe("Renderers", function () {
                 areaRenderer.project("fill", newFillAccessor);
                 areaRenderer.renderTo(svg);
                 renderArea = areaRenderer.renderArea;
-                var path = renderArea.select("path");
-                assert.equal(path.attr("fill"), "pink", "fill changed correctly");
+                var areaPath = renderArea.select(".area");
+                assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
                 verifier.end();
             });
 
@@ -2293,8 +2490,8 @@ describe("Renderers", function () {
                 });
                 areaRenderer.renderTo(svg);
                 renderArea = areaRenderer.renderArea;
-                var path = renderArea.select("path");
-                assert.equal(path.attr("d"), "M0,500L500,0L500,250L0,500Z");
+                var areaPath = renderArea.select(".area");
+                assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
                 verifier.end();
             });
 
@@ -2848,6 +3045,37 @@ describe("Scales", function () {
             var d = scale.domain();
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
+        });
+
+        it("autoPad defaults to [v-1, v+1] if there's only one value", function () {
+            var scale = new Plottable.LinearScale();
+            scale.domain([5, 5]);
+            scale.padDomain();
+            assert.deepEqual(scale.domain(), [4, 6]);
+        });
+
+        it("autoPad works in general case", function () {
+            var scale = new Plottable.LinearScale();
+            scale.domain([100, 200]);
+            scale.padDomain(0.20);
+            assert.deepEqual(scale.domain(), [90, 210]);
+        });
+
+        it("autoPad works for date scales", function () {
+            var scale = new Plottable.TimeScale();
+            var f = d3.time.format("%x");
+            var d1 = f.parse("06/02/2014");
+            var d2 = f.parse("06/03/2014");
+            scale.domain([d1, d2]);
+            scale.padDomain();
+            var dd1 = scale.domain()[0];
+            var dd2 = scale.domain()[1];
+            assert.isDefined(dd1.toDateString, "padDomain produced dates");
+            assert.isNotNull(dd1.toDateString, "padDomain produced dates");
+            assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
+            assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
+            assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
+            assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
         });
     });
 
@@ -3420,11 +3648,17 @@ describe("TextUtils", function () {
     });
 
     describe("addEllipsesToLine", function () {
-        var svg = generateSVG();
-        var measure = Plottable.TextUtils.getTextMeasure(svg);
-        var e = function (text, width) {
-            return Plottable.TextUtils.addEllipsesToLine(text, width, measure);
-        };
+        var svg;
+        var measure;
+        var e;
+
+        before(function () {
+            svg = generateSVG();
+            measure = Plottable.TextUtils.getTextMeasure(svg);
+            e = function (text, width) {
+                return Plottable.TextUtils.addEllipsesToLine(text, width, measure);
+            };
+        });
         it("works on an empty string", function () {
             assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");
         });
