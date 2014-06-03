@@ -134,5 +134,22 @@ describe("Legends", () => {
       });
       svg.remove();
     });
+
+    it("random toggling tests", () => {
+      var numElements = 5;
+      var domain = ["a", "b", "c", "d", "e"];
+      color.domain(domain);
+      toggleLegend.renderTo(svg);
+      var state = [true, true, true, true, true];
+      for (var t = 0; t < 20; t++) {
+        var index = Math.floor(Math.random() * numElements);
+        var selection = toggleLegend.content.selectAll(".legend-row")
+          .filter((d, i) => d === domain[index]);
+        selection.on("click")(domain[index], index);
+        state[index] = !state[index];
+        verifyState(selection, state[index]);
+      }
+      svg.remove();
+    });
   });
 });
