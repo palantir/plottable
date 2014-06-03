@@ -3962,12 +3962,6 @@ var Plottable;
             this.xAlign("RIGHT").yAlign("TOP");
             this.xOffset(5).yOffset(5);
         }
-        Legend.prototype._setup = function () {
-            _super.prototype._setup.call(this);
-            this.legendBox = this.content.append("rect").classed("legend-box", true);
-            return this;
-        };
-
         Legend.prototype.scale = function (scale) {
             var _this = this;
             if (scale != null) {
