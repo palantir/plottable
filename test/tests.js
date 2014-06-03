@@ -213,14 +213,14 @@ describe("Axes", function () {
     });
 
     it("X Axis height can be changed", function () {
-        var svg = generateSVG(500, 100);
+        var svg = generateSVG(500, 30);
         var xScale = new Plottable.LinearScale();
         xScale.domain([0, 10]);
         xScale.range([0, 500]);
         var xAxis = new Plottable.XAxis(xScale, "top");
         xAxis.renderTo(svg);
 
-        var oldHeight = xAxis._requestedSpace(500, 100).height;
+        var oldHeight = xAxis._requestedSpace(500, 30).height;
         var axisBBoxBefore = xAxis.element.node().getBBox();
         var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
         assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
@@ -273,14 +273,14 @@ describe("Axes", function () {
     });
 
     it("Y Axis width can be changed", function () {
-        var svg = generateSVG(100, 500);
+        var svg = generateSVG(50, 500);
         var yScale = new Plottable.LinearScale();
         yScale.domain([0, 10]);
         yScale.range([500, 0]);
         var yAxis = new Plottable.YAxis(yScale, "left");
         yAxis.renderTo(svg);
 
-        var oldWidth = yAxis._requestedSpace(100, 500).width;
+        var oldWidth = yAxis._requestedSpace(50, 500).width;
         var axisBBoxBefore = yAxis.element.node().getBBox();
         var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
         assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
@@ -2248,9 +2248,24 @@ describe("Renderers", function () {
                 verifier.start();
             });
 
+            it("draws area and line correctly", function () {
+                var areaPath = renderArea.select(".area");
+                assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+                assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
+                var areaComputedStyle = window.getComputedStyle(areaPath.node());
+                assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
+
+                var linePath = renderArea.select(".line");
+                assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+                assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
+                var lineComputedStyle = window.getComputedStyle(linePath.node());
+                assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+                verifier.end();
+            });
+
             it("fill colors set appropriately from accessor", function () {
-                var path = renderArea.select("path");
-                assert.equal(path.attr("fill"), "steelblue", "fill set correctly");
+                var areaPath = renderArea.select(".area");
+                assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
                 verifier.end();
             });
 
@@ -2261,8 +2276,8 @@ describe("Renderers", function () {
                 areaRenderer.project("fill", newFillAccessor);
                 areaRenderer.renderTo(svg);
                 renderArea = areaRenderer.renderArea;
-                var path = renderArea.select("path");
-                assert.equal(path.attr("fill"), "pink", "fill changed correctly");
+                var areaPath = renderArea.select(".area");
+                assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
                 verifier.end();
             });
 
@@ -2272,8 +2287,8 @@ describe("Renderers", function () {
                 });
                 areaRenderer.renderTo(svg);
                 renderArea = areaRenderer.renderArea;
-                var path = renderArea.select("path");
-                assert.equal(path.attr("d"), "M0,500L500,0L500,250L0,500Z");
+                var areaPath = renderArea.select(".area");
+                assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
                 verifier.end();
             });
 

@@ -848,6 +848,7 @@ declare module Plottable {
 
 declare module Plottable {
     class Axis extends Component {
+        };
         static _DEFAULT_TICK_SIZE: number;
         /**
         * Creates an Axis.
