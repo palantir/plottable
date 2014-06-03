@@ -39,8 +39,8 @@ module Plottable {
     public _paint() {
       super._paint();
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-      this.dataSelection.enter().append("rect");
+      var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      cells.enter().append("rect");
 
       var xStep = this.xScale.rangeBand();
       var yStep = this.yScale.rangeBand();
@@ -49,8 +49,8 @@ module Plottable {
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
 
-      this.dataSelection.attr(attrToProjector);
-      this.dataSelection.exit().remove();
+      cells.attr(attrToProjector);
+      cells.exit().remove();
     }
   }
 }

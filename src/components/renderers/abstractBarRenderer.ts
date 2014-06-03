@@ -2,6 +2,7 @@
 
 module Plottable {
   export class AbstractBarRenderer extends XYRenderer {
+    public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignment: string;
@@ -65,7 +66,7 @@ module Plottable {
       var selectedBar: D3.Selection = null;
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      this.dataSelection.each(function(d: any) {
+      this._bars.each(function(d: any) {
         var bbox = this.getBBox();
         if (bbox.x <= x && x <= bbox.x + bbox.width &&
             bbox.y <= y && y <= bbox.y + bbox.height) {
@@ -85,7 +86,7 @@ module Plottable {
      * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
      */
     public deselectAll() {
-      this.dataSelection.classed("selected", false);
+      this._bars.classed("selected", false);
       return this;
     }
   }

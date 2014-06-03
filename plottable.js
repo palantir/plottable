@@ -2077,7 +2077,6 @@ var Plottable;
             this._dataChanged = false;
             this._animate = false;
             this._ANIMATION_DURATION = 250;
-            this._hasRendered = false;
             this._projectors = {};
             this._rerenderUpdateSelection = false;
             // A perf-efficient manner of rendering would be to calculate attributes only
@@ -2180,7 +2179,6 @@ var Plottable;
 
         Renderer.prototype._doRender = function () {
             if (this.element != null) {
-                this._hasRendered = true;
                 this._paint();
                 this._dataChanged = false;
                 this._requireRerender = false;
@@ -2207,9 +2205,6 @@ var Plottable;
         Renderer.prototype.animate = function (enabled) {
             this._animate = enabled;
             return this;
-        };
-        Renderer.DEFAULT_COLOR_ACCESSOR = function (d) {
-            return "#1f77b4";
         };
         return Renderer;
     })(Plottable.Component);
@@ -4202,7 +4197,6 @@ var Plottable;
         };
 
         XYRenderer.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-            this._hasRendered = false;
             _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
             this.xScale.range([0, this.availableWidth]);
             this.yScale.range([this.availableHeight, 0]);
@@ -4210,7 +4204,7 @@ var Plottable;
         };
 
         XYRenderer.prototype.rescale = function () {
-            if (this.element != null && this._hasRendered) {
+            if (this.element != null) {
                 this._render();
             }
         };
@@ -4269,11 +4263,11 @@ var Plottable;
                 return 0;
             };
 
-            this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
-            this.dataSelection.enter().append("circle");
-            this.dataSelection.attr(attrToProjector);
+            var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
+            circles.enter().append("circle");
+            circles.attr(attrToProjector);
 
-            var updateSelection = this.dataSelection;
+            var updateSelection = circles;
             if (this._animate && this._dataChanged) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
@@ -4282,7 +4276,7 @@ var Plottable;
             }
             updateSelection.attr("r", rFunction);
 
-            this.dataSelection.exit().remove();
+            circles.exit().remove();
         };
         return CircleRenderer;
     })(Plottable.XYRenderer);
@@ -4331,18 +4325,18 @@ var Plottable;
             delete attrToProjector["x"];
             delete attrToProjector["y"];
 
-            this.dataSelection = this.path.datum(this._dataSource.data());
+            this.path.datum(this._dataSource.data());
             if (this._animate && this._dataChanged) {
                 var animationStartLine = d3.svg.line().x(xFunction).y(scaledZero);
                 this.path.attr("d", animationStartLine).attr(attrToProjector);
             }
 
-            this.line = d3.svg.line().x(xFunction).y(yFunction);
+            var line = d3.svg.line().x(xFunction).y(yFunction);
             var updateSelection = this.path;
             if (this._animate) {
                 updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
             }
-            updateSelection.attr("d", this.line).attr(attrToProjector);
+            updateSelection.attr("d", line).attr(attrToProjector);
         };
         return LineRenderer;
     })(Plottable.XYRenderer);
@@ -4391,10 +4385,10 @@ var Plottable;
                 return yF(d, i) - heightF(d, i) / 2;
             };
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            this.dataSelection.enter().append("rect");
-            this.dataSelection.attr(attrToProjector);
-            this.dataSelection.exit().remove();
+            var rects = this.renderArea.selectAll("rect").data(this._dataSource.data());
+            rects.enter().append("rect");
+            rects.attr(attrToProjector);
+            rects.exit().remove();
         };
         return RectRenderer;
     })(Plottable.XYRenderer);
@@ -4444,8 +4438,8 @@ var Plottable;
         GridRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            this.dataSelection.enter().append("rect");
+            var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
+            cells.enter().append("rect");
 
             var xStep = this.xScale.rangeBand();
             var yStep = this.yScale.rangeBand();
@@ -4458,8 +4452,8 @@ var Plottable;
                 return yStep;
             };
 
-            this.dataSelection.attr(attrToProjector);
-            this.dataSelection.exit().remove();
+            cells.attr(attrToProjector);
+            cells.exit().remove();
         };
         return GridRenderer;
     })(Plottable.XYRenderer);
@@ -4539,7 +4533,7 @@ var Plottable;
             var selectedBar = null;
 
             // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-            this.dataSelection.each(function (d) {
+            this._bars.each(function (d) {
                 var bbox = this.getBBox();
                 if (bbox.x <= x && x <= bbox.x + bbox.width && bbox.y <= y && y <= bbox.y + bbox.height) {
                     selectedBar = d3.select(this);
@@ -4558,7 +4552,7 @@ var Plottable;
         * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
         */
         AbstractBarRenderer.prototype.deselectAll = function () {
-            this.dataSelection.classed("selected", false);
+            this._bars.classed("selected", false);
             return this;
         };
         return AbstractBarRenderer;
@@ -4596,8 +4590,8 @@ var Plottable;
             _super.prototype._paint.call(this);
             var scaledBaseline = this.yScale.scale(this._baselineValue);
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            this.dataSelection.enter().append("rect");
+            this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+            this._bars.enter().append("rect");
 
             var attrToProjector = this._generateAttrToProjector();
 
@@ -4632,7 +4626,7 @@ var Plottable;
                 attrToProjector["height"] = function () {
                     return 0;
                 };
-                this.dataSelection.attr(attrToProjector);
+                this._bars.attr(attrToProjector);
             }
 
             attrToProjector["y"] = function (d, i) {
@@ -4646,10 +4640,10 @@ var Plottable;
             attrToProjector["height"] = heightFunction;
 
             if (attrToProjector["fill"] != null) {
-                this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
             }
 
-            var updateSelection = this.dataSelection;
+            var updateSelection = this._bars;
             if (this._animate) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
@@ -4658,7 +4652,7 @@ var Plottable;
             }
 
             updateSelection.attr(attrToProjector);
-            this.dataSelection.exit().remove();
+            this._bars.exit().remove();
 
             this._baseline.attr({
                 "x1": 0,
@@ -4719,8 +4713,8 @@ var Plottable;
         HorizontalBarRenderer.prototype._paint = function () {
             var _this = this;
             _super.prototype._paint.call(this);
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            this.dataSelection.enter().append("rect");
+            this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+            this._bars.enter().append("rect");
 
             var attrToProjector = this._generateAttrToProjector();
 
@@ -4758,7 +4752,7 @@ var Plottable;
                 attrToProjector["width"] = function () {
                     return 0;
                 };
-                this.dataSelection.attr(attrToProjector);
+                this._bars.attr(attrToProjector);
             }
 
             attrToProjector["x"] = function (d, i) {
@@ -4772,10 +4766,10 @@ var Plottable;
             attrToProjector["width"] = widthFunction; // actual SVG rect width
 
             if (attrToProjector["fill"] != null) {
-                this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
             }
 
-            var updateSelection = this.dataSelection;
+            var updateSelection = this._bars;
             if (this._animate) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
@@ -4784,7 +4778,7 @@ var Plottable;
             }
 
             updateSelection.attr(attrToProjector);
-            this.dataSelection.exit().remove();
+            this._bars.exit().remove();
 
             this._baseline.attr({
                 "x1": scaledBaseline,
@@ -4865,7 +4859,7 @@ var Plottable;
             delete attrToProjector["y0"];
             delete attrToProjector["y"];
 
-            this.dataSelection = this.areaPath.datum(this._dataSource.data());
+            this.areaPath.datum(this._dataSource.data());
             this.linePath.datum(this._dataSource.data());
             if (this._animate && this._dataChanged) {
                 var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
@@ -4874,16 +4868,16 @@ var Plottable;
                 this.linePath.attr("d", animationStartLine).attr(attrToProjector);
             }
 
-            this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+            var area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
             var areaUpdateSelection = this.areaPath;
             var lineUpdateSelection = this.linePath;
             if (this._animate) {
                 areaUpdateSelection = this.areaPath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
                 lineUpdateSelection = this.linePath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
             }
-            this.line = d3.svg.line().x(xFunction).y(yFunction);
-            areaUpdateSelection.attr("d", this.area).attr(attrToProjector);
-            lineUpdateSelection.attr("d", this.line).attr(attrToProjector);
+            var line = d3.svg.line().x(xFunction).y(yFunction);
+            areaUpdateSelection.attr("d", area).attr(attrToProjector);
+            lineUpdateSelection.attr("d", line).attr(attrToProjector);
         };
         return AreaRenderer;
     })(Plottable.XYRenderer);

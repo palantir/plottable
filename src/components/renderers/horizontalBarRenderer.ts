@@ -20,8 +20,8 @@ module Plottable {
 
     public _paint() {
       super._paint();
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-      this.dataSelection.enter().append("rect");
+      this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      this._bars.enter().append("rect");
 
       var attrToProjector = this._generateAttrToProjector();
 
@@ -49,7 +49,7 @@ module Plottable {
       if (this._animate && this._dataChanged) {
         attrToProjector["x"] = () => scaledBaseline;
         attrToProjector["width"] = () => 0;
-        this.dataSelection.attr(attrToProjector);
+        this._bars.attr(attrToProjector);
       }
 
       attrToProjector["x"] = (d: any, i: number) => {
@@ -63,10 +63,10 @@ module Plottable {
       attrToProjector["width"] = widthFunction; // actual SVG rect width
 
       if (attrToProjector["fill"] != null) {
-        this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+        this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
 
-      var updateSelection: any = this.dataSelection;
+      var updateSelection: any = this._bars;
       if (this._animate) {
         var n = this.dataSource().data().length;
         updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION)
@@ -74,7 +74,7 @@ module Plottable {
       }
 
       updateSelection.attr(attrToProjector);
-      this.dataSelection.exit().remove();
+      this._bars.exit().remove();
 
       this._baseline.attr({
         "x1": scaledBaseline,

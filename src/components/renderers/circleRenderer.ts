@@ -38,11 +38,11 @@ module Plottable {
       var rFunction = attrToProjector["r"];
       attrToProjector["r"] = () => 0;
 
-      this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
-      this.dataSelection.enter().append("circle");
-      this.dataSelection.attr(attrToProjector);
+      var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
+      circles.enter().append("circle");
+      circles.attr(attrToProjector);
 
-      var updateSelection: any = this.dataSelection;
+      var updateSelection: any = circles;
       if (this._animate && this._dataChanged) {
         var n = this.dataSource().data().length;
         updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION)
@@ -50,7 +50,7 @@ module Plottable {
       }
       updateSelection.attr("r", rFunction);
 
-      this.dataSelection.exit().remove();
+      circles.exit().remove();
     }
   }
 }

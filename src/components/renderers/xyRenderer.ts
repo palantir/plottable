@@ -2,7 +2,6 @@
 
 module Plottable {
   export class XYRenderer extends Renderer {
-    public dataSelection: D3.UpdateSelection;
     public xScale: Scale;
     public yScale: Scale;
     public _xAccessor: any;
@@ -40,12 +39,11 @@ module Plottable {
         this.yScale._autoPad = true;
       }
       super.project(attrToSet, accessor, scale);
-      
+
       return this;
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      this._hasRendered = false;
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.xScale.range([0, this.availableWidth]);
       this.yScale.range([this.availableHeight, 0]);
@@ -53,7 +51,7 @@ module Plottable {
     }
 
     private rescale() {
-      if (this.element != null && this._hasRendered) {
+      if (this.element != null) {
         this._render();
       }
     }
