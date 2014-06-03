@@ -22,19 +22,23 @@ module Plottable {
     public _doRender(): HoverLegend {
       super._doRender();
       var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
-      dataSelection.classed("selected", (d: any) => this.selected !== undefined ? this.selected === d : false);
-      dataSelection.classed("not-selected", (d: any) => this.selected !== undefined ? this.selected !== d : false);
       dataSelection.on("mouseover", (d: any, i: number) => {
-        console.log("ON: " + d + " " + i);
         this.selected = d;
         this.callback(d);
+        this.updateClasses();
       });
       dataSelection.on("mouseout", (d: any, i: number) => {
-        console.log("OFF: " + d + " " + i);
         this.selected = undefined;
         this.callback();
+        this.updateClasses();
       });
       return this;
+    }
+
+    private updateClasses() {
+      var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
+      dataSelection.classed("selected", (d: any) => this.selected !== undefined ? this.selected === d : false);
+      dataSelection.classed("not-selected", (d: any) => this.selected !== undefined ? this.selected !== d : false);
     }
   }
 }

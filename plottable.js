@@ -4141,23 +4141,28 @@ var Plottable;
             var _this = this;
             _super.prototype._doRender.call(this);
             var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+            dataSelection.on("mouseover", function (d, i) {
+                _this.selected = d;
+                _this.callback(d);
+                _this.updateClasses();
+            });
+            dataSelection.on("mouseout", function (d, i) {
+                _this.selected = undefined;
+                _this.callback();
+                _this.updateClasses();
+            });
+            return this;
+        };
+
+        HoverLegend.prototype.updateClasses = function () {
+            var _this = this;
+            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
             dataSelection.classed("selected", function (d) {
                 return _this.selected !== undefined ? _this.selected === d : false;
             });
             dataSelection.classed("not-selected", function (d) {
                 return _this.selected !== undefined ? _this.selected !== d : false;
             });
-            dataSelection.on("mouseover", function (d, i) {
-                console.log("ON: " + d + " " + i);
-                _this.selected = d;
-                _this.callback(d);
-            });
-            dataSelection.on("mouseout", function (d, i) {
-                console.log("OFF: " + d + " " + i);
-                _this.selected = undefined;
-                _this.callback();
-            });
-            return this;
         };
         return HoverLegend;
     })(Plottable.Legend);

@@ -7,7 +7,7 @@
     <script src="../../examples/exampleUtil.js"></script>
     <style>
         .not-selected circle {
-            fill:#d3d3d3;
+            opacity:.1;
         }
     </style>
     <script>
@@ -17,8 +17,8 @@
 
 
         var colors = new Plottable.ColorScale("10").range();
-        var numRenderers = 5;
-        var names = ["bat", "cat", "mat", "rat", "pat"];
+        var numRenderers = 10;
+        var names = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
         var colorScale = new Plottable.ColorScale();
         colorScale.range(colors);
         colorScale.domain(names);
@@ -50,15 +50,20 @@
         var legendLabel = new Plottable.TitleLabel("fat");
         var legend = new Plottable.HoverLegend(colorScale,
             function (d) {
-                cg.removeAll();
                 if (d === undefined) {
-                    for (var i = 0; i < numRenderers; i++){
-                        cg.merge (renderers[i]);
+                    for (var i = 0; i < numRenderers; i++) {
+                        renderers[i].project("opacity", 1);
                     }
                 } else {
                     var index = names.indexOf(d);
-                    cg.merge(renderers[index]);
+                    for (var i = 0; i < numRenderers; i++) {
+                        if (index === i) {
+                            continue;
+                        }
+                        renderers[i].project("opacity", .1);
+                    }
                 }
+                cg._invalidateLayout();
             }
         );
         var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
