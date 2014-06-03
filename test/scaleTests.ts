@@ -31,10 +31,6 @@ describe("Scales", () => {
     callbackWasCalled = false;
     scale.nice();
     assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
-
-    callbackWasCalled = false;
-    scale.padDomain(0.2);
-    assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
   describe("autoranging behavior", () => {
     var data: any[];
@@ -48,10 +44,21 @@ describe("Scales", () => {
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
       scale._addPerspective("1", dataSource, "foo");
-      scale.autoDomain().padDomain().nice();
+      scale.autoDomain().nice();
       assert.isTrue(scale._autoDomain, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
       assert.isFalse(scale._autoDomain, "the autoDomain flag is false after domain explicitly set");
+    });
+
+    it("scale domainFunction is called", () => {
+      var defaultFunc = scale.domainFunction();
+      var callbackWasCalled = false;
+      scale.domainFunction((values) => {
+        callbackWasCalled = true;
+        return defaultFunc(values);
+      });
+      scale.autoDomain();
+      assert.isTrue(callbackWasCalled, "Custom domainFunction was called");
     });
 
     it("scale autorange works as expected with single dataSource", () => {

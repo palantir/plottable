@@ -86,6 +86,16 @@ var Plottable;
             return out;
         }
         Utils.createFilledArray = createFilledArray;
+
+        /**
+        * Returns the concatenation of each sub-array in `a`. Note that it isn't
+        * recursive, it only goes "one level down" so that it can have a proper
+        * type signature.
+        */
+        function flatten(a) {
+            return Array.prototype.concat.apply([], a);
+        }
+        Utils.flatten = flatten;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -875,8 +885,7 @@ var Plottable;
         };
 
         DataSource.prototype.computeExtent = function (accessor) {
-            var appliedAccessor = Plottable.Utils.applyAccessor(accessor, this);
-            var mappedData = this._data.map(appliedAccessor);
+            var mappedData = this._getValues(accessor);
             if (mappedData.length === 0) {
                 return undefined;
             } else if (typeof (mappedData[0]) === "string") {
@@ -884,6 +893,14 @@ var Plottable;
             } else {
                 return d3.extent(mappedData);
             }
+        };
+
+        /**
+        * Maps the accessor over the data and returns an array of the results.
+        */
+        DataSource.prototype._getValues = function (accessor) {
+            var appliedAccessor = Plottable.Utils.applyAccessor(accessor, this);
+            return this._data.map(appliedAccessor);
         };
         return DataSource;
     })(Plottable.Broadcaster);
@@ -1967,6 +1984,16 @@ var Plottable;
             return [];
         };
 
+        Scale.prototype._getAllValues = function () {
+            var perspectives = d3.values(this.rendererID2Perspective);
+            var extents = perspectives.map(function (p) {
+                var source = p.dataSource;
+                var accessor = p.accessor;
+                return source._getValues(accessor);
+            });
+            return Plottable.Utils.flatten(extents);
+        };
+
         /**
         * Modify the domain on the scale so that it includes the extent of all
         * perspectives it depends on. Extent: The (min, max) pair for a
@@ -2301,8 +2328,18 @@ var Plottable;
         * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
         */
         function QuantitiveScale(scale) {
+            var _this = this;
             _super.call(this, scale);
             this.lastRequestedTickCount = 10;
+            this._domainFunction = function (values) {
+                if (values.length === 0) {
+                    return [0, 1];
+                } else if (_this._autoPad) {
+                    return _this.getDomainPadding(values);
+                } else {
+                    return d3.extent(values);
+                }
+            };
         }
         QuantitiveScale.prototype._getExtent = function () {
             var extents = this._getAllExtents();
@@ -2320,10 +2357,8 @@ var Plottable;
         };
 
         QuantitiveScale.prototype.autoDomain = function () {
-            _super.prototype.autoDomain.call(this);
-            if (this._autoPad) {
-                this.padDomain();
-            }
+            var values = this._getAllValues();
+            this._setDomain(this._domainFunction(values));
             if (this._autoNice) {
                 this.nice();
             }
@@ -2414,18 +2449,12 @@ var Plottable;
             return this._d3Scale.tickFormat(count, format);
         };
 
-        /**
-        * Pads out the domain of the scale by a specified ratio.
-        *
-        * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-        * @returns {QuantitiveScale} The calling QuantitiveScale.
-        */
-        QuantitiveScale.prototype.padDomain = function (padProportion) {
+        // same as above function but returns the new domain
+        QuantitiveScale.prototype.getDomainPadding = function (data, padProportion) {
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
-            var currentDomain = this.domain();
+            var currentDomain = [d3.min(data), d3.max(data)];
             if (currentDomain[0] === currentDomain[1]) {
-                this._setDomain([currentDomain[0] - 1, currentDomain[0] + 1]);
-                return this;
+                return [currentDomain[0] - 1, currentDomain[0] + 1];
             }
 
             var extent = currentDomain[1] - currentDomain[0];
@@ -2436,8 +2465,15 @@ var Plottable;
             if (currentDomain[1] === 0) {
                 newDomain[1] = 0;
             }
-            this._setDomain(newDomain);
-            return this;
+            return newDomain;
+        };
+
+        QuantitiveScale.prototype.domainFunction = function (fn) {
+            if (fn == null) {
+                return this._domainFunction;
+            } else {
+                return this._domainFunction = fn;
+            }
         };
         return QuantitiveScale;
     })(Plottable.Scale);

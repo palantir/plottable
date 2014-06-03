@@ -29,6 +29,12 @@ declare module Plottable {
         * @return {any[]}
         */
         function createFilledArray(value: any, count: number): any[];
+        /**
+        * Returns the concatenation of each sub-array in `a`. Note that it isn't
+        * recursive, it only goes "one level down" so that it can have a proper
+        * type signature.
+        */
+        function flatten(a: any[][]): any[];
     }
 }
 
@@ -653,13 +659,7 @@ declare module Plottable {
         * @returns {(n: number) => string} A formatting function.
         */
         public tickFormat(count: number, format?: string): (n: number) => string;
-        /**
-        * Pads out the domain of the scale by a specified ratio.
-        *
-        * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-        * @returns {QuantitiveScale} The calling QuantitiveScale.
-        */
-        public padDomain(padProportion?: number): QuantitiveScale;
+        public domainFunction(fn?: (values: number[]) => number[]): (values: number[]) => number[];
     }
 }
 

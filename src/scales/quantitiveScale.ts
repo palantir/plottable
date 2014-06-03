@@ -4,6 +4,15 @@ module Plottable {
   export class QuantitiveScale extends Scale {
     public _d3Scale: D3.Scale.QuantitiveScale;
     private lastRequestedTickCount = 10;
+    private _domainFunction : (values: number[]) => number[] = (values: number[]) => {
+      if (values.length === 0) {
+        return [0, 1];
+      } else if (this._autoPad) {
+        return this.getDomainPadding(values);
+      } else {
+        return d3.extent(values);
+      }
+    };
 
     /**
      * Creates a new QuantitiveScale.
@@ -27,10 +36,8 @@ module Plottable {
     }
 
     public autoDomain() {
-      super.autoDomain();
-      if (this._autoPad) {
-        this.padDomain();
-      }
+      var values = this._getAllValues();
+      this._setDomain(this._domainFunction(values));
       if (this._autoNice) {
         this.nice();
       }
@@ -139,17 +146,11 @@ module Plottable {
       return this._d3Scale.tickFormat(count, format);
     }
 
-    /**
-     * Pads out the domain of the scale by a specified ratio.
-     *
-     * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-     * @returns {QuantitiveScale} The calling QuantitiveScale.
-     */
-    public padDomain(padProportion = 0.05): QuantitiveScale {
-      var currentDomain = this.domain();
+    // same as above function but returns the new domain
+    private getDomainPadding(data: number[], padProportion = 0.05): number[] {
+      var currentDomain = [d3.min(data), d3.max(data)];
       if (currentDomain[0] === currentDomain[1]) {
-        this._setDomain([currentDomain[0] - 1, currentDomain[0] + 1]);
-        return this;
+        return [currentDomain[0] - 1, currentDomain[0] + 1];
       }
 
       var extent = currentDomain[1]-currentDomain[0];
@@ -160,8 +161,15 @@ module Plottable {
       if (currentDomain[1] === 0) {
         newDomain[1] = 0;
       }
-      this._setDomain(newDomain);
-      return this;
+      return newDomain;
+    }
+
+    public domainFunction(fn?: (values: number[]) => number[]): (values: number[]) => number[] {
+      if (fn == null) {
+        return this._domainFunction;
+      } else {
+        return this._domainFunction = fn;
+      }
     }
   }
 }

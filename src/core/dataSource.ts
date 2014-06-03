@@ -71,8 +71,7 @@ module Plottable {
     }
 
     private computeExtent(accessor: IAccessor): any[] {
-      var appliedAccessor = Utils.applyAccessor(accessor, this);
-      var mappedData = this._data.map(appliedAccessor);
+      var mappedData = this._getValues(accessor);
       if (mappedData.length === 0){
         return undefined;
       } else if (typeof(mappedData[0]) === "string") {
@@ -80,6 +79,14 @@ module Plottable {
       } else {
         return d3.extent(mappedData);
       }
+    }
+
+    /**
+     * Maps the accessor over the data and returns an array of the results.
+     */
+    public _getValues(accessor: IAccessor): any[] {
+      var appliedAccessor = Utils.applyAccessor(accessor, this);
+      return this._data.map(appliedAccessor);
     }
   }
 }
