@@ -317,8 +317,8 @@
   var legend    = new Plottable.Legend(colorScale).xOffset(-80).minimumWidth(200);
   var center = renderer.merge(gridlines).merge(legend);
 
-  var dragBox = new Plottable.XYDragBoxInteraction(center).registerWithComponent();
-  Plottable.setupDragBoxZoom(dragBox, xScale, yScale);
+  //var dragBox = new Plottable.XYDragBoxInteraction(center).registerWithComponent();
+  //Plottable.setupDragBoxZoom(dragBox, xScale, yScale);
   // Now we'll make a Table to organize the layout of the components. The first row will have a yAxis and renderer; the second will
   // only have the xAxis, and it will be aligned to the column of the renderer.
   // The yAxis is fixed-width and the xAxis is fixed-height, so the renderer will naturally expand to take up all free space
