@@ -2154,66 +2154,6 @@ describe("Renderers", function () {
             svg.remove();
         });
 
-        describe("Basic LineRenderer functionality, with custom accessors", function () {
-            // We test all the underlying XYRenderer logic with our CircleRenderer, let's just verify that the line
-            // draws properly for the LineRenderer
-            var svg;
-            var xScale = new Plottable.LinearScale().domain([0, 1]);
-            var yScale = new Plottable.LinearScale().domain([0, 1]);
-            var xAccessor = function (d) {
-                return d.foo;
-            };
-            var yAccessor = function (d) {
-                return d.bar;
-            };
-            var colorAccessor = function (d, i, m) {
-                return d3.rgb(d.foo, d.bar, i).toString();
-            };
-            var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
-            var lineRenderer = new Plottable.LineRenderer(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("stroke", colorAccessor);
-            var renderArea;
-            var verifier = new MultiTestVerifier();
-
-            before(function () {
-                svg = generateSVG(500, 500);
-                lineRenderer.renderTo(svg);
-                renderArea = lineRenderer.renderArea;
-            });
-
-            beforeEach(function () {
-                verifier.start();
-            });
-
-            it("the line renderer drew an appropriate line", function () {
-                var path = renderArea.select("path");
-                assert.equal(path.attr("d"), "M0,500L500,0", "path-d is correct");
-                assert.equal(path.attr("stroke"), "#000000", "path-stroke is correct");
-                verifier.end();
-            });
-
-            it("rendering is idempotent", function () {
-                lineRenderer._render();
-                var path = renderArea.select("path");
-                assert.equal(path.attr("d"), "M0,500L500,0");
-                verifier.end();
-            });
-
-            it("rescaled rerender works properly", function () {
-                xScale.domain([0, 5]);
-                yScale.domain([0, 10]);
-                var path = renderArea.select("path");
-                assert.equal(path.attr("d"), "M0,500L100,450");
-                verifier.end();
-            });
-
-            after(function () {
-                if (verifier.passed) {
-                    svg.remove();
-                }
-                ;
-            });
-        });
-
         describe("Basic AreaRenderer functionality", function () {
             var svg;
             var xScale = new Plottable.LinearScale().domain([0, 1]);
@@ -2297,6 +2237,21 @@ describe("Renderers", function () {
                     svg.remove();
                 }
                 ;
+            });
+        });
+
+        describe("LineRenderer", function () {
+            it("defaults to no fill", function () {
+                var svg = generateSVG(500, 500);
+                var data = [{ x: 0, y: 0 }, { x: 2, y: 2 }];
+                var xScale = new Plottable.LinearScale();
+                var yScale = new Plottable.LinearScale();
+                var lineRenderer = new Plottable.LineRenderer(data, xScale, yScale);
+                lineRenderer.renderTo(svg);
+
+                var areaPath = lineRenderer.renderArea.select(".area");
+                assert.strictEqual(areaPath.attr("fill"), "none");
+                svg.remove();
             });
         });
 

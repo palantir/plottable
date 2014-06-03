@@ -1096,21 +1096,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class LineRenderer extends XYRenderer {
-        /**
-        * Creates a LineRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        constructor(dataset: any, xScale: Scale, yScale: Scale);
-    }
-}
-
-
-declare module Plottable {
     class RectRenderer extends XYRenderer {
         /**
         * Creates a RectRenderer.
@@ -1235,6 +1220,21 @@ declare module Plottable {
     class AreaRenderer extends XYRenderer {
         /**
         * Creates an AreaRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
+    }
+}
+
+
+declare module Plottable {
+    class LineRenderer extends AreaRenderer {
+        /**
+        * Creates a LineRenderer.
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.
