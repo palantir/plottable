@@ -73,5 +73,36 @@ module Plottable {
       hitBox.call(this.dragBehavior);
       return this;
     }
+
+    public setupZoomCallback(xScale?: QuantitiveScale, yScale?: QuantitiveScale) {
+      var xDomainOriginal = xScale != null ? xScale.domain() : null;
+      var yDomainOriginal = yScale != null ? yScale.domain() : null;
+      var resetOnNextClick = false;
+      function callback(pixelArea: IPixelArea) {
+        if (pixelArea == null) {
+          if (resetOnNextClick) {
+            if (xScale != null) {
+              xScale.domain(xDomainOriginal);
+            }
+            if (yScale != null) {
+              yScale.domain(yDomainOriginal);
+            }
+          }
+          resetOnNextClick = !resetOnNextClick;
+          return;
+        }
+        resetOnNextClick = false;
+        if (xScale != null) {
+          xScale.domain([xScale.invert(pixelArea.xMin), xScale.invert(pixelArea.xMax)]);
+        }
+        if (yScale != null) {
+          yScale.domain([yScale.invert(pixelArea.yMax), yScale.invert(pixelArea.yMin)]);
+        }
+        this.clearBox();
+        return;
+      }
+      this.callback(callback);
+      return this;
+    }
   }
 }

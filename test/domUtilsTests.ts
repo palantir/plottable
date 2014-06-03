@@ -69,4 +69,11 @@ describe("DOMUtils", () => {
       child.remove();
     });
   });
+
+  it("isSelectionRemoved works", () => {
+    var svg = generateSVG();
+    assert.isFalse(Plottable.DOMUtils.isSelectionRemoved(svg), "svg is in DOM");
+    svg.remove();
+    assert.isTrue(Plottable.DOMUtils.isSelectionRemoved(svg), "svg is no longer in DOM");
+    });
 });

@@ -17,6 +17,9 @@ module Plottable {
      */
     constructor(scale?: D3.Scale.OrdinalScale) {
       super(scale == null ? d3.scale.ordinal() : scale);
+      if (this._innerPadding > this._outerPadding) {
+        throw new Error("outerPadding must be >= innerPadding so cat axis bands work out reasonably");
+      }
     }
 
     public _getExtent(): any[] {
@@ -74,6 +77,21 @@ module Plottable {
      */
     public rangeBand() : number {
       return this._d3Scale.rangeBand();
+    }
+
+    public innerPadding(): number {
+      var d = this.domain();
+      if (d.length < 2) {
+        return 0;
+      }
+      var step = Math.abs(this.scale(d[1]) - this.scale(d[0]));
+      return step - this.rangeBand();
+    }
+
+    public fullBandStartAndWidth(v: any) {
+      var start = this.scale(v) - this.innerPadding() / 2;
+      var width = this.rangeBand() + this.innerPadding();
+      return [start, width];
     }
 
     /**
