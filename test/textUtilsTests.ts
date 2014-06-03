@@ -39,9 +39,15 @@ describe("TextUtils", () => {
   });
 
   describe("addEllipsesToLine", () => {
-    var svg = generateSVG();
-    var measure = Plottable.TextUtils.getTextMeasure(svg);
-    var e = (text: string, width: number) => Plottable.TextUtils.addEllipsesToLine(text, width, measure);
+    var svg: D3.Selection;
+    var measure: any;
+    var e: any;
+
+    before(() => {
+      svg = generateSVG();
+      measure = Plottable.TextUtils.getTextMeasure(svg);
+      e = (text: string, width: number) => Plottable.TextUtils.addEllipsesToLine(text, width, measure);
+    });
     it("works on an empty string" ,() => {
       assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");
     });
