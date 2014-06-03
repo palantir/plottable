@@ -2,8 +2,10 @@
 
 module Plottable {
   export class AreaRenderer extends XYRenderer {
-    private path: D3.Selection;
+    private areaPath: D3.Selection;
+    private linePath: D3.Selection;
     private area: D3.Svg.Area;
+    private line: D3.Svg.Line;
     public _ANIMATION_DURATION = 600; //milliseconds
 
     /**
@@ -19,11 +21,13 @@ module Plottable {
       this.classed("area-renderer", true);
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
+      this.project("stroke", () => "steelblue"); // default
     }
 
     public _setup() {
       super._setup();
-      this.path = this.renderArea.append("path").classed("area", true);
+      this.areaPath = this.renderArea.append("path").classed("area", true);
+      this.linePath = this.renderArea.append("path").classed("line", true);
       return this;
     }
 
@@ -37,24 +41,35 @@ module Plottable {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      this.dataSelection = this.path.datum(this._dataSource.data());
+      this.dataSelection = this.areaPath.datum(this._dataSource.data());
+      this.linePath.datum(this._dataSource.data());
       if (this._animate && this._dataChanged) {
          var animationStartArea = d3.svg.area()
                                         .x(xFunction)
                                         .y0(y0Function)
                                         .y1(y0Function);
-        this.path.attr("d", animationStartArea).attr(attrToProjector);
+        this.areaPath.attr("d", animationStartArea).attr(attrToProjector);
+        var animationStartLine = d3.svg.line()
+                                       .x(xFunction)
+                                       .y(y0Function);
+        this.linePath.attr("d", animationStartLine).attr(attrToProjector);
       }
 
       this.area = d3.svg.area()
-            .x(xFunction)
-            .y0(y0Function)
-            .y1(yFunction);
-      var updateSelection: any = this.path;
+                        .x(xFunction)
+                        .y0(y0Function)
+                        .y1(yFunction);
+      var areaUpdateSelection: any = this.areaPath;
+      var lineUpdateSelection: any = this.linePath;
       if (this._animate) {
-        updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+        areaUpdateSelection = this.areaPath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+        lineUpdateSelection = this.linePath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
       }
-      updateSelection.attr("d", this.area).attr(attrToProjector);
+      this.line = d3.svg.line()
+                        .x(xFunction)
+                        .y(yFunction);
+      areaUpdateSelection.attr("d", this.area).attr(attrToProjector);
+      lineUpdateSelection.attr("d", this.line).attr(attrToProjector);
     }
   }
 }

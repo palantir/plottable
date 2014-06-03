@@ -257,9 +257,24 @@ describe("Renderers", () => {
         verifier.start();
       });
 
+      it("draws area and line correctly", () => {
+        var areaPath = renderArea.select(".area");
+        assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+        assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
+        var areaComputedStyle = window.getComputedStyle(areaPath.node());
+        assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
+
+        var linePath = renderArea.select(".line");
+        assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+        assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
+        var lineComputedStyle = window.getComputedStyle(linePath.node());
+        assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+        verifier.end();
+      });
+
       it("fill colors set appropriately from accessor", () => {
-        var path = renderArea.select("path");
-        assert.equal(path.attr("fill"), "steelblue", "fill set correctly");
+        var areaPath = renderArea.select(".area");
+        assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
         verifier.end();
       });
 
@@ -268,8 +283,8 @@ describe("Renderers", () => {
         areaRenderer.project("fill", newFillAccessor);
         areaRenderer.renderTo(svg);
         renderArea = areaRenderer.renderArea;
-        var path = renderArea.select("path");
-        assert.equal(path.attr("fill"), "pink", "fill changed correctly");
+        var areaPath = renderArea.select(".area");
+        assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
         verifier.end();
       });
 
@@ -277,8 +292,8 @@ describe("Renderers", () => {
         areaRenderer.project("y0", (d: any) => d.bar/2);
         areaRenderer.renderTo(svg);
         renderArea = areaRenderer.renderArea;
-        var path = renderArea.select("path");
-        assert.equal(path.attr("d"), "M0,500L500,0L500,250L0,500Z");
+        var areaPath = renderArea.select(".area");
+        assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
         verifier.end();
       });
 

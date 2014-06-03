@@ -2140,6 +2140,7 @@ var Plottable;
 
         Renderer.prototype.project = function (attrToSet, accessor, scale) {
             var _this = this;
+            attrToSet = attrToSet.toLowerCase();
             var rendererIDAttr = this._plottableID + attrToSet;
             var currentProjection = this._projectors[attrToSet];
             var existingScale = (currentProjection != null) ? currentProjection.scale : null;
@@ -4838,10 +4839,14 @@ var Plottable;
             this.project("fill", function () {
                 return "steelblue";
             }); // default
+            this.project("stroke", function () {
+                return "steelblue";
+            }); // default
         }
         AreaRenderer.prototype._setup = function () {
             _super.prototype._setup.call(this);
-            this.path = this.renderArea.append("path").classed("area", true);
+            this.areaPath = this.renderArea.append("path").classed("area", true);
+            this.linePath = this.renderArea.append("path").classed("line", true);
             return this;
         };
 
@@ -4855,18 +4860,25 @@ var Plottable;
             delete attrToProjector["y0"];
             delete attrToProjector["y"];
 
-            this.dataSelection = this.path.datum(this._dataSource.data());
+            this.dataSelection = this.areaPath.datum(this._dataSource.data());
+            this.linePath.datum(this._dataSource.data());
             if (this._animate && this._dataChanged) {
                 var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
-                this.path.attr("d", animationStartArea).attr(attrToProjector);
+                this.areaPath.attr("d", animationStartArea).attr(attrToProjector);
+                var animationStartLine = d3.svg.line().x(xFunction).y(y0Function);
+                this.linePath.attr("d", animationStartLine).attr(attrToProjector);
             }
 
             this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-            var updateSelection = this.path;
+            var areaUpdateSelection = this.areaPath;
+            var lineUpdateSelection = this.linePath;
             if (this._animate) {
-                updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+                areaUpdateSelection = this.areaPath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
+                lineUpdateSelection = this.linePath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
             }
-            updateSelection.attr("d", this.area).attr(attrToProjector);
+            this.line = d3.svg.line().x(xFunction).y(yFunction);
+            areaUpdateSelection.attr("d", this.area).attr(attrToProjector);
+            lineUpdateSelection.attr("d", this.line).attr(attrToProjector);
         };
         return AreaRenderer;
     })(Plottable.XYRenderer);
