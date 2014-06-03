@@ -4078,6 +4078,12 @@ var Plottable;
             this.isOff = d3.set([]);
             // initially, everything is toggled on
         }
+        /**
+        * Assigns a new ColorScale to the Legend.
+        *
+        * @param {ColorScale} scale
+        * @returns {ToggleLegend} The calling ToggleLegend.
+        */
         ToggleLegend.prototype.scale = function (scale) {
             var _this = this;
             if (scale != null) {
@@ -4098,14 +4104,8 @@ var Plottable;
         ToggleLegend.prototype._doRender = function () {
             var _this = this;
             _super.prototype._doRender.call(this);
-            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
-            dataSelection.classed("toggled-on", function (d) {
-                return !_this.isOff.has(d);
-            });
-            dataSelection.classed("toggled-off", function (d) {
-                return _this.isOff.has(d);
-            });
-            dataSelection.on("click", function (d) {
+            this.updateClasses();
+            this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS).on("click", function (d) {
                 var turningOn = _this.isOff.has(d);
                 if (turningOn) {
                     _this.isOff.remove(d);
@@ -4113,9 +4113,20 @@ var Plottable;
                     _this.isOff.add(d);
                 }
                 _this.callback(d, turningOn);
-                _this._invalidateLayout();
+                _this.updateClasses();
             });
             return this;
+        };
+
+        ToggleLegend.prototype.updateClasses = function () {
+            var _this = this;
+            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+            dataSelection.classed("toggled-on", function (d) {
+                return !_this.isOff.has(d);
+            });
+            dataSelection.classed("toggled-off", function (d) {
+                return _this.isOff.has(d);
+            });
         };
         return ToggleLegend;
     })(Plottable.Legend);

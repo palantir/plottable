@@ -22,6 +22,12 @@ module Plottable {
       // initially, everything is toggled on
     }
 
+    /**
+     * Assigns a new ColorScale to the Legend.
+     *
+     * @param {ColorScale} scale
+     * @returns {ToggleLegend} The calling ToggleLegend.
+     */
     public scale(scale?: ColorScale): any {
       if (scale != null) {
         super.scale(scale);
@@ -39,10 +45,8 @@ module Plottable {
 
     public _doRender(): ToggleLegend {
       super._doRender();
-      var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
-      dataSelection.classed("toggled-on", (d: any) => !this.isOff.has(d));
-      dataSelection.classed("toggled-off", (d: any) => this.isOff.has(d));
-      dataSelection.on("click", (d: any) => {
+      this.updateClasses();
+      this.content.selectAll("." + Legend._SUBELEMENT_CLASS).on("click", (d: any) => {
         var turningOn = this.isOff.has(d);
         if (turningOn) {
           this.isOff.remove(d);
@@ -50,9 +54,15 @@ module Plottable {
           this.isOff.add(d);
         }
         this.callback(d, turningOn);
-        this._invalidateLayout();
+        this.updateClasses();
       });
       return this;
+    }
+
+    private updateClasses() {
+      var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
+      dataSelection.classed("toggled-on", (d: any) => !this.isOff.has(d));
+      dataSelection.classed("toggled-off", (d: any) => this.isOff.has(d));
     }
   }
 }
