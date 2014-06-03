@@ -46,7 +46,7 @@ var Plottable;
         * @return {D3.Set} A set that contains elements that appear in both set1 and set2
         */
         function intersection(set1, set2) {
-            var set = d3.set([]);
+            var set = d3.set();
             set1.forEach(function (v) {
                 if (set2.has(v)) {
                     set.add(v);
@@ -4079,15 +4079,24 @@ var Plottable;
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(datum: any, newState: boolean) => any} callback The function to be called when a legend entry is clicked.
+        * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
         */
         function ToggleLegend(colorScale, callback) {
             this.callback = callback;
-
-            // initially, everything is toggled on
-            this.isOff = d3.set([]);
+            this.isOff = d3.set(); // initially, everything is toggled on
             _super.call(this, colorScale);
         }
+        /**
+        * Assigns the callback to the ToggleLegend
+        * Call with argument of null to remove the callback
+        *
+        * @param{ToggleCallback} callback The new callback function
+        */
+        ToggleLegend.prototype.setCallback = function (callback) {
+            this.callback = callback;
+            return this;
+        };
+
         /**
         * Assigns a new ColorScale to the Legend.
         *
@@ -4124,7 +4133,9 @@ var Plottable;
                 } else {
                     _this.isOff.add(d);
                 }
-                _this.callback(d, turningOn);
+                if (_this.callback != null) {
+                    _this.callback(d, turningOn);
+                }
                 _this.updateClasses();
             });
             return this;
@@ -4132,7 +4143,7 @@ var Plottable;
 
         ToggleLegend.prototype.updateClasses = function () {
             var _this = this;
-            if (this.content != undefined) {
+            if (this._isSetup) {
                 var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
                 dataSelection.classed("toggled-on", function (d) {
                     return !_this.isOff.has(d);

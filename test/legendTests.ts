@@ -148,7 +148,7 @@ describe("Legends", () => {
     var toggleLegend: Plottable.ToggleLegend;
 
     beforeEach(() => {
-      toggleLegend = new Plottable.ToggleLegend(color, (d, b) => d);
+      toggleLegend = new Plottable.ToggleLegend(color);
     });
 
     function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
@@ -197,9 +197,9 @@ describe("Legends", () => {
       var domain = ["a", "b", "c", "d", "e"];
       color.domain(domain);
       toggleLegend.renderTo(svg);
-      toggleEntry("a", 1);
-      toggleEntry("d", 4);
-      toggleEntry("c", 3);
+      toggleEntry("a", 0);
+      toggleEntry("d", 3);
+      toggleEntry("c", 2);
 
       var newDomain = ["r", "a", "d", "g"];
       var newColorScale = new Plottable.ColorScale("Category10");
@@ -217,9 +217,9 @@ describe("Legends", () => {
     it("listeners on scale will correctly update states", () =>  {
       color.domain(["a", "b", "c", "d", "e"]);
       toggleLegend.renderTo(svg);
-      toggleEntry("a", 1);
-      toggleEntry("d", 4);
-      toggleEntry("c", 3);
+      toggleEntry("a", 0);
+      toggleEntry("d", 3);
+      toggleEntry("c", 2);
 
       color.domain(["e", "d", "b", "a", "c"]);
       verifyEntry("a", false);
@@ -227,6 +227,78 @@ describe("Legends", () => {
       verifyEntry("c", false);
       verifyEntry("d", false);
       verifyEntry("e", true);
+      svg.remove();
+    });
+
+    it("Testing callback works correctly", () =>  {
+      var domain = ["a", "b", "c", "d", "e"];
+      color.domain(domain);
+      var state = [true, true, true, true, true];
+
+      toggleLegend.setCallback((d, b) => {
+        state[domain.indexOf(d)] = b;
+      });
+      toggleLegend.renderTo(svg);
+
+      toggleEntry("a", 0);
+      verifyEntry("a", false);
+      assert.equal(state[0], false, "callback was successful");
+
+      toggleEntry("d", 3);
+      verifyEntry("d", false);
+      assert.equal(state[3], false, "callback was successful");
+
+      toggleEntry("a", 0);
+      verifyEntry("a", true);
+      assert.equal(state[0], true, "callback was successful");
+
+      toggleEntry("c", 2);
+      verifyEntry("c", false);
+      assert.equal(state[2], false, "callback was successful");
+      svg.remove();
+    });
+
+    it("Overwriting callback is successfull", () => {
+      var domain = ["a"];
+      color.domain(domain);
+      var state = true;
+      toggleLegend.renderTo(svg);
+
+      toggleLegend.setCallback((d, b) => {
+        state = b;
+      });
+
+      toggleEntry("a", 0);
+      assert.equal(state, false, "callback was successful");
+
+      var count = 0;
+      toggleLegend.setCallback((d, b) => {
+        count++;
+      });
+
+      toggleEntry("a", 0);
+      assert.equal(state, false, "callback was overwritten");
+      assert.equal(count, 1, "new callback was successfully called");
+      svg.remove();
+    });
+
+    it("Removing callback is successful", () =>  {
+      var domain = ["a"];
+      color.domain(domain);
+      var state = true;
+      toggleLegend.renderTo(svg);
+
+      toggleLegend.setCallback((d, b) => {
+        state = b;
+      });
+
+      toggleEntry("a", 0);
+      assert.equal(state, false, "callback was successful");
+
+      toggleLegend.setCallback(null);
+      toggleEntry("a", 0);
+      assert.equal(state, false, "callback was removed");
+
       svg.remove();
     });
   });

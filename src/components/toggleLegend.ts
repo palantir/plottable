@@ -1,8 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+  export interface ToggleCallback {
+      (datum: any, newState: boolean): any;
+  }
+
   export class ToggleLegend extends Legend {
-    private callback: (datum: any, newState: boolean) => any;
+    private callback: ToggleCallback;
 
     // this is the set of all elements that are currently toggled off
     private isOff: D3.Set;
@@ -12,13 +16,23 @@ module Plottable {
      *
      * @constructor
      * @param {ColorScale} colorScale
-     * @param {(datum: any, newState: boolean) => any} callback The function to be called when a legend entry is clicked.
+     * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
      */
-    constructor(colorScale: ColorScale, callback: (datum: any, newState: boolean) => any) {
+    constructor(colorScale: ColorScale, callback?: ToggleCallback) {
       this.callback = callback;
-      // initially, everything is toggled on
-      this.isOff = d3.set([]);
+      this.isOff = d3.set(); // initially, everything is toggled on
       super(colorScale);
+    }
+
+    /**
+     * Assigns the callback to the ToggleLegend
+     * Call with argument of null to remove the callback
+     * 
+     * @param{ToggleCallback} callback The new callback function
+     */
+    public setCallback(callback: ToggleCallback): ToggleLegend {
+      this.callback = callback;
+      return this;
     }
 
     /**
@@ -54,14 +68,16 @@ module Plottable {
         } else {
           this.isOff.add(d);
         }
-        this.callback(d, turningOn);
+        if (this.callback != null) {
+          this.callback(d, turningOn);
+        }
         this.updateClasses();
       });
       return this;
     }
 
     private updateClasses() {
-      if (this.content !== undefined) {
+      if (this._isSetup) {
         var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
         dataSelection.classed("toggled-on", (d: any) => !this.isOff.has(d));
         dataSelection.classed("toggled-off", (d: any) => this.isOff.has(d));
