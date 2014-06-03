@@ -3430,11 +3430,17 @@ describe("TextUtils", function () {
     });
 
     describe("addEllipsesToLine", function () {
-        var svg = generateSVG();
-        var measure = Plottable.TextUtils.getTextMeasure(svg);
-        var e = function (text, width) {
-            return Plottable.TextUtils.addEllipsesToLine(text, width, measure);
-        };
+        var svg;
+        var measure;
+        var e;
+
+        before(function () {
+            svg = generateSVG();
+            measure = Plottable.TextUtils.getTextMeasure(svg);
+            e = function (text, width) {
+                return Plottable.TextUtils.addEllipsesToLine(text, width, measure);
+            };
+        });
         it("works on an empty string", function () {
             assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");
         });
