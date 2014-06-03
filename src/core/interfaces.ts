@@ -39,4 +39,11 @@ module Plottable {
     wantsWidth: boolean;
     wantsHeight: boolean;
   }
+
+  export interface IPixelArea {
+    xMin: number;
+    xMax: number;
+    yMin: number;
+    yMax: number;
+  }
 }
