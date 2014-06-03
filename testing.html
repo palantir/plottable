@@ -49,11 +49,10 @@
     <td>
       <iframe id="FileFrame" src="about:blank"></iframe>
       <script type="text/javascript">
+      var test1html = "hi";
       var doc = document.getElementById('FileFrame').contentWindow.document;
       doc.open();
-      doc.write($.get("examples/jsfiddle/chartWithLabels/demo.js", function(data) {
-          $("#FileFrame").html(data);
-        }));
+      doc.write('<html><head><title></title></head><body>' + test1html + '</body></html>');
       doc.close();
       </script>
     </td> 
