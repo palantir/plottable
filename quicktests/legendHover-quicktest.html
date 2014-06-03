@@ -1,11 +1,21 @@
 <html>
   <head>
+<<<<<<< HEAD
     <title>Legend Hover Quicktest</title>
+=======
+    <title>Legend Toggle Quicktest</title>
+>>>>>>> 081f76742bb6f171b9e4e2d5b78f6fe8164e18de
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../../plottable.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
     <style>
+<<<<<<< HEAD
+=======
+        .not-selected circle {
+            fill:#d3d3d3;
+        }
+>>>>>>> 081f76742bb6f171b9e4e2d5b78f6fe8164e18de
     </style>
     <script>
 
@@ -15,7 +25,11 @@
 
         var colors = new Plottable.ColorScale("10").range();
         var numRenderers = 5;
+<<<<<<< HEAD
         var names = ["aaa", "bbb", "ccc", "ddd", "eee"];
+=======
+        var names = ["bat", "cat", "mat", "rat", "pat"];
+>>>>>>> 081f76742bb6f171b9e4e2d5b78f6fe8164e18de
         var colorScale = new Plottable.ColorScale();
         colorScale.range(colors);
         colorScale.domain(names);
@@ -44,6 +58,7 @@
                                   [null,  xAxis]
                                 ]);
         
+<<<<<<< HEAD
         var legendLabel = new Plottable.TitleLabel("q");
         var legend = new Plottable.HoverLegend(colorScale,
             function (d) {
@@ -61,6 +76,20 @@
                     }
                 }
                 cg._invalidateLayout();
+=======
+        var legendLabel = new Plottable.TitleLabel("fat");
+        var legend = new Plottable.HoverLegend(colorScale,
+            function (d) {
+                cg.removeAll();
+                if (d === undefined) {
+                    for (var i = 0; i < numRenderers; i++){
+                        cg.merge (renderers[i]);
+                    }
+                } else {
+                    var index = names.indexOf(d);
+                    cg.merge(renderers[index]);
+                }
+>>>>>>> 081f76742bb6f171b9e4e2d5b78f6fe8164e18de
             }
         );
         var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
