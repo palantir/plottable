@@ -590,6 +590,12 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     }
+    interface IPixelArea {
+        xMin: number;
+        xMax: number;
+        yMin: number;
+        yMax: number;
+    }
 }
 
 
@@ -1379,6 +1385,7 @@ declare module Plottable {
         * @returns {AreaInteraction} The calling AreaInteraction.
         */
         public callback(cb?: (a: any) => any): DragInteraction;
+        public setupZoomCallback(xScale?: QuantitiveScale, yScale?: QuantitiveScale): DragInteraction;
     }
 }
 
@@ -1406,17 +1413,6 @@ declare module Plottable {
 declare module Plottable {
     class XYDragBoxInteraction extends DragBoxInteraction {
     }
-}
-
-
-declare module Plottable {
-    interface IPixelArea {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    }
-    function setupDragBoxZoom(dragBox: XYDragBoxInteraction, xScale: QuantitiveScale, yScale: QuantitiveScale): void;
 }
 
 

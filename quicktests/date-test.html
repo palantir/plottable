@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <script>
+
+var data = [
+    {x: "5/2/2014", y: 2},
+    {x: "5/3/2014", y: 3},
+    {x: "5/6/2014", y: 4}
+    ]
+
+
+
+window.onload = function () {
+    xScale = new Plottable.TimeScale();
+    yScale = new Plottable.LinearScale();
+    lineRenderer = new Plottable.LineRenderer(data, xScale, yScale)
+                                .project("x", function (d) { return d3.time.format("%x").parse(d.x)});
+    xAxis = new Plottable.XAxis(xScale);
+    yAxis = new Plottable.YAxis(yScale);
+    new Plottable.StandardChart().center(lineRenderer).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
+
+
+};
+
+
+
+
+
+    </script>
+    </head>
+
+<body>
+<div class="demo-title">Simple Chart</div>
+<br>
+
+
+<br>
+<svg id="chart"></svg>
+
+
+
+<p />
+</body>
+</html>
