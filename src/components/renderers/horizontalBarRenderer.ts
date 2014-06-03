@@ -3,6 +3,8 @@
 module Plottable {
   export class HorizontalBarRenderer extends AbstractBarRenderer {
     public _barAlignment = "top";
+    public _ANIMATION_DURATION = 300; //milliseconds
+    public _ANIMATION_DELAY = 15; //milliseconds
 
     /**
      * Creates a HorizontalBarRenderer.
@@ -67,8 +69,8 @@ module Plottable {
       var updateSelection: any = this.dataSelection;
       if (this._animate) {
         var n = this.dataSource().data().length;
-        updateSelection = updateSelection.transition()
-                                         .delay((d: any, i: number) => i * this._ANIMATION_DURATION / n);
+        updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION)
+                                            .delay((d: any, i: number) => i * this._ANIMATION_DELAY);
       }
 
       updateSelection.attr(attrToProjector);

@@ -102,13 +102,7 @@ var MultiTestVerifier = (function () {
     };
     return MultiTestVerifier;
 })();
-///<reference path="../typings/chai/chai-assert.d.ts" />
-///<reference path="../typings/mocha/mocha.d.ts" />
-///<reference path="../typings/d3/d3.d.ts" />
-///<reference path="../typings/jquery/jquery.d.ts" />
-///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="testUtils.ts" />
-///<reference path="../plottable.d.ts" />
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -426,6 +420,120 @@ describe("Axes", function () {
         svg.remove();
     });
 });
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("BaseAxis", function () {
+    it("orientation", function () {
+        var scale = new Plottable.LinearScale();
+        assert.throws(function () {
+            return new Plottable.BaseAxis(scale, "blargh");
+        }, "unsupported");
+    });
+
+    it("draws ticks and baseline (horizontal)", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.LinearScale();
+        scale.range([0, SVG_WIDTH]);
+        var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+        baseAxis._getTickValues = function () {
+            return scale.ticks(10);
+        };
+        baseAxis.renderTo(svg);
+
+        var ticks = svg.selectAll(".tick");
+        assert.strictEqual(ticks[0].length, scale.ticks(10).length, "A line was drawn for each tick");
+        var baseline = svg.select(".baseline");
+
+        assert.isNotNull(baseline.node(), "baseline was drawn");
+        assert.strictEqual(baseline.attr("x1"), "0");
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("y1"), "0");
+        assert.strictEqual(baseline.attr("y2"), "0");
+
+        baseAxis.orient("top");
+        assert.isNotNull(baseline.node(), "baseline was drawn");
+        assert.strictEqual(baseline.attr("x1"), "0");
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("y1"), String(SVG_HEIGHT));
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+
+        svg.remove();
+    });
+
+    it("draws ticks and baseline (vertical)", function () {
+        var SVG_WIDTH = 100;
+        var SVG_HEIGHT = 500;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.LinearScale();
+        scale.range([0, SVG_WIDTH]);
+        var baseAxis = new Plottable.BaseAxis(scale, "left");
+        baseAxis._getTickValues = function () {
+            return scale.ticks(10);
+        };
+        baseAxis.renderTo(svg);
+
+        var ticks = svg.selectAll(".tick");
+        assert.strictEqual(ticks[0].length, scale.ticks(10).length, "A line was drawn for each tick");
+        var baseline = svg.select(".baseline");
+
+        assert.isNotNull(baseline.node(), "baseline was drawn");
+        assert.strictEqual(baseline.attr("x1"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
+        assert.strictEqual(baseline.attr("y1"), "0");
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+
+        baseAxis.orient("right");
+        assert.isNotNull(baseline.node(), "baseline was drawn");
+        assert.strictEqual(baseline.attr("x1"), "0");
+        assert.strictEqual(baseline.attr("x2"), "0");
+        assert.strictEqual(baseline.attr("y1"), "0");
+        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+
+        svg.remove();
+    });
+
+    it("tickLength()", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.LinearScale();
+        scale.range([0, SVG_WIDTH]);
+        var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+        baseAxis._getTickValues = function () {
+            return scale.ticks(10);
+        };
+        baseAxis.renderTo(svg);
+
+        var firstTick = svg.select(".tick").select("line");
+        assert.strictEqual(firstTick.attr("x1"), "0");
+        assert.strictEqual(firstTick.attr("x2"), "0");
+        assert.strictEqual(firstTick.attr("y1"), "0");
+        assert.strictEqual(firstTick.attr("y2"), String(baseAxis.tickLength()));
+
+        baseAxis.tickLength(10);
+        assert.strictEqual(firstTick.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
+
+        assert.throws(function () {
+            return baseAxis.tickLength(-1);
+        }, "must be positive");
+
+        svg.remove();
+    });
+
+    it("tickLabelPadding()", function () {
+        var scale = new Plottable.LinearScale();
+        var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+
+        assert.throws(function () {
+            return baseAxis.tickLabelPadding(-1);
+        }, "must be positive");
+    });
+});
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -488,6 +596,7 @@ describe("Broadcasters", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -559,6 +668,7 @@ describe("ComponentContainer", function () {
         assert.deepEqual(container.components(), [c1, c2], "internal list of components was not changed");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -779,6 +889,7 @@ describe("ComponentGroups", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1142,6 +1253,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1164,6 +1276,7 @@ describe("Coordinators", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1222,6 +1335,7 @@ describe("DataSource", function () {
         assert.deepEqual(dataSource._getExtent(a3), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1291,7 +1405,15 @@ describe("DOMUtils", function () {
             child.remove();
         });
     });
+
+    it("isSelectionRemoved works", function () {
+        var svg = generateSVG();
+        assert.isFalse(Plottable.DOMUtils.isSelectionRemoved(svg), "svg is in DOM");
+        svg.remove();
+        assert.isTrue(Plottable.DOMUtils.isSelectionRemoved(svg), "svg is no longer in DOM");
+    });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1343,6 +1465,7 @@ describe("Gridlines", function () {
         // test passes if error is not thrown.
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1359,6 +1482,7 @@ describe("IDCounter", function () {
         assert.equal(i.decrement(2), -1);
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1558,6 +1682,7 @@ describe("Interactions", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1676,6 +1801,7 @@ describe("Labels", function () {
         }, Error, "not a valid orientation");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -1778,6 +1904,7 @@ describe("Legends", function () {
         svg.remove();
     });
 });
+
 var PerfDiagnostics;
 (function (_PerfDiagnostics) {
     var PerfDiagnostics = (function () {
@@ -1843,6 +1970,7 @@ var PerfDiagnostics;
     ;
 })(PerfDiagnostics || (PerfDiagnostics = {}));
 window.report = PerfDiagnostics.logResults;
+
 ///<reference path="testReference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -2598,6 +2726,7 @@ describe("Renderers", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -2698,6 +2827,37 @@ describe("Scales", function () {
             var d = scale.domain();
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
+        });
+
+        it("autoPad defaults to [v-1, v+1] if there's only one value", function () {
+            var scale = new Plottable.LinearScale();
+            scale.domain([5, 5]);
+            scale.padDomain();
+            assert.deepEqual(scale.domain(), [4, 6]);
+        });
+
+        it("autoPad works in general case", function () {
+            var scale = new Plottable.LinearScale();
+            scale.domain([100, 200]);
+            scale.padDomain(0.20);
+            assert.deepEqual(scale.domain(), [90, 210]);
+        });
+
+        it("autoPad works for date scales", function () {
+            var scale = new Plottable.TimeScale();
+            var f = d3.time.format("%x");
+            var d1 = f.parse("06/02/2014");
+            var d2 = f.parse("06/03/2014");
+            scale.domain([d1, d2]);
+            scale.padDomain();
+            var dd1 = scale.domain()[0];
+            var dd2 = scale.domain()[1];
+            assert.isDefined(dd1.toDateString, "padDomain produced dates");
+            assert.isNotNull(dd1.toDateString, "padDomain produced dates");
+            assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
+            assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
+            assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
+            assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
         });
     });
 
@@ -2813,6 +2973,7 @@ describe("Scales", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -2841,6 +3002,7 @@ describe("StrictEqualityAssociativeArray", function () {
         assert.equal(s.get("3"), "ball");
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
@@ -3056,7 +3218,7 @@ describe("Tables", function () {
         assert.isFalse(table._isFixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });
 
-    it("table._requestedSpace works properly", function () {
+    it.skip("table._requestedSpace works properly", function () {
         // [0 1]
         // [2 3]
         var c0 = new Plottable.Component();
@@ -3105,7 +3267,7 @@ describe("Tables", function () {
             verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
         });
 
-        it("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
+        it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
             fixComponentSize(c1, 490, 50);
             var result = table.iterateLayout(500, 500);
             verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
@@ -3128,7 +3290,7 @@ describe("Tables", function () {
             verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "..when there's extra space");
         });
 
-        it("iterateLayout works in the tricky case when components can be unsatisfied but request little space", function () {
+        it.skip("iterateLayout works in the tricky case when components can be unsatisfied but request little space", function () {
             table = new Plottable.Table([[c1, c2]]);
             fixComponentSize(c1, null, null);
             c2._requestedSpace = function (w, h) {
@@ -3227,9 +3389,10 @@ describe("Tables", function () {
         });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
-
+var tu = Plottable.TextUtils;
 describe("TextUtils", function () {
     it("getTruncatedText works properly", function () {
         var svg = generateSVG();
@@ -3266,39 +3429,216 @@ describe("TextUtils", function () {
         svg.remove();
     });
 
-    it("getWrappedText works properly", function () {
-        var svg = generateSVG();
-        var textEl = svg.append("text").attr("x", 20).attr("y", 50);
-        textEl.style("font-size", "12pt").style("font-family", "sans-serif");
+    describe("addEllipsesToLine", function () {
+        var svg;
+        var measure;
+        var e;
 
-        textEl.text("foobar");
-        var textWithSpaces = "012345 6 789";
-        var wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 100, 100, textEl);
-        assert.deepEqual(wrappedLines, ["012345 6", "789"], "Wraps at first space after the cutoff");
-        assert.equal(textEl.text(), "foobar", "getWrappedText did not modify the text in the element");
-
-        wrappedLines = Plottable.TextUtils.getWrappedText(textWithSpaces, 100, 100, textEl, 0.5);
-        assert.deepEqual(wrappedLines, ["012345", "6 789"], "reducing the cutoff ratio causes text to wrap at an earlier space");
-
-        var shortText = "a";
-        wrappedLines = Plottable.TextUtils.getWrappedText(shortText, 100, 100, textEl);
-        assert.deepEqual(wrappedLines, ["a"], "short text is unchanged");
-
-        var longTextNoSpaces = "Supercalifragilisticexpialidocious";
-        wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 100, 100, textEl);
-        assert.operator(wrappedLines.length, ">=", 2, "long text with no spaces gets wrapped");
-        wrappedLines.forEach(function (line, i) {
-            if (i < wrappedLines.length - 1) {
-                assert.equal(line.charAt(line.length - 1), "-", "long text with no spaces gets hyphenated");
-            }
+        before(function () {
+            svg = generateSVG();
+            measure = Plottable.TextUtils.getTextMeasure(svg);
+            e = function (text, width) {
+                return Plottable.TextUtils.addEllipsesToLine(text, width, measure);
+            };
+        });
+        it("works on an empty string", function () {
+            assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");
         });
 
-        wrappedLines = Plottable.TextUtils.getWrappedText(longTextNoSpaces, 100, 20, textEl);
-        assert.equal(wrappedLines[0].substr(wrappedLines[0].length - 3, 3), "...", "text gets truncated if there's not enough height for all lines");
+        it("works as expected when given no width", function () {
+            assert.equal(e("this wont fit", 0), "", "returned empty string when width is 0");
+        });
 
-        svg.remove();
+        it("works as expected when given only one periods worth of space", function () {
+            var w = measure(".")[0];
+            assert.equal(e("this won't fit", w), ".", "returned a single period");
+        });
+
+        it("works as expected with plenty of space", function () {
+            assert.equal(e("this will fit", 400), "this will fit...");
+        });
+
+        it("works as expected with insufficient space", function () {
+            var w = measure("this won't fit")[0];
+            assert.equal(e("this won't fit", w), "this won't...");
+        });
+
+        it("handles spaces intelligently", function () {
+            var spacey = "this            xx";
+            var w = measure(spacey)[0] - 1;
+            assert.equal(e(spacey, w), "this...");
+        });
+
+        after(function () {
+            assert.lengthOf(svg.node().childNodes, 0, "this was all without side-effects");
+            svg.remove();
+        });
+    });
+
+    describe("getTextMeasure", function () {
+        var svg;
+        var t;
+        var canonicalBB;
+        var canonicalResult;
+
+        before(function () {
+            svg = generateSVG(200, 200);
+            t = svg.append("text");
+            t.text("hi there");
+            canonicalBB = Plottable.DOMUtils.getBBox(t);
+            canonicalResult = [canonicalBB.width, canonicalBB.height];
+            t.text("bla bla bla");
+        });
+
+        it("works on empty string", function () {
+            var measure = Plottable.TextUtils.getTextMeasure(t);
+            var result = measure("");
+            assert.deepEqual(result, [0, 0], "empty string has 0 width and height");
+        });
+        it("works on non-empty string and has no side effects", function () {
+            var measure = Plottable.TextUtils.getTextMeasure(t);
+            var result2 = measure("hi there");
+            assert.deepEqual(result2, canonicalResult, "measurement is as expected");
+            assert.equal(t.text(), "bla bla bla", "the text was unchanged");
+        });
+
+        it("works when operating on the top svg instead of text selection, and has no side effects", function () {
+            var measure2 = Plottable.TextUtils.getTextMeasure(svg);
+            var result3 = measure2("hi there");
+            assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
+            assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
+        });
+        after(function () {
+            svg.remove();
+        });
+    });
+
+    describe("writeLine", function () {
+        var svg;
+        var g;
+        var text = "hello world ARE YOU THERE?";
+        var hideResults = true;
+
+        describe("writeLineHorizontally", function () {
+            it("performs basic functionality and defaults to left, top", function () {
+                svg = generateSVG(400, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400);
+                var textEl = g.select("text");
+                var bb = Plottable.DOMUtils.getBBox(textEl);
+                var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0];
+                var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1];
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("center, center alignment works", function () {
+                svg = generateSVG(400, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "center", "center");
+                svg.append("circle").attr({ cx: 200, cy: 200, r: 5 });
+                var textEl = g.select("text");
+                var bb = Plottable.DOMUtils.getBBox(textEl);
+                var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0] + bb.width / 2;
+                var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1] + bb.height / 2;
+
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("right, bottom alignment works", function () {
+                svg = generateSVG(400, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "right", "bottom");
+                var textEl = g.select("text");
+                var bb = Plottable.DOMUtils.getBBox(textEl);
+                var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0] + bb.width;
+                var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1] + bb.height;
+
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+
+            it("throws an error if there's too little space", function () {
+                svg = generateSVG(20, 20);
+                g = svg.append("g");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+        });
+
+        describe("writeLineVertically", function () {
+            it("performs basic functionality and defaults to right, left, top", function () {
+                svg = generateSVG(60, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400);
+                var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("right, center, center", function () {
+                svg = generateSVG(60, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically("x", g, 60, 400, "center", "center", "right");
+                var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("right, right, bottom", function () {
+                svg = generateSVG(60, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "right", "bottom", "right");
+                var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+            it("left, left, top", function () {
+                svg = generateSVG(60, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "left", "top", "left");
+                var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+
+            it("left, center, center", function () {
+                svg = generateSVG(60, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "center", "center", "left");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+
+            it("left, right, bottom", function () {
+                svg = generateSVG(60, 400);
+                g = svg.append("g");
+                var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "right", "bottom", "left");
+                if (hideResults) {
+                    svg.remove();
+                }
+                ;
+            });
+        });
     });
 });
+
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 

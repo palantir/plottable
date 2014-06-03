@@ -2,6 +2,8 @@
 
 module Plottable {
   export class CircleRenderer extends XYRenderer {
+    public _ANIMATION_DURATION = 250; //milliseconds
+    public _ANIMATION_DELAY = 5; //milliseconds
 
     /**
      * Creates a CircleRenderer.
@@ -43,8 +45,8 @@ module Plottable {
       var updateSelection: any = this.dataSelection;
       if (this._animate && this._dataChanged) {
         var n = this.dataSource().data().length;
-        updateSelection = updateSelection.transition()
-                                         .delay((d: any, i: number) => i * this._ANIMATION_DURATION / n);
+        updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION)
+                                                      .delay((d: any, i: number) => i * this._ANIMATION_DELAY);
       }
       updateSelection.attr("r", rFunction);
 

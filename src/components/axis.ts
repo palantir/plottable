@@ -374,7 +374,8 @@ module Plottable {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var wrappedLines = TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+            var measure = TextUtils.getTextMeasure(textEl);
+            var wrappedLines = WordWrapUtils.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
               textEl.text(TextUtils.getTruncatedText(currentText, availableWidth, textEl));
             } else {
@@ -510,7 +511,8 @@ module Plottable {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var wrappedLines = TextUtils.getWrappedText(currentText, availableWidth, availableHeight, textEl);
+            var measure = TextUtils.getTextMeasure(textEl);
+            var wrappedLines = WordWrapUtils.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
               textEl.text(TextUtils.getTruncatedText(currentText, availableWidth, textEl));
             } else {

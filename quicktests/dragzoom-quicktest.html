@@ -30,8 +30,7 @@
                       .xAxis(xAxis).yAxis(yAxis)
                       .center(renderGroup)
                       .renderTo("#xy-test");
-        cb = function(xy) {console.log("XY drag area: ", xy);}
-        window.xy = new Plottable.XYDragBoxInteraction(renderGroup).callback(cb).registerWithComponent();
+        window.xy = new Plottable.XYDragBoxInteraction(renderGroup).setupZoomCallback(xScale, yScale).registerWithComponent();
       }
       function xdrag() {
         var dataseries = makeRandomData(20, 0.3);
@@ -64,8 +63,7 @@
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
                         .renderTo("#x-test");
 
-        cb = function(x) {console.log("X drag area: ", x);}
-        window.x = new Plottable.XDragBoxInteraction(renderGroup).callback(cb).registerWithComponent();
+        window.x = new Plottable.XDragBoxInteraction(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
       }
 
 

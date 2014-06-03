@@ -13,8 +13,7 @@ module.exports = function(grunt) {
   var tsJSON = {
     dev: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
-      out: "plottable.js",
-      // watch: "src",
+      outDir: "build/src/",
       options: {
         target: 'es5',
         noImplicitAny: true,
@@ -24,8 +23,8 @@ module.exports = function(grunt) {
       }
     },
     test: {
-      src: ["test/*.ts", "typings/**/*.d.ts", "plottable.d.ts"],
-      out: "test/tests.js",
+      src: ["test/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
+      outDir: "build/test/",
       // watch: "test",
       options: {
         target: 'es5',
@@ -71,7 +70,7 @@ module.exports = function(grunt) {
     private_definitions: {
       pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts",
+      path: "build/plottable.d.ts",
     },
     protected_definitions: {
       pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
@@ -88,7 +87,53 @@ module.exports = function(grunt) {
       replacement: "",
       path: "plottable.d.ts",
     },
+    plottable_multifile: {
+      pattern: '/// *<reference path="([^."]*).ts" */>',
+      replacement: 'synchronousRequire("/build/src/$1.js");',
+      path: "plottable_multifile.js",
+    },
+    definitions: {
+      pattern: '/// *<reference path=".*" */>',
+      replacement: "",
+      path: "build/plottable.d.ts",
+    },
+    tests_multifile: {
+      pattern: '/// *<reference path="([^."]*).ts" */>',
+      replacement: 'synchronousRequire("/build/test/$1.js");',
+      path: "test/tests_multifile.js",
+    },
   };
+
+  // e.g. ["components/foo.ts", ...]
+  // the important thing is that they are sorted by hierarchy,
+  // leaves first, roots last
+  var tsFiles;
+  // since src/reference.ts might have changed, I need to update this
+  // on each recompile
+  var updateTsFiles = function() {
+    tsFiles = grunt.file.read("src/reference.ts")
+                  .split("\n")
+                  .filter(function(s) {
+                    return s !== "";
+                  })
+                  .map(function(s) {
+                    return s.match(/"(.*\.ts)"/)[1];
+                  });
+  };
+  updateTsFiles();
+
+  var testTsFiles;
+  var updateTestTsFiles = function() {
+    testTsFiles = grunt.file.read("test/testReference.ts")
+                  .split("\n")
+                  .filter(function(s) {
+                    return s !== "";
+                  })
+                  .map(function(s) {
+                    return s.match(/"(.*\.ts)"/)[1];
+                  });
+  };
+  updateTestTsFiles();
 
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
@@ -97,6 +142,32 @@ module.exports = function(grunt) {
       header: {
         src: ["license_header.tmp", "plottable.js"],
         dest: "plottable.js",
+      },
+      plottable_multifile: {
+        src: ["synchronousRequire.js", "src/reference.ts"],
+        dest: "plottable_multifile.js",
+      },
+      tests_multifile: {
+        src: ["synchronousRequire.js", "test/testReference.ts"],
+        dest: "test/tests_multifile.js",
+      },
+      plottable: {
+        src: tsFiles.map(function(s) {
+              return "build/src/" + s.replace(".ts", ".js");
+          }),
+        dest: "plottable.js",
+      },
+      tests: {
+        src: testTsFiles.map(function(s) {
+              return "build/test/" + s.replace(".ts", ".js");
+          }),
+        dest: "test/tests.js",
+      },
+      definitions: {
+        src: tsFiles.map(function(s) {
+              return "build/src/" + s.replace(".ts", ".d.ts");
+          }),
+        dest: "build/plottable.d.ts",
       },
     },
     ts: tsJSON,
@@ -115,14 +186,14 @@ module.exports = function(grunt) {
         "files": ["src/**/*.ts"]
       },
       "tests": {
-        "tasks": ["ts:test", "tslint"],
+        "tasks": ["test-compile", "tslint"],
         "files": ["test/**.ts"]
       }
     },
     blanket_mocha: {
       all: ['test/coverage.html'],
       options: {
-        threshold: 80
+        threshold: 70
       }
     },
     connect: {
@@ -188,22 +259,43 @@ module.exports = function(grunt) {
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("handle-header",
             ["copy:header", "sed:header", "concat:header", "clean:header"]);
+  grunt.registerTask("update_ts_files", updateTsFiles);
+  grunt.registerTask("update_test_ts_files", updateTestTsFiles);
+  grunt.registerTask("definitions_prod", function() {
+    grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
+  });
+  grunt.registerTask("test-compile", [
+                                  "ts:test",
+                                  "concat:tests_multifile",
+                                  "sed:tests_multifile",
+                                  "concat:tests",
+                                  ]);
   grunt.registerTask("default", "launch");
   grunt.registerTask("dev-compile", [
+                                  "update_ts_files",
+                                  "update_test_ts_files",
                                   "ts:dev",
+                                  "concat:plottable",
+                                  "concat:definitions",
+                                  "sed:definitions",
                                   "sed:private_definitions",
-                                  "ts:test",
+                                  "definitions_prod",
+                                  "test-compile",
                                   "tslint",
                                   "handle-header",
                                   "sed:protected_definitions",
                                   "sed:public_member_vars",
+                                  "concat:plottable_multifile",
+                                  "sed:plottable_multifile",
                                   "clean:tscommand"]);
+
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
+                                  "tslint",
                                   "blanket_mocha",
                                   "uglify",
                                   "compress"
