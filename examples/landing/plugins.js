@@ -22,8 +22,7 @@ function pluginsChart(gitData) {
   var center = renderer.merge(gridlines).merge(legend);
 
   if (!window.mobilecheck()) {
-    var dragBox = new Plottable.XYDragBoxInteraction(center).registerWithComponent();
-    Plottable.setupDragBoxZoom(dragBox, xScale, yScale);
+    var dragBox = new Plottable.XYDragBoxInteraction(center).registerWithComponent().setupZoomCallback(xScale, yScale);
   };
   // Now we'll make a Table to organize the layout of the components. The first row will have a yAxis and renderer; the second will
   // only have the xAxis, and it will be aligned to the column of the renderer.
