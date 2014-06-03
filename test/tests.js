@@ -1913,13 +1913,28 @@ describe("Legends", function () {
             });
         });
 
-        it("basic initialization tests", function () {
+        function verifyState(selection, b, msg) {
+            assert.equal(selection.classed("toggled-on"), b, msg);
+            assert.equal(selection.classed("toggled-off"), !b, msg);
+        }
+
+        it("basic initialization test", function () {
             color.domain(["a", "b", "c", "d", "e"]);
             toggleLegend.renderTo(svg);
             toggleLegend.content.selectAll(".legend-row").each(function (d, i) {
                 var selection = d3.select(this);
-                assert.equal(selection.classed("toggled-on"), true, "should be toggled on");
-                assert.equal(selection.classed("toggled-off"), false, "shouldn't be toggled off");
+                verifyState(selection, true);
+            });
+            svg.remove();
+        });
+
+        it("basic toggling test", function () {
+            color.domain(["a"]);
+            toggleLegend.renderTo(svg);
+            toggleLegend.content.selectAll(".legend-row").each(function (d, i) {
+                var selection = d3.select(this);
+                selection.on("click")(d, i);
+                verifyState(selection, false);
             });
             svg.remove();
         });

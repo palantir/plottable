@@ -38,6 +38,24 @@ var Plottable;
         }
         Utils.addArrays = addArrays;
 
+        /**
+        * Takes two sets and returns the intersection
+        *
+        * @param {D3.Set} set1 The first set
+        * @param {D3.Set} set2 The second set
+        * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+        */
+        function intersection(set1, set2) {
+            var set = d3.set([]);
+            set1.forEach(function (v) {
+                if (set2.has(v)) {
+                    set.add(v);
+                }
+            });
+            return set;
+        }
+        Utils.intersection = intersection;
+
         function accessorize(accessor) {
             if (typeof (accessor) === "function") {
                 return accessor;
@@ -4057,23 +4075,21 @@ var Plottable;
         function ToggleLegend(colorScale, callback) {
             _super.call(this, colorScale);
             this.callback = callback;
-            this.isOff = [];
+            this.isOff = d3.set([]);
             // initially, everything is toggled on
         }
         ToggleLegend.prototype.scale = function (scale) {
             var _this = this;
             if (scale != null) {
-                var curLegend = _super.prototype.scale.call(this, scale);
+                _super.prototype.scale.call(this, scale);
 
                 // overwrite our previous listener from when we called super
-                curLegend._registerToBroadcaster(scale, function () {
+                this._registerToBroadcaster(scale, function () {
                     // preserve the state of already existing elements
-                    _this.isOff = _this.isOff.filter(function (d) {
-                        return scale.domain().indexOf(d) >= 0;
-                    });
+                    _this.isOff = Plottable.Utils.intersection(_this.isOff, d3.set(scale.domain()));
                     _this._invalidateLayout();
                 });
-                return curLegend;
+                return this;
             } else {
                 return _super.prototype.scale.call(this);
             }
@@ -4084,20 +4100,20 @@ var Plottable;
             _super.prototype._doRender.call(this);
             var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
             dataSelection.classed("toggled-on", function (d) {
-                return _this.isOff.indexOf(d) < 0;
+                return !_this.isOff.has(d);
             });
             dataSelection.classed("toggled-off", function (d) {
-                return _this.isOff.indexOf(d) >= 0;
+                return _this.isOff.has(d);
             });
             dataSelection.on("click", function (d) {
-                var index = _this.isOff.indexOf(d);
-                var turningOff = index < 0;
-                if (turningOff) {
-                    _this.isOff.push(d);
+                var turningOn = _this.isOff.has(d);
+                if (turningOn) {
+                    _this.isOff.remove(d);
                 } else {
-                    _this.isOff.splice(index, 1);
+                    _this.isOff.add(d);
                 }
-                _this.callback(d, !turningOff);
+                _this.callback(d, turningOn);
+                _this._invalidateLayout();
             });
             return this;
         };

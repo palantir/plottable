@@ -18,6 +18,14 @@ declare module Plottable {
         * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
         */
         function addArrays(alist: number[], blist: number[]): number[];
+        /**
+        * Takes two sets and returns the intersection
+        *
+        * @param {D3.Set} set1 The first set
+        * @param {D3.Set} set2 The second set
+        * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+        */
+        function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
         function accessorize(accessor: any): IAccessor;
         function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
         function uniq(strings: string[]): string[];
@@ -1040,14 +1048,7 @@ declare module Plottable {
         * @param {boolean} callback.b The state that the entry has changed to.
         */
         constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any);
-        /**
-        * Assigns a new ColorScale to the Legend.
-        *
-        * @param {ColorScale} scale
-        * @returns {ToggleLegend} The calling ToggleLegend.
-        */
-        public scale(scale: ColorScale): ToggleLegend;
-        public scale(): ColorScale;
+        public scale(scale?: ColorScale): any;
     }
 }
 

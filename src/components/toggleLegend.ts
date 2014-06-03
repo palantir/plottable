@@ -5,7 +5,7 @@ module Plottable {
     private callback: (d: any, b: boolean) => any;
 
     // if in isOff array, it is toggled off, otherwise, it is toggled on
-    private isOff: any[];
+    private isOff: D3.Set;
     /**
      * Creates a ToggleLegend.
      *
@@ -18,28 +18,20 @@ module Plottable {
     constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any) {
       super(colorScale);
       this.callback = callback;
-      this.isOff = [];
+      this.isOff = d3.set([]);
       // initially, everything is toggled on
     }
 
-    /**
-     * Assigns a new ColorScale to the Legend.
-     *
-     * @param {ColorScale} scale
-     * @returns {ToggleLegend} The calling ToggleLegend.
-     */
-    public scale(scale: ColorScale): ToggleLegend;
-    public scale(): ColorScale;
     public scale(scale?: ColorScale): any {
       if (scale != null) {
-        var curLegend = super.scale(scale);
+        super.scale(scale);
         // overwrite our previous listener from when we called super
-        curLegend._registerToBroadcaster (scale, () => {
+        this._registerToBroadcaster (scale, () => {
           // preserve the state of already existing elements
-          this.isOff = this.isOff.filter((d) => scale.domain().indexOf(d) >= 0);
+          this.isOff = Utils.intersection(this.isOff, d3.set(scale.domain()));
           this._invalidateLayout();
         });
-        return curLegend;
+        return this;
       } else {
         return super.scale();
       }
@@ -48,17 +40,17 @@ module Plottable {
     public _doRender(): ToggleLegend {
       super._doRender();
       var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
-      dataSelection.classed("toggled-on", (d: any) => this.isOff.indexOf(d) < 0);
-      dataSelection.classed("toggled-off", (d: any) => this.isOff.indexOf(d) >= 0);
+      dataSelection.classed("toggled-on", (d: any) => !this.isOff.has(d));
+      dataSelection.classed("toggled-off", (d: any) => this.isOff.has(d));
       dataSelection.on("click", (d: any) => {
-        var index = this.isOff.indexOf(d);
-        var turningOff = index < 0;
-        if (turningOff) { // add it into isOff array
-          this.isOff.push(d);
-        } else { // otherwise remove it
-          this.isOff.splice(index, 1);
+        var turningOn = this.isOff.has(d);
+        if (turningOn) {
+          this.isOff.remove(d);
+        } else {
+          this.isOff.add(d);
         }
-        this.callback(d, !turningOff);
+        this.callback(d, turningOn);
+        this._invalidateLayout();
       });
       return this;
     }
