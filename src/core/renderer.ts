@@ -10,15 +10,12 @@ module Plottable {
     public _dataSource: DataSource;
     public _dataChanged = false;
 
-    public dataSelection: D3.UpdateSelection;
     public renderArea: D3.Selection;
     public element: D3.Selection;
     public scales: Scale[];
     public _colorAccessor: IAccessor;
     public _animate = false;
     public _ANIMATION_DURATION = 250; // milliseconds
-    public _hasRendered = false;
-    private static DEFAULT_COLOR_ACCESSOR = (d: any) => "#1f77b4";
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
 
     public _rerenderUpdateSelection = false;
@@ -140,7 +137,6 @@ module Plottable {
 
     public _doRender(): Renderer {
       if (this.element != null) {
-        this._hasRendered = true;
         this._paint();
         this._dataChanged = false;
         this._requireRerender = false;

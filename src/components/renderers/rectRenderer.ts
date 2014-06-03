@@ -28,10 +28,10 @@ module Plottable {
       attrToProjector["x"] = (d: any, i: number) => xF(d, i) -  widthF(d, i) / 2;
       attrToProjector["y"] = (d: any, i: number) => yF(d, i) - heightF(d, i) / 2;
 
-      this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-      this.dataSelection.enter().append("rect");
-      this.dataSelection.attr(attrToProjector);
-      this.dataSelection.exit().remove();
+      var rects = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      rects.enter().append("rect");
+      rects.attr(attrToProjector);
+      rects.exit().remove();
     }
   }
 }

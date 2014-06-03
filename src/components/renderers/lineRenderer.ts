@@ -3,7 +3,6 @@
 module Plottable {
   export class LineRenderer extends XYRenderer {
     private path: D3.Selection;
-    private line: D3.Svg.Line;
     public _ANIMATION_DURATION = 600; //milliseconds
 
     /**
@@ -35,7 +34,7 @@ module Plottable {
       delete attrToProjector["x"];
       delete attrToProjector["y"];
 
-      this.dataSelection = this.path.datum(this._dataSource.data());
+      this.path.datum(this._dataSource.data());
       if (this._animate && this._dataChanged) {
         var animationStartLine = d3.svg.line()
                                        .x(xFunction)
@@ -43,14 +42,14 @@ module Plottable {
         this.path.attr("d", animationStartLine).attr(attrToProjector);
       }
 
-      this.line = d3.svg.line()
+      var line = d3.svg.line()
             .x(xFunction)
             .y(yFunction);
       var updateSelection: any = this.path;
       if (this._animate) {
         updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
       }
-      updateSelection.attr("d", this.line).attr(attrToProjector);
+      updateSelection.attr("d", line).attr(attrToProjector);
     }
   }
 }
