@@ -2,20 +2,19 @@
 
 module Plottable {
   export class ToggleLegend extends Legend {
-    private callback: (d: any, b: boolean) => any;
+    private callback: (datum: any, setState: boolean) => any;
 
-    // if in isOff array, it is toggled off, otherwise, it is toggled on
+    // this is the set of all elements that are currently toggled off
     private isOff: D3.Set;
+
     /**
      * Creates a ToggleLegend.
      *
      * @constructor
      * @param {ColorScale} colorScale
      * @param {(d: any, b: boolean) => any} callback The callback function for clicking on a legend entry.
-     * @param {any} callback.d The legend entry.
-     * @param {boolean} callback.b The state that the entry has changed to.
      */
-    constructor(colorScale: ColorScale, callback: (d: any, b: boolean) => any) {
+    constructor(colorScale: ColorScale, callback: (datum: any, setState: boolean) => any) {
       super(colorScale);
       this.callback = callback;
       this.isOff = d3.set([]);
