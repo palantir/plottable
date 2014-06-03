@@ -7,8 +7,10 @@ module Plottable {
   export class HoverLegend extends Legend {
     private callback: HoverCallback;
 
-    // if in state array, it is toggled on, otherwise, it is toggled off
+    // selected is the element currently being hovered over
+    // if no elements are currently being hovered over, selected is undefined
     private selected: any;
+    
     /**
      * Creates a HoverLegend.
      *
@@ -22,10 +24,10 @@ module Plottable {
     }
 
     /**
-     * Assigns the callback to the ToggleLegend
+     * Assigns the callback to the HoverLegend
      * Call with argument of null to remove the callback
      * 
-     * @param{ToggleCallback} callback The new callback function
+     * @param{HoverCallback} callback The new callback function
      */
     public setCallback(callback: HoverCallback): HoverLegend {
       this.callback = callback;

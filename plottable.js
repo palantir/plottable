@@ -4181,10 +4181,10 @@ var Plottable;
             this.callback = callback;
         }
         /**
-        * Assigns the callback to the ToggleLegend
+        * Assigns the callback to the HoverLegend
         * Call with argument of null to remove the callback
         *
-        * @param{ToggleCallback} callback The new callback function
+        * @param{HoverCallback} callback The new callback function
         */
         HoverLegend.prototype.setCallback = function (callback) {
             this.callback = callback;

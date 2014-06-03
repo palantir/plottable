@@ -1088,10 +1088,10 @@ declare module Plottable {
         */
         constructor(colorScale: ColorScale, callback?: HoverCallback);
         /**
-        * Assigns the callback to the ToggleLegend
+        * Assigns the callback to the HoverLegend
         * Call with argument of null to remove the callback
         *
-        * @param{ToggleCallback} callback The new callback function
+        * @param{HoverCallback} callback The new callback function
         */
         public setCallback(callback: HoverCallback): HoverLegend;
     }
