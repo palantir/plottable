@@ -169,6 +169,10 @@ module.exports = function(grunt) {
           }),
         dest: "build/plottable.d.ts",
       },
+      sumblime_typings: {
+        src: ["src/reference.ts", "typings/**/*.d.ts"],
+        dest: "build/sumblime_typings.ts",
+      },
     },
     ts: tsJSON,
     tslint: {
@@ -287,6 +291,7 @@ module.exports = function(grunt) {
                                   "sed:public_member_vars",
                                   "concat:plottable_multifile",
                                   "sed:plottable_multifile",
+                                  "concat:sumblime_typings",
                                   "clean:tscommand"]);
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
