@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <title>Selection Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+
+    <script>
+      window.onload = function() {
+
+        xdrag();
+        xydrag();
+      }
+
+      function xydrag() {
+        var dataseries = makeRandomData(20);
+
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
+        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderGroup = gridlines.merge(renderAreaD1);
+
+        new Plottable.StandardChart()
+                      .xAxis(xAxis).yAxis(yAxis)
+                      .center(renderGroup)
+                      .renderTo("#xy-test");
+        window.xy = new Plottable.XYDragBoxInteraction(renderGroup).setupZoomCallback(xScale, yScale).registerWithComponent();
+      }
+      function xdrag() {
+        var dataseries = makeRandomData(20, 0.3);
+        var dataseries_top = makeRandomData(20, 0.3);
+        for (var i = 0; i < 20; ++i) {
+          dataseries_top[i].x = dataseries[i].x;
+          dataseries_top[i].y += dataseries[i].y;
+        }
+
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var y0Accessor = function(d, i) { return dataseries[i].y; }
+
+        var renderAreaD1 = new Plottable.AreaRenderer(dataseries, xScale, yScale);
+        var renderAreaD2 = new Plottable.AreaRenderer(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
+
+        var fillAccessor = function() { return "steelblue"; }
+        var fillAccessorTop = function() { return "pink"; }
+        renderAreaD1.project("fill", fillAccessor)
+        renderAreaD2.project("fill", fillAccessorTop)
+
+        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1, renderAreaD2]);
+
+        var chart = new Plottable.StandardChart()
+                        .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
+                        .renderTo("#x-test");
+
+        window.x = new Plottable.XDragBoxInteraction(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
+      }
+
+
+    </script>
+  </head>
+  <body>
+    <svg id="xy-test" width="480" height="320"></svg>
+    <svg id="x-test" width="480" height="320"></svg>
+  </body>
+
+</html>
