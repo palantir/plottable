@@ -102,6 +102,11 @@ module.exports = function(grunt) {
       replacement: 'synchronousRequire("/build/test/$1.js");',
       path: "test/tests_multifile.js",
     },
+    sublime: {
+      pattern: "(.*\\.ts)",
+      replacement: '/// <reference path="../$1" />',
+      path: "build/sublime.d.ts",
+    }
   };
 
   // e.g. ["components/foo.ts", ...]
@@ -247,7 +252,12 @@ module.exports = function(grunt) {
       main: {
         files: {'plottable.min.js': ['plottable.js']}
       }
-    }
+    },
+    shell: {
+      sublime: {
+        command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts",
+      },
+    },
   };
 
 
@@ -306,4 +316,9 @@ module.exports = function(grunt) {
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
   grunt.registerTask("bm", ["blanket_mocha"]);
+
+  grunt.registerTask("sublime", [
+                                  "shell:sublime",
+                                  "sed:sublime",
+                                  ]);
 };
