@@ -164,11 +164,14 @@ module Plottable {
       return newDomain;
     }
 
-    public domainFunction(fn?: (values: number[]) => number[]): (values: number[]) => number[] {
+    public domainFunction() : (values: number[]) => number[];
+    public domainFunction(fn: (values: number[]) => number[]): QuantitiveScale;
+    public domainFunction(fn?: (values: number[]) => number[]): any {
       if (fn == null) {
         return this._domainFunction;
       } else {
-        return this._domainFunction = fn;
+        this._domainFunction = fn;
+        return this;
       }
     }
   }

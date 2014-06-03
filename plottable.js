@@ -2472,7 +2472,8 @@ var Plottable;
             if (fn == null) {
                 return this._domainFunction;
             } else {
-                return this._domainFunction = fn;
+                this._domainFunction = fn;
+                return this;
             }
         };
         return QuantitiveScale;

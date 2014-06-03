@@ -659,7 +659,8 @@ declare module Plottable {
         * @returns {(n: number) => string} A formatting function.
         */
         public tickFormat(count: number, format?: string): (n: number) => string;
-        public domainFunction(fn?: (values: number[]) => number[]): (values: number[]) => number[];
+        public domainFunction(): (values: number[]) => number[];
+        public domainFunction(fn: (values: number[]) => number[]): QuantitiveScale;
     }
 }
 
