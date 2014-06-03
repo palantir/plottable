@@ -52,8 +52,8 @@
       var doc = document.getElementById('FileFrame').contentWindow.document;
       doc.open();
       doc.write($.get("examples/jsfiddle/chartWithLabels/demo.js", function(data) {
-          $("#chart-with-labels-source").html(data);
-        }););
+          $("#FileFrame").html(data);
+        }));
       doc.close();
       </script>
     </td> 
