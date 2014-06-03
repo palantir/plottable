@@ -178,9 +178,6 @@ declare module Plottable {
 }
 
 
-declare var LINE_BREAKS_BEFORE: RegExp;
-declare var LINE_BREAKS_AFTER: RegExp;
-declare var SPACES: RegExp;
 declare module Plottable {
     module WordWrapUtils {
         interface IWrappedText {

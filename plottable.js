@@ -473,12 +473,13 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var LINE_BREAKS_BEFORE = /[{\[]/;
-var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
-var SPACES = /^\s+$/;
 var Plottable;
 (function (Plottable) {
     (function (WordWrapUtils) {
+        var LINE_BREAKS_BEFORE = /[{\[]/;
+        var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
+        var SPACES = /^\s+$/;
+
         ;
 
         /**
