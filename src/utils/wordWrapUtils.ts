@@ -1,11 +1,11 @@
 ///<reference path="../reference.ts" />
 
-var LINE_BREAKS_BEFORE = /[{\[]/;
-var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
-var SPACES = /^\s+$/;
 module Plottable {
   export module WordWrapUtils {
 
+  var LINE_BREAKS_BEFORE = /[{\[]/;
+  var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
+  var SPACES = /^\s+$/;
     export interface IWrappedText {
       originalText: string;
       lines: string[];
