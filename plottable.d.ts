@@ -1075,16 +1075,25 @@ declare module Plottable {
 
 
 declare module Plottable {
+    interface HoverCallback {
+        (datum?: any): any;
+    }
     class HoverLegend extends Legend {
         /**
         * Creates a HoverLegend.
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d?: any) => any} callback The callback function for clicking on a legend entry.
-        * @param {any} callback.d The legend entry. No argument corresponds to a mouseout
+        * @param {HoverCallback} callback The callback function for hovering over a legend entry.
         */
-        constructor(colorScale: ColorScale, callback: (d?: any) => any);
+        constructor(colorScale: ColorScale, callback?: HoverCallback);
+        /**
+        * Assigns the callback to the ToggleLegend
+        * Call with argument of null to remove the callback
+        *
+        * @param{ToggleCallback} callback The new callback function
+        */
+        public setCallback(callback: HoverCallback): HoverLegend;
     }
 }
 

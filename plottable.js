@@ -4174,39 +4174,53 @@ var Plottable;
         *
         * @constructor
         * @param {ColorScale} colorScale
-        * @param {(d?: any) => any} callback The callback function for clicking on a legend entry.
-        * @param {any} callback.d The legend entry. No argument corresponds to a mouseout
+        * @param {HoverCallback} callback The callback function for hovering over a legend entry.
         */
         function HoverLegend(colorScale, callback) {
             _super.call(this, colorScale);
             this.callback = callback;
         }
+        /**
+        * Assigns the callback to the ToggleLegend
+        * Call with argument of null to remove the callback
+        *
+        * @param{ToggleCallback} callback The new callback function
+        */
+        HoverLegend.prototype.setCallback = function (callback) {
+            this.callback = callback;
+            return this;
+        };
+
         HoverLegend.prototype._doRender = function () {
             var _this = this;
             _super.prototype._doRender.call(this);
+            this.updateClasses();
             var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
-            dataSelection.on("mouseover", function (d, i) {
-                _this.selected = d;
-                _this.callback(d);
-                _this.updateClasses();
-            });
-            dataSelection.on("mouseout", function (d, i) {
-                _this.selected = undefined;
-                _this.callback();
-                _this.updateClasses();
-            });
+            var func = function (b) {
+                return function (d, i) {
+                    _this.selected = b ? d : undefined;
+                    if (_this.callback != null) {
+                        _this.callback(_this.selected);
+                    }
+                    _this.updateClasses();
+                };
+            };
+            dataSelection.on("mouseover", func(true));
+            dataSelection.on("mouseout", func(false));
             return this;
         };
 
         HoverLegend.prototype.updateClasses = function () {
             var _this = this;
-            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
-            dataSelection.classed("selected", function (d) {
-                return _this.selected !== undefined ? _this.selected === d : false;
-            });
-            dataSelection.classed("not-selected", function (d) {
-                return _this.selected !== undefined ? _this.selected !== d : false;
-            });
+            if (this._isSetup) {
+                var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+                dataSelection.classed("selected", function (d) {
+                    return _this.selected !== undefined ? _this.selected === d : false;
+                });
+                dataSelection.classed("not-selected", function (d) {
+                    return _this.selected !== undefined ? _this.selected !== d : false;
+                });
+            }
         };
         return HoverLegend;
     })(Plottable.Legend);

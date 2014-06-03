@@ -1,8 +1,11 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+  export interface HoverCallback {
+    (datum?: any): any;
+  }
   export class HoverLegend extends Legend {
-    private callback: (d?: any) => any;
+    private callback: HoverCallback;
 
     // if in state array, it is toggled on, otherwise, it is toggled off
     private selected: any;
@@ -11,34 +14,46 @@ module Plottable {
      *
      * @constructor
      * @param {ColorScale} colorScale
-     * @param {(d?: any) => any} callback The callback function for clicking on a legend entry.
-     * @param {any} callback.d The legend entry. No argument corresponds to a mouseout
+     * @param {HoverCallback} callback The callback function for hovering over a legend entry.
      */
-    constructor(colorScale: ColorScale, callback: (d?: any) => any) {
+    constructor(colorScale: ColorScale, callback?: HoverCallback) {
       super(colorScale);
       this.callback = callback;
     }
 
+    /**
+     * Assigns the callback to the ToggleLegend
+     * Call with argument of null to remove the callback
+     * 
+     * @param{ToggleCallback} callback The new callback function
+     */
+    public setCallback(callback: HoverCallback): HoverLegend {
+      this.callback = callback;
+      return this;
+    }
+
     public _doRender(): HoverLegend {
       super._doRender();
+      this.updateClasses();
       var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
-      dataSelection.on("mouseover", (d: any, i: number) => {
-        this.selected = d;
-        this.callback(d);
+      var func = (b: boolean) => (d: any, i: number) => {
+        this.selected = b ? d : undefined;
+        if (this.callback != null) {
+          this.callback(this.selected);
+        }
         this.updateClasses();
-      });
-      dataSelection.on("mouseout", (d: any, i: number) => {
-        this.selected = undefined;
-        this.callback();
-        this.updateClasses();
-      });
+      };
+      dataSelection.on("mouseover", func(true));
+      dataSelection.on("mouseout", func(false));
       return this;
     }
 
     private updateClasses() {
-      var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
-      dataSelection.classed("selected", (d: any) => this.selected !== undefined ? this.selected === d : false);
-      dataSelection.classed("not-selected", (d: any) => this.selected !== undefined ? this.selected !== d : false);
+      if (this._isSetup) {
+        var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
+        dataSelection.classed("selected", (d: any) => this.selected !== undefined ? this.selected === d : false);
+        dataSelection.classed("not-selected", (d: any) => this.selected !== undefined ? this.selected !== d : false);
+      }
     }
   }
 }

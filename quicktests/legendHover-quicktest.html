@@ -1,14 +1,11 @@
 <html>
   <head>
-    <title>Legend Toggle Quicktest</title>
+    <title>Legend Hover Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../../plottable.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
     <style>
-        .not-selected circle {
-            opacity:.1;
-        }
     </style>
     <script>
 
@@ -17,8 +14,8 @@
 
 
         var colors = new Plottable.ColorScale("10").range();
-        var numRenderers = 10;
-        var names = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+        var numRenderers = 5;
+        var names = ["aaa", "bbb", "ccc", "ddd", "eee"];
         var colorScale = new Plottable.ColorScale();
         colorScale.range(colors);
         colorScale.domain(names);
@@ -47,7 +44,7 @@
                                   [null,  xAxis]
                                 ]);
         
-        var legendLabel = new Plottable.TitleLabel("fat");
+        var legendLabel = new Plottable.TitleLabel("q");
         var legend = new Plottable.HoverLegend(colorScale,
             function (d) {
                 if (d === undefined) {
