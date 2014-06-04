@@ -56,9 +56,7 @@
         var doc = document.getElementById('FileFrame').contentWindow.document;
         doc.open();
         $.get( "quicktests/areaRenderer-quicktest.html", function( data ) {
-          alert( "Data Loaded: " + data );
-          doc.write('<html><head><title></title></head><body>' + $("#test1html").text() + '</body></html>');
-
+          doc.write(data);
         });
         doc.close();
       </script>
