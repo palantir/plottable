@@ -53,12 +53,13 @@
       <br>
       <iframe id="FileFrame" src="about:blank"></iframe>
       <script type="text/javascript">
-        $.get( "quicktests/areaRenderer-quicktest.html", function( data ) {
-          alert( "Data Loaded: " + data );
-        });
         var doc = document.getElementById('FileFrame').contentWindow.document;
         doc.open();
-        doc.write('<html><head><title></title></head><body>' + $("#test1html").text() + '</body></html>');
+        $.get( "quicktests/areaRenderer-quicktest.html", function( data ) {
+          alert( "Data Loaded: " + data );
+          doc.write('<html><head><title></title></head><body>' + $("#test1html").text() + '</body></html>');
+
+        });
         doc.close();
       </script>
     </td> 
