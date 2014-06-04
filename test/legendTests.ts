@@ -235,7 +235,7 @@ describe("Legends", () => {
       color.domain(domain);
       var state = [true, true, true, true, true];
 
-      toggleLegend.setCallback((d, b) => {
+      toggleLegend.callback((d, b) => {
         state[domain.indexOf(d)] = b;
       });
       toggleLegend.renderTo(svg);
@@ -264,7 +264,7 @@ describe("Legends", () => {
       var state = true;
       toggleLegend.renderTo(svg);
 
-      toggleLegend.setCallback((d, b) => {
+      toggleLegend.callback((d, b) => {
         state = b;
       });
 
@@ -272,7 +272,7 @@ describe("Legends", () => {
       assert.equal(state, false, "callback was successful");
 
       var count = 0;
-      toggleLegend.setCallback((d, b) => {
+      toggleLegend.callback((d, b) => {
         count++;
       });
 
@@ -288,16 +288,20 @@ describe("Legends", () => {
       var state = true;
       toggleLegend.renderTo(svg);
 
-      toggleLegend.setCallback((d, b) => {
+      toggleLegend.callback((d, b) => {
         state = b;
       });
 
       toggleEntry("a", 0);
       assert.equal(state, false, "callback was successful");
 
-      toggleLegend.setCallback(null);
+      toggleLegend.callback(); // this should not remove the callback
       toggleEntry("a", 0);
-      assert.equal(state, false, "callback was removed");
+      assert.equal(state, true, "callback was successful");
+
+      toggleLegend.callback(null); // this should remove the callback
+      toggleEntry("a", 0);
+      assert.equal(state, true, "callback was removed");
 
       svg.remove();
     });

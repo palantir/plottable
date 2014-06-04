@@ -4082,23 +4082,21 @@ var Plottable;
         * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
         */
         function ToggleLegend(colorScale, callback) {
-            this.callback = callback;
+            this.callback(callback);
             this.isOff = d3.set(); // initially, everything is toggled on
             _super.call(this, colorScale);
         }
-        /**
-        * Assigns the callback to the ToggleLegend
-        * Call with argument of null to remove the callback
-        *
-        * @param{ToggleCallback} callback The new callback function
-        */
-        ToggleLegend.prototype.setCallback = function (callback) {
-            this.callback = callback;
-            return this;
+        ToggleLegend.prototype.callback = function (callback) {
+            if (callback !== undefined) {
+                this._callback = callback;
+                return this;
+            } else {
+                return this;
+            }
         };
 
         /**
-        * Assigns a new ColorScale to the Legend.
+        * Assigns a new ColorScale to the ToggleLegend.
         *
         * @param {ColorScale} scale
         * @returns {ToggleLegend} The calling ToggleLegend.
@@ -4133,8 +4131,8 @@ var Plottable;
                 } else {
                     _this.isOff.add(d);
                 }
-                if (_this.callback != null) {
-                    _this.callback(d, turningOn);
+                if (_this._callback != null) {
+                    _this._callback(d, turningOn);
                 }
                 _this.updateClasses();
             });

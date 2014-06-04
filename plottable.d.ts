@@ -1057,14 +1057,15 @@ declare module Plottable {
         */
         constructor(colorScale: ColorScale, callback?: ToggleCallback);
         /**
-        * Assigns the callback to the ToggleLegend
+        * Assigns or gets the callback to the ToggleLegend
         * Call with argument of null to remove the callback
         *
         * @param{ToggleCallback} callback The new callback function
         */
-        public setCallback(callback: ToggleCallback): ToggleLegend;
+        public callback(callback: ToggleCallback): ToggleLegend;
+        public callback(): ToggleCallback;
         /**
-        * Assigns a new ColorScale to the Legend.
+        * Assigns a new ColorScale to the ToggleLegend.
         *
         * @param {ColorScale} scale
         * @returns {ToggleLegend} The calling ToggleLegend.
