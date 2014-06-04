@@ -4172,17 +4172,16 @@ var Plottable;
         */
         function HoverLegend(colorScale, callback) {
             _super.call(this, colorScale);
-            this.callback = callback;
+            this.callback(callback);
+            this._callback = callback;
         }
-        /**
-        * Assigns the callback to the HoverLegend
-        * Call with argument of null to remove the callback
-        *
-        * @param{HoverCallback} callback The new callback function
-        */
-        HoverLegend.prototype.setCallback = function (callback) {
-            this.callback = callback;
-            return this;
+        HoverLegend.prototype.callback = function (callback) {
+            if (callback !== undefined) {
+                this._callback = callback;
+                return this;
+            } else {
+                return this;
+            }
         };
 
         HoverLegend.prototype._doRender = function () {
@@ -4193,8 +4192,8 @@ var Plottable;
             var func = function (b) {
                 return function (d, i) {
                     _this.selected = b ? d : undefined;
-                    if (_this.callback != null) {
-                        _this.callback(_this.selected);
+                    if (_this._callback != null) {
+                        _this._callback(_this.selected);
                     }
                     _this.updateClasses();
                 };

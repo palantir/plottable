@@ -5,7 +5,7 @@ module Plottable {
     (datum?: any): any;
   }
   export class HoverLegend extends Legend {
-    private callback: HoverCallback;
+    private _callback: HoverCallback;
 
     // selected is the element currently being hovered over
     // if no elements are currently being hovered over, selected is undefined
@@ -20,18 +20,25 @@ module Plottable {
      */
     constructor(colorScale: ColorScale, callback?: HoverCallback) {
       super(colorScale);
-      this.callback = callback;
+      this.callback(callback);
+      this._callback = callback;
     }
 
     /**
-     * Assigns the callback to the HoverLegend
+     * Assigns or gets the callback to the HoverLegend
      * Call with argument of null to remove the callback
      * 
      * @param{HoverCallback} callback The new callback function
      */
-    public setCallback(callback: HoverCallback): HoverLegend {
-      this.callback = callback;
-      return this;
+    public callback(callback: HoverCallback): HoverLegend;
+    public callback(): HoverCallback;
+    public callback(callback?: HoverCallback): any {
+      if (callback !== undefined) {
+        this._callback = callback;
+        return this;
+      } else {
+        return this;
+      }
     }
 
     public _doRender(): HoverLegend {
@@ -40,8 +47,8 @@ module Plottable {
       var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
       var func = (b: boolean) => (d: any, i: number) => {
         this.selected = b ? d : undefined;
-        if (this.callback != null) {
-          this.callback(this.selected);
+        if (this._callback != null) {
+          this._callback(this.selected);
         }
         this.updateClasses();
       };
