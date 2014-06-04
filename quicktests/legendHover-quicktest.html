@@ -48,17 +48,10 @@
         var legend = new Plottable.HoverLegend(colorScale,
             function (d) {
                 if (d === undefined) {
-                    for (var i = 0; i < numRenderers; i++) {
-                        renderers[i].project("opacity", 1);
-                    }
+                    renderers.forEach(function(r, i) { r.project("opacity", 1); });
                 } else {
                     var index = names.indexOf(d);
-                    for (var i = 0; i < numRenderers; i++) {
-                        if (index === i) {
-                            continue;
-                        }
-                        renderers[i].project("opacity", .1);
-                    }
+                    renderers.forEach(function(r, i) { r.project("opacity", i === index ? 1 : .1); });
                 }
                 cg._invalidateLayout();
             }

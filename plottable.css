@@ -83,6 +83,6 @@ svg.plottable {
   fill: #d3d3d3;
 }
 
-.plottable .legend .not-selected circle {
+.plottable .legend .not-focus circle {
   opacity: .1;
 }

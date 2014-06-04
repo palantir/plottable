@@ -7,9 +7,9 @@ module Plottable {
   export class HoverLegend extends Legend {
     private _callback: HoverCallback;
 
-    // selected is the element currently being hovered over
-    // if no elements are currently being hovered over, selected is undefined
-    private selected: any;
+    // focus is the element currently being hovered over
+    // if no elements are currently being hovered over, focus is undefined
+    private focus: any;
     
     /**
      * Creates a HoverLegend.
@@ -46,9 +46,9 @@ module Plottable {
       this.updateClasses();
       var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
       var func = (b: boolean) => (d: any, i: number) => {
-        this.selected = b ? d : undefined;
+        this.focus = b ? d : undefined;
         if (this._callback != null) {
-          this._callback(this.selected);
+          this._callback(this.focus);
         }
         this.updateClasses();
       };
@@ -60,8 +60,10 @@ module Plottable {
     private updateClasses() {
       if (this._isSetup) {
         var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
-        dataSelection.classed("selected", (d: any) => this.selected !== undefined ? this.selected === d : false);
-        dataSelection.classed("not-selected", (d: any) => this.selected !== undefined ? this.selected !== d : false);
+        // don't attach any classes if nothing is focused
+        // this is so users can do something for things not focused (i.e. fading), or focused (i.e. highlighting)
+        dataSelection.classed("focus", (d: any) => this.focus !== undefined ? this.focus === d : false);
+        dataSelection.classed("not-focus", (d: any) => this.focus !== undefined ? this.focus !== d : false);
       }
     }
   }

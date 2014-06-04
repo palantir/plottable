@@ -4191,9 +4191,9 @@ var Plottable;
             var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
             var func = function (b) {
                 return function (d, i) {
-                    _this.selected = b ? d : undefined;
+                    _this.focus = b ? d : undefined;
                     if (_this._callback != null) {
-                        _this._callback(_this.selected);
+                        _this._callback(_this.focus);
                     }
                     _this.updateClasses();
                 };
@@ -4207,11 +4207,14 @@ var Plottable;
             var _this = this;
             if (this._isSetup) {
                 var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
-                dataSelection.classed("selected", function (d) {
-                    return _this.selected !== undefined ? _this.selected === d : false;
+
+                // don't attach any classes if nothing is focused
+                // this is so users can do something for things not focused (i.e. fading), or focused (i.e. highlighting)
+                dataSelection.classed("focus", function (d) {
+                    return _this.focus !== undefined ? _this.focus === d : false;
                 });
-                dataSelection.classed("not-selected", function (d) {
-                    return _this.selected !== undefined ? _this.selected !== d : false;
+                dataSelection.classed("not-focus", function (d) {
+                    return _this.focus !== undefined ? _this.focus !== d : false;
                 });
             }
         };
