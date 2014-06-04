@@ -37,7 +37,6 @@
 /// <reference path="components/axisUtils.ts" />
 /// <reference path="components/renderers/xyRenderer.ts" />
 /// <reference path="components/renderers/circleRenderer.ts" />
-/// <reference path="components/renderers/rectRenderer.ts" />
 /// <reference path="components/renderers/gridRenderer.ts" />
 /// <reference path="components/renderers/abstractBarRenderer.ts" />
 /// <reference path="components/renderers/barRenderer.ts" />
