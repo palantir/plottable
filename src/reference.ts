@@ -4,7 +4,7 @@
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
-/// <reference path="utils/DOMUtils.ts" />
+/// <reference path="utils/domUtils.ts" />
 
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
@@ -43,7 +43,6 @@
 /// <reference path="components/renderers/horizontalBarRenderer.ts" />
 /// <reference path="components/renderers/areaRenderer.ts" />
 /// <reference path="components/renderers/lineRenderer.ts" />
-
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
