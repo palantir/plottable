@@ -38,6 +38,24 @@ var Plottable;
         }
         Utils.addArrays = addArrays;
 
+        /**
+        * Takes two sets and returns the intersection
+        *
+        * @param {D3.Set} set1 The first set
+        * @param {D3.Set} set2 The second set
+        * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+        */
+        function intersection(set1, set2) {
+            var set = d3.set();
+            set1.forEach(function (v) {
+                if (set2.has(v)) {
+                    set.add(v);
+                }
+            });
+            return set;
+        }
+        Utils.intersection = intersection;
+
         function accessorize(accessor) {
             if (typeof (accessor) === "function") {
                 return accessor;
@@ -3967,6 +3985,7 @@ var Plottable;
                 this._registerToBroadcaster(this.colorScale, function () {
                     return _this._invalidateLayout();
                 });
+                this._invalidateLayout();
                 return this;
             } else {
                 return this.colorScale;
@@ -3986,7 +4005,7 @@ var Plottable;
             var totalNumRows = this.colorScale.domain().length;
             var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
-            var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+            var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
             var fakeText = fakeLegendEl.append("text");
             var maxWidth = d3.max(this.colorScale.domain(), function (d) {
                 return Plottable.TextUtils.getTextWidth(fakeText, d);
@@ -4004,7 +4023,7 @@ var Plottable;
 
         Legend.prototype.measureTextHeight = function () {
             // note: can't be called before anchoring atm
-            var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+            var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
             var textHeight = Plottable.TextUtils.getTextHeight(fakeLegendEl.append("text"));
             fakeLegendEl.remove();
             return textHeight;
@@ -4016,24 +4035,120 @@ var Plottable;
             var textHeight = this.measureTextHeight();
             var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
             var r = textHeight - Legend.MARGIN * 2 - 2;
-            this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
-            var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
-            var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true).attr("transform", function (d, i) {
-                return "translate(0," + i * textHeight + ")";
+            var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain, function (d) {
+                return d;
             });
+            var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true);
             legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
             legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
+            legend.exit().remove();
+            legend.attr("transform", function (d) {
+                return "translate(0," + domain.indexOf(d) * textHeight + ")";
+            });
             legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
-            legend.selectAll("text").text(function (d, i) {
+            legend.selectAll("text").text(function (d) {
                 return Plottable.TextUtils.getTruncatedText(d, availableWidth, d3.select(this));
             });
             return this;
         };
-        Legend.SUBELEMENT_CLASS = "legend-row";
+        Legend._SUBELEMENT_CLASS = "legend-row";
         Legend.MARGIN = 5;
         return Legend;
     })(Plottable.Component);
     Plottable.Legend = Legend;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var ToggleLegend = (function (_super) {
+        __extends(ToggleLegend, _super);
+        /**
+        * Creates a ToggleLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
+        */
+        function ToggleLegend(colorScale, callback) {
+            this.callback(callback);
+            this.isOff = d3.set(); // initially, everything is toggled on
+            _super.call(this, colorScale);
+        }
+        ToggleLegend.prototype.callback = function (callback) {
+            if (callback !== undefined) {
+                this._callback = callback;
+                return this;
+            } else {
+                return this;
+            }
+        };
+
+        /**
+        * Assigns a new ColorScale to the ToggleLegend.
+        *
+        * @param {ColorScale} scale
+        * @returns {ToggleLegend} The calling ToggleLegend.
+        */
+        ToggleLegend.prototype.scale = function (scale) {
+            var _this = this;
+            if (scale != null) {
+                _super.prototype.scale.call(this, scale);
+
+                // overwrite our previous listener from when we called super
+                this._registerToBroadcaster(scale, function () {
+                    // preserve the state of already existing elements
+                    _this.isOff = Plottable.Utils.intersection(_this.isOff, d3.set(_this.scale().domain()));
+                    _this._invalidateLayout();
+                });
+                this.isOff = Plottable.Utils.intersection(this.isOff, d3.set(this.scale().domain()));
+                this.updateClasses();
+                return this;
+            } else {
+                return _super.prototype.scale.call(this);
+            }
+        };
+
+        ToggleLegend.prototype._doRender = function () {
+            var _this = this;
+            _super.prototype._doRender.call(this);
+            this.updateClasses();
+            this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS).on("click", function (d) {
+                var turningOn = _this.isOff.has(d);
+                if (turningOn) {
+                    _this.isOff.remove(d);
+                } else {
+                    _this.isOff.add(d);
+                }
+                if (_this._callback != null) {
+                    _this._callback(d, turningOn);
+                }
+                _this.updateClasses();
+            });
+            return this;
+        };
+
+        ToggleLegend.prototype.updateClasses = function () {
+            var _this = this;
+            if (this._isSetup) {
+                var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+                dataSelection.classed("toggled-on", function (d) {
+                    return !_this.isOff.has(d);
+                });
+                dataSelection.classed("toggled-off", function (d) {
+                    return _this.isOff.has(d);
+                });
+            }
+        };
+        return ToggleLegend;
+    })(Plottable.Legend);
+    Plottable.ToggleLegend = ToggleLegend;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

@@ -18,6 +18,14 @@ declare module Plottable {
         * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
         */
         function addArrays(alist: number[], blist: number[]): number[];
+        /**
+        * Takes two sets and returns the intersection
+        *
+        * @param {D3.Set} set1 The first set
+        * @param {D3.Set} set2 The second set
+        * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+        */
+        function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
         function accessorize(accessor: any): IAccessor;
         function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
         function uniq(strings: string[]): string[];
@@ -1015,6 +1023,7 @@ declare module Plottable {
 
 declare module Plottable {
     class Legend extends Component {
+        static _SUBELEMENT_CLASS: string;
         /**
         * Creates a Legend.
         *
@@ -1030,6 +1039,38 @@ declare module Plottable {
         */
         public scale(scale: ColorScale): Legend;
         public scale(): ColorScale;
+    }
+}
+
+
+declare module Plottable {
+    interface ToggleCallback {
+        (datum: any, newState: boolean): any;
+    }
+    class ToggleLegend extends Legend {
+        /**
+        * Creates a ToggleLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
+        */
+        constructor(colorScale: ColorScale, callback?: ToggleCallback);
+        /**
+        * Assigns or gets the callback to the ToggleLegend
+        * Call with argument of null to remove the callback
+        *
+        * @param{ToggleCallback} callback The new callback function
+        */
+        public callback(callback: ToggleCallback): ToggleLegend;
+        public callback(): ToggleCallback;
+        /**
+        * Assigns a new ColorScale to the ToggleLegend.
+        *
+        * @param {ColorScale} scale
+        * @returns {ToggleLegend} The calling ToggleLegend.
+        */
+        public scale(scale?: ColorScale): any;
     }
 }
 

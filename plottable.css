@@ -84,3 +84,7 @@ svg.plottable {
   stroke-width: 2px;
   vector-effect: non-scaling-stroke;
 }
+
+.plottable .legend .toggled-off circle {
+  fill: #d3d3d3;
+}

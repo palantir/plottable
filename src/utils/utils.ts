@@ -29,6 +29,23 @@ module Plottable {
       return alist.map((_: number, i: number) => alist[i] + blist[i]);
     }
 
+    /**
+     * Takes two sets and returns the intersection
+     *
+     * @param {D3.Set} set1 The first set
+     * @param {D3.Set} set2 The second set
+     * @return {D3.Set} A set that contains elements that appear in both set1 and set2
+     */
+    export function intersection(set1: D3.Set, set2: D3.Set) {
+      var set = d3.set();
+      set1.forEach((v) => {
+        if(set2.has(v)) {
+          set.add(v);
+        }
+      });
+      return set;
+    }
+
     export function accessorize(accessor: any): IAccessor {
       if (typeof(accessor) === "function") {
         return (<IAccessor> accessor);

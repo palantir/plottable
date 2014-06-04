@@ -2,7 +2,7 @@
 
 module Plottable {
   export class Legend extends Component {
-    private static SUBELEMENT_CLASS = "legend-row";
+    public static _SUBELEMENT_CLASS = "legend-row";
     private static MARGIN = 5;
 
     private colorScale: ColorScale;
@@ -38,6 +38,7 @@ module Plottable {
         }
         this.colorScale = scale;
         this._registerToBroadcaster(this.colorScale, () => this._invalidateLayout());
+        this._invalidateLayout();
         return this;
       } else {
         return this.colorScale;
@@ -57,7 +58,7 @@ module Plottable {
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
-      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => TextUtils.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
@@ -73,7 +74,7 @@ module Plottable {
 
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
-      var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
+      var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
       var textHeight = TextUtils.getTextHeight(fakeLegendEl.append("text"));
       fakeLegendEl.remove();
       return textHeight;
@@ -85,11 +86,9 @@ module Plottable {
       var textHeight = this.measureTextHeight();
       var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
       var r = textHeight - Legend.MARGIN * 2 - 2;
-      this.content.selectAll("." + Legend.SUBELEMENT_CLASS).remove(); // hackhack to ensure it always rerenders properly
-      var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain);
+      var legend: D3.UpdateSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
-          .append("g").classed(Legend.SUBELEMENT_CLASS, true)
-          .attr("transform", (d: any, i: number) => "translate(0," + i * textHeight + ")");
+          .append("g").classed(Legend._SUBELEMENT_CLASS, true);
       legendEnter.append("circle")
           .attr("cx", Legend.MARGIN + r/2)
           .attr("cy", Legend.MARGIN + r/2)
@@ -97,9 +96,11 @@ module Plottable {
       legendEnter.append("text")
           .attr("x", textHeight)
           .attr("y", Legend.MARGIN + textHeight / 2);
+      legend.exit().remove();
+      legend.attr("transform", (d: any) => "translate(0," + domain.indexOf(d) * textHeight + ")");
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: any, i: number) {return TextUtils.getTruncatedText(d, availableWidth , d3.select(this));});
+            .text(function(d: any) {return TextUtils.getTruncatedText(d, availableWidth , d3.select(this));});
       return this;
     }
   }
