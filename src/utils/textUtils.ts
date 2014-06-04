@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export module TextUtils {
+export module Utils {
+  export module Text {
 
     export interface TextMeasurer {
       (s: string): number[];
@@ -18,19 +19,19 @@ module Plottable {
         if (s.trim() === "") {
           return [0, 0];
         }
-        if (DOMUtils.isSelectionRemoved(selection)) {
+        if (DOM.isSelectionRemoved(selection)) {
           throw new Error("Cannot measure text in a removed node");
         }
         var bb: SVGRect;
         if (selection.node().nodeName === "text") {
           var originalText = selection.text();
           selection.text(s);
-          bb = DOMUtils.getBBox(selection);
+          bb = DOM.getBBox(selection);
           selection.text(originalText);
           return [bb.width, bb.height];
         } else {
           var t = selection.append("text").text(s);
-          bb = DOMUtils.getBBox(t);
+          bb = DOM.getBBox(t);
           t.remove();
           return [bb.width, bb.height];
         }
@@ -110,7 +111,7 @@ module Plottable {
       var innerG = g.append("g");
       var textEl = innerG.append("text");
       textEl.text(line);
-      var bb = DOMUtils.getBBox(textEl);
+      var bb = DOM.getBBox(textEl);
       var h = bb.height;
       var w = bb.width;
       if (w > width || h > height) {
@@ -123,7 +124,7 @@ module Plottable {
       var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
       var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
       textEl.attr("text-anchor", anchor).attr("y", ems + "em");
-      DOMUtils.translate(innerG, xOff, yOff);
+      DOM.translate(innerG, xOff, yOff);
       return [w, h];
     }
 
@@ -156,7 +157,7 @@ module Plottable {
       var blockG = g.append("g");
       brokenText.forEach((line: string, i: number) => {
         var innerG = blockG.append("g");
-        DOMUtils.translate(innerG, 0, i*h);
+        DOM.translate(innerG, 0, i*h);
         var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
         if (wh[0] > maxWidth) {
           maxWidth = wh[0];
@@ -165,7 +166,7 @@ module Plottable {
       var usedSpace = h * brokenText.length;
       var freeSpace = height - usedSpace;
       var translator: {[s: string]: number} = {center: 0.5, top: 0, bottom: 1};
-      DOMUtils.translate(blockG, 0, freeSpace * translator[yAlign]);
+      DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
       return [maxWidth, usedSpace];
     }
 
@@ -177,7 +178,7 @@ module Plottable {
       var blockG = g.append("g");
       brokenText.forEach((line: string, i: number) => {
         var innerG = blockG.append("g");
-        DOMUtils.translate(innerG, i*h, 0);
+        DOM.translate(innerG, i*h, 0);
         var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
         if (wh[1] > maxHeight) {
           maxHeight = wh[1];
@@ -186,7 +187,7 @@ module Plottable {
       var usedSpace = h * brokenText.length;
       var freeSpace = width - usedSpace;
       var translator: {[s: string]: number} = {center: 0.5, left: 0, right: 1};
-      DOMUtils.translate(blockG, freeSpace * translator[xAlign], 0);
+      DOM.translate(blockG, freeSpace * translator[xAlign], 0);
 
       return [usedSpace, maxHeight];
     }
@@ -214,7 +215,7 @@ module Plottable {
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
       var measureText = getTextMeasure(innerG);
-      var wrappedText = WordWrapUtils.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+      var wrappedText = Utils.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
 
       var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
       var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
@@ -225,4 +226,5 @@ module Plottable {
       };
     }
   }
+}
 }

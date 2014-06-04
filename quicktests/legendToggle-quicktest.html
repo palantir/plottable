@@ -12,39 +12,39 @@
         var renderers = [];
 
 
-        var colors = new Plottable.ColorScale("10").range();
+        var colors = new Plottable.Scales.Color("10").range();
         var maxRenderers = 10;
         var numRenderers = 5;
         var names = ["bat", "cat", "hat", "rat", "pat", "mat", "sat", "vat", "at", "splat"];
-        var colorScale = new Plottable.ColorScale();
+        var colorScale = new Plottable.Scales.Color();
         colorScale.range(colors);
         colorScale.domain(names.slice(0, numRenderers));
 
 
-        var xScale = new Plottable.LinearScale();
-        var yScale = new Plottable.LinearScale();
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
 
         for (var i=0; i<numRenderers; i++) {
             var data = makeRandomData(20);
-            var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+            var renderer = new Plottable.Plots.Line(data, xScale, yScale);
                 renderers.push(renderer);
         }
 
-        var cg = new Plottable.ComponentGroup();
+        var cg = new Plottable.Components.Group();
         renderers.forEach(function(renderer, i) {
             renderer.project("stroke", function() { return colors[i]; });
             cg.merge(renderer);
         });
 
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        var chart = new Plottable.Table([
+        var chart = new Plottable.Components.Table([
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
-        
-        var legendLabel = new Plottable.TitleLabel("fat");
+
+        var legendLabel = new Plottable.Components.TitleLabel("fat");
         var legend = new Plottable.ToggleLegend(colorScale,
             function (d, b) {
                 var index = names.indexOf(d);
@@ -55,9 +55,9 @@
                 }
             }
         );
-        var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
+        var legendTable = new Plottable.Components.Table([[legendLabel], [legend]]);
 
-        var outerTable = new Plottable.Table([[chart, legendTable]]);
+        var outerTable = new Plottable.Components.Table([[chart, legendTable]]);
 
       window.onload = function() {
         outerTable.renderTo("#legend-toggle-test");
@@ -91,7 +91,7 @@
       function addRenderer() {
         if (numRenderers < maxRenderers) {
           var data = makeRandomData(20);
-          var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+          var renderer = new Plottable.Plots.Line(data, xScale, yScale);
           var nextColor = colors[numRenderers]
           renderer.project("stroke", function() { return nextColor; });
           renderers.push(renderer);

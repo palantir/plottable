@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
-module Plottable {
-  export class Label extends Component {
+module Plottable{
+export module Components {
+  export class Label extends Abstract.Component {
     private textElement: D3.Selection;
     private text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private orientation: string;
@@ -70,13 +71,13 @@ module Plottable {
     }
 
     private measureAndSetTextSize() {
-      var bbox = DOMUtils.getBBox(this.textElement);
+      var bbox = Utils.DOM.getBBox(this.textElement);
       this.textHeight = bbox.height;
       this.textLength = this.text === "" ? 0 : bbox.width;
     }
 
     private truncateTextAndRemeasure(availableLength: number) {
-      var shortText = TextUtils.getTruncatedText(this.text, availableLength, this.textElement);
+      var shortText = Utils.Text.getTruncatedText(this.text, availableLength, this.textElement);
       this.textElement.text(shortText);
       this.measureAndSetTextSize();
     }
@@ -84,7 +85,7 @@ module Plottable {
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-      var bbox = DOMUtils.getBBox(this.textElement);
+      var bbox = Utils.DOM.getBBox(this.textElement);
       this.textElement.attr("dy", -bbox.y);
 
       var xShift = 0;
@@ -125,4 +126,5 @@ module Plottable {
       this.classed("axis-label", true);
     }
   }
+}
 }

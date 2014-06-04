@@ -1,6 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Abstract {
   export class Component extends PlottableObject {
 
     public element: D3.Selection;
@@ -124,8 +125,8 @@ module Plottable {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth  = DOMUtils.getElementWidth(elem);
-          availableHeight = DOMUtils.getElementHeight(elem);
+          availableWidth  = Utils.DOM.getElementWidth(elem);
+          availableHeight = Utils.DOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
@@ -164,14 +165,14 @@ module Plottable {
      */
     public _render() {
       if (this._isAnchored && this._isSetup) {
-        RenderController.registerToRender(this);
+        Singletons.RenderController.registerToRender(this);
       }
       return this;
     }
 
     public _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        RenderController.registerToComputeLayout(this);
+        Singletons.RenderController.registerToComputeLayout(this);
       }
       return this;
     }
@@ -419,17 +420,17 @@ module Plottable {
      * @param {Component} c The component to merge in.
      * @return {ComponentGroup}
      */
-    public merge(c: Component): ComponentGroup {
-      var cg: ComponentGroup;
+    public merge(c: Component): Components.Group {
+      var cg: Components.Group;
       if (this._isSetup || this._isAnchored) {
         throw new Error("Can't presently merge a component that's already been anchored");
       }
-      if (ComponentGroup.prototype.isPrototypeOf(c)) {
-        cg = (<ComponentGroup> c);
+      if (Components.Group.prototype.isPrototypeOf(c)) {
+        cg = (<Components.Group> c);
         cg._addComponent(this, true);
         return cg;
       } else {
-        cg = new ComponentGroup([this, c]);
+        cg = new Components.Group([this, c]);
         return cg;
       }
     }
@@ -449,4 +450,5 @@ module Plottable {
       return this;
     }
   }
+}
 }

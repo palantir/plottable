@@ -1,7 +1,8 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable {
-  export class LineRenderer extends AreaRenderer {
+module Plottable{
+export module Plots {
+  export class Line extends Area {
     private path: D3.Selection;
     public _ANIMATION_DURATION = 600; //milliseconds
 
@@ -13,11 +14,12 @@ module Plottable {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Scale, yScale: Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("line-renderer", true);
       this.project("stroke", () => "steelblue");
       this.project("fill", () => "none");
     }
   }
+}
 }

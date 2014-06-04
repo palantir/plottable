@@ -1,14 +1,15 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Singletons {
   export class RenderController {
-    private static componentsNeedingRender: {[key: string]: Component} = {};
-    private static componentsNeedingComputeLayout: {[key: string]: Component} = {};
+    private static componentsNeedingRender: {[key: string]: Abstract.Component} = {};
+    private static componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
     private static animationRequested = false;
     public static enabled = (<any> window).PlottableTestCode == null && (window.requestAnimationFrame) != null;
 
-    public static registerToRender(c: Component) {
-      if (!Plottable.RenderController.enabled) {
+    public static registerToRender(c: Abstract.Component) {
+      if (!RenderController.enabled) {
         c._doRender();
         return;
       }
@@ -16,8 +17,8 @@ module Plottable {
       RenderController.requestFrame();
     }
 
-    public static registerToComputeLayout(c: Component) {
-      if (!Plottable.RenderController.enabled) {
+    public static registerToComputeLayout(c: Abstract.Component) {
+      if (!RenderController.enabled) {
         c._computeLayout()._render();
         return;
       }
@@ -49,4 +50,5 @@ module Plottable {
       }
     }
   }
+}
 }

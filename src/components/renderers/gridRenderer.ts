@@ -1,10 +1,11 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable {
-  export class GridRenderer extends XYRenderer {
-    public colorScale: Scale;
-    public xScale: OrdinalScale;
-    public yScale: OrdinalScale;
+module Plottable{
+export module Plots {
+  export class Grid extends Abstract.XYPlot {
+    public colorScale: Abstract.Scale;
+    public xScale: Scales.Ordinal;
+    public yScale: Scales.Ordinal;
 
     /**
      * Creates a GridRenderer.
@@ -16,7 +17,7 @@ module Plottable {
      * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
      *     cell.
      */
-    constructor(dataset: any, xScale: OrdinalScale, yScale: OrdinalScale, colorScale: Scale) {
+    constructor(dataset: any, xScale: Scales.Ordinal, yScale: Scales.Ordinal, colorScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("grid-renderer", true);
 
@@ -28,7 +29,7 @@ module Plottable {
       this.project("fill", "value", colorScale); // default
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "fill") {
         this.colorScale = this._projectors["fill"].scale;
@@ -53,4 +54,5 @@ module Plottable {
       cells.exit().remove();
     }
   }
+}
 }

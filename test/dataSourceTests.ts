@@ -9,7 +9,7 @@ describe("DataSource", () => {
     var newData = [ 1, 2, 3 ];
 
     var callbackCalled = false;
-    var callback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Broadcaster) => {
+    var callback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
       assert.equal(broadcaster, ds, "Callback received the DataSource as the first argument");
       assert.deepEqual(ds.data(), newData, "DataSource arrives with correct data");
       callbackCalled = true;
@@ -26,7 +26,7 @@ describe("DataSource", () => {
     var newMetadata = "blargh";
 
     var callbackCalled = false;
-    var callback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Broadcaster) => {
+    var callback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
       assert.equal(broadcaster, ds, "Callback received the DataSource as the first argument");
       assert.deepEqual(ds.metadata(), newMetadata, "DataSource arrives with correct metadata");
       callbackCalled = true;

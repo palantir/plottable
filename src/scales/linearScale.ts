@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
-module Plottable {
-  export class LinearScale extends QuantitiveScale {
+module Plottable{
+export module Scales {
+  export class Linear extends Abstract.QuantitiveScale {
 
     /**
      * Creates a new LinearScale.
@@ -20,8 +21,9 @@ module Plottable {
      *
      * @returns {LinearScale} A copy of the calling LinearScale.
      */
-    public copy(): LinearScale {
-      return new LinearScale(this._d3Scale.copy());
+    public copy(): Linear {
+      return new Linear(this._d3Scale.copy());
     }
   }
+}
 }

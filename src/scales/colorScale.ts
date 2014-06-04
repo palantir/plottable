@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
-module Plottable {
-  export class ColorScale extends Scale {
+module Plottable{
+export module Scales {
+  export class Color extends Abstract.Scale {
 
     /**
      * Creates a ColorScale.
@@ -50,7 +51,8 @@ module Plottable {
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
-      return Utils.uniq(concatenatedExtents);
+      return Utils.Methods.uniq(concatenatedExtents);
     }
   }
+}
 }

@@ -5,10 +5,10 @@ var assert = chai.assert;
 describe("Coordinators", () => {
   describe("ScaleDomainCoordinator", () => {
     it("domains are coordinated", () => {
-      var s1 = new Plottable.LinearScale();
-      var s2 = new Plottable.LinearScale();
-      var s3 = new Plottable.LinearScale();
-      var dc = new Plottable.ScaleDomainCoordinator([s1, s2, s3]);
+      var s1 = new Plottable.Scales.Linear();
+      var s2 = new Plottable.Scales.Linear();
+      var s3 = new Plottable.Scales.Linear();
+      var dc = new Plottable.Utils.ScaleDomainCoordinator([s1, s2, s3]);
       s1.domain([0, 100]);
       assert.deepEqual(s1.domain(), [0, 100]);
       assert.deepEqual(s1.domain(), s2.domain());

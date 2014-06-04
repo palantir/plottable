@@ -16,21 +16,21 @@
       function xydrag() {
         var dataseries = makeRandomData(20);
 
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scales.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scales.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
-        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderAreaD1 = new Plottable.Plots.Scatter(dataseries, xScale, yScale);
+        var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
         var renderGroup = gridlines.merge(renderAreaD1);
 
-        new Plottable.StandardChart()
+        new Plottable.Templates.StandardChart()
                       .xAxis(xAxis).yAxis(yAxis)
                       .center(renderGroup)
                       .renderTo("#xy-test");
-        window.xy = new Plottable.XYDragBoxInteraction(renderGroup).setupZoomCallback(xScale, yScale).registerWithComponent();
+        window.xy = new Plottable.Interactions.XYDragBox(renderGroup).setupZoomCallback(xScale, yScale).registerWithComponent();
       }
       function xdrag() {
         var dataseries = makeRandomData(20, 0.3);
@@ -40,30 +40,30 @@
           dataseries_top[i].y += dataseries[i].y;
         }
 
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scales.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scales.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
         var y0Accessor = function(d, i) { return dataseries[i].y; }
 
-        var renderAreaD1 = new Plottable.AreaRenderer(dataseries, xScale, yScale);
-        var renderAreaD2 = new Plottable.AreaRenderer(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
+        var renderAreaD1 = new Plottable.Plots.Area(dataseries, xScale, yScale);
+        var renderAreaD2 = new Plottable.Plots.Area(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
 
         var fillAccessor = function() { return "steelblue"; }
         var fillAccessorTop = function() { return "pink"; }
         renderAreaD1.project("fill", fillAccessor)
         renderAreaD2.project("fill", fillAccessorTop)
 
-        var gridlines = new Plottable.Gridlines(xScale, yScale);
-        var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1, renderAreaD2]);
+        var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+        var renderGroup = new Plottable.Components.Group([gridlines, renderAreaD1, renderAreaD2]);
 
-        var chart = new Plottable.StandardChart()
+        var chart = new Plottable.Templates.StandardChart()
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
                         .renderTo("#x-test");
 
-        window.x = new Plottable.XDragBoxInteraction(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
+        window.x = new Plottable.Interactions.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
       }
 
 

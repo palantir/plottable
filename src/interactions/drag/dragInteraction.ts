@@ -1,7 +1,8 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable {
-  export class DragInteraction extends Interaction {
+module Plottable{
+export module Interactions {
+  export class Drag extends Abstract.Interaction {
     private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;
     public origin = [0,0];
@@ -11,11 +12,11 @@ module Plottable {
     public callbackToCall: (dragInfo: any) => any;
 
     /**
-     * Creates a DragInteraction.
+     * Creates a Drag.
      *
      * @param {Component} componentToListenTo The component to listen for interactions on.
      */
-    constructor(componentToListenTo: Component) {
+    constructor(componentToListenTo: Abstract.Component) {
       super(componentToListenTo);
       this.dragBehavior = d3.behavior.drag();
       this.dragBehavior.on("dragstart", () => this._dragstart());
@@ -74,7 +75,7 @@ module Plottable {
       return this;
     }
 
-    public setupZoomCallback(xScale?: QuantitiveScale, yScale?: QuantitiveScale) {
+    public setupZoomCallback(xScale?: Abstract.QuantitiveScale, yScale?: Abstract.QuantitiveScale) {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;
@@ -105,4 +106,5 @@ module Plottable {
       return this;
     }
   }
+}
 }

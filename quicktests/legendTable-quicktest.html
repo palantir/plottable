@@ -21,30 +21,30 @@
           dataseries_top[i].y += dataseries[i].y;
         }
 
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scales.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scales.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
         var y0Accessor = function(d, i) { return dataseries[i].y; }
 
-        var renderArea = new Plottable.AreaRenderer(dataseries, xScale, yScale);
+        var renderArea = new Plottable.Plots.Area(dataseries, xScale, yScale);
 
         var fillAccessor = function() { return "steelblue"; }
         renderArea.project("fill", fillAccessor)
 
 
-        var chart = new Plottable.Table([[yAxis, renderArea], [null, xAxis]]);
-        // var chart = new Plottable.StandardChart()
+        var chart = new Plottable.Components.Table([[yAxis, renderArea], [null, xAxis]]);
+        // var chart = new Plottable.Templates.StandardChart()
         //                 .center(renderGroup).xAxis(xAxis).yAxis(yAxis);
 
         chart.name = "INNER_CHART"
-        var colorScale = new Plottable.ColorScale("10").domain(["foo", "bar"]);
-        var legend = new Plottable.Legend(colorScale);
-        var legendLabel = new Plottable.TitleLabel("foo");
-        var legendTable = new Plottable.Table([[legendLabel], [legend]]);
-        var outerTable = new Plottable.Table([[chart, legendTable]]);
+        var colorScale = new Plottable.Scales.Color("10").domain(["foo", "bar"]);
+        var legend = new Plottable.Components.Legend(colorScale);
+        var legendLabel = new Plottable.Components.TitleLabel("foo");
+        var legendTable = new Plottable.Components.Table([[legendLabel], [legend]]);
+        var outerTable = new Plottable.Components.Table([[chart, legendTable]]);
         outerTable.name = "OUTER_TABLE";
         legendTable.name = "LEGEND_TABLE";
         window.legend = legend;

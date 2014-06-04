@@ -21,26 +21,26 @@
           dataseries_top[i].y += dataseries[i].y;
         }
 
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scales.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scales.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
         var y0Accessor = function(d, i) { return dataseries[i].y; }
 
-        var renderAreaD1 = new Plottable.AreaRenderer(dataseries, xScale, yScale);
-        var renderAreaD2 = new Plottable.AreaRenderer(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
+        var renderAreaD1 = new Plottable.Plots.Area(dataseries, xScale, yScale);
+        var renderAreaD2 = new Plottable.Plots.Area(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
 
         var fillAccessor = function() { return "steelblue"; }
         var fillAccessorTop = function() { return "pink"; }
         renderAreaD1.project("fill", fillAccessor)
         renderAreaD2.project("fill", fillAccessorTop)
 
-        var gridlines = new Plottable.Gridlines(xScale, yScale);
-        var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1, renderAreaD2]);
+        var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+        var renderGroup = new Plottable.Components.Group([gridlines, renderAreaD1, renderAreaD2]);
 
-        var chart = new Plottable.StandardChart()
+        var chart = new Plottable.Templates.StandardChart()
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
                         .renderTo("#areaRenderer-test");
       }

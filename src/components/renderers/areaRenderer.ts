@@ -1,7 +1,8 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable {
-  export class AreaRenderer extends XYRenderer {
+module Plottable{
+export module Plots {
+  export class Area extends Abstract.XYPlot {
     private areaPath: D3.Selection;
     private linePath: D3.Selection;
     public _ANIMATION_DURATION = 600; //milliseconds
@@ -14,7 +15,7 @@ module Plottable {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Scale, yScale: Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("area-renderer", true);
       this.project("y0", 0, yScale); // default
@@ -70,4 +71,5 @@ module Plottable {
       lineUpdateSelection.attr("d", line).attr(attrToProjector);
     }
   }
+}
 }

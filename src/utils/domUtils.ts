@@ -1,6 +1,7 @@
 
-module Plottable {
-  export module DOMUtils {
+module Plottable{
+export module Utils {
+  export module DOM {
     /**
      * Gets the bounding box of an element.
      * @param {D3.Selection} element
@@ -81,4 +82,5 @@ module Plottable {
       }
     }
   }
+}
 }

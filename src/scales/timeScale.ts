@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
-module Plottable {
-  export class TimeScale extends QuantitiveScale {
+module Plottable{
+export module Scales {
+  export class Time extends Abstract.QuantitiveScale {
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
     /**
      * Creates a new TimeScale.
@@ -16,4 +17,5 @@ module Plottable {
       super._setDomain(values.map((d: any) => new Date(d)));
     }
   }
+}
 }

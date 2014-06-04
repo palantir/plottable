@@ -16,19 +16,19 @@
         ];
 
       var ds = new Plottable.DataSource(data);
-      var xScale = new Plottable.LinearScale();
-      var xAxis = new Plottable.XAxis(xScale, "bottom");
+      var xScale = new Plottable.Scales.Linear();
+      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-      var yScale = new Plottable.OrdinalScale().rangeType("bands");
-      var yAxis = new Plottable.YAxis(yScale, "left", function(d) { return d; } );
+      var yScale = new Plottable.Scales.Ordinal().rangeType("bands");
+      var yAxis = new Plottable.Axis.YAxis(yScale, "left", function(d) { return d; } );
       yAxis.width(60);
 
-      var barRenderer = new Plottable.HorizontalBarRenderer(ds, xScale, yScale)
+      var barRenderer = new Plottable.Plots.HorizontalBar(ds, xScale, yScale)
                               .project("x", "age", xScale)
                               .project("y", "name", yScale)
                               .animate(true);
 
-      var chart = new Plottable.Table([
+      var chart = new Plottable.Components.Table([
         [yAxis, barRenderer],
         [null, xAxis]
       ]);

@@ -5,10 +5,10 @@ var assert = chai.assert;
 describe("Axes", () => {
   it("Renders ticks", () => {
     var svg = generateSVG(500, 100);
-    var xScale = new Plottable.LinearScale();
+    var xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
-    var axis = new Plottable.XAxis(xScale, "bottom");
+    var axis = new Plottable.Axis.XAxis(xScale, "bottom");
     axis.renderTo(svg);
     var ticks = svg.selectAll(".tick");
     assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
@@ -21,10 +21,10 @@ describe("Axes", () => {
 
   it("formatter can be changed", () => {
     var svg = generateSVG(500, 100);
-    var xScale = new Plottable.LinearScale();
+    var xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
-    var axis = new Plottable.XAxis(xScale, "bottom");
+    var axis = new Plottable.Axis.XAxis(xScale, "bottom");
     axis.renderTo(svg);
 
     var tickTexts = svg.selectAll(".tick text")[0].map(function(t: HTMLElement) { return d3.select(t).text(); });
@@ -42,10 +42,10 @@ describe("Axes", () => {
 
   it("Still displays tick labels if space is constrained.", () => {
     var svg = generateSVG(100, 100);
-    var yScale = new Plottable.LinearScale()
+    var yScale = new Plottable.Scales.Linear()
                                 .domain([0, 10])
                                 .range([0, 100]);
-    var yAxis = new Plottable.YAxis(yScale, "left");
+    var yAxis = new Plottable.Axis.YAxis(yScale, "left");
     yAxis.renderTo(svg);
     var tickTexts = svg.selectAll(".tick text");
     var visibleTickTexts = tickTexts.filter(function() {
@@ -54,10 +54,10 @@ describe("Axes", () => {
     assert.operator(visibleTickTexts[0].length, ">=", 2, "Two tick labels remain visible");
     yAxis.remove();
 
-    var xScale = new Plottable.LinearScale()
+    var xScale = new Plottable.Scales.Linear()
                                 .domain([0, 10])
                                 .range([0, 100]);
-    var xAxis = new Plottable.XAxis(yScale, "bottom");
+    var xAxis = new Plottable.Axis.XAxis(yScale, "bottom");
     xAxis.renderTo(svg);
     tickTexts = svg.selectAll(".tick text");
     visibleTickTexts = tickTexts.filter(function() {
@@ -69,10 +69,10 @@ describe("Axes", () => {
 
   it("XAxis positions tick labels correctly", () => {
     var svg = generateSVG(500, 100);
-    var xScale = new Plottable.LinearScale();
+    var xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
-    var xAxis = new Plottable.XAxis(xScale, "bottom");
+    var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
     xAxis.renderTo(svg);
     var tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
     var tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
@@ -109,10 +109,10 @@ describe("Axes", () => {
 
   it("X Axis height can be changed", () => {
     var svg = generateSVG(500, 30);
-    var xScale = new Plottable.LinearScale();
+    var xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
-    var xAxis = new Plottable.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
+    var xAxis = new Plottable.Axis.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
     xAxis.renderTo(svg);
 
     var oldHeight = xAxis._requestedSpace(500, 30).height;
@@ -134,10 +134,10 @@ describe("Axes", () => {
 
   it("YAxis positions tick labels correctly", () => {
     var svg = generateSVG(100, 500);
-    var yScale = new Plottable.LinearScale();
+    var yScale = new Plottable.Scales.Linear();
     yScale.domain([0, 10]);
     yScale.range([500, 0]);
-    var yAxis = new Plottable.YAxis(yScale, "left");
+    var yAxis = new Plottable.Axis.YAxis(yScale, "left");
     yAxis.renderTo(svg);
     var tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
     var tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
@@ -173,10 +173,10 @@ describe("Axes", () => {
 
   it("Y Axis width can be changed", () => {
     var svg = generateSVG(50, 500);
-    var yScale = new Plottable.LinearScale();
+    var yScale = new Plottable.Scales.Linear();
     yScale.domain([0, 10]);
     yScale.range([500, 0]);
-    var yAxis = new Plottable.YAxis(yScale, "left");
+    var yAxis = new Plottable.Axis.YAxis(yScale, "left");
     yAxis.renderTo(svg);
 
     var oldWidth = yAxis._requestedSpace(50, 500).width;
@@ -199,10 +199,10 @@ describe("Axes", () => {
   it("generate relative date formatter", () => {
     var baseDate = new Date(2000, 0, 1);
     var testDate = new Date(2001, 0, 1);
-    var formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate.valueOf());
+    var formatter = Plottable.Utils.Axis.generateRelativeDateFormatter(baseDate.valueOf());
     assert.equal(formatter(testDate), "366"); // leap year
 
-    formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate.valueOf(), Plottable.AxisUtils.ONE_DAY, "d");
+    formatter = Plottable.Utils.Axis.generateRelativeDateFormatter(baseDate.valueOf(), Plottable.Utils.Axis.ONE_DAY, "d");
     assert.equal(formatter(testDate), "366d");
   });
 
@@ -210,14 +210,14 @@ describe("Axes", () => {
     var svg = generateSVG(500, 100);
     var startDate = new Date(2000, 0, 1);
     var endDate = new Date(2001, 0, 1);
-    var timeScale = new Plottable.LinearScale();
+    var timeScale = new Plottable.Scales.Linear();
     timeScale.domain([startDate, endDate]);
     timeScale.range([0, 500]);
     timeScale.nice();
-    var xAxis = new Plottable.XAxis(timeScale, "bottom");
+    var xAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
     var baseDate = d3.min(timeScale.domain());
 
-    var formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate);
+    var formatter = Plottable.Utils.Axis.generateRelativeDateFormatter(baseDate);
     xAxis.tickFormat(formatter);
     xAxis.renderTo(svg);
     var tickLabels = $(".tick").children("text");
@@ -228,13 +228,13 @@ describe("Axes", () => {
 
     svg = generateSVG(100, 500);
     endDate = new Date(2010, 0, 1);
-    var timescaleY = new Plottable.LinearScale().domain([startDate, endDate])
+    var timescaleY = new Plottable.Scales.Linear().domain([startDate, endDate])
                                                 .range([0, 500]);
-    var yAxis = new Plottable.YAxis(timescaleY, "left");
-    var oneYear = 365 * Plottable.AxisUtils.ONE_DAY;
+    var yAxis = new Plottable.Axis.YAxis(timescaleY, "left");
+    var oneYear = 365 * Plottable.Utils.Axis.ONE_DAY;
     baseDate = new Date(1990, 0, 1);
 
-    formatter = Plottable.AxisUtils.generateRelativeDateFormatter(baseDate, oneYear, "y");
+    formatter = Plottable.Utils.Axis.generateRelativeDateFormatter(baseDate, oneYear, "y");
     yAxis.tickFormat(formatter);
     yAxis.renderTo(svg);
     tickLabels = $(".tick").children("text");
@@ -246,11 +246,11 @@ describe("Axes", () => {
 
   it("XAxis wraps long tick label texts so they don't overlap", () => {
     var svg = generateSVG(300, 60);
-    var ordinalScale = new Plottable.OrdinalScale();
+    var ordinalScale = new Plottable.Scales.Ordinal();
     ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
     ordinalScale.range([0, 300]);
 
-    var xAxis = new Plottable.XAxis(ordinalScale, "bottom");
+    var xAxis = new Plottable.Axis.XAxis(ordinalScale, "bottom");
     xAxis.height(60);
     xAxis.renderTo(svg);
 
@@ -278,11 +278,11 @@ describe("Axes", () => {
 
   it("Yaxis wraps long tick label texts so they don't overlap", () => {
     var svg = generateSVG(100, 300);
-    var ordinalScale = new Plottable.OrdinalScale();
+    var ordinalScale = new Plottable.Scales.Ordinal();
     ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
     ordinalScale.range([0, 300]);
 
-    var yAxis = new Plottable.YAxis(ordinalScale, "left");
+    var yAxis = new Plottable.Axis.YAxis(ordinalScale, "left");
     yAxis.width(100);
     yAxis.renderTo(svg);
 

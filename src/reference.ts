@@ -4,7 +4,7 @@
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
-/// <reference path="utils/domUtils.ts" />
+/// <reference path="utils/DOMUtils.ts" />
 
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />

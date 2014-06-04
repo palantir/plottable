@@ -1,8 +1,9 @@
 ///<reference path="../reference.ts" />
 
-module Plottable {
-  export class MousemoveInteraction extends Interaction {
-    constructor(componentToListenTo: Component) {
+module Plottable{
+export module Interactions {
+  export class Mousemove extends Abstract.Interaction {
+    constructor(componentToListenTo: Abstract.Component) {
       super(componentToListenTo);
     }
 
@@ -20,4 +21,5 @@ module Plottable {
       return; //no-op
     }
   }
+}
 }

@@ -1,9 +1,10 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class Gridlines extends Component {
-    private xScale: QuantitiveScale;
-    private yScale: QuantitiveScale;
+export module Components {
+  export class Gridlines extends Abstract.Component {
+    private xScale: Abstract.QuantitiveScale;
+    private yScale: Abstract.QuantitiveScale;
     private xLinesContainer: D3.Selection;
     private yLinesContainer: D3.Selection;
 
@@ -14,7 +15,7 @@ module Plottable {
      * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
      * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
-    constructor(xScale: QuantitiveScale, yScale: QuantitiveScale) {
+    constructor(xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale) {
       super();
       this.classed("gridlines", true);
       this.xScale = xScale;
@@ -69,4 +70,5 @@ module Plottable {
       }
     }
   }
+}
 }

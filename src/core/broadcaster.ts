@@ -1,12 +1,13 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Abstract {
   interface IListenerCallbackPair {
     l: any;
     c: IBroadcasterCallback;
   }
   export class Broadcaster extends PlottableObject {
-    private listener2Callback = new StrictEqualityAssociativeArray();
+    private listener2Callback = new Utils.StrictEqualityAssociativeArray();
 
     /**
      * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -50,4 +51,5 @@ module Plottable {
       }
     }
   }
+}
 }

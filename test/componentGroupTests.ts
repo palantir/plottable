@@ -6,10 +6,10 @@ var assert = chai.assert;
 describe("ComponentGroups", () => {
   it("components in componentGroups overlap", () => {
     var c1 = makeFixedSizeComponent(10, 10);
-    var c2 = new Plottable.Component();
-    var c3 = new Plottable.Component();
+    var c2 = new Plottable.Abstract.Component();
+    var c3 = new Plottable.Abstract.Component();
 
-    var cg = new Plottable.ComponentGroup([c1, c2, c3]);
+    var cg = new Plottable.Components.Group([c1, c2, c3]);
     var svg = generateSVG(400, 400);
     cg._anchor(svg);
     (<any> c1).addBox("test-box1");
@@ -28,9 +28,9 @@ describe("ComponentGroups", () => {
   it("components can be added before and after anchoring", () => {
     var c1 = makeFixedSizeComponent(10, 10);
     var c2 = makeFixedSizeComponent(20, 20);
-    var c3 = new Plottable.Component();
+    var c3 = new Plottable.Abstract.Component();
 
-    var cg = new Plottable.ComponentGroup([c1]);
+    var cg = new Plottable.Components.Group([c1]);
     var svg = generateSVG(400, 400);
     cg.merge(c2)._anchor(svg);
     (<any> c1).addBox("test-box1");
@@ -49,9 +49,9 @@ describe("ComponentGroups", () => {
   });
 
   it("component fixity is computed appropriately", () => {
-    var cg = new Plottable.ComponentGroup();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
+    var cg = new Plottable.Components.Group();
+    var c1 = new Plottable.Abstract.Component();
+    var c2 = new Plottable.Abstract.Component();
 
     cg.merge(c1).merge(c2);
     assert.isFalse(cg._isFixedHeight(), "height not fixed when both components unfixed");
@@ -67,9 +67,9 @@ describe("ComponentGroups", () => {
   });
 
   it("componentGroup subcomponents have xOffset, yOffset of 0", () => {
-    var cg = new Plottable.ComponentGroup();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
+    var cg = new Plottable.Components.Group();
+    var c1 = new Plottable.Abstract.Component();
+    var c2 = new Plottable.Abstract.Component();
     cg.merge(c1).merge(c2);
 
     var svg = generateSVG();
@@ -89,9 +89,9 @@ describe("ComponentGroups", () => {
     });
 
   it("remove() and removeComponent work correctly for componentGroup", () => {
-    var c1 = new Plottable.Component().classed("component-1", true);
-    var c2 = new Plottable.Component().classed("component-2", true);
-    var cg = new Plottable.ComponentGroup([c1, c2]);
+    var c1 = new Plottable.Abstract.Component().classed("component-1", true);
+    var c2 = new Plottable.Abstract.Component().classed("component-2", true);
+    var cg = new Plottable.Components.Group([c1, c2]);
 
     var svg = generateSVG(200, 200);
     cg.renderTo(svg);
@@ -128,10 +128,10 @@ describe("ComponentGroups", () => {
   });
 
   it("removeAll() works as expected", () => {
-    var cg = new Plottable.ComponentGroup();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
-    var c3 = new Plottable.Component();
+    var cg = new Plottable.Components.Group();
+    var c1 = new Plottable.Abstract.Component();
+    var c2 = new Plottable.Abstract.Component();
+    var c3 = new Plottable.Abstract.Component();
     assert.isTrue(cg.empty(), "cg initially empty");
     cg.merge(c1).merge(c2).merge(c3);
     assert.isFalse(cg.empty(), "cg not empty after merging components");
@@ -145,25 +145,25 @@ describe("ComponentGroups", () => {
 
   describe("ComponentGroup._requestedSpace works as expected", () => {
     it("_works for an empty ComponentGroup", () => {
-        var cg = new Plottable.ComponentGroup();
+        var cg = new Plottable.Components.Group();
         var request = cg._requestedSpace(10, 10);
         verifySpaceRequest(request, 0, 0, false, false, "");
     });
 
     it("works for a ComponentGroup with only proportional-size components", () => {
-      var cg = new Plottable.ComponentGroup();
-      var c1 = new Plottable.Component();
-      var c2 = new Plottable.Component();
+      var cg = new Plottable.Components.Group();
+      var c1 = new Plottable.Abstract.Component();
+      var c2 = new Plottable.Abstract.Component();
       cg.merge(c1).merge(c2);
       var request = cg._requestedSpace(10, 10);
       verifySpaceRequest(request, 0, 0, false, false, "");
     });
 
     it("works when there are fixed-size components", () => {
-      var cg = new Plottable.ComponentGroup();
-      var c1 = new Plottable.Component();
-      var c2 = new Plottable.Component();
-      var c3 = new Plottable.Component();
+      var cg = new Plottable.Components.Group();
+      var c1 = new Plottable.Abstract.Component();
+      var c2 = new Plottable.Abstract.Component();
+      var c3 = new Plottable.Abstract.Component();
       cg.merge(c1).merge(c2).merge(c3);
       fixComponentSize(c1, null, 10);
       fixComponentSize(c2, null, 50);
@@ -173,46 +173,46 @@ describe("ComponentGroups", () => {
   });
 
     describe("Component.merge works as expected", () => {
-      var c1 = new Plottable.Component();
-      var c2 = new Plottable.Component();
-      var c3 = new Plottable.Component();
-      var c4 = new Plottable.Component();
+      var c1 = new Plottable.Abstract.Component();
+      var c2 = new Plottable.Abstract.Component();
+      var c3 = new Plottable.Abstract.Component();
+      var c4 = new Plottable.Abstract.Component();
 
       it("Component.merge works as expected (Component.merge Component)", () => {
-        var cg: Plottable.ComponentGroup = c1.merge(c2);
-        var innerComponents: Plottable.Component[] = cg._components;
+        var cg: Plottable.Components.Group = c1.merge(c2);
+        var innerComponents: Plottable.Abstract.Component[] = cg._components;
         assert.lengthOf(innerComponents, 2, "There are two components");
         assert.equal(innerComponents[0], c1, "first component correct");
         assert.equal(innerComponents[1], c2, "second component correct");
       });
 
       it("Component.merge works as expected (Component.merge ComponentGroup)", () => {
-        var cg = new Plottable.ComponentGroup([c2,c3,c4]);
+        var cg = new Plottable.Components.Group([c2,c3,c4]);
         var cg2 = c1.merge(cg);
         assert.equal(cg, cg2, "c.merge(cg) returns cg");
-        var components: Plottable.Component[] = cg._components;
+        var components: Plottable.Abstract.Component[] = cg._components;
         assert.lengthOf(components, 4, "four components");
         assert.equal(components[0], c1, "first component in front");
         assert.equal(components[1], c2, "second component is second");
       });
 
       it("Component.merge works as expected (ComponentGroup.merge Component)", () => {
-        var cg = new Plottable.ComponentGroup([c1,c2,c3]);
+        var cg = new Plottable.Components.Group([c1,c2,c3]);
         var cg2 = cg.merge(c4);
         assert.equal(cg, cg2, "cg.merge(c) returns cg");
-        var components: Plottable.Component[] = cg._components;
+        var components: Plottable.Abstract.Component[] = cg._components;
         assert.lengthOf(components, 4, "there are four components");
         assert.equal(components[0], c1, "first is first");
         assert.equal(components[3], c4, "fourth is fourth");
         });
 
       it("Component.merge works as expected (ComponentGroup.merge ComponentGroup)", () => {
-        var cg1 = new Plottable.ComponentGroup([c1,c2]);
-        var cg2 = new Plottable.ComponentGroup([c3,c4]);
+        var cg1 = new Plottable.Components.Group([c1,c2]);
+        var cg2 = new Plottable.Components.Group([c3,c4]);
         var cg = cg1.merge(cg2);
         assert.equal(cg, cg1, "merged == cg1");
         assert.notEqual(cg, cg2, "merged != cg2");
-        var components: Plottable.Component[] = cg._components;
+        var components: Plottable.Abstract.Component[] = cg._components;
         assert.lengthOf(components, 3, "there are three inner components");
         assert.equal(components[0], c1, "components are inside");
         assert.equal(components[1], c2, "components are inside");

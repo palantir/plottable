@@ -24,37 +24,37 @@
       var cuteFormatter = function(d) { return d + " is a pretty darn cute cat"; } ;
 
       var ds = new Plottable.DataSource(data);
-      var xScale = new Plottable.OrdinalScale().rangeType("bands");
-      var xAxis = new Plottable.CategoryAxis(xScale);
+      var xScale = new Plottable.Scales.Ordinal().rangeType("bands");
+      var xAxis = new Plottable.Axis.Category(xScale);
 
-      var yScale = new Plottable.LinearScale();
-      var yAxis = new Plottable.YAxis(yScale, "left");
+      var yScale = new Plottable.Scales.Linear();
+      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
       yAxis.showEndTickLabels(true);
 
-      var barRenderer = new Plottable.BarRenderer(ds, xScale, yScale)
+      var barRenderer = new Plottable.Plots.Bar(ds, xScale, yScale)
                               .project("x", "name", xScale)
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"; })
                               .animate(true);
-      var chart = new Plottable.Table([
+      var chart = new Plottable.Components.Table([
                                   [yAxis, barRenderer],
                                   [null,  xAxis]
                                 ]);
 
-      var xScale2 = new Plottable.LinearScale();
-      var xAxis2 = new Plottable.XAxis(xScale2, "bottom");
+      var xScale2 = new Plottable.Scales.Linear();
+      var xAxis2 = new Plottable.Axis.XAxis(xScale2, "bottom");
 
-      var yScale2 = new Plottable.OrdinalScale().rangeType("bands");
-      var yAxis2 = new Plottable.CategoryAxis(yScale2, "left");
+      var yScale2 = new Plottable.Scales.Ordinal().rangeType("bands");
+      var yAxis2 = new Plottable.Axis.Category(yScale2, "left");
       window.yAxis = yAxis2;
 
-      var horizBarRenderer = new Plottable.HorizontalBarRenderer(ds, xScale2, yScale2)
+      var horizBarRenderer = new Plottable.Plots.HorizontalBar(ds, xScale2, yScale2)
                               .project("x", "age", xScale2)
                               .project("y", "name", yScale2)
                               .project("fill", function() {return "steelblue"; })
                               .animate(true);
 
-      var horizChart = new Plottable.Table([
+      var horizChart = new Plottable.Components.Table([
         [yAxis2, horizBarRenderer],
         [null, xAxis2]
       ]);

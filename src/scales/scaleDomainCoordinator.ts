@@ -1,13 +1,14 @@
 ///<reference path="../reference.ts" />
 
-module Plottable {
+module Plottable{
+export module Utils {
   export class ScaleDomainCoordinator {
     /* This class is responsible for maintaining coordination between linked scales.
     It registers event listeners for when one of its scales changes its domain. When the scale
     does change its domain, it re-propogates the change to every linked scale.
     */
     private rescaleInProgress = false;
-    private scales: Scale[];
+    private scales: Abstract.Scale[];
 
     /**
      * Creates a ScaleDomainCoordinator.
@@ -15,12 +16,12 @@ module Plottable {
      * @constructor
      * @param {Scale[]} scales A list of scales whose domains should be linked.
      */
-    constructor(scales: Scale[]) {
+    constructor(scales: Abstract.Scale[]) {
       this.scales = scales;
-      this.scales.forEach((s) => s.registerListener(this, (sx: Scale) => this.rescale(sx)));
+      this.scales.forEach((s) => s.registerListener(this, (sx: Abstract.Scale) => this.rescale(sx)));
     }
 
-    public rescale(scale: Scale) {
+    public rescale(scale: Abstract.Scale) {
       if (this.rescaleInProgress) {
         return;
       }
@@ -30,4 +31,5 @@ module Plottable {
       this.rescaleInProgress = false;
     }
   }
+}
 }

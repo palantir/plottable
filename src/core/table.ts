@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-
+export module Components {
   interface LayoutAllocation {
     guaranteedWidths : number[];
     guaranteedHeights: number[];
@@ -18,11 +18,11 @@ module Plottable {
     wantsHeight         : boolean;
   };
 
-  export class Table extends ComponentContainer {
+  export class Table extends Abstract.ComponentContainer {
     private rowPadding = 0;
     private colPadding = 0;
 
-    private rows: Component[][] = [];
+    private rows: Abstract.Component[][] = [];
     private minimumHeights: number[];
     private minimumWidths: number[];
 
@@ -39,7 +39,7 @@ module Plottable {
      * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
      * null can be used if a cell is empty.
      */
-    constructor(rows: Component[][] = []) {
+    constructor(rows: Abstract.Component[][] = []) {
       super();
       this.classed("table", true);
       rows.forEach((row, rowIndex) => {
@@ -56,7 +56,7 @@ module Plottable {
      * @param {number} col The column in which to add the Component.
      * @param {Component} component The Component to be added.
      */
-    public addComponent(row: number, col: number, component: Component): Table {
+    public addComponent(row: number, col: number, component: Abstract.Component): Table {
       if (this._addComponent(component)) {
         this.nRows = Math.max(row + 1, this.nRows);
         this.nCols = Math.max(col + 1, this.nCols);
@@ -72,7 +72,7 @@ module Plottable {
       return this;
     }
 
-    public _removeComponent(c: Component): Table {
+    public _removeComponent(c: Abstract.Component): Table {
       super._removeComponent(c);
       var rowpos: number;
       var colpos: number;
@@ -133,8 +133,8 @@ module Plottable {
       var availableWidthAfterPadding  = availableWidth  - this.colPadding * (this.nCols - 1);
       var availableHeightAfterPadding = availableHeight - this.rowPadding * (this.nRows - 1);
 
-      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Component) => (c == null) || c._isFixedHeight());
-      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Component) => (c == null) || c._isFixedWidth());
+      var rowWeights = Table.calcComponentWeights(this.rowWeights, this.rows, (c: Abstract.Component) => (c == null) || c._isFixedHeight());
+      var colWeights = Table.calcComponentWeights(this.colWeights,      cols, (c: Abstract.Component) => (c == null) || c._isFixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -144,16 +144,16 @@ module Plottable {
       var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding );
       var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
 
-      var guaranteedWidths  = Utils.createFilledArray(0, this.nCols);
-      var guaranteedHeights = Utils.createFilledArray(0, this.nRows);
+      var guaranteedWidths  = Utils.Methods.createFilledArray(0, this.nCols);
+      var guaranteedHeights = Utils.Methods.createFilledArray(0, this.nRows);
 
       var freeWidth : number;
       var freeHeight: number;
 
       var nIterations = 0;
       while (true) {
-        var offeredHeights = Utils.addArrays(guaranteedHeights, rowProportionalSpace);
-        var offeredWidths  = Utils.addArrays(guaranteedWidths,  colProportionalSpace);
+        var offeredHeights = Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
+        var offeredWidths  = Utils.Methods.addArrays(guaranteedWidths,  colProportionalSpace);
         var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
         guaranteedWidths = guarantees.guaranteedWidths;
         guaranteedHeights = guarantees.guaranteedHeights;
@@ -167,7 +167,7 @@ module Plottable {
         var xWeights: number[];
         if (wantsWidth) { // If something wants width, divide free space between components that want more width
           xWeights = guarantees.wantsWidthArr.map((x) => x ? 0.1 : 0);
-          xWeights = Utils.addArrays(xWeights, colWeights);
+          xWeights = Utils.Methods.addArrays(xWeights, colWeights);
         } else { // Otherwise, divide free space according to the weights
           xWeights = colWeights;
         }
@@ -175,7 +175,7 @@ module Plottable {
         var yWeights: number[];
         if (wantsHeight) {
           yWeights = guarantees.wantsHeightArr.map((x) => x ? 0.1 : 0);
-          yWeights = Utils.addArrays(yWeights, rowWeights);
+          yWeights = Utils.Methods.addArrays(yWeights, rowWeights);
         } else {
           yWeights = rowWeights;
         }
@@ -211,12 +211,12 @@ module Plottable {
     }
 
     private determineGuarantees(offeredWidths: number[], offeredHeights: number[]): LayoutAllocation {
-      var requestedWidths  = Utils.createFilledArray(0, this.nCols);
-      var requestedHeights = Utils.createFilledArray(0, this.nRows);
-      var layoutWantsWidth  = Utils.createFilledArray(false, this.nCols);
-      var layoutWantsHeight = Utils.createFilledArray(false, this.nRows);
-      this.rows.forEach((row: Component[], rowIndex: number) => {
-        row.forEach((component: Component, colIndex: number) => {
+      var requestedWidths  = Utils.Methods.createFilledArray(0, this.nCols);
+      var requestedHeights = Utils.Methods.createFilledArray(0, this.nRows);
+      var layoutWantsWidth  = Utils.Methods.createFilledArray(false, this.nCols);
+      var layoutWantsHeight = Utils.Methods.createFilledArray(false, this.nRows);
+      this.rows.forEach((row: Abstract.Component[], rowIndex: number) => {
+        row.forEach((component: Abstract.Component, colIndex: number) => {
           var spaceRequest: ISpaceRequest;
           if (component != null) {
             spaceRequest = component._requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
@@ -224,7 +224,7 @@ module Plottable {
             spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
           }
           if (spaceRequest.width > offeredWidths[colIndex] || spaceRequest.height > offeredHeights[rowIndex]) {
-            throw new Error("Invariant Violation: Component cannot request more space than is offered");
+            throw new Error("Invariant Violation: Abstract.Component cannot request more space than is offered");
           }
 
           requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], spaceRequest.width );
@@ -253,12 +253,12 @@ module Plottable {
       var layout = this.iterateLayout(this.availableWidth , this.availableHeight);
 
       var sumPair = (p: number[]) => p[0] + p[1];
-      var rowHeights = Utils.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
-      var colWidths  = Utils.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
+      var rowHeights = Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
+      var colWidths  = Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
       var childYOffset = 0;
-      this.rows.forEach((row: Component[], rowIndex: number) => {
+      this.rows.forEach((row: Abstract.Component[], rowIndex: number) => {
         var childXOffset = 0;
-        row.forEach((component: Component, colIndex: number) => {
+        row.forEach((component: Abstract.Component, colIndex: number) => {
           // recursively compute layout
           if (component != null) {
             component._computeLayout(childXOffset, childYOffset, colWidths[colIndex], rowHeights[rowIndex]);
@@ -314,11 +314,11 @@ module Plottable {
 
     public _isFixedWidth(): boolean {
       var cols = d3.transpose(this.rows);
-      return Table.fixedSpace(cols, (c: Component) => (c == null) || c._isFixedWidth());
+      return Table.fixedSpace(cols, (c: Abstract.Component) => (c == null) || c._isFixedWidth());
     }
 
     public _isFixedHeight(): boolean {
-      return Table.fixedSpace(this.rows, (c: Component) => (c == null) || c._isFixedHeight());
+      return Table.fixedSpace(this.rows, (c: Abstract.Component) => (c == null) || c._isFixedHeight());
     }
 
     private padTableToSize(nRows: number, nCols: number) {
@@ -341,8 +341,8 @@ module Plottable {
     }
 
     private static calcComponentWeights(setWeights: number[],
-                                        componentGroups: Component[][],
-                                        fixityAccessor: (c: Component) => boolean) {
+                                        componentGroups: Abstract.Component[][],
+                                        fixityAccessor: (c: Abstract.Component) => boolean) {
       // If the row/col weight was explicitly set, then return it outright
       // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
       // then weight is 0, otherwise weight is 1
@@ -359,16 +359,17 @@ module Plottable {
     private static calcProportionalSpace(weights: number[], freeSpace: number): number[] {
       var weightSum = d3.sum(weights);
       if (weightSum === 0) {
-        return Utils.createFilledArray(0, weights.length);
+        return Utils.Methods.createFilledArray(0, weights.length);
       } else {
         return weights.map((w) => freeSpace * w / weightSum);
       }
     }
 
-    private static fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
+    private static fixedSpace(componentGroup: Abstract.Component[][], fixityAccessor: (c: Abstract.Component) => boolean) {
       var all = (bools: boolean[]) => bools.reduce((a, b) => a && b, true);
-      var group_isFixed = (components: Component[]) => all(components.map(fixityAccessor));
+      var group_isFixed = (components: Abstract.Component[]) => all(components.map(fixityAccessor));
       return all(componentGroup.map(group_isFixed));
     }
   }
+}
 }

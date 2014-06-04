@@ -14,7 +14,7 @@
 ///<reference path="componentTests.ts" />
 ///<reference path="coordinatorTests.ts" />
 ///<reference path="dataSourceTests.ts" />
-///<reference path="domUtilsTests.ts" />
+///<reference path="DOMUtilsTests.ts" />
 ///<reference path="gridlinesTests.ts" />
 ///<reference path="idCounterTests.ts" />
 ///<reference path="interactionTests.ts" />

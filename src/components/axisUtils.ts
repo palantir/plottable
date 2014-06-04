@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export module AxisUtils {
+export module Utils {
+  export module Axis {
     export var ONE_DAY = 24 * 60 * 60 * 1000;
 
     /**
@@ -19,4 +20,5 @@ module Plottable {
       return formatter;
     }
   }
+}
 }

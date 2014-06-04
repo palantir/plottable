@@ -1,14 +1,14 @@
 function makeChartWithSubplots() {
-  var xScale = new Plottable.LinearScale();
-  var xAxis = new Plottable.XAxis(xScale, "bottom");
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-  var lineYScale = new Plottable.LinearScale();
-  var lineYAxis = new Plottable.YAxis(lineYScale, "left");
-  var lineRenderer = new Plottable.LineRenderer(gitData, xScale, lineYScale);
+  var lineYScale = new Plottable.Scales.Linear();
+  var lineYAxis = new Plottable.Axis.YAxis(lineYScale, "left");
+  var lineRenderer = new Plottable.Plots.Line(gitData, xScale, lineYScale);
 
-  var circleYScale = new Plottable.LinearScale();
-  var circleYAxis = new Plottable.YAxis(circleYScale, "left");
-  var circleRenderer = new Plottable.CircleRenderer(gitData, xScale, circleYScale);
+  var circleYScale = new Plottable.Scales.Linear();
+  var circleYAxis = new Plottable.Axis.YAxis(circleYScale, "left");
+  var circleRenderer = new Plottable.Plots.Scatter(gitData, xScale, circleYScale);
 
   function getDayValue(d) {
     return d.day;
@@ -26,7 +26,7 @@ function makeChartWithSubplots() {
   }
   circleRenderer.project("y", getNetCommitSize, circleYScale);
 
-  var chart = new Plottable.Table([
+  var chart = new Plottable.Components.Table([
                     [lineYAxis,   lineRenderer],
                     [circleYAxis, circleRenderer],
                     [null,        xAxis   ]

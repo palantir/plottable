@@ -1,18 +1,18 @@
 ///<reference path="testReference.ts" />
 
 var assert = chai.assert;
-var tu = Plottable.TextUtils;
-describe("TextUtils", () => {
+var tu = Plottable.Utils.Text;
+describe("Utils.Text", () => {
   it("getTruncatedText works properly", () => {
     var svg = generateSVG();
     var textEl = svg.append("text").attr("x", 20).attr("y", 50);
     textEl.text("foobar");
 
-    var fullText = Plottable.TextUtils.getTruncatedText("hellom world!", 200, textEl);
+    var fullText = Plottable.Utils.Text.getTruncatedText("hellom world!", 200, textEl);
     assert.equal(fullText, "hellom world!", "text untruncated");
-    var partialText = Plottable.TextUtils.getTruncatedText("hellom world!", 70, textEl);
+    var partialText = Plottable.Utils.Text.getTruncatedText("hellom world!", 70, textEl);
     assert.equal(partialText, "hello...", "text truncated");
-    var tinyText = Plottable.TextUtils.getTruncatedText("hellom world!", 5, textEl);
+    var tinyText = Plottable.Utils.Text.getTruncatedText("hellom world!", 5, textEl);
     assert.equal(tinyText, "", "empty string for tiny text");
 
     assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
@@ -24,16 +24,16 @@ describe("TextUtils", () => {
     var textEl = svg.append("text").attr("x", 20).attr("y", 50);
     textEl.style("font-size", "20pt");
     textEl.text("hello, world");
-    var height1 = Plottable.TextUtils.getTextHeight(textEl);
+    var height1 = Plottable.Utils.Text.getTextHeight(textEl);
     textEl.style("font-size", "30pt");
-    var height2 = Plottable.TextUtils.getTextHeight(textEl);
+    var height2 = Plottable.Utils.Text.getTextHeight(textEl);
     assert.operator(height1, "<", height2, "measured height is greater when font size is increased");
     assert.equal(textEl.text(), "hello, world", "getTextHeight did not modify the text in the element");
     textEl.text("");
-    assert.equal(Plottable.TextUtils.getTextHeight(textEl), height2, "works properly if there is no text in the element");
+    assert.equal(Plottable.Utils.Text.getTextHeight(textEl), height2, "works properly if there is no text in the element");
     assert.equal(textEl.text(), "", "getTextHeight did not modify the text in the element");
     textEl.text(" ");
-    assert.equal(Plottable.TextUtils.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
+    assert.equal(Plottable.Utils.Text.getTextHeight(textEl), height2, "works properly if there is just a space in the element");
     assert.equal(textEl.text(), " ", "getTextHeight did not modify the text in the element");
     svg.remove();
   });
@@ -45,8 +45,8 @@ describe("TextUtils", () => {
 
     before(() => {
       svg = generateSVG();
-      measure = Plottable.TextUtils.getTextMeasure(svg);
-      e = (text: string, width: number) => Plottable.TextUtils.addEllipsesToLine(text, width, measure);
+      measure = Plottable.Utils.Text.getTextMeasure(svg);
+      e = (text: string, width: number) => Plottable.Utils.Text.addEllipsesToLine(text, width, measure);
     });
     it("works on an empty string" ,() => {
       assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");
@@ -92,26 +92,26 @@ describe("TextUtils", () => {
       svg = generateSVG(200, 200);
       t = svg.append("text");
       t.text("hi there");
-      canonicalBB = Plottable.DOMUtils.getBBox(t);
+      canonicalBB = Plottable.Utils.DOM.getBBox(t);
       canonicalResult = [canonicalBB.width, canonicalBB.height];
       t.text("bla bla bla");
     });
 
 
     it("works on empty string", () => {
-      var measure = Plottable.TextUtils.getTextMeasure(t);
+      var measure = Plottable.Utils.Text.getTextMeasure(t);
       var result = measure("");
       assert.deepEqual(result, [0, 0], "empty string has 0 width and height");
     });
     it("works on non-empty string and has no side effects", () => {
-      var measure = Plottable.TextUtils.getTextMeasure(t);
+      var measure = Plottable.Utils.Text.getTextMeasure(t);
       var result2 = measure("hi there");
       assert.deepEqual(result2, canonicalResult, "measurement is as expected");
       assert.equal(t.text(), "bla bla bla", "the text was unchanged");
     });
 
     it("works when operating on the top svg instead of text selection, and has no side effects", () => {
-      var measure2 = Plottable.TextUtils.getTextMeasure(svg);
+      var measure2 = Plottable.Utils.Text.getTextMeasure(svg);
       var result3 = measure2("hi there");
       assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
       assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
@@ -131,11 +131,11 @@ describe("TextUtils", () => {
       it("performs basic functionality and defaults to left, top", () => {
         svg = generateSVG(400, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400);
+        var wh = Plottable.Utils.Text.writeLineHorizontally(text, g, 400, 400);
         var textEl = g.select("text");
-        var bb = Plottable.DOMUtils.getBBox(textEl);
-        var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0];
-        var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1];
+        var bb = Plottable.Utils.DOM.getBBox(textEl);
+        var x = bb.x + Plottable.Utils.DOM.translate(g.select("g"))[0];
+        var y = bb.y + Plottable.Utils.DOM.translate(g.select("g"))[1];
         if (hideResults) {
           svg.remove();
         };
@@ -143,12 +143,12 @@ describe("TextUtils", () => {
       it("center, center alignment works", () => {
         svg = generateSVG(400, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "center", "center");
+        var wh = Plottable.Utils.Text.writeLineHorizontally(text, g, 400, 400, "center", "center");
         svg.append("circle").attr({cx: 200, cy: 200, r: 5});
         var textEl = g.select("text");
-        var bb = Plottable.DOMUtils.getBBox(textEl);
-        var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0] + bb.width/2;
-        var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1] + bb.height/2;
+        var bb = Plottable.Utils.DOM.getBBox(textEl);
+        var x = bb.x + Plottable.Utils.DOM.translate(g.select("g"))[0] + bb.width/2;
+        var y = bb.y + Plottable.Utils.DOM.translate(g.select("g"))[1] + bb.height/2;
 
         if (hideResults) {
           svg.remove();
@@ -157,11 +157,11 @@ describe("TextUtils", () => {
       it("right, bottom alignment works", () => {
         svg = generateSVG(400, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineHorizontally(text, g, 400, 400, "right", "bottom");
+        var wh = Plottable.Utils.Text.writeLineHorizontally(text, g, 400, 400, "right", "bottom");
         var textEl = g.select("text");
-        var bb = Plottable.DOMUtils.getBBox(textEl);
-        var x = bb.x + Plottable.DOMUtils.translate(g.select("g"))[0] + bb.width;
-        var y = bb.y + Plottable.DOMUtils.translate(g.select("g"))[1] + bb.height;
+        var bb = Plottable.Utils.DOM.getBBox(textEl);
+        var x = bb.x + Plottable.Utils.DOM.translate(g.select("g"))[0] + bb.width;
+        var y = bb.y + Plottable.Utils.DOM.translate(g.select("g"))[1] + bb.height;
 
         if (hideResults) {
           svg.remove();
@@ -181,8 +181,8 @@ describe("TextUtils", () => {
       it("performs basic functionality and defaults to right, left, top", () => {
         svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400);
-        var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+        var wh = Plottable.Utils.Text.writeLineVertically(text, g, 60, 400);
+        var bb = Plottable.Utils.DOM.getBBox(g.select("g"));
 
         if (hideResults) {
           svg.remove();
@@ -191,8 +191,8 @@ describe("TextUtils", () => {
       it("right, center, center", () => {
         svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically("x", g, 60, 400, "center", "center", "right");
-        var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+        var wh = Plottable.Utils.Text.writeLineVertically("x", g, 60, 400, "center", "center", "right");
+        var bb = Plottable.Utils.DOM.getBBox(g.select("g"));
         if (hideResults) {
           svg.remove();
         };
@@ -200,8 +200,8 @@ describe("TextUtils", () => {
       it("right, right, bottom", () => {
         svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "right", "bottom", "right");
-        var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+        var wh = Plottable.Utils.Text.writeLineVertically(text, g, 60, 400, "right", "bottom", "right");
+        var bb = Plottable.Utils.DOM.getBBox(g.select("g"));
         if (hideResults) {
           svg.remove();
         };
@@ -209,8 +209,8 @@ describe("TextUtils", () => {
       it("left, left, top", () => {
         svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "left", "top", "left");
-        var bb = Plottable.DOMUtils.getBBox(g.select("g"));
+        var wh = Plottable.Utils.Text.writeLineVertically(text, g, 60, 400, "left", "top", "left");
+        var bb = Plottable.Utils.DOM.getBBox(g.select("g"));
         if (hideResults) {
           svg.remove();
         };
@@ -219,7 +219,7 @@ describe("TextUtils", () => {
       it("left, center, center", () => {
         svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "center", "center", "left");
+        var wh = Plottable.Utils.Text.writeLineVertically(text, g, 60, 400, "center", "center", "left");
         if (hideResults) {
           svg.remove();
         };
@@ -228,7 +228,7 @@ describe("TextUtils", () => {
       it("left, right, bottom", () => {
         svg = generateSVG(60, 400);
         g = svg.append("g");
-        var wh = Plottable.TextUtils.writeLineVertically(text, g, 60, 400, "right", "bottom", "left");
+        var wh = Plottable.Utils.Text.writeLineVertically(text, g, 60, 400, "right", "bottom", "left");
         if (hideResults) {
           svg.remove();
         };

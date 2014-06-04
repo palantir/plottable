@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 
-function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
+function assertComponentXY(component: Plottable.Abstract.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform(component.element.attr("transform")).translate;
   var xActual = translate[0];
@@ -14,12 +14,12 @@ function assertComponentXY(component: Plottable.Component, x: number, y: number,
 
 describe("Component behavior", () => {
   var svg: D3.Selection;
-  var c: Plottable.Component;
+  var c: Plottable.Abstract.Component;
   var SVG_WIDTH = 400;
   var SVG_HEIGHT = 300;
   beforeEach(() => {
     svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    c = new Plottable.Component();
+    c = new Plottable.Abstract.Component();
   });
 
   describe("anchor", () => {
@@ -209,10 +209,10 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("componentID works as expected", () => {
-    var expectedID = (<any> Plottable.PlottableObject).nextID;
-    var c1 = new Plottable.Component();
+    var expectedID = (<any> Plottable.Abstract.PlottableObject).nextID;
+    var c1 = new Plottable.Abstract.Component();
     assert.equal(c1._plottableID, expectedID, "component id on next component was as expected");
-    var c2 = new Plottable.Component();
+    var c2 = new Plottable.Abstract.Component();
     assert.equal(c2._plottableID, expectedID+1, "future components increment appropriately");
     svg.remove();
   });
@@ -228,7 +228,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     boxStrings.forEach((s) => {
       var box = boxContainer.select(s);
       assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-      var bb = Plottable.DOMUtils.getBBox(box);
+      var bb = Plottable.Utils.DOM.getBBox(box);
       assert.equal(bb.width, SVG_WIDTH, s + " width as expected");
       assert.equal(bb.height, SVG_HEIGHT, s + " height as expected");
     });
@@ -236,7 +236,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("hitboxes are created iff there are registered interactions", () => {
-    function verifyHitbox(component: Plottable.Component) {
+    function verifyHitbox(component: Plottable.Abstract.Component) {
       var hitBox = (<any> component).hitBox;
       assert.isNotNull(hitBox, "the hitbox was created");
       var hitBoxFill = hitBox.style("fill");
@@ -250,16 +250,16 @@ it("components can be offset relative to their alignment, and throw errors if th
     svg.remove();
     svg = generateSVG();
 
-    c = new Plottable.Component();
-    var i = new Plottable.Interaction(c).registerWithComponent();
+    c = new Plottable.Abstract.Component();
+    var i = new Plottable.Abstract.Interaction(c).registerWithComponent();
     c._anchor(svg);
     verifyHitbox(c);
     svg.remove();
     svg = generateSVG();
 
-    c = new Plottable.Component();
+    c = new Plottable.Abstract.Component();
     c._anchor(svg);
-    i = new Plottable.Interaction(c).registerWithComponent();
+    i = new Plottable.Abstract.Interaction(c).registerWithComponent();
     verifyHitbox(c);
     svg.remove();
   });
@@ -308,10 +308,10 @@ it("components can be offset relative to their alignment, and throw errors if th
 
   it("remove works as expected", () => {
     var cbCalled = 0;
-    var cb = (b: Plottable.Broadcaster) => cbCalled++;
-    var b = new Plottable.Broadcaster();
+    var cb = (b: Plottable.Abstract.Broadcaster) => cbCalled++;
+    var b = new Plottable.Abstract.Broadcaster();
 
-    var c1 = new Plottable.Component();
+    var c1 = new Plottable.Abstract.Component();
 
     c1._registerToBroadcaster(b, cb);
 
@@ -329,7 +329,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("_invalidateLayout works as expected", () => {
-    var cg = new Plottable.ComponentGroup();
+    var cg = new Plottable.Components.Group();
     var c = makeFixedSizeComponent(10, 10);
     cg._addComponent(c);
     cg.renderTo(svg);
@@ -343,7 +343,7 @@ it("components can be offset relative to their alignment, and throw errors if th
   });
 
   it("components can be removed even if not anchored", () => {
-    var c = new Plottable.Component();
+    var c = new Plottable.Abstract.Component();
     c.remove(); // no error thrown
     svg.remove();
   });

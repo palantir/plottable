@@ -10,36 +10,36 @@
       var renderers = [];
 
 
-      var colors = new Plottable.ColorScale("20").range();
+      var colors = new Plottable.Scales.Color("20").range();
 
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
       var numRenderers = 4;
 
       for (var i=0; i<numRenderers; i++) {
         var data = makeRandomData(20);
-        var renderer = new Plottable.LineRenderer(data, xScale, yScale).animate(true);
+        var renderer = new Plottable.Plots.Line(data, xScale, yScale).animate(true);
         renderers.push(renderer);
       }
 
-      var cg = new Plottable.ComponentGroup();
+      var cg = new Plottable.Components.Group();
 
       renderers.forEach(function(renderer, i) {
         renderer.project("stroke", function() { return colors[i]; });
         cg.merge(renderer);
       })
 
-      var xAxis = new Plottable.XAxis(xScale, "bottom");
-      var yAxis = new Plottable.YAxis(yScale, "left");
+      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-      var chart = new Plottable.Table([
+      var chart = new Plottable.Components.Table([
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
 
       window.onload = function() {
         chart.renderTo("#chart");
-        var pzi = new Plottable.PanZoomInteraction(cg, xScale, yScale);
+        var pzi = new Plottable.Interactions.PanZoom(cg, xScale, yScale);
         pzi.registerWithComponent();
 
       }
@@ -54,7 +54,7 @@
       function addRenderer() {
         if (numRenderers >= renderers.length) {
           var data = makeRandomData(20);
-          var renderer = new Plottable.LineRenderer(data, xScale, yScale).animate(true);
+          var renderer = new Plottable.Plots.Line(data, xScale, yScale).animate(true);
           var nextColor = colors[numRenderers]
           renderer.project("stroke", function() { return nextColor; });
           renderers.push(renderer);

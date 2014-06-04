@@ -31,66 +31,66 @@
 
       var circleRenderer;
       function makeCircleChart() {
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scales.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scales.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        circleRenderer = new Plottable.CircleRenderer(xyDataSource, xScale, yScale);
+        circleRenderer = new Plottable.Plots.Scatter(xyDataSource, xScale, yScale);
         circleRenderer.project("r", 8);
         circleRenderer.project("opacity", 0.75);
         circleRenderer.animate(doAnimate);
 
-        var circleChart = new Plottable.Table([[yAxis, circleRenderer],
+        var circleChart = new Plottable.Components.Table([[yAxis, circleRenderer],
                                                [null,  xAxis]]);
         circleChart.renderTo("#circles");
       }
 
       var barRenderer;
       function makeBarChart() {
-        var xScale = new Plottable.OrdinalScale().rangeType("bands");
-        var xAxis = new Plottable.XAxis(xScale, "bottom", function(d) { return d; } );
+        var xScale = new Plottable.Scales.Ordinal().rangeType("bands");
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", function(d) { return d; } );
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scales.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
         yAxis.showEndTickLabels(true);
 
-        barRenderer = new Plottable.BarRenderer(barDataSource, xScale, yScale)
+        barRenderer = new Plottable.Plots.Bar(barDataSource, xScale, yScale)
                                 .project("fill", function() {return "steelblue"});
         barRenderer.animate(doAnimate);
-        var barChart = new Plottable.Table([[yAxis, barRenderer],
+        var barChart = new Plottable.Components.Table([[yAxis, barRenderer],
                                          [null,  xAxis]]);
         barChart.renderTo("#bars");
       }
 
       var lineRenderer;
       function makeLineChart() {
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scales.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scales.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        lineRenderer = new Plottable.LineRenderer(xyDataSource, xScale, yScale);
+        lineRenderer = new Plottable.Plots.Line(xyDataSource, xScale, yScale);
 
         lineRenderer.animate(doAnimate);
-        var lineChart = new Plottable.Table([[yAxis, lineRenderer],
+        var lineChart = new Plottable.Components.Table([[yAxis, lineRenderer],
                                                [null,  xAxis]]);
         lineChart.renderTo("#line");
       }
 
       var areaRenderer;
       function makeAreaChart() {
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scales.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scales.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        areaRenderer = new Plottable.AreaRenderer(xyDataSource, xScale, yScale);
+        areaRenderer = new Plottable.Plots.Area(xyDataSource, xScale, yScale);
         areaRenderer.animate(doAnimate);
-        var areaChart = new Plottable.Table([[yAxis, areaRenderer],
+        var areaChart = new Plottable.Components.Table([[yAxis, areaRenderer],
                                                [null,  xAxis]]);
         areaChart.renderTo("#area");
       }

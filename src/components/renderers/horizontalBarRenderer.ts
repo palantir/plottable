@@ -1,7 +1,8 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable {
-  export class HorizontalBarRenderer extends AbstractBarRenderer {
+module Plottable{
+export module Plots {
+  export class HorizontalBar extends Abstract.BarPlot {
     public _barAlignment = "top";
     public _ANIMATION_DURATION = 300; //milliseconds
     public _ANIMATION_DELAY = 15; //milliseconds
@@ -14,7 +15,7 @@ module Plottable {
      * @param {QuantitiveScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: QuantitiveScale, yScale: Scale) {
+    constructor(dataset: any, xScale: Abstract.QuantitiveScale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
     }
 
@@ -30,7 +31,7 @@ module Plottable {
       attrToProjector["height"] = attrToProjector["width"]; // remapping due to naming conventions
       var heightFunction = attrToProjector["height"];
 
-      var castYScale = (<OrdinalScale> this.yScale);
+      var castYScale = (<Scales.Ordinal> this.yScale);
       var rangeType = (castYScale.rangeType == null) ? "points" : castYScale.rangeType();
       if (rangeType === "points") {
         if (this._barAlignment === "middle") {
@@ -103,4 +104,5 @@ module Plottable {
       return this;
     }
   }
+}
 }

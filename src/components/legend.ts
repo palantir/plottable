@@ -1,11 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class Legend extends Component {
+export module Components {
+  export class Legend extends Abstract.Component {
     public static _SUBELEMENT_CLASS = "legend-row";
     private static MARGIN = 5;
 
-    private colorScale: ColorScale;
+    private colorScale: Scales.Color;
     private maxWidth: number;
     private nRowsDrawn: number;
 
@@ -15,7 +16,7 @@ module Plottable {
      * @constructor
      * @param {ColorScale} colorScale
      */
-    constructor(colorScale?: ColorScale) {
+    constructor(colorScale?: Scales.Color) {
       super();
       this.classed("legend", true);
       this.scale(colorScale);
@@ -29,9 +30,9 @@ module Plottable {
      * @param {ColorScale} scale
      * @returns {Legend} The calling Legend.
      */
-    public scale(scale: ColorScale): Legend;
-    public scale(): ColorScale;
-    public scale(scale?: ColorScale): any {
+    public scale(scale: Scales.Color): Legend;
+    public scale(): Scales.Color;
+    public scale(scale?: Scales.Color): any {
       if (scale != null) {
         if (this.colorScale != null) {
           this._deregisterFromBroadcaster(this.colorScale);
@@ -60,7 +61,7 @@ module Plottable {
 
       var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
-      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => TextUtils.getTextWidth(fakeText, d));
+      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Utils.Text.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
@@ -75,7 +76,7 @@ module Plottable {
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
-      var textHeight = TextUtils.getTextHeight(fakeLegendEl.append("text"));
+      var textHeight = Utils.Text.getTextHeight(fakeLegendEl.append("text"));
       fakeLegendEl.remove();
       return textHeight;
     }
@@ -100,8 +101,9 @@ module Plottable {
       legend.attr("transform", (d: any) => "translate(0," + domain.indexOf(d) * textHeight + ")");
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: any) {return TextUtils.getTruncatedText(d, availableWidth , d3.select(this));});
+            .text(function(d: any) {return Utils.Text.getTruncatedText(d, availableWidth , d3.select(this));});
       return this;
     }
   }
+}
 }

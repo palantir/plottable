@@ -1,13 +1,14 @@
 ///<reference path="../reference.ts" />
 
-module Plottable {
-  export class LogScale extends QuantitiveScale {
+module Plottable{
+export module Scales {
+  export class Log extends Abstract.QuantitiveScale {
 
     /**
-     * Creates a new LogScale.
+     * Creates a new Scale.Log.
      *
      * @constructor
-     * @param {D3.Scale.LogScale} [scale] The D3 LogScale backing the LogScale. If not supplied, uses a default scale.
+     * @param {D3.Scale.LogScale} [scale] The D3 Scale.Log backing the Scale.Log. If not supplied, uses a default scale.
      */
     constructor();
     constructor(scale: D3.Scale.LogScale);
@@ -16,12 +17,13 @@ module Plottable {
     }
 
     /**
-     * Creates a copy of the LogScale with the same domain and range but without any registered listeners.
+     * Creates a copy of the Scale.Log with the same domain and range but without any registered listeners.
      *
-     * @returns {LogScale} A copy of the calling LogScale.
+     * @returns {Scale.Log} A copy of the calling Scale.Log.
      */
-    public copy(): LogScale {
-      return new LogScale(this._d3Scale.copy());
+    public copy(): Log {
+      return new Log(this._d3Scale.copy());
     }
   }
+}
 }

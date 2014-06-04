@@ -5,13 +5,13 @@ var assert = chai.assert;
 
 describe("Legends", () => {
   var svg: D3.Selection;
-  var color: Plottable.ColorScale;
-  var legend: Plottable.Legend;
+  var color: Plottable.Scales.Color;
+  var legend: Plottable.Components.Legend;
 
   beforeEach(() => {
     svg = generateSVG(400, 400);
-    color = new Plottable.ColorScale("Category10");
-    legend = new Plottable.Legend(color);
+    color = new Plottable.Scales.Color("Category10");
+    legend = new Plottable.Components.Legend(color);
   });
 
   it.skip("a basic legend renders", () => {
@@ -55,7 +55,7 @@ describe("Legends", () => {
     var totalHeight = 0;
     var legends = legend.content.selectAll(".legend-row");
     legends.each(function(d, i) {
-      totalHeight += Plottable.DOMUtils.getBBox(d3.select(this).select("text")).height;
+      totalHeight += Plottable.Utils.DOM.getBBox(d3.select(this).select("text")).height;
     });
     assert.lengthOf(legends[0], 8, "there were 8 legends");
     assert.operator(totalHeight, "<=", legend.availableHeight, "the legend did not overflow its space");
@@ -108,7 +108,7 @@ describe("Legends", () => {
     legend.renderTo(svg);
 
     var newDomain = ["a", "b", "c"];
-    var newColorScale = new Plottable.ColorScale("20");
+    var newColorScale = new Plottable.Scales.Color("20");
     newColorScale.domain(newDomain);
     legend.scale(newColorScale);
 
@@ -128,7 +128,7 @@ describe("Legends", () => {
     legend.renderTo(svg);
 
     var tempDomain = ["a", "b", "c"];
-    var newColorScale = new Plottable.ColorScale("20");
+    var newColorScale = new Plottable.Scales.Color("20");
     newColorScale.domain(tempDomain);
     legend.scale(newColorScale);
 
@@ -145,10 +145,10 @@ describe("Legends", () => {
   });
 
   describe("ToggleLegend tests", () => {
-    var toggleLegend: Plottable.ToggleLegend;
+    var toggleLegend: Plottable.Components.ToggleLegend;
 
     beforeEach(() => {
-      toggleLegend = new Plottable.ToggleLegend(color);
+      toggleLegend = new Plottable.Components.ToggleLegend(color);
     });
 
     function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
@@ -202,7 +202,7 @@ describe("Legends", () => {
       toggleEntry("c", 2);
 
       var newDomain = ["r", "a", "d", "g"];
-      var newColorScale = new Plottable.ColorScale("Category10");
+      var newColorScale = new Plottable.Scales.Color("Category10");
       newColorScale.domain(newDomain);
       toggleLegend.scale(newColorScale);
 

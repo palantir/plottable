@@ -1,10 +1,10 @@
 function makeCustomProjectorChart() {
-  var xScale = new Plottable.LinearScale();
-  var yScale = new Plottable.LinearScale();
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
 
-  var xAxis = new Plottable.XAxis(xScale, "bottom");
-  var yAxis = new Plottable.YAxis(yScale, "left");
-  var renderer = new Plottable.LineRenderer(gitData, xScale, yScale);
+  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+  var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+  var renderer = new Plottable.Plots.Line(gitData, xScale, yScale);
 
   function getXDataValue(d) {
     return d.day;
@@ -16,7 +16,7 @@ function makeCustomProjectorChart() {
   }
   renderer.project("y", getYDataValue, yScale);
 
-  var chart = new Plottable.Table([
+  var chart = new Plottable.Components.Table([
                     [yAxis, renderer],
                     [null,  xAxis   ]
                   ]);

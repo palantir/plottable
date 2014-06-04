@@ -21,40 +21,40 @@
       window.onload = function() {
         var dataseries = makeRandomData(20);
 
-        var xScale = new Plottable.LinearScale();
-        var xAxisLeft = new Plottable.XAxis(xScale, "bottom").tickLabelPosition("left");
-        var xAxisCenter = new Plottable.XAxis(xScale, "bottom");
-        var xAxisRight = new Plottable.XAxis(xScale, "bottom").tickLabelPosition("right");
-        var xAxisTable = new Plottable.Table([[xAxisLeft],
+        var xScale = new Plottable.Scales.Linear();
+        var xAxisLeft = new Plottable.Axis.XAxis(xScale, "bottom").tickLabelPosition("left");
+        var xAxisCenter = new Plottable.Axis.XAxis(xScale, "bottom");
+        var xAxisRight = new Plottable.Axis.XAxis(xScale, "bottom").tickLabelPosition("right");
+        var xAxisTable = new Plottable.Components.Table([[xAxisLeft],
                                               [xAxisCenter],
                                               [xAxisRight]]);
 
-        var xAxisLeft2 = new Plottable.XAxis(xScale, "top").tickLabelPosition("left");
-        var xAxisCenter2 = new Plottable.XAxis(xScale, "top");
-        var xAxisRight2 = new Plottable.XAxis(xScale, "top").tickLabelPosition("right");
-        var xAxisTable2 = new Plottable.Table([[xAxisLeft2],
+        var xAxisLeft2 = new Plottable.Axis.XAxis(xScale, "top").tickLabelPosition("left");
+        var xAxisCenter2 = new Plottable.Axis.XAxis(xScale, "top");
+        var xAxisRight2 = new Plottable.Axis.XAxis(xScale, "top").tickLabelPosition("right");
+        var xAxisTable2 = new Plottable.Components.Table([[xAxisLeft2],
                                               [xAxisCenter2],
                                               [xAxisRight2]]);
 
-        var yScale = new Plottable.LinearScale();
-        var yAxisTop = new Plottable.YAxis(yScale, "left").tickLabelPosition("top");
-        var yAxisMiddle = new Plottable.YAxis(yScale, "left");
-        var yAxisBottom = new Plottable.YAxis(yScale, "left").tickLabelPosition("bottom");
-        var yAxisTable = new Plottable.Table([[yAxisTop, yAxisMiddle, yAxisBottom]]);
+        var yScale = new Plottable.Scales.Linear();
+        var yAxisTop = new Plottable.Axis.YAxis(yScale, "left").tickLabelPosition("top");
+        var yAxisMiddle = new Plottable.Axis.YAxis(yScale, "left");
+        var yAxisBottom = new Plottable.Axis.YAxis(yScale, "left").tickLabelPosition("bottom");
+        var yAxisTable = new Plottable.Components.Table([[yAxisTop, yAxisMiddle, yAxisBottom]]);
 
-        var yAxisTop2 = new Plottable.YAxis(yScale, "right").tickLabelPosition("top");
-        var yAxisMiddle2 = new Plottable.YAxis(yScale, "right");
-        var yAxisBottom2 = new Plottable.YAxis(yScale, "right").tickLabelPosition("bottom");
-        var yAxisTable2 = new Plottable.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
+        var yAxisTop2 = new Plottable.Axis.YAxis(yScale, "right").tickLabelPosition("top");
+        var yAxisMiddle2 = new Plottable.Axis.YAxis(yScale, "right");
+        var yAxisBottom2 = new Plottable.Axis.YAxis(yScale, "right").tickLabelPosition("bottom");
+        var yAxisTable2 = new Plottable.Components.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
-        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
-        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderAreaD1 = new Plottable.Plots.Scatter(dataseries, xScale, yScale);
+        var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
 
-        var basicTable = new Plottable.Table([[null, xAxisTable2, null],
+        var basicTable = new Plottable.Components.Table([[null, xAxisTable2, null],
                                               [yAxisTable, renderAreaD1.merge(gridlines), yAxisTable2],
                                               [null, xAxisTable, null]]);
         basicTable.renderTo("#axis-test");
-        var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
+        var pzi = new Plottable.Interactions.PanZoom(renderAreaD1, xScale, yScale);
         pzi.registerWithComponent();
       }
     </script>
