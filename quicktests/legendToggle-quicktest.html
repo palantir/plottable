@@ -48,10 +48,11 @@
             function (d, b) {
                 var index = names.indexOf(d);
                 if (b) {
-                    cg.merge(renderers[index]);
+                  renderers[index].project("opacity", 1);
                 } else {
-                    renderers[index].remove();
+                  renderers[index].project("opacity", 0);
                 }
+                cg._invalidateLayout();
             }
         );
         var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
