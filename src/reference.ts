@@ -38,13 +38,14 @@
 /// <reference path="components/axisUtils.ts" />
 /// <reference path="components/renderers/xyRenderer.ts" />
 /// <reference path="components/renderers/circleRenderer.ts" />
-/// <reference path="components/renderers/lineRenderer.ts" />
 /// <reference path="components/renderers/rectRenderer.ts" />
 /// <reference path="components/renderers/gridRenderer.ts" />
 /// <reference path="components/renderers/abstractBarRenderer.ts" />
 /// <reference path="components/renderers/barRenderer.ts" />
 /// <reference path="components/renderers/horizontalBarRenderer.ts" />
 /// <reference path="components/renderers/areaRenderer.ts" />
+/// <reference path="components/renderers/lineRenderer.ts" />
+
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />

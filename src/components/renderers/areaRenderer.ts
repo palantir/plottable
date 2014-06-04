@@ -4,8 +4,6 @@ module Plottable {
   export class AreaRenderer extends XYRenderer {
     private areaPath: D3.Selection;
     private linePath: D3.Selection;
-    private area: D3.Svg.Area;
-    private line: D3.Svg.Line;
     public _ANIMATION_DURATION = 600; //milliseconds
 
     /**
@@ -21,7 +19,7 @@ module Plottable {
       this.classed("area-renderer", true);
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
-      this.project("stroke", () => "steelblue"); // default
+      this.project("stroke", () => "none"); // default
     }
 
     public _setup() {
@@ -41,7 +39,7 @@ module Plottable {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      this.dataSelection = this.areaPath.datum(this._dataSource.data());
+      this.areaPath.datum(this._dataSource.data());
       this.linePath.datum(this._dataSource.data());
       if (this._animate && this._dataChanged) {
          var animationStartArea = d3.svg.area()
@@ -55,7 +53,7 @@ module Plottable {
         this.linePath.attr("d", animationStartLine).attr(attrToProjector);
       }
 
-      this.area = d3.svg.area()
+      var area = d3.svg.area()
                         .x(xFunction)
                         .y0(y0Function)
                         .y1(yFunction);
@@ -65,11 +63,11 @@ module Plottable {
         areaUpdateSelection = this.areaPath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
         lineUpdateSelection = this.linePath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
       }
-      this.line = d3.svg.line()
+      var line = d3.svg.line()
                         .x(xFunction)
                         .y(yFunction);
-      areaUpdateSelection.attr("d", this.area).attr(attrToProjector);
-      lineUpdateSelection.attr("d", this.line).attr(attrToProjector);
+      areaUpdateSelection.attr("d", area).attr(attrToProjector);
+      lineUpdateSelection.attr("d", line).attr(attrToProjector);
     }
   }
 }

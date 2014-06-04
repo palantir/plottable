@@ -178,9 +178,6 @@ declare module Plottable {
 }
 
 
-declare var LINE_BREAKS_BEFORE: RegExp;
-declare var LINE_BREAKS_AFTER: RegExp;
-declare var SPACES: RegExp;
 declare module Plottable {
     module WordWrapUtils {
         interface IWrappedText {
@@ -1057,14 +1054,15 @@ declare module Plottable {
         */
         constructor(colorScale: ColorScale, callback?: ToggleCallback);
         /**
-        * Assigns the callback to the ToggleLegend
+        * Assigns or gets the callback to the ToggleLegend
         * Call with argument of null to remove the callback
         *
         * @param{ToggleCallback} callback The new callback function
         */
-        public setCallback(callback: ToggleCallback): ToggleLegend;
+        public callback(callback: ToggleCallback): ToggleLegend;
+        public callback(): ToggleCallback;
         /**
-        * Assigns a new ColorScale to the Legend.
+        * Assigns a new ColorScale to the ToggleLegend.
         *
         * @param {ColorScale} scale
         * @returns {ToggleLegend} The calling ToggleLegend.
@@ -1155,21 +1153,6 @@ declare module Plottable {
         */
         constructor(dataset: any, xScale: Scale, yScale: Scale);
         public project(attrToSet: string, accessor: any, scale?: Scale): CircleRenderer;
-    }
-}
-
-
-declare module Plottable {
-    class LineRenderer extends XYRenderer {
-        /**
-        * Creates a LineRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        constructor(dataset: any, xScale: Scale, yScale: Scale);
     }
 }
 
@@ -1299,6 +1282,21 @@ declare module Plottable {
     class AreaRenderer extends XYRenderer {
         /**
         * Creates an AreaRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
+    }
+}
+
+
+declare module Plottable {
+    class LineRenderer extends AreaRenderer {
+        /**
+        * Creates a LineRenderer.
         *
         * @constructor
         * @param {IDataset} dataset The dataset to render.

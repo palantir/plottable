@@ -1,5 +1,5 @@
 /*!
-Plottable 0.14.1 (https://github.com/palantir/plottable)
+Plottable 0.14.2 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -473,12 +473,13 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var LINE_BREAKS_BEFORE = /[{\[]/;
-var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
-var SPACES = /^\s+$/;
 var Plottable;
 (function (Plottable) {
     (function (WordWrapUtils) {
+        var LINE_BREAKS_BEFORE = /[{\[]/;
+        var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
+        var SPACES = /^\s+$/;
+
         ;
 
         /**
@@ -2095,7 +2096,6 @@ var Plottable;
             this._dataChanged = false;
             this._animate = false;
             this._ANIMATION_DURATION = 250;
-            this._hasRendered = false;
             this._projectors = {};
             this._rerenderUpdateSelection = false;
             // A perf-efficient manner of rendering would be to calculate attributes only
@@ -2198,7 +2198,6 @@ var Plottable;
 
         Renderer.prototype._doRender = function () {
             if (this.element != null) {
-                this._hasRendered = true;
                 this._paint();
                 this._dataChanged = false;
                 this._requireRerender = false;
@@ -2225,9 +2224,6 @@ var Plottable;
         Renderer.prototype.animate = function (enabled) {
             this._animate = enabled;
             return this;
-        };
-        Renderer.DEFAULT_COLOR_ACCESSOR = function (d) {
-            return "#1f77b4";
         };
         return Renderer;
     })(Plottable.Component);
@@ -4082,23 +4078,21 @@ var Plottable;
         * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
         */
         function ToggleLegend(colorScale, callback) {
-            this.callback = callback;
+            this.callback(callback);
             this.isOff = d3.set(); // initially, everything is toggled on
             _super.call(this, colorScale);
         }
-        /**
-        * Assigns the callback to the ToggleLegend
-        * Call with argument of null to remove the callback
-        *
-        * @param{ToggleCallback} callback The new callback function
-        */
-        ToggleLegend.prototype.setCallback = function (callback) {
-            this.callback = callback;
-            return this;
+        ToggleLegend.prototype.callback = function (callback) {
+            if (callback !== undefined) {
+                this._callback = callback;
+                return this;
+            } else {
+                return this;
+            }
         };
 
         /**
-        * Assigns a new ColorScale to the Legend.
+        * Assigns a new ColorScale to the ToggleLegend.
         *
         * @param {ColorScale} scale
         * @returns {ToggleLegend} The calling ToggleLegend.
@@ -4133,8 +4127,8 @@ var Plottable;
                 } else {
                     _this.isOff.add(d);
                 }
-                if (_this.callback != null) {
-                    _this.callback(d, turningOn);
+                if (_this._callback != null) {
+                    _this._callback(d, turningOn);
                 }
                 _this.updateClasses();
             });
@@ -4382,7 +4376,6 @@ var Plottable;
         };
 
         XYRenderer.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-            this._hasRendered = false;
             _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
             this.xScale.range([0, this.availableWidth]);
             this.yScale.range([this.availableHeight, 0]);
@@ -4390,7 +4383,7 @@ var Plottable;
         };
 
         XYRenderer.prototype.rescale = function () {
-            if (this.element != null && this._hasRendered) {
+            if (this.element != null) {
                 this._render();
             }
         };
@@ -4449,11 +4442,11 @@ var Plottable;
                 return 0;
             };
 
-            this.dataSelection = this.renderArea.selectAll("circle").data(this._dataSource.data());
-            this.dataSelection.enter().append("circle");
-            this.dataSelection.attr(attrToProjector);
+            var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
+            circles.enter().append("circle");
+            circles.attr(attrToProjector);
 
-            var updateSelection = this.dataSelection;
+            var updateSelection = circles;
             if (this._animate && this._dataChanged) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
@@ -4462,71 +4455,11 @@ var Plottable;
             }
             updateSelection.attr("r", rFunction);
 
-            this.dataSelection.exit().remove();
+            circles.exit().remove();
         };
         return CircleRenderer;
     })(Plottable.XYRenderer);
     Plottable.CircleRenderer = CircleRenderer;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var LineRenderer = (function (_super) {
-        __extends(LineRenderer, _super);
-        /**
-        * Creates a LineRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        function LineRenderer(dataset, xScale, yScale) {
-            _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 600;
-            this.classed("line-renderer", true);
-            this.project("stroke", function () {
-                return "steelblue";
-            });
-        }
-        LineRenderer.prototype._setup = function () {
-            _super.prototype._setup.call(this);
-            this.path = this.renderArea.append("path").classed("line", true);
-            return this;
-        };
-
-        LineRenderer.prototype._paint = function () {
-            _super.prototype._paint.call(this);
-            var attrToProjector = this._generateAttrToProjector();
-            var scaledZero = this.yScale.scale(0);
-            var xFunction = attrToProjector["x"];
-            var yFunction = attrToProjector["y"];
-            delete attrToProjector["x"];
-            delete attrToProjector["y"];
-
-            this.dataSelection = this.path.datum(this._dataSource.data());
-            if (this._animate && this._dataChanged) {
-                var animationStartLine = d3.svg.line().x(xFunction).y(scaledZero);
-                this.path.attr("d", animationStartLine).attr(attrToProjector);
-            }
-
-            this.line = d3.svg.line().x(xFunction).y(yFunction);
-            var updateSelection = this.path;
-            if (this._animate) {
-                updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
-            }
-            updateSelection.attr("d", this.line).attr(attrToProjector);
-        };
-        return LineRenderer;
-    })(Plottable.XYRenderer);
-    Plottable.LineRenderer = LineRenderer;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -4571,10 +4504,10 @@ var Plottable;
                 return yF(d, i) - heightF(d, i) / 2;
             };
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            this.dataSelection.enter().append("rect");
-            this.dataSelection.attr(attrToProjector);
-            this.dataSelection.exit().remove();
+            var rects = this.renderArea.selectAll("rect").data(this._dataSource.data());
+            rects.enter().append("rect");
+            rects.attr(attrToProjector);
+            rects.exit().remove();
         };
         return RectRenderer;
     })(Plottable.XYRenderer);
@@ -4624,8 +4557,8 @@ var Plottable;
         GridRenderer.prototype._paint = function () {
             _super.prototype._paint.call(this);
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            this.dataSelection.enter().append("rect");
+            var cells = this.renderArea.selectAll("rect").data(this._dataSource.data());
+            cells.enter().append("rect");
 
             var xStep = this.xScale.rangeBand();
             var yStep = this.yScale.rangeBand();
@@ -4638,8 +4571,8 @@ var Plottable;
                 return yStep;
             };
 
-            this.dataSelection.attr(attrToProjector);
-            this.dataSelection.exit().remove();
+            cells.attr(attrToProjector);
+            cells.exit().remove();
         };
         return GridRenderer;
     })(Plottable.XYRenderer);
@@ -4719,7 +4652,7 @@ var Plottable;
             var selectedBar = null;
 
             // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-            this.dataSelection.each(function (d) {
+            this._bars.each(function (d) {
                 var bbox = this.getBBox();
                 if (bbox.x <= x && x <= bbox.x + bbox.width && bbox.y <= y && y <= bbox.y + bbox.height) {
                     selectedBar = d3.select(this);
@@ -4738,7 +4671,7 @@ var Plottable;
         * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
         */
         AbstractBarRenderer.prototype.deselectAll = function () {
-            this.dataSelection.classed("selected", false);
+            this._bars.classed("selected", false);
             return this;
         };
         return AbstractBarRenderer;
@@ -4776,8 +4709,8 @@ var Plottable;
             _super.prototype._paint.call(this);
             var scaledBaseline = this.yScale.scale(this._baselineValue);
 
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            this.dataSelection.enter().append("rect");
+            this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+            this._bars.enter().append("rect");
 
             var attrToProjector = this._generateAttrToProjector();
 
@@ -4812,7 +4745,7 @@ var Plottable;
                 attrToProjector["height"] = function () {
                     return 0;
                 };
-                this.dataSelection.attr(attrToProjector);
+                this._bars.attr(attrToProjector);
             }
 
             attrToProjector["y"] = function (d, i) {
@@ -4826,10 +4759,10 @@ var Plottable;
             attrToProjector["height"] = heightFunction;
 
             if (attrToProjector["fill"] != null) {
-                this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
             }
 
-            var updateSelection = this.dataSelection;
+            var updateSelection = this._bars;
             if (this._animate) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
@@ -4838,7 +4771,7 @@ var Plottable;
             }
 
             updateSelection.attr(attrToProjector);
-            this.dataSelection.exit().remove();
+            this._bars.exit().remove();
 
             this._baseline.attr({
                 "x1": 0,
@@ -4899,8 +4832,8 @@ var Plottable;
         HorizontalBarRenderer.prototype._paint = function () {
             var _this = this;
             _super.prototype._paint.call(this);
-            this.dataSelection = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            this.dataSelection.enter().append("rect");
+            this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+            this._bars.enter().append("rect");
 
             var attrToProjector = this._generateAttrToProjector();
 
@@ -4938,7 +4871,7 @@ var Plottable;
                 attrToProjector["width"] = function () {
                     return 0;
                 };
-                this.dataSelection.attr(attrToProjector);
+                this._bars.attr(attrToProjector);
             }
 
             attrToProjector["x"] = function (d, i) {
@@ -4952,10 +4885,10 @@ var Plottable;
             attrToProjector["width"] = widthFunction; // actual SVG rect width
 
             if (attrToProjector["fill"] != null) {
-                this.dataSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
             }
 
-            var updateSelection = this.dataSelection;
+            var updateSelection = this._bars;
             if (this._animate) {
                 var n = this.dataSource().data().length;
                 updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
@@ -4964,7 +4897,7 @@ var Plottable;
             }
 
             updateSelection.attr(attrToProjector);
-            this.dataSelection.exit().remove();
+            this._bars.exit().remove();
 
             this._baseline.attr({
                 "x1": scaledBaseline,
@@ -5025,7 +4958,7 @@ var Plottable;
                 return "steelblue";
             }); // default
             this.project("stroke", function () {
-                return "steelblue";
+                return "none";
             }); // default
         }
         AreaRenderer.prototype._setup = function () {
@@ -5045,7 +4978,7 @@ var Plottable;
             delete attrToProjector["y0"];
             delete attrToProjector["y"];
 
-            this.dataSelection = this.areaPath.datum(this._dataSource.data());
+            this.areaPath.datum(this._dataSource.data());
             this.linePath.datum(this._dataSource.data());
             if (this._animate && this._dataChanged) {
                 var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
@@ -5054,20 +4987,55 @@ var Plottable;
                 this.linePath.attr("d", animationStartLine).attr(attrToProjector);
             }
 
-            this.area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+            var area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
             var areaUpdateSelection = this.areaPath;
             var lineUpdateSelection = this.linePath;
             if (this._animate) {
                 areaUpdateSelection = this.areaPath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
                 lineUpdateSelection = this.linePath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
             }
-            this.line = d3.svg.line().x(xFunction).y(yFunction);
-            areaUpdateSelection.attr("d", this.area).attr(attrToProjector);
-            lineUpdateSelection.attr("d", this.line).attr(attrToProjector);
+            var line = d3.svg.line().x(xFunction).y(yFunction);
+            areaUpdateSelection.attr("d", area).attr(attrToProjector);
+            lineUpdateSelection.attr("d", line).attr(attrToProjector);
         };
         return AreaRenderer;
     })(Plottable.XYRenderer);
     Plottable.AreaRenderer = AreaRenderer;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var LineRenderer = (function (_super) {
+        __extends(LineRenderer, _super);
+        /**
+        * Creates a LineRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        function LineRenderer(dataset, xScale, yScale) {
+            _super.call(this, dataset, xScale, yScale);
+            this._ANIMATION_DURATION = 600;
+            this.classed("line-renderer", true);
+            this.project("stroke", function () {
+                return "steelblue";
+            });
+            this.project("fill", function () {
+                return "none";
+            });
+        }
+        return LineRenderer;
+    })(Plottable.AreaRenderer);
+    Plottable.LineRenderer = LineRenderer;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

@@ -6,7 +6,7 @@ module Plottable {
   }
 
   export class ToggleLegend extends Legend {
-    private callback: ToggleCallback;
+    private _callback: ToggleCallback;
 
     // this is the set of all elements that are currently toggled off
     private isOff: D3.Set;
@@ -19,24 +19,30 @@ module Plottable {
      * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
      */
     constructor(colorScale: ColorScale, callback?: ToggleCallback) {
-      this.callback = callback;
+      this.callback(callback);
       this.isOff = d3.set(); // initially, everything is toggled on
       super(colorScale);
     }
 
     /**
-     * Assigns the callback to the ToggleLegend
+     * Assigns or gets the callback to the ToggleLegend
      * Call with argument of null to remove the callback
      * 
      * @param{ToggleCallback} callback The new callback function
      */
-    public setCallback(callback: ToggleCallback): ToggleLegend {
-      this.callback = callback;
-      return this;
+    public callback(callback: ToggleCallback): ToggleLegend;
+    public callback(): ToggleCallback;
+    public callback(callback?: ToggleCallback): any {
+      if (callback !== undefined) {
+        this._callback = callback;
+        return this;
+      } else {
+        return this;
+      }
     }
 
     /**
-     * Assigns a new ColorScale to the Legend.
+     * Assigns a new ColorScale to the ToggleLegend.
      *
      * @param {ColorScale} scale
      * @returns {ToggleLegend} The calling ToggleLegend.
@@ -68,8 +74,8 @@ module Plottable {
         } else {
           this.isOff.add(d);
         }
-        if (this.callback != null) {
-          this.callback(d, turningOn);
+        if (this._callback != null) {
+          this._callback(d, turningOn);
         }
         this.updateClasses();
       });
