@@ -53,10 +53,13 @@
       <br>
       <iframe id="FileFrame" src="about:blank"></iframe>
       <script type="text/javascript">
-      var doc = document.getElementById('FileFrame').contentWindow.document;
-      doc.open();
-      doc.write('<html><head><title></title></head><body>' + $("#test1html").text() + '</body></html>');
-      doc.close();
+        $.get( "http://jsfiddle.net/cmorford/5YZ9u/54/", function( data ) {
+          alert( "Data Loaded: " + data );
+        });
+        var doc = document.getElementById('FileFrame').contentWindow.document;
+        doc.open();
+        doc.write('<html><head><title></title></head><body>' + $("#test1html").text() + '</body></html>');
+        doc.close();
       </script>
     </td> 
   </tr>
