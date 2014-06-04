@@ -47,15 +47,7 @@
       </iframe>
     </td>
     <td>
-      <iframe id="FileFrame" src="about:blank" width="100%" height="800px"></iframe>
-      <script type="text/javascript">
-        var doc = document.getElementById('FileFrame').contentWindow.document;
-        doc.open();
-        $.get( "testing_docs/tableLayoutComplete.html", function( data ) {
-          doc.write(data);
-        });
-        doc.close();
-      </script>
+      <iframe width="100%" height="800px"></iframe>
     </td> 
   </tr>
   <tr>
@@ -92,3 +84,29 @@
 
 </body>
 </html>
+
+<script>
+  var Plottables = {};
+
+  function loadPlottable(branchName, callback) {
+  var url;
+  if (branchName != null) {
+  url = "https://rawgithub.com/palantir/plottable/" + branchName + "/plottable.js";
+  } else {
+  branchName = "#local";
+  url = "../plottable.js"; //load local version
+  }
+  
+  var element = document.createElement("script");
+  element.type = "text/javascript";
+  element.src = url;
+  element.id = branchName;
+  element.onload = function() {
+    console.log("loaded Plottable:" + branchName);
+    Plottables[branchName] = Plottable;
+        Plottable = null;
+        if (callback != null) callback()
+  }
+  document.head.appendChild(element);
+  }
+</script>
