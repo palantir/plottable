@@ -54,10 +54,10 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
 function assertBBoxInclusion(outerEl, innerEl) {
     var outerBox = outerEl.node().getBoundingClientRect();
     var innerBox = innerEl.node().getBoundingClientRect();
-    assert.operator(outerBox.left, "<=", innerBox.left + 0.5, "bounding rect left included");
-    assert.operator(outerBox.top, "<=", innerBox.top + 0.5, "bounding rect top included");
-    assert.operator(outerBox.right + 0.5, ">=", innerBox.right, "bounding rect right included");
-    assert.operator(outerBox.bottom + 0.5, ">=", innerBox.bottom, "bounding rect bottom included");
+    assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left), "bounding rect left included");
+    assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top), "bounding rect top included");
+    assert.operator(Math.ceil(outerBox.right), ">=", Math.floor(innerBox.right), "bounding rect right included");
+    assert.operator(Math.ceil(outerBox.bottom), ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
 }
 
 function assertXY(el, xExpected, yExpected, message) {

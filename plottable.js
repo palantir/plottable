@@ -3036,7 +3036,7 @@ var Plottable;
             var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
             var isInsideBBox = function (tickBox) {
-                return (boundingBox.left <= tickBox.left && boundingBox.top <= tickBox.top && tickBox.right <= boundingBox.left + _this.availableWidth && tickBox.bottom <= boundingBox.top + _this.availableHeight);
+                return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
             };
 
             tickLabels.each(function (d) {
