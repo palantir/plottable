@@ -1,0 +1,98 @@
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://palantir.github.io/plottable/plottable.js"></script>
+  <script src="http://palantir.github.io/plottable/examples/exampleUtil.js"></script>
+  <link rel="stylesheet" type="text/css" href="plottable.css">
+
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
+
+  <style>
+    .example {
+
+    }
+    .source, .output {
+      display: inline-block;
+      vertical-align: top
+    }
+    code {
+      font-size: 8pt;
+    }
+    .fiddle-link {
+      font-size: 12pt;
+    }
+    .prettyprint {
+      padding: 5px;
+    }
+  </style>
+
+  <title>Plottable.js: Examples</title>
+</head>
+
+<body>
+<table style="width:100%">
+  <tr>
+    <th>Master</th>
+    <th>
+      <form>
+        Feature Branch: <input type="text" name="featureBranch"><br>
+      </form>
+    </th> 
+  </tr>
+  <tr>
+    <td>
+      <iframe width="100%" height="800px"
+        src="http://jsfiddle.net/cmorford/5YZ9u/187/embedded/result,js">
+      </iframe>
+    </td>
+    <td>
+      <textarea id="test1html">
+        Hello World
+      </textarea>
+      <br>
+      <iframe id="FileFrame" src="about:blank"></iframe>
+      <script type="text/javascript">
+        var doc = document.getElementById('FileFrame').contentWindow.document;
+        doc.open();
+        $.get( "quicktests/areaRenderer-quicktest.html", function( data ) {
+          doc.write(data);
+        });
+        doc.close();
+      </script>
+    </td> 
+  </tr>
+  <tr>
+    <td>
+      <iframe width="100%" height="800px"
+        src="http://jsfiddle.net/cmorford/5YZ9u/185/embedded/result,js">
+      </iframe>
+    </td>
+    <td>
+      <iframe width="100%" height="800px"></iframe>
+    </td> 
+  </tr>
+  <tr>
+    <td>
+      <iframe width="100%" height="800px"
+        src="http://jsfiddle.net/cmorford/5YZ9u/181/embedded/result,js">
+      </iframe>
+    </td>
+    <td>
+      <iframe width="100%" height="800px"></iframe>
+    </td> 
+  </tr>
+  <tr>
+    <td>
+      <iframe width="100%" height="800px"
+        src="http://jsfiddle.net/cmorford/5YZ9u/198/embedded/result,js">
+      </iframe>
+    </td>
+    <td>
+      <iframe width="100%" height="800px"></iframe>
+    </td> 
+  </tr>
+  </table>
+
+</body>
+</html>
