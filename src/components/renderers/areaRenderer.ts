@@ -19,7 +19,7 @@ module Plottable {
       this.classed("area-renderer", true);
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
-      this.project("stroke", () => "steelblue"); // default
+      this.project("stroke", () => "none"); // default
     }
 
     public _setup() {

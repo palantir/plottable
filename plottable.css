@@ -68,12 +68,6 @@ svg.plottable {
   font-size: 14pt;
 }
 
-.plottable .line-renderer .line {
-  fill: none;
-  stroke-width: 2px;
-  vector-effect: non-scaling-stroke;
-}
-
 .plottable .area-renderer path.area {
   stroke: none;
   fill-opacity: 0.5;
