@@ -97,10 +97,12 @@ export module Axis {
       var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
       var isInsideBBox = (tickBox: ClientRect) => {
-        return (boundingBox.left <= tickBox.left &&
-                boundingBox.top  <= tickBox.top  &&
-                tickBox.right  <= boundingBox.left + this.availableWidth &&
-                tickBox.bottom <= boundingBox.top  + this.availableHeight);
+        return (
+          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
+          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+        );
       };
 
       tickLabels.each(function (d: any){
