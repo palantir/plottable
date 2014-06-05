@@ -1184,6 +1184,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+<<<<<<< HEAD
     module Plot {
         class Scatter extends Abstract.XYPlot {
             /**
@@ -1217,6 +1218,44 @@ declare module Plottable {
             constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale);
             public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Grid;
         }
+||||||| merged common ancestors
+    class LineRenderer extends XYRenderer {
+        /**
+        * Creates a LineRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
+    }
+}
+
+
+declare module Plottable {
+    class RectRenderer extends XYRenderer {
+        /**
+        * Creates a RectRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
+=======
+    class RectRenderer extends XYRenderer {
+        /**
+        * Creates a RectRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
+>>>>>>> master
     }
 }
 
@@ -1350,6 +1389,7 @@ declare module Plottable {
 
 
 declare module Plottable {
+<<<<<<< HEAD
     module Singleton {
         interface IKeyEventListenerCallback {
             (e: D3.Event): any;
@@ -1358,6 +1398,36 @@ declare module Plottable {
             static initialize(): void;
             static addCallback(keyCode: number, cb: IKeyEventListenerCallback): void;
         }
+||||||| merged common ancestors
+    interface IKeyEventListenerCallback {
+        (e: D3.Event): any;
+    }
+    class KeyEventListener {
+        static initialize(): void;
+        static addCallback(keyCode: number, cb: IKeyEventListenerCallback): void;
+=======
+    class LineRenderer extends AreaRenderer {
+        /**
+        * Creates a LineRenderer.
+        *
+        * @constructor
+        * @param {IDataset} dataset The dataset to render.
+        * @param {Scale} xScale The x scale to use.
+        * @param {Scale} yScale The y scale to use.
+        */
+        constructor(dataset: any, xScale: Scale, yScale: Scale);
+    }
+}
+
+
+declare module Plottable {
+    interface IKeyEventListenerCallback {
+        (e: D3.Event): any;
+    }
+    class KeyEventListener {
+        static initialize(): void;
+        static addCallback(keyCode: number, cb: IKeyEventListenerCallback): void;
+>>>>>>> master
     }
 }
 
