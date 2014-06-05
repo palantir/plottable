@@ -104,7 +104,7 @@ function commitDashboard(dataManager, svg) {
   var contributorBarXAxis = new Plottable.Axis.XAxis(contributorBarXScale, "bottom", function(d) { return d});
   var contributorBarYAxis = new Plottable.Axis.YAxis(contributorBarYScale, "right").showEndTickLabels(true);
   contributorBarXAxis.classed("no-tick-labels", true);
-  var contributorBarRenderer = new Plottable.Plot.Bar(linesByContributor,
+  var contributorBarRenderer = new Plottable.Plot.VerticalBar(linesByContributor,
                                                                  contributorBarXScale,
                                                                  contributorBarYScale);
   contributorBarRenderer.project("width", 40)
@@ -122,7 +122,7 @@ function commitDashboard(dataManager, svg) {
   var directoryBarXScale = new Plottable.Scale.Ordinal().domain(dataManager.directories).rangeType('bands');
   var directoryBarXAxis = new Plottable.Axis.XAxis(directoryBarXScale, "bottom", function(d) { return d});
   directoryBarXAxis.classed("no-tick-labels", true);
-  var directoryBarRenderer = new Plottable.Plot.Bar(linesByDirectory,
+  var directoryBarRenderer = new Plottable.Plot.VerticalBar(linesByDirectory,
                                                                directoryBarXScale,
                                                                directoryBarYScale);
   directoryBarRenderer.project("width", 40)

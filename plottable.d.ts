@@ -1269,7 +1269,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Bar extends Abstract.BarPlot {
+        class VerticalBar extends Abstract.BarPlot {
             /**
             * Creates a BarRenderer.
             *
@@ -1285,7 +1285,7 @@ declare module Plottable {
             * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
             * @return {BarRenderer} The calling BarRenderer.
             */
-            public barAlignment(alignment: string): Bar;
+            public barAlignment(alignment: string): VerticalBar;
         }
     }
 }

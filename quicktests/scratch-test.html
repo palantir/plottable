@@ -90,7 +90,7 @@ window.onload = function () {
     xAxis2 = new Plottable.Axis.Category(xScale2, "top");
     yAxis2 = new Plottable.Axis.YAxis(yScale2, "right");
     //rendering
-    renderArea2 = new Plottable.Plot.Bar(dataseries2, xScale2, yScale2);
+    renderArea2 = new Plottable.Plot.VerticalBar(dataseries2, xScale2, yScale2);
     basicTable2 = new Plottable.Component.Table()
                 .addComponent(1, 1, yAxis2)
                 .addComponent(1, 0, renderArea2)

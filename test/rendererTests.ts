@@ -353,7 +353,7 @@ describe("Renderers", () => {
       var dataset: Plottable.DataSource;
       var xScale: Plottable.Scale.Ordinal;
       var yScale: Plottable.Scale.Linear;
-      var renderer: Plottable.Plot.Bar;
+      var renderer: Plottable.Plot.VerticalBar;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
@@ -368,7 +368,7 @@ describe("Renderers", () => {
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.Plot.Bar(dataset, xScale, yScale);
+        renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
         renderer.animate(false);
         renderer.renderTo(svg);
       });

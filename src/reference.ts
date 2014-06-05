@@ -37,7 +37,7 @@
 /// <reference path="components/axisUtils.ts" />
 
 /// <reference path="components/plots/xyPlot.ts" />
-/// <reference path="components/plots/circlePlot.ts" />
+/// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
 /// <reference path="components/plots/abstractBarPlot.ts" />
 /// <reference path="components/plots/verticalBarPlot.ts" />

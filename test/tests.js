@@ -2572,7 +2572,7 @@ describe("Renderers", function () {
                 ];
                 dataset = new Plottable.DataSource(data);
 
-                renderer = new Plottable.Plot.Bar(dataset, xScale, yScale);
+                renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
                 renderer.animate(false);
                 renderer.renderTo(svg);
             });

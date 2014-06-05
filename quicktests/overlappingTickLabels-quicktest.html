@@ -31,7 +31,7 @@
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
       yAxis.showEndTickLabels(true);
 
-      var barRenderer = new Plottable.Plot.Bar(ds, xScale, yScale)
+      var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
                               .project("x", "name", xScale)
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"; })

@@ -4676,8 +4676,8 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
-        var Bar = (function (_super) {
-            __extends(Bar, _super);
+        var VerticalBar = (function (_super) {
+            __extends(VerticalBar, _super);
             /**
             * Creates a BarRenderer.
             *
@@ -4686,13 +4686,13 @@ var Plottable;
             * @param {Scale} xScale The x scale to use.
             * @param {QuantitiveScale} yScale The y scale to use.
             */
-            function Bar(dataset, xScale, yScale) {
+            function VerticalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._barAlignment = "left";
                 this._ANIMATION_DURATION = 300;
                 this._ANIMATION_DELAY = 15;
             }
-            Bar.prototype._paint = function () {
+            VerticalBar.prototype._paint = function () {
                 var _this = this;
                 _super.prototype._paint.call(this);
                 var scaledBaseline = this.yScale.scale(this._baselineValue);
@@ -4775,7 +4775,7 @@ var Plottable;
             * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
             * @return {BarRenderer} The calling BarRenderer.
             */
-            Bar.prototype.barAlignment = function (alignment) {
+            VerticalBar.prototype.barAlignment = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
                 if (alignmentLC !== "left" && alignmentLC !== "center" && alignmentLC !== "right") {
                     throw new Error("unsupported bar alignment");
@@ -4787,9 +4787,9 @@ var Plottable;
                 }
                 return this;
             };
-            return Bar;
+            return VerticalBar;
         })(Plottable.Abstract.BarPlot);
-        Plot.Bar = Bar;
+        Plot.VerticalBar = VerticalBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));

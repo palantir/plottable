@@ -56,7 +56,7 @@
         var yAxis = new Plottable.Axis.YAxis(yScale, "left");
         yAxis.showEndTickLabels(true);
 
-        barRenderer = new Plottable.Plot.Bar(barDataSource, xScale, yScale)
+        barRenderer = new Plottable.Plot.VerticalBar(barDataSource, xScale, yScale)
                                 .project("fill", function() {return "steelblue"});
         barRenderer.animate(doAnimate);
         var barChart = new Plottable.Component.Table([[yAxis, barRenderer],
