@@ -4,7 +4,7 @@ module Plottable {
   export interface HoverCallback {
     (datum?: any): any;
   }
-  export class HoverLegend extends Legend {
+  export class HoverLegend extends Component.Legend {
     private _callback: HoverCallback;
 
     // focus is the element currently being hovered over
@@ -15,10 +15,10 @@ module Plottable {
      * Creates a HoverLegend.
      *
      * @constructor
-     * @param {ColorScale} colorScale
+     * @param {Scale.Color} colorScale
      * @param {HoverCallback} callback The callback function for hovering over a legend entry.
      */
-    constructor(colorScale: ColorScale, callback?: HoverCallback) {
+    constructor(colorScale: Scale.Color, callback?: HoverCallback) {
       super(colorScale);
       this.callback(callback);
       this._callback = callback;
@@ -44,7 +44,7 @@ module Plottable {
     public _doRender(): HoverLegend {
       super._doRender();
       this.updateClasses();
-      var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
+      var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
       var func = (b: boolean) => (d: any, i: number) => {
         this.focus = b ? d : undefined;
         if (this._callback != null) {
@@ -59,7 +59,7 @@ module Plottable {
 
     private updateClasses() {
       if (this._isSetup) {
-        var dataSelection = this.content.selectAll("." + Legend._SUBELEMENT_CLASS);
+        var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
         // don't attach any classes if nothing is focused
         // this is so users can do something for things not focused (i.e. fading), or focused (i.e. highlighting)
         dataSelection.classed("focus", (d: any) => this.focus !== undefined ? this.focus === d : false);

@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class ClickInteraction extends Interaction {
+export module Interaction {
+  export class Click extends Abstract.Interaction {
     private _callback: (x: number, y: number) => any;
 
     /**
@@ -10,7 +11,7 @@ module Plottable {
      * @constructor
      * @param {Component} componentToListenTo The component to listen for clicks on.
      */
-    constructor(componentToListenTo: Component) {
+    constructor(componentToListenTo: Abstract.Component) {
       super(componentToListenTo);
     }
 
@@ -29,9 +30,10 @@ module Plottable {
      *
      * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
      */
-    public callback(cb: (x: number, y: number) => any): ClickInteraction {
+    public callback(cb: (x: number, y: number) => any): Click {
       this._callback = cb;
       return this;
     }
   }
+}
 }

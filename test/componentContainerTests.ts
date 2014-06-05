@@ -6,10 +6,10 @@ var assert = chai.assert;
 describe("ComponentContainer", () => {
 
   it("_addComponent()", () => {
-    var container = new Plottable.ComponentContainer();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
-    var c3 = new Plottable.Component();
+    var container = new Plottable.Abstract.ComponentContainer();
+    var c1 = new Plottable.Abstract.Component();
+    var c2 = new Plottable.Abstract.Component();
+    var c3 = new Plottable.Abstract.Component();
 
     assert.isTrue(container._addComponent(c1), "returns true on successful adding");
     assert.deepEqual(container.components(), [c1], "component was added");
@@ -28,9 +28,9 @@ describe("ComponentContainer", () => {
   });
 
   it("_removeComponent()", () => {
-    var container = new Plottable.ComponentContainer();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
+    var container = new Plottable.Abstract.ComponentContainer();
+    var c1 = new Plottable.Abstract.Component();
+    var c2 = new Plottable.Abstract.Component();
     container._addComponent(c1);
     container._addComponent(c2);
 
@@ -43,17 +43,17 @@ describe("ComponentContainer", () => {
   });
 
   it("empty()", () => {
-    var container = new Plottable.ComponentContainer();
+    var container = new Plottable.Abstract.ComponentContainer();
     assert.isTrue(container.empty());
-    var c1 = new Plottable.Component();
+    var c1 = new Plottable.Abstract.Component();
     container._addComponent(c1);
     assert.isFalse(container.empty());
   });
 
   it("removeAll()", () => {
-    var container = new Plottable.ComponentContainer();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
+    var container = new Plottable.Abstract.ComponentContainer();
+    var c1 = new Plottable.Abstract.Component();
+    var c2 = new Plottable.Abstract.Component();
     container._addComponent(c1);
     container._addComponent(c2);
     container.removeAll();
@@ -62,9 +62,9 @@ describe("ComponentContainer", () => {
   });
 
   it("components() returns a shallow copy", () => {
-    var container = new Plottable.ComponentContainer();
-    var c1 = new Plottable.Component();
-    var c2 = new Plottable.Component();
+    var container = new Plottable.Abstract.ComponentContainer();
+    var c1 = new Plottable.Abstract.Component();
+    var c2 = new Plottable.Abstract.Component();
     container._addComponent(c1);
     container._addComponent(c2);
 

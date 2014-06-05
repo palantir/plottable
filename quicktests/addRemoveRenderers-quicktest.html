@@ -10,65 +10,65 @@
       var renderers = [];
 
 
-      var colors = new Plottable.ColorScale("20").range();
+      var colors = new Plottable.Scale.Color("20").range();
 
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
-      var numRenderers = 4;
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      var numPlots = 4;
 
-      for (var i=0; i<numRenderers; i++) {
+      for (var i=0; i<numPlots; i++) {
         var data = makeRandomData(20);
-        var renderer = new Plottable.LineRenderer(data, xScale, yScale).animate(true);
+        var renderer = new Plottable.Plot.Line(data, xScale, yScale).animate(true);
         renderers.push(renderer);
       }
 
-      var cg = new Plottable.ComponentGroup();
+      var cg = new Plottable.Component.Group();
 
       renderers.forEach(function(renderer, i) {
         renderer.project("stroke", function() { return colors[i]; });
         cg.merge(renderer);
       })
 
-      var xAxis = new Plottable.XAxis(xScale, "bottom");
-      var yAxis = new Plottable.YAxis(yScale, "left");
+      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-      var chart = new Plottable.Table([
+      var chart = new Plottable.Component.Table([
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
 
       window.onload = function() {
         chart.renderTo("#chart");
-        var pzi = new Plottable.PanZoomInteraction(cg, xScale, yScale);
+        var pzi = new Plottable.Interaction.PanZoom(cg, xScale, yScale);
         pzi.registerWithComponent();
 
       }
 
-      function removeRenderer() {
-        if (numRenderers > 0) {
-          (renderers[numRenderers - 1]).remove();
-          numRenderers--;
+      function removePlot() {
+        if (numPlots > 0) {
+          (renderers[numPlots - 1]).remove();
+          numPlots--;
         }
       }
 
-      function addRenderer() {
-        if (numRenderers >= renderers.length) {
+      function addPlot() {
+        if (numPlots >= renderers.length) {
           var data = makeRandomData(20);
-          var renderer = new Plottable.LineRenderer(data, xScale, yScale).animate(true);
-          var nextColor = colors[numRenderers]
+          var renderer = new Plottable.Plot.Line(data, xScale, yScale).animate(true);
+          var nextColor = colors[numPlots]
           renderer.project("stroke", function() { return nextColor; });
           renderers.push(renderer);
         }
-        cg.merge(renderers[numRenderers]);
-        numRenderers++;
+        cg.merge(renderers[numPlots]);
+        numPlots++;
       }
     </script>
   </head>
   <body>
     <svg id="chart" width="480" height="320"></svg>
     <p />
-    <button name="remove" onclick="removeRenderer()">Remove</button>
-    <button name="add" onclick="addRenderer()">Add</button>
+    <button name="remove" onclick="removePlot()">Remove</button>
+    <button name="add" onclick="addPlot()">Add</button>
   </body>
 
 </html>

@@ -3,12 +3,12 @@
 var assert = chai.assert;
 
 describe("Broadcasters", () => {
-  var b: Plottable.Broadcaster;
+  var b: Plottable.Abstract.Broadcaster;
   var called: boolean;
   var cb: any;
 
   beforeEach(() => {
-    b = new Plottable.Broadcaster();
+    b = new Plottable.Abstract.Broadcaster();
     called = false;
     cb = () => {called = true;};
   });
@@ -40,7 +40,7 @@ describe("Broadcasters", () => {
   it("arguments are passed through to callback", () => {
     var g2 = {};
     var g3 = "foo";
-    var cb = (a1: Plottable.Broadcaster, rest: any[]) => {
+    var cb = (a1: Plottable.Abstract.Broadcaster, rest: any[]) => {
       assert.equal(b, a1, "broadcaster passed through");
       assert.equal(g2, rest[0], "arg1 passed through");
       assert.equal(g3, rest[1], "arg2 passed through");

@@ -30,7 +30,7 @@ module Plottable {
   }
 
   export interface IBroadcasterCallback {
-    (broadcaster: Broadcaster, ...args: any[]): any;
+    (broadcaster: Abstract.Broadcaster, ...args: any[]): any;
   }
 
   export interface ISpaceRequest {

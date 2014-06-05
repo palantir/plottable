@@ -15,13 +15,13 @@ var data = [
 
 
 window.onload = function () {
-    xScale = new Plottable.TimeScale();
-    yScale = new Plottable.LinearScale();
-    lineRenderer = new Plottable.LineRenderer(data, xScale, yScale)
+    xScale = new Plottable.Scale.Time();
+    yScale = new Plottable.Scale.Linear();
+    linePlot = new Plottable.Plot.Line(data, xScale, yScale)
                                 .project("x", function (d) { return d3.time.format("%x").parse(d.x)});
-    xAxis = new Plottable.XAxis(xScale);
-    yAxis = new Plottable.YAxis(yScale);
-    new Plottable.StandardChart().center(lineRenderer).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
+    xAxis = new Plottable.Axis.XAxis(xScale);
+    yAxis = new Plottable.Axis.YAxis(yScale);
+    new Plottable.Template.StandardChart().center(linePlot).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
 
 
 };

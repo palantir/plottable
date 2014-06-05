@@ -3,7 +3,8 @@
 // This file contains open source utilities, along with their copyright notices
 
 module Plottable {
-  export module OSUtils {
+export module Util {
+  export module OpenSource {
     /**
      * Returns the sortedIndex for inserting a value into an array.
      * Takes a number and an array of numbers OR an array of objects and an accessor that returns a number.
@@ -59,4 +60,5 @@ module Plottable {
       return low;
     };
   }
+}
 }
