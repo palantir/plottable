@@ -413,7 +413,7 @@ declare module Plottable {
     module Component {
         class Group extends Abstract.ComponentContainer {
             /**
-            * Creates a Group.
+            * Creates a ComponentGroup.
             *
             * @constructor
             * @param {Component[]} [components] The Components in the Group.
@@ -1187,7 +1187,7 @@ declare module Plottable {
     module Plot {
         class Scatter extends Abstract.XYPlot {
             /**
-            * Creates a CirclePlot.
+            * Creates a ScatterPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1271,7 +1271,7 @@ declare module Plottable {
     module Plot {
         class VerticalBar extends Abstract.BarPlot {
             /**
-            * Creates a BarPlot.
+            * Creates a VerticalBarPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.

@@ -1,5 +1,5 @@
 /*!
-Plottable 0.14.2 (https://github.com/palantir/plottable)
+Plottable 0.15.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -117,7 +117,7 @@ var Plottable;
 (function (Plottable) {
     (function (Util) {
         (function (OpenSource) {
-
+            
 
             function sortedIndex(val, arr, accessor) {
                 var low = 0;
@@ -1501,7 +1501,7 @@ var Plottable;
         var Group = (function (_super) {
             __extends(Group, _super);
             /**
-            * Creates a Group.
+            * Creates a ComponentGroup.
             *
             * @constructor
             * @param {Component[]} [components] The Components in the Group.
@@ -3109,7 +3109,7 @@ var Plottable;
                 var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
                 var isInsideBBox = function (tickBox) {
-                    return (boundingBox.left <= tickBox.left && boundingBox.top <= tickBox.top && tickBox.right <= boundingBox.left + _this.availableWidth && tickBox.bottom <= boundingBox.top + _this.availableHeight);
+                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
                 };
 
                 tickLabels.each(function (d) {
@@ -3118,15 +3118,7 @@ var Plottable;
                     }
                 });
 
-<<<<<<< HEAD
                 return this;
-||||||| merged common ancestors
-            var isInsideBBox = function (tickBox) {
-                return (boundingBox.left <= tickBox.left && boundingBox.top <= tickBox.top && tickBox.right <= boundingBox.left + _this.availableWidth && tickBox.bottom <= boundingBox.top + _this.availableHeight);
-=======
-            var isInsideBBox = function (tickBox) {
-                return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
->>>>>>> master
             };
 
             Axis.prototype._hideOverlappingTickLabels = function () {
@@ -4443,7 +4435,7 @@ var Plottable;
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
-            * Creates a CirclePlot.
+            * Creates a ScatterPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -4687,7 +4679,7 @@ var Plottable;
         var VerticalBar = (function (_super) {
             __extends(VerticalBar, _super);
             /**
-            * Creates a BarPlot.
+            * Creates a VerticalBarPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
