@@ -6,28 +6,28 @@ function makeChartWithLabels() {
   var lineYScale = new Plottable.Scale.Linear();
   var lineYAxis = new Plottable.Axis.YAxis(lineYScale, "left");
   var commitsLabel = new Plottable.Component.Label("Commits", "vertical-left");
-  var lineRenderer = new Plottable.Plot.Line(gitData, xScale, lineYScale);
+  var linePlot = new Plottable.Plot.Line(gitData, xScale, lineYScale);
 
   var circleYScale = new Plottable.Scale.Linear();
   var circleYAxis = new Plottable.Axis.YAxis(circleYScale, "left");
   var sizeLabel = new Plottable.Component.Label("Net Lines", "vertical-left");
-  var circleRenderer = new Plottable.Plot.Scatter(gitData, xScale, circleYScale);
+  var circlePlot = new Plottable.Plot.Scatter(gitData, xScale, circleYScale);
 
   function getDayValue(d) {
     return d.day;
   }
-  lineRenderer.project("x", getDayValue, xScale);
-  circleRenderer.project("x", getDayValue, xScale);
+  linePlot.project("x", getDayValue, xScale);
+  circlePlot.project("x", getDayValue, xScale);
 
   function getTotalCommits(d) {
     return d.total_commits;
   }
-  lineRenderer.project("y", getTotalCommits, lineYScale);
+  linePlot.project("y", getTotalCommits, lineYScale);
 
   function getNetCommitSize(d) {
     return d.additions - d.deletions;
   }
-  circleRenderer.project("y", getNetCommitSize, circleYScale);
+  circlePlot.project("y", getNetCommitSize, circleYScale);
 
   var xAxisTable = new Plottable.Component.Table([
                           [xAxis],
@@ -43,8 +43,8 @@ function makeChartWithLabels() {
                              ]);
 
   var chart = new Plottable.Component.Table([
-                    [commitsAxisTable,   lineRenderer  ],
-                    [netLinesAxisTable,  circleRenderer],
+                    [commitsAxisTable,   linePlot  ],
+                    [netLinesAxisTable,  circlePlot],
                     [null,               xAxisTable    ]
                   ]);
 

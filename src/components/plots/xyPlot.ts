@@ -9,7 +9,7 @@ export module Abstract {
     public _yAccessor: any;
 
     /**
-     * Creates an XYRenderer.
+     * Creates an XYPlot.
      *
      * @constructor
      * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.

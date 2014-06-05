@@ -118,7 +118,7 @@
       <h2>What is Plottable?</h2>
       <p>
         Plottable.js is a library for data visualization and charting, under development by Palantir Technologies.
-        Plottable is built on D3 and provides higher-level components like a CircleRenderer, Legend, and TitleLabel. These components are
+        Plottable is built on D3 and provides higher-level components like a CirclePlot, Legend, and TitleLabel. These components are
         bundled with a layout engine that can position them in complex arrangements and size them. Plottable is flexible, pluggable, performant, and interactive.
       </p>
       <p>
@@ -141,7 +141,7 @@
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();
 
-  // The Axes and LineRenderer are all Components, meaning they take up visual space and are placed by the layout engine
+  // The Axes and LinePlot are all Components, meaning they take up visual space and are placed by the layout engine
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", d3.format("d"));
   var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
@@ -162,7 +162,7 @@
     <br><br><h2>Powerful</h2>
     <p>
     We've also designed Plottable to be highly flexible and customizable. Plottable renderers are agonstic to the way data is structured,
-    and support setting arbitrary SVG attributes based on functions and scales they are given. In the example below, we have a CircleRenderer that
+    and support setting arbitrary SVG attributes based on functions and scales they are given. In the example below, we have a CirclePlot that
     uses an accessor function to compute some derived attributes from the data on-the-fly, and uses that data to set the fill on the circles.
   </p>
       <div class="svg-container"><svg id="customProjectors" width="100%"></svg></div>
@@ -233,14 +233,14 @@
   // A DataSource is a Plottable object that maintains data and metadata, and updates dependents when it changes
   // In the previous example, we implicitly created a DataSource by putting the data directly into the Renderer constructor
   var gitDataSource   = new Plottable.DataSource(data);
-  var commitsRenderer = new Plottable.Plot.Line(gitDataSource, xScale, yScaleCommits);
-  var locRenderer     = new Plottable.Plot.Area(gitDataSource, xScale, yScaleLOC);
+  var commitsPlot = new Plottable.Plot.Line(gitDataSource, xScale, yScaleCommits);
+  var locPlot     = new Plottable.Plot.Area(gitDataSource, xScale, yScaleLOC);
 
-  commitsRenderer.project("x", "day_delta", xScale);
-  locRenderer    .project("x", "day_delta", xScale);
+  commitsPlot.project("x", "day_delta", xScale);
+  locPlot    .project("x", "day_delta", xScale);
 
-  commitsRenderer.project("y", "commit_number", yScaleCommits);
-  locRenderer    .project("y", "lines_of_code", yScaleLOC);
+  commitsPlot.project("y", "commit_number", yScaleCommits);
+  locPlot    .project("y", "lines_of_code", yScaleLOC);
 
   var commitsTitle = new Plottable.Component.TitleLabel("# of Commits Over Time");
   var locTitle     = new Plottable.Component.TitleLabel("# of Lines Of Code Over Time");
@@ -255,9 +255,9 @@
   // or set proportional "weights" on each column.
   var chart = new Plottable.Component.Table([
                     [null        , commitsTitle   , null        ],
-                    [yAxisCommits, commitsRenderer, null        ],
+                    [yAxisCommits, commitsPlot, null        ],
                     [null        , locTitle       , null        ],
-                    [null        , locRenderer    , yAxisLOC    ],
+                    [null        , locPlot    , yAxisLOC    ],
                     [null        , xAxis          , null        ]
                   ]);
 
@@ -268,7 +268,7 @@
       <br><br><h2>Pluggable</h2>
       <p>
         Plottable consists of a small core architecture and a large set of lightweight plugins. In the example below, almost everything is
-        a plugin: the CircleRenderer, the Gridlines, the Legend, and the DragBoxInteraction. Adding a new Component or Interaction - say, a DragBox that
+        a plugin: the CirclePlot, the Gridlines, the Legend, and the DragBoxInteraction. Adding a new Component or Interaction - say, a DragBox that
         can be dragged and repositioned after it is created - would only be 10-20 lines of Typescript code. </p>
       <p>
         The chart below is interactive - try dragging out a box on it, or double-click to reset.
@@ -280,7 +280,7 @@
   var yScale = new Plottable.Scale.Log().domain([0.9, 100000]);
   var colorScale = new Plottable.Scale.Color("category10");
 
-  // The Axes and LineRenderer are all Components,
+  // The Axes and LinePlot are all Components,
   // meaning they take up visual space and are placed by the layout engine
   var xAxis  = new Plottable.Axis.XAxis(xScale, "bottom", d3.format("%"));
   var yAxis  = new Plottable.Axis.YAxis(yScale, "left");

@@ -5,7 +5,7 @@ function makeBasicChart() {
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();
 
-  // The Axes and LineRenderer are all Components, meaning they take up visual space and are placed by the layout engine
+  // The Axes and LinePlot are all Components, meaning they take up visual space and are placed by the layout engine
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
   var yAxis = new Plottable.Axis.YAxis(yScale, "left");
   var renderer = new Plottable.Plot.Line(xyData, xScale, yScale);

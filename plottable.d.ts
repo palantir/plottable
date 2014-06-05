@@ -1169,7 +1169,7 @@ declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
             /**
-            * Creates an XYRenderer.
+            * Creates an XYPlot.
             *
             * @constructor
             * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
@@ -1187,7 +1187,7 @@ declare module Plottable {
     module Plot {
         class Scatter extends Abstract.XYPlot {
             /**
-            * Creates a CircleRenderer.
+            * Creates a CirclePlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1205,7 +1205,7 @@ declare module Plottable {
     module Plot {
         class Grid extends Abstract.XYPlot {
             /**
-            * Creates a GridRenderer.
+            * Creates a GridPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1225,7 +1225,7 @@ declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
             /**
-            * Creates an AbstractBarRenderer.
+            * Creates an AbstractBarPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1237,7 +1237,7 @@ declare module Plottable {
             * Sets the baseline for the bars to the specified value.
             *
             * @param {number} value The value to position the baseline at.
-            * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+            * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             public baseline(value: number): BarPlot;
             /**
@@ -1245,7 +1245,7 @@ declare module Plottable {
             * Behavior depends on subclass implementation.
             *
             * @param {string} alignment The desired alignment.
-            * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+            * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             public barAlignment(alignment: string): BarPlot;
             /**
@@ -1259,7 +1259,7 @@ declare module Plottable {
             public selectBar(x: number, y: number, select?: boolean): D3.Selection;
             /**
             * Deselects all bars.
-            * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+            * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             public deselectAll(): BarPlot;
         }
@@ -1271,7 +1271,7 @@ declare module Plottable {
     module Plot {
         class VerticalBar extends Abstract.BarPlot {
             /**
-            * Creates a BarRenderer.
+            * Creates a BarPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1283,7 +1283,7 @@ declare module Plottable {
             * Sets the horizontal alignment of the bars.
             *
             * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
-            * @return {BarRenderer} The calling BarRenderer.
+            * @return {BarPlot} The calling BarPlot.
             */
             public barAlignment(alignment: string): VerticalBar;
         }
@@ -1295,7 +1295,7 @@ declare module Plottable {
     module Plot {
         class HorizontalBar extends Abstract.BarPlot {
             /**
-            * Creates a HorizontalBarRenderer.
+            * Creates a HorizontalBarPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1307,7 +1307,7 @@ declare module Plottable {
             * Sets the vertical alignment of the bars.
             *
             * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
-            * @return {HorizontalBarRenderer} The calling HorizontalBarRenderer.
+            * @return {HorizontalBarPlot} The calling HorizontalBarPlot.
             */
             public barAlignment(alignment: string): HorizontalBar;
         }
@@ -1319,7 +1319,7 @@ declare module Plottable {
     module Plot {
         class Area extends Abstract.XYPlot {
             /**
-            * Creates an AreaRenderer.
+            * Creates an AreaPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1336,7 +1336,7 @@ declare module Plottable {
     module Plot {
         class Line extends Area {
             /**
-            * Creates a LineRenderer.
+            * Creates a LinePlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.

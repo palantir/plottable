@@ -45,15 +45,15 @@ function commitDashboard(dataManager, svg) {
           .range([2, 12]);
   function radiusAccessor(d) { return rScale.scale(linesAddedAccessor(d)); }
 
-  var scatterRenderer = new Plottable.Plot.Scatter(commits, timeScale, scatterYScale)
+  var scatterPlot = new Plottable.Plot.Scatter(commits, timeScale, scatterYScale)
                .project("x", "date")
                .project("y", hourAccessor)
                .project("r", linesAddedAccessor, rScale)
                .project("fill", "name", contributorColorScale);
-  window.scatterRenderer = scatterRenderer;
+  window.scatterPlot = scatterPlot;
 
   var scatterGridlines = new Plottable.Component.Gridlines(timeScale, scatterYScale);
-  var scatterRenderArea = scatterGridlines.merge(scatterRenderer);
+  var scatterRenderArea = scatterGridlines.merge(scatterPlot);
   // ----- /Scatterplot -----
 
   // ---- Timeseries -----
@@ -65,22 +65,22 @@ function commitDashboard(dataManager, svg) {
   tscDateAxis.tickFormat(formatter);
 
   var tscRenderArea = new Plottable.Component.Gridlines(timeScale, tscYScale);
-  var tscRenderers = {};
+  var tscPlots = {};
   dataManager.directories.forEach(function(dir) {
     var timeSeries = directoryTimeSeries[dir];
-    var lineRenderer = new Plottable.Plot.Line(timeSeries, timeScale, tscYScale);
-    lineRenderer.project("x", function(d) { return d[0]; })
+    var linePlot = new Plottable.Plot.Line(timeSeries, timeScale, tscYScale);
+    linePlot.project("x", function(d) { return d[0]; })
                 .project("y", function(d) { return d[1]; })
                 .project("stroke", function() {return dir}, directoryColorScale);
-    lineRenderer.classed(dir, true);
-    tscRenderers[dir] = lineRenderer;
-    tscRenderArea = tscRenderArea.merge(lineRenderer);
-    window.lineRenderer = lineRenderer;
+    linePlot.classed(dir, true);
+    tscPlots[dir] = linePlot;
+    tscRenderArea = tscRenderArea.merge(linePlot);
+    window.linePlot = linePlot;
   });
 
   var loadTSCData = function() {
     directories.forEach(function(dir) {
-      tscRenderers[dir].data(directoryTimeSeries[dir]);
+      tscPlots[dir].data(directoryTimeSeries[dir]);
     });
   }
   // ---- /Timeseries -----
@@ -104,15 +104,15 @@ function commitDashboard(dataManager, svg) {
   var contributorBarXAxis = new Plottable.Axis.XAxis(contributorBarXScale, "bottom", function(d) { return d});
   var contributorBarYAxis = new Plottable.Axis.YAxis(contributorBarYScale, "right").showEndTickLabels(true);
   contributorBarXAxis.classed("no-tick-labels", true);
-  var contributorBarRenderer = new Plottable.Plot.VerticalBar(linesByContributor,
+  var contributorBarPlot = new Plottable.Plot.VerticalBar(linesByContributor,
                                                                  contributorBarXScale,
                                                                  contributorBarYScale);
-  contributorBarRenderer.project("width", 40)
+  contributorBarPlot.project("width", 40)
                         .project("fill", "name", contributorColorScale)
                         .project("x", "name").project("y", linesAddedAccessor);
   var contributorGridlines = new Plottable.Component.Gridlines(null, contributorBarYScale);
   var contributorBarChart = new Plottable.Component.Table([
-    [contributorBarRenderer.merge(contributorGridlines), contributorBarYAxis]
+    [contributorBarPlot.merge(contributorGridlines), contributorBarYAxis]
   ]);
   // ----- /Bar1 -----
 
@@ -122,16 +122,16 @@ function commitDashboard(dataManager, svg) {
   var directoryBarXScale = new Plottable.Scale.Ordinal().domain(dataManager.directories).rangeType('bands');
   var directoryBarXAxis = new Plottable.Axis.XAxis(directoryBarXScale, "bottom", function(d) { return d});
   directoryBarXAxis.classed("no-tick-labels", true);
-  var directoryBarRenderer = new Plottable.Plot.VerticalBar(linesByDirectory,
+  var directoryBarPlot = new Plottable.Plot.VerticalBar(linesByDirectory,
                                                                directoryBarXScale,
                                                                directoryBarYScale);
-  directoryBarRenderer.project("width", 40)
+  directoryBarPlot.project("width", 40)
                       .project("fill", "directory", directoryColorScale)
                       .project("x", "directory")
                       .project("y", linesAddedAccessor);
   var directoryGridlines = new Plottable.Component.Gridlines(null, directoryBarYScale);
   var directoryBarChart = new Plottable.Component.Table([
-    [directoryBarRenderer.merge(directoryGridlines), directoryBarYAxis]  ]);
+    [directoryBarPlot.merge(directoryGridlines), directoryBarYAxis]  ]);
   // ----- /Bar2 -----
 
 
@@ -184,17 +184,17 @@ function commitDashboard(dataManager, svg) {
   function updateData(filter) {
     var newData = dataManager(filter);
 
-    scatterRenderer.dataSource().data(newData.commits);
+    scatterPlot.dataSource().data(newData.commits);
 
     tscYScale.domain([0, 0]);
     dataManager.directories.forEach(function(dir) {
-      tscRenderers[dir].dataSource().data(newData.directoryTimeSeries[dir]);
+      tscPlots[dir].dataSource().data(newData.directoryTimeSeries[dir]);
     });
 
-    contributorBarRenderer.dataSource().data(newData.linesByContributor);
+    contributorBarPlot.dataSource().data(newData.linesByContributor);
     contributorBarYScale.domain([0, 0]);
 
-    directoryBarRenderer.dataSource().data(newData.linesByDirectory);
+    directoryBarPlot.dataSource().data(newData.linesByDirectory);
     directoryBarYScale.domain([0, 0]);
 
     timeScale.domain([startDate, endDate]).nice();
@@ -202,33 +202,33 @@ function commitDashboard(dataManager, svg) {
     dashboardTable._render();
   }
 
-  var contributorClick = new Plottable.Interaction.Click(contributorBarRenderer);
+  var contributorClick = new Plottable.Interaction.Click(contributorBarPlot);
   var lastContributor = null;
   var contributorClickCallback = function(x, y) {
-    contributorBarRenderer.deselectAll();
-    directoryBarRenderer.deselectAll();
-    var bar = contributorBarRenderer.selectBar(x, y);
+    contributorBarPlot.deselectAll();
+    directoryBarPlot.deselectAll();
+    var bar = contributorBarPlot.selectBar(x, y);
     if (bar != null && bar.data()[0].name != lastContributor) {
       lastContributor = bar.data()[0].name;
     } else {
       lastContributor = null;
-      contributorBarRenderer.deselectAll();
+      contributorBarPlot.deselectAll();
     }
     updateData(lastContributor);
   };
   // contributorClick.callback(contributorClickCallback).registerWithComponent();
 
-  var directoryClick = new Plottable.Interaction.Click(directoryBarRenderer);
+  var directoryClick = new Plottable.Interaction.Click(directoryBarPlot);
   var lastDirectory = null;
   var directoryClickCallback = function(x, y) {
-    directoryBarRenderer.deselectAll();
-    contributorBarRenderer.deselectAll();
-    var bar = directoryBarRenderer.selectBar(x, y);
+    directoryBarPlot.deselectAll();
+    contributorBarPlot.deselectAll();
+    var bar = directoryBarPlot.selectBar(x, y);
     if (bar != null && bar.data()[0].directory != lastDirectory) {
       lastDirectory = bar.data()[0].directory;
     } else {
       lastDirectory = null;
-      directoryBarRenderer.deselectAll();
+      directoryBarPlot.deselectAll();
     }
     updateData(lastDirectory);
   };

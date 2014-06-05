@@ -7,7 +7,7 @@ export module Plot {
     public _ANIMATION_DURATION = 600; //milliseconds
 
     /**
-     * Creates a LineRenderer.
+     * Creates a LinePlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.

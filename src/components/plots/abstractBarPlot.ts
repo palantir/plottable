@@ -9,7 +9,7 @@ export module Abstract {
     public _barAlignment: string;
 
     /**
-     * Creates an AbstractBarRenderer.
+     * Creates an AbstractBarPlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
@@ -33,7 +33,7 @@ export module Abstract {
      * Sets the baseline for the bars to the specified value.
      *
      * @param {number} value The value to position the baseline at.
-     * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+     * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
       this._baselineValue = value;
@@ -48,7 +48,7 @@ export module Abstract {
      * Behavior depends on subclass implementation.
      *
      * @param {string} alignment The desired alignment.
-     * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+     * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public barAlignment(alignment: string) {
       // implementation in child classes
@@ -84,7 +84,7 @@ export module Abstract {
 
     /**
      * Deselects all bars.
-     * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+     * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
       this._bars.classed("selected", false);

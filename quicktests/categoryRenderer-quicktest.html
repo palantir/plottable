@@ -23,12 +23,12 @@
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
       yAxis.showEndTickLabels(true);
 
-      var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
+      var barPlot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
                               .project("x", "name", xScale)
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"});
-      barRenderer.animate(true);
-      var chart = new Plottable.Component.Table([[yAxis, barRenderer],
+      barPlot.animate(true);
+      var chart = new Plottable.Component.Table([[yAxis, barPlot],
                                        [null,  xAxis]]);
 
 

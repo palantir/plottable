@@ -8,7 +8,7 @@ export module Plot {
     public _ANIMATION_DELAY = 15; //milliseconds
 
     /**
-     * Creates a HorizontalBarRenderer.
+     * Creates a HorizontalBarPlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
@@ -89,7 +89,7 @@ export module Plot {
      * Sets the vertical alignment of the bars.
      *
      * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
-     * @return {HorizontalBarRenderer} The calling HorizontalBarRenderer.
+     * @return {HorizontalBarPlot} The calling HorizontalBarPlot.
      */
     public barAlignment(alignment: string) {
       var alignmentLC = alignment.toLowerCase();

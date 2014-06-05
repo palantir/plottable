@@ -8,7 +8,7 @@ export module Plot {
     public _ANIMATION_DURATION = 600; //milliseconds
 
     /**
-     * Creates an AreaRenderer.
+     * Creates an AreaPlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.

@@ -23,13 +23,13 @@
       var yAxis = new Plottable.Axis.YAxis(yScale, "left", function(d) { return d; } );
       yAxis.width(60);
 
-      var barRenderer = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
+      var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
                               .project("x", "age", xScale)
                               .project("y", "name", yScale)
                               .animate(true);
 
       var chart = new Plottable.Component.Table([
-        [yAxis, barRenderer],
+        [yAxis, barPlot],
         [null, xAxis]
       ]);
 

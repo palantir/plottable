@@ -8,7 +8,7 @@ export module Plot {
     public yScale: Scale.Ordinal;
 
     /**
-     * Creates a GridRenderer.
+     * Creates a GridPlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.

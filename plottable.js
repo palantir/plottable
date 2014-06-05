@@ -117,7 +117,7 @@ var Plottable;
 (function (Plottable) {
     (function (Util) {
         (function (OpenSource) {
-            
+
 
             function sortedIndex(val, arr, accessor) {
                 var low = 0;
@@ -4369,7 +4369,7 @@ var Plottable;
         var XYPlot = (function (_super) {
             __extends(XYPlot, _super);
             /**
-            * Creates an XYRenderer.
+            * Creates an XYPlot.
             *
             * @constructor
             * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
@@ -4435,7 +4435,7 @@ var Plottable;
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
-            * Creates a CircleRenderer.
+            * Creates a CirclePlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -4508,7 +4508,7 @@ var Plottable;
         var Grid = (function (_super) {
             __extends(Grid, _super);
             /**
-            * Creates a GridRenderer.
+            * Creates a GridPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -4576,7 +4576,7 @@ var Plottable;
         var BarPlot = (function (_super) {
             __extends(BarPlot, _super);
             /**
-            * Creates an AbstractBarRenderer.
+            * Creates an AbstractBarPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -4602,7 +4602,7 @@ var Plottable;
             * Sets the baseline for the bars to the specified value.
             *
             * @param {number} value The value to position the baseline at.
-            * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+            * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.baseline = function (value) {
                 this._baselineValue = value;
@@ -4617,7 +4617,7 @@ var Plottable;
             * Behavior depends on subclass implementation.
             *
             * @param {string} alignment The desired alignment.
-            * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+            * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.barAlignment = function (alignment) {
                 // implementation in child classes
@@ -4653,7 +4653,7 @@ var Plottable;
 
             /**
             * Deselects all bars.
-            * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+            * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.deselectAll = function () {
                 this._bars.classed("selected", false);
@@ -4679,7 +4679,7 @@ var Plottable;
         var VerticalBar = (function (_super) {
             __extends(VerticalBar, _super);
             /**
-            * Creates a BarRenderer.
+            * Creates a BarPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -4773,7 +4773,7 @@ var Plottable;
             * Sets the horizontal alignment of the bars.
             *
             * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
-            * @return {BarRenderer} The calling BarRenderer.
+            * @return {BarPlot} The calling BarPlot.
             */
             VerticalBar.prototype.barAlignment = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
@@ -4807,7 +4807,7 @@ var Plottable;
         var HorizontalBar = (function (_super) {
             __extends(HorizontalBar, _super);
             /**
-            * Creates a HorizontalBarRenderer.
+            * Creates a HorizontalBarPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -4902,7 +4902,7 @@ var Plottable;
             * Sets the vertical alignment of the bars.
             *
             * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
-            * @return {HorizontalBarRenderer} The calling HorizontalBarRenderer.
+            * @return {HorizontalBarPlot} The calling HorizontalBarPlot.
             */
             HorizontalBar.prototype.barAlignment = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
@@ -4936,7 +4936,7 @@ var Plottable;
         var Area = (function (_super) {
             __extends(Area, _super);
             /**
-            * Creates an AreaRenderer.
+            * Creates an AreaPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -5012,7 +5012,7 @@ var Plottable;
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
-            * Creates a LineRenderer.
+            * Creates a LinePlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.

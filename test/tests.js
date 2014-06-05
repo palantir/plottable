@@ -2310,7 +2310,7 @@ describe("Renderers", function () {
         });
     });
 
-    describe("XYRenderer functionality", function () {
+    describe("XYPlot functionality", function () {
         it("the accessors properly access data, index, and metadata", function () {
             var svg = generateSVG(400, 400);
             var xScale = new Plottable.Scale.Linear();
@@ -2353,7 +2353,7 @@ describe("Renderers", function () {
             svg.remove();
         });
 
-        describe("Basic AreaRenderer functionality", function () {
+        describe("Basic AreaPlot functionality", function () {
             var svg;
             var xScale = new Plottable.Scale.Linear().domain([0, 1]);
             var yScale = new Plottable.Scale.Linear().domain([0, 1]);
@@ -2373,14 +2373,14 @@ describe("Renderers", function () {
                 return "steelblue";
             };
             var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
-            var areaRenderer = new Plottable.Plot.Area(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("y0", y0Accessor).project("fill", fillAccessor).project("stroke", colorAccessor);
+            var areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("y0", y0Accessor).project("fill", fillAccessor).project("stroke", colorAccessor);
             var renderArea;
             var verifier = new MultiTestVerifier();
 
             before(function () {
                 svg = generateSVG(500, 500);
-                areaRenderer.renderTo(svg);
-                renderArea = areaRenderer.renderArea;
+                areaPlot.renderTo(svg);
+                renderArea = areaPlot.renderArea;
             });
 
             beforeEach(function () {
@@ -2412,20 +2412,20 @@ describe("Renderers", function () {
                 var newFillAccessor = function () {
                     return "pink";
                 };
-                areaRenderer.project("fill", newFillAccessor);
-                areaRenderer.renderTo(svg);
-                renderArea = areaRenderer.renderArea;
+                areaPlot.project("fill", newFillAccessor);
+                areaPlot.renderTo(svg);
+                renderArea = areaPlot.renderArea;
                 var areaPath = renderArea.select(".area");
                 assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
                 verifier.end();
             });
 
             it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
-                areaRenderer.project("y0", function (d) {
+                areaPlot.project("y0", function (d) {
                     return d.bar / 2;
                 });
-                areaRenderer.renderTo(svg);
-                renderArea = areaRenderer.renderArea;
+                areaPlot.renderTo(svg);
+                renderArea = areaPlot.renderArea;
                 var areaPath = renderArea.select(".area");
                 assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
                 verifier.end();
@@ -2439,26 +2439,26 @@ describe("Renderers", function () {
             });
         });
 
-        describe("LineRenderer", function () {
+        describe("LinePlot", function () {
             it("defaults to no fill", function () {
                 var svg = generateSVG(500, 500);
                 var data = [{ x: 0, y: 0 }, { x: 2, y: 2 }];
                 var xScale = new Plottable.Scale.Linear();
                 var yScale = new Plottable.Scale.Linear();
-                var lineRenderer = new Plottable.Plot.Line(data, xScale, yScale);
-                lineRenderer.renderTo(svg);
+                var linePlot = new Plottable.Plot.Line(data, xScale, yScale);
+                linePlot.renderTo(svg);
 
-                var areaPath = lineRenderer.renderArea.select(".area");
+                var areaPath = linePlot.renderArea.select(".area");
                 assert.strictEqual(areaPath.attr("fill"), "none");
                 svg.remove();
             });
         });
 
-        describe("Example CircleRenderer with quadratic series", function () {
+        describe("Example CirclePlot with quadratic series", function () {
             var svg;
             var xScale;
             var yScale;
-            var circleRenderer;
+            var circlePlot;
             var SVG_WIDTH = 600;
             var SVG_HEIGHT = 300;
             var verifier = new MultiTestVerifier();
@@ -2471,11 +2471,11 @@ describe("Renderers", function () {
             };
             var circlesInArea;
 
-            function getCircleRendererVerifier() {
+            function getCirclePlotVerifier() {
                 // creates a function that verifies that circles are drawn properly after accounting for svg transform
                 // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
                 circlesInArea = 0;
-                var renderArea = circleRenderer.renderArea;
+                var renderArea = circlePlot.renderArea;
                 var renderAreaTransform = d3.transform(renderArea.attr("transform"));
                 var translate = renderAreaTransform.translate;
                 var scale = renderAreaTransform.scale;
@@ -2506,22 +2506,22 @@ describe("Renderers", function () {
                 svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 xScale = new Plottable.Scale.Linear().domain([0, 9]);
                 yScale = new Plottable.Scale.Linear().domain([0, 81]);
-                circleRenderer = new Plottable.Plot.Scatter(quadraticDataset, xScale, yScale);
-                circleRenderer.project("fill", colorAccessor);
-                circleRenderer.renderTo(svg);
+                circlePlot = new Plottable.Plot.Scatter(quadraticDataset, xScale, yScale);
+                circlePlot.project("fill", colorAccessor);
+                circlePlot.renderTo(svg);
             });
 
             it("setup is handled properly", function () {
                 assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
                 assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
-                circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
+                circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
                 assert.equal(circlesInArea, 10, "10 circles were drawn");
                 verifier.end();
             });
 
             it("rendering is idempotent", function () {
-                circleRenderer._render()._render();
-                circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
+                circlePlot._render()._render();
+                circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
                 assert.equal(circlesInArea, 10, "10 circles were drawn");
                 verifier.end();
             });
@@ -2535,9 +2535,9 @@ describe("Renderers", function () {
                 });
 
                 it("the circles re-rendered properly", function () {
-                    var renderArea = circleRenderer.renderArea;
+                    var renderArea = circlePlot.renderArea;
                     var circles = renderArea.selectAll("circle");
-                    circles.each(getCircleRendererVerifier());
+                    circles.each(getCirclePlotVerifier());
                     assert.equal(circlesInArea, 4, "four circles were found in the render area");
                     verifier.end();
                 });

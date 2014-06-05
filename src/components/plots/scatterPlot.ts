@@ -7,7 +7,7 @@ export module Plot {
     public _ANIMATION_DELAY = 5; //milliseconds
 
     /**
-     * Creates a CircleRenderer.
+     * Creates a CirclePlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.

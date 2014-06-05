@@ -11,14 +11,14 @@ function layoutChart(data) {
   // A DataSource is a Plottable object that maintains data and metadata, and updates dependents when it changes
   // In the previous example, we implicitly created a DataSource by putting the data directly into the Renderer constructor
   var gitDataSource   = new Plottable.DataSource(data);
-  var commitsRenderer = new Plottable.Plot.Line(gitDataSource, xScale, yScaleCommits);
-  var locRenderer     = new Plottable.Plot.Area(gitDataSource, xScale, yScaleLOC);
+  var commitsPlot = new Plottable.Plot.Line(gitDataSource, xScale, yScaleCommits);
+  var locPlot     = new Plottable.Plot.Area(gitDataSource, xScale, yScaleLOC);
 
-  commitsRenderer.project("x", "day_delta", xScale);
-  locRenderer    .project("x", "day_delta", xScale);
+  commitsPlot.project("x", "day_delta", xScale);
+  locPlot    .project("x", "day_delta", xScale);
 
-  commitsRenderer.project("y", "commit_number", yScaleCommits);
-  locRenderer    .project("y", "lines_of_code", yScaleLOC);
+  commitsPlot.project("y", "commit_number", yScaleCommits);
+  locPlot    .project("y", "lines_of_code", yScaleLOC);
 
   var commitsTitle = new Plottable.Component.TitleLabel("# of Commits Over Time");
   var locTitle     = new Plottable.Component.TitleLabel("# of Lines Of Code Over Time");
@@ -33,9 +33,9 @@ function layoutChart(data) {
   // or set proportional "weights" on each column.
   var chart = new Plottable.Component.Table([
                     [null        , commitsTitle   , null        ],
-                    [yAxisCommits, commitsRenderer, null        ],
+                    [yAxisCommits, commitsPlot, null        ],
                     [null        , locTitle       , null        ],
-                    [null        , locRenderer    , yAxisLOC    ],
+                    [null        , locPlot    , yAxisLOC    ],
                     [null        , xAxis          , null        ]
                   ]);
 

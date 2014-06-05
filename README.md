@@ -5,7 +5,7 @@ Plottable.js is a library for easily creating flexible, interactive, and perform
 
 Plottable consists of three main pieces:
 - A grid-based layout engine which handles positioning, sizing, and alignment of components
-- "Components", such as LineRenderer or Axis, which process data and can be connected to d3 Scales
+- "Components", such as LinePlot or Axis, which process data and can be connected to d3 Scales
 - "Interactions", such as PanZoomInteraction or AreaInteraction, which easily allow for custom logic to be bound to common interaction patterns
 
 By virtue of being higher-level than D3, it is often much easier to create charts in Plottable.js, with less of a learning curve. Plottable's Renderers provide a convenient API for encapsulating, sharing and reusing D3 visualizations.

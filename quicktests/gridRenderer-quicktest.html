@@ -23,7 +23,7 @@
 window.onload = function() {
 
     var c1, c2, c3;
-    var xScale, yScale, colorScale, xAxisB, xAxisT, yAxisL, yAxisR, gridRenderer;
+    var xScale, yScale, colorScale, xAxisB, xAxisT, yAxisL, yAxisR, gridPlot;
       function randomData() {
         var data = [];
         ["Work", "Food Is Tasty And I like it", "Sex", "Sleep"].forEach(function(category) {
@@ -69,7 +69,7 @@ window.onload = function() {
           xAxisT        = new Plottable.Axis.Category(xScale, "top");
           yAxisL        = new Plottable.Axis.Category(yScale, "left");
           yAxisR        = new Plottable.Axis.Category(yScale, "right");
-          gridRenderer = new Plottable.Plot.Grid(data, xScale, yScale, colorScale)
+          gridPlot = new Plottable.Plot.Grid(data, xScale, yScale, colorScale)
                                   .project("x", "category")
                                   .project("y", "day")
                                   .project("fill", "awesomeness");
@@ -77,7 +77,7 @@ window.onload = function() {
           return new Plottable.Component.Table()
             .addComponent(1, 0, yAxisL)
             .addComponent(1, 2, yAxisR)
-            .addComponent(1, 1, gridRenderer)
+            .addComponent(1, 1, gridPlot)
             .addComponent(0, 1, xAxisT)
             .addComponent(2, 1, xAxisB)
             .renderTo(selector);

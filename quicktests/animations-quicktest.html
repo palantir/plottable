@@ -29,7 +29,7 @@
       }
       var barDataSource = new Plottable.DataSource(barData);
 
-      var circleRenderer;
+      var circlePlot;
       function makeCircleChart() {
         var xScale = new Plottable.Scale.Linear();
         var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
@@ -37,17 +37,17 @@
         var yScale = new Plottable.Scale.Linear();
         var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        circleRenderer = new Plottable.Plot.Scatter(xyDataSource, xScale, yScale);
-        circleRenderer.project("r", 8);
-        circleRenderer.project("opacity", 0.75);
-        circleRenderer.animate(doAnimate);
+        circlePlot = new Plottable.Plot.Scatter(xyDataSource, xScale, yScale);
+        circlePlot.project("r", 8);
+        circlePlot.project("opacity", 0.75);
+        circlePlot.animate(doAnimate);
 
-        var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer],
+        var circleChart = new Plottable.Component.Table([[yAxis, circlePlot],
                                                [null,  xAxis]]);
         circleChart.renderTo("#circles");
       }
 
-      var barRenderer;
+      var barPlot;
       function makeBarChart() {
         var xScale = new Plottable.Scale.Ordinal().rangeType("bands");
         var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", function(d) { return d; } );
@@ -56,15 +56,15 @@
         var yAxis = new Plottable.Axis.YAxis(yScale, "left");
         yAxis.showEndTickLabels(true);
 
-        barRenderer = new Plottable.Plot.VerticalBar(barDataSource, xScale, yScale)
+        barPlot = new Plottable.Plot.VerticalBar(barDataSource, xScale, yScale)
                                 .project("fill", function() {return "steelblue"});
-        barRenderer.animate(doAnimate);
-        var barChart = new Plottable.Component.Table([[yAxis, barRenderer],
+        barPlot.animate(doAnimate);
+        var barChart = new Plottable.Component.Table([[yAxis, barPlot],
                                          [null,  xAxis]]);
         barChart.renderTo("#bars");
       }
 
-      var lineRenderer;
+      var linePlot;
       function makeLineChart() {
         var xScale = new Plottable.Scale.Linear();
         var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
@@ -72,15 +72,15 @@
         var yScale = new Plottable.Scale.Linear();
         var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        lineRenderer = new Plottable.Plot.Line(xyDataSource, xScale, yScale);
+        linePlot = new Plottable.Plot.Line(xyDataSource, xScale, yScale);
 
-        lineRenderer.animate(doAnimate);
-        var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
+        linePlot.animate(doAnimate);
+        var lineChart = new Plottable.Component.Table([[yAxis, linePlot],
                                                [null,  xAxis]]);
         lineChart.renderTo("#line");
       }
 
-      var areaRenderer;
+      var areaPlot;
       function makeAreaChart() {
         var xScale = new Plottable.Scale.Linear();
         var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
@@ -88,9 +88,9 @@
         var yScale = new Plottable.Scale.Linear();
         var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        areaRenderer = new Plottable.Plot.Area(xyDataSource, xScale, yScale);
-        areaRenderer.animate(doAnimate);
-        var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
+        areaPlot = new Plottable.Plot.Area(xyDataSource, xScale, yScale);
+        areaPlot.animate(doAnimate);
+        var areaChart = new Plottable.Component.Table([[yAxis, areaPlot],
                                                [null,  xAxis]]);
         areaChart.renderTo("#area");
       }
@@ -110,10 +110,10 @@
 
       function toggleAnimations() {
         doAnimate = !doAnimate;
-        circleRenderer.animate(doAnimate);
-        barRenderer.animate(doAnimate);
-        lineRenderer.animate(doAnimate);
-        areaRenderer.animate(doAnimate);
+        circlePlot.animate(doAnimate);
+        barPlot.animate(doAnimate);
+        linePlot.animate(doAnimate);
+        areaPlot.animate(doAnimate);
         d3.select("#toggle").text((doAnimate?"Disable":"Enable")+" Animations");
       }
 
