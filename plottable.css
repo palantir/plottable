@@ -83,6 +83,10 @@ svg.plottable {
   fill: #d3d3d3;
 }
 
-.plottable .legend .not-focus {
-  opacity: .2;
+.plottable .legend .hover {
+  opacity:.2;
+}
+
+.plottable .legend .hover.focus {
+  opacity:1;
 }

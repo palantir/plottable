@@ -4279,8 +4279,19 @@ var Plottable;
             _super.prototype._doRender.call(this);
             this.updateClasses();
             var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-            var func = function (b) {
-                return function (d, i) {
+
+            // on mouseover, tag everything with the "hover" class
+            var func1 = function (b) {
+                return function (d) {
+                    dataSelection.classed("hover", b);
+                };
+            };
+            this.content.on("mouseover", func1(true));
+            this.content.on("mouseout", func1(false));
+
+            // tag the element that is being hovered over with the class "focus"
+            var func2 = function (b) {
+                return function (d) {
                     _this.focus = b ? d : undefined;
                     if (_this._callback != null) {
                         _this._callback(_this.focus);
@@ -4288,8 +4299,8 @@ var Plottable;
                     _this.updateClasses();
                 };
             };
-            dataSelection.on("mouseover", func(true));
-            dataSelection.on("mouseout", func(false));
+            dataSelection.on("mouseover", func2(true));
+            dataSelection.on("mouseout", func2(false));
             return this;
         };
 
@@ -4297,14 +4308,8 @@ var Plottable;
             var _this = this;
             if (this._isSetup) {
                 var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-
-                // don't attach any classes if nothing is focused
-                // this is so users can do something for things not focused (i.e. fading), or focused (i.e. highlighting)
                 dataSelection.classed("focus", function (d) {
-                    return _this.focus !== undefined ? _this.focus === d : false;
-                });
-                dataSelection.classed("not-focus", function (d) {
-                    return _this.focus !== undefined ? _this.focus !== d : false;
+                    return _this.focus === d;
                 });
             }
         };
@@ -4388,7 +4393,17 @@ var Plottable;
             _super.prototype._doRender.call(this);
             this.updateClasses();
             var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-            var func = function (b) {
+
+            // on mouseover, tag everything with the "hover" class
+            var func1 = function (b) {
+                return function (d) {
+                    dataSelection.classed("hover", b);
+                };
+            };
+            this.content.on("mouseover", func1(true));
+            this.content.on("mouseout", func1(false));
+
+            var func2 = function (b) {
                 return function (d, i) {
                     _this.focus = b ? d : undefined;
                     if (_this._callbackHover != null) {
@@ -4397,8 +4412,9 @@ var Plottable;
                     _this.updateClasses();
                 };
             };
-            dataSelection.on("mouseover", func(true));
-            dataSelection.on("mouseout", func(false));
+            dataSelection.on("mouseover", func2(true));
+            dataSelection.on("mouseout", func2(false));
+
             dataSelection.on("click", function (d) {
                 var turningOn = _this.isOff.has(d);
                 if (turningOn) {
@@ -4418,14 +4434,8 @@ var Plottable;
             var _this = this;
             if (this._isSetup) {
                 var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-
-                // don't attach any classes if nothing is focused
-                // this is so users can do something for things not focused (i.e. fading), or focused (i.e. highlighting)
                 dataSelection.classed("focus", function (d) {
-                    return _this.focus !== undefined ? _this.focus === d : false;
-                });
-                dataSelection.classed("not-focus", function (d) {
-                    return _this.focus !== undefined ? _this.focus !== d : false;
+                    return _this.focus === d;
                 });
 
                 dataSelection.classed("toggled-on", function (d) {

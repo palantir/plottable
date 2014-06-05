@@ -45,25 +45,31 @@ module Plottable {
       super._doRender();
       this.updateClasses();
       var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
-      var func = (b: boolean) => (d: any, i: number) => {
+
+      // on mouseover, tag everything with the "hover" class
+      var func1 = (b: boolean) => (d: any) => {
+         dataSelection.classed("hover", b);
+      };
+      this.content.on("mouseover", func1(true));
+      this.content.on("mouseout", func1(false));
+
+      // tag the element that is being hovered over with the class "focus"
+      var func2 = (b: boolean) => (d: any) => {
         this.focus = b ? d : undefined;
         if (this._callback != null) {
           this._callback(this.focus);
         }
         this.updateClasses();
       };
-      dataSelection.on("mouseover", func(true));
-      dataSelection.on("mouseout", func(false));
+      dataSelection.on("mouseover", func2(true));
+      dataSelection.on("mouseout", func2(false));
       return this;
     }
 
     private updateClasses() {
       if (this._isSetup) {
         var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
-        // don't attach any classes if nothing is focused
-        // this is so users can do something for things not focused (i.e. fading), or focused (i.e. highlighting)
-        dataSelection.classed("focus", (d: any) => this.focus !== undefined ? this.focus === d : false);
-        dataSelection.classed("not-focus", (d: any) => this.focus !== undefined ? this.focus !== d : false);
+        dataSelection.classed("focus", (d: any) => this.focus === d);
       }
     }
   }
