@@ -1,6 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Singleton {
   export interface IKeyEventListenerCallback {
     (e: D3.Event): any
   }
@@ -39,4 +40,5 @@ module Plottable {
       });
     }
   }
+}
 }

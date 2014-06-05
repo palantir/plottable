@@ -1,27 +1,27 @@
 function layoutChart(data) {
   // The two subplots will share an xScale, but have two seperate yScales for their data
-  var xScale        = new Plottable.LinearScale().domain([0, 100]);
-  var yScaleCommits = new Plottable.LinearScale();
-  var yScaleLOC     = new Plottable.LinearScale();
+  var xScale        = new Plottable.Scale.Linear().domain([0, 100]);
+  var yScaleCommits = new Plottable.Scale.Linear();
+  var yScaleLOC     = new Plottable.Scale.Linear();
 
-  var xAxis         = new Plottable.XAxis(xScale, "bottom").showEndTickLabels(true);
-  var yAxisCommits  = new Plottable.YAxis(yScaleCommits, "left");
-  var yAxisLOC      = new Plottable.YAxis(yScaleLOC, "right");
+  var xAxis         = new Plottable.Axis.XAxis(xScale, "bottom").showEndTickLabels(true);
+  var yAxisCommits  = new Plottable.Axis.YAxis(yScaleCommits, "left");
+  var yAxisLOC      = new Plottable.Axis.YAxis(yScaleLOC, "right");
 
   // A DataSource is a Plottable object that maintains data and metadata, and updates dependents when it changes
   // In the previous example, we implicitly created a DataSource by putting the data directly into the Renderer constructor
   var gitDataSource   = new Plottable.DataSource(data);
-  var commitsRenderer = new Plottable.LineRenderer(gitDataSource, xScale, yScaleCommits);
-  var locRenderer     = new Plottable.AreaRenderer(gitDataSource, xScale, yScaleLOC);
+  var commitsPlot = new Plottable.Plot.Line(gitDataSource, xScale, yScaleCommits);
+  var locPlot     = new Plottable.Plot.Area(gitDataSource, xScale, yScaleLOC);
 
-  commitsRenderer.project("x", "day_delta", xScale);
-  locRenderer    .project("x", "day_delta", xScale);
+  commitsPlot.project("x", "day_delta", xScale);
+  locPlot    .project("x", "day_delta", xScale);
 
-  commitsRenderer.project("y", "commit_number", yScaleCommits);
-  locRenderer    .project("y", "lines_of_code", yScaleLOC);
+  commitsPlot.project("y", "commit_number", yScaleCommits);
+  locPlot    .project("y", "lines_of_code", yScaleLOC);
 
-  var commitsTitle = new Plottable.TitleLabel("# of Commits Over Time");
-  var locTitle     = new Plottable.TitleLabel("# of Lines Of Code Over Time");
+  var commitsTitle = new Plottable.Component.TitleLabel("# of Commits Over Time");
+  var locTitle     = new Plottable.Component.TitleLabel("# of Lines Of Code Over Time");
 
   // A Table is the principle abstraction for laying out Plottable Components.
   // The rows and columns express alignment constraints between objects, and Tables can be nested inside other
@@ -31,11 +31,11 @@ function layoutChart(data) {
   // left over by the Axes.
   // If we had multiple columns with variable-width components, we could let Plottable balance the columns between them,
   // or set proportional "weights" on each column.
-  var chart = new Plottable.Table([
+  var chart = new Plottable.Component.Table([
                     [null        , commitsTitle   , null        ],
-                    [yAxisCommits, commitsRenderer, null        ],
+                    [yAxisCommits, commitsPlot, null        ],
                     [null        , locTitle       , null        ],
-                    [null        , locRenderer    , yAxisLOC    ],
+                    [null        , locPlot    , yAxisLOC    ],
                     [null        , xAxis          , null        ]
                   ]);
 

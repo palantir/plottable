@@ -21,33 +21,33 @@
           dataseries_top[i].y += dataseries[i].y;
         }
 
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scale.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scale.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
         var y0Accessor = function(d, i) { return dataseries[i].y; }
 
-        var renderAreaD1 = new Plottable.AreaRenderer(dataseries, xScale, yScale);
-        var renderAreaD2 = new Plottable.AreaRenderer(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
+        var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
+        var renderAreaD2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
 
         var fillAccessor = function() { return "steelblue"; }
         var fillAccessorTop = function() { return "pink"; }
         renderAreaD1.project("fill", fillAccessor)
         renderAreaD2.project("fill", fillAccessorTop)
 
-        var gridlines = new Plottable.Gridlines(xScale, yScale);
-        var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1, renderAreaD2]);
+        var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+        var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1, renderAreaD2]);
 
-        var chart = new Plottable.StandardChart()
+        var chart = new Plottable.Template.StandardChart()
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-                        .renderTo("#areaRenderer-test");
+                        .renderTo("#areaPlot-test");
       }
     </script>
   </head>
   <body>
-    <svg id="areaRenderer-test" width="480" height="320"></svg>
+    <svg id="areaPlot-test" width="480" height="320"></svg>
   </body>
 
 </html>

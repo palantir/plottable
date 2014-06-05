@@ -1,7 +1,8 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-  export class DragBoxInteraction extends DragInteraction {
+export module Interaction {
+  export class DragBox extends Drag {
     private static CLASS_DRAG_BOX = "drag-box";
     public dragBox: D3.Selection;
     public boxIsDrawn = false;
@@ -37,10 +38,11 @@ module Plottable {
 
     public _anchor(hitBox: D3.Selection) {
       super._anchor(hitBox);
-      var cname = DragBoxInteraction.CLASS_DRAG_BOX;
+      var cname = DragBox.CLASS_DRAG_BOX;
       var background = this.componentToListenTo.backgroundContainer;
       this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
       return this;
     }
   }
+}
 }

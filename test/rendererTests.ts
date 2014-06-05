@@ -2,25 +2,19 @@
 
 var assert = chai.assert;
 
+class CountingPlot extends Plottable.Abstract.Plot {
+  public renders: number = 0;
 
-module Plottable {
-  /**
-   * A mock that keeps track of how many times _render() was
-   * called - useful for checking DataSource callbacks.
-   */
-  export class CountingRenderer extends Renderer {
-    public renders: number = 0;
+  constructor(dataset: any) {
+    super(dataset);
+  }
 
-    constructor(dataset: any) {
-      super(dataset);
-    }
-
-    public _render() {
-      ++this.renders;
-      return super._render();
-    }
+  public _render() {
+    ++this.renders;
+    return super._render();
   }
 }
+
 
 var quadraticDataset = makeQuadraticSeries(10);
 
@@ -28,14 +22,14 @@ describe("Renderers", () => {
 
   describe("base Renderer", () => {
     it("Renderers default correctly", () => {
-      var r = new Plottable.Renderer();
+      var r = new Plottable.Abstract.Plot();
       assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
     });
 
     it("Base Renderer functionality works", () => {
       var svg = generateSVG(400, 300);
       var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
-      var r = new Plottable.Renderer(d1);
+      var r = new Plottable.Abstract.Plot(d1);
       r._anchor(svg)._computeLayout();
       var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
@@ -44,7 +38,7 @@ describe("Renderers", () => {
 
     it("Allows the DataSource to be changed", () => {
       var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
-      var r = new Plottable.Renderer(d1);
+      var r = new Plottable.Abstract.Plot(d1);
       assert.equal(d1, r.dataSource(), "returns the original");
 
       var d2 = new Plottable.DataSource(["bar"], {cssClass: "boo"});
@@ -54,7 +48,7 @@ describe("Renderers", () => {
 
     it("Changes DataSource listeners when the DataSource is changed", () => {
       var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
-      var r = new Plottable.CountingRenderer(d1);
+      var r = new CountingPlot(d1);
 
       assert.equal(0, r.renders, "initially hasn't rendered anything");
 
@@ -77,19 +71,19 @@ describe("Renderers", () => {
 
     it("Updates its projectors when the DataSource is changed", () => {
       var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
-      var r = new Plottable.Renderer(d1);
+      var r = new Plottable.Abstract.Plot(d1);
 
       var xScaleCalls: number = 0;
       var yScaleCalls: number = 0;
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
       r.project("x", null, xScale);
       r.project("y", null, yScale);
-      xScale.registerListener(null, (broadcaster: Plottable.Broadcaster) => {
+      xScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
         assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
-      yScale.registerListener(null, (broadcaster: Plottable.Broadcaster) => {
+      yScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
         assert.equal(broadcaster, yScale, "Callback received the calling scale as the first argument");
         ++yScaleCalls;
       });
@@ -117,15 +111,15 @@ describe("Renderers", () => {
 
     it("Renderer automatically generates a DataSource if only data is provided", () => {
       var data = ["foo", "bar"];
-      var r = new Plottable.Renderer(data);
+      var r = new Plottable.Abstract.Plot(data);
       var dataSource = r.dataSource();
       assert.isNotNull(dataSource, "A DataSource was automatically generated");
       assert.deepEqual(dataSource.data(), data, "The generated DataSource has the correct data");
     });
 
     it("Renderer.project works as intended", () => {
-      var r = new Plottable.Renderer();
-      var s = new Plottable.LinearScale().domain([0, 1]).range([0, 10]);
+      var r = new Plottable.Abstract.Plot();
+      var s = new Plottable.Scale.Linear().domain([0, 1]).range([0, 10]);
       r.project("attr", "a", s);
       var attrToProjector = r._generateAttrToProjector();
       var projector = attrToProjector["attr"];
@@ -133,11 +127,11 @@ describe("Renderers", () => {
     });
   });
 
-  describe("XYRenderer functionality", () => {
+  describe("XYPlot functionality", () => {
     it("the accessors properly access data, index, and metadata", () => {
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.LinearScale();
-      var yScale = new Plottable.LinearScale();
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
       xScale.domain([0, 400]);
       yScale.domain([400, 0]);
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
@@ -145,7 +139,7 @@ describe("Renderers", () => {
       var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
       var yAccessor = (d: any, i?: number, m?: any) => m.bar;
       var dataSource = new Plottable.DataSource(data, metadata);
-      var renderer = new Plottable.CircleRenderer(dataSource, xScale, yScale)
+      var renderer = new Plottable.Plot.Scatter(dataSource, xScale, yScale)
                                   .project("x", xAccessor)
                                   .project("y", yAccessor);
       renderer.renderTo(svg);
@@ -174,17 +168,17 @@ describe("Renderers", () => {
       svg.remove();
     });
 
-    describe("Basic AreaRenderer functionality", () => {
+    describe("Basic AreaPlot functionality", () => {
       var svg: D3.Selection;
-      var xScale = new Plottable.LinearScale().domain([0, 1]);
-      var yScale = new Plottable.LinearScale().domain([0, 1]);
+      var xScale = new Plottable.Scale.Linear().domain([0, 1]);
+      var yScale = new Plottable.Scale.Linear().domain([0, 1]);
       var xAccessor = (d: any) => d.foo;
       var yAccessor = (d: any) => d.bar;
       var y0Accessor = () => 0;
       var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       var fillAccessor = () => "steelblue";
       var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      var areaRenderer = new Plottable.AreaRenderer(simpleDataset, xScale, yScale)
+      var areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale)
                                   .project("x", xAccessor)
                                   .project("y", yAccessor)
                                   .project("y0", y0Accessor)
@@ -195,8 +189,8 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(500, 500);
-        areaRenderer.renderTo(svg);
-        renderArea = areaRenderer.renderArea;
+        areaPlot.renderTo(svg);
+        renderArea = areaPlot.renderArea;
       });
 
       beforeEach(() => {
@@ -226,18 +220,18 @@ describe("Renderers", () => {
 
       it("fill colors can be changed by projecting new accessor and re-render appropriately", () => {
         var newFillAccessor = () => "pink";
-        areaRenderer.project("fill", newFillAccessor);
-        areaRenderer.renderTo(svg);
-        renderArea = areaRenderer.renderArea;
+        areaPlot.project("fill", newFillAccessor);
+        areaPlot.renderTo(svg);
+        renderArea = areaPlot.renderArea;
         var areaPath = renderArea.select(".area");
         assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
         verifier.end();
       });
 
       it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-        areaRenderer.project("y0", (d: any) => d.bar/2);
-        areaRenderer.renderTo(svg);
-        renderArea = areaRenderer.renderArea;
+        areaPlot.project("y0", (d: any) => d.bar/2);
+        areaPlot.renderTo(svg);
+        renderArea = areaPlot.renderArea;
         var areaPath = renderArea.select(".area");
         assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
         verifier.end();
@@ -248,26 +242,26 @@ describe("Renderers", () => {
       });
     });
 
-    describe("LineRenderer", () => {
+    describe("LinePlot", () => {
       it("defaults to no fill", () => {
         var svg = generateSVG(500, 500);
         var data = [{x: 0, y: 0}, {x: 2, y: 2}];
-        var xScale = new Plottable.LinearScale();
-        var yScale = new Plottable.LinearScale();
-        var lineRenderer = new Plottable.LineRenderer(data, xScale, yScale);
-        lineRenderer.renderTo(svg);
+        var xScale = new Plottable.Scale.Linear();
+        var yScale = new Plottable.Scale.Linear();
+        var linePlot = new Plottable.Plot.Line(data, xScale, yScale);
+        linePlot.renderTo(svg);
 
-        var areaPath = lineRenderer.renderArea.select(".area");
+        var areaPath = linePlot.renderArea.select(".area");
         assert.strictEqual(areaPath.attr("fill"), "none");
         svg.remove();
       });
     });
 
-    describe("Example CircleRenderer with quadratic series", () => {
+    describe("Example CirclePlot with quadratic series", () => {
       var svg: D3.Selection;
-      var xScale: Plottable.LinearScale;
-      var yScale: Plottable.LinearScale;
-      var circleRenderer: Plottable.CircleRenderer;
+      var xScale: Plottable.Scale.Linear;
+      var yScale: Plottable.Scale.Linear;
+      var circlePlot: Plottable.Plot.Scatter;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
       var verifier = new MultiTestVerifier();
@@ -278,11 +272,11 @@ describe("Renderers", () => {
       var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y ,i).toString();
       var circlesInArea: number;
 
-      function getCircleRendererVerifier() {
+      function getCirclePlotVerifier() {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
         // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
         circlesInArea = 0;
-        var renderArea = circleRenderer.renderArea;
+        var renderArea = circlePlot.renderArea;
         var renderAreaTransform = d3.transform(renderArea.attr("transform"));
         var translate = renderAreaTransform.translate;
         var scale     = renderAreaTransform.scale;
@@ -309,24 +303,24 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.LinearScale().domain([0, 9]);
-        yScale = new Plottable.LinearScale().domain([0, 81]);
-        circleRenderer = new Plottable.CircleRenderer(quadraticDataset, xScale, yScale);
-        circleRenderer.project("fill", colorAccessor);
-        circleRenderer.renderTo(svg);
+        xScale = new Plottable.Scale.Linear().domain([0, 9]);
+        yScale = new Plottable.Scale.Linear().domain([0, 81]);
+        circlePlot = new Plottable.Plot.Scatter(quadraticDataset, xScale, yScale);
+        circlePlot.project("fill", colorAccessor);
+        circlePlot.renderTo(svg);
       });
 
       it("setup is handled properly", () => {
         assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
-        circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
+        circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         verifier.end();
       });
 
       it("rendering is idempotent", () => {
-        circleRenderer._render()._render();
-        circleRenderer.renderArea.selectAll("circle").each(getCircleRendererVerifier());
+        circlePlot._render()._render();
+        circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
         assert.equal(circlesInArea, 10, "10 circles were drawn");
         verifier.end();
       });
@@ -340,9 +334,9 @@ describe("Renderers", () => {
         });
 
         it("the circles re-rendered properly", () => {
-          var renderArea = circleRenderer.renderArea;
+          var renderArea = circlePlot.renderArea;
           var circles = renderArea.selectAll("circle");
-          circles.each(getCircleRendererVerifier());
+          circles.each(getCirclePlotVerifier());
           assert.equal(circlesInArea, 4, "four circles were found in the render area");
           verifier.end();
         });
@@ -357,16 +351,16 @@ describe("Renderers", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.DataSource;
-      var xScale: Plottable.OrdinalScale;
-      var yScale: Plottable.LinearScale;
-      var renderer: Plottable.BarRenderer;
+      var xScale: Plottable.Scale.Ordinal;
+      var yScale: Plottable.Scale.Linear;
+      var renderer: Plottable.Plot.VerticalBar;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.OrdinalScale().domain(["A", "B"]).rangeType("points");
-        yScale = new Plottable.LinearScale();
+        xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+        yScale = new Plottable.Scale.Linear();
         var data = [
           {x: "A", y: 1},
           {x: "B", y: -1.5},
@@ -374,7 +368,7 @@ describe("Renderers", () => {
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.BarRenderer(dataset, xScale, yScale);
+        renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
         renderer.animate(false);
         renderer.renderTo(svg);
       });
@@ -479,16 +473,16 @@ describe("Renderers", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.DataSource;
-      var yScale: Plottable.OrdinalScale;
-      var xScale: Plottable.LinearScale;
-      var renderer: Plottable.HorizontalBarRenderer;
+      var yScale: Plottable.Scale.Ordinal;
+      var xScale: Plottable.Scale.Linear;
+      var renderer: Plottable.Plot.HorizontalBar;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.OrdinalScale().domain(["A", "B"]).rangeType("points");
-        xScale = new Plottable.LinearScale();
+        yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+        xScale = new Plottable.Scale.Linear();
 
         var data = [
           {y: "A", x: 1},
@@ -497,7 +491,7 @@ describe("Renderers", () => {
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.HorizontalBarRenderer(dataset, xScale, yScale);
+        renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
         renderer._animate = false;
         renderer.renderTo(svg);
       });
@@ -626,11 +620,11 @@ describe("Renderers", () => {
       };
 
       it("renders correctly", () => {
-        var xScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
-        var yScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
-        var colorScale: Plottable.InterpolatedColorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var renderer: Plottable.GridRenderer = new Plottable.GridRenderer(DATA, xScale, yScale, colorScale)
+        var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale)
                                                             .project("fill", "magnitude");
         renderer.renderTo(svg);
         VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
@@ -639,11 +633,11 @@ describe("Renderers", () => {
 
 
       it("renders correctly when data is set after construction", () => {
-        var xScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
-        var yScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
-        var colorScale: Plottable.InterpolatedColorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var renderer: Plottable.GridRenderer = new Plottable.GridRenderer(null, xScale, yScale, colorScale)
+        var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
                                                             .project("fill", "magnitude");
         renderer.renderTo(svg);
         renderer.dataSource().data(DATA);
@@ -652,11 +646,11 @@ describe("Renderers", () => {
       });
 
       it("can invert y axis correctly", () => {
-        var xScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
-        var yScale: Plottable.OrdinalScale = new Plottable.OrdinalScale();
-        var colorScale: Plottable.InterpolatedColorScale = new Plottable.InterpolatedColorScale(["black", "white"]);
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var renderer: Plottable.GridRenderer = new Plottable.GridRenderer(null, xScale, yScale, colorScale)
+        var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
                                                             .project("fill", "magnitude");
         renderer.renderTo(svg);
 

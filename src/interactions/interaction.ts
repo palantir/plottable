@@ -1,6 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Abstract {
   export class Interaction {
     /* A general base class for interactions.
     It maintains a 'hitBox' which is where all event listeners are attached. Due to cross-
@@ -9,7 +10,7 @@ module Plottable {
     draw things, e.g. crosshairs.
     */
     public hitBox: D3.Selection;
-    public componentToListenTo: Component;
+    public componentToListenTo: Abstract.Component;
 
     /**
      * Creates an Interaction.
@@ -17,7 +18,7 @@ module Plottable {
      * @constructor
      * @param {Component} componentToListenTo The component to listen for interactions on.
      */
-    constructor(componentToListenTo: Component) {
+    constructor(componentToListenTo: Abstract.Component) {
       this.componentToListenTo = componentToListenTo;
     }
 
@@ -34,4 +35,5 @@ module Plottable {
       return this;
     }
   }
+}
 }

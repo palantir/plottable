@@ -1,6 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Abstract {
   export class QuantitiveScale extends Scale {
     public _d3Scale: D3.Scale.QuantitiveScale;
     private lastRequestedTickCount = 10;
@@ -167,4 +168,5 @@ module Plottable {
       return this;
     }
   }
+}
 }
