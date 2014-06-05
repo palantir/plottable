@@ -902,7 +902,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Axis extends Abstract.Component {
-            };
             static _DEFAULT_TICK_SIZE: number;
             /**
             * Creates an Axis.
