@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plot {
-  export class Bar extends Abstract.BarPlot {
+  export class VerticalBar extends Abstract.BarPlot {
     public _barAlignment = "left";
     public _ANIMATION_DURATION = 300; //milliseconds
     public _ANIMATION_DELAY = 15; //milliseconds
