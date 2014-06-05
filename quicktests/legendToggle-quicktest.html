@@ -20,14 +20,8 @@
         colorScale.range(colors);
         colorScale.domain(names.slice(0, numPlots));
 
-<<<<<<< HEAD
-        var xScale = new Plottable.LinearScale();
-        var yScale = new Plottable.LinearScale();
-=======
-
         var xScale = new Plottable.Scale.Linear();
         var yScale = new Plottable.Scale.Linear();
->>>>>>> master
 
         for (var i=0; i<numPlots; i++) {
             var data = makeRandomData(20);
