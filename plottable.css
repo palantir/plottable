@@ -4,7 +4,9 @@ svg.plottable {
 }
 
 .plottable .bounding-box {
-  fill: none;
+  /* Invisible pink bounding-box to allow for collision testing */
+  fill: pink;
+  visibility: hidden;
 }
 
 .plottable .label text {
