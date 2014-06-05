@@ -4311,6 +4311,9 @@ var Plottable;
                 dataSelection.classed("focus", function (d) {
                     return _this.focus === d;
                 });
+                dataSelection.classed("not-focus", function (d) {
+                    return _this.focus !== d;
+                });
                 if (b != null) {
                     dataSelection.classed("hover", b);
                 }
@@ -4406,6 +4409,7 @@ var Plottable;
             this.content.on("mouseover", func1(true));
             this.content.on("mouseout", func1(false));
 
+            // tag the element that is being hovered over with the class "focus"
             var func2 = function (b) {
                 return function (d, i) {
                     _this.focus = b ? d : undefined;
@@ -4439,6 +4443,9 @@ var Plottable;
                 var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
                 dataSelection.classed("focus", function (d) {
                     return _this.focus === d;
+                });
+                dataSelection.classed("not-focus", function (d) {
+                    return _this.focus !== d;
                 });
                 if (b != null) {
                     dataSelection.classed("hover", b);

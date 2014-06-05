@@ -70,6 +70,7 @@ module Plottable {
       if (this._isSetup) {
         var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
         dataSelection.classed("focus", (d: any) => this.focus === d);
+        dataSelection.classed("not-focus", (d: any) => this.focus !== d);
         if (b != null) {
           dataSelection.classed("hover", b);
         }

@@ -44,7 +44,7 @@
                                 ]);
 
         var legendLabel = new Plottable.Component.TitleLabel("fat");
-        var legend = new Plottable.ToggleLegend(colorScale,
+        var legend = new Plottable.Component.ToggleLegend(colorScale,
             function (d, b) {
                 var index = names.indexOf(d);
                 if (b) {

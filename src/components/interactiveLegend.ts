@@ -105,6 +105,7 @@ module Plottable {
       this.content.on("mouseover", func1(true));
       this.content.on("mouseout", func1(false));
 
+      // tag the element that is being hovered over with the class "focus"
       var func2 = (b: boolean) => (d: any, i: number) => {
         this.focus = b ? d : undefined;
         if (this._callbackHover != null) {
@@ -134,6 +135,7 @@ module Plottable {
       if (this._isSetup) {
         var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
         dataSelection.classed("focus", (d: any) => this.focus === d);
+        dataSelection.classed("not-focus", (d: any) => this.focus !== d);
         if (b != null) {
           dataSelection.classed("hover", b);
         }
