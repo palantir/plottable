@@ -181,6 +181,21 @@ export module Abstract {
       // will override
       return [];
     }
+
+    private updateProjectors() {
+        d3.keys(this._projectors).forEach((attrToSet: string) => {
+          var projector = this._projectors[attrToSet];
+          if (projector.scale != null) {
+            // calculate new extent here
+            // if (projector.scale instanceof QuantitiveScale) {
+            //   var newExtent
+            // }
+            // var newExtent: any[] = [];
+            projector.scale.extentChanged(this._plottableID, newExtent);
+          }
+        });
+        return this;
+    }
   }
 }
 }

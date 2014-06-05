@@ -2303,6 +2303,22 @@ var Plottable;
                 // will override
                 return [];
             };
+
+            Plot.prototype.updateProjectors = function () {
+                var _this = this;
+                d3.keys(this._projectors).forEach(function (attrToSet) {
+                    var projector = _this._projectors[attrToSet];
+                    if (projector.scale != null) {
+                        // calculate new extent here
+                        if (projector.scale instanceof Plottable.Abstract.QuantitiveScale) {
+                            // aoeua
+                        }
+                        var newExtent = [];
+                        projector.scale.extentChanged(_this._plottableID, newExtent);
+                    }
+                });
+                return this;
+            };
             return Plot;
         })(Plottable.Abstract.Component);
         Abstract.Plot = Plot;
