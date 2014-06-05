@@ -1098,6 +1098,44 @@ declare module Plottable {
 
 
 declare module Plottable {
+    class InteractiveLegend extends Legend {
+        /**
+        * Creates a InteractiveLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {ToggleCallback} cbc The function to be called when a legend entry is clicked.
+        * @param {HoverCallback} cbh The function to be called when a legend entry is hovered over.
+        */
+        constructor(colorScale: ColorScale, cbc?: ToggleCallback, cbh?: HoverCallback);
+        /**
+        * Assigns or gets the callback to the ToggleLegend
+        * Call with argument of null to remove the callback
+        *
+        * @param{ToggleCallback} callback The new callback function
+        */
+        public callbackClick(callback: ToggleCallback): ToggleLegend;
+        public callbackClick(): ToggleCallback;
+        /**
+        * Assigns or gets the callback to the HoverLegend
+        * Call with argument of null to remove the callback
+        *
+        * @param{HoverCallback} callback The new callback function
+        */
+        public callbackHover(callback: HoverCallback): HoverLegend;
+        public callbackHover(): HoverCallback;
+        /**
+        * Assigns a new ColorScale to the ToggleLegend.
+        *
+        * @param {ColorScale} scale
+        * @returns {ToggleLegend} The calling ToggleLegend.
+        */
+        public scale(scale?: ColorScale): any;
+    }
+}
+
+
+declare module Plottable {
     class Gridlines extends Component {
         /**
         * Creates a set of Gridlines.

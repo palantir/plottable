@@ -1,0 +1,89 @@
+<html>
+  <head>
+    <title>Interactive Legend Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <style>
+    .not-focus {
+      opacity:.2;
+    }
+    </style>
+
+    <script>
+        var renderers = [];
+
+        var colors = new Plottable.ColorScale("10").range();
+        var maxRenderers = 10;
+        var numRenderers = 5;
+        var names = ["bat", "cat", "hat", "rat", "pat", "mat", "sat", "vat", "at", "splat"];
+        var colorScale = new Plottable.ColorScale();
+        colorScale.range(colors);
+        colorScale.domain(names.slice(0, numRenderers));
+
+        var xScale = new Plottable.LinearScale();
+        var yScale = new Plottable.LinearScale();
+
+        for (var i=0; i<numRenderers; i++) {
+            var data = makeRandomData(20);
+            var renderer = new Plottable.CircleRenderer(data, xScale, yScale);
+                renderers.push(renderer);
+        }
+
+        var cg = new Plottable.ComponentGroup();
+        renderers.forEach(function(renderer, i) {
+            renderer.project("fill", function() { return colors[i]; });
+            cg.merge(renderer);
+        });
+
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var chart = new Plottable.Table([
+                                  [yAxis, cg],
+                                  [null,  xAxis]
+                                ]);
+        
+        var legendLabel = new Plottable.TitleLabel("fat");
+        var state = [];
+        for (var i = 0; i < numRenderers; i++) {
+          state.push(true);
+        }
+        var legend = new Plottable.InteractiveLegend(colorScale,
+            function (d, b) {
+                var index = names.indexOf(d);
+                state[index] = b;
+                if (b) {
+                  renderers[index].project("opacity", 1);
+                } else {
+                  renderers[index].project("opacity", 0);
+                }
+                cg._invalidateLayout();
+            },
+            function (d) {
+                if (d === undefined) {
+                    renderers.forEach(function(r, i) { r.project("opacity", state[i] ? 1 : 0); });
+                } else {
+                    var index = names.indexOf(d);
+                    renderers.forEach(function(r, i) { r.project("opacity", state[i] ? i === index ? 1 : .1 : 0); });
+                }
+                cg._invalidateLayout();
+            }
+        );
+
+        var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
+        var outerTable = new Plottable.Table([[chart, legendTable]]);
+
+      window.onload = function() {
+        outerTable.renderTo("#legend-toggle-test");
+      }
+
+    </script>
+  </head>
+  <body>
+    <svg id="legend-toggle-test" width="480" height="320"></svg>
+    <p />
+  </body>
+
+</html>

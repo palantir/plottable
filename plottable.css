@@ -82,7 +82,3 @@ svg.plottable {
 .plottable .legend .toggled-off circle {
   fill: #d3d3d3;
 }
-
-.plottable .legend .not-focus circle {
-  opacity: .1;
-}

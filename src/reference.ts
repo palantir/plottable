@@ -34,6 +34,7 @@
 /// <reference path="components/legend.ts" />
 /// <reference path="components/toggleLegend.ts" />
 /// <reference path="components/hoverLegend.ts" />
+/// <reference path="components/interactiveLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/axisUtils.ts" />
 /// <reference path="components/renderers/xyRenderer.ts" />

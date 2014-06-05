@@ -4232,6 +4232,134 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var InteractiveLegend = (function (_super) {
+        __extends(InteractiveLegend, _super);
+        /**
+        * Creates a InteractiveLegend.
+        *
+        * @constructor
+        * @param {ColorScale} colorScale
+        * @param {ToggleCallback} cbc The function to be called when a legend entry is clicked.
+        * @param {HoverCallback} cbh The function to be called when a legend entry is hovered over.
+        */
+        function InteractiveLegend(colorScale, cbc, cbh) {
+            this._callbackClick = cbc;
+            this._callbackHover = cbh;
+            this.isOff = d3.set();
+            _super.call(this, colorScale);
+        }
+        InteractiveLegend.prototype.callbackClick = function (callback) {
+            if (callback !== undefined) {
+                this._callbackClick = callback;
+                return this;
+            } else {
+                return this;
+            }
+        };
+
+        InteractiveLegend.prototype.callbackHover = function (callback) {
+            if (callback !== undefined) {
+                this._callbackHover = callback;
+                return this;
+            } else {
+                return this;
+            }
+        };
+
+        /**
+        * Assigns a new ColorScale to the ToggleLegend.
+        *
+        * @param {ColorScale} scale
+        * @returns {ToggleLegend} The calling ToggleLegend.
+        */
+        InteractiveLegend.prototype.scale = function (scale) {
+            var _this = this;
+            if (scale != null) {
+                _super.prototype.scale.call(this, scale);
+
+                // overwrite our previous listener from when we called super
+                this._registerToBroadcaster(scale, function () {
+                    // preserve the state of already existing elements
+                    _this.isOff = Plottable.Utils.intersection(_this.isOff, d3.set(_this.scale().domain()));
+                    _this.focus = undefined;
+                    _this._invalidateLayout();
+                });
+                this.isOff = Plottable.Utils.intersection(this.isOff, d3.set(this.scale().domain()));
+                this.focus = undefined;
+                this.updateClasses();
+                return this;
+            } else {
+                return _super.prototype.scale.call(this);
+            }
+        };
+
+        InteractiveLegend.prototype._doRender = function () {
+            var _this = this;
+            _super.prototype._doRender.call(this);
+            this.updateClasses();
+            var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+            var func = function (b) {
+                return function (d, i) {
+                    _this.focus = b ? d : undefined;
+                    if (_this._callbackHover != null) {
+                        _this._callbackHover(_this.focus);
+                    }
+                    _this.updateClasses();
+                };
+            };
+            dataSelection.on("mouseover", func(true));
+            dataSelection.on("mouseout", func(false));
+            dataSelection.on("click", function (d) {
+                var turningOn = _this.isOff.has(d);
+                if (turningOn) {
+                    _this.isOff.remove(d);
+                } else {
+                    _this.isOff.add(d);
+                }
+                if (_this._callbackClick != null) {
+                    _this._callbackClick(d, turningOn);
+                }
+                _this.updateClasses();
+            });
+            return this;
+        };
+
+        InteractiveLegend.prototype.updateClasses = function () {
+            var _this = this;
+            if (this._isSetup) {
+                var dataSelection = this.content.selectAll("." + Plottable.Legend._SUBELEMENT_CLASS);
+
+                // don't attach any classes if nothing is focused
+                // this is so users can do something for things not focused (i.e. fading), or focused (i.e. highlighting)
+                dataSelection.classed("focus", function (d) {
+                    return _this.focus !== undefined ? _this.focus === d : false;
+                });
+                dataSelection.classed("not-focus", function (d) {
+                    return _this.focus !== undefined ? _this.focus !== d : false;
+                });
+
+                dataSelection.classed("toggled-on", function (d) {
+                    return !_this.isOff.has(d);
+                });
+                dataSelection.classed("toggled-off", function (d) {
+                    return _this.isOff.has(d);
+                });
+            }
+        };
+        return InteractiveLegend;
+    })(Plottable.Legend);
+    Plottable.InteractiveLegend = InteractiveLegend;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Gridlines = (function (_super) {
         __extends(Gridlines, _super);
         /**
