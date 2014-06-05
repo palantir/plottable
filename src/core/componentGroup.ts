@@ -5,7 +5,7 @@ export module Component {
   export class Group extends Abstract.ComponentContainer {
 
     /**
-     * Creates a Group.
+     * Creates a ComponentGroup.
      *
      * @constructor
      * @param {Component[]} [components] The Components in the Group.

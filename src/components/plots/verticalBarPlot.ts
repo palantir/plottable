@@ -8,7 +8,7 @@ export module Plot {
     public _ANIMATION_DELAY = 15; //milliseconds
 
     /**
-     * Creates a BarPlot.
+     * Creates a VerticalBarPlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
