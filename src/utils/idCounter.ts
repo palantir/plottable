@@ -1,6 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Util {
   export class IDCounter {
     private counter: {[id: string]: number} = {};
 
@@ -25,4 +26,5 @@ module Plottable {
       return this.counter[id];
     }
   }
+}
 }

@@ -5,10 +5,10 @@ module Plottable {
     accessor: IAccessor;
     extent: any[];
   }
-  export class DataSource extends Broadcaster {
+  export class DataSource extends Abstract.Broadcaster {
     private _data: any[];
     private _metadata: any;
-    private accessor2cachedExtent: StrictEqualityAssociativeArray;
+    private accessor2cachedExtent: Util.StrictEqualityAssociativeArray;
     /**
      * Creates a new DataSource.
      *
@@ -20,7 +20,7 @@ module Plottable {
       super();
       this._data = data;
       this._metadata = metadata;
-      this.accessor2cachedExtent = new StrictEqualityAssociativeArray();
+      this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
     }
 
     /**
@@ -36,7 +36,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this.accessor2cachedExtent = new StrictEqualityAssociativeArray();
+        this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
         this._broadcast();
         return this;
       }
@@ -55,7 +55,7 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this.accessor2cachedExtent = new StrictEqualityAssociativeArray();
+        this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
         this._broadcast();
         return this;
       }
@@ -71,12 +71,12 @@ module Plottable {
     }
 
     private computeExtent(accessor: IAccessor): any[] {
-      var appliedAccessor = Utils.applyAccessor(accessor, this);
+      var appliedAccessor = Util.Methods.applyAccessor(accessor, this);
       var mappedData = this._data.map(appliedAccessor);
       if (mappedData.length === 0){
         return undefined;
       } else if (typeof(mappedData[0]) === "string") {
-        return Utils.uniq(mappedData);
+        return Util.Methods.uniq(mappedData);
       } else {
         return d3.extent(mappedData);
       }

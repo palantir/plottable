@@ -1,20 +1,21 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-  export class HorizontalBarRenderer extends AbstractBarRenderer {
+export module Plot {
+  export class HorizontalBar extends Abstract.BarPlot {
     public _barAlignment = "top";
     public _ANIMATION_DURATION = 300; //milliseconds
     public _ANIMATION_DELAY = 15; //milliseconds
 
     /**
-     * Creates a HorizontalBarRenderer.
+     * Creates a HorizontalBarPlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
      * @param {QuantitiveScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: QuantitiveScale, yScale: Scale) {
+    constructor(dataset: any, xScale: Abstract.QuantitiveScale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
     }
 
@@ -30,7 +31,7 @@ module Plottable {
       attrToProjector["height"] = attrToProjector["width"]; // remapping due to naming conventions
       var heightFunction = attrToProjector["height"];
 
-      var castYScale = (<OrdinalScale> this.yScale);
+      var castYScale = (<Scale.Ordinal> this.yScale);
       var rangeType = (castYScale.rangeType == null) ? "points" : castYScale.rangeType();
       if (rangeType === "points") {
         if (this._barAlignment === "middle") {
@@ -88,7 +89,7 @@ module Plottable {
      * Sets the vertical alignment of the bars.
      *
      * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
-     * @return {HorizontalBarRenderer} The calling HorizontalBarRenderer.
+     * @return {HorizontalBarPlot} The calling HorizontalBarPlot.
      */
     public barAlignment(alignment: string) {
       var alignmentLC = alignment.toLowerCase();
@@ -103,4 +104,5 @@ module Plottable {
       return this;
     }
   }
+}
 }

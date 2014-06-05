@@ -22,9 +22,8 @@
     <script>
 window.onload = function() {
 
-Plottable.RenderController.enabled = false;
     var c1, c2, c3;
-    var xScale, yScale, colorScale, xAxisB, xAxisT, yAxisL, yAxisR, gridRenderer;
+    var xScale, yScale, colorScale, xAxisB, xAxisT, yAxisL, yAxisR, gridPlot;
       function randomData() {
         var data = [];
         ["Work", "Food Is Tasty And I like it", "Sex", "Sleep"].forEach(function(category) {
@@ -61,24 +60,24 @@ Plottable.RenderController.enabled = false;
     }
 
       function makeChart(selector, colors, data) {
-          xScale       = new Plottable.OrdinalScale().rangeType("bands");
-          yScale       = new Plottable.OrdinalScale().rangeType("bands");
-          colorScale   = new Plottable.InterpolatedColorScale(colors);
+          xScale       = new Plottable.Scale.Ordinal().rangeType("bands");
+          yScale       = new Plottable.Scale.Ordinal().rangeType("bands");
+          colorScale   = new Plottable.Scale.InterpolatedColor(colors);
 
           identity     = function(d){return d;};
-          xAxisB        = new Plottable.CategoryAxis(xScale, "bottom");
-          xAxisT        = new Plottable.CategoryAxis(xScale, "top");
-          yAxisL        = new Plottable.CategoryAxis(yScale, "left");
-          yAxisR        = new Plottable.CategoryAxis(yScale, "right");
-          gridRenderer = new Plottable.GridRenderer(data, xScale, yScale, colorScale)
+          xAxisB        = new Plottable.Axis.Category(xScale, "bottom");
+          xAxisT        = new Plottable.Axis.Category(xScale, "top");
+          yAxisL        = new Plottable.Axis.Category(yScale, "left");
+          yAxisR        = new Plottable.Axis.Category(yScale, "right");
+          gridPlot = new Plottable.Plot.Grid(data, xScale, yScale, colorScale)
                                   .project("x", "category")
                                   .project("y", "day")
                                   .project("fill", "awesomeness");
 
-          return new Plottable.Table()
+          return new Plottable.Component.Table()
             .addComponent(1, 0, yAxisL)
             .addComponent(1, 2, yAxisR)
-            .addComponent(1, 1, gridRenderer)
+            .addComponent(1, 1, gridPlot)
             .addComponent(0, 1, xAxisT)
             .addComponent(2, 1, xAxisB)
             .renderTo(selector);

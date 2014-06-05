@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export module Utils {
+export module Util {
+  export module Methods {
 
     /**
      * Checks if x is between a and b.
@@ -91,4 +92,5 @@ module Plottable {
       return true;
     }
   }
+}
 }

@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class OrdinalScale extends Scale {
+export module Scale {
+  export class Ordinal extends Abstract.Scale {
     public _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
     private _rangeType: string = "bands";
@@ -28,7 +29,7 @@ module Plottable {
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
-      return Utils.uniq(concatenatedExtents);
+      return Util.Methods.uniq(concatenatedExtents);
     }
 
     /**
@@ -38,7 +39,7 @@ module Plottable {
      * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
      */
     public domain(): any[];
-    public domain(values: any[]): OrdinalScale;
+    public domain(values: any[]): Ordinal;
     public domain(values?: any[]): any {
       return super.domain(values);
     }
@@ -55,7 +56,7 @@ module Plottable {
      * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
      */
     public range(): any[];
-    public range(values: number[]): OrdinalScale;
+    public range(values: number[]): Ordinal;
     public range(values?: number[]): any {
       if (values == null) {
         return this._range;
@@ -108,7 +109,7 @@ module Plottable {
      *     OrdinalScale.
      */
     public rangeType() : string;
-    public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : OrdinalScale;
+    public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : Ordinal;
     public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
       if (rangeType == null) {
         return this._rangeType;
@@ -132,8 +133,9 @@ module Plottable {
       this._rendererID2Extent[rendererID] = extent;
       extent = <string[]>extent;
       // this.domain will broadcast for us
-      this.domain(Utils.uniq(this.domain()));
+      this.domain(Util.Methods.uniq(this.domain()));
       return this;
     }
   }
+}
 }

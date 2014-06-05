@@ -35,16 +35,15 @@
 /// <reference path="components/toggleLegend.ts" />
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/axisUtils.ts" />
-/// <reference path="components/renderers/xyRenderer.ts" />
-/// <reference path="components/renderers/circleRenderer.ts" />
-/// <reference path="components/renderers/rectRenderer.ts" />
-/// <reference path="components/renderers/gridRenderer.ts" />
-/// <reference path="components/renderers/abstractBarRenderer.ts" />
-/// <reference path="components/renderers/barRenderer.ts" />
-/// <reference path="components/renderers/horizontalBarRenderer.ts" />
-/// <reference path="components/renderers/areaRenderer.ts" />
-/// <reference path="components/renderers/lineRenderer.ts" />
 
+/// <reference path="components/plots/xyPlot.ts" />
+/// <reference path="components/plots/scatterPlot.ts" />
+/// <reference path="components/plots/gridPlot.ts" />
+/// <reference path="components/plots/abstractBarPlot.ts" />
+/// <reference path="components/plots/verticalBarPlot.ts" />
+/// <reference path="components/plots/horizontalBarPlot.ts" />
+/// <reference path="components/plots/areaPlot.ts" />
+/// <reference path="components/plots/linePlot.ts" />
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />

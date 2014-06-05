@@ -1,11 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class CategoryAxis extends BaseAxis {
-    public _scale: OrdinalScale;
+export module Axis {
+  export class Category extends Abstract.Axis {
+    public _scale: Scale.Ordinal;
     public _tickLabelsG: D3.Selection;
 
-    constructor(scale: OrdinalScale, orientation = "bottom") {
+    constructor(scale: Scale.Ordinal, orientation = "bottom") {
       super(scale, orientation);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
@@ -55,9 +56,9 @@ module Plottable {
       return this._scale.domain();
     }
 
-    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): TextUtils.IWriteTextResult {
+    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Util.Text.IWriteTextResult {
       var self = this;
-      var textWriteResults: TextUtils.IWriteTextResult[] = [];
+      var textWriteResults: Util.Text.IWriteTextResult[] = [];
       ticks.each(function (d: string, i: number) {
         var d3this = d3.select(this);
         var startAndWidth = self._scale.fullBandStartAndWidth(d);
@@ -74,16 +75,16 @@ module Plottable {
         var xAlign: {[s: string]: string} = {left: "right", right: "left", top: "center", bottom: "center"};
         var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
 
-        var textWriteResult = TextUtils.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
+        var textWriteResult = Util.Text.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
         textWriteResults.push(textWriteResult);
       });
 
       var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
       var heightFn = this._isHorizontal() ? d3.max : d3.sum;
       return {
-        textFits: textWriteResults.every((t: TextUtils.IWriteTextResult) => t.textFits),
-        usedWidth : widthFn(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedWidth),
-        usedHeight: heightFn(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedHeight)
+        textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
+        usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),
+        usedHeight: heightFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedHeight)
       };
 
     }
@@ -98,9 +99,10 @@ module Plottable {
 
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
-      DOMUtils.translate(this._tickLabelsG, xTranslate, yTranslate);
-      DOMUtils.translate(this._ticksContainer, translate[0], translate[1]);
+      Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
+      Util.DOM.translate(this._ticksContainer, translate[0], translate[1]);
       return this;
     }
   }
+}
 }

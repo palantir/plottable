@@ -33,7 +33,7 @@
     <script>
       function sizeSVG(selection) {
         var svg = d3.select(selection);
-        var width = Plottable.DOMUtils.getSVGPixelWidth(svg);
+        var width = Plottable.Util.DOM.getSVGPixelWidth(svg);
         svg.attr("width", width);
         var height = Math.min(width*.6, 500);
         svg.attr("height", height);
@@ -118,7 +118,7 @@
       <h2>What is Plottable?</h2>
       <p>
         Plottable.js is a library for data visualization and charting, under development by Palantir Technologies.
-        Plottable is built on D3 and provides higher-level components like a CircleRenderer, Legend, and TitleLabel. These components are
+        Plottable is built on D3 and provides higher-level components like a CirclePlot, Legend, and TitleLabel. These components are
         bundled with a layout engine that can position them in complex arrangements and size them. Plottable is flexible, pluggable, performant, and interactive.
       </p>
       <p>
@@ -138,20 +138,20 @@
   // These scales are Plottable wrappers for a d3.scale object.
   // Like D3 scales, they manage a mapping from data to visual properties; pixel positions in this case
   // Unlike D3 scales, they automatically set their domain and range, and have event handling to update dependent components on changes
-  var xScale = new Plottable.LinearScale();
-  var yScale = new Plottable.LinearScale();
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
 
-  // The Axes and LineRenderer are all Components, meaning they take up visual space and are placed by the layout engine
-  var xAxis = new Plottable.XAxis(xScale, "bottom", d3.format("d"));
-  var yAxis = new Plottable.YAxis(yScale, "left");
+  // The Axes and LinePlot are all Components, meaning they take up visual space and are placed by the layout engine
+  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", d3.format("d"));
+  var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
   // In this case, the xyData is organized to be an array of {x, y} points. The Renderer automatically accesses these attributes.
-  var renderer = new Plottable.LineRenderer(xyData, xScale, yScale);
+  var renderer = new Plottable.Plot.Line(xyData, xScale, yScale);
 
   // Now we'll make a Table to organize the layout of the components. The first row will have a yAxis and renderer; the second will
   // only have the xAxis, and it will be aligned to the column of the renderer.
   // The yAxis is fixed-width and the xAxis is fixed-height, so the renderer will naturally expand to take up all free space
-  var chart = new Plottable.Table([
+  var chart = new Plottable.Component.Table([
                     [yAxis, renderer],
                     [null,  xAxis   ]
                   ]);
@@ -162,19 +162,19 @@
     <br><br><h2>Powerful</h2>
     <p>
     We've also designed Plottable to be highly flexible and customizable. Plottable renderers are agonstic to the way data is structured,
-    and support setting arbitrary SVG attributes based on functions and scales they are given. In the example below, we have a CircleRenderer that
+    and support setting arbitrary SVG attributes based on functions and scales they are given. In the example below, we have a CirclePlot that
     uses an accessor function to compute some derived attributes from the data on-the-fly, and uses that data to set the fill on the circles.
   </p>
       <div class="svg-container"><svg id="customProjectors" width="100%"></svg></div>
       <br>
       <pre class="prettyprint"><code>function customProjectorChart(data) {
-  var xScale = new Plottable.LinearScale().domain([-5, 100]);
-  var yScale = new Plottable.LogScale().domain([0.5, 100000]);
+  var xScale = new Plottable.Scale.Linear().domain([-5, 100]);
+  var yScale = new Plottable.Scale.Log().domain([0.5, 100000]);
 
-  var xAxis = new Plottable.XAxis(xScale, "bottom", d3.format("d"));
-  var yAxis = new Plottable.YAxis(yScale, "left");
+  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", d3.format("d"));
+  var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-  var renderer = new Plottable.CircleRenderer(data, xScale, yScale);
+  var renderer = new Plottable.Plot.Scatter(data, xScale, yScale);
 
   // By calling renderer.project(attribute=x, accessor="day_delta", scale=xScale), we tell the renderer to set the "x"
   // attribute on data using the given accessor and scale. In general, an accessor is a function that takes in a data
@@ -194,10 +194,10 @@
     return d.additions / (d.deletions + d.additions);
   }
   // This scale interpolates between red for commits with mostly deletions, and green for commits with mostly additions.
-  var colorScale = new Plottable.InterpolatedColorScale(["#FF0000", "#008B00"]);
+  var colorScale = new Plottable.Scale.InterpolatedColor(["#FF0000", "#008B00"]);
   renderer.project("fill", additionsOverLinesChanged, colorScale);
 
-  var chart = new Plottable.StandardChart()
+  var chart = new Plottable.Template.StandardChart()
                     .xAxis(xAxis).yAxis(yAxis)
                     .center(renderer)
                     .xLabel("days since start of project")
@@ -222,28 +222,28 @@
       <br>
       <pre class="prettyprint"><code>function layoutChart(data) {
   // The two subplots will share an xScale, but have two seperate yScales for their data
-  var xScale        = new Plottable.LinearScale().domain([0, 100]);
-  var yScaleCommits = new Plottable.LinearScale();
-  var yScaleLOC     = new Plottable.LinearScale();
+  var xScale        = new Plottable.Scale.Linear().domain([0, 100]);
+  var yScaleCommits = new Plottable.Scale.Linear();
+  var yScaleLOC     = new Plottable.Scale.Linear();
 
-  var xAxis         = new Plottable.XAxis(xScale, "bottom").showEndTickLabels(true);
-  var yAxisCommits  = new Plottable.YAxis(yScaleCommits, "left");
-  var yAxisLOC      = new Plottable.YAxis(yScaleLOC, "right");
+  var xAxis         = new Plottable.Axis.XAxis(xScale, "bottom").showEndTickLabels(true);
+  var yAxisCommits  = new Plottable.Axis.YAxis(yScaleCommits, "left");
+  var yAxisLOC      = new Plottable.Axis.YAxis(yScaleLOC, "right");
 
   // A DataSource is a Plottable object that maintains data and metadata, and updates dependents when it changes
   // In the previous example, we implicitly created a DataSource by putting the data directly into the Renderer constructor
   var gitDataSource   = new Plottable.DataSource(data);
-  var commitsRenderer = new Plottable.LineRenderer(gitDataSource, xScale, yScaleCommits);
-  var locRenderer     = new Plottable.AreaRenderer(gitDataSource, xScale, yScaleLOC);
+  var commitsPlot = new Plottable.Plot.Line(gitDataSource, xScale, yScaleCommits);
+  var locPlot     = new Plottable.Plot.Area(gitDataSource, xScale, yScaleLOC);
 
-  commitsRenderer.project("x", "day_delta", xScale);
-  locRenderer    .project("x", "day_delta", xScale);
+  commitsPlot.project("x", "day_delta", xScale);
+  locPlot    .project("x", "day_delta", xScale);
 
-  commitsRenderer.project("y", "commit_number", yScaleCommits);
-  locRenderer    .project("y", "lines_of_code", yScaleLOC);
+  commitsPlot.project("y", "commit_number", yScaleCommits);
+  locPlot    .project("y", "lines_of_code", yScaleLOC);
 
-  var commitsTitle = new Plottable.TitleLabel("# of Commits Over Time");
-  var locTitle     = new Plottable.TitleLabel("# of Lines Of Code Over Time");
+  var commitsTitle = new Plottable.Component.TitleLabel("# of Commits Over Time");
+  var locTitle     = new Plottable.Component.TitleLabel("# of Lines Of Code Over Time");
 
   // A Table is the principle abstraction for laying out Plottable Components.
   // The rows and columns express alignment constraints between objects, and Tables can be nested inside other
@@ -253,11 +253,11 @@
   // left over by the Axes.
   // If we had multiple columns with variable-width components, we could let Plottable balance the columns between them,
   // or set proportional "weights" on each column.
-  var chart = new Plottable.Table([
+  var chart = new Plottable.Component.Table([
                     [null        , commitsTitle   , null        ],
-                    [yAxisCommits, commitsRenderer, null        ],
+                    [yAxisCommits, commitsPlot, null        ],
                     [null        , locTitle       , null        ],
-                    [null        , locRenderer    , yAxisLOC    ],
+                    [null        , locPlot    , yAxisLOC    ],
                     [null        , xAxis          , null        ]
                   ]);
 
@@ -268,7 +268,7 @@
       <br><br><h2>Pluggable</h2>
       <p>
         Plottable consists of a small core architecture and a large set of lightweight plugins. In the example below, almost everything is
-        a plugin: the CircleRenderer, the Gridlines, the Legend, and the DragBoxInteraction. Adding a new Component or Interaction - say, a DragBox that
+        a plugin: the CirclePlot, the Gridlines, the Legend, and the DragBoxInteraction. Adding a new Component or Interaction - say, a DragBox that
         can be dragged and repositioned after it is created - would only be 10-20 lines of Typescript code. </p>
       <p>
         The chart below is interactive - try dragging out a box on it, or double-click to reset.
@@ -276,34 +276,34 @@
       <div class="svg-container"><svg id="plugins" width="100%"></svg></div>
       <br>
 <pre class="prettyprint"><code>function pluginsChart(gitData) {
-  var xScale = new Plottable.LinearScale().domain([-0.03, 1.03]);
-  var yScale = new Plottable.LogScale().domain([0.9, 100000]);
-  var colorScale = new Plottable.ColorScale("category10");
+  var xScale = new Plottable.Scale.Linear().domain([-0.03, 1.03]);
+  var yScale = new Plottable.Scale.Log().domain([0.9, 100000]);
+  var colorScale = new Plottable.Scale.Color("category10");
 
-  // The Axes and LineRenderer are all Components,
+  // The Axes and LinePlot are all Components,
   // meaning they take up visual space and are placed by the layout engine
-  var xAxis  = new Plottable.XAxis(xScale, "bottom", d3.format("%"));
-  var yAxis  = new Plottable.YAxis(yScale, "left");
+  var xAxis  = new Plottable.Axis.XAxis(xScale, "bottom", d3.format("%"));
+  var yAxis  = new Plottable.Axis.YAxis(yScale, "left");
 
 
   var linesChanged = function(d) { return d.additions + d.deletions; };
   var percentAdditions = function(d) {
     return (linesChanged(d) === 0) ? 0.5 : d.additions / linesChanged(d);
   }
-  var renderer  = new Plottable.CircleRenderer(gitData, xScale, yScale)
+  var renderer  = new Plottable.Plot.Scatter(gitData, xScale, yScale)
                                .project("x", percentAdditions, xScale)
                                .project("y", linesChanged, yScale)
                                .project("fill", "name", colorScale)
-  var gridlines = new Plottable.Gridlines(xScale, yScale);
-  var legend    = new Plottable.Legend(colorScale).xOffset(-80).minimumWidth(200);
+  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+  var legend    = new Plottable.Component.Legend(colorScale).xOffset(-80).minimumWidth(200);
   var center = renderer.merge(gridlines).merge(legend);
 
-  var dragBox = new Plottable.XYDragBoxInteraction(center).registerWithComponent();
+  var dragBox = new Plottable.Interaction.XYDragBox(center).registerWithComponent();
   Plottable.setupDragBoxZoom(dragBox, xScale, yScale);
   // Now we'll make a Table to organize the layout of the components. The first row will have a yAxis and renderer; the second will
   // only have the xAxis, and it will be aligned to the column of the renderer.
   // The yAxis is fixed-width and the xAxis is fixed-height, so the renderer will naturally expand to take up all free space
-  new Plottable.StandardChart().xAxis(xAxis).yAxis(yAxis).center(center)
+  new Plottable.Template.StandardChart().xAxis(xAxis).yAxis(yAxis).center(center)
                                .xLabel("% of Lines Changed that were Additions")
                                .yLabel("# of Lines Changed")
                                .titleLabel("Commits by Lines Changed and % Additions")

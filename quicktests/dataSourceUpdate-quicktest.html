@@ -21,26 +21,26 @@
         var dataseries = makeRandomData(20, 0.3);
         // newData();
 
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scale.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scale.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
         var y0Accessor = function(d, i) { return dataseries[i].y; }
 
         ds = new Plottable.DataSource(dataseries);
 
-        renderAreaD1 = new Plottable.AreaRenderer(ds, xScale, yScale);
+        renderAreaD1 = new Plottable.Plot.Area(ds, xScale, yScale);
 
         var fillAccessor = function() { return "steelblue"; }
         var fillAccessorTop = function() { return "pink"; }
         renderAreaD1.project("fill", fillAccessor)
 
-        var gridlines = new Plottable.Gridlines(xScale, yScale);
-        var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1]);
+        var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+        var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1]);
 
-        var chart = new Plottable.StandardChart()
+        var chart = new Plottable.Template.StandardChart()
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
                         .renderTo("#areaRenderer-test");
       }

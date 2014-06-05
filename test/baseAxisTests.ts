@@ -4,17 +4,17 @@ var assert = chai.assert;
 
 describe("BaseAxis", () => {
   it("orientation", () => {
-    var scale = new Plottable.LinearScale();
-    assert.throws(() => new Plottable.BaseAxis(scale, "blargh"), "unsupported");
+    var scale = new Plottable.Scale.Linear();
+    assert.throws(() => new Plottable.Abstract.Axis(scale, "blargh"), "unsupported");
   });
 
   it("draws ticks and baseline (horizontal)", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.LinearScale();
+    var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
-    var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+    var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
     (<any> baseAxis)._getTickValues = function() { return scale.ticks(10); };
     baseAxis.renderTo(svg);
 
@@ -42,9 +42,9 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.LinearScale();
+    var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
-    var baseAxis = new Plottable.BaseAxis(scale, "left");
+    var baseAxis = new Plottable.Abstract.Axis(scale, "left");
     (<any> baseAxis)._getTickValues = function() { return scale.ticks(10); };
     baseAxis.renderTo(svg);
 
@@ -72,9 +72,9 @@ describe("BaseAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.LinearScale();
+    var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
-    var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+    var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
     (<any> baseAxis)._getTickValues = function() { return scale.ticks(10); };
     baseAxis.renderTo(svg);
 
@@ -93,8 +93,8 @@ describe("BaseAxis", () => {
   });
 
   it("tickLabelPadding()", () => {
-    var scale = new Plottable.LinearScale();
-    var baseAxis = new Plottable.BaseAxis(scale, "bottom");
+    var scale = new Plottable.Scale.Linear();
+    var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
 
     assert.throws(() => baseAxis.tickLabelPadding(-1), "must be positive");
   });

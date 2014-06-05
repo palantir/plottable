@@ -1,7 +1,0 @@
----
-name: Plottable.js Bar Chart with Gridlines Demo
-description: Creates a bar cahrt with gridlines and no tick labels on the x-axis.
-authors:
-  - Justin Lan
-normalize_css: no
-...

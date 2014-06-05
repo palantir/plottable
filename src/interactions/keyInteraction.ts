@@ -1,7 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class KeyInteraction extends Interaction {
+export module Interaction {
+  export class Key extends Abstract.Interaction {
     private _callback: () => any;
     private activated = false;
     private keyCode: number;
@@ -13,7 +14,7 @@ module Plottable {
      * @param {Component} componentToListenTo The component to listen for keypresses on.
      * @param {number} keyCode The key code to listen for.
      */
-    constructor(componentToListenTo: Component, keyCode: number) {
+    constructor(componentToListenTo: Abstract.Component, keyCode: number) {
       super(componentToListenTo);
       this.keyCode = keyCode;
     }
@@ -27,7 +28,7 @@ module Plottable {
         this.activated = false;
       });
 
-      Plottable.KeyEventListener.addCallback(this.keyCode, (e: D3.Event) => {
+      Plottable.Singleton.KeyEventListener.addCallback(this.keyCode, (e: D3.Event) => {
         if (this.activated && this._callback != null) {
           this._callback();
         }
@@ -39,9 +40,10 @@ module Plottable {
      *
      * @param {() => any} cb: Callback to be called.
      */
-    public callback(cb: () => any): KeyInteraction {
+    public callback(cb: () => any): Key {
       this._callback = cb;
       return this;
     }
   }
+}
 }

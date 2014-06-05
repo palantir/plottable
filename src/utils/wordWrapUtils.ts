@@ -1,11 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export module WordWrapUtils {
+export module Util {
+  export module WordWrap {
 
-  var LINE_BREAKS_BEFORE = /[{\[]/;
-  var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
-  var SPACES = /^\s+$/;
+    var LINE_BREAKS_BEFORE = /[{\[]/;
+    var LINE_BREAKS_AFTER = /[!"%),-.:;?\]}]/;
+    var SPACES = /^\s+$/;
     export interface IWrappedText {
       originalText: string;
       lines: string[];
@@ -16,7 +17,7 @@ module Plottable {
      * Takes a block of text, a width and height to fit it in, and a 2-d text measurement function.
      * Wraps words and fits as much of the text as possible into the given width and height.
      */
-    export function breakTextToFitRect(text: string, width: number, height: number, measureText: TextUtils.TextMeasurer): IWrappedText {
+    export function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): IWrappedText {
       var widthMeasure = (s: string) => measureText(s)[0];
       var lines = breakTextToFitWidth(text, width, widthMeasure);
       var textHeight = measureText("hello world")[1];
@@ -26,7 +27,7 @@ module Plottable {
         lines = lines.splice(0, nLinesThatFit);
         if (nLinesThatFit > 0) {
           // Overwrite the last line to one that has had a ... appended to the end
-          lines[nLinesThatFit-1] = TextUtils.addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
+          lines[nLinesThatFit-1] = Text.addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
         }
       }
       return {originalText: text, lines: lines, textFits: textFit};
@@ -194,4 +195,5 @@ module Plottable {
       return true;
     }
   }
+}
 }

@@ -1,21 +1,22 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-  export class AbstractBarRenderer extends XYRenderer {
+export module Abstract {
+  export class BarPlot extends XYPlot {
     public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignment: string;
 
     /**
-     * Creates an AbstractBarRenderer.
+     * Creates an AbstractBarPlot.
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Scale, yScale: Scale) {
+    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("bar-renderer", true);
       this.project("width", 10);
@@ -32,7 +33,7 @@ module Plottable {
      * Sets the baseline for the bars to the specified value.
      *
      * @param {number} value The value to position the baseline at.
-     * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+     * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
       this._baselineValue = value;
@@ -47,7 +48,7 @@ module Plottable {
      * Behavior depends on subclass implementation.
      *
      * @param {string} alignment The desired alignment.
-     * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+     * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public barAlignment(alignment: string) {
       // implementation in child classes
@@ -83,11 +84,12 @@ module Plottable {
 
     /**
      * Deselects all bars.
-     * @return {AbstractBarRenderer} The calling AbstractBarRenderer.
+     * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
       this._bars.classed("selected", false);
       return this;
     }
   }
+}
 }
