@@ -3,7 +3,7 @@
 ///<reference path="../typings/d3/d3.d.ts" />
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="testUtilts" />
+///<reference path="testUtils.ts" />
 ///<reference path="../build/plottable.d.ts" />
 
 ///<reference path="axisTests.ts" />
