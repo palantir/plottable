@@ -48,7 +48,7 @@ module Plottable {
 
       // on mouseover, tag everything with the "hover" class
       var func1 = (b: boolean) => (d: any) => {
-         dataSelection.classed("hover", b);
+        this.updateClasses(b);
       };
       this.content.on("mouseover", func1(true));
       this.content.on("mouseout", func1(false));
@@ -66,10 +66,13 @@ module Plottable {
       return this;
     }
 
-    private updateClasses() {
+    private updateClasses(b?: boolean) {
       if (this._isSetup) {
         var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
         dataSelection.classed("focus", (d: any) => this.focus === d);
+        if (b != null) {
+          dataSelection.classed("hover", b);
+        }
       }
     }
   }

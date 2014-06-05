@@ -4283,7 +4283,7 @@ var Plottable;
             // on mouseover, tag everything with the "hover" class
             var func1 = function (b) {
                 return function (d) {
-                    dataSelection.classed("hover", b);
+                    _this.updateClasses(b);
                 };
             };
             this.content.on("mouseover", func1(true));
@@ -4304,13 +4304,16 @@ var Plottable;
             return this;
         };
 
-        HoverLegend.prototype.updateClasses = function () {
+        HoverLegend.prototype.updateClasses = function (b) {
             var _this = this;
             if (this._isSetup) {
                 var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
                 dataSelection.classed("focus", function (d) {
                     return _this.focus === d;
                 });
+                if (b != null) {
+                    dataSelection.classed("hover", b);
+                }
             }
         };
         return HoverLegend;
@@ -4397,7 +4400,7 @@ var Plottable;
             // on mouseover, tag everything with the "hover" class
             var func1 = function (b) {
                 return function (d) {
-                    dataSelection.classed("hover", b);
+                    _this.updateClasses(b);
                 };
             };
             this.content.on("mouseover", func1(true));
@@ -4430,13 +4433,16 @@ var Plottable;
             return this;
         };
 
-        InteractiveLegend.prototype.updateClasses = function () {
+        InteractiveLegend.prototype.updateClasses = function (b) {
             var _this = this;
             if (this._isSetup) {
                 var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
                 dataSelection.classed("focus", function (d) {
                     return _this.focus === d;
                 });
+                if (b != null) {
+                    dataSelection.classed("hover", b);
+                }
 
                 dataSelection.classed("toggled-on", function (d) {
                     return !_this.isOff.has(d);
