@@ -6,7 +6,7 @@ export module Singleton {
     private static componentsNeedingRender: {[key: string]: Abstract.Component} = {};
     private static componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
     private static animationRequested = false;
-    public static enabled = (<any> window).PlottableTestCode == null && (window.requestAnimationFrame) != null;
+    public static enabled = (<any> window).PlottableTestCode == null;
 
     public static registerToRender(c: Abstract.Component) {
       if (!RenderController.enabled) {
@@ -29,7 +29,11 @@ export module Singleton {
 
     private static requestFrame() {
       if (!RenderController.animationRequested) {
-        requestAnimationFrame(RenderController.flush);
+        if (window.requestAnimationFrame != null) {
+          requestAnimationFrame(RenderController.flush);
+        } else {
+          setTimeout(RenderController.flush, 16);
+        }
         RenderController.animationRequested = true;
       }
     }
