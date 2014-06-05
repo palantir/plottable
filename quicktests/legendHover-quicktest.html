@@ -13,38 +13,38 @@
         var renderers = [];
 
 
-        var colors = new Plottable.ColorScale("10").range();
+        var colors = new Plottable.Scale.Color("10").range();
         var numRenderers = 5;
         var names = ["aaa", "bbb", "ccc", "ddd", "eee"];
-        var colorScale = new Plottable.ColorScale();
+        var colorScale = new Plottable.Scale.Color();
         colorScale.range(colors);
         colorScale.domain(names);
 
 
-        var xScale = new Plottable.LinearScale();
-        var yScale = new Plottable.LinearScale();
+        var xScale = new Plottable.Scale.Linear();
+        var yScale = new Plottable.Scale.Linear();
 
         for (var i=0; i<numRenderers; i++) {
             var data = makeRandomData(20);
-            var renderer = new Plottable.LineRenderer(data, xScale, yScale);
+            var renderer = new Plottable.Plot.Line(data, xScale, yScale);
                 renderers.push(renderer);
         }
 
-        var cg = new Plottable.ComponentGroup();
+        var cg = new Plottable.Component.Group();
         renderers.forEach(function(renderer, i) {
             renderer.project("stroke", function() { return colors[i]; });
             cg.merge(renderer);
         });
 
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        var chart = new Plottable.Table([
+        var chart = new Plottable.Component.Table ([
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
 
-        var legendLabel = new Plottable.TitleLabel("q");
+        var legendLabel = new Plottable.Component.TitleLabel("q");
         var legend = new Plottable.HoverLegend(colorScale,
             function (d) {
                 if (d === undefined) {
@@ -56,9 +56,9 @@
                 cg._invalidateLayout();
             }
         );
-        var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
+        var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]); 
 
-        var outerTable = new Plottable.Table([[chart, legendTable]]);
+        var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
         outerTable.renderTo("#legend-hover-test");
       }
     </script>
