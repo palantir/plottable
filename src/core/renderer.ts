@@ -12,7 +12,6 @@ module Plottable {
 
     public renderArea: D3.Selection;
     public element: D3.Selection;
-    public scales: Scale[];
     public _colorAccessor: IAccessor;
     public _animate = false;
     public _ANIMATION_DURATION = 250; // milliseconds
@@ -29,6 +28,8 @@ module Plottable {
     // A perf-efficient approach to rendering scale changes would be to transform
     // the container rather than re-render. In the event that the data is changed,
     // it will be necessary to do a regular rerender.
+
+    private scales: Scale[];
 
     /**
      * Creates a Renderer.
@@ -83,6 +84,7 @@ module Plottable {
 
         // point all scales at the new datasource
         d3.keys(this._projectors).forEach((attrToSet: string) => {
+          console.log(attrToSet);
           var projector = this._projectors[attrToSet];
           if (projector.scale != null) {
             var rendererIDAttr = this._plottableID + attrToSet;
@@ -92,7 +94,8 @@ module Plottable {
         });
       }
       this._dataSource = source;
-      this._registerToBroadcaster(this._dataSource, () => {
+      // NOTE: rendererID is a number, convert it to a string first or something
+      this._registerToBroadcaster(this._dataSource, (newDataSource) => {
         this._dataChanged = true;
         this._render();
       });
@@ -163,6 +166,19 @@ module Plottable {
     public animate(enabled: boolean) {
       this._animate = enabled;
       return this;
+    }
+
+    public addScale(scale: Scale) {
+      this.scales.push(scale);
+      scale.registerListener(this, () => {
+        // get new extent from scale
+        console.log("it's happening");
+      });
+    }
+
+    public _extentFromDataSource(ds: DataSource): any[] {
+      // will override
+      return [];
     }
   }
 }

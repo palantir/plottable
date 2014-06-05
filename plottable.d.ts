@@ -37,6 +37,7 @@ declare module Plottable {
         * @return {any[]}
         */
         function createFilledArray(value: any, count: number): any[];
+        function arrayEqual<T>(a: T[], b: T[]): boolean;
     }
 }
 
@@ -506,6 +507,7 @@ declare module Plottable {
         * @returns {Scale} A copy of the calling Scale.
         */
         public copy(): Scale;
+        public extentChanged(rendererID: number, extent: any[]): Scale;
     }
 }
 
@@ -540,6 +542,7 @@ declare module Plottable {
         * @param {boolean} enabled Whether or not to animate.
         */
         public animate(enabled: boolean): Renderer;
+        public addScale(scale: Scale): void;
     }
 }
 
@@ -671,6 +674,7 @@ declare module Plottable {
         * @returns {QuantitiveScale} The calling QuantitiveScale.
         */
         public padDomain(padProportion?: number): QuantitiveScale;
+        public extentChanged(rendererID: number, extent: any[]): QuantitiveScale;
     }
 }
 
@@ -762,6 +766,7 @@ declare module Plottable {
         */
         public rangeType(): string;
         public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): OrdinalScale;
+        public extentChanged(rendererID: number, extent: any[]): OrdinalScale;
     }
 }
 

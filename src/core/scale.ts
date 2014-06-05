@@ -5,11 +5,13 @@ module Plottable {
     dataSource: DataSource;
     accessor: IAccessor;
   }
+
   export class Scale extends Broadcaster {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomain = true;
     private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
     private dataSourceReferenceCounter = new IDCounter();
+    public _rendererID2Extent: {[rendererID: number]: any[]} = {};
     public _autoNice = false;
     public _autoPad  = false;
     /**
@@ -143,6 +145,14 @@ module Plottable {
      */
     public copy(): Scale {
       return new Scale(this._d3Scale.copy());
+    }
+
+    // this is called by renderer whenever there is an update from the dataSource
+    public extentChanged(rendererID: number, extent: any[]) {
+      // TODO: override
+      return this;
+      // this will look up the old extent in its renderer => extent mapping
+      // and decide if it needs to change its domain
     }
   }
 }

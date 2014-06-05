@@ -104,6 +104,16 @@ var Plottable;
             return out;
         }
         Utils.createFilledArray = createFilledArray;
+
+        function arrayEqual(a, b) {
+            for (var i = 0; i < a.length; i++) {
+                if (a[i] !== b[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        Utils.arrayEqual = arrayEqual;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -1966,6 +1976,7 @@ var Plottable;
             this._autoDomain = true;
             this.rendererID2Perspective = {};
             this.dataSourceReferenceCounter = new Plottable.IDCounter();
+            this._rendererID2Extent = {};
             this._autoNice = false;
             this._autoPad = false;
             this._d3Scale = scale;
@@ -2075,6 +2086,14 @@ var Plottable;
         Scale.prototype.copy = function () {
             return new Scale(this._d3Scale.copy());
         };
+
+        // this is called by renderer whenever there is an update from the dataSource
+        Scale.prototype.extentChanged = function (rendererID, extent) {
+            // TODO: override
+            return this;
+            // this will look up the old extent in its renderer => extent mapping
+            // and decide if it needs to change its domain
+        };
         return Scale;
     })(Plottable.Broadcaster);
     Plottable.Scale = Scale;
@@ -2138,6 +2157,7 @@ var Plottable;
 
                 // point all scales at the new datasource
                 d3.keys(this._projectors).forEach(function (attrToSet) {
+                    console.log(attrToSet);
                     var projector = _this._projectors[attrToSet];
                     if (projector.scale != null) {
                         var rendererIDAttr = _this._plottableID + attrToSet;
@@ -2147,7 +2167,9 @@ var Plottable;
                 });
             }
             this._dataSource = source;
-            this._registerToBroadcaster(this._dataSource, function () {
+
+            // NOTE: rendererID is a number, convert it to a string first or something
+            this._registerToBroadcaster(this._dataSource, function (newDataSource) {
                 _this._dataChanged = true;
                 _this._render();
             });
@@ -2224,6 +2246,19 @@ var Plottable;
         Renderer.prototype.animate = function (enabled) {
             this._animate = enabled;
             return this;
+        };
+
+        Renderer.prototype.addScale = function (scale) {
+            this.scales.push(scale);
+            scale.registerListener(this, function () {
+                // get new extent from scale
+                console.log("it's happening");
+            });
+        };
+
+        Renderer.prototype._extentFromDataSource = function (ds) {
+            // will override
+            return [];
         };
         return Renderer;
     })(Plottable.Component);
@@ -2458,6 +2493,26 @@ var Plottable;
             this._setDomain(newDomain);
             return this;
         };
+
+        QuantitiveScale.prototype.extentChanged = function (rendererID, extent) {
+            this._rendererID2Extent[rendererID] = extent;
+            var newDomain = this.calculateDomain();
+
+            // this.autoDomain will automatically broadcast for us.
+            // In the future, if we detect that the domain hasn't changed,
+            // we won't signal.
+            this.autoDomain();
+            return this;
+        };
+
+        // Returns a domain from this._rendererID2Extent. In the future, this
+        // will be where the pluggable autodomaining stuff will go.
+        QuantitiveScale.prototype.calculateDomain = function () {
+            var extents = d3.values(this._rendererID2Extent);
+            return extents.reduce(function (a, b) {
+                return [Math.min(a[0], b[0]), Math.max(a[1], b[1])];
+            });
+        };
         return QuantitiveScale;
     })(Plottable.Scale);
     Plottable.QuantitiveScale = QuantitiveScale;
@@ -2617,6 +2672,15 @@ var Plottable;
                 this._broadcast();
                 return this;
             }
+        };
+
+        OrdinalScale.prototype.extentChanged = function (rendererID, extent) {
+            this._rendererID2Extent[rendererID] = extent;
+            extent = extent;
+
+            // this.domain will broadcast for us
+            this.domain(Plottable.Utils.uniq(this.domain()));
+            return this;
         };
         return OrdinalScale;
     })(Plottable.Scale);

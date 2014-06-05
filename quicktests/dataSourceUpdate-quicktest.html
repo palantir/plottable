@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>DataSource Update Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <style>
+      .plottable .axis line {
+/*        stroke: black;
+        opacity: 1;*/
+      }
+    </style>
+
+    <script>
+      var dataseries;
+      var renderAreaD1;
+      var ds;
+
+      window.onload = function() {
+        var dataseries = makeRandomData(20, 0.3);
+        // newData();
+
+        var xScale = new Plottable.LinearScale();
+        var xAxis = new Plottable.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.LinearScale();
+        var yAxis = new Plottable.YAxis(yScale, "left");
+
+        var y0Accessor = function(d, i) { return dataseries[i].y; }
+
+        ds = new Plottable.DataSource(dataseries);
+
+        renderAreaD1 = new Plottable.AreaRenderer(ds, xScale, yScale);
+
+        var fillAccessor = function() { return "steelblue"; }
+        var fillAccessorTop = function() { return "pink"; }
+        renderAreaD1.project("fill", fillAccessor)
+
+        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderGroup = new Plottable.ComponentGroup([gridlines, renderAreaD1]);
+
+        var chart = new Plottable.StandardChart()
+                        .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
+                        .renderTo("#areaRenderer-test");
+      }
+
+      function newData() {
+      	ds.data(makeRandomData(20, 0.3));
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="areaRenderer-test" width="480" height="320"></svg>
+    <button onclick="newData()">new data</button>
+  </body>
+
+</html>

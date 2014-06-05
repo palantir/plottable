@@ -127,5 +127,13 @@ module Plottable {
         return this;
       }
     }
+
+    public extentChanged(rendererID: number, extent: any[]) {
+      this._rendererID2Extent[rendererID] = extent;
+      extent = <string[]>extent;
+      // this.domain will broadcast for us
+      this.domain(Utils.uniq(this.domain()));
+      return this;
+    }
   }
 }
