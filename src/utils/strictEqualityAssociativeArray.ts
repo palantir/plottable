@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Utils {
+export module Util {
   /**
    * An associative array that can be keyed by anything (inc objects).
    * Uses pointer equality checks which is why this works.

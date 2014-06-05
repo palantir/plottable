@@ -3,7 +3,7 @@
 // This file contains open source utilities, along with their copyright notices
 
 module Plottable {
-export module Utils {
+export module Util {
   export module OpenSource {
     /**
      * Returns the sortedIndex for inserting a value into an array.

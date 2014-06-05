@@ -1,6 +1,6 @@
 
 declare module Plottable {
-    module Utils {
+    module Util {
         module Methods {
             /**
             * Checks if x is between a and b.
@@ -44,7 +44,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
+    module Util {
         module OpenSource {
             /**
             * Returns the sortedIndex for inserting a value into an array.
@@ -90,7 +90,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
+    module Util {
         class IDCounter {
             public increment(id: any): number;
             public decrement(id: any): number;
@@ -101,7 +101,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
+    module Util {
         /**
         * An associative array that can be keyed by anything (inc objects).
         * Uses pointer equality checks which is why this works.
@@ -126,7 +126,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
+    module Util {
         module Text {
             interface TextMeasurer {
                 (s: string): number[];
@@ -189,7 +189,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
+    module Util {
         module WordWrap {
             interface IWrappedText {
                 originalText: string;
@@ -218,7 +218,7 @@ declare module Plottable {
 }
 
 declare module Plottable {
-    module Utils {
+    module Util {
         module DOM {
             /**
             * Gets the bounding box of an element.
@@ -884,7 +884,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
+    module Util {
         class ScaleDomainCoordinator {
             /**
             * Creates a ScaleDomainCoordinator.
@@ -1149,7 +1149,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Utils {
+    module Util {
         module Axis {
             var ONE_DAY: number;
             /**

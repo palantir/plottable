@@ -125,8 +125,8 @@ export module Abstract {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth  = UtilDOM.getElementWidth(elem);
-          availableHeight = UtilDOM.getElementHeight(elem);
+          availableWidth  = Util.DOM.getElementWidth(elem);
+          availableHeight = Util.DOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }

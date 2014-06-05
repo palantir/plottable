@@ -10,7 +10,7 @@ export module Abstract {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomain = true;
     private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
-    private dataSourceReferenceCounter = new UtilIDCounter();
+    private dataSourceReferenceCounter = new Util.IDCounter();
     public _autoNice = false;
     public _autoPad  = false;
     /**

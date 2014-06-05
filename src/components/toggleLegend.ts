@@ -54,10 +54,10 @@ export module Component {
         // overwrite our previous listener from when we called super
         this._registerToBroadcaster (scale, () => {
           // preserve the state of already existing elements
-          this.isOff = UtilMethods.intersection(this.isOff, d3.set(this.scale().domain()));
+          this.isOff = Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
           this._invalidateLayout();
         });
-        this.isOff = UtilMethods.intersection(this.isOff, d3.set(this.scale().domain()));
+        this.isOff = Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
         this.updateClasses();
         return this;
       } else {

@@ -61,7 +61,7 @@ function commitDashboard(dataManager, svg) {
   var tscYAxis = new Plottable.Axis.YAxis(tscYScale, "left");
   var tscDateAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
   var baseValue = d3.min(timeScale.domain());
-  var formatter = Plottable.UtilAxis.generateRelativeDateFormatter(baseValue, Plottable.UtilONE_DAY, "d");
+  var formatter = Plottable.Util.Axis.generateRelativeDateFormatter(baseValue, Plottable.Util.ONE_DAY, "d");
   tscDateAxis.tickFormat(formatter);
 
   var tscRenderArea = new Plottable.Component.Gridlines(timeScale, tscYScale);

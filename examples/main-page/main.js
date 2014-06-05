@@ -22,7 +22,7 @@ window.onload = function() {
 
 
 function sizeSVG(svg) {
-  var width = Plottable.UtilgetSVGPixelWidth(svg);
+  var width = Plottable.Util.getSVGPixelWidth(svg);
   svg.attr("width", width);
   var height = Math.min(width*.75, 1200);
   svg.attr("height", height);

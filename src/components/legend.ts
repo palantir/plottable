@@ -61,7 +61,7 @@ export module Component {
 
       var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
-      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => UtilText.getTextWidth(fakeText, d));
+      var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Util.Text.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
@@ -76,7 +76,7 @@ export module Component {
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
-      var textHeight = UtilText.getTextHeight(fakeLegendEl.append("text"));
+      var textHeight = Util.Text.getTextHeight(fakeLegendEl.append("text"));
       fakeLegendEl.remove();
       return textHeight;
     }
@@ -101,7 +101,7 @@ export module Component {
       legend.attr("transform", (d: any) => "translate(0," + domain.indexOf(d) * textHeight + ")");
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: any) {return UtilText.getTruncatedText(d, availableWidth , d3.select(this));});
+            .text(function(d: any) {return Util.Text.getTruncatedText(d, availableWidth , d3.select(this));});
       return this;
     }
   }

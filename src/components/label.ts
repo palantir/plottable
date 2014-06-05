@@ -71,13 +71,13 @@ export module Component {
     }
 
     private measureAndSetTextSize() {
-      var bbox = UtilDOM.getBBox(this.textElement);
+      var bbox = Util.DOM.getBBox(this.textElement);
       this.textHeight = bbox.height;
       this.textLength = this.text === "" ? 0 : bbox.width;
     }
 
     private truncateTextAndRemeasure(availableLength: number) {
-      var shortText = UtilText.getTruncatedText(this.text, availableLength, this.textElement);
+      var shortText = Util.Text.getTruncatedText(this.text, availableLength, this.textElement);
       this.textElement.text(shortText);
       this.measureAndSetTextSize();
     }
@@ -85,7 +85,7 @@ export module Component {
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-      var bbox = UtilDOM.getBBox(this.textElement);
+      var bbox = Util.DOM.getBBox(this.textElement);
       this.textElement.attr("dy", -bbox.y);
 
       var xShift = 0;

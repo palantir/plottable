@@ -378,10 +378,10 @@ export module Axis {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var measure = UtilText.getTextMeasure(textEl);
-            var wrappedLines = UtilWordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
+            var measure = Util.Text.getTextMeasure(textEl);
+            var wrappedLines = Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
-              textEl.text(UtilText.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(Util.Text.getTruncatedText(currentText, availableWidth, textEl));
             } else {
               textEl.text("");
               var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -517,10 +517,10 @@ export module Axis {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var measure = UtilText.getTextMeasure(textEl);
-            var wrappedLines = UtilWordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
+            var measure = Util.Text.getTextMeasure(textEl);
+            var wrappedLines = Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
-              textEl.text(UtilText.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(Util.Text.getTruncatedText(currentText, availableWidth, textEl));
             } else {
               var baseY = 0; // measured in ems
               if (tickLabelPosition === "top") {

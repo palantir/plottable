@@ -18,7 +18,7 @@ describe("Labels", () => {
     assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
 
     var text = content.select("text");
-    var bbox = Plottable.UtilDOM.getBBox(text);
+    var bbox = Plottable.Util.DOM.getBBox(text);
     assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
     assert.equal(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
@@ -32,7 +32,7 @@ describe("Labels", () => {
     var text = content.select("text");
     label._computeLayout();
     label._render();
-    var textBBox = Plottable.UtilDOM.getBBox(text);
+    var textBBox = Plottable.Util.DOM.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
     assert.equal(textBBox.height, label.availableWidth , "text height === label.minimumWidth() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
@@ -47,7 +47,7 @@ describe("Labels", () => {
     var text = content.select("text");
     label._computeLayout();
     label._render();
-    var textBBox = Plottable.UtilDOM.getBBox(text);
+    var textBBox = Plottable.Util.DOM.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
     assert.equal(textBBox.height, label.availableWidth , "text height === label.minimumWidth() (it's rotated)");
     assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
@@ -77,7 +77,7 @@ describe("Labels", () => {
     var text = content.select("text");
     label._computeLayout();
     label._render();
-    var bbox = Plottable.UtilDOM.getBBox(text);
+    var bbox = Plottable.Util.DOM.getBBox(text);
     assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();

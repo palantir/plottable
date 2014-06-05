@@ -34,24 +34,24 @@
 
         //------------------------------functions------------------------------
         var write_horizontal = function (i, xAlign, yAlign) {
-            Plottable.TextUtilwriteLineHorizontally(text, sel_array[i],
+            Plottable.TextUtil.writeLineHorizontally(text, sel_array[i],
             sel_array[i].attr("width"), sel_array[i].attr("height"),
             xAlign, yAlign);
         }
 
         var write_horizontal_ = function (i) {
-            Plottable.TextUtilwriteLineHorizontally(text, sel_array[i],
+            Plottable.TextUtil.writeLineHorizontally(text, sel_array[i],
             sel_array[i].attr("width"), sel_array[i].attr("height"));
         }
 
         var write_vertical = function (i, xAlign, yAlign) {
-            Plottable.TextUtilwriteLineVertically(text, sel_array[i],
+            Plottable.TextUtil.writeLineVertically(text, sel_array[i],
             sel_array[i].attr("width"), sel_array[i].attr("height"),
             xAlign, yAlign);
         }
 
         var write_vertical_ = function (i) {
-            Plottable.TextUtilwriteLineVertically(text, sel_array[i],
+            Plottable.TextUtil.writeLineVertically(text, sel_array[i],
             sel_array[i].attr("width"), sel_array[i].attr("height"));
         }
 

@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Utils {
+export module Util {
   export module Axis {
     export var ONE_DAY = 24 * 60 * 60 * 1000;
 
