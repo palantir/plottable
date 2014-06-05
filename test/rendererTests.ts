@@ -246,9 +246,9 @@ describe("Renderers", () => {
       it("defaults to no fill", () => {
         var svg = generateSVG(500, 500);
         var data = [{x: 0, y: 0}, {x: 2, y: 2}];
-        var xScale = new Plottable.LinearScale();
-        var yScale = new Plottable.LinearScale();
-        var lineRenderer = new Plottable.LineRenderer(data, xScale, yScale);
+        var xScale = new Plottable.Scale.Linear();
+        var yScale = new Plottable.Scale.Linear();
+        var lineRenderer = new Plottable.Plot.Line(data, xScale, yScale);
         lineRenderer.renderTo(svg);
 
         var areaPath = lineRenderer.renderArea.select(".area");

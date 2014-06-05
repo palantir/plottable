@@ -2439,7 +2439,6 @@ describe("Renderers", function () {
             });
         });
 
-<<<<<<< HEAD
         describe("LineRenderer", function () {
             it("defaults to no fill", function () {
                 var svg = generateSVG(500, 500);
@@ -2455,24 +2454,6 @@ describe("Renderers", function () {
             });
         });
 
-||||||| merged common ancestors
-=======
-        describe("LineRenderer", function () {
-            it("defaults to no fill", function () {
-                var svg = generateSVG(500, 500);
-                var data = [{ x: 0, y: 0 }, { x: 2, y: 2 }];
-                var xScale = new Plottable.LinearScale();
-                var yScale = new Plottable.LinearScale();
-                var lineRenderer = new Plottable.LineRenderer(data, xScale, yScale);
-                lineRenderer.renderTo(svg);
-
-                var areaPath = lineRenderer.renderArea.select(".area");
-                assert.strictEqual(areaPath.attr("fill"), "none");
-                svg.remove();
-            });
-        });
-
->>>>>>> master
         describe("Example CircleRenderer with quadratic series", function () {
             var svg;
             var xScale;

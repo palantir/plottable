@@ -4365,7 +4365,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-<<<<<<< HEAD
     (function (Abstract) {
         var XYPlot = (function (_super) {
             __extends(XYPlot, _super);
@@ -4494,151 +4493,6 @@ var Plottable;
         Plot.Scatter = Scatter;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
-||||||| merged common ancestors
-    var LineRenderer = (function (_super) {
-        __extends(LineRenderer, _super);
-        /**
-        * Creates a LineRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        function LineRenderer(dataset, xScale, yScale) {
-            _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 600;
-            this.classed("line-renderer", true);
-            this.project("stroke", function () {
-                return "steelblue";
-            });
-        }
-        LineRenderer.prototype._setup = function () {
-            _super.prototype._setup.call(this);
-            this.path = this.renderArea.append("path").classed("line", true);
-            return this;
-        };
-
-        LineRenderer.prototype._paint = function () {
-            _super.prototype._paint.call(this);
-            var attrToProjector = this._generateAttrToProjector();
-            var scaledZero = this.yScale.scale(0);
-            var xFunction = attrToProjector["x"];
-            var yFunction = attrToProjector["y"];
-            delete attrToProjector["x"];
-            delete attrToProjector["y"];
-
-            this.path.datum(this._dataSource.data());
-            if (this._animate && this._dataChanged) {
-                var animationStartLine = d3.svg.line().x(xFunction).y(scaledZero);
-                this.path.attr("d", animationStartLine).attr(attrToProjector);
-            }
-
-            var line = d3.svg.line().x(xFunction).y(yFunction);
-            var updateSelection = this.path;
-            if (this._animate) {
-                updateSelection = this.path.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
-            }
-            updateSelection.attr("d", line).attr(attrToProjector);
-        };
-        return LineRenderer;
-    })(Plottable.XYRenderer);
-    Plottable.LineRenderer = LineRenderer;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var RectRenderer = (function (_super) {
-        __extends(RectRenderer, _super);
-        /**
-        * Creates a RectRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        function RectRenderer(dataset, xScale, yScale) {
-            _super.call(this, dataset, xScale, yScale);
-            this.classed("rect-renderer", true);
-            this.project("width", 4); // default
-            this.project("height", 4); // default
-            this.project("fill", function () {
-                return "steelblue";
-            });
-        }
-        RectRenderer.prototype._paint = function () {
-            _super.prototype._paint.call(this);
-            var attrToProjector = this._generateAttrToProjector();
-            var xF = attrToProjector["x"];
-            var yF = attrToProjector["y"];
-            var widthF = attrToProjector["width"];
-            var heightF = attrToProjector["height"];
-            attrToProjector["x"] = function (d, i) {
-                return xF(d, i) - widthF(d, i) / 2;
-            };
-            attrToProjector["y"] = function (d, i) {
-                return yF(d, i) - heightF(d, i) / 2;
-            };
-
-            var rects = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            rects.enter().append("rect");
-            rects.attr(attrToProjector);
-            rects.exit().remove();
-        };
-        return RectRenderer;
-    })(Plottable.XYRenderer);
-    Plottable.RectRenderer = RectRenderer;
-=======
-    var RectRenderer = (function (_super) {
-        __extends(RectRenderer, _super);
-        /**
-        * Creates a RectRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        function RectRenderer(dataset, xScale, yScale) {
-            _super.call(this, dataset, xScale, yScale);
-            this.classed("rect-renderer", true);
-            this.project("width", 4); // default
-            this.project("height", 4); // default
-            this.project("fill", function () {
-                return "steelblue";
-            });
-        }
-        RectRenderer.prototype._paint = function () {
-            _super.prototype._paint.call(this);
-            var attrToProjector = this._generateAttrToProjector();
-            var xF = attrToProjector["x"];
-            var yF = attrToProjector["y"];
-            var widthF = attrToProjector["width"];
-            var heightF = attrToProjector["height"];
-            attrToProjector["x"] = function (d, i) {
-                return xF(d, i) - widthF(d, i) / 2;
-            };
-            attrToProjector["y"] = function (d, i) {
-                return yF(d, i) - heightF(d, i) / 2;
-            };
-
-            var rects = this.renderArea.selectAll("rect").data(this._dataSource.data());
-            rects.enter().append("rect");
-            rects.attr(attrToProjector);
-            rects.exit().remove();
-        };
-        return RectRenderer;
-    })(Plottable.XYRenderer);
-    Plottable.RectRenderer = RectRenderer;
->>>>>>> master
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -5078,7 +4932,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-<<<<<<< HEAD
     (function (Plot) {
         var Area = (function (_super) {
             __extends(Area, _super);
@@ -5108,65 +4961,6 @@ var Plottable;
                 this.linePath = this.renderArea.append("path").classed("line", true);
                 return this;
             };
-||||||| merged common ancestors
-    var AreaRenderer = (function (_super) {
-        __extends(AreaRenderer, _super);
-        /**
-        * Creates an AreaRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        function AreaRenderer(dataset, xScale, yScale) {
-            _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 600;
-            this.classed("area-renderer", true);
-            this.project("y0", 0, yScale); // default
-            this.project("fill", function () {
-                return "steelblue";
-            }); // default
-            this.project("stroke", function () {
-                return "steelblue";
-            }); // default
-        }
-        AreaRenderer.prototype._setup = function () {
-            _super.prototype._setup.call(this);
-            this.areaPath = this.renderArea.append("path").classed("area", true);
-            this.linePath = this.renderArea.append("path").classed("line", true);
-            return this;
-        };
-=======
-    var AreaRenderer = (function (_super) {
-        __extends(AreaRenderer, _super);
-        /**
-        * Creates an AreaRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        function AreaRenderer(dataset, xScale, yScale) {
-            _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 600;
-            this.classed("area-renderer", true);
-            this.project("y0", 0, yScale); // default
-            this.project("fill", function () {
-                return "steelblue";
-            }); // default
-            this.project("stroke", function () {
-                return "none";
-            }); // default
-        }
-        AreaRenderer.prototype._setup = function () {
-            _super.prototype._setup.call(this);
-            this.areaPath = this.renderArea.append("path").classed("area", true);
-            this.linePath = this.renderArea.append("path").classed("line", true);
-            return this;
-        };
->>>>>>> master
 
             Area.prototype._paint = function () {
                 _super.prototype._paint.call(this);
@@ -5241,41 +5035,6 @@ var Plottable;
         Plot.Line = Line;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var LineRenderer = (function (_super) {
-        __extends(LineRenderer, _super);
-        /**
-        * Creates a LineRenderer.
-        *
-        * @constructor
-        * @param {IDataset} dataset The dataset to render.
-        * @param {Scale} xScale The x scale to use.
-        * @param {Scale} yScale The y scale to use.
-        */
-        function LineRenderer(dataset, xScale, yScale) {
-            _super.call(this, dataset, xScale, yScale);
-            this._ANIMATION_DURATION = 600;
-            this.classed("line-renderer", true);
-            this.project("stroke", function () {
-                return "steelblue";
-            });
-            this.project("fill", function () {
-                return "none";
-            });
-        }
-        return LineRenderer;
-    })(Plottable.AreaRenderer);
-    Plottable.LineRenderer = LineRenderer;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
