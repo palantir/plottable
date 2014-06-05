@@ -2306,7 +2306,7 @@ var Plottable;
                     if (window.requestAnimationFrame != null) {
                         requestAnimationFrame(RenderController.flush);
                     } else {
-                        setTimeout(RenderController.flush, 16);
+                        setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
                     }
                     RenderController.animationRequested = true;
                 }
@@ -2334,6 +2334,7 @@ var Plottable;
                     RenderController.animationRequested = false;
                 }
             };
+            RenderController.IE_TIMEOUT = 1000 / 60;
             RenderController.componentsNeedingRender = {};
             RenderController.componentsNeedingComputeLayout = {};
             RenderController.animationRequested = false;

@@ -3,6 +3,7 @@
 module Plottable {
 export module Singleton {
   export class RenderController {
+    private static IE_TIMEOUT = 1000 / 60; // 60 fps
     private static componentsNeedingRender: {[key: string]: Abstract.Component} = {};
     private static componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
     private static animationRequested = false;
@@ -32,7 +33,7 @@ export module Singleton {
         if (window.requestAnimationFrame != null) {
           requestAnimationFrame(RenderController.flush);
         } else {
-          setTimeout(RenderController.flush, 16);
+          setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
         }
         RenderController.animationRequested = true;
       }
