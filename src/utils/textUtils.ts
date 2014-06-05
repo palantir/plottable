@@ -215,7 +215,7 @@ export module Utils {
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
       var measureText = getTextMeasure(innerG);
-      var wrappedText = Utils.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+      var wrappedText = UtilWordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
 
       var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
       var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);

@@ -1,17 +1,17 @@
 function makeChartWithLabels() {
-  var xScale = new Plottable.Scales.Linear();
+  var xScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
-  var xAxisLabel = new Plottable.Components.Label("Days", "horizontal");
+  var xAxisLabel = new Plottable.Component.Label("Days", "horizontal");
 
-  var lineYScale = new Plottable.Scales.Linear();
+  var lineYScale = new Plottable.Scale.Linear();
   var lineYAxis = new Plottable.Axis.YAxis(lineYScale, "left");
-  var commitsLabel = new Plottable.Components.Label("Commits", "vertical-left");
-  var lineRenderer = new Plottable.Plots.Line(gitData, xScale, lineYScale);
+  var commitsLabel = new Plottable.Component.Label("Commits", "vertical-left");
+  var lineRenderer = new Plottable.Plot.Line(gitData, xScale, lineYScale);
 
-  var circleYScale = new Plottable.Scales.Linear();
+  var circleYScale = new Plottable.Scale.Linear();
   var circleYAxis = new Plottable.Axis.YAxis(circleYScale, "left");
-  var sizeLabel = new Plottable.Components.Label("Net Lines", "vertical-left");
-  var circleRenderer = new Plottable.Plots.Scatter(gitData, xScale, circleYScale);
+  var sizeLabel = new Plottable.Component.Label("Net Lines", "vertical-left");
+  var circleRenderer = new Plottable.Plot.Scatter(gitData, xScale, circleYScale);
 
   function getDayValue(d) {
     return d.day;
@@ -29,20 +29,20 @@ function makeChartWithLabels() {
   }
   circleRenderer.project("y", getNetCommitSize, circleYScale);
 
-  var xAxisTable = new Plottable.Components.Table([
+  var xAxisTable = new Plottable.Component.Table([
                           [xAxis],
                           [xAxisLabel]
                        ]);
 
-  var commitsAxisTable = new Plottable.Components.Table([
+  var commitsAxisTable = new Plottable.Component.Table([
                                 [commitsLabel, lineYAxis]
                              ]);
 
-  var netLinesAxisTable = new Plottable.Components.Table([
+  var netLinesAxisTable = new Plottable.Component.Table([
                                 [sizeLabel, circleYAxis]
                              ]);
 
-  var chart = new Plottable.Components.Table([
+  var chart = new Plottable.Component.Table([
                     [commitsAxisTable,   lineRenderer  ],
                     [netLinesAxisTable,  circleRenderer],
                     [null,               xAxisTable    ]

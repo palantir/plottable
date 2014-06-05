@@ -1,6 +1,6 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
+module Plottable {
 export module Utils {
   /**
    * An associative array that can be keyed by anything (inc objects).

@@ -2,7 +2,7 @@
 
 // This file contains open source utilities, along with their copyright notices
 
-module Plottable{
+module Plottable {
 export module Utils {
   export module OpenSource {
     /**

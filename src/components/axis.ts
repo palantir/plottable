@@ -1,6 +1,6 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
+module Plottable {
 export module Axis {
   export class Axis extends Abstract.Component {
     public axisElement: D3.Selection;
@@ -359,7 +359,7 @@ export module Axis {
           }
         }
 
-        if ((<Scales.Ordinal> this._axisScale).rangeType != null) { // ordinal scale
+        if ((<Scale.Ordinal> this._axisScale).rangeType != null) { // ordinal scale
           var scaleRange = this._axisScale.range();
           var availableWidth = this.availableWidth;
           var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
@@ -378,10 +378,10 @@ export module Axis {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var measure = Utils.Text.getTextMeasure(textEl);
-            var wrappedLines = Utils.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
+            var measure = UtilText.getTextMeasure(textEl);
+            var wrappedLines = UtilWordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
-              textEl.text(Utils.Text.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(UtilText.getTruncatedText(currentText, availableWidth, textEl));
             } else {
               textEl.text("");
               var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -499,7 +499,7 @@ export module Axis {
           }
         }
 
-        if ((<Scales.Ordinal> this._axisScale).rangeType != null) { // ordinal scale
+        if ((<Scale.Ordinal> this._axisScale).rangeType != null) { // ordinal scale
           var scaleRange = this._axisScale.range();
           var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
           var availableWidth = this.availableWidth - tickLengthWithPadding;
@@ -517,10 +517,10 @@ export module Axis {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var measure = Utils.Text.getTextMeasure(textEl);
-            var wrappedLines = Utils.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
+            var measure = UtilText.getTextMeasure(textEl);
+            var wrappedLines = UtilWordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
-              textEl.text(Utils.Text.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(UtilText.getTruncatedText(currentText, availableWidth, textEl));
             } else {
               var baseY = 0; // measured in ems
               if (tickLabelPosition === "top") {

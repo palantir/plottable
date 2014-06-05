@@ -105,8 +105,8 @@ var Plottable;
                 return out;
             }
             Methods.createFilledArray = createFilledArray;
-        })(Utils.Methods || (Utils.Methods = {}));
-        var Methods = Utils.Methods;
+        })(UtilMethods || (UtilMethods = {}));
+        var Methods = UtilMethods;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -117,7 +117,7 @@ var Plottable;
 (function (Plottable) {
     (function (Utils) {
         (function (OpenSource) {
-            
+
 
             function sortedIndex(val, arr, accessor) {
                 var low = 0;
@@ -138,8 +138,8 @@ var Plottable;
             }
             OpenSource.sortedIndex = sortedIndex;
             ;
-        })(Utils.OpenSource || (Utils.OpenSource = {}));
-        var OpenSource = Utils.OpenSource;
+        })(UtilOpenSource || (UtilOpenSource = {}));
+        var OpenSource = UtilOpenSource;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -174,7 +174,7 @@ var Plottable;
             };
             return IDCounter;
         })();
-        Utils.IDCounter = IDCounter;
+        UtilIDCounter = IDCounter;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -245,7 +245,7 @@ var Plottable;
             };
             return StrictEqualityAssociativeArray;
         })();
-        Utils.StrictEqualityAssociativeArray = StrictEqualityAssociativeArray;
+        UtilStrictEqualityAssociativeArray = StrictEqualityAssociativeArray;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -268,19 +268,19 @@ var Plottable;
                     if (s.trim() === "") {
                         return [0, 0];
                     }
-                    if (Plottable.Utils.DOM.isSelectionRemoved(selection)) {
+                    if (Plottable.UtilDOM.isSelectionRemoved(selection)) {
                         throw new Error("Cannot measure text in a removed node");
                     }
                     var bb;
                     if (selection.node().nodeName === "text") {
                         var originalText = selection.text();
                         selection.text(s);
-                        bb = Plottable.Utils.DOM.getBBox(selection);
+                        bb = Plottable.UtilDOM.getBBox(selection);
                         selection.text(originalText);
                         return [bb.width, bb.height];
                     } else {
                         var t = selection.append("text").text(s);
-                        bb = Plottable.Utils.DOM.getBBox(t);
+                        bb = Plottable.UtilDOM.getBBox(t);
                         t.remove();
                         return [bb.width, bb.height];
                     }
@@ -366,7 +366,7 @@ var Plottable;
                 var innerG = g.append("g");
                 var textEl = innerG.append("text");
                 textEl.text(line);
-                var bb = Plottable.Utils.DOM.getBBox(textEl);
+                var bb = Plottable.UtilDOM.getBBox(textEl);
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
@@ -379,7 +379,7 @@ var Plottable;
                 var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
                 var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
-                Plottable.Utils.DOM.translate(innerG, xOff, yOff);
+                Plottable.UtilDOM.translate(innerG, xOff, yOff);
                 return [w, h];
             }
             Text.writeLineHorizontally = writeLineHorizontally;
@@ -414,7 +414,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Plottable.Utils.DOM.translate(innerG, 0, i * h);
+                    Plottable.UtilDOM.translate(innerG, 0, i * h);
                     var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
                     if (wh[0] > maxWidth) {
                         maxWidth = wh[0];
@@ -423,7 +423,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = height - usedSpace;
                 var translator = { center: 0.5, top: 0, bottom: 1 };
-                Plottable.Utils.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
+                Plottable.UtilDOM.translate(blockG, 0, freeSpace * translator[yAlign]);
                 return [maxWidth, usedSpace];
             }
             Text.writeTextHorizontally = writeTextHorizontally;
@@ -437,7 +437,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Plottable.Utils.DOM.translate(innerG, i * h, 0);
+                    Plottable.UtilDOM.translate(innerG, i * h, 0);
                     var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
                     if (wh[1] > maxHeight) {
                         maxHeight = wh[1];
@@ -446,7 +446,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = width - usedSpace;
                 var translator = { center: 0.5, left: 0, right: 1 };
-                Plottable.Utils.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
+                Plottable.UtilDOM.translate(blockG, freeSpace * translator[xAlign], 0);
 
                 return [usedSpace, maxHeight];
             }
@@ -470,7 +470,7 @@ var Plottable;
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
                 var measureText = getTextMeasure(innerG);
-                var wrappedText = Plottable.Utils.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+                var wrappedText = Plottable.UtilWordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
 
                 var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
                 var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
@@ -481,8 +481,8 @@ var Plottable;
                 };
             }
             Text.writeText = writeText;
-        })(Utils.Text || (Utils.Text = {}));
-        var Text = Utils.Text;
+        })(UtilText || (UtilText = {}));
+        var Text = UtilText;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -514,7 +514,7 @@ var Plottable;
                     lines = lines.splice(0, nLinesThatFit);
                     if (nLinesThatFit > 0) {
                         // Overwrite the last line to one that has had a ... appended to the end
-                        lines[nLinesThatFit - 1] = Plottable.Utils.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
+                        lines[nLinesThatFit - 1] = Plottable.UtilText.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
                     }
                 }
                 return { originalText: text, lines: lines, textFits: textFit };
@@ -683,8 +683,8 @@ var Plottable;
                 }
                 return true;
             }
-        })(Utils.WordWrap || (Utils.WordWrap = {}));
-        var WordWrap = Utils.WordWrap;
+        })(UtilWordWrap || (UtilWordWrap = {}));
+        var WordWrap = UtilWordWrap;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -770,8 +770,8 @@ var Plottable;
                 }
             }
             DOM.translate = translate;
-        })(Utils.DOM || (Utils.DOM = {}));
-        var DOM = Utils.DOM;
+        })(UtilDOM || (UtilDOM = {}));
+        var DOM = UtilDOM;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -806,7 +806,7 @@ var Plottable;
             __extends(Broadcaster, _super);
             function Broadcaster() {
                 _super.apply(this, arguments);
-                this.listener2Callback = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.listener2Callback = new Plottable.UtilStrictEqualityAssociativeArray();
             }
             /**
             * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -887,14 +887,14 @@ var Plottable;
             _super.call(this);
             this._data = data;
             this._metadata = metadata;
-            this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+            this.accessor2cachedExtent = new Plottable.UtilStrictEqualityAssociativeArray();
         }
         DataSource.prototype.data = function (data) {
             if (data == null) {
                 return this._data;
             } else {
                 this._data = data;
-                this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.accessor2cachedExtent = new Plottable.UtilStrictEqualityAssociativeArray();
                 this._broadcast();
                 return this;
             }
@@ -905,7 +905,7 @@ var Plottable;
                 return this._metadata;
             } else {
                 this._metadata = metadata;
-                this.accessor2cachedExtent = new Plottable.Utils.StrictEqualityAssociativeArray();
+                this.accessor2cachedExtent = new Plottable.UtilStrictEqualityAssociativeArray();
                 this._broadcast();
                 return this;
             }
@@ -921,12 +921,12 @@ var Plottable;
         };
 
         DataSource.prototype.computeExtent = function (accessor) {
-            var appliedAccessor = Plottable.Utils.Methods.applyAccessor(accessor, this);
+            var appliedAccessor = Plottable.UtilMethods.applyAccessor(accessor, this);
             var mappedData = this._data.map(appliedAccessor);
             if (mappedData.length === 0) {
                 return undefined;
             } else if (typeof (mappedData[0]) === "string") {
-                return Plottable.Utils.Methods.uniq(mappedData);
+                return Plottable.UtilMethods.uniq(mappedData);
             } else {
                 return d3.extent(mappedData);
             }
@@ -1061,8 +1061,8 @@ var Plottable;
                         }
 
                         var elem = this.rootSVG.node();
-                        availableWidth = Plottable.Utils.DOM.getElementWidth(elem);
-                        availableHeight = Plottable.Utils.DOM.getElementHeight(elem);
+                        availableWidth = Plottable.UtilDOM.getElementWidth(elem);
+                        availableHeight = Plottable.UtilDOM.getElementHeight(elem);
                     } else {
                         throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
                     }
@@ -1103,14 +1103,14 @@ var Plottable;
             */
             Component.prototype._render = function () {
                 if (this._isAnchored && this._isSetup) {
-                    Plottable.Singletons.RenderController.registerToRender(this);
+                    Plottable.Singleton.RenderController.registerToRender(this);
                 }
                 return this;
             };
 
             Component.prototype._scheduleComputeLayout = function () {
                 if (this._isAnchored && this._isSetup) {
-                    Plottable.Singletons.RenderController.registerToComputeLayout(this);
+                    Plottable.Singleton.RenderController.registerToComputeLayout(this);
                 }
                 return this;
             };
@@ -1355,12 +1355,12 @@ var Plottable;
                 if (this._isSetup || this._isAnchored) {
                     throw new Error("Can't presently merge a component that's already been anchored");
                 }
-                if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
+                if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
                     cg = c;
                     cg._addComponent(this, true);
                     return cg;
                 } else {
-                    cg = new Plottable.Components.Group([this, c]);
+                    cg = new Plottable.Component.Group([this, c]);
                     return cg;
                 }
             };
@@ -1497,7 +1497,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Components) {
+    (function (Component) {
         var Group = (function (_super) {
             __extends(Group, _super);
             /**
@@ -1569,9 +1569,9 @@ var Plottable;
             };
             return Group;
         })(Plottable.Abstract.ComponentContainer);
-        Components.Group = Group;
-    })(Plottable.Components || (Plottable.Components = {}));
-    var Components = Plottable.Components;
+        Component.Group = Group;
+    })(Plottable.Component || (Plottable.Component = {}));
+    var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1583,7 +1583,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Components) {
+    (function (Component) {
         ;
 
         var Table = (function (_super) {
@@ -1725,16 +1725,16 @@ var Plottable;
                 var colProportionalSpace = Table.calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
                 var rowProportionalSpace = Table.calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
 
-                var guaranteedWidths = Plottable.Utils.Methods.createFilledArray(0, this.nCols);
-                var guaranteedHeights = Plottable.Utils.Methods.createFilledArray(0, this.nRows);
+                var guaranteedWidths = Plottable.UtilMethods.createFilledArray(0, this.nCols);
+                var guaranteedHeights = Plottable.UtilMethods.createFilledArray(0, this.nRows);
 
                 var freeWidth;
                 var freeHeight;
 
                 var nIterations = 0;
                 while (true) {
-                    var offeredHeights = Plottable.Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
-                    var offeredWidths = Plottable.Utils.Methods.addArrays(guaranteedWidths, colProportionalSpace);
+                    var offeredHeights = Plottable.UtilMethods.addArrays(guaranteedHeights, rowProportionalSpace);
+                    var offeredWidths = Plottable.UtilMethods.addArrays(guaranteedWidths, colProportionalSpace);
                     var guarantees = this.determineGuarantees(offeredWidths, offeredHeights);
                     guaranteedWidths = guarantees.guaranteedWidths;
                     guaranteedHeights = guarantees.guaranteedHeights;
@@ -1754,7 +1754,7 @@ var Plottable;
                         xWeights = guarantees.wantsWidthArr.map(function (x) {
                             return x ? 0.1 : 0;
                         });
-                        xWeights = Plottable.Utils.Methods.addArrays(xWeights, colWeights);
+                        xWeights = Plottable.UtilMethods.addArrays(xWeights, colWeights);
                     } else {
                         xWeights = colWeights;
                     }
@@ -1764,7 +1764,7 @@ var Plottable;
                         yWeights = guarantees.wantsHeightArr.map(function (x) {
                             return x ? 0.1 : 0;
                         });
-                        yWeights = Plottable.Utils.Methods.addArrays(yWeights, rowWeights);
+                        yWeights = Plottable.UtilMethods.addArrays(yWeights, rowWeights);
                     } else {
                         yWeights = rowWeights;
                     }
@@ -1801,10 +1801,10 @@ var Plottable;
             };
 
             Table.prototype.determineGuarantees = function (offeredWidths, offeredHeights) {
-                var requestedWidths = Plottable.Utils.Methods.createFilledArray(0, this.nCols);
-                var requestedHeights = Plottable.Utils.Methods.createFilledArray(0, this.nRows);
-                var layoutWantsWidth = Plottable.Utils.Methods.createFilledArray(false, this.nCols);
-                var layoutWantsHeight = Plottable.Utils.Methods.createFilledArray(false, this.nRows);
+                var requestedWidths = Plottable.UtilMethods.createFilledArray(0, this.nCols);
+                var requestedHeights = Plottable.UtilMethods.createFilledArray(0, this.nRows);
+                var layoutWantsWidth = Plottable.UtilMethods.createFilledArray(false, this.nCols);
+                var layoutWantsHeight = Plottable.UtilMethods.createFilledArray(false, this.nRows);
                 this.rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         var spaceRequest;
@@ -1847,8 +1847,8 @@ var Plottable;
                 var sumPair = function (p) {
                     return p[0] + p[1];
                 };
-                var rowHeights = Plottable.Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
-                var colWidths = Plottable.Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
+                var rowHeights = Plottable.UtilMethods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
+                var colWidths = Plottable.UtilMethods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
                 var childYOffset = 0;
                 this.rows.forEach(function (row, rowIndex) {
                     var childXOffset = 0;
@@ -1957,7 +1957,7 @@ var Plottable;
             Table.calcProportionalSpace = function (weights, freeSpace) {
                 var weightSum = d3.sum(weights);
                 if (weightSum === 0) {
-                    return Plottable.Utils.Methods.createFilledArray(0, weights.length);
+                    return Plottable.UtilMethods.createFilledArray(0, weights.length);
                 } else {
                     return weights.map(function (w) {
                         return freeSpace * w / weightSum;
@@ -1978,9 +1978,9 @@ var Plottable;
             };
             return Table;
         })(Plottable.Abstract.ComponentContainer);
-        Components.Table = Table;
-    })(Plottable.Components || (Plottable.Components = {}));
-    var Components = Plottable.Components;
+        Component.Table = Table;
+    })(Plottable.Component || (Plottable.Component = {}));
+    var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2005,7 +2005,7 @@ var Plottable;
                 _super.call(this);
                 this._autoDomain = true;
                 this.rendererID2Perspective = {};
-                this.dataSourceReferenceCounter = new Plottable.Utils.IDCounter();
+                this.dataSourceReferenceCounter = new Plottable.UtilIDCounter();
                 this._autoNice = false;
                 this._autoPad = false;
                 this._d3Scale = scale;
@@ -2229,7 +2229,7 @@ var Plottable;
                 var h = {};
                 d3.keys(this._projectors).forEach(function (a) {
                     var projector = _this._projectors[a];
-                    var accessor = Plottable.Utils.Methods.applyAccessor(projector.accessor, _this.dataSource());
+                    var accessor = Plottable.UtilMethods.applyAccessor(projector.accessor, _this.dataSource());
                     var scale = projector.scale;
                     var fn = scale == null ? accessor : function (d, i) {
                         return scale.scale(accessor(d, i));
@@ -2278,7 +2278,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (Singletons) {
+    (function (Singleton) {
         var RenderController = (function () {
             function RenderController() {
             }
@@ -2336,9 +2336,9 @@ var Plottable;
             RenderController.enabled = window.PlottableTestCode == null && (window.requestAnimationFrame) != null;
             return RenderController;
         })();
-        Singletons.RenderController = RenderController;
-    })(Plottable.Singletons || (Plottable.Singletons = {}));
-    var Singletons = Plottable.Singletons;
+        Singleton.RenderController = RenderController;
+    })(Plottable.Singleton || (Plottable.Singleton = {}));
+    var Singleton = Plottable.Singleton;
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -2523,7 +2523,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Scales) {
+    (function (Scale) {
         var Linear = (function (_super) {
             __extends(Linear, _super);
             function Linear(scale) {
@@ -2539,9 +2539,9 @@ var Plottable;
             };
             return Linear;
         })(Plottable.Abstract.QuantitiveScale);
-        Scales.Linear = Linear;
-    })(Plottable.Scales || (Plottable.Scales = {}));
-    var Scales = Plottable.Scales;
+        Scale.Linear = Linear;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2553,7 +2553,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Scales) {
+    (function (Scale) {
         var Log = (function (_super) {
             __extends(Log, _super);
             function Log(scale) {
@@ -2569,9 +2569,9 @@ var Plottable;
             };
             return Log;
         })(Plottable.Abstract.QuantitiveScale);
-        Scales.Log = Log;
-    })(Plottable.Scales || (Plottable.Scales = {}));
-    var Scales = Plottable.Scales;
+        Scale.Log = Log;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2583,7 +2583,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Scales) {
+    (function (Scale) {
         var Ordinal = (function (_super) {
             __extends(Ordinal, _super);
             /**
@@ -2608,7 +2608,7 @@ var Plottable;
                 extents.forEach(function (e) {
                     concatenatedExtents = concatenatedExtents.concat(e);
                 });
-                return Plottable.Utils.Methods.uniq(concatenatedExtents);
+                return Plottable.UtilMethods.uniq(concatenatedExtents);
             };
 
             Ordinal.prototype.domain = function (values) {
@@ -2678,9 +2678,9 @@ var Plottable;
             };
             return Ordinal;
         })(Plottable.Abstract.Scale);
-        Scales.Ordinal = Ordinal;
-    })(Plottable.Scales || (Plottable.Scales = {}));
-    var Scales = Plottable.Scales;
+        Scale.Ordinal = Ordinal;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2692,7 +2692,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Scales) {
+    (function (Scale) {
         var Color = (function (_super) {
             __extends(Color, _super);
             /**
@@ -2741,13 +2741,13 @@ var Plottable;
                 extents.forEach(function (e) {
                     concatenatedExtents = concatenatedExtents.concat(e);
                 });
-                return Plottable.Utils.Methods.uniq(concatenatedExtents);
+                return Plottable.UtilMethods.uniq(concatenatedExtents);
             };
             return Color;
         })(Plottable.Abstract.Scale);
-        Scales.Color = Color;
-    })(Plottable.Scales || (Plottable.Scales = {}));
-    var Scales = Plottable.Scales;
+        Scale.Color = Color;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2759,7 +2759,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Scales) {
+    (function (Scale) {
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -2778,9 +2778,9 @@ var Plottable;
             };
             return Time;
         })(Plottable.Abstract.QuantitiveScale);
-        Scales.Time = Time;
-    })(Plottable.Scales || (Plottable.Scales = {}));
-    var Scales = Plottable.Scales;
+        Scale.Time = Time;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2792,7 +2792,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Scales) {
+    (function (Scale) {
         ;
 
         var InterpolatedColor = (function (_super) {
@@ -2957,9 +2957,9 @@ var Plottable;
             };
             return InterpolatedColor;
         })(Plottable.Abstract.QuantitiveScale);
-        Scales.InterpolatedColor = InterpolatedColor;
-    })(Plottable.Scales || (Plottable.Scales = {}));
-    var Scales = Plottable.Scales;
+        Scale.InterpolatedColor = InterpolatedColor;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3000,7 +3000,7 @@ var Plottable;
             };
             return ScaleDomainCoordinator;
         })();
-        Utils.ScaleDomainCoordinator = ScaleDomainCoordinator;
+        UtilScaleDomainCoordinator = ScaleDomainCoordinator;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -3369,10 +3369,10 @@ var Plottable;
                         tickTextLabels.each(function (t, i) {
                             var textEl = d3.select(this);
                             var currentText = textEl.text();
-                            var measure = Plottable.Utils.Text.getTextMeasure(textEl);
-                            var wrappedLines = Plottable.Utils.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
+                            var measure = Plottable.UtilText.getTextMeasure(textEl);
+                            var wrappedLines = Plottable.UtilWordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
                             if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Utils.Text.getTruncatedText(currentText, availableWidth, textEl));
+                                textEl.text(Plottable.UtilText.getTruncatedText(currentText, availableWidth, textEl));
                             } else {
                                 textEl.text("");
                                 var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -3507,10 +3507,10 @@ var Plottable;
                         tickTextLabels.each(function (t, i) {
                             var textEl = d3.select(this);
                             var currentText = textEl.text();
-                            var measure = Plottable.Utils.Text.getTextMeasure(textEl);
-                            var wrappedLines = Plottable.Utils.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
+                            var measure = Plottable.UtilText.getTextMeasure(textEl);
+                            var wrappedLines = Plottable.UtilWordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
                             if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Utils.Text.getTruncatedText(currentText, availableWidth, textEl));
+                                textEl.text(Plottable.UtilText.getTruncatedText(currentText, availableWidth, textEl));
                             } else {
                                 var baseY = 0;
                                 if (tickLabelPosition === "top") {
@@ -3854,7 +3854,7 @@ var Plottable;
                     var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                     var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
 
-                    var textWriteResult = Plottable.Utils.Text.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
+                    var textWriteResult = Plottable.UtilText.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
                     textWriteResults.push(textWriteResult);
                 });
 
@@ -3883,8 +3883,8 @@ var Plottable;
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
-                Plottable.Utils.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
-                Plottable.Utils.DOM.translate(this._ticksContainer, translate[0], translate[1]);
+                Plottable.UtilDOM.translate(this._tickLabelsG, xTranslate, yTranslate);
+                Plottable.UtilDOM.translate(this._ticksContainer, translate[0], translate[1]);
                 return this;
             };
             return Category;
@@ -3903,7 +3903,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Components) {
+    (function (Component) {
         var Label = (function (_super) {
             __extends(Label, _super);
             /**
@@ -3969,13 +3969,13 @@ var Plottable;
             };
 
             Label.prototype.measureAndSetTextSize = function () {
-                var bbox = Plottable.Utils.DOM.getBBox(this.textElement);
+                var bbox = Plottable.UtilDOM.getBBox(this.textElement);
                 this.textHeight = bbox.height;
                 this.textLength = this.text === "" ? 0 : bbox.width;
             };
 
             Label.prototype.truncateTextAndRemeasure = function (availableLength) {
-                var shortText = Plottable.Utils.Text.getTruncatedText(this.text, availableLength, this.textElement);
+                var shortText = Plottable.UtilText.getTruncatedText(this.text, availableLength, this.textElement);
                 this.textElement.text(shortText);
                 this.measureAndSetTextSize();
             };
@@ -3983,7 +3983,7 @@ var Plottable;
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-                var bbox = Plottable.Utils.DOM.getBBox(this.textElement);
+                var bbox = Plottable.UtilDOM.getBBox(this.textElement);
                 this.textElement.attr("dy", -bbox.y);
 
                 var xShift = 0;
@@ -4011,7 +4011,7 @@ var Plottable;
             };
             return Label;
         })(Plottable.Abstract.Component);
-        Components.Label = Label;
+        Component.Label = Label;
 
         var TitleLabel = (function (_super) {
             __extends(TitleLabel, _super);
@@ -4021,7 +4021,7 @@ var Plottable;
             }
             return TitleLabel;
         })(Label);
-        Components.TitleLabel = TitleLabel;
+        Component.TitleLabel = TitleLabel;
 
         var AxisLabel = (function (_super) {
             __extends(AxisLabel, _super);
@@ -4031,9 +4031,9 @@ var Plottable;
             }
             return AxisLabel;
         })(Label);
-        Components.AxisLabel = AxisLabel;
-    })(Plottable.Components || (Plottable.Components = {}));
-    var Components = Plottable.Components;
+        Component.AxisLabel = AxisLabel;
+    })(Plottable.Component || (Plottable.Component = {}));
+    var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4045,7 +4045,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Components) {
+    (function (Component) {
         var Legend = (function (_super) {
             __extends(Legend, _super);
             /**
@@ -4094,7 +4094,7 @@ var Plottable;
                 var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
                 var fakeText = fakeLegendEl.append("text");
                 var maxWidth = d3.max(this.colorScale.domain(), function (d) {
-                    return Plottable.Utils.Text.getTextWidth(fakeText, d);
+                    return Plottable.UtilText.getTextWidth(fakeText, d);
                 });
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
@@ -4110,7 +4110,7 @@ var Plottable;
             Legend.prototype.measureTextHeight = function () {
                 // note: can't be called before anchoring atm
                 var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
-                var textHeight = Plottable.Utils.Text.getTextHeight(fakeLegendEl.append("text"));
+                var textHeight = Plottable.UtilText.getTextHeight(fakeLegendEl.append("text"));
                 fakeLegendEl.remove();
                 return textHeight;
             };
@@ -4133,7 +4133,7 @@ var Plottable;
                 });
                 legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
                 legend.selectAll("text").text(function (d) {
-                    return Plottable.Utils.Text.getTruncatedText(d, availableWidth, d3.select(this));
+                    return Plottable.UtilText.getTruncatedText(d, availableWidth, d3.select(this));
                 });
                 return this;
             };
@@ -4141,9 +4141,9 @@ var Plottable;
             Legend.MARGIN = 5;
             return Legend;
         })(Plottable.Abstract.Component);
-        Components.Legend = Legend;
-    })(Plottable.Components || (Plottable.Components = {}));
-    var Components = Plottable.Components;
+        Component.Legend = Legend;
+    })(Plottable.Component || (Plottable.Component = {}));
+    var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4155,7 +4155,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Components) {
+    (function (Component) {
         var ToggleLegend = (function (_super) {
             __extends(ToggleLegend, _super);
             /**
@@ -4193,10 +4193,10 @@ var Plottable;
                     // overwrite our previous listener from when we called super
                     this._registerToBroadcaster(scale, function () {
                         // preserve the state of already existing elements
-                        _this.isOff = Plottable.Utils.Methods.intersection(_this.isOff, d3.set(_this.scale().domain()));
+                        _this.isOff = Plottable.UtilMethods.intersection(_this.isOff, d3.set(_this.scale().domain()));
                         _this._invalidateLayout();
                     });
-                    this.isOff = Plottable.Utils.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
+                    this.isOff = Plottable.UtilMethods.intersection(this.isOff, d3.set(this.scale().domain()));
                     this.updateClasses();
                     return this;
                 } else {
@@ -4208,7 +4208,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 this.updateClasses();
-                this.content.selectAll("." + Plottable.Components.Legend._SUBELEMENT_CLASS).on("click", function (d) {
+                this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS).on("click", function (d) {
                     var turningOn = _this.isOff.has(d);
                     if (turningOn) {
                         _this.isOff.remove(d);
@@ -4226,7 +4226,7 @@ var Plottable;
             ToggleLegend.prototype.updateClasses = function () {
                 var _this = this;
                 if (this._isSetup) {
-                    var dataSelection = this.content.selectAll("." + Plottable.Components.Legend._SUBELEMENT_CLASS);
+                    var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
                     dataSelection.classed("toggled-on", function (d) {
                         return !_this.isOff.has(d);
                     });
@@ -4236,10 +4236,10 @@ var Plottable;
                 }
             };
             return ToggleLegend;
-        })(Plottable.Components.Legend);
-        Components.ToggleLegend = ToggleLegend;
-    })(Plottable.Components || (Plottable.Components = {}));
-    var Components = Plottable.Components;
+        })(Plottable.Component.Legend);
+        Component.ToggleLegend = ToggleLegend;
+    })(Plottable.Component || (Plottable.Component = {}));
+    var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4251,7 +4251,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Components) {
+    (function (Component) {
         var Gridlines = (function (_super) {
             __extends(Gridlines, _super);
             /**
@@ -4321,9 +4321,9 @@ var Plottable;
             };
             return Gridlines;
         })(Plottable.Abstract.Component);
-        Components.Gridlines = Gridlines;
-    })(Plottable.Components || (Plottable.Components = {}));
-    var Components = Plottable.Components;
+        Component.Gridlines = Gridlines;
+    })(Plottable.Component || (Plottable.Component = {}));
+    var Component = Plottable.Component;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4350,8 +4350,8 @@ var Plottable;
                 return formatter;
             }
             Axis.generateRelativeDateFormatter = generateRelativeDateFormatter;
-        })(Utils.Axis || (Utils.Axis = {}));
-        var Axis = Utils.Axis;
+        })(UtilAxis || (UtilAxis = {}));
+        var Axis = UtilAxis;
     })(Plottable.Utils || (Plottable.Utils = {}));
     var Utils = Plottable.Utils;
 })(Plottable || (Plottable = {}));
@@ -4431,7 +4431,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Plots) {
+    (function (Plot) {
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
@@ -4490,9 +4490,9 @@ var Plottable;
             };
             return Scatter;
         })(Plottable.Abstract.XYPlot);
-        Plots.Scatter = Scatter;
-    })(Plottable.Plots || (Plottable.Plots = {}));
-    var Plots = Plottable.Plots;
+        Plot.Scatter = Scatter;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -4504,7 +4504,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Plots) {
+    (function (Plot) {
         var Grid = (function (_super) {
             __extends(Grid, _super);
             /**
@@ -4558,9 +4558,9 @@ var Plottable;
             };
             return Grid;
         })(Plottable.Abstract.XYPlot);
-        Plots.Grid = Grid;
-    })(Plottable.Plots || (Plottable.Plots = {}));
-    var Plots = Plottable.Plots;
+        Plot.Grid = Grid;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -4675,7 +4675,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Plots) {
+    (function (Plot) {
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
@@ -4789,9 +4789,9 @@ var Plottable;
             };
             return Bar;
         })(Plottable.Abstract.BarPlot);
-        Plots.Bar = Bar;
-    })(Plottable.Plots || (Plottable.Plots = {}));
-    var Plots = Plottable.Plots;
+        Plot.Bar = Bar;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -4803,7 +4803,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Plots) {
+    (function (Plot) {
         var HorizontalBar = (function (_super) {
             __extends(HorizontalBar, _super);
             /**
@@ -4918,9 +4918,9 @@ var Plottable;
             };
             return HorizontalBar;
         })(Plottable.Abstract.BarPlot);
-        Plots.HorizontalBar = HorizontalBar;
-    })(Plottable.Plots || (Plottable.Plots = {}));
-    var Plots = Plottable.Plots;
+        Plot.HorizontalBar = HorizontalBar;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -4932,7 +4932,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Plots) {
+    (function (Plot) {
         var Area = (function (_super) {
             __extends(Area, _super);
             /**
@@ -4994,9 +4994,9 @@ var Plottable;
             };
             return Area;
         })(Plottable.Abstract.XYPlot);
-        Plots.Area = Area;
-    })(Plottable.Plots || (Plottable.Plots = {}));
-    var Plots = Plottable.Plots;
+        Plot.Area = Area;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -5008,7 +5008,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Plots) {
+    (function (Plot) {
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
@@ -5031,16 +5031,16 @@ var Plottable;
                 });
             }
             return Line;
-        })(Plottable.Plots.Area);
-        Plots.Line = Line;
-    })(Plottable.Plots || (Plottable.Plots = {}));
-    var Plots = Plottable.Plots;
+        })(Plottable.Plot.Area);
+        Plot.Line = Line;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (Singletons) {
+    (function (Singleton) {
         var KeyEventListener = (function () {
             function KeyEventListener() {
             }
@@ -5077,9 +5077,9 @@ var Plottable;
             KeyEventListener.callbacks = [];
             return KeyEventListener;
         })();
-        Singletons.KeyEventListener = KeyEventListener;
-    })(Plottable.Singletons || (Plottable.Singletons = {}));
-    var Singletons = Plottable.Singletons;
+        Singleton.KeyEventListener = KeyEventListener;
+    })(Plottable.Singleton || (Plottable.Singleton = {}));
+    var Singleton = Plottable.Singleton;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5124,7 +5124,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Interactions) {
+    (function (Interaction) {
         var Click = (function (_super) {
             __extends(Click, _super);
             /**
@@ -5158,9 +5158,9 @@ var Plottable;
             };
             return Click;
         })(Plottable.Abstract.Interaction);
-        Interactions.Click = Click;
-    })(Plottable.Interactions || (Plottable.Interactions = {}));
-    var Interactions = Plottable.Interactions;
+        Interaction.Click = Click;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5172,7 +5172,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Interactions) {
+    (function (Interaction) {
         var Mousemove = (function (_super) {
             __extends(Mousemove, _super);
             function Mousemove(componentToListenTo) {
@@ -5194,9 +5194,9 @@ var Plottable;
             };
             return Mousemove;
         })(Plottable.Abstract.Interaction);
-        Interactions.Mousemove = Mousemove;
-    })(Plottable.Interactions || (Plottable.Interactions = {}));
-    var Interactions = Plottable.Interactions;
+        Interaction.Mousemove = Mousemove;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5208,7 +5208,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Interactions) {
+    (function (Interaction) {
         var Key = (function (_super) {
             __extends(Key, _super);
             /**
@@ -5233,7 +5233,7 @@ var Plottable;
                     _this.activated = false;
                 });
 
-                Plottable.Singletons.KeyEventListener.addCallback(this.keyCode, function (e) {
+                Plottable.Singleton.KeyEventListener.addCallback(this.keyCode, function (e) {
                     if (_this.activated && _this._callback != null) {
                         _this._callback();
                     }
@@ -5251,9 +5251,9 @@ var Plottable;
             };
             return Key;
         })(Plottable.Abstract.Interaction);
-        Interactions.Key = Key;
-    })(Plottable.Interactions || (Plottable.Interactions = {}));
-    var Interactions = Plottable.Interactions;
+        Interaction.Key = Key;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5265,7 +5265,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Interactions) {
+    (function (Interaction) {
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
             /**
@@ -5315,9 +5315,9 @@ var Plottable;
             };
             return PanZoom;
         })(Plottable.Abstract.Interaction);
-        Interactions.PanZoom = PanZoom;
-    })(Plottable.Interactions || (Plottable.Interactions = {}));
-    var Interactions = Plottable.Interactions;
+        Interaction.PanZoom = PanZoom;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -5329,7 +5329,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Interactions) {
+    (function (Interaction) {
         var Drag = (function (_super) {
             __extends(Drag, _super);
             /**
@@ -5442,9 +5442,9 @@ var Plottable;
             };
             return Drag;
         })(Plottable.Abstract.Interaction);
-        Interactions.Drag = Drag;
-    })(Plottable.Interactions || (Plottable.Interactions = {}));
-    var Interactions = Plottable.Interactions;
+        Interaction.Drag = Drag;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -5456,7 +5456,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Interactions) {
+    (function (Interaction) {
         var DragBox = (function (_super) {
             __extends(DragBox, _super);
             function DragBox() {
@@ -5501,10 +5501,10 @@ var Plottable;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
             return DragBox;
-        })(Plottable.Interactions.Drag);
-        Interactions.DragBox = DragBox;
-    })(Plottable.Interactions || (Plottable.Interactions = {}));
-    var Interactions = Plottable.Interactions;
+        })(Plottable.Interaction.Drag);
+        Interaction.DragBox = DragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -5516,7 +5516,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Interactions) {
+    (function (Interaction) {
         var XDragBox = (function (_super) {
             __extends(XDragBox, _super);
             function XDragBox() {
@@ -5542,10 +5542,10 @@ var Plottable;
                 return this;
             };
             return XDragBox;
-        })(Plottable.Interactions.DragBox);
-        Interactions.XDragBox = XDragBox;
-    })(Plottable.Interactions || (Plottable.Interactions = {}));
-    var Interactions = Plottable.Interactions;
+        })(Plottable.Interaction.DragBox);
+        Interaction.XDragBox = XDragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
@@ -5557,7 +5557,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Interactions) {
+    (function (Interaction) {
         var XYDragBox = (function (_super) {
             __extends(XYDragBox, _super);
             function XYDragBox() {
@@ -5580,10 +5580,10 @@ var Plottable;
                 this.callbackToCall(pixelArea);
             };
             return XYDragBox;
-        })(Plottable.Interactions.DragBox);
-        Interactions.XYDragBox = XYDragBox;
-    })(Plottable.Interactions || (Plottable.Interactions = {}));
-    var Interactions = Plottable.Interactions;
+        })(Plottable.Interaction.DragBox);
+        Interaction.XYDragBox = XYDragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5595,15 +5595,15 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Templates) {
+    (function (Template) {
         var StandardChart = (function (_super) {
             __extends(StandardChart, _super);
             function StandardChart() {
                 _super.call(this);
-                this.xTable = new Plottable.Components.Table();
-                this.yTable = new Plottable.Components.Table();
-                this.centerComponent = new Plottable.Components.Group();
-                this.xyTable = new Plottable.Components.Table().addComponent(0, 0, this.yTable).addComponent(1, 1, this.xTable).addComponent(0, 1, this.centerComponent);
+                this.xTable = new Plottable.Component.Table();
+                this.yTable = new Plottable.Component.Table();
+                this.centerComponent = new Plottable.Component.Group();
+                this.xyTable = new Plottable.Component.Table().addComponent(0, 0, this.yTable).addComponent(1, 1, this.xTable).addComponent(0, 1, this.centerComponent);
                 this.addComponent(1, 0, this.xyTable);
             }
             StandardChart.prototype.yAxis = function (y) {
@@ -5643,7 +5643,7 @@ var Plottable;
                         }
                     }
                     if (typeof (y) === "string") {
-                        y = new Plottable.Components.AxisLabel(y, "vertical-left");
+                        y = new Plottable.Component.AxisLabel(y, "vertical-left");
                     }
                     this._yLabel = y;
                     this.yTable.addComponent(0, 0, this._yLabel);
@@ -5664,7 +5664,7 @@ var Plottable;
                         }
                     }
                     if (typeof (x) === "string") {
-                        x = new Plottable.Components.AxisLabel(x, "horizontal");
+                        x = new Plottable.Component.AxisLabel(x, "horizontal");
                     }
                     this._xLabel = x;
                     this.xTable.addComponent(1, 0, this._xLabel);
@@ -5685,7 +5685,7 @@ var Plottable;
                         }
                     }
                     if (typeof (x) === "string") {
-                        x = new Plottable.Components.TitleLabel(x, "horizontal");
+                        x = new Plottable.Component.TitleLabel(x, "horizontal");
                     }
                     this._titleLabel = x;
                     this.addComponent(0, 0, this._titleLabel);
@@ -5700,8 +5700,8 @@ var Plottable;
                 return this;
             };
             return StandardChart;
-        })(Plottable.Components.Table);
-        Templates.StandardChart = StandardChart;
-    })(Plottable.Templates || (Plottable.Templates = {}));
-    var Templates = Plottable.Templates;
+        })(Plottable.Component.Table);
+        Template.StandardChart = StandardChart;
+    })(Plottable.Template || (Plottable.Template = {}));
+    var Template = Plottable.Template;
 })(Plottable || (Plottable = {}));

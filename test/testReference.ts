@@ -3,7 +3,7 @@
 ///<reference path="../typings/d3/d3.d.ts" />
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="testUtils.ts" />
+///<reference path="testUtilts" />
 ///<reference path="../build/plottable.d.ts" />
 
 ///<reference path="axisTests.ts" />
@@ -14,7 +14,7 @@
 ///<reference path="componentTests.ts" />
 ///<reference path="coordinatorTests.ts" />
 ///<reference path="dataSourceTests.ts" />
-///<reference path="DOMUtilsTests.ts" />
+///<reference path="domUtilsTests.ts" />
 ///<reference path="gridlinesTests.ts" />
 ///<reference path="idCounterTests.ts" />
 ///<reference path="interactionTests.ts" />

@@ -70,13 +70,13 @@ window.onload = function () {
     //data
     dataseries = new Plottable.DataSource(Data());
     //Axis
-    xScale = new Plottable.Scales.Linear().domain([0, 90]);
-    yScale = new Plottable.Scales.Ordinal();
+    xScale = new Plottable.Scale.Linear().domain([0, 90]);
+    yScale = new Plottable.Scale.Ordinal();
     xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
     yAxis = new Plottable.Axis.Category(yScale, "left");
     //rendering
-    renderArea1 = new Plottable.Plots.HorizontalBar(dataseries, xScale, yScale);
-    basicTable = new Plottable.Components.Table()
+    renderArea1 = new Plottable.Plot.HorizontalBar(dataseries, xScale, yScale);
+    basicTable = new Plottable.Component.Table()
                 .addComponent(0, 0, yAxis)
                 .addComponent(0, 1, renderArea1)
                 .addComponent(1, 1, xAxis);
@@ -85,19 +85,19 @@ window.onload = function () {
     //data
     dataseries2 = new Plottable.DataSource(Data2());
     //Axis
-    xScale2 = new Plottable.Scales.Ordinal();
-    yScale2 = new Plottable.Scales.Linear().domain([0, 90]);
+    xScale2 = new Plottable.Scale.Ordinal();
+    yScale2 = new Plottable.Scale.Linear().domain([0, 90]);
     xAxis2 = new Plottable.Axis.Category(xScale2, "top");
     yAxis2 = new Plottable.Axis.YAxis(yScale2, "right");
     //rendering
-    renderArea2 = new Plottable.Plots.Bar(dataseries2, xScale2, yScale2);
-    basicTable2 = new Plottable.Components.Table()
+    renderArea2 = new Plottable.Plot.Bar(dataseries2, xScale2, yScale2);
+    basicTable2 = new Plottable.Component.Table()
                 .addComponent(1, 1, yAxis2)
                 .addComponent(1, 0, renderArea2)
                 .addComponent(0, 0, xAxis2);
 
 
-    bigTable = new Plottable.Components.Table()
+    bigTable = new Plottable.Component.Table()
             .addComponent(0,0, basicTable)
             .addComponent(1,0, basicTable2)
 

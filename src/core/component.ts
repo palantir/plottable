@@ -125,8 +125,8 @@ export module Abstract {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this.rootSVG.node());
-          availableWidth  = Utils.DOM.getElementWidth(elem);
-          availableHeight = Utils.DOM.getElementHeight(elem);
+          availableWidth  = UtilDOM.getElementWidth(elem);
+          availableHeight = UtilDOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to _computeLayout() on a non-root node");
         }
@@ -165,14 +165,14 @@ export module Abstract {
      */
     public _render() {
       if (this._isAnchored && this._isSetup) {
-        Singletons.RenderController.registerToRender(this);
+        Singleton.RenderController.registerToRender(this);
       }
       return this;
     }
 
     public _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Singletons.RenderController.registerToComputeLayout(this);
+        Singleton.RenderController.registerToComputeLayout(this);
       }
       return this;
     }
@@ -420,17 +420,17 @@ export module Abstract {
      * @param {Component} c The component to merge in.
      * @return {ComponentGroup}
      */
-    public merge(c: Component): Components.Group {
-      var cg: Components.Group;
+    public merge(c: Component): Component.Group {
+      var cg: Component.Group;
       if (this._isSetup || this._isAnchored) {
         throw new Error("Can't presently merge a component that's already been anchored");
       }
-      if (Components.Group.prototype.isPrototypeOf(c)) {
-        cg = (<Components.Group> c);
+      if (Plottable.Component.Group.prototype.isPrototypeOf(c)) {
+        cg = (<Plottable.Component.Group> c);
         cg._addComponent(this, true);
         return cg;
       } else {
-        cg = new Components.Group([this, c]);
+        cg = new Plottable.Component.Group([this, c]);
         return cg;
       }
     }

@@ -75,8 +75,8 @@ describe("Renderers", () => {
 
       var xScaleCalls: number = 0;
       var yScaleCalls: number = 0;
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
       r.project("x", null, xScale);
       r.project("y", null, yScale);
       xScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
@@ -119,7 +119,7 @@ describe("Renderers", () => {
 
     it("Renderer.project works as intended", () => {
       var r = new Plottable.Abstract.Plot();
-      var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
+      var s = new Plottable.Scale.Linear().domain([0, 1]).range([0, 10]);
       r.project("attr", "a", s);
       var attrToProjector = r._generateAttrToProjector();
       var projector = attrToProjector["attr"];
@@ -130,8 +130,8 @@ describe("Renderers", () => {
   describe("XYRenderer functionality", () => {
     it("the accessors properly access data, index, and metadata", () => {
       var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
       xScale.domain([0, 400]);
       yScale.domain([400, 0]);
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
@@ -139,7 +139,7 @@ describe("Renderers", () => {
       var xAccessor = (d: any, i?: number, m?: any) => d.x + i * m.foo;
       var yAccessor = (d: any, i?: number, m?: any) => m.bar;
       var dataSource = new Plottable.DataSource(data, metadata);
-      var renderer = new Plottable.Plots.Scatter(dataSource, xScale, yScale)
+      var renderer = new Plottable.Plot.Scatter(dataSource, xScale, yScale)
                                   .project("x", xAccessor)
                                   .project("y", yAccessor);
       renderer.renderTo(svg);
@@ -170,15 +170,15 @@ describe("Renderers", () => {
 
     describe("Basic AreaRenderer functionality", () => {
       var svg: D3.Selection;
-      var xScale = new Plottable.Scales.Linear().domain([0, 1]);
-      var yScale = new Plottable.Scales.Linear().domain([0, 1]);
+      var xScale = new Plottable.Scale.Linear().domain([0, 1]);
+      var yScale = new Plottable.Scale.Linear().domain([0, 1]);
       var xAccessor = (d: any) => d.foo;
       var yAccessor = (d: any) => d.bar;
       var y0Accessor = () => 0;
       var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
       var fillAccessor = () => "steelblue";
       var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      var areaRenderer = new Plottable.Plots.Area(simpleDataset, xScale, yScale)
+      var areaRenderer = new Plottable.Plot.Area(simpleDataset, xScale, yScale)
                                   .project("x", xAccessor)
                                   .project("y", yAccessor)
                                   .project("y0", y0Accessor)
@@ -246,9 +246,9 @@ describe("Renderers", () => {
       it("defaults to no fill", () => {
         var svg = generateSVG(500, 500);
         var data = [{x: 0, y: 0}, {x: 2, y: 2}];
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
-        var lineRenderer = new Plottable.Plots.Line(data, xScale, yScale);
+        var xScale = new Plottable.Scale.Linear();
+        var yScale = new Plottable.Scale.Linear();
+        var lineRenderer = new Plottable.Plot.Line(data, xScale, yScale);
         lineRenderer.renderTo(svg);
 
         var areaPath = lineRenderer.renderArea.select(".area");
@@ -259,9 +259,9 @@ describe("Renderers", () => {
 
     describe("Example CircleRenderer with quadratic series", () => {
       var svg: D3.Selection;
-      var xScale: Plottable.Scales.Linear;
-      var yScale: Plottable.Scales.Linear;
-      var circleRenderer: Plottable.Plots.Scatter;
+      var xScale: Plottable.Scale.Linear;
+      var yScale: Plottable.Scale.Linear;
+      var circleRenderer: Plottable.Plot.Scatter;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 300;
       var verifier = new MultiTestVerifier();
@@ -303,9 +303,9 @@ describe("Renderers", () => {
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scales.Linear().domain([0, 9]);
-        yScale = new Plottable.Scales.Linear().domain([0, 81]);
-        circleRenderer = new Plottable.Plots.Scatter(quadraticDataset, xScale, yScale);
+        xScale = new Plottable.Scale.Linear().domain([0, 9]);
+        yScale = new Plottable.Scale.Linear().domain([0, 81]);
+        circleRenderer = new Plottable.Plot.Scatter(quadraticDataset, xScale, yScale);
         circleRenderer.project("fill", colorAccessor);
         circleRenderer.renderTo(svg);
       });
@@ -351,16 +351,16 @@ describe("Renderers", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.DataSource;
-      var xScale: Plottable.Scales.Ordinal;
-      var yScale: Plottable.Scales.Linear;
-      var renderer: Plottable.Plots.Bar;
+      var xScale: Plottable.Scale.Ordinal;
+      var yScale: Plottable.Scale.Linear;
+      var renderer: Plottable.Plot.Bar;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scales.Ordinal().domain(["A", "B"]).rangeType("points");
-        yScale = new Plottable.Scales.Linear();
+        xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+        yScale = new Plottable.Scale.Linear();
         var data = [
           {x: "A", y: 1},
           {x: "B", y: -1.5},
@@ -368,7 +368,7 @@ describe("Renderers", () => {
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.Plots.Bar(dataset, xScale, yScale);
+        renderer = new Plottable.Plot.Bar(dataset, xScale, yScale);
         renderer.animate(false);
         renderer.renderTo(svg);
       });
@@ -473,16 +473,16 @@ describe("Renderers", () => {
       var verifier = new MultiTestVerifier();
       var svg: D3.Selection;
       var dataset: Plottable.DataSource;
-      var yScale: Plottable.Scales.Ordinal;
-      var xScale: Plottable.Scales.Linear;
-      var renderer: Plottable.Plots.HorizontalBar;
+      var yScale: Plottable.Scale.Ordinal;
+      var xScale: Plottable.Scale.Linear;
+      var renderer: Plottable.Plot.HorizontalBar;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
       before(() => {
         svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.Scales.Ordinal().domain(["A", "B"]).rangeType("points");
-        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+        xScale = new Plottable.Scale.Linear();
 
         var data = [
           {y: "A", x: 1},
@@ -491,7 +491,7 @@ describe("Renderers", () => {
         ];
         dataset = new Plottable.DataSource(data);
 
-        renderer = new Plottable.Plots.HorizontalBar(dataset, xScale, yScale);
+        renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
         renderer._animate = false;
         renderer.renderTo(svg);
       });
@@ -620,11 +620,11 @@ describe("Renderers", () => {
       };
 
       it("renders correctly", () => {
-        var xScale: Plottable.Scales.Ordinal = new Plottable.Scales.Ordinal();
-        var yScale: Plottable.Scales.Ordinal = new Plottable.Scales.Ordinal();
-        var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var renderer: Plottable.Plots.Grid = new Plottable.Plots.Grid(DATA, xScale, yScale, colorScale)
+        var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale)
                                                             .project("fill", "magnitude");
         renderer.renderTo(svg);
         VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
@@ -633,11 +633,11 @@ describe("Renderers", () => {
 
 
       it("renders correctly when data is set after construction", () => {
-        var xScale: Plottable.Scales.Ordinal = new Plottable.Scales.Ordinal();
-        var yScale: Plottable.Scales.Ordinal = new Plottable.Scales.Ordinal();
-        var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var renderer: Plottable.Plots.Grid = new Plottable.Plots.Grid(null, xScale, yScale, colorScale)
+        var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
                                                             .project("fill", "magnitude");
         renderer.renderTo(svg);
         renderer.dataSource().data(DATA);
@@ -646,11 +646,11 @@ describe("Renderers", () => {
       });
 
       it("can invert y axis correctly", () => {
-        var xScale: Plottable.Scales.Ordinal = new Plottable.Scales.Ordinal();
-        var yScale: Plottable.Scales.Ordinal = new Plottable.Scales.Ordinal();
-        var colorScale: Plottable.Scales.InterpolatedColor = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+        var xScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var yScale: Plottable.Scale.Ordinal = new Plottable.Scale.Ordinal();
+        var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var renderer: Plottable.Plots.Grid = new Plottable.Plots.Grid(null, xScale, yScale, colorScale)
+        var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
                                                             .project("fill", "magnitude");
         renderer.renderTo(svg);
 

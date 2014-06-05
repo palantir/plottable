@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable{
-export module Plots {
+module Plottable {
+export module Plot {
   export class HorizontalBar extends Abstract.BarPlot {
     public _barAlignment = "top";
     public _ANIMATION_DURATION = 300; //milliseconds
@@ -31,7 +31,7 @@ export module Plots {
       attrToProjector["height"] = attrToProjector["width"]; // remapping due to naming conventions
       var heightFunction = attrToProjector["height"];
 
-      var castYScale = (<Scales.Ordinal> this.yScale);
+      var castYScale = (<Scale.Ordinal> this.yScale);
       var rangeType = (castYScale.rangeType == null) ? "points" : castYScale.rangeType();
       if (rangeType === "points") {
         if (this._barAlignment === "middle") {

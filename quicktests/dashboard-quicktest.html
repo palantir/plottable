@@ -33,7 +33,7 @@
     <script>
       function sizeSVG(selection) {
         var svg = d3.select(selection);
-        var width = Plottable.Utils.getSVGPixelWidth(svg);
+        var width = Plottable.UtilgetSVGPixelWidth(svg);
         svg.attr("width", width);
         var height = Math.min(width*.6, 500);
         svg.attr("height", height);

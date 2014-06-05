@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable{
-export module Plots {
+module Plottable {
+export module Plot {
   export class Area extends Abstract.XYPlot {
     private areaPath: D3.Selection;
     private linePath: D3.Selection;

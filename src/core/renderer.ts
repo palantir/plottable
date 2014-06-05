@@ -128,7 +128,7 @@ export module Abstract {
       var h: { [attrName: string]: IAppliedAccessor; } = {};
       d3.keys(this._projectors).forEach((a) => {
         var projector = this._projectors[a];
-        var accessor = Utils.Methods.applyAccessor(projector.accessor, this.dataSource());
+        var accessor = UtilMethods.applyAccessor(projector.accessor, this.dataSource());
         var scale = projector.scale;
         var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
         h[a] = fn;

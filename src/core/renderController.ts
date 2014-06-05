@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Singletons {
+export module Singleton {
   export class RenderController {
     private static componentsNeedingRender: {[key: string]: Abstract.Component} = {};
     private static componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};

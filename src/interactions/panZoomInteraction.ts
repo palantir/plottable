@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
-export module Interactions {
+module Plottable {
+export module Interaction {
   export class PanZoom extends Abstract.Interaction {
     private zoom: D3.Behavior.Zoom;
     public xScale: Abstract.QuantitiveScale;

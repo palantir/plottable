@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
-export module Interactions {
+module Plottable {
+export module Interaction {
   export class Mousemove extends Abstract.Interaction {
     constructor(componentToListenTo: Abstract.Component) {
       super(componentToListenTo);

@@ -24,37 +24,37 @@
       var cuteFormatter = function(d) { return d + " is a pretty darn cute cat"; } ;
 
       var ds = new Plottable.DataSource(data);
-      var xScale = new Plottable.Scales.Ordinal().rangeType("bands");
+      var xScale = new Plottable.Scale.Ordinal().rangeType("bands");
       var xAxis = new Plottable.Axis.Category(xScale);
 
-      var yScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
       yAxis.showEndTickLabels(true);
 
-      var barRenderer = new Plottable.Plots.Bar(ds, xScale, yScale)
+      var barRenderer = new Plottable.Plot.Bar(ds, xScale, yScale)
                               .project("x", "name", xScale)
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"; })
                               .animate(true);
-      var chart = new Plottable.Components.Table([
+      var chart = new Plottable.Component.Table([
                                   [yAxis, barRenderer],
                                   [null,  xAxis]
                                 ]);
 
-      var xScale2 = new Plottable.Scales.Linear();
+      var xScale2 = new Plottable.Scale.Linear();
       var xAxis2 = new Plottable.Axis.XAxis(xScale2, "bottom");
 
-      var yScale2 = new Plottable.Scales.Ordinal().rangeType("bands");
+      var yScale2 = new Plottable.Scale.Ordinal().rangeType("bands");
       var yAxis2 = new Plottable.Axis.Category(yScale2, "left");
       window.yAxis = yAxis2;
 
-      var horizBarRenderer = new Plottable.Plots.HorizontalBar(ds, xScale2, yScale2)
+      var horizBarRenderer = new Plottable.Plot.HorizontalBar(ds, xScale2, yScale2)
                               .project("x", "age", xScale2)
                               .project("y", "name", yScale2)
                               .project("fill", function() {return "steelblue"; })
                               .animate(true);
 
-      var horizChart = new Plottable.Components.Table([
+      var horizChart = new Plottable.Component.Table([
         [yAxis2, horizBarRenderer],
         [null, xAxis2]
       ]);

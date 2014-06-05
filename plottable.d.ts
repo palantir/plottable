@@ -373,7 +373,7 @@ declare module Plottable {
             * @param {Component} c The component to merge in.
             * @return {ComponentGroup}
             */
-            public merge(c: Component): Components.Group;
+            public merge(c: Component): Component.Group;
             /**
             * Removes a Component from the DOM.
             */
@@ -410,7 +410,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Components {
+    module Component {
         class Group extends Abstract.ComponentContainer {
             /**
             * Creates a Group.
@@ -426,7 +426,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Components {
+    module Component {
         interface IterateLayoutResult {
             colProportionalSpace: number[];
             rowProportionalSpace: number[];
@@ -575,7 +575,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Singletons {
+    module Singleton {
         class RenderController {
             static enabled: boolean;
             static registerToRender(c: Abstract.Component): void;
@@ -710,7 +710,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Scales {
+    module Scale {
         class Linear extends Abstract.QuantitiveScale {
             /**
             * Creates a new LinearScale.
@@ -732,7 +732,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Scales {
+    module Scale {
         class Log extends Abstract.QuantitiveScale {
             /**
             * Creates a new Scale.Log.
@@ -754,7 +754,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Scales {
+    module Scale {
         class Ordinal extends Abstract.Scale {
             /**
             * Creates a new OrdinalScale. Domain and Range are set later.
@@ -807,7 +807,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Scales {
+    module Scale {
         class Color extends Abstract.Scale {
             /**
             * Creates a ColorScale.
@@ -823,7 +823,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Scales {
+    module Scale {
         class Time extends Abstract.QuantitiveScale {
             /**
             * Creates a new TimeScale.
@@ -837,7 +837,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Scales {
+    module Scale {
         class InterpolatedColor extends Abstract.QuantitiveScale {
             /**
             * Creates a InterpolatedColorScale.
@@ -1039,14 +1039,14 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends Abstract.Axis {
-            constructor(scale: Scales.Ordinal, orientation?: string);
+            constructor(scale: Scale.Ordinal, orientation?: string);
         }
     }
 }
 
 
 declare module Plottable {
-    module Components {
+    module Component {
         class Label extends Abstract.Component {
             /**
             * Creates a Label.
@@ -1075,7 +1075,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Components {
+    module Component {
         class Legend extends Abstract.Component {
             static _SUBELEMENT_CLASS: string;
             /**
@@ -1084,22 +1084,22 @@ declare module Plottable {
             * @constructor
             * @param {ColorScale} colorScale
             */
-            constructor(colorScale?: Scales.Color);
+            constructor(colorScale?: Scale.Color);
             /**
             * Assigns a new ColorScale to the Legend.
             *
             * @param {ColorScale} scale
             * @returns {Legend} The calling Legend.
             */
-            public scale(scale: Scales.Color): Legend;
-            public scale(): Scales.Color;
+            public scale(scale: Scale.Color): Legend;
+            public scale(): Scale.Color;
         }
     }
 }
 
 
 declare module Plottable {
-    module Components {
+    module Component {
         interface ToggleCallback {
             (datum: any, newState: boolean): any;
         }
@@ -1111,7 +1111,7 @@ declare module Plottable {
             * @param {ColorScale} colorScale
             * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
             */
-            constructor(colorScale: Scales.Color, callback?: ToggleCallback);
+            constructor(colorScale: Scale.Color, callback?: ToggleCallback);
             /**
             * Assigns or gets the callback to the ToggleLegend
             * Call with argument of null to remove the callback
@@ -1126,14 +1126,14 @@ declare module Plottable {
             * @param {ColorScale} scale
             * @returns {ToggleLegend} The calling ToggleLegend.
             */
-            public scale(scale?: Scales.Color): any;
+            public scale(scale?: Scale.Color): any;
         }
     }
 }
 
 
 declare module Plottable {
-    module Components {
+    module Component {
         class Gridlines extends Abstract.Component {
             /**
             * Creates a set of Gridlines.
@@ -1184,7 +1184,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
+    module Plot {
         class Scatter extends Abstract.XYPlot {
             /**
             * Creates a CircleRenderer.
@@ -1202,7 +1202,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
+    module Plot {
         class Grid extends Abstract.XYPlot {
             /**
             * Creates a GridRenderer.
@@ -1214,7 +1214,7 @@ declare module Plottable {
             * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
             *     cell.
             */
-            constructor(dataset: any, xScale: Scales.Ordinal, yScale: Scales.Ordinal, colorScale: Abstract.Scale);
+            constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale);
             public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Grid;
         }
     }
@@ -1268,7 +1268,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
+    module Plot {
         class Bar extends Abstract.BarPlot {
             /**
             * Creates a BarRenderer.
@@ -1292,7 +1292,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
+    module Plot {
         class HorizontalBar extends Abstract.BarPlot {
             /**
             * Creates a HorizontalBarRenderer.
@@ -1316,7 +1316,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
+    module Plot {
         class Area extends Abstract.XYPlot {
             /**
             * Creates an AreaRenderer.
@@ -1333,7 +1333,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
+    module Plot {
         class Line extends Area {
             /**
             * Creates a LineRenderer.
@@ -1350,7 +1350,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Singletons {
+    module Singleton {
         interface IKeyEventListenerCallback {
             (e: D3.Event): any;
         }
@@ -1383,7 +1383,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
+    module Interaction {
         class Click extends Abstract.Interaction {
             /**
             * Creates a ClickInteraction.
@@ -1404,7 +1404,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
+    module Interaction {
         class Mousemove extends Abstract.Interaction {
             constructor(componentToListenTo: Abstract.Component);
             public mousemove(x: number, y: number): void;
@@ -1414,7 +1414,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
+    module Interaction {
         class Key extends Abstract.Interaction {
             /**
             * Creates a KeyInteraction.
@@ -1436,7 +1436,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
+    module Interaction {
         class PanZoom extends Abstract.Interaction {
             /**
             * Creates a PanZoomInteraction.
@@ -1454,7 +1454,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
+    module Interaction {
         class Drag extends Abstract.Interaction {
             public callbackToCall: (dragInfo: any) => any;
             /**
@@ -1477,7 +1477,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
+    module Interaction {
         class DragBox extends Drag {
             /**
             * Clears the highlighted drag-selection box drawn by the AreaInteraction.
@@ -1492,7 +1492,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
+    module Interaction {
         class XDragBox extends DragBox {
             public setBox(x0: number, x1: number): XDragBox;
         }
@@ -1501,7 +1501,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Interactions {
+    module Interaction {
         class XYDragBox extends DragBox {
         }
     }
@@ -1509,22 +1509,22 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Templates {
-        class StandardChart extends Components.Table {
+    module Template {
+        class StandardChart extends Component.Table {
             constructor();
             public yAxis(y: Axis.YAxis): StandardChart;
             public yAxis(): Axis.YAxis;
             public xAxis(x: Axis.XAxis): StandardChart;
             public xAxis(): Axis.XAxis;
-            public yLabel(y: Components.AxisLabel): StandardChart;
+            public yLabel(y: Component.AxisLabel): StandardChart;
             public yLabel(y: string): StandardChart;
-            public yLabel(): Components.AxisLabel;
-            public xLabel(x: Components.AxisLabel): StandardChart;
+            public yLabel(): Component.AxisLabel;
+            public xLabel(x: Component.AxisLabel): StandardChart;
             public xLabel(x: string): StandardChart;
-            public xLabel(): Components.AxisLabel;
-            public titleLabel(x: Components.TitleLabel): StandardChart;
+            public xLabel(): Component.AxisLabel;
+            public titleLabel(x: Component.TitleLabel): StandardChart;
             public titleLabel(x: string): StandardChart;
-            public titleLabel(): Components.TitleLabel;
+            public titleLabel(): Component.TitleLabel;
             public center(c: Abstract.Component): StandardChart;
         }
     }

@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable{
-export module Interactions {
+module Plottable {
+export module Interaction {
   export class Drag extends Abstract.Interaction {
     private dragInitialized = false;
     private dragBehavior: D3.Behavior.Drag;

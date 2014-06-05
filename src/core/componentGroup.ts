@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Components {
+export module Component {
   export class Group extends Abstract.ComponentContainer {
 
     /**

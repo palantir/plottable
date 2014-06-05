@@ -1,11 +1,11 @@
 function customProjectorChart(data) {
-  var xScale = new Plottable.Scales.Linear().domain([-5, 100]);
-  var yScale = new Plottable.Scales.Log().domain([0.5, 100000]);
+  var xScale = new Plottable.Scale.Linear().domain([-5, 100]);
+  var yScale = new Plottable.Scale.Log().domain([0.5, 100000]);
 
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", d3.format("d"));
   var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-  var renderer = new Plottable.Plots.Scatter(data, xScale, yScale);
+  var renderer = new Plottable.Plot.Scatter(data, xScale, yScale);
 
   // By calling renderer.project(attribute=x, accessor="day_delta", scale=xScale), we tell the renderer to set the "x"
   // attribute on data using the given accessor and scale. In general, an accessor is a function that takes in a data
@@ -25,10 +25,10 @@ function customProjectorChart(data) {
     return d.additions / (d.deletions + d.additions);
   }
   // This scale interpolates between red for commits with mostly deletions, and green for commits with mostly additions.
-  var colorScale = new Plottable.Scales.InterpolatedColor(["#FF0000", "#008B00"]);
+  var colorScale = new Plottable.Scale.InterpolatedColor(["#FF0000", "#008B00"]);
   renderer.project("fill", additionsOverLinesChanged, colorScale);
 
-  var chart = new Plottable.Templates.StandardChart()
+  var chart = new Plottable.Template.StandardChart()
                     .xAxis(xAxis).yAxis(yAxis)
                     .center(renderer)
                     .xLabel("days since start of project")

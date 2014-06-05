@@ -1,11 +1,11 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable{
-export module Plots {
+module Plottable {
+export module Plot {
   export class Grid extends Abstract.XYPlot {
     public colorScale: Abstract.Scale;
-    public xScale: Scales.Ordinal;
-    public yScale: Scales.Ordinal;
+    public xScale: Scale.Ordinal;
+    public yScale: Scale.Ordinal;
 
     /**
      * Creates a GridRenderer.
@@ -17,7 +17,7 @@ export module Plots {
      * @param {ColorScale|InterpolatedColorScale} colorScale The color scale to use for each grid
      *     cell.
      */
-    constructor(dataset: any, xScale: Scales.Ordinal, yScale: Scales.Ordinal, colorScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("grid-renderer", true);
 

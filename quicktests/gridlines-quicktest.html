@@ -16,22 +16,22 @@
       window.onload = function() {
         dataseries = makeRandomData(20);
 
-        xScale = new Plottable.Scales.Linear();
+        xScale = new Plottable.Scale.Linear();
         xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        yScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scale.Linear();
         yAxis = new Plottable.Axis.YAxis(yScale, "left").tickLabelPosition("bottom");
         yAxis.tickFormat(d3.format("g"));
         window.yAxis = yAxis;
         yAxis.debug = true;
 
-        renderAreaD1 = new Plottable.Plots.Scatter(dataseries, xScale, yScale);
-        gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+        renderAreaD1 = new Plottable.Plot.Scatter(dataseries, xScale, yScale);
+        gridlines = new Plottable.Component.Gridlines(xScale, yScale);
         renderGroup = renderAreaD1.merge(gridlines);
-        chart = new Plottable.Components.Table([[yAxis, renderGroup],
+        chart = new Plottable.Component.Table([[yAxis, renderGroup],
                                          [null,  xAxis]]);
         chart.renderTo("#gridlines-test");
-        var pzi = new Plottable.Interactions.PanZoom(renderGroup, xScale, yScale);
+        var pzi = new Plottable.Interaction.PanZoom(renderGroup, xScale, yScale);
         pzi.registerWithComponent();
       }
     </script>

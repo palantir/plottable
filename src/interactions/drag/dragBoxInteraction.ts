@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable{
-export module Interactions {
+module Plottable {
+export module Interaction {
   export class DragBox extends Drag {
     private static CLASS_DRAG_BOX = "drag-box";
     public dragBox: D3.Selection;

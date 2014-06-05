@@ -1,15 +1,15 @@
 function commitChart(svg, dataset) {
-  var xScale = new Plottable.Scales.Time()
+  var xScale = new Plottable.Scale.Time()
               .domain([new Date(2014, 0, 20), new Date(2014, 2, 23)]).nice();
 
-  var yScale = new Plottable.Scales.Linear()
+  var yScale = new Plottable.Scale.Linear()
               .domain([8, 26]);
 
-  var rScale = new Plottable.Scales.Log()
+  var rScale = new Plottable.Scale.Log()
               .range([2, 12])
               .widenDomainOnData(dataset.data, linesAddedAccessor);
 
-  var colorScale = new Plottable.Scales.Color()
+  var colorScale = new Plottable.Scale.Color()
                     .domain(["danmane", "jlan", "aramaswamy", "derekcicerone"])
                     .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]);
 
@@ -25,19 +25,19 @@ function commitChart(svg, dataset) {
   }
 
 
-  var renderer = new Plottable.Plots.Scatter(dataset, xScale, yScale)
+  var renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale)
                  .xAccessor("date").yAccessor(hourAccessor)
                  .rAccessor(radiusAccessor).colorAccessor(colorAccessor);
 
-  var legend    = new Plottable.Components.Legend(colorScale).minimumWidth(160).xOffset(-15).yOffset(10);
-  var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+  var legend    = new Plottable.Component.Legend(colorScale).minimumWidth(160).xOffset(-15).yOffset(10);
+  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var group     = legend.merge(renderer).merge(gridlines);
 
   var dateFormatter = d3.time.format("%-m/%-d/%y");
   var xAxis  = new Plottable.Axis.XAxis(xScale, "bottom", dateFormatter);
   var yAxis  = new Plottable.Axis.YAxis(yScale, "left", hourFormatter).showEndTickLabels(true);
 
-  var chart = new Plottable.Templates.StandardChart().center(group)
+  var chart = new Plottable.Template.StandardChart().center(group)
                   .xAxis(xAxis).yAxis(yAxis)
                   .xLabel("Date of Commit").yLabel("Commit Time")
                   .titleLabel("Commit History");

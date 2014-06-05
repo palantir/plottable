@@ -60,21 +60,21 @@ window.onload = function() {
     }
 
       function makeChart(selector, colors, data) {
-          xScale       = new Plottable.Scales.Ordinal().rangeType("bands");
-          yScale       = new Plottable.Scales.Ordinal().rangeType("bands");
-          colorScale   = new Plottable.Scales.InterpolatedColor(colors);
+          xScale       = new Plottable.Scale.Ordinal().rangeType("bands");
+          yScale       = new Plottable.Scale.Ordinal().rangeType("bands");
+          colorScale   = new Plottable.Scale.InterpolatedColor(colors);
 
           identity     = function(d){return d;};
           xAxisB        = new Plottable.Axis.Category(xScale, "bottom");
           xAxisT        = new Plottable.Axis.Category(xScale, "top");
           yAxisL        = new Plottable.Axis.Category(yScale, "left");
           yAxisR        = new Plottable.Axis.Category(yScale, "right");
-          gridRenderer = new Plottable.Plots.Grid(data, xScale, yScale, colorScale)
+          gridRenderer = new Plottable.Plot.Grid(data, xScale, yScale, colorScale)
                                   .project("x", "category")
                                   .project("y", "day")
                                   .project("fill", "awesomeness");
 
-          return new Plottable.Components.Table()
+          return new Plottable.Component.Table()
             .addComponent(1, 0, yAxisL)
             .addComponent(1, 2, yAxisR)
             .addComponent(1, 1, gridRenderer)

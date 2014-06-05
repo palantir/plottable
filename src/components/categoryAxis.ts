@@ -3,10 +3,10 @@
 module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
-    public _scale: Scales.Ordinal;
+    public _scale: Scale.Ordinal;
     public _tickLabelsG: D3.Selection;
 
-    constructor(scale: Scales.Ordinal, orientation = "bottom") {
+    constructor(scale: Scale.Ordinal, orientation = "bottom") {
       super(scale, orientation);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
@@ -56,9 +56,9 @@ export module Axis {
       return this._scale.domain();
     }
 
-    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Utils.Text.IWriteTextResult {
+    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): UtilText.IWriteTextResult {
       var self = this;
-      var textWriteResults: Utils.Text.IWriteTextResult[] = [];
+      var textWriteResults: UtilText.IWriteTextResult[] = [];
       ticks.each(function (d: string, i: number) {
         var d3this = d3.select(this);
         var startAndWidth = self._scale.fullBandStartAndWidth(d);
@@ -75,16 +75,16 @@ export module Axis {
         var xAlign: {[s: string]: string} = {left: "right", right: "left", top: "center", bottom: "center"};
         var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
 
-        var textWriteResult = Utils.Text.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
+        var textWriteResult = UtilText.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
         textWriteResults.push(textWriteResult);
       });
 
       var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
       var heightFn = this._isHorizontal() ? d3.max : d3.sum;
       return {
-        textFits: textWriteResults.every((t: Utils.Text.IWriteTextResult) => t.textFits),
-        usedWidth : widthFn(textWriteResults, (t: Utils.Text.IWriteTextResult) => t.usedWidth),
-        usedHeight: heightFn(textWriteResults, (t: Utils.Text.IWriteTextResult) => t.usedHeight)
+        textFits: textWriteResults.every((t: UtilText.IWriteTextResult) => t.textFits),
+        usedWidth : widthFn(textWriteResults, (t: UtilText.IWriteTextResult) => t.usedWidth),
+        usedHeight: heightFn(textWriteResults, (t: UtilText.IWriteTextResult) => t.usedHeight)
       };
 
     }
@@ -99,8 +99,8 @@ export module Axis {
 
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
-      Utils.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
-      Utils.DOM.translate(this._ticksContainer, translate[0], translate[1]);
+      UtilDOM.translate(this._tickLabelsG, xTranslate, yTranslate);
+      UtilDOM.translate(this._ticksContainer, translate[0], translate[1]);
       return this;
     }
   }

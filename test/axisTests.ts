@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("Axes", () => {
   it("Renders ticks", () => {
     var svg = generateSVG(500, 100);
-    var xScale = new Plottable.Scales.Linear();
+    var xScale = new Plottable.Scale.Linear();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
     var axis = new Plottable.Axis.XAxis(xScale, "bottom");
@@ -21,7 +21,7 @@ describe("Axes", () => {
 
   it("formatter can be changed", () => {
     var svg = generateSVG(500, 100);
-    var xScale = new Plottable.Scales.Linear();
+    var xScale = new Plottable.Scale.Linear();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
     var axis = new Plottable.Axis.XAxis(xScale, "bottom");
@@ -42,7 +42,7 @@ describe("Axes", () => {
 
   it("Still displays tick labels if space is constrained.", () => {
     var svg = generateSVG(100, 100);
-    var yScale = new Plottable.Scales.Linear()
+    var yScale = new Plottable.Scale.Linear()
                                 .domain([0, 10])
                                 .range([0, 100]);
     var yAxis = new Plottable.Axis.YAxis(yScale, "left");
@@ -54,7 +54,7 @@ describe("Axes", () => {
     assert.operator(visibleTickTexts[0].length, ">=", 2, "Two tick labels remain visible");
     yAxis.remove();
 
-    var xScale = new Plottable.Scales.Linear()
+    var xScale = new Plottable.Scale.Linear()
                                 .domain([0, 10])
                                 .range([0, 100]);
     var xAxis = new Plottable.Axis.XAxis(yScale, "bottom");
@@ -69,7 +69,7 @@ describe("Axes", () => {
 
   it("XAxis positions tick labels correctly", () => {
     var svg = generateSVG(500, 100);
-    var xScale = new Plottable.Scales.Linear();
+    var xScale = new Plottable.Scale.Linear();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
     var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
@@ -109,7 +109,7 @@ describe("Axes", () => {
 
   it("X Axis height can be changed", () => {
     var svg = generateSVG(500, 30);
-    var xScale = new Plottable.Scales.Linear();
+    var xScale = new Plottable.Scale.Linear();
     xScale.domain([0, 10]);
     xScale.range([0, 500]);
     var xAxis = new Plottable.Axis.XAxis(xScale, "top"); // not a common position, but needed to test that things get shifted
@@ -134,7 +134,7 @@ describe("Axes", () => {
 
   it("YAxis positions tick labels correctly", () => {
     var svg = generateSVG(100, 500);
-    var yScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scale.Linear();
     yScale.domain([0, 10]);
     yScale.range([500, 0]);
     var yAxis = new Plottable.Axis.YAxis(yScale, "left");
@@ -173,7 +173,7 @@ describe("Axes", () => {
 
   it("Y Axis width can be changed", () => {
     var svg = generateSVG(50, 500);
-    var yScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scale.Linear();
     yScale.domain([0, 10]);
     yScale.range([500, 0]);
     var yAxis = new Plottable.Axis.YAxis(yScale, "left");
@@ -199,10 +199,10 @@ describe("Axes", () => {
   it("generate relative date formatter", () => {
     var baseDate = new Date(2000, 0, 1);
     var testDate = new Date(2001, 0, 1);
-    var formatter = Plottable.Utils.Axis.generateRelativeDateFormatter(baseDate.valueOf());
+    var formatter = Plottable.UtilAxis.generateRelativeDateFormatter(baseDate.valueOf());
     assert.equal(formatter(testDate), "366"); // leap year
 
-    formatter = Plottable.Utils.Axis.generateRelativeDateFormatter(baseDate.valueOf(), Plottable.Utils.Axis.ONE_DAY, "d");
+    formatter = Plottable.UtilAxis.generateRelativeDateFormatter(baseDate.valueOf(), Plottable.UtilAxis.ONE_DAY, "d");
     assert.equal(formatter(testDate), "366d");
   });
 
@@ -210,14 +210,14 @@ describe("Axes", () => {
     var svg = generateSVG(500, 100);
     var startDate = new Date(2000, 0, 1);
     var endDate = new Date(2001, 0, 1);
-    var timeScale = new Plottable.Scales.Linear();
+    var timeScale = new Plottable.Scale.Linear();
     timeScale.domain([startDate, endDate]);
     timeScale.range([0, 500]);
     timeScale.nice();
     var xAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
     var baseDate = d3.min(timeScale.domain());
 
-    var formatter = Plottable.Utils.Axis.generateRelativeDateFormatter(baseDate);
+    var formatter = Plottable.UtilAxis.generateRelativeDateFormatter(baseDate);
     xAxis.tickFormat(formatter);
     xAxis.renderTo(svg);
     var tickLabels = $(".tick").children("text");
@@ -228,13 +228,13 @@ describe("Axes", () => {
 
     svg = generateSVG(100, 500);
     endDate = new Date(2010, 0, 1);
-    var timescaleY = new Plottable.Scales.Linear().domain([startDate, endDate])
+    var timescaleY = new Plottable.Scale.Linear().domain([startDate, endDate])
                                                 .range([0, 500]);
     var yAxis = new Plottable.Axis.YAxis(timescaleY, "left");
-    var oneYear = 365 * Plottable.Utils.Axis.ONE_DAY;
+    var oneYear = 365 * Plottable.UtilAxis.ONE_DAY;
     baseDate = new Date(1990, 0, 1);
 
-    formatter = Plottable.Utils.Axis.generateRelativeDateFormatter(baseDate, oneYear, "y");
+    formatter = Plottable.UtilAxis.generateRelativeDateFormatter(baseDate, oneYear, "y");
     yAxis.tickFormat(formatter);
     yAxis.renderTo(svg);
     tickLabels = $(".tick").children("text");
@@ -246,7 +246,7 @@ describe("Axes", () => {
 
   it("XAxis wraps long tick label texts so they don't overlap", () => {
     var svg = generateSVG(300, 60);
-    var ordinalScale = new Plottable.Scales.Ordinal();
+    var ordinalScale = new Plottable.Scale.Ordinal();
     ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
     ordinalScale.range([0, 300]);
 
@@ -278,7 +278,7 @@ describe("Axes", () => {
 
   it("Yaxis wraps long tick label texts so they don't overlap", () => {
     var svg = generateSVG(100, 300);
-    var ordinalScale = new Plottable.Scales.Ordinal();
+    var ordinalScale = new Plottable.Scale.Ordinal();
     ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
     ordinalScale.range([0, 300]);
 

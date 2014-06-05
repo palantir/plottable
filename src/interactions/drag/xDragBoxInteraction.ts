@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable{
-export module Interactions {
+module Plottable {
+export module Interaction {
   export class XDragBox extends DragBox {
     public _drag(){
       super._drag();

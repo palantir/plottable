@@ -1,6 +1,6 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
+module Plottable {
 export module Utils {
   export class ScaleDomainCoordinator {
     /* This class is responsible for maintaining coordination between linked scales.

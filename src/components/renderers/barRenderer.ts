@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plots {
+export module Plot {
   export class Bar extends Abstract.BarPlot {
     public _barAlignment = "left";
     public _ANIMATION_DURATION = 300; //milliseconds
@@ -31,7 +31,7 @@ export module Plots {
       var xF = attrToProjector["x"];
       var widthF = attrToProjector["width"];
 
-      var castXScale = (<Scales.Ordinal> this.xScale);
+      var castXScale = (<Scale.Ordinal> this.xScale);
       var rangeType = (castXScale.rangeType == null) ? "points" : castXScale.rangeType();
 
       if (rangeType === "points") {

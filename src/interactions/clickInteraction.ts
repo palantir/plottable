@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
-export module Interactions {
+module Plottable {
+export module Interaction {
   export class Click extends Abstract.Interaction {
     private _callback: (x: number, y: number) => any;
 

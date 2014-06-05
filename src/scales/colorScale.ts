@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
-export module Scales {
+module Plottable {
+export module Scale {
   export class Color extends Abstract.Scale {
 
     /**
@@ -51,7 +51,7 @@ export module Scales {
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
-      return Utils.Methods.uniq(concatenatedExtents);
+      return UtilMethods.uniq(concatenatedExtents);
     }
   }
 }

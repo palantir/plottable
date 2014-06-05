@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
-export module Scales {
+module Plottable {
+export module Scale {
   interface ColorGroups {
     [key: string]: string[];
   };

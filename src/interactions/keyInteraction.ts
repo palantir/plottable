@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
-export module Interactions {
+module Plottable {
+export module Interaction {
   export class Key extends Abstract.Interaction {
     private _callback: () => any;
     private activated = false;
@@ -28,7 +28,7 @@ export module Interactions {
         this.activated = false;
       });
 
-      Plottable.Singletons.KeyEventListener.addCallback(this.keyCode, (e: D3.Event) => {
+      Plottable.Singleton.KeyEventListener.addCallback(this.keyCode, (e: D3.Event) => {
         if (this.activated && this._callback != null) {
           this._callback();
         }

@@ -1,12 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Components {
+export module Component {
   export interface ToggleCallback {
       (datum: any, newState: boolean): any;
   }
 
-  export class ToggleLegend extends Components.Legend {
+  export class ToggleLegend extends Component.Legend {
     private _callback: ToggleCallback;
 
     // this is the set of all elements that are currently toggled off
@@ -19,7 +19,7 @@ export module Components {
      * @param {ColorScale} colorScale
      * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
      */
-    constructor(colorScale: Scales.Color, callback?: ToggleCallback) {
+    constructor(colorScale: Scale.Color, callback?: ToggleCallback) {
       this.callback(callback);
       this.isOff = d3.set(); // initially, everything is toggled on
       super(colorScale);
@@ -48,16 +48,16 @@ export module Components {
      * @param {ColorScale} scale
      * @returns {ToggleLegend} The calling ToggleLegend.
      */
-    public scale(scale?: Scales.Color): any {
+    public scale(scale?: Scale.Color): any {
       if (scale != null) {
         super.scale(scale);
         // overwrite our previous listener from when we called super
         this._registerToBroadcaster (scale, () => {
           // preserve the state of already existing elements
-          this.isOff = Utils.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
+          this.isOff = UtilMethods.intersection(this.isOff, d3.set(this.scale().domain()));
           this._invalidateLayout();
         });
-        this.isOff = Utils.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
+        this.isOff = UtilMethods.intersection(this.isOff, d3.set(this.scale().domain()));
         this.updateClasses();
         return this;
       } else {

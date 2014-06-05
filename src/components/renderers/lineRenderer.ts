@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable{
-export module Plots {
+module Plottable {
+export module Plot {
   export class Line extends Area {
     private path: D3.Selection;
     public _ANIMATION_DURATION = 600; //milliseconds

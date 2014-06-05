@@ -45,16 +45,16 @@ window.onload = function () {
     var dataseries = new Plottable.DataSource(Data());
 
     //Axis
-    var xScale = new Plottable.Scales.Linear().domain([0, 90]);
-    var yScale = new Plottable.Scales.Ordinal();
+    var xScale = new Plottable.Scale.Linear().domain([0, 90]);
+    var yScale = new Plottable.Scale.Ordinal();
     var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
     var yAxis = new Plottable.Axis.Category(yScale, "left");
 
     //rendering
-    renderArea1 = new Plottable.Plots.HorizontalBar(dataseries, xScale, yScale);
+    renderArea1 = new Plottable.Plot.HorizontalBar(dataseries, xScale, yScale);
 
 
-    var basicTable = new Plottable.Components.Table()
+    var basicTable = new Plottable.Component.Table()
                 .addComponent(0, 0, yAxis)
                 .addComponent(0, 1, renderArea1)
                 .addComponent(1, 1, xAxis);

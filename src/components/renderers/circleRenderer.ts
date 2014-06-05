@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
-module Plottable{
-export module Plots {
+module Plottable {
+export module Plot {
   export class Scatter extends Abstract.XYPlot {
     public _ANIMATION_DURATION = 250; //milliseconds
     public _ANIMATION_DELAY = 5; //milliseconds

@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Components {
+export module Component {
   export class Gridlines extends Abstract.Component {
     private xScale: Abstract.QuantitiveScale;
     private yScale: Abstract.QuantitiveScale;

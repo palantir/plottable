@@ -10,19 +10,19 @@
       var renderers = [];
 
 
-      var colors = new Plottable.Scales.Color("20").range();
+      var colors = new Plottable.Scale.Color("20").range();
 
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
       var numRenderers = 4;
 
       for (var i=0; i<numRenderers; i++) {
         var data = makeRandomData(20);
-        var renderer = new Plottable.Plots.Line(data, xScale, yScale).animate(true);
+        var renderer = new Plottable.Plot.Line(data, xScale, yScale).animate(true);
         renderers.push(renderer);
       }
 
-      var cg = new Plottable.Components.Group();
+      var cg = new Plottable.Component.Group();
 
       renderers.forEach(function(renderer, i) {
         renderer.project("stroke", function() { return colors[i]; });
@@ -32,14 +32,14 @@
       var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-      var chart = new Plottable.Components.Table([
+      var chart = new Plottable.Component.Table([
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
 
       window.onload = function() {
         chart.renderTo("#chart");
-        var pzi = new Plottable.Interactions.PanZoom(cg, xScale, yScale);
+        var pzi = new Plottable.Interaction.PanZoom(cg, xScale, yScale);
         pzi.registerWithComponent();
 
       }
@@ -54,7 +54,7 @@
       function addRenderer() {
         if (numRenderers >= renderers.length) {
           var data = makeRandomData(20);
-          var renderer = new Plottable.Plots.Line(data, xScale, yScale).animate(true);
+          var renderer = new Plottable.Plot.Line(data, xScale, yScale).animate(true);
           var nextColor = colors[numRenderers]
           renderer.project("stroke", function() { return nextColor; });
           renderers.push(renderer);

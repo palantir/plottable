@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
-module Plottable{
-export module Scales {
+module Plottable {
+export module Scale {
   export class Ordinal extends Abstract.Scale {
     public _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
@@ -29,7 +29,7 @@ export module Scales {
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
       });
-      return Utils.Methods.uniq(concatenatedExtents);
+      return UtilMethods.uniq(concatenatedExtents);
     }
 
     /**
