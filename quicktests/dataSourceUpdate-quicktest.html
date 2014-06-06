@@ -18,20 +18,20 @@
       var ds;
 
       window.onload = function() {
+        Plottable.Singleton.RenderController.enabled=false;
         var dataseries = makeRandomData(20, 0.3);
         // newData();
 
-        var xScale = new Plottable.Scale.Linear();
-        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+        xScale = new Plottable.Scale.Linear();
+        xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.Scale.Linear();
-        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
-
-        var y0Accessor = function(d, i) { return dataseries[i].y; }
+        yScale = new Plottable.Scale.Linear();
+        yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
         ds = new Plottable.DataSource(dataseries);
 
         renderAreaD1 = new Plottable.Plot.Area(ds, xScale, yScale);
+        renderAreaD1.animate(false);
 
         var fillAccessor = function() { return "steelblue"; }
         var fillAccessorTop = function() { return "pink"; }
@@ -46,7 +46,13 @@
       }
 
       function newData() {
-      	ds.data(makeRandomData(20, 0.3));
+      	var data = makeRandomData(20, Math.random());
+        var maxY = d3.max(data.map(function(o) {
+          return o.y;
+        }));
+        // console.log(maxY);
+        // console.log(JSON.stringify(data));
+        ds.data(data);
       }
     </script>
   </head>

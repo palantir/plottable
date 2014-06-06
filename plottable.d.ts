@@ -119,6 +119,7 @@ declare module Plottable {
             public set(key: any, value: any): boolean;
             public get(key: any): any;
             public has(key: any): boolean;
+            public keys(): any[];
             public values(): any[];
             public delete(key: any): boolean;
         }
@@ -572,6 +573,9 @@ declare module Plottable {
             */
             public animate(enabled: boolean): Plot;
             public addScale(scale: Scale): void;
+            public updateProjectors(): Plot;
+            public newExtent(extent: any[], mappedData: any[], attr: string): any[];
+            static expandExtent(extent: any[], mappedData: any[]): any[];
         }
     }
 }
@@ -1183,6 +1187,7 @@ declare module Plottable {
             */
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             public project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
+            public newExtent(extent: any[], mappedData: any[], attr: string): any[];
         }
     }
 }
@@ -1267,6 +1272,7 @@ declare module Plottable {
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             public deselectAll(): BarPlot;
+            public newExtent(extent: any[], mappedData: any[], attr: string): any[];
         }
     }
 }
