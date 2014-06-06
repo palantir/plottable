@@ -2,6 +2,7 @@ var quicktests = (quicktests || []);
 
 var quicktest = function(svg, data, Plottable) {
 
+      var doAnimate = true;
       var circleRenderer;
       var xScale = new Plottable.Scale.Linear();
       var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
