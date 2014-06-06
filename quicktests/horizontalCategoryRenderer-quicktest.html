@@ -2,7 +2,7 @@
   <head>
     <title>Horizontal Category Renderer Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../bower_components/d3/d3.js"></script>
     <script src="../../plottable_multifile.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
 
@@ -19,9 +19,8 @@
       var xScale = new Plottable.Scale.Linear();
       var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-      var yScale = new Plottable.Scale.Ordinal().rangeType("bands");
-      var yAxis = new Plottable.Axis.YAxis(yScale, "left", function(d) { return d; } );
-      yAxis.width(60);
+      var yScale = new Plottable.Scale.Ordinal();
+      yAxis = new Plottable.Axis.Category(yScale, "left");
 
       var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
                               .project("x", "age", xScale)
