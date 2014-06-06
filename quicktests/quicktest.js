@@ -71,6 +71,7 @@ function loadSingleQuicktest(container, quickTest, Plottable) {
 function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
   var tr = tableSelection.append("tr");
   loadSingleQuicktest(tr.append("td"), quickTest, Plottable1);
+  tr.append("td");
   loadSingleQuicktest(tr.append("td"), quickTest, Plottable2);
 }
 
