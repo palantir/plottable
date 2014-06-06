@@ -1,5 +1,5 @@
 /*!
-Plottable 0.15.0 (https://github.com/palantir/plottable)
+Plottable 0.15.1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -2303,7 +2303,11 @@ var Plottable;
 
             RenderController.requestFrame = function () {
                 if (!RenderController.animationRequested) {
-                    requestAnimationFrame(RenderController.flush);
+                    if (window.requestAnimationFrame != null) {
+                        requestAnimationFrame(RenderController.flush);
+                    } else {
+                        setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
+                    }
                     RenderController.animationRequested = true;
                 }
             };
@@ -2330,10 +2334,11 @@ var Plottable;
                     RenderController.animationRequested = false;
                 }
             };
+            RenderController.IE_TIMEOUT = 1000 / 60;
             RenderController.componentsNeedingRender = {};
             RenderController.componentsNeedingComputeLayout = {};
             RenderController.animationRequested = false;
-            RenderController.enabled = window.PlottableTestCode == null && (window.requestAnimationFrame) != null;
+            RenderController.enabled = window.PlottableTestCode == null;
             return RenderController;
         })();
         Singleton.RenderController = RenderController;
@@ -3782,6 +3787,16 @@ var Plottable;
     (function (Axis) {
         var Category = (function (_super) {
             __extends(Category, _super);
+            /**
+            * Creates a CategoryAxis.
+            *
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * display the scale as efficiently as possible.
+            *
+            * @constructor
+            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            */
             function Category(scale, orientation) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 var _this = this;
