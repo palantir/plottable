@@ -307,4 +307,17 @@ describe("Axes", () => {
                   "all labels fit within the available space");
     svg.remove();
   });
+
+  describe("Category Axes", () => {
+    it("re-renders appropriately when data is changed", () => {
+      var svg = generateSVG(400, 400);
+      var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+      var ca = new Plottable.Axis.Category(xScale, "left");
+      ca.renderTo(svg);
+      assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+      assert.doesNotThrow(() => xScale.domain(["bar", "baz", "bam"]));
+      assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+      svg.remove();
+    });
+  });
 });
