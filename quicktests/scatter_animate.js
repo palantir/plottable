@@ -9,7 +9,7 @@ var quicktest = function(svg, data, Plottable) {
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-      circleRenderer = new Plottable.CircleRenderer(data[0].slice(0, 21), xScale, yScale);
+      circleRenderer = new Plottable.Plot.Scatter(data[0].slice(0, 21), xScale, yScale);
       circleRenderer.project("r", 8);
       circleRenderer.project("opacity", 0.75);
       circleRenderer.animate(doAnimate);
