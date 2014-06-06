@@ -2106,8 +2106,9 @@ describe("Legends", function () {
             assert.equal(state, true, "callback was successful");
 
             toggleLegend.callbackClick(null); // this should remove the callback
-            toggleEntry("a", 0);
-            assert.equal(state, true, "callback was removed");
+            assert.throws(function () {
+                toggleEntry("a", 0);
+            }, "not a function");
 
             svg.remove();
         });
