@@ -206,8 +206,8 @@ export module Util {
      * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
     export function writeText(text: string, g: D3.Selection, width: number, height: number,
-                              xAlign: string, yAlign: string): IWriteTextResult {
-      var orientHorizontally = width * 1.1 > height;
+                              xAlign: string, yAlign: string, horizontally?: boolean): IWriteTextResult {
+      var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
       var innerG = g.append("g").classed("writeText-inner-g", true); // unleash your inner G
       // the outerG contains general transforms for positining the whole block, the inner g
       // will contain transforms specific to orienting the text properly within the block.

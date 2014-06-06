@@ -461,8 +461,8 @@ var Plottable;
             * Will align the text vertically if it seems like that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text, g, width, height, xAlign, yAlign) {
-                var orientHorizontally = width * 1.1 > height;
+            function writeText(text, g, width, height, xAlign, yAlign, horizontally) {
+                var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
                 var innerG = g.append("g").classed("writeText-inner-g", true);
 
                 // the outerG contains general transforms for positining the whole block, the inner g
@@ -3862,7 +3862,7 @@ var Plottable;
                     var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                     var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
 
-                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation]);
+                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
                     textWriteResults.push(textWriteResult);
                 });
 
