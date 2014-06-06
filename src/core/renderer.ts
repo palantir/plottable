@@ -31,6 +31,7 @@ export module Abstract {
     // it will be necessary to do a regular rerender.
 
     private scales: Abstract.Scale[];
+ 
 
     /**
      * Creates a Plot.
@@ -83,20 +84,24 @@ export module Abstract {
         this._requireRerender = true;
         this._rerenderUpdateSelection = true;
 
+        // I don't need this here because it's called by this._render()
+        // this.updateProjectors();
         // point all scales at the new datasource
-        d3.keys(this._projectors).forEach((attrToSet: string) => {
-          console.log(attrToSet);
-          var projector = this._projectors[attrToSet];
-          if (projector.scale != null) {
-            var rendererIDAttr = this._plottableID + attrToSet;
-            projector.scale._removePerspective(rendererIDAttr);
-            projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
-          }
-        });
+        // d3.keys(this._projectors).forEach((attrToSet: string) => {
+        //   console.log(attrToSet);
+        //   var projector = this._projectors[attrToSet];
+        //   if (projector.scale != null) {
+        //     var rendererIDAttr = this._plottableID + attrToSet;
+        //     projector.scale._removePerspective(rendererIDAttr);
+        //     projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
+        //   }
+        // });
       }
       this._dataSource = source;
       // NOTE: rendererID is a number, convert it to a string first or something
       this._registerToBroadcaster(this._dataSource, (newDataSource) => {
+
+        this.updateProjectors();
         this._dataChanged = true;
         this._render();
       });
@@ -114,16 +119,17 @@ export module Abstract {
         scale = existingScale;
       }
       if (existingScale != null) {
-        existingScale._removePerspective(rendererIDAttr);
+        // existingScale._removePerspective(rendererIDAttr);
         this._deregisterFromBroadcaster(existingScale);
       }
       if (scale != null) {
-        scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
+        // scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
         this._registerToBroadcaster(scale, () => this._render());
       }
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
       this._requireRerender = true;
       this._rerenderUpdateSelection = true;
+      this.updateProjectors();
       return this;
     }
 
@@ -133,13 +139,21 @@ export module Abstract {
         var projector = this._projectors[a];
         var accessor = Util.Methods.applyAccessor(projector.accessor, this.dataSource());
         var scale = projector.scale;
-        var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
+        var fn = scale == null ? accessor : (d: any, i: number) => {
+          var x = scale.scale(accessor(d, i));
+          // console.log(a);
+          // console.log(accessor(d, i));
+          // console.log(x);
+          return x;
+        };
         h[a] = fn;
       });
       return h;
     }
 
     public _doRender(): Plot {
+      // well this is rather strange. Doesn't draw anything. Ask a mentor how the
+      // drawing code works.
       if (this.element != null) {
         this._paint();
         this._dataChanged = false;
@@ -182,20 +196,95 @@ export module Abstract {
       return [];
     }
 
-    private updateProjectors() {
-        d3.keys(this._projectors).forEach((attrToSet: string) => {
-          var projector = this._projectors[attrToSet];
-          if (projector.scale != null) {
-            // calculate new extent here
-            // if (projector.scale instanceof QuantitiveScale) {
-            //   var newExtent
-            // }
-            // var newExtent: any[] = [];
-            projector.scale.extentChanged(this._plottableID, newExtent);
+    public updateProjectors(): Plot {
+      var scales = d3.values(this._projectors).map((p: _IProjector) => p.scale);
+      scales.filter((s) => s != null).forEach((scale: Scale) => {
+        var extent: any[] = [];
+        d3.keys(this._projectors).forEach((attr: string) => {
+          var projector = this._projectors[attr];
+          var appliedAccessor: (d: any, i: number) => any = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
+          var mappedData = this._dataSource.data().map(appliedAccessor);
+          if (projector.scale === scale && mappedData.length > 0) {
+            extent = this.newExtent(extent, mappedData, attr);
           }
         });
-        return this;
+        scale.extentChanged(this._plottableID, extent);
+      });
+      // will override
+      return this;
     }
+
+    public newExtent(extent: any[], mappedData: any[], attr: string): any[] {
+      return [];
+    }
+
+
+
+         //  d3.keys(this._projectors).forEach((attrToSet: string) => {
+         //    var projector = this._projectors[attrToSet];
+         //    if (projector.scale != null) {
+         //      var appliedAccessor: (d: any, i: number) => any = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
+         //      var mappedData = this._dataSource.data().map(appliedAccessor);
+         //      // console.log(attrToSet);
+         //      // console.log(mappedData);
+         //      var newExtent: any[];
+         //      if (mappedData.length === 0){
+         //        return;
+         //      } else if (typeof(mappedData[0]) === "string") {
+         //        newExtent = Util.Methods.uniq(mappedData);
+         //      } else {
+         //        newExtent = d3.extent(mappedData);
+         //      }
+         //      // var newExtent = this._dataSource._getExtent(projector.accessor);
+         //      // console.log(newExtent);
+         //      projector.scale.extentChanged(this._plottableID, newExtent);
+         //    }
+         // });
+         //  return this;
+
+    public static expandExtent(extent: any[], mappedData: any[]): any[] {
+      if (mappedData.length === 0) {
+        return extent;
+      }
+      if (typeof mappedData[0] === "number") {
+        var min = d3.min(mappedData);
+        var max = d3.max(mappedData);
+        if (extent.length === 0) {
+          return [min, max];
+        }
+        return [Math.min(min, extent[0]), Math.max(max, extent[1])];
+      } else if (typeof mappedData[0] === "string") {
+        return Util.Methods.uniq(extent.concat(mappedData));
+      } else {
+        // undefined or something
+        return extent;
+      }
+    }
+
+    // private static includeZero(mappedData: any[], extent: number[]): number[] {
+    //   if (extent.length === 0) {
+    //     return [0, 0];
+    //   }
+    //   if (0 <= extent[0]) {
+    //     return [0, extent[1]];
+    //   } else if (extent[0] <= 0 && 0 <= extent[1]) {
+    //     return extent;
+    //   } else {
+    //     return [extent[0], 0];
+    //   }
+    // }
+
+    // private computeExtent(accessor: IAccessor): any[] {
+    //   var appliedAccessor = Util.Methods.applyAccessor(accessor, this);
+    //   var mappedData = this._data.map(appliedAccessor);
+    //   if (mappedData.length === 0){
+    //     return undefined;
+    //   } else if (typeof(mappedData[0]) === "string") {
+    //     return Util.Methods.uniq(mappedData);
+    //   } else {
+    //     return d3.extent(mappedData);
+    //   }
+    // }
   }
 }
 }

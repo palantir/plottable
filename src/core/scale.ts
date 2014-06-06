@@ -150,7 +150,8 @@ export module Abstract {
 
     // this is called by renderer whenever there is an update from the dataSource
     public extentChanged(rendererID: number, extent: any[]) {
-      // TODO: override
+      // TODO: remove debugger
+      debugger;
       return this;
       // this will look up the old extent in its renderer => extent mapping
       // and decide if it needs to change its domain

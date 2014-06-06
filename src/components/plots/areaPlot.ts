@@ -53,7 +53,6 @@ export module Plot {
                                        .y(y0Function);
         this.linePath.attr("d", animationStartLine).attr(attrToProjector);
       }
-
       var area = d3.svg.area()
                         .x(xFunction)
                         .y0(y0Function)

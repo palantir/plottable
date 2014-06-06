@@ -90,6 +90,21 @@ export module Abstract {
       this._bars.classed("selected", false);
       return this;
     }
+
+    public newExtent(extent: any[], mappedData: any[], attr: string): any[] {
+      switch (attr) {
+        case "x":
+        case "y":
+        case "x0":
+        case "y0":
+        console.log(attr, mappedData);
+        return Plot.expandExtent(extent, mappedData);
+
+        default:
+        console.log(attr);
+        return extent;
+      }
+    }
   }
 }
 }

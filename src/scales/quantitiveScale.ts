@@ -170,19 +170,13 @@ export module Abstract {
 
     public extentChanged(rendererID: number, extent: any[]) {
       this._rendererID2Extent[rendererID] = extent;
-      var newDomain = this.calculateDomain();
+      var extents = d3.values(this._rendererID2Extent);
+      var newDomain = extents.reduce((a, b) => [Math.min(a[0], b[0]), Math.max(a[1], b[1])]);
+      this._setDomain(newDomain);
       // this.autoDomain will automatically broadcast for us.
       // In the future, if we detect that the domain hasn't changed,
       // we won't signal.
-      this.autoDomain();
       return this;
-    }
-
-    // Returns a domain from this._rendererID2Extent. In the future, this
-    // will be where the pluggable autodomaining stuff will go.
-    private calculateDomain(): number[] {
-      var extents = d3.values(this._rendererID2Extent);
-      return extents.reduce((a, b) => [Math.min(a[0], b[0]), Math.max(a[1], b[1])]);
     }
   }
 }

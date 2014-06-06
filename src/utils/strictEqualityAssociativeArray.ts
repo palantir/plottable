@@ -46,6 +46,10 @@ export module Util {
       return false;
     }
 
+    public keys(): any[] {
+      return this.keyValuePairs.map((x) => x[0]);
+    }
+
     public values(): any[] {
       return this.keyValuePairs.map((x) => x[1]);
     }
