@@ -5514,8 +5514,8 @@ var Plottable;
             DragBox.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
-                var background = this.componentToListenTo.backgroundContainer;
-                this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+                var foreground = this.componentToListenTo.foregroundContainer;
+                this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 return this;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
