@@ -57,7 +57,7 @@ svg.plottable {
 
 .plottable .drag-box {
   fill: aliceblue;
-  opacity: 1;
+  opacity: .7;
   stroke: #C0C8FF;
 
 }

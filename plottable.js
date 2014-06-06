@@ -5512,7 +5512,6 @@ var Plottable;
                 var cname = DragBox.CLASS_DRAG_BOX;
                 var foreground = this.componentToListenTo.foregroundContainer;
                 this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
-                this.dragBox.style("opacity", .7);
                 return this;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
