@@ -30,7 +30,7 @@ var quicktest = function(svg, data, Plottable){
 
         var chart = new Plottable.Template.StandardChart()
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-                        .renderTo("#x-test");
+                        .renderTo(svg);
 
         window.x = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
 
