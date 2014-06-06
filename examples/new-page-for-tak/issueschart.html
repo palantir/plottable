@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="/bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable.js"></script>
+    <script src="issueschart.js"></script>
+    <script>
+
+    window.onload = function() {
+        d3.json("../data/aggregate_issues.json", function(data) {
+            var parseDate = d3.time.format("%Y/%m/%d");
+            data.forEach(function(d) {
+                d.parsedDate = parseDate.parse(d.date);
+            });
+            var svg = d3.select("body").append("svg").attr("width", 600).attr("height", 600);
+            makeIssuesChart(svg, data);
+        });
+    }
+
+    </script>
+    </head>
+
+<body>
+
+</body>
+</html>
