@@ -4368,10 +4368,10 @@ var Plottable;
         };
 
         /**
-        * Assigns a new ColorScale to the ToggleLegend.
+        * Assigns a new ColorScale to the InteractiveLegend.
         *
         * @param {ColorScale} scale
-        * @returns {ToggleLegend} The calling ToggleLegend.
+        * @returns {InteractiveLegend} The calling InteractiveLegend.
         */
         InteractiveLegend.prototype.scale = function (scale) {
             var _this = this;

@@ -69,10 +69,10 @@ module Plottable {
 
 
     /**
-     * Assigns a new ColorScale to the ToggleLegend.
+     * Assigns a new ColorScale to the InteractiveLegend.
      *
      * @param {ColorScale} scale
-     * @returns {ToggleLegend} The calling ToggleLegend.
+     * @returns {InteractiveLegend} The calling InteractiveLegend.
      */
     public scale(scale?: Scale.Color): any {
       if (scale != null) {

@@ -1191,10 +1191,10 @@ declare module Plottable {
         public callbackHover(callback: HoverCallback): InteractiveLegend;
         public callbackHover(): HoverCallback;
         /**
-        * Assigns a new ColorScale to the ToggleLegend.
+        * Assigns a new ColorScale to the InteractiveLegend.
         *
         * @param {ColorScale} scale
-        * @returns {ToggleLegend} The calling ToggleLegend.
+        * @returns {InteractiveLegend} The calling InteractiveLegend.
         */
         public scale(scale?: Scale.Color): any;
     }
