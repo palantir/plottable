@@ -50,20 +50,12 @@
                 renderers[index].classed("toggled-off", !b);
             },
             function (d) {
-                if (d === undefined) {
-                    renderers.forEach(function(r, i) {
-                        r.classed("hover", false);
-                        r.classed("not-focus", true);
-                        r.classed("focus", false);
-                    });
-                } else {
-                    var index = names.indexOf(d);
-                    renderers.forEach(function(r, i) {
-                        r.classed("hover", true);
-                        r.classed("focus", i === index); 
-                        r.classed("not-focus", i !== index);
-                    });
-                }
+                var index = names.indexOf(d);
+                renderers.forEach(function(r, i) {
+                    r.classed("hover", d !== undefined);
+                    r.classed("focus", d !== undefined && i === index);
+                    r.classed("not-focus", d === undefined || i !== index);
+                });
             }
         );
 

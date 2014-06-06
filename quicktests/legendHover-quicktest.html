@@ -47,13 +47,12 @@
         var legendLabel = new Plottable.Component.TitleLabel("q");
         var legend = new Plottable.HoverLegend(colorScale,
             function (d) {
-                if (d === undefined) {
-                    renderers.forEach(function(r, i) { r.classed("hover", false); r.classed("not-focus", true); r.classed("focus", false);});
-                } else {
-                    var index = names.indexOf(d);
-                    renderers.forEach(function(r, i) { r.classed("hover", true); r.classed("focus", i === index); r.classed("not-focus", i !== index);});
-                }
-                cg._invalidateLayout();
+                var index = names.indexOf(d);
+                renderers.forEach(function(r, i) {
+                    r.classed("hover", d !== undefined);
+                    r.classed("focus", d !== undefined && i === index);
+                    r.classed("not-focus", d === undefined || i !== index);
+                });
             }
         );
         var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]); 
