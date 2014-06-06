@@ -84,7 +84,7 @@ svg.plottable {
 }
 
 .plottable .renderer.toggled-on {
-  opacity:1;
+  visibility:visible;
 }
 
 .plottable .hover.not-focus {
@@ -96,5 +96,5 @@ svg.plottable {
 }
 
 .plottable .renderer.toggled-off {
-  opacity:0;
+  visibility:hidden;
 }
