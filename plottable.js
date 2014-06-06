@@ -2303,7 +2303,11 @@ var Plottable;
 
             RenderController.requestFrame = function () {
                 if (!RenderController.animationRequested) {
-                    requestAnimationFrame(RenderController.flush);
+                    if (window.requestAnimationFrame != null) {
+                        requestAnimationFrame(RenderController.flush);
+                    } else {
+                        setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
+                    }
                     RenderController.animationRequested = true;
                 }
             };
@@ -2330,10 +2334,11 @@ var Plottable;
                     RenderController.animationRequested = false;
                 }
             };
+            RenderController.IE_TIMEOUT = 1000 / 60;
             RenderController.componentsNeedingRender = {};
             RenderController.componentsNeedingComputeLayout = {};
             RenderController.animationRequested = false;
-            RenderController.enabled = window.PlottableTestCode == null && (window.requestAnimationFrame) != null;
+            RenderController.enabled = window.PlottableTestCode == null;
             return RenderController;
         })();
         Singleton.RenderController = RenderController;
