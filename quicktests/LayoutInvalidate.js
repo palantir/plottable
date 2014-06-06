@@ -17,8 +17,8 @@ var quicktest = function(svg, data, Plottable) {
              return colorScale1.scale(m.name);
           };
 
-          renderAreaD1 = new Plottable.Plot.Scatter(dataseries1, xScale, yScale);
-          renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
+          renderAreaD1 = new Plottable.Plot.Scatter(data[0].slice(0, 21), xScale, yScale);
+          renderAreaD2 = new Plottable.Plot.Line(data[1].slice(0, 21), xScale, yScale);
           renderAreaD1.project("fill", colorProjector);
           renderAreaD2.project("stroke", colorProjector);
           var renderAreas = renderAreaD1.merge(renderAreaD2);
