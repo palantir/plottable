@@ -3855,21 +3855,14 @@ var Plottable;
                 var textWriteResults = [];
                 ticks.each(function (d, i) {
                     var d3this = d3.select(this);
-                    var startAndWidth = self._scale.fullBandStartAndWidth(d);
-                    var bandWidth = startAndWidth[1];
-                    var bandStartPosition = startAndWidth[0];
+                    var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self.tickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-                    d3this.selectAll("g").remove(); //HACKHACK
-                    var g = d3this.append("g").classed("tick-label", true);
-                    var x = self._isHorizontal() ? bandStartPosition : 0;
-                    var y = self._isHorizontal() ? 0 : bandStartPosition;
-                    g.attr("transform", "translate(" + x + "," + y + ")");
                     var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                     var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
 
-                    var textWriteResult = Plottable.Util.Text.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
+                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
                     textWriteResults.push(textWriteResult);
                 });
 
@@ -3889,10 +3882,21 @@ var Plottable;
             };
 
             Category.prototype._doRender = function () {
+                var _this = this;
                 _super.prototype._doRender.call(this);
+                this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
                 var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+
+                var getTickLabelTransform = function (d, i) {
+                    var startAndWidth = _this._scale.fullBandStartAndWidth(d);
+                    var bandStartPosition = startAndWidth[0];
+                    var x = _this._isHorizontal() ? bandStartPosition : 0;
+                    var y = _this._isHorizontal() ? 0 : bandStartPosition;
+                    return "translate(" + x + "," + y + ")";
+                };
                 tickLabels.enter().append("g").classed("tick-label", true);
                 tickLabels.exit().remove();
+                tickLabels.attr("transform", getTickLabelTransform);
                 this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
