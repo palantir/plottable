@@ -5,7 +5,10 @@ var quicktest = function(svg, data, Plottable) {
 
   varyScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.YAxis(yScale, "left").tickLabelPosition("bottom");
-  //yAxis.tickFormat(d3.format("g"));
+  yAxis.tickFormat(d3.format("g"));
+
+
+  console.log(data);
 
   var renderAreaD1 = new Plottable.Plot.Scatter(data[0].slice(0, 3), xScale, yScale);
   console.log(renderAreaD1.dataSource.data());
