@@ -144,11 +144,12 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  describe("ToggleLegend tests", () => {
-    var toggleLegend: Plottable.Component.ToggleLegend;
+  describe("Legend toggle tests", () => {
+    var toggleLegend: Plottable.Component.Legend;
 
     beforeEach(() => {
-      toggleLegend = new Plottable.Component.ToggleLegend(color);
+      toggleLegend = new Plottable.Component.Legend(color);
+      toggleLegend.callbackClick(function(d, b) {/* no-op */});
     });
 
     function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
@@ -235,7 +236,7 @@ describe("Legends", () => {
       color.domain(domain);
       var state = [true, true, true, true, true];
 
-      toggleLegend.callback((d, b) => {
+      toggleLegend.callbackClick((d, b) => {
         state[domain.indexOf(d)] = b;
       });
       toggleLegend.renderTo(svg);
@@ -264,7 +265,7 @@ describe("Legends", () => {
       var state = true;
       toggleLegend.renderTo(svg);
 
-      toggleLegend.callback((d, b) => {
+      toggleLegend.callbackClick((d, b) => {
         state = b;
       });
 
@@ -272,7 +273,7 @@ describe("Legends", () => {
       assert.equal(state, false, "callback was successful");
 
       var count = 0;
-      toggleLegend.callback((d, b) => {
+      toggleLegend.callbackClick((d, b) => {
         count++;
       });
 
@@ -288,18 +289,18 @@ describe("Legends", () => {
       var state = true;
       toggleLegend.renderTo(svg);
 
-      toggleLegend.callback((d, b) => {
+      toggleLegend.callbackClick((d, b) => {
         state = b;
       });
 
       toggleEntry("a", 0);
       assert.equal(state, false, "callback was successful");
 
-      toggleLegend.callback(); // this should not remove the callback
+      toggleLegend.callbackClick(); // this should not remove the callback
       toggleEntry("a", 0);
       assert.equal(state, true, "callback was successful");
 
-      toggleLegend.callback(null); // this should remove the callback
+      toggleLegend.callbackClick(null); // this should remove the callback
       toggleEntry("a", 0);
       assert.equal(state, true, "callback was removed");
 

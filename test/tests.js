@@ -1947,11 +1947,13 @@ describe("Legends", function () {
         svg.remove();
     });
 
-    describe("ToggleLegend tests", function () {
+    describe("Legend toggle tests", function () {
         var toggleLegend;
 
         beforeEach(function () {
-            toggleLegend = new Plottable.Component.ToggleLegend(color);
+            toggleLegend = new Plottable.Component.Legend(color);
+            toggleLegend.callbackClick(function (d, b) {
+            });
         });
 
         function verifyState(selection, b, msg) {
@@ -2039,7 +2041,7 @@ describe("Legends", function () {
             color.domain(domain);
             var state = [true, true, true, true, true];
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.callbackClick(function (d, b) {
                 state[domain.indexOf(d)] = b;
             });
             toggleLegend.renderTo(svg);
@@ -2068,7 +2070,7 @@ describe("Legends", function () {
             var state = true;
             toggleLegend.renderTo(svg);
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.callbackClick(function (d, b) {
                 state = b;
             });
 
@@ -2076,7 +2078,7 @@ describe("Legends", function () {
             assert.equal(state, false, "callback was successful");
 
             var count = 0;
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.callbackClick(function (d, b) {
                 count++;
             });
 
@@ -2092,18 +2094,18 @@ describe("Legends", function () {
             var state = true;
             toggleLegend.renderTo(svg);
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.callbackClick(function (d, b) {
                 state = b;
             });
 
             toggleEntry("a", 0);
             assert.equal(state, false, "callback was successful");
 
-            toggleLegend.callback(); // this should not remove the callback
+            toggleLegend.callbackClick(); // this should not remove the callback
             toggleEntry("a", 0);
             assert.equal(state, true, "callback was successful");
 
-            toggleLegend.callback(null); // this should remove the callback
+            toggleLegend.callbackClick(null); // this should remove the callback
             toggleEntry("a", 0);
             assert.equal(state, true, "callback was removed");
 

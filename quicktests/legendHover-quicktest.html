@@ -45,7 +45,8 @@
                                 ]);
 
         var legendLabel = new Plottable.Component.TitleLabel("q");
-        var legend = new Plottable.HoverLegend(colorScale,
+        var legend = new Plottable.Component.Legend(colorScale);
+        legend.callbackHover(
             function (d) {
                 var index = names.indexOf(d);
                 renderers.forEach(function(r, i) {

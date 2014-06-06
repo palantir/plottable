@@ -43,12 +43,15 @@
                                 ]);
         
         var legendLabel = new Plottable.Component.TitleLabel("fat");
-        var legend = new Plottable.InteractiveLegend(colorScale,
+        var legend = new Plottable.Component.Legend(colorScale);
+        legend.callbackClick(
             function (d, b) {
                 var index = names.indexOf(d);
                 renderers[index].classed("toggled-on", b);
                 renderers[index].classed("toggled-off", !b);
-            },
+            }
+        );
+        legend.callbackHover(
             function (d) {
                 var index = names.indexOf(d);
                 renderers.forEach(function(r, i) {

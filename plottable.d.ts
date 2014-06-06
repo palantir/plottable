@@ -1085,8 +1085,13 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        interface ToggleCallback {
+            (datum: any, newState: boolean): any;
+        }
+        interface HoverCallback {
+            (datum?: any): any;
+        }
         class Legend extends Abstract.Component {
-            static _SUBELEMENT_CLASS: string;
             /**
             * Creates a Legend.
             *
@@ -1094,6 +1099,22 @@ declare module Plottable {
             * @param {ColorScale} colorScale
             */
             constructor(colorScale?: Scale.Color);
+            /**
+            * Assigns or gets the callback to the Legend
+            * Call with argument of null to remove the callback
+            *
+            * @param{ToggleCallback} callback The new callback function
+            */
+            public callbackClick(callback: ToggleCallback): Legend;
+            public callbackClick(): ToggleCallback;
+            /**
+            * Assigns or gets the callback to the Legend
+            * Call with argument of null to remove the callback
+            *
+            * @param{HoverCallback} callback The new callback function
+            */
+            public callbackHover(callback: HoverCallback): Legend;
+            public callbackHover(): HoverCallback;
             /**
             * Assigns a new ColorScale to the Legend.
             *
@@ -1103,109 +1124,6 @@ declare module Plottable {
             public scale(scale: Scale.Color): Legend;
             public scale(): Scale.Color;
         }
-    }
-}
-
-
-declare module Plottable {
-    module Component {
-        interface ToggleCallback {
-            (datum: any, newState: boolean): any;
-        }
-        class ToggleLegend extends Legend {
-            /**
-            * Creates a ToggleLegend.
-            *
-            * @constructor
-            * @param {ColorScale} colorScale
-            * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
-            */
-            constructor(colorScale: Scale.Color, callback?: ToggleCallback);
-            /**
-            * Assigns or gets the callback to the ToggleLegend
-            * Call with argument of null to remove the callback
-            *
-            * @param{ToggleCallback} callback The new callback function
-            */
-            public callback(callback: ToggleCallback): ToggleLegend;
-            public callback(): ToggleCallback;
-            /**
-            * Assigns a new ColorScale to the ToggleLegend.
-            *
-            * @param {ColorScale} scale
-            * @returns {ToggleLegend} The calling ToggleLegend.
-            */
-            public scale(scale?: Scale.Color): any;
-        }
-    }
-}
-
-
-declare module Plottable {
-    interface HoverCallback {
-        (datum?: any): any;
-    }
-    class HoverLegend extends Component.Legend {
-        /**
-        * Creates a HoverLegend.
-        *
-        * @constructor
-        * @param {Scale.Color} colorScale
-        * @param {HoverCallback} callback The callback function for hovering over a legend entry.
-        */
-        constructor(colorScale: Scale.Color, callback?: HoverCallback);
-        /**
-        * Assigns or gets the callback to the HoverLegend
-        * Call with argument of null to remove the callback
-        *
-        * @param{HoverCallback} callback The new callback function
-        */
-        public callback(callback: HoverCallback): HoverLegend;
-        public callback(): HoverCallback;
-    }
-}
-
-
-declare module Plottable {
-    interface ToggleCallback {
-        (datum: any, newState: boolean): any;
-    }
-    interface HoverCallback {
-        (datum?: any): any;
-    }
-    class InteractiveLegend extends Component.Legend {
-        /**
-        * Creates a InteractiveLegend.
-        *
-        * @constructor
-        * @param {ColorScale} colorScale
-        * @param {ToggleCallback} cbc The function to be called when a legend entry is clicked.
-        * @param {HoverCallback} cbh The function to be called when a legend entry is hovered over.
-        */
-        constructor(colorScale: Scale.Color, cbc?: ToggleCallback, cbh?: HoverCallback);
-        /**
-        * Assigns or gets the callback to the InteractiveLegend
-        * Call with argument of null to remove the callback
-        *
-        * @param{ToggleCallback} callback The new callback function
-        */
-        public callbackClick(callback: ToggleCallback): InteractiveLegend;
-        public callbackClick(): ToggleCallback;
-        /**
-        * Assigns or gets the callback to the InteractiveLegend
-        * Call with argument of null to remove the callback
-        *
-        * @param{HoverCallback} callback The new callback function
-        */
-        public callbackHover(callback: HoverCallback): InteractiveLegend;
-        public callbackHover(): HoverCallback;
-        /**
-        * Assigns a new ColorScale to the InteractiveLegend.
-        *
-        * @param {ColorScale} scale
-        * @returns {InteractiveLegend} The calling InteractiveLegend.
-        */
-        public scale(scale?: Scale.Color): any;
     }
 }
 

@@ -4076,6 +4076,30 @@ var Plottable;
                 this.xAlign("RIGHT").yAlign("TOP");
                 this.xOffset(5).yOffset(5);
             }
+            Legend.prototype.callbackClick = function (callback) {
+                if (callback !== undefined) {
+                    this._callbackClick = callback;
+                    this.isOff = d3.set();
+                    this.updateListeners();
+                    this.updateClasses();
+                    return this;
+                } else {
+                    return this._callbackClick;
+                }
+            };
+
+            Legend.prototype.callbackHover = function (callback) {
+                if (callback !== undefined) {
+                    this._callbackHover = callback;
+                    this.focus = undefined;
+                    this.updateListeners();
+                    this.updateClasses();
+                    return this;
+                } else {
+                    return this._callbackHover;
+                }
+            };
+
             Legend.prototype.scale = function (scale) {
                 var _this = this;
                 if (scale != null) {
@@ -4084,13 +4108,23 @@ var Plottable;
                     }
                     this.colorScale = scale;
                     this._registerToBroadcaster(this.colorScale, function () {
-                        return _this._invalidateLayout();
+                        return _this.domainUpdate();
                     });
-                    this._invalidateLayout();
+                    this.domainUpdate();
                     return this;
                 } else {
                     return this.colorScale;
                 }
+            };
+
+            Legend.prototype.domainUpdate = function () {
+                if (this._callbackClick != null) {
+                    this.isOff = Plottable.Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
+                }
+                if (this._callbackHover != null) {
+                    this.focus = undefined;
+                }
+                this._invalidateLayout();
             };
 
             Legend.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
@@ -4150,7 +4184,84 @@ var Plottable;
                 legend.selectAll("text").text(function (d) {
                     return Plottable.Util.Text.getTruncatedText(d, availableWidth, d3.select(this));
                 });
+                this.updateListeners();
                 return this;
+            };
+
+            Legend.prototype.updateListeners = function () {
+                var _this = this;
+                if (this._isSetup) {
+                    var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
+                    if (this._callbackHover != null) {
+                        // on mouseover, tag everything with the "hover" class
+                        var hoverAll = function (mouseover) {
+                            return function (datum) {
+                                _this.updateClasses(mouseover);
+                            };
+                        };
+                        this.content.on("mouseover", hoverAll(true));
+                        this.content.on("mouseout", hoverAll(false));
+
+                        // tag the element that is being hovered over with the class "focus"
+                        var hoverSelected = function (mouseover) {
+                            return function (datum) {
+                                _this.focus = mouseover ? datum : undefined;
+                                _this._callbackHover(_this.focus);
+                                _this.updateClasses();
+                            };
+                        };
+                        dataSelection.on("mouseover", hoverSelected(true));
+                        dataSelection.on("mouseout", hoverSelected(false));
+                    } else {
+                        // remove all mouseover/mouseout listeners
+                        this.content.on("mouseover", null);
+                        this.content.on("mouseout", null);
+                        dataSelection.on("mouseover", null);
+                        dataSelection.on("mouseout", null);
+                    }
+
+                    if (this._callbackClick != null) {
+                        dataSelection.on("click", function (datum) {
+                            var turningOn = _this.isOff.has(datum);
+                            if (turningOn) {
+                                _this.isOff.remove(datum);
+                            } else {
+                                _this.isOff.add(datum);
+                            }
+                            _this._callbackClick(datum, turningOn);
+                            _this.updateClasses();
+                        });
+                    } else {
+                        // remove all click listeners
+                        dataSelection.on("click", null);
+                    }
+                }
+            };
+
+            Legend.prototype.updateClasses = function (b) {
+                var _this = this;
+                if (this._isSetup) {
+                    var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
+                    if (this._callbackHover != null) {
+                        dataSelection.classed("focus", function (d) {
+                            return _this.focus === d;
+                        });
+                        dataSelection.classed("not-focus", function (d) {
+                            return _this.focus !== d;
+                        });
+                        if (b != null) {
+                            dataSelection.classed("hover", b);
+                        }
+                    }
+                    if (this._callbackClick != null) {
+                        dataSelection.classed("toggled-on", function (d) {
+                            return !_this.isOff.has(d);
+                        });
+                        dataSelection.classed("toggled-off", function (d) {
+                            return _this.isOff.has(d);
+                        });
+                    }
+                }
             };
             Legend._SUBELEMENT_CLASS = "legend-row";
             Legend.MARGIN = 5;
@@ -4159,324 +4270,6 @@ var Plottable;
         Component.Legend = Legend;
     })(Plottable.Component || (Plottable.Component = {}));
     var Component = Plottable.Component;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Component) {
-        var ToggleLegend = (function (_super) {
-            __extends(ToggleLegend, _super);
-            /**
-            * Creates a ToggleLegend.
-            *
-            * @constructor
-            * @param {ColorScale} colorScale
-            * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
-            */
-            function ToggleLegend(colorScale, callback) {
-                this.callback(callback);
-                this.isOff = d3.set(); // initially, everything is toggled on
-                _super.call(this, colorScale);
-            }
-            ToggleLegend.prototype.callback = function (callback) {
-                if (callback !== undefined) {
-                    this._callback = callback;
-                    return this;
-                } else {
-                    return this;
-                }
-            };
-
-            /**
-            * Assigns a new ColorScale to the ToggleLegend.
-            *
-            * @param {ColorScale} scale
-            * @returns {ToggleLegend} The calling ToggleLegend.
-            */
-            ToggleLegend.prototype.scale = function (scale) {
-                var _this = this;
-                if (scale != null) {
-                    _super.prototype.scale.call(this, scale);
-
-                    // overwrite our previous listener from when we called super
-                    this._registerToBroadcaster(scale, function () {
-                        // preserve the state of already existing elements
-                        _this.isOff = Plottable.Util.Methods.intersection(_this.isOff, d3.set(_this.scale().domain()));
-                        _this._invalidateLayout();
-                    });
-                    this.isOff = Plottable.Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
-                    this.updateClasses();
-                    return this;
-                } else {
-                    return _super.prototype.scale.call(this);
-                }
-            };
-
-            ToggleLegend.prototype._doRender = function () {
-                var _this = this;
-                _super.prototype._doRender.call(this);
-                this.updateClasses();
-                this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS).on("click", function (d) {
-                    var turningOn = _this.isOff.has(d);
-                    if (turningOn) {
-                        _this.isOff.remove(d);
-                    } else {
-                        _this.isOff.add(d);
-                    }
-                    if (_this._callback != null) {
-                        _this._callback(d, turningOn);
-                    }
-                    _this.updateClasses();
-                });
-                return this;
-            };
-
-            ToggleLegend.prototype.updateClasses = function () {
-                var _this = this;
-                if (this._isSetup) {
-                    var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-                    dataSelection.classed("toggled-on", function (d) {
-                        return !_this.isOff.has(d);
-                    });
-                    dataSelection.classed("toggled-off", function (d) {
-                        return _this.isOff.has(d);
-                    });
-                }
-            };
-            return ToggleLegend;
-        })(Plottable.Component.Legend);
-        Component.ToggleLegend = ToggleLegend;
-    })(Plottable.Component || (Plottable.Component = {}));
-    var Component = Plottable.Component;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var HoverLegend = (function (_super) {
-        __extends(HoverLegend, _super);
-        /**
-        * Creates a HoverLegend.
-        *
-        * @constructor
-        * @param {Scale.Color} colorScale
-        * @param {HoverCallback} callback The callback function for hovering over a legend entry.
-        */
-        function HoverLegend(colorScale, callback) {
-            _super.call(this, colorScale);
-            this.callback(callback);
-            this._callback = callback;
-        }
-        HoverLegend.prototype.callback = function (callback) {
-            if (callback !== undefined) {
-                this._callback = callback;
-                return this;
-            } else {
-                return this;
-            }
-        };
-
-        HoverLegend.prototype._doRender = function () {
-            var _this = this;
-            _super.prototype._doRender.call(this);
-            this.updateClasses();
-            var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-
-            // on mouseover, tag everything with the "hover" class
-            var func1 = function (b) {
-                return function (d) {
-                    _this.updateClasses(b);
-                };
-            };
-            this.content.on("mouseover", func1(true));
-            this.content.on("mouseout", func1(false));
-
-            // tag the element that is being hovered over with the class "focus"
-            var func2 = function (b) {
-                return function (d) {
-                    _this.focus = b ? d : undefined;
-                    if (_this._callback != null) {
-                        _this._callback(_this.focus);
-                    }
-                    _this.updateClasses();
-                };
-            };
-            dataSelection.on("mouseover", func2(true));
-            dataSelection.on("mouseout", func2(false));
-            return this;
-        };
-
-        HoverLegend.prototype.updateClasses = function (b) {
-            var _this = this;
-            if (this._isSetup) {
-                var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-                dataSelection.classed("focus", function (d) {
-                    return _this.focus === d;
-                });
-                dataSelection.classed("not-focus", function (d) {
-                    return _this.focus !== d;
-                });
-                if (b != null) {
-                    dataSelection.classed("hover", b);
-                }
-            }
-        };
-        return HoverLegend;
-    })(Plottable.Component.Legend);
-    Plottable.HoverLegend = HoverLegend;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var InteractiveLegend = (function (_super) {
-        __extends(InteractiveLegend, _super);
-        /**
-        * Creates a InteractiveLegend.
-        *
-        * @constructor
-        * @param {ColorScale} colorScale
-        * @param {ToggleCallback} cbc The function to be called when a legend entry is clicked.
-        * @param {HoverCallback} cbh The function to be called when a legend entry is hovered over.
-        */
-        function InteractiveLegend(colorScale, cbc, cbh) {
-            this._callbackClick = cbc;
-            this._callbackHover = cbh;
-            this.isOff = d3.set();
-            _super.call(this, colorScale);
-        }
-        InteractiveLegend.prototype.callbackClick = function (callback) {
-            if (callback !== undefined) {
-                this._callbackClick = callback;
-                return this;
-            } else {
-                return this;
-            }
-        };
-
-        InteractiveLegend.prototype.callbackHover = function (callback) {
-            if (callback !== undefined) {
-                this._callbackHover = callback;
-                return this;
-            } else {
-                return this;
-            }
-        };
-
-        /**
-        * Assigns a new ColorScale to the InteractiveLegend.
-        *
-        * @param {ColorScale} scale
-        * @returns {InteractiveLegend} The calling InteractiveLegend.
-        */
-        InteractiveLegend.prototype.scale = function (scale) {
-            var _this = this;
-            if (scale != null) {
-                _super.prototype.scale.call(this, scale);
-
-                // overwrite our previous listener from when we called super
-                this._registerToBroadcaster(scale, function () {
-                    // preserve the state of already existing elements
-                    _this.isOff = Plottable.Util.Methods.intersection(_this.isOff, d3.set(_this.scale().domain()));
-                    _this.focus = undefined;
-                    _this._invalidateLayout();
-                });
-                this.isOff = Plottable.Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
-                this.focus = undefined;
-                this.updateClasses();
-                return this;
-            } else {
-                return _super.prototype.scale.call(this);
-            }
-        };
-
-        InteractiveLegend.prototype._doRender = function () {
-            var _this = this;
-            _super.prototype._doRender.call(this);
-            this.updateClasses();
-            var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-
-            // on mouseover, tag everything with the "hover" class
-            var func1 = function (b) {
-                return function (d) {
-                    _this.updateClasses(b);
-                };
-            };
-            this.content.on("mouseover", func1(true));
-            this.content.on("mouseout", func1(false));
-
-            // tag the element that is being hovered over with the class "focus"
-            var func2 = function (b) {
-                return function (d, i) {
-                    _this.focus = b ? d : undefined;
-                    if (_this._callbackHover != null) {
-                        _this._callbackHover(_this.focus);
-                    }
-                    _this.updateClasses();
-                };
-            };
-            dataSelection.on("mouseover", func2(true));
-            dataSelection.on("mouseout", func2(false));
-
-            dataSelection.on("click", function (d) {
-                var turningOn = _this.isOff.has(d);
-                if (turningOn) {
-                    _this.isOff.remove(d);
-                } else {
-                    _this.isOff.add(d);
-                }
-                if (_this._callbackClick != null) {
-                    _this._callbackClick(d, turningOn);
-                }
-                _this.updateClasses();
-            });
-            return this;
-        };
-
-        InteractiveLegend.prototype.updateClasses = function (b) {
-            var _this = this;
-            if (this._isSetup) {
-                var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-                dataSelection.classed("focus", function (d) {
-                    return _this.focus === d;
-                });
-                dataSelection.classed("not-focus", function (d) {
-                    return _this.focus !== d;
-                });
-                if (b != null) {
-                    dataSelection.classed("hover", b);
-                }
-
-                dataSelection.classed("toggled-on", function (d) {
-                    return !_this.isOff.has(d);
-                });
-                dataSelection.classed("toggled-off", function (d) {
-                    return _this.isOff.has(d);
-                });
-            }
-        };
-        return InteractiveLegend;
-    })(Plottable.Component.Legend);
-    Plottable.InteractiveLegend = InteractiveLegend;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

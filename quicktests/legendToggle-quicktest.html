@@ -44,7 +44,8 @@
                                 ]);
 
         var legendLabel = new Plottable.Component.TitleLabel("fat");
-        var legend = new Plottable.Component.ToggleLegend(colorScale,
+        var legend = new Plottable.Component.Legend(colorScale);
+        legend.callbackClick(
             function (d, b) {
                 var index = names.indexOf(d);
                 renderers[index].classed("toggled-on", b);
