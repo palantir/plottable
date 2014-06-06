@@ -49,7 +49,6 @@
                 var index = names.indexOf(d);
                 renderers[index].classed("toggled-on", b);
                 renderers[index].classed("toggled-off", !b);
-                cg._invalidateLayout();
             }
         );
         var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
