@@ -47,11 +47,8 @@
         var legend = new Plottable.Component.ToggleLegend(colorScale,
             function (d, b) {
                 var index = names.indexOf(d);
-                if (b) {
-                  renderers[index].project("opacity", 1);
-                } else {
-                  renderers[index].project("opacity", 0);
-                }
+                renderers[index].classed("toggled-on", b);
+                renderers[index].classed("toggled-off", !b);
                 cg._invalidateLayout();
             }
         );

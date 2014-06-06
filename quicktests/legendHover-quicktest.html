@@ -6,12 +6,6 @@
     <script src="../../plottable.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
     <style>
-    .hover {
-        opacity:.2;
-    }
-    .hover.focus {
-        opacity:1;
-    }
     </style>
     <script>
 
@@ -54,10 +48,10 @@
         var legend = new Plottable.HoverLegend(colorScale,
             function (d) {
                 if (d === undefined) {
-                    renderers.forEach(function(r, i) { r.project("opacity", 1); });
+                    renderers.forEach(function(r, i) { r.classed("hover", false); r.classed("not-focus", true); r.classed("focus", false);});
                 } else {
                     var index = names.indexOf(d);
-                    renderers.forEach(function(r, i) { r.project("opacity", i === index ? 1 : .1); });
+                    renderers.forEach(function(r, i) { r.classed("hover", true); r.classed("focus", i === index); r.classed("not-focus", i !== index);});
                 }
                 cg._invalidateLayout();
             }

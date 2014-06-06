@@ -43,29 +43,27 @@
                                 ]);
         
         var legendLabel = new Plottable.Component.TitleLabel("fat");
-        var state = [];
-        for (var i = 0; i < numRenderers; i++) {
-          state.push(true);
-        }
         var legend = new Plottable.InteractiveLegend(colorScale,
             function (d, b) {
                 var index = names.indexOf(d);
-                state[index] = b;
-                if (b) {
-                  renderers[index].project("opacity", 1);
-                } else {
-                  renderers[index].project("opacity", 0);
-                }
-                cg._invalidateLayout();
+                renderers[index].classed("toggled-on", b);
+                renderers[index].classed("toggled-off", !b);
             },
             function (d) {
                 if (d === undefined) {
-                    renderers.forEach(function(r, i) { r.project("opacity", state[i] ? 1 : 0); });
+                    renderers.forEach(function(r, i) {
+                        r.classed("hover", false);
+                        r.classed("not-focus", true);
+                        r.classed("focus", false);
+                    });
                 } else {
                     var index = names.indexOf(d);
-                    renderers.forEach(function(r, i) { r.project("opacity", state[i] ? i === index ? 1 : .1 : 0); });
+                    renderers.forEach(function(r, i) {
+                        r.classed("hover", true);
+                        r.classed("focus", i === index); 
+                        r.classed("not-focus", i !== index);
+                    });
                 }
-                cg._invalidateLayout();
             }
         );
 
