@@ -3,10 +3,10 @@
 module Plottable {
 export module Component {
   export interface ToggleCallback {
-      (datum: any, newState: boolean): any;
+      (datum: string, newState: boolean): any;
   }
   export interface HoverCallback {
-      (datum?: any): any;
+      (datum?: string): any;
   }
 
   export class Legend extends Abstract.Component {
@@ -22,7 +22,7 @@ export module Component {
 
     // focus is the element currently being hovered over
     // if no elements are currently being hovered over, focus is undefined
-    private focus: any;
+    private focus: string;
 
     // this is the set of all elements that are currently toggled off
     private isOff: D3.Set;
@@ -166,10 +166,11 @@ export module Component {
           .attr("x", textHeight)
           .attr("y", Legend.MARGIN + textHeight / 2);
       legend.exit().remove();
-      legend.attr("transform", (d: any) => "translate(0," + domain.indexOf(d) * textHeight + ")");
+      legend.attr("transform", (d: string) => "translate(0," + domain.indexOf(d) * textHeight + ")");
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: any) {return Util.Text.getTruncatedText(d, availableWidth , d3.select(this));});
+            .text(function(d: string) {return Util.Text.getTruncatedText(d, availableWidth , d3.select(this));});
+      this.updateClasses();
       this.updateListeners();
       return this;
     }
@@ -179,14 +180,14 @@ export module Component {
         var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
         if (this._callbackHover != null) {
           // on mouseover, tag everything with the "hover" class
-          var hoverAll = (mouseover: boolean) => (datum: any) => {
+          var hoverAll = (mouseover: boolean) => (datum: string) => {
             this.updateClasses(mouseover);
           };
           this.content.on("mouseover", hoverAll(true));
           this.content.on("mouseout", hoverAll(false));
 
           // tag the element that is being hovered over with the class "focus"
-          var hoverSelected = (mouseover: boolean) => (datum: any) => {
+          var hoverSelected = (mouseover: boolean) => (datum: string) => {
             this.focus = mouseover ? datum : undefined;
             this._callbackHover(this.focus);
             this.updateClasses();
@@ -202,7 +203,7 @@ export module Component {
         }
 
         if (this._callbackClick != null) {
-          dataSelection.on("click", (datum: any) => {
+          dataSelection.on("click", (datum: string) => {
             var turningOn = this.isOff.has(datum);
             if (turningOn) {
               this.isOff.remove(datum);
@@ -219,19 +220,19 @@ export module Component {
       }
     }
 
-    private updateClasses(b?: boolean) {
+    private updateClasses(updateHover?: boolean) {
       if (this._isSetup) {
         var dataSelection = this.content.selectAll("." + Component.Legend._SUBELEMENT_CLASS);
         if (this._callbackHover != null) {
-          dataSelection.classed("focus", (d: any) => this.focus === d);
-          dataSelection.classed("not-focus", (d: any) => this.focus !== d);
-          if (b != null) {
-            dataSelection.classed("hover", b);
+          dataSelection.classed("focus", (d: string) => this.focus === d);
+          dataSelection.classed("not-focus", (d: string) => this.focus !== d);
+          if (updateHover != null) {
+            dataSelection.classed("hover", updateHover);
           }
         }
         if (this._callbackClick != null) {
-          dataSelection.classed("toggled-on", (d: any) => !this.isOff.has(d));
-          dataSelection.classed("toggled-off", (d: any) => this.isOff.has(d));
+          dataSelection.classed("toggled-on", (d: string) => !this.isOff.has(d));
+          dataSelection.classed("toggled-off", (d: string) => this.isOff.has(d));
         }
       }
     }

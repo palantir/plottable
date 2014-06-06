@@ -4184,6 +4184,7 @@ var Plottable;
                 legend.selectAll("text").text(function (d) {
                     return Plottable.Util.Text.getTruncatedText(d, availableWidth, d3.select(this));
                 });
+                this.updateClasses();
                 this.updateListeners();
                 return this;
             };
@@ -4238,7 +4239,7 @@ var Plottable;
                 }
             };
 
-            Legend.prototype.updateClasses = function (b) {
+            Legend.prototype.updateClasses = function (updateHover) {
                 var _this = this;
                 if (this._isSetup) {
                     var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
@@ -4249,8 +4250,8 @@ var Plottable;
                         dataSelection.classed("not-focus", function (d) {
                             return _this.focus !== d;
                         });
-                        if (b != null) {
-                            dataSelection.classed("hover", b);
+                        if (updateHover != null) {
+                            dataSelection.classed("hover", updateHover);
                         }
                     }
                     if (this._callbackClick != null) {

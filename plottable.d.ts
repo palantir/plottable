@@ -1086,10 +1086,10 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         interface ToggleCallback {
-            (datum: any, newState: boolean): any;
+            (datum: string, newState: boolean): any;
         }
         interface HoverCallback {
-            (datum?: any): any;
+            (datum?: string): any;
         }
         class Legend extends Abstract.Component {
             /**
