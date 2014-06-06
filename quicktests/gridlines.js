@@ -10,7 +10,6 @@ var quicktest = function(svg, data, Plottable) {
   yAxis.tickFormat(d3.format("g"));
 
   var renderAreaD1 = new Plottable.Plot.Scatter(data[0].slice(0, 3), xScale, yScale);
-  console.log(renderAreaD1.dataSource.data());
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var renderGroup = renderAreaD1.merge(gridlines);
   var chart = new Plottable.Component.Table([[yAxis, renderGroup],
