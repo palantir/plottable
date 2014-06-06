@@ -14,8 +14,8 @@ var quicktest = function(svg, data, Plottable) {
   var renderGroup = renderAreaD1.merge(gridlines);
   var chart = new Plottable.Component.Table([[yAxis, renderGroup],
                                          [null,  xAxis]]);
-  //var pzi = new Plottable.Interaction.PanZoom(renderGroup, xScale, yScale);
-  //pzi.registerWithComponent();
+  var pzi = new Plottable.Interaction.PanZoom(renderGroup, xScale, yScale);
+  pzi.registerWithComponent();
   chart.renderTo(svg);
 
 }
