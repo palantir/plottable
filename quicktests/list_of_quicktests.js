@@ -2,7 +2,7 @@ var list_of_quicktests = [
   "area_animate",
   "areaRenderer",
   "dragzoom_x",
-  "gridlines",
+  "panzoom",
   "LayoutInvalidate",
   "line_animate",
   "scatter_animate",
