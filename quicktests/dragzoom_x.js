@@ -1,5 +1,3 @@
-var quicktests = (quicktests || []);
-
 var quicktest = function(svg, data, Plottable){
 
         var dataseries = data[0].slice(0, 21);
@@ -35,5 +33,5 @@ var quicktest = function(svg, data, Plottable){
         window.x = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
 
 }
-
+quicktest.quicktestName = "dragzoom_x";
 quicktests.push(quicktest)

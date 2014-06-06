@@ -1,5 +1,3 @@
-var quicktests = (quicktests || []);
-
 var quicktest = function(svg, data, Plottable) {
 
       var doAnimate = true;
@@ -19,4 +17,5 @@ var quicktest = function(svg, data, Plottable) {
       vBarChart.renderTo(svg);
 }
 
+quicktest.quicktestName = "verticalBar_animate";
 quicktests.push(quicktest);

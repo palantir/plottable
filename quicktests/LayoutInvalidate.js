@@ -1,5 +1,3 @@
-var quicktests = (quicktests || []);
-
 var quicktest = function(svg, data, Plottable) {
           var dataseries1 = new Plottable.DataSource(data);
           dataseries1.metadata({name: "series1"});
@@ -64,5 +62,5 @@ function button6Callback() {
 }
 
 
-
+quicktest.quicktestName = "layout-invalidate";
 quicktests.push(quicktest);

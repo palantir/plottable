@@ -1,5 +1,3 @@
-var quicktests = (quicktests || []);
-
 var quicktest = function(svg, data, Plottable) {
 
       var doAnimate = true;
@@ -18,5 +16,7 @@ var quicktest = function(svg, data, Plottable) {
                                                [null,  xAxis]]);
       hBarChart.renderTo(svg);
 }
+
+quicktest.quicktestName = "horizontalBar_animate";
 
 quicktests.push(quicktest);

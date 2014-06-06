@@ -1,5 +1,3 @@
-var quicktests = (quicktests || []);
-
 var quicktest = function(svg, data, Plottable) {
 
   xScale = new Plottable.Scale.Linear();
@@ -19,4 +17,5 @@ var quicktest = function(svg, data, Plottable) {
   pzi.registerWithComponent();
 }
 
+quicktest.quicktestName = "gridlines";
 quicktests.push(quicktest);

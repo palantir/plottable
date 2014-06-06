@@ -1,6 +1,8 @@
-var quicktests = (quicktests || []);
+
+yScales = []
 
 var quicktest = function(svg, data, Plottable) {
+  function getY(d) { return d.y};
 
   var dataseries = data[0].slice(0, 21);
   var dataseries_top = data[1].slice(0, 21);
@@ -8,17 +10,19 @@ var quicktest = function(svg, data, Plottable) {
     dataseries_top[i].x = dataseries[i].x;
     dataseries_top[i].y += dataseries[i].y;
   }
+  console.log("SUM:", d3.sum(dataseries, getY), d3.sum(dataseries_top, getY));
 
   var xScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
   var yScale = new Plottable.Scale.Linear();
+  yScales.push(yScale);
   var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
   var y0Accessor = function(d, i) { return dataseries[i].y; }
 
   var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
-  var renderAreaD2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
+  var renderAreaD2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale).project("y0", y0Accessor, yScale);
 
   var fillAccessor = function() { return "steelblue"; }
   var fillAccessorTop = function() { return "pink"; }
@@ -33,4 +37,5 @@ var quicktest = function(svg, data, Plottable) {
                   .renderTo(svg);
 }
 
+quicktest.quicktestName = "areaRenderer";
 quicktests.push(quicktest);

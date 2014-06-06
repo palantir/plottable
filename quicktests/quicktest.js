@@ -63,9 +63,9 @@ var data1 = makeRandomData(50);
 var data2 = makeRandomData(50);
 
 function loadSingleQuicktest(container, quickTest, Plottable) {
-  container.append("p").text("a quicktest");
+  container.append("p").text(quickTest.quicktestName);
   var svg = container.append("svg").attr("height", 500);
-  quickTest(svg, [data1, data2], Plottable);
+  quickTest(svg, _.cloneDeep([data1, data2]), Plottable);
 }
 
 function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {

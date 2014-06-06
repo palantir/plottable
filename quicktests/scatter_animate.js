@@ -1,5 +1,3 @@
-var quicktests = (quicktests || []);
-
 var quicktest = function(svg, data, Plottable) {
 
       var doAnimate = true;
@@ -20,6 +18,7 @@ var quicktest = function(svg, data, Plottable) {
       circleChart.renderTo(svg);
 }
 
+quicktest.quicktestName = "scatter_animate";
 quicktests.push(quicktest);
 
 
