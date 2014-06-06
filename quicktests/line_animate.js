@@ -1,7 +1,7 @@
 var quicktests = (quicktests || []);
 
 var quicktest = function(svg, data, Plottable) {
-      
+
       var doAnimate = true;
       var lineRenderer;
       var xScale = new Plottable.Scale.Linear();
@@ -14,7 +14,7 @@ var quicktest = function(svg, data, Plottable) {
       lineRenderer.project("opacity", 0.75);
       lineRenderer.animate(doAnimate);
 
-      var lineaChart = new Plottable.Table([[yAxis, lineRenderer],
+      var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
                                                [null,  xAxis]]);
       lineChart.renderTo(svg);
 }

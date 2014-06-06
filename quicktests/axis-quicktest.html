@@ -25,14 +25,14 @@
         var xAxisLeft = new Plottable.XAxis(xScale, "bottom").tickLabelPosition("left");
         var xAxisCenter = new Plottable.XAxis(xScale, "bottom");
         var xAxisRight = new Plottable.XAxis(xScale, "bottom").tickLabelPosition("right");
-        var xAxisTable = new Plottable.Table([[xAxisLeft],
+        var xAxisTable = new Plottable.Component.Table([[xAxisLeft],
                                               [xAxisCenter],
                                               [xAxisRight]]);
 
         var xAxisLeft2 = new Plottable.XAxis(xScale, "top").tickLabelPosition("left");
         var xAxisCenter2 = new Plottable.XAxis(xScale, "top");
         var xAxisRight2 = new Plottable.XAxis(xScale, "top").tickLabelPosition("right");
-        var xAxisTable2 = new Plottable.Table([[xAxisLeft2],
+        var xAxisTable2 = new Plottable.Component.Table([[xAxisLeft2],
                                               [xAxisCenter2],
                                               [xAxisRight2]]);
 
@@ -40,20 +40,20 @@
         var yAxisTop = new Plottable.YAxis(yScale, "left").tickLabelPosition("top");
         var yAxisMiddle = new Plottable.YAxis(yScale, "left");
         var yAxisBottom = new Plottable.YAxis(yScale, "left").tickLabelPosition("bottom");
-        var yAxisTable = new Plottable.Table([[yAxisTop, yAxisMiddle, yAxisBottom]]);
+        var yAxisTable = new Plottable.Component.Table([[yAxisTop, yAxisMiddle, yAxisBottom]]);
 
         var yAxisTop2 = new Plottable.YAxis(yScale, "right").tickLabelPosition("top");
         var yAxisMiddle2 = new Plottable.YAxis(yScale, "right");
         var yAxisBottom2 = new Plottable.YAxis(yScale, "right").tickLabelPosition("bottom");
-        var yAxisTable2 = new Plottable.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
+        var yAxisTable2 = new Plottable.Component.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
         var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
         var gridlines = new Plottable.Gridlines(xScale, yScale);
 
-        var basicTable = new Plottable.Table([[null, xAxisTable2, null],
+        var basicTable = new Plottable.Component.Table([[null, xAxisTable2, null],
                                               [yAxisTable, renderAreaD1.merge(gridlines), yAxisTable2],
                                               [null, xAxisTable, null]]);
-        basicTable.renderTo("#axis-test");
+        basicTable.renderTo(svg);
         var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale);
         pzi.registerWithComponent();
       }

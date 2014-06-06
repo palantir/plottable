@@ -35,7 +35,7 @@
         renderArea.project("fill", fillAccessor)
 
 
-        var chart = new Plottable.Table([[yAxis, renderArea], [null, xAxis]]);
+        var chart = new Plottable.Component.Table([[yAxis, renderArea], [null, xAxis]]);
         // var chart = new Plottable.StandardChart()
         //                 .center(renderGroup).xAxis(xAxis).yAxis(yAxis);
 
@@ -43,8 +43,8 @@
         var colorScale = new Plottable.ColorScale("10").domain(["foo", "bar"]);
         var legend = new Plottable.Legend(colorScale);
         var legendLabel = new Plottable.TitleLabel("foo");
-        var legendTable = new Plottable.Table([[legendLabel], [legend]]);
-        var outerTable = new Plottable.Table([[chart, legendTable]]);
+        var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
+        var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
         outerTable.name = "OUTER_TABLE";
         legendTable.name = "LEGEND_TABLE";
         window.legend = legend;
@@ -53,7 +53,7 @@
         window.renderArea = renderArea;
         window.chart = chart;
         window.outerTable = outerTable;
-        outerTable.renderTo("#areaRenderer-test");
+        outerTable.renderTo(svg);
 
       }
     </script>

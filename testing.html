@@ -2,12 +2,11 @@
 <head>
   <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <script src="http://palantir.github.io/plottable/plottable.js"></script>
   <script src="http://palantir.github.io/plottable/examples/exampleUtil.js"></script>
   <link rel="stylesheet" type="text/css" href="plottable.css">
 
   <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
-
+  <script src="quicktests/quicktest.js"> </script>
   <style>
     .example {
 
@@ -38,78 +37,10 @@
       <form>
         Feature Branch: <input type="text" name="featureBranch"><br>
       </form>
-    </th> 
+    </th>
   </tr>
-  <tr>
-    <td>
-      <p> Test 1: master</p>
-      <svg width = "100%" height = "800px" id = "master_1"></svg>
-    </td>
-    <td>
-      <p> Test 1: feature-branch</p>
-      <svg width = "100%" height = "800px" id = "feature_1"></svg>
-    </td> 
-  </tr>
-  <tr>
-    <td>
-      <p> Test 2: master</p>
-      <svg width = "100%" height = "800px" id = "master_2"></svg>
-    </td>
-    <td>
-      <p> Test 2: feature-branch</p>
-      <svg width = "100%" height = "800px" id = "feature_2"></svg>
-    </td> 
-  </tr>
-  <tr>
-    <td>
-      <p> Test 3: master</p>
-      <svg width = "100%" height = "800px" id = "master_3"></svg>
-    </td>
-    <td>
-      <p> Test 3: feature-branch</p>
-      <svg width = "100%" height = "800px" id = "feature_3"></svg>    </td> 
-  </tr>
-  <tr>
-    <td>
-      <p> Test 4: master</p>
-      <svg width = "100%" height = "800px" id = "master_4"></svg>
-    </td>
-    <td>
-      <p> Test 4: feature-branch</p>
-      <svg width = "100%" height = "800px" id = "feature_4"></svg>    </td> 
-  </tr>
+
   </table>
 
 </body>
 </html>
-
-<script>
-  var Plottables = {};
-  var quicktests = ["Test1", "Test2"];
-  var checklist = Array.apply(null, new Array(3)).map(Boolean.prototype.valueOf, false);
-  
-
-  function loadPlottable(branchName, callback) {
-    var url;
-    if (branchName != null) {
-      url = "https://rawgithub.com/palantir/plottable/" + branchName + "/plottable.js";
-    } else {
-      branchName = "#local";
-      url = "../plottable.js"; //load local version
-    }
-    
-    var element = document.createElement("script");
-    element.type = "text/javascript";
-    element.src = url;
-    element.id = branchName;
-    element.onload = function() {
-      console.log("loaded Plottable:" + branchName);
-      Plottables[branchName] = Plottable;
-      Plottable = null;
-      if (callback != null) callback()
-    }
-    document.head.appendChild(element);
-  }
-  
-  
-</script>

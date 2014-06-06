@@ -54,7 +54,7 @@ window.onload = function () {
     renderArea1 = new Plottable.HorizontalBarRenderer(dataseries, xScale, yScale);
 
 
-    var basicTable = new Plottable.Table()
+    var basicTable = new Plottable.Component.Table()
                 .addComponent(0, 0, yAxis)
                 .addComponent(0, 1, renderArea1)
                 .addComponent(1, 1, xAxis);

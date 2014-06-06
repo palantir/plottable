@@ -28,7 +28,7 @@ var quicktest = function(svg, data, Plottable) {
 
           title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
           legend1 = new Plottable.Component.Legend(colorScale1);
-          var titleTable = new Plottable.Table().addComponent(0,0, title1)
+          var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
                                                 .addComponent(0,1, legend1);
 
           basicTable = new Plottable.Component.Table().addComponent(0,2, titleTable)

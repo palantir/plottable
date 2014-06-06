@@ -36,7 +36,7 @@
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"; })
                               .animate(true);
-      var chart = new Plottable.Table([
+      var chart = new Plottable.Component.Table([
                                   [yAxis, barRenderer],
                                   [null,  xAxis]
                                 ]);
@@ -54,14 +54,14 @@
                               .project("fill", function() {return "steelblue"; })
                               .animate(true);
 
-      var horizChart = new Plottable.Table([
+      var horizChart = new Plottable.Component.Table([
         [yAxis2, horizBarRenderer],
         [null, xAxis2]
       ]);
 
       window.onload = function() {
-        chart.renderTo("#meow");
-        horizChart.renderTo("#nya");
+        chart.renderTo(svg);
+        horizChart.renderTo(svg);
       }
 
       function younger() {

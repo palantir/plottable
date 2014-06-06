@@ -32,13 +32,13 @@
       var xAxis = new Plottable.XAxis(xScale, "bottom");
       var yAxis = new Plottable.YAxis(yScale, "left");
 
-      var chart = new Plottable.Table([
+      var chart = new Plottable.Component.Table([
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
 
       window.onload = function() {
-        chart.renderTo("#chart");
+        chart.renderTo(svg);
         var pzi = new Plottable.PanZoomInteraction(cg, xScale, yScale);
         pzi.registerWithComponent();
 

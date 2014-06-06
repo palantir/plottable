@@ -28,13 +28,13 @@
                               .project("y", "name", yScale)
                               .animate(true);
 
-      var chart = new Plottable.Table([
+      var chart = new Plottable.Component.Table([
         [yAxis, barRenderer],
         [null, xAxis]
       ]);
 
       window.onload = function() {
-        chart.renderTo("#meow");
+        chart.renderTo(svg);
       }
 
       function younger() {

@@ -21,7 +21,7 @@ window.onload = function () {
                                 .project("x", function (d) { return d3.time.format("%x").parse(d.x)});
     xAxis = new Plottable.XAxis(xScale);
     yAxis = new Plottable.YAxis(yScale);
-    new Plottable.StandardChart().center(lineRenderer).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
+    new Plottable.StandardChart().center(lineRenderer).xAxis(xAxis).yAxis(yAxis).renderTo(svg);
 
 
 };

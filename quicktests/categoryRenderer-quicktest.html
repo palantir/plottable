@@ -28,11 +28,11 @@
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"});
       barRenderer.animate(true);
-      var chart = new Plottable.Table([[yAxis, barRenderer],
+      var chart = new Plottable.Component.Table([[yAxis, barRenderer],
                                        [null,  xAxis]]);
 
 
-      window.onload = function() { chart.renderTo("#meow"); }
+      window.onload = function() { chart.renderTo(svg); }
 
       function younger() {
         var data = ds.data();

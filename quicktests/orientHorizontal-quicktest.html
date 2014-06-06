@@ -38,7 +38,7 @@ window.onload = function() {
     yAxis = new Plottable.YAxis(yScale, "left");
 
     var renderAreaD1 = new Plottable.CircleRenderer(data, xScale, yScale);
-    basicTable = new Plottable.Table().addComponent(0, 0, yAxis)
+    basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis)
                                           .addComponent(0, 1, renderAreaD1)
                                           .addComponent(1, 1, xAxis);
 

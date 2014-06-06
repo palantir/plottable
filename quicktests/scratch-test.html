@@ -76,7 +76,7 @@ window.onload = function () {
     yAxis = new Plottable.CategoryAxis(yScale, "left");
     //rendering
     renderArea1 = new Plottable.HorizontalBarRenderer(dataseries, xScale, yScale);
-    basicTable = new Plottable.Table()
+    basicTable = new Plottable.Component.Table()
                 .addComponent(0, 0, yAxis)
                 .addComponent(0, 1, renderArea1)
                 .addComponent(1, 1, xAxis);
@@ -91,13 +91,13 @@ window.onload = function () {
     yAxis2 = new Plottable.YAxis(yScale2, "right");
     //rendering
     renderArea2 = new Plottable.BarRenderer(dataseries2, xScale2, yScale2);
-    basicTable2 = new Plottable.Table()
+    basicTable2 = new Plottable.Component.Table()
                 .addComponent(1, 1, yAxis2)
                 .addComponent(1, 0, renderArea2)
                 .addComponent(0, 0, xAxis2);
 
 
-    bigTable = new Plottable.Table()
+    bigTable = new Plottable.Component.Table()
             .addComponent(0,0, basicTable)
             .addComponent(1,0, basicTable2)
 

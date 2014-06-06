@@ -14,7 +14,7 @@ var quicktest = function(svg, data, Plottable) {
       areaRenderer.project("opacity", 0.75);
       areaRenderer.animate(doAnimate);
 
-      var areaChart = new Plottable.Table([[yAxis, areaRenderer],
+      var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
                                                [null,  xAxis]]);
       areaChart.renderTo(svg);
 }

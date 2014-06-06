@@ -39,11 +39,11 @@
         var xAxis = new Plottable.XAxis(xScale, "bottom");
         var yAxis = new Plottable.YAxis(yScale, "left");
 
-        var chart = new Plottable.Table([
+        var chart = new Plottable.Component.Table([
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
-        
+
         var legendLabel = new Plottable.TitleLabel("fat");
         var legend = new Plottable.ToggleLegend(colorScale,
             function (d, b) {
@@ -55,12 +55,12 @@
                 }
             }
         );
-        var legendTable = new Plottable.Table([[legendLabel], [legend]]); 
+        var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
 
-        var outerTable = new Plottable.Table([[chart, legendTable]]);
+        var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
 
       window.onload = function() {
-        outerTable.renderTo("#legend-toggle-test");
+        outerTable.renderTo(svg);
       }
 
       function shuffle() {
