@@ -1,32 +1,33 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class StandardChart extends Table {
-      private _xAxis: XAxis;
-      private _yAxis: YAxis;
-      private _xLabel: AxisLabel;
-      private _yLabel: AxisLabel;
-      private centerComponent: Component;
-      private _titleLabel: TitleLabel;
-      private xTable: Table;
-      private yTable: Table;
-      private xyTable: Table;
-      private fullTable: Table;
+export module Template {
+  export class StandardChart extends Component.Table {
+      private _xAxis: Axis.XAxis;
+      private _yAxis: Axis.YAxis;
+      private _xLabel: Component.AxisLabel;
+      private _yLabel: Component.AxisLabel;
+      private centerComponent: Abstract.Component;
+      private _titleLabel: Component.TitleLabel;
+      private xTable: Component.Table;
+      private yTable: Component.Table;
+      private xyTable: Component.Table;
+      private fullTable: Component.Table;
 
       constructor() {
         super();
-        this.xTable    = new Table();
-        this.yTable    = new Table();
-        this.centerComponent = new ComponentGroup();
-        this.xyTable   = new Table().addComponent(0, 0, this.yTable)
+        this.xTable    = new Component.Table();
+        this.yTable    = new Component.Table();
+        this.centerComponent = new Component.Group();
+        this.xyTable   = new Component.Table().addComponent(0, 0, this.yTable)
                                     .addComponent(1, 1, this.xTable)
                                     .addComponent(0, 1, this.centerComponent);
         this.addComponent(1, 0, this.xyTable);
       }
 
 
-      public yAxis(y: YAxis): StandardChart;
-      public yAxis(): YAxis;
+      public yAxis(y: Axis.YAxis): StandardChart;
+      public yAxis(): Axis.YAxis;
       public yAxis(y?: any): any {
         if (y != null) {
           if (this._yAxis != null) {
@@ -40,8 +41,8 @@ module Plottable {
         }
       }
 
-      public xAxis(x: XAxis): StandardChart;
-      public xAxis(): XAxis;
+      public xAxis(x: Axis.XAxis): StandardChart;
+      public xAxis(): Axis.XAxis;
       public xAxis(x?: any): any {
         if (x != null) {
           if (this._xAxis != null) {
@@ -55,9 +56,9 @@ module Plottable {
         }
       }
 
-    public yLabel(y: AxisLabel): StandardChart;
+    public yLabel(y: Component.AxisLabel): StandardChart;
     public yLabel(y: string): StandardChart;
-    public yLabel(): AxisLabel;
+    public yLabel(): Component.AxisLabel;
     public yLabel(y?: any): any {
       if (y != null) {
         if (this._yLabel != null) {
@@ -69,7 +70,7 @@ module Plottable {
           }
         }
         if (typeof(y) === "string") {
-          y = new AxisLabel(y, "vertical-left");
+          y = new Component.AxisLabel(y, "vertical-left");
         }
         this._yLabel = y;
         this.yTable.addComponent(0, 0, this._yLabel);
@@ -79,9 +80,9 @@ module Plottable {
       }
     }
 
-    public xLabel(x: AxisLabel): StandardChart;
+    public xLabel(x: Component.AxisLabel): StandardChart;
     public xLabel(x: string): StandardChart;
-    public xLabel(): AxisLabel;
+    public xLabel(): Component.AxisLabel;
     public xLabel(x?: any): any {
       if (x != null) {
         if (this._xLabel != null) {
@@ -93,7 +94,7 @@ module Plottable {
           }
         }
         if (typeof(x) === "string") {
-          x = new AxisLabel(x, "horizontal");
+          x = new Component.AxisLabel(x, "horizontal");
         }
         this._xLabel = x;
         this.xTable.addComponent(1, 0, this._xLabel);
@@ -103,9 +104,9 @@ module Plottable {
       }
     }
 
-    public titleLabel(x: TitleLabel): StandardChart;
+    public titleLabel(x: Component.TitleLabel): StandardChart;
     public titleLabel(x: string): StandardChart;
-    public titleLabel(): TitleLabel;
+    public titleLabel(): Component.TitleLabel;
     public titleLabel(x?: any): any {
       if (x != null) {
         if (this._titleLabel != null) {
@@ -117,7 +118,7 @@ module Plottable {
           }
         }
         if (typeof(x) === "string") {
-          x = new TitleLabel(x, "horizontal");
+          x = new Component.TitleLabel(x, "horizontal");
         }
         this._titleLabel = x;
         this.addComponent(0, 0, this._titleLabel);
@@ -127,9 +128,10 @@ module Plottable {
       }
     }
 
-    public center(c: Component): StandardChart {
+    public center(c: Abstract.Component): StandardChart {
       this.centerComponent.merge(c);
       return this;
     }
   }
+}
 }

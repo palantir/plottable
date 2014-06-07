@@ -1,11 +1,22 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class CategoryAxis extends BaseAxis {
-    public _scale: OrdinalScale;
+export module Axis {
+  export class Category extends Abstract.Axis {
+    public _scale: Scale.Ordinal;
     public _tickLabelsG: D3.Selection;
 
-    constructor(scale: OrdinalScale, orientation = "bottom") {
+    /**
+     * Creates a CategoryAxis.
+     *
+     * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+     * display the scale as efficiently as possible.
+     *
+     * @constructor
+     * @param {OrdinalScale} scale The scale to base the Axis on.
+     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     */
+    constructor(scale: Scale.Ordinal, orientation = "bottom") {
       super(scale, orientation);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
@@ -55,52 +66,56 @@ module Plottable {
       return this._scale.domain();
     }
 
-    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): TextUtils.IWriteTextResult {
+    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Util.Text.IWriteTextResult {
       var self = this;
-      var textWriteResults: TextUtils.IWriteTextResult[] = [];
+      var textWriteResults: Util.Text.IWriteTextResult[] = [];
       ticks.each(function (d: string, i: number) {
         var d3this = d3.select(this);
-        var startAndWidth = self._scale.fullBandStartAndWidth(d);
-        var bandWidth = startAndWidth[1];
-        var bandStartPosition = startAndWidth[0];
+        var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-        d3this.selectAll("g").remove(); //HACKHACK
-        var g = d3this.append("g").classed("tick-label", true);
-        var x = self._isHorizontal() ? bandStartPosition : 0;
-        var y = self._isHorizontal() ? 0 : bandStartPosition;
-        g.attr("transform", "translate(" + x + "," + y + ")");
-        var xAlign: {[s: string]: string} = {left: "right", right: "left", top: "center", bottom: "center"};
+        var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
         var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
 
-        var textWriteResult = TextUtils.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
+        var textWriteResult = Util.Text.writeText(d, d3this, width, height,
+                                                  xAlign[self._orientation], yAlign[self._orientation], true);
         textWriteResults.push(textWriteResult);
       });
 
       var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
       var heightFn = this._isHorizontal() ? d3.max : d3.sum;
       return {
-        textFits: textWriteResults.every((t: TextUtils.IWriteTextResult) => t.textFits),
-        usedWidth : widthFn(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedWidth),
-        usedHeight: heightFn(textWriteResults, (t: TextUtils.IWriteTextResult) => t.usedHeight)
+        textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
+        usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),
+        usedHeight: heightFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedHeight)
       };
-
     }
 
     public _doRender() {
       super._doRender();
+      this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
       var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+
+      var getTickLabelTransform = (d: string, i: number) => {
+        var startAndWidth = this._scale.fullBandStartAndWidth(d);
+        var bandStartPosition = startAndWidth[0];
+        var x = this._isHorizontal() ? bandStartPosition : 0;
+        var y = this._isHorizontal() ? 0 : bandStartPosition;
+        return "translate(" + x + "," + y + ")";
+      };
       tickLabels.enter().append("g").classed("tick-label", true);
       tickLabels.exit().remove();
+      tickLabels.attr("transform", getTickLabelTransform);
       this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
-      DOMUtils.translate(this._tickLabelsG, xTranslate, yTranslate);
-      DOMUtils.translate(this._ticksContainer, translate[0], translate[1]);
+      Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
+      Util.DOM.translate(this._ticksContainer, translate[0], translate[1]);
       return this;
     }
   }
+}
 }

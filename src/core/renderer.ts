@@ -1,18 +1,19 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Abstract {
   export interface _IProjector {
     accessor: IAccessor;
-    scale?: Scale;
+    scale?: Abstract.Scale;
   }
 
-  export class Renderer extends Component {
+  export class Plot extends Component {
     public _dataSource: DataSource;
     public _dataChanged = false;
 
     public renderArea: D3.Selection;
     public element: D3.Selection;
-    public scales: Scale[];
+    public scales: Abstract.Scale[];
     public _colorAccessor: IAccessor;
     public _animate = false;
     public _ANIMATION_DURATION = 250; // milliseconds
@@ -31,10 +32,10 @@ module Plottable {
     // it will be necessary to do a regular rerender.
 
     /**
-     * Creates a Renderer.
+     * Creates a Plot.
      *
      * @constructor
-     * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Renderer.
+     * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Plot.
      */
     constructor();
     constructor(dataset: any[]);
@@ -64,13 +65,13 @@ module Plottable {
     }
 
     /**
-     * Retrieves the current DataSource, or sets a DataSource if the Renderer doesn't yet have one.
+     * Retrieves the current DataSource, or sets a DataSource if the Plot doesn't yet have one.
      *
-     * @param {DataSource} [source] The DataSource the Renderer should use, if it doesn't yet have one.
-     * @return {DataSource|Renderer} The current DataSource or the calling Renderer.
+     * @param {DataSource} [source] The DataSource the Plot should use, if it doesn't yet have one.
+     * @return {DataSource|Plot} The current DataSource or the calling Plot.
      */
     public dataSource(): DataSource;
-    public dataSource(source: DataSource): Renderer;
+    public dataSource(source: DataSource): Plot;
     public dataSource(source?: DataSource): any {
       if (source == null) {
         return this._dataSource;
@@ -101,7 +102,7 @@ module Plottable {
       return this;
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale) {
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       attrToSet = attrToSet.toLowerCase();
       var rendererIDAttr = this._plottableID + attrToSet;
       var currentProjection = this._projectors[attrToSet];
@@ -127,7 +128,7 @@ module Plottable {
       var h: { [attrName: string]: IAppliedAccessor; } = {};
       d3.keys(this._projectors).forEach((a) => {
         var projector = this._projectors[a];
-        var accessor = Utils.applyAccessor(projector.accessor, this.dataSource());
+        var accessor = Util.Methods.applyAccessor(projector.accessor, this.dataSource());
         var scale = projector.scale;
         var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
         h[a] = fn;
@@ -135,7 +136,7 @@ module Plottable {
       return h;
     }
 
-    public _doRender(): Renderer {
+    public _doRender(): Plot {
       if (this.element != null) {
         this._paint();
         this._dataChanged = false;
@@ -165,4 +166,5 @@ module Plottable {
       return this;
     }
   }
+}
 }

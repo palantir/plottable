@@ -1,10 +1,11 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class Axis extends Component {
+export module Axis {
+  export class Axis extends Abstract.Component {
     public axisElement: D3.Selection;
     private d3Axis: D3.Svg.Axis;
-    public _axisScale: Scale;
+    public _axisScale: Abstract.Scale;
     private _showEndTickLabels = false;
     private tickPositioning = "center";
     public orientToAlign: {[s: string]: string} = {left: "right", right: "left", top: "bottom", bottom: "top"};
@@ -18,7 +19,7 @@ module Plottable {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      * @param {any} [formatter] a D3 formatter
      */
-    constructor(axisScale: Scale, orientation: string, formatter?: any) {
+    constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any) {
       super();
       this._axisScale = axisScale;
       orientation = orientation.toLowerCase();
@@ -60,8 +61,8 @@ module Plottable {
       }
 
       // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
-      if ((<QuantitiveScale> this._axisScale).ticks != null) {
-        var scale = <QuantitiveScale> this._axisScale;
+      if ((<Abstract.QuantitiveScale> this._axisScale).ticks != null) {
+        var scale = <Abstract.QuantitiveScale> this._axisScale;
         var nTicks = 10;
         var ticks = scale.ticks(nTicks);
         var numericDomain = scale.domain();
@@ -96,10 +97,12 @@ module Plottable {
       var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
       var isInsideBBox = (tickBox: ClientRect) => {
-        return (boundingBox.left <= tickBox.left &&
-                boundingBox.top  <= tickBox.top  &&
-                tickBox.right  <= boundingBox.left + this.availableWidth &&
-                tickBox.bottom <= boundingBox.top  + this.availableHeight);
+        return (
+          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
+          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+        );
       };
 
       tickLabels.each(function (d: any){
@@ -134,9 +137,9 @@ module Plottable {
       });
     }
 
-    public scale(): Scale;
-    public scale(newScale: Scale): Axis;
-    public scale(newScale?: Scale): any {
+    public scale(): Abstract.Scale;
+    public scale(newScale: Abstract.Scale): Axis;
+    public scale(newScale?: Abstract.Scale): any {
       if (newScale == null) {
         return this._axisScale;
       } else {
@@ -274,7 +277,7 @@ module Plottable {
      * @param {string} orientation The orientation of the Axis (top/bottom)
      * @param {any} [formatter] a D3 formatter
      */
-    constructor(scale: Scale, orientation = "bottom", formatter: any = null) {
+    constructor(scale: Abstract.Scale, orientation = "bottom", formatter: any = null) {
       super(scale, orientation, formatter);
       var orientation = orientation.toLowerCase();
       if (orientation !== "top" && orientation !== "bottom") {
@@ -358,7 +361,7 @@ module Plottable {
           }
         }
 
-        if ((<OrdinalScale> this._axisScale).rangeType != null) { // ordinal scale
+        if ((<Scale.Ordinal> this._axisScale).rangeType != null) { // ordinal scale
           var scaleRange = this._axisScale.range();
           var availableWidth = this.availableWidth;
           var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
@@ -377,10 +380,10 @@ module Plottable {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var measure = TextUtils.getTextMeasure(textEl);
-            var wrappedLines = WordWrapUtils.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
+            var measure = Util.Text.getTextMeasure(textEl);
+            var wrappedLines = Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
-              textEl.text(TextUtils.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(Util.Text.getTruncatedText(currentText, availableWidth, textEl));
             } else {
               textEl.text("");
               var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -414,7 +417,7 @@ module Plottable {
      * @param {string} orientation The orientation of the Axis (left/right)
      * @param {any} [formatter] a D3 formatter
      */
-    constructor(scale: Scale, orientation = "left", formatter: any = null) {
+    constructor(scale: Abstract.Scale, orientation = "left", formatter: any = null) {
       super(scale, orientation, formatter);
       orientation = orientation.toLowerCase();
       if (orientation !== "left" && orientation !== "right") {
@@ -498,7 +501,7 @@ module Plottable {
           }
         }
 
-        if ((<OrdinalScale> this._axisScale).rangeType != null) { // ordinal scale
+        if ((<Scale.Ordinal> this._axisScale).rangeType != null) { // ordinal scale
           var scaleRange = this._axisScale.range();
           var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
           var availableWidth = this.availableWidth - tickLengthWithPadding;
@@ -516,10 +519,10 @@ module Plottable {
           tickTextLabels.each(function(t: any, i: number) {
             var textEl = d3.select(this);
             var currentText = textEl.text();
-            var measure = TextUtils.getTextMeasure(textEl);
-            var wrappedLines = WordWrapUtils.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
+            var measure = Util.Text.getTextMeasure(textEl);
+            var wrappedLines = Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
-              textEl.text(TextUtils.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(Util.Text.getTruncatedText(currentText, availableWidth, textEl));
             } else {
               var baseY = 0; // measured in ems
               if (tickLabelPosition === "top") {
@@ -551,4 +554,5 @@ module Plottable {
       return this;
     }
   }
+}
 }

@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("StrictEqualityAssociativeArray", () => {
 
   it("StrictEqualityAssociativeArray works as expected", () => {
-    var s = new Plottable.StrictEqualityAssociativeArray();
+    var s = new Plottable.Util.StrictEqualityAssociativeArray();
     var o1 = {};
     var o2 = {};
     assert.isFalse(s.has(o1));

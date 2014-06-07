@@ -1,7 +1,0 @@
----
-name: Plottable.js Chart With Legend demo
-description: Creates a timeseries chart with gridlines and a legend.
-authors:
-  - Justin Lan
-normalize_css: no
-...

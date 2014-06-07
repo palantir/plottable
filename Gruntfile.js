@@ -83,7 +83,7 @@ module.exports = function(grunt) {
       path: "license_header.tmp",
     },
     public_member_vars: {
-      pattern: jsdoc + prefixMatch + "public " + "[^(;]*;",
+      pattern: jsdoc + prefixMatch + "public " + "[^(;{]*(\{[^}]*\})?;",
       replacement: "",
       path: "plottable.d.ts",
     },

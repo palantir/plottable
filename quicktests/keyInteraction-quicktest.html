@@ -19,14 +19,14 @@
         var svg = d3.select("#key-test");
         svg.attr("width", 480).attr("height", 320);
 
-        var xScale = new Plottable.LinearScale();
-        var xAxis = new Plottable.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scale.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        var yScale = new Plottable.LinearScale();
-        var yAxis = new Plottable.YAxis(yScale, "left");
+        var yScale = new Plottable.Scale.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        var renderAreaD1 = new Plottable.CircleRenderer(dataseries, xScale, yScale);
-        var gridlines = new Plottable.Gridlines(xScale, yScale);
+        var renderAreaD1 = new Plottable.Plot.Scatter(dataseries, xScale, yScale);
+        var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
         var renderGroup = gridlines.merge(renderAreaD1);
 
         var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis)
@@ -40,9 +40,9 @@
           x: xScale.domain(),
           y: yScale.domain()
         }
-        var pzi = new Plottable.PanZoomInteraction(renderAreaD1, xScale, yScale).registerWithComponent();
+        var pzi = new Plottable.Interaction.PanZoom(renderAreaD1, xScale, yScale).registerWithComponent();
 
-        var ki = new Plottable.KeyInteraction(renderAreaD1, 65);
+        var ki = new Plottable.Interaction.Key(renderAreaD1, 65);
         ki.callback(function() {
           // renderAreaD1.autorange();
           xScale.domain(initialDomains.x);

@@ -1,12 +1,13 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export class BaseAxis extends Component {
+export module Abstract {
+  export class Axis extends Abstract.Component {
     public axisElement: D3.Selection;
     public _ticksContainer: D3.Selection;
     public _ticks: D3.UpdateSelection;
     public _baseline: D3.Selection;
-    public _scale: Scale;
+    public _scale: Abstract.Scale;
     public _formatter: (n: any) => string;
     public _orientation: string;
     private _tickLength = 5;
@@ -22,7 +23,7 @@ module Plottable {
      * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
      * @param {(n: any) => string} [formatter] A function to format tick labels.
      */
-    constructor(scale: Scale, orientation: string, formatter?: (n: any) => string) {
+    constructor(scale: Abstract.Scale, orientation: string, formatter?: (n: any) => string) {
       super();
       this._scale = scale;
       this.orient(orientation);
@@ -166,7 +167,7 @@ module Plottable {
      * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
      */
     public tickLength(): number;
-    public tickLength(length: number): BaseAxis;
+    public tickLength(length: number): Axis;
     public tickLength(length?: number): any {
       if (length == null) {
         return this._tickLength;
@@ -187,7 +188,7 @@ module Plottable {
      * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
      */
     public tickLabelPadding(): number;
-    public tickLabelPadding(padding: number): BaseAxis;
+    public tickLabelPadding(padding: number): Axis;
     public tickLabelPadding(padding?: number): any {
       if (padding == null) {
         return this._tickLabelPadding;
@@ -202,7 +203,7 @@ module Plottable {
     }
 
     public orient(): string;
-    public orient(newOrientation: string): BaseAxis;
+    public orient(newOrientation: string): Axis;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
         return this._orientation;
@@ -220,4 +221,5 @@ module Plottable {
       }
     }
   }
+}
 }

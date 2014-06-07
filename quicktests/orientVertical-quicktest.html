@@ -31,13 +31,13 @@ window.onload = function() {
     var svg = d3.select("#chart");
     svg.attr("width", 480).attr("height", 320);
 
-    var xScale = new Plottable.LinearScale();
-    xAxis = new Plottable.XAxis(xScale, "bottom");
+    var xScale = new Plottable.Scale.Linear();
+    xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-    var yScale = new Plottable.LinearScale();
-    yAxis = new Plottable.YAxis(yScale, "left");
+    var yScale = new Plottable.Scale.Linear();
+    yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-    var renderAreaD1 = new Plottable.CircleRenderer(data, xScale, yScale);
+    var renderAreaD1 = new Plottable.Plot.Scatter(data, xScale, yScale);
     basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis)
                                           .addComponent(0, 1, renderAreaD1)
                                           .addComponent(1, 1, xAxis);

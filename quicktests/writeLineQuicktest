@@ -23,46 +23,46 @@
         var med_side = 200;
         var short_side = 100;
         var text = "hello world";
-        
+
         var svg_array = ["h_1", "v_1", "h_2", "v_2", "h_3", "v_3",
             "h_4", "v_4", "h_5", "v_5", "h_6", "v_6",
             "h_7", "v_7", "h_8", "v_8", "h_9", "v_9",
             "h_10", "v_10", "h_11", "v_11", "h_12", "v_12"];
         var sel_array = [];
         sel_array.length = svg_array.length;
-        
-        
+
+
         //------------------------------functions------------------------------
         var write_horizontal = function (i, xAlign, yAlign) {
-            Plottable.TextUtils.writeLineHorizontally(text, sel_array[i],
+            Plottable.TextUtil.writeLineHorizontally(text, sel_array[i],
             sel_array[i].attr("width"), sel_array[i].attr("height"),
             xAlign, yAlign);
         }
-        
+
         var write_horizontal_ = function (i) {
-            Plottable.TextUtils.writeLineHorizontally(text, sel_array[i],
+            Plottable.TextUtil.writeLineHorizontally(text, sel_array[i],
             sel_array[i].attr("width"), sel_array[i].attr("height"));
         }
-        
+
         var write_vertical = function (i, xAlign, yAlign) {
-            Plottable.TextUtils.writeLineVertically(text, sel_array[i],
+            Plottable.TextUtil.writeLineVertically(text, sel_array[i],
             sel_array[i].attr("width"), sel_array[i].attr("height"),
             xAlign, yAlign);
         }
-        
+
         var write_vertical_ = function (i) {
-            Plottable.TextUtils.writeLineVertically(text, sel_array[i],
+            Plottable.TextUtil.writeLineVertically(text, sel_array[i],
             sel_array[i].attr("width"), sel_array[i].attr("height"));
         }
-        
-        
+
+
         //----------------------------------main-----------------------------------
         window.onload = function () {
-        
+
             for (i = 0; i < 24; i++) {
                 sel_array[i] = d3.select("#" + svg_array[i]);
                 var j = i % 6;
-        
+
                 if (j < 2) {
                     sel_array[i].attr("width", long_side).attr("height", short_side);
                 } else if (j < 4) {
@@ -71,7 +71,7 @@
                     sel_array[i].attr("width", short_side).attr("height", long_side);
                 }
             }
-        
+
             for (i = 0; i < 24; i++) {
                 if (i < 6) {
                     if (i % 2 == 0) write_horizontal(i, "right", "top");
@@ -87,7 +87,7 @@
                     else write_vertical_(i);
                 }
             }
-        
+
         }
     </script>
   </head>

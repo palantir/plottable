@@ -1,14 +1,16 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export module Singleton {
   export class RenderController {
-    private static componentsNeedingRender: {[key: string]: Component} = {};
-    private static componentsNeedingComputeLayout: {[key: string]: Component} = {};
+    private static IE_TIMEOUT = 1000 / 60; // 60 fps
+    private static componentsNeedingRender: {[key: string]: Abstract.Component} = {};
+    private static componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
     private static animationRequested = false;
-    public static enabled = (<any> window).PlottableTestCode == null && (window.requestAnimationFrame) != null;
+    public static enabled = (<any> window).PlottableTestCode == null;
 
-    public static registerToRender(c: Component) {
-      if (!Plottable.RenderController.enabled) {
+    public static registerToRender(c: Abstract.Component) {
+      if (!RenderController.enabled) {
         c._doRender();
         return;
       }
@@ -16,8 +18,8 @@ module Plottable {
       RenderController.requestFrame();
     }
 
-    public static registerToComputeLayout(c: Component) {
-      if (!Plottable.RenderController.enabled) {
+    public static registerToComputeLayout(c: Abstract.Component) {
+      if (!RenderController.enabled) {
         c._computeLayout()._render();
         return;
       }
@@ -28,7 +30,11 @@ module Plottable {
 
     private static requestFrame() {
       if (!RenderController.animationRequested) {
-        requestAnimationFrame(RenderController.flush);
+        if (window.requestAnimationFrame != null) {
+          requestAnimationFrame(RenderController.flush);
+        } else {
+          setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
+        }
         RenderController.animationRequested = true;
       }
     }
@@ -49,4 +55,5 @@ module Plottable {
       }
     }
   }
+}
 }
