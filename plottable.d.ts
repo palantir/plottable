@@ -38,7 +38,11 @@ declare module Plottable {
             * @return {any[]}
             */
             function createFilledArray(value: any, count: number): any[];
-            function arrayEqual<T>(a: T[], b: T[]): boolean;
+            /**
+            * @param {T[][]} a The 2D array that will have its elements joined together.
+            * @return {T[]} Every array in a, concatenated together in the order they appear.
+            */
+            function flatten<T>(a: T[][]): T[];
         }
     }
 }
@@ -119,7 +123,6 @@ declare module Plottable {
             public set(key: any, value: any): boolean;
             public get(key: any): any;
             public has(key: any): boolean;
-            public keys(): any[];
             public values(): any[];
             public delete(key: any): boolean;
         }
@@ -572,7 +575,6 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
-            public addScale(scale: Scale): void;
             public updateProjectors(): Plot;
             public newExtent(extent: any[], mappedData: any[], attr: string): any[];
             static expandExtent(extent: any[], mappedData: any[]): any[];

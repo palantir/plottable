@@ -106,15 +106,14 @@ var Plottable;
             }
             Methods.createFilledArray = createFilledArray;
 
-            function arrayEqual(a, b) {
-                for (var i = 0; i < a.length; i++) {
-                    if (a[i] !== b[i]) {
-                        return false;
-                    }
-                }
-                return true;
+            /**
+            * @param {T[][]} a The 2D array that will have its elements joined together.
+            * @return {T[]} Every array in a, concatenated together in the order they appear.
+            */
+            function flatten(a) {
+                return Array.prototype.concat.apply([], a);
             }
-            Methods.arrayEqual = arrayEqual;
+            Methods.flatten = flatten;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -236,12 +235,6 @@ var Plottable;
                     }
                 }
                 return false;
-            };
-
-            StrictEqualityAssociativeArray.prototype.keys = function () {
-                return this.keyValuePairs.map(function (x) {
-                    return x[0];
-                });
             };
 
             StrictEqualityAssociativeArray.prototype.values = function () {
@@ -2135,10 +2128,8 @@ var Plottable;
 
             // this is called by renderer whenever there is an update from the dataSource
             Scale.prototype.extentChanged = function (rendererID, extent) {
-                debugger;
+                // will override
                 return this;
-                // this will look up the old extent in its renderer => extent mapping
-                // and decide if it needs to change its domain
             };
             return Scale;
         })(Plottable.Abstract.Broadcaster);
@@ -2203,22 +2194,8 @@ var Plottable;
                     this._deregisterFromBroadcaster(this._dataSource);
                     this._requireRerender = true;
                     this._rerenderUpdateSelection = true;
-                    // I don't need this here because it's called by this._render()
-                    // this.updateProjectors();
-                    // point all scales at the new datasource
-                    // d3.keys(this._projectors).forEach((attrToSet: string) => {
-                    //   console.log(attrToSet);
-                    //   var projector = this._projectors[attrToSet];
-                    //   if (projector.scale != null) {
-                    //     var rendererIDAttr = this._plottableID + attrToSet;
-                    //     projector.scale._removePerspective(rendererIDAttr);
-                    //     projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
-                    //   }
-                    // });
                 }
                 this._dataSource = source;
-
-                // NOTE: rendererID is a number, convert it to a string first or something
                 this._registerToBroadcaster(this._dataSource, function (newDataSource) {
                     _this.updateProjectors();
                     _this._dataChanged = true;
@@ -2239,11 +2216,9 @@ var Plottable;
                     scale = existingScale;
                 }
                 if (existingScale != null) {
-                    // existingScale._removePerspective(rendererIDAttr);
                     this._deregisterFromBroadcaster(existingScale);
                 }
                 if (scale != null) {
-                    // scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
                     this._registerToBroadcaster(scale, function () {
                         return _this._render();
                     });
@@ -2264,10 +2239,6 @@ var Plottable;
                     var scale = projector.scale;
                     var fn = scale == null ? accessor : function (d, i) {
                         var x = scale.scale(accessor(d, i));
-
-                        // console.log(a);
-                        // console.log(accessor(d, i));
-                        // console.log(x);
                         return x;
                     };
                     h[a] = fn;
@@ -2276,8 +2247,6 @@ var Plottable;
             };
 
             Plot.prototype._doRender = function () {
-                // well this is rather strange. Doesn't draw anything. Ask a mentor how the
-                // drawing code works.
                 if (this.element != null) {
                     this._paint();
                     this._dataChanged = false;
@@ -2307,19 +2276,6 @@ var Plottable;
                 return this;
             };
 
-            Plot.prototype.addScale = function (scale) {
-                this.scales.push(scale);
-                scale.registerListener(this, function () {
-                    // get new extent from scale
-                    console.log("it's happening");
-                });
-            };
-
-            Plot.prototype._extentFromDataSource = function (ds) {
-                // will override
-                return [];
-            };
-
             Plot.prototype.updateProjectors = function () {
                 var _this = this;
                 var scales = d3.values(this._projectors).map(function (p) {
@@ -2339,36 +2295,14 @@ var Plottable;
                     });
                     scale.extentChanged(_this._plottableID, extent);
                 });
-
-                // will override
                 return this;
             };
 
             Plot.prototype.newExtent = function (extent, mappedData, attr) {
+                // will override
                 return [];
             };
 
-            //  d3.keys(this._projectors).forEach((attrToSet: string) => {
-            //    var projector = this._projectors[attrToSet];
-            //    if (projector.scale != null) {
-            //      var appliedAccessor: (d: any, i: number) => any = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
-            //      var mappedData = this._dataSource.data().map(appliedAccessor);
-            //      // console.log(attrToSet);
-            //      // console.log(mappedData);
-            //      var newExtent: any[];
-            //      if (mappedData.length === 0){
-            //        return;
-            //      } else if (typeof(mappedData[0]) === "string") {
-            //        newExtent = Util.Methods.uniq(mappedData);
-            //      } else {
-            //        newExtent = d3.extent(mappedData);
-            //      }
-            //      // var newExtent = this._dataSource._getExtent(projector.accessor);
-            //      // console.log(newExtent);
-            //      projector.scale.extentChanged(this._plottableID, newExtent);
-            //    }
-            // });
-            //  return this;
             Plot.expandExtent = function (extent, mappedData) {
                 if (mappedData.length === 0) {
                     return extent;
@@ -2817,10 +2751,10 @@ var Plottable;
 
             Ordinal.prototype.extentChanged = function (rendererID, extent) {
                 this._rendererID2Extent[rendererID] = extent;
-                extent = extent;
+                var all = Plottable.Util.Methods.flatten(d3.values(this._rendererID2Extent));
 
                 // this.domain will broadcast for us
-                this.domain(Plottable.Util.Methods.uniq(this.domain()));
+                this._setDomain(Plottable.Util.Methods.uniq(all));
                 return this;
             };
             return Ordinal;
@@ -3196,15 +3130,9 @@ var Plottable;
                 }
                 this.tickFormat(formatter);
                 this._registerToBroadcaster(this._axisScale, function () {
-                    // never called?
-                    _this._render();
+                    return _this._render();
                 });
             }
-            Axis.prototype._render = function () {
-                _super.prototype._render.call(this);
-                return this;
-            };
-
             Axis.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.axisElement = this.content.append("g").classed("axis", true);
@@ -4592,7 +4520,6 @@ var Plottable;
                         return Plottable.Abstract.Plot.expandExtent(extent, mappedData);
 
                     default:
-                        console.log(attr);
                         return extent;
                 }
             };
@@ -4847,11 +4774,9 @@ var Plottable;
                     case "y":
                     case "x0":
                     case "y0":
-                        console.log(attr, mappedData);
                         return Plottable.Abstract.Plot.expandExtent(extent, mappedData);
 
                     default:
-                        console.log(attr);
                         return extent;
                 }
             };
@@ -5176,6 +5101,7 @@ var Plottable;
                     var animationStartLine = d3.svg.line().x(xFunction).y(y0Function);
                     this.linePath.attr("d", animationStartLine).attr(attrToProjector);
                 }
+
                 var area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 var areaUpdateSelection = this.areaPath;
                 var lineUpdateSelection = this.linePath;

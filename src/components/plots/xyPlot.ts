@@ -66,7 +66,6 @@ export module Abstract {
         return Plot.expandExtent(extent, mappedData);
 
         default:
-        console.log(attr);
         return extent;
       }
     }

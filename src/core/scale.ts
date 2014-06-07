@@ -6,7 +6,6 @@ export module Abstract {
     dataSource: DataSource;
     accessor: IAccessor;
   }
-
   export class Scale extends Broadcaster {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomain = true;
@@ -150,11 +149,8 @@ export module Abstract {
 
     // this is called by renderer whenever there is an update from the dataSource
     public extentChanged(rendererID: number, extent: any[]) {
-      // TODO: remove debugger
-      debugger;
+      // will override
       return this;
-      // this will look up the old extent in its renderer => extent mapping
-      // and decide if it needs to change its domain
     }
   }
 }

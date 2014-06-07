@@ -38,15 +38,7 @@ export module Axis {
         };
       }
       this.tickFormat(formatter);
-      this._registerToBroadcaster(this._axisScale, () => {
-        // never called?
-        this._render();
-        });
-    }
-
-    public _render() {
-      super._render();
-      return this;
+      this._registerToBroadcaster(this._axisScale, () => this._render());
     }
 
     public _setup() {

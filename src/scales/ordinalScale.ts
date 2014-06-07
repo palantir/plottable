@@ -131,9 +131,7 @@ export module Scale {
 
     public extentChanged(rendererID: number, extent: any[]) {
       this._rendererID2Extent[rendererID] = extent;
-      extent = <string[]>extent;
-      var all = Util.Methods.flatten(d3.values(this._rendererID2Extent));
-      // this.domain will broadcast for us
+      var all: any[] = Util.Methods.flatten(d3.values(this._rendererID2Extent));
       this._setDomain(Util.Methods.uniq(all));
       return this;
     }

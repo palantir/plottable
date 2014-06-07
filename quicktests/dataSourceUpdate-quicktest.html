@@ -20,7 +20,6 @@
       window.onload = function() {
         Plottable.Singleton.RenderController.enabled=false;
         var dataseries = makeRandomData(20, 0.3);
-        // newData();
 
         xScale = new Plottable.Scale.Linear();
         xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
@@ -46,12 +45,7 @@
       }
 
       function newData() {
-      	var data = makeRandomData(20, Math.random());
-        var maxY = d3.max(data.map(function(o) {
-          return o.y;
-        }));
-        // console.log(maxY);
-        // console.log(JSON.stringify(data));
+      	ds.data(makeRandomData(20, Math.random()));
         ds.data(data);
       }
     </script>
