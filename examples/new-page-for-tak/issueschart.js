@@ -6,13 +6,13 @@ function makeIssuesChart(svg, data) {
                         .project("x", "parsedDate", xScale)
                         .project("y", "nClosed", yScale)
                         .project("y0", 0, yScale)
-                        .project("fill", function() {return "green"});
+                        .classed("closed", true);
 
   var openArea = new Plottable.Plot.Area(data, xScale, yScale)
                         .project("x", "parsedDate", xScale)
                         .project("y", "nTotal", yScale)
                         .project("y0", "nClosed", yScale)
-                        .project("fill", function() {return "red"});
+                        .classed("open", true);
 
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
   var group = closedLine.merge(openArea).merge(gridlines);
