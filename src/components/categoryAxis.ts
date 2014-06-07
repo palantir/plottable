@@ -6,6 +6,16 @@ export module Axis {
     public _scale: Scale.Ordinal;
     public _tickLabelsG: D3.Selection;
 
+    /**
+     * Creates a CategoryAxis.
+     *
+     * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+     * display the scale as efficiently as possible.
+     *
+     * @constructor
+     * @param {OrdinalScale} scale The scale to base the Axis on.
+     * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     */
     constructor(scale: Scale.Ordinal, orientation = "bottom") {
       super(scale, orientation);
       this.classed("category-axis", true);
@@ -61,21 +71,15 @@ export module Axis {
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
       ticks.each(function (d: string, i: number) {
         var d3this = d3.select(this);
-        var startAndWidth = self._scale.fullBandStartAndWidth(d);
-        var bandWidth = startAndWidth[1];
-        var bandStartPosition = startAndWidth[0];
+        var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-        d3this.selectAll("g").remove(); //HACKHACK
-        var g = d3this.append("g").classed("tick-label", true);
-        var x = self._isHorizontal() ? bandStartPosition : 0;
-        var y = self._isHorizontal() ? 0 : bandStartPosition;
-        g.attr("transform", "translate(" + x + "," + y + ")");
-        var xAlign: {[s: string]: string} = {left: "right", right: "left", top: "center", bottom: "center"};
+        var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
         var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
 
-        var textWriteResult = Util.Text.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
+        var textWriteResult = Util.Text.writeText(d, d3this, width, height,
+                                                  xAlign[self._orientation], yAlign[self._orientation], true);
         textWriteResults.push(textWriteResult);
       });
 
@@ -86,14 +90,23 @@ export module Axis {
         usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),
         usedHeight: heightFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedHeight)
       };
-
     }
 
     public _doRender() {
       super._doRender();
+      this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
       var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+
+      var getTickLabelTransform = (d: string, i: number) => {
+        var startAndWidth = this._scale.fullBandStartAndWidth(d);
+        var bandStartPosition = startAndWidth[0];
+        var x = this._isHorizontal() ? bandStartPosition : 0;
+        var y = this._isHorizontal() ? 0 : bandStartPosition;
+        return "translate(" + x + "," + y + ")";
+      };
       tickLabels.enter().append("g").classed("tick-label", true);
       tickLabels.exit().remove();
+      tickLabels.attr("transform", getTickLabelTransform);
       this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 

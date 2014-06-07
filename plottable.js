@@ -1,5 +1,5 @@
 /*!
-Plottable 0.15.0 (https://github.com/palantir/plottable)
+Plottable 0.15.2 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -477,8 +477,8 @@ var Plottable;
             * Will align the text vertically if it seems like that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text, g, width, height, xAlign, yAlign) {
-                var orientHorizontally = width * 1.1 > height;
+            function writeText(text, g, width, height, xAlign, yAlign, horizontally) {
+                var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
                 var innerG = g.append("g").classed("writeText-inner-g", true);
 
                 // the outerG contains general transforms for positining the whole block, the inner g
@@ -2422,7 +2422,11 @@ var Plottable;
 
             RenderController.requestFrame = function () {
                 if (!RenderController.animationRequested) {
-                    requestAnimationFrame(RenderController.flush);
+                    if (window.requestAnimationFrame != null) {
+                        requestAnimationFrame(RenderController.flush);
+                    } else {
+                        setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
+                    }
                     RenderController.animationRequested = true;
                 }
             };
@@ -2449,10 +2453,11 @@ var Plottable;
                     RenderController.animationRequested = false;
                 }
             };
+            RenderController.IE_TIMEOUT = 1000 / 60;
             RenderController.componentsNeedingRender = {};
             RenderController.componentsNeedingComputeLayout = {};
             RenderController.animationRequested = false;
-            RenderController.enabled = window.PlottableTestCode == null && (window.requestAnimationFrame) != null;
+            RenderController.enabled = window.PlottableTestCode == null;
             return RenderController;
         })();
         Singleton.RenderController = RenderController;
@@ -3930,6 +3935,16 @@ var Plottable;
     (function (Axis) {
         var Category = (function (_super) {
             __extends(Category, _super);
+            /**
+            * Creates a CategoryAxis.
+            *
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * display the scale as efficiently as possible.
+            *
+            * @constructor
+            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            */
             function Category(scale, orientation) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 var _this = this;
@@ -3988,21 +4003,14 @@ var Plottable;
                 var textWriteResults = [];
                 ticks.each(function (d, i) {
                     var d3this = d3.select(this);
-                    var startAndWidth = self._scale.fullBandStartAndWidth(d);
-                    var bandWidth = startAndWidth[1];
-                    var bandStartPosition = startAndWidth[0];
+                    var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self.tickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-                    d3this.selectAll("g").remove(); //HACKHACK
-                    var g = d3this.append("g").classed("tick-label", true);
-                    var x = self._isHorizontal() ? bandStartPosition : 0;
-                    var y = self._isHorizontal() ? 0 : bandStartPosition;
-                    g.attr("transform", "translate(" + x + "," + y + ")");
                     var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                     var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
 
-                    var textWriteResult = Plottable.Util.Text.writeText(d, g, width, height, xAlign[self._orientation], yAlign[self._orientation]);
+                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
                     textWriteResults.push(textWriteResult);
                 });
 
@@ -4022,10 +4030,21 @@ var Plottable;
             };
 
             Category.prototype._doRender = function () {
+                var _this = this;
                 _super.prototype._doRender.call(this);
+                this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
                 var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+
+                var getTickLabelTransform = function (d, i) {
+                    var startAndWidth = _this._scale.fullBandStartAndWidth(d);
+                    var bandStartPosition = startAndWidth[0];
+                    var x = _this._isHorizontal() ? bandStartPosition : 0;
+                    var y = _this._isHorizontal() ? 0 : bandStartPosition;
+                    return "translate(" + x + "," + y + ")";
+                };
                 tickLabels.enter().append("g").classed("tick-label", true);
                 tickLabels.exit().remove();
+                tickLabels.attr("transform", getTickLabelTransform);
                 this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
@@ -5671,8 +5690,8 @@ var Plottable;
             DragBox.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
-                var background = this.componentToListenTo.backgroundContainer;
-                this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+                var foreground = this.componentToListenTo.foregroundContainer;
+                this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 return this;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";

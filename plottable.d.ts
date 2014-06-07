@@ -184,7 +184,7 @@ declare module Plottable {
             * Will align the text vertically if it seems like that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string): IWriteTextResult;
+            function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string, horizontally?: boolean): IWriteTextResult;
         }
     }
 }
@@ -911,7 +911,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Axis extends Abstract.Component {
-            };
             static _DEFAULT_TICK_SIZE: number;
             /**
             * Creates an Axis.
@@ -1048,6 +1047,16 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends Abstract.Axis {
+            /**
+            * Creates a CategoryAxis.
+            *
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * display the scale as efficiently as possible.
+            *
+            * @constructor
+            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            */
             constructor(scale: Scale.Ordinal, orientation?: string);
         }
     }
