@@ -99,7 +99,7 @@ button.onclick = function () {
   var quicktests = [];
   var quicktestsToLoad = [];
   $("tr").each(function (index) {
-    if (index > 0){  $(this).remove();}
+    if (index > 0){  $(this).detach();}
   } ); 
   var fb = $('#featureBranch').val();
   loadQuickTestsAndPlottables(fb, makeMainFunctionForGivenBranch(fb));
