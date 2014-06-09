@@ -1,6 +1,6 @@
 var list_of_quicktests = [
   "animate_area",
-  "animate_horizontalBar".
+  "animate_horizontalBar",
   "animate_line",
   "animate_scatter",
   "animate_verticalBar",
