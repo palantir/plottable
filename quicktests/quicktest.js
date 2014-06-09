@@ -42,6 +42,7 @@ function loadQuicktests(qts, callback) {
     });
   }
   else{
+    console.log(filterword);
     qts.forEach(function(q) {
       if ( q.categories.indexOf( filterword ) > -1 ){ loadScript("quicktests/" + q.name + ".js", inner); }
     });    
