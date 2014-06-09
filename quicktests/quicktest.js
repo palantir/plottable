@@ -36,7 +36,7 @@ function loadQuicktests(qts, callback) {
   }
 
   qts.forEach(function(q) {
-    loadScript("quicktests/" + q + ".js", inner);
+    loadScript("quicktests/" + q.name + ".js", inner);
   });
 }
 
