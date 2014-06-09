@@ -1,7 +1,7 @@
 var quicktest = function(svg, data, Plottable){
 
-        var dataseries = data[0].slice(0, 21);
-        var dataseries_top = data[1].slice(0, 21);
+        var dataseries = data[0].slice(0, 20);
+        var dataseries_top = data[1].slice(0, 20);
         for (var i = 0; i < 20; ++i) {
           dataseries_top[i].x = dataseries[i].x;
           dataseries_top[i].y += dataseries[i].y;
