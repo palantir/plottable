@@ -55,5 +55,6 @@
 /// <reference path="interactions/drag/dragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
+/// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 
 /// <reference path="templates/standardChart.ts" />
