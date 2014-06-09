@@ -149,7 +149,7 @@ describe("Legends", () => {
 
     beforeEach(() => {
       toggleLegend = new Plottable.Component.Legend(color);
-      toggleLegend.callbackClick(function(d, b) {/* no-op */});
+      toggleLegend.toggleCallback(function(d, b) {/* no-op */});
     });
 
     function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
@@ -236,7 +236,7 @@ describe("Legends", () => {
       color.domain(domain);
       var state = [true, true, true, true, true];
 
-      toggleLegend.callbackClick((d, b) => {
+      toggleLegend.toggleCallback((d, b) => {
         state[domain.indexOf(d)] = b;
       });
       toggleLegend.renderTo(svg);
@@ -265,7 +265,7 @@ describe("Legends", () => {
       var state = true;
       toggleLegend.renderTo(svg);
 
-      toggleLegend.callbackClick((d, b) => {
+      toggleLegend.toggleCallback((d, b) => {
         state = b;
       });
 
@@ -273,7 +273,7 @@ describe("Legends", () => {
       assert.equal(state, false, "callback was successful");
 
       var count = 0;
-      toggleLegend.callbackClick((d, b) => {
+      toggleLegend.toggleCallback((d, b) => {
         count++;
       });
 
@@ -289,19 +289,190 @@ describe("Legends", () => {
       var state = true;
       toggleLegend.renderTo(svg);
 
-      toggleLegend.callbackClick((d, b) => {
+      toggleLegend.toggleCallback((d, b) => {
         state = b;
       });
 
       toggleEntry("a", 0);
       assert.equal(state, false, "callback was successful");
 
-      toggleLegend.callbackClick(); // this should not remove the callback
+      toggleLegend.toggleCallback(); // this should not remove the callback
       toggleEntry("a", 0);
       assert.equal(state, true, "callback was successful");
 
-      toggleLegend.callbackClick(null); // this should remove the callback
+      toggleLegend.toggleCallback(null); // this should remove the callback
       assert.throws(function() {toggleEntry("a", 0);}, "not a function");
+      var selection = getSelection("a");
+      // should have no classes
+      assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
+      assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
+
+      svg.remove();
+    });
+  });
+
+  describe("Legend hover tests", () => {
+    var hoverLegend: Plottable.Component.Legend;
+
+    beforeEach(() => {
+      hoverLegend = new Plottable.Component.Legend(color);
+      hoverLegend.hoverCallback(function(d) {/* no-op */});
+    });
+
+    function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
+      assert.equal(selection.classed("toggled-on"), b, msg);
+      assert.equal(selection.classed("toggled-off"), !b, msg);
+    }
+
+    function getSelection(datum: any) {
+      var selection = hoverLegend.content.selectAll(".legend-row")
+        .filter((d, i) => d === datum);
+      return selection;
+    }
+
+    function verifyEntry(datum: any, b: boolean, msg?: string) {
+      verifyState(getSelection(datum), b, msg);
+    }
+
+    function toggleEntry(datum: any, index: number) {
+      getSelection(datum).on("click")(datum, index);
+    }
+
+    it("basic initialization test", () => {
+      color.domain(["a", "b", "c", "d", "e"]);
+      hoverLegend.renderTo(svg);
+      hoverLegend.content.selectAll(".legend-row").each(function(d, i) {
+        var selection = d3.select(this);
+        verifyState(selection, true);
+      });
+      svg.remove();
+    });
+
+    it("basic toggling test", () => {
+      color.domain(["a"]);
+      hoverLegend.renderTo(svg);
+      hoverLegend.content.selectAll(".legend-row").each(function(d, i) {
+        var selection = d3.select(this);
+        selection.on("click")(d, i);
+        verifyState(selection, false);
+        selection.on("click")(d, i);
+        verifyState(selection, true);
+      });
+      svg.remove();
+    });
+
+    it("hoverLegend.scale() works as intended", () => {
+      var domain = ["a", "b", "c", "d", "e"];
+      color.domain(domain);
+      hoverLegend.renderTo(svg);
+      toggleEntry("a", 0);
+      toggleEntry("d", 3);
+      toggleEntry("c", 2);
+
+      var newDomain = ["r", "a", "d", "g"];
+      var newColorScale = new Plottable.Scale.Color("Category10");
+      newColorScale.domain(newDomain);
+      hoverLegend.scale(newColorScale);
+
+      verifyEntry("r", true);
+      verifyEntry("a", false);
+      verifyEntry("g", true);
+      verifyEntry("d", false);
+
+      svg.remove();
+    });
+
+    it("listeners on scale will correctly update states", () =>  {
+      color.domain(["a", "b", "c", "d", "e"]);
+      hoverLegend.renderTo(svg);
+      toggleEntry("a", 0);
+      toggleEntry("d", 3);
+      toggleEntry("c", 2);
+
+      color.domain(["e", "d", "b", "a", "c"]);
+      verifyEntry("a", false);
+      verifyEntry("b", true);
+      verifyEntry("c", false);
+      verifyEntry("d", false);
+      verifyEntry("e", true);
+      svg.remove();
+    });
+
+    it("Testing callback works correctly", () =>  {
+      var domain = ["a", "b", "c", "d", "e"];
+      color.domain(domain);
+      var state = [true, true, true, true, true];
+
+      hoverLegend.toggleCallback((d, b) => {
+        state[domain.indexOf(d)] = b;
+      });
+      hoverLegend.renderTo(svg);
+
+      toggleEntry("a", 0);
+      verifyEntry("a", false);
+      assert.equal(state[0], false, "callback was successful");
+
+      toggleEntry("d", 3);
+      verifyEntry("d", false);
+      assert.equal(state[3], false, "callback was successful");
+
+      toggleEntry("a", 0);
+      verifyEntry("a", true);
+      assert.equal(state[0], true, "callback was successful");
+
+      toggleEntry("c", 2);
+      verifyEntry("c", false);
+      assert.equal(state[2], false, "callback was successful");
+      svg.remove();
+    });
+
+    it("Overwriting callback is successfull", () => {
+      var domain = ["a"];
+      color.domain(domain);
+      var state = true;
+      hoverLegend.renderTo(svg);
+
+      hoverLegend.toggleCallback((d, b) => {
+        state = b;
+      });
+
+      toggleEntry("a", 0);
+      assert.equal(state, false, "callback was successful");
+
+      var count = 0;
+      hoverLegend.toggleCallback((d, b) => {
+        count++;
+      });
+
+      toggleEntry("a", 0);
+      assert.equal(state, false, "callback was overwritten");
+      assert.equal(count, 1, "new callback was successfully called");
+      svg.remove();
+    });
+
+    it("Removing callback is successful", () =>  {
+      var domain = ["a"];
+      color.domain(domain);
+      var state = true;
+      hoverLegend.renderTo(svg);
+
+      hoverLegend.toggleCallback((d, b) => {
+        state = b;
+      });
+
+      toggleEntry("a", 0);
+      assert.equal(state, false, "callback was successful");
+
+      hoverLegend.toggleCallback(); // this should not remove the callback
+      toggleEntry("a", 0);
+      assert.equal(state, true, "callback was successful");
+
+      hoverLegend.toggleCallback(null); // this should remove the callback
+      assert.throws(function() {toggleEntry("a", 0);}, "not a function");
+      var selection = getSelection("a");
+      // should have no classes
+      assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
+      assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
 
       svg.remove();
     });

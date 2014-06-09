@@ -1,9 +1,3 @@
-/*!
-Plottable 0.15.2 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -4080,27 +4074,27 @@ var Plottable;
                 this.xAlign("RIGHT").yAlign("TOP");
                 this.xOffset(5).yOffset(5);
             }
-            Legend.prototype.callbackClick = function (callback) {
+            Legend.prototype.toggleCallback = function (callback) {
                 if (callback !== undefined) {
-                    this._callbackClick = callback;
+                    this._toggleCallback = callback;
                     this.isOff = d3.set();
                     this.updateListeners();
                     this.updateClasses();
                     return this;
                 } else {
-                    return this._callbackClick;
+                    return this._toggleCallback;
                 }
             };
 
-            Legend.prototype.callbackHover = function (callback) {
+            Legend.prototype.hoverCallback = function (callback) {
                 if (callback !== undefined) {
-                    this._callbackHover = callback;
-                    this.focus = undefined;
+                    this._hoverCallback = callback;
+                    this.datumCurrentlyFocusedOn = undefined;
                     this.updateListeners();
                     this.updateClasses();
                     return this;
                 } else {
-                    return this._callbackHover;
+                    return this._hoverCallback;
                 }
             };
 
@@ -4112,21 +4106,21 @@ var Plottable;
                     }
                     this.colorScale = scale;
                     this._registerToBroadcaster(this.colorScale, function () {
-                        return _this.domainUpdate();
+                        return _this.updateDomain();
                     });
-                    this.domainUpdate();
+                    this.updateDomain();
                     return this;
                 } else {
                     return this.colorScale;
                 }
             };
 
-            Legend.prototype.domainUpdate = function () {
-                if (this._callbackClick != null) {
+            Legend.prototype.updateDomain = function () {
+                if (this._toggleCallback != null) {
                     this.isOff = Plottable.Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
                 }
-                if (this._callbackHover != null) {
-                    this.focus = undefined;
+                if (this._hoverCallback != null) {
+                    this.datumCurrentlyFocusedOn = undefined;
                 }
                 this._invalidateLayout();
             };
@@ -4144,7 +4138,7 @@ var Plottable;
                 var totalNumRows = this.colorScale.domain().length;
                 var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
-                var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
+                var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var fakeText = fakeLegendEl.append("text");
                 var maxWidth = d3.max(this.colorScale.domain(), function (d) {
                     return Plottable.Util.Text.getTextWidth(fakeText, d);
@@ -4162,7 +4156,7 @@ var Plottable;
 
             Legend.prototype.measureTextHeight = function () {
                 // note: can't be called before anchoring atm
-                var fakeLegendEl = this.content.append("g").classed(Legend._SUBELEMENT_CLASS, true);
+                var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var textHeight = Plottable.Util.Text.getTextHeight(fakeLegendEl.append("text"));
                 fakeLegendEl.remove();
                 return textHeight;
@@ -4174,10 +4168,10 @@ var Plottable;
                 var textHeight = this.measureTextHeight();
                 var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
                 var r = textHeight - Legend.MARGIN * 2 - 2;
-                var legend = this.content.selectAll("." + Legend._SUBELEMENT_CLASS).data(domain, function (d) {
+                var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) {
                     return d;
                 });
-                var legendEnter = legend.enter().append("g").classed(Legend._SUBELEMENT_CLASS, true);
+                var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
                 legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
                 legend.exit().remove();
@@ -4195,80 +4189,78 @@ var Plottable;
 
             Legend.prototype.updateListeners = function () {
                 var _this = this;
-                if (this._isSetup) {
-                    var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-                    if (this._callbackHover != null) {
-                        // on mouseover, tag everything with the "hover" class
-                        var hoverAll = function (mouseover) {
-                            return function (datum) {
-                                _this.updateClasses(mouseover);
-                            };
+                if (!this._isSetup) {
+                    return;
+                }
+                var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
+                if (this._hoverCallback != null) {
+                    // tag the element that is being hovered over with the class "focus"
+                    // this callback will trigger with the specific element being hovered over.
+                    var hoverRow = function (mouseover) {
+                        return function (datum) {
+                            _this.datumCurrentlyFocusedOn = mouseover ? datum : undefined;
+                            _this._hoverCallback(_this.datumCurrentlyFocusedOn);
+                            _this.updateClasses(mouseover);
                         };
-                        this.content.on("mouseover", hoverAll(true));
-                        this.content.on("mouseout", hoverAll(false));
+                    };
+                    dataSelection.on("mouseover", hoverRow(true));
+                    dataSelection.on("mouseout", hoverRow(false));
+                } else {
+                    // remove all mouseover/mouseout listeners
+                    dataSelection.on("mouseover", null);
+                    dataSelection.on("mouseout", null);
+                }
 
-                        // tag the element that is being hovered over with the class "focus"
-                        var hoverSelected = function (mouseover) {
-                            return function (datum) {
-                                _this.focus = mouseover ? datum : undefined;
-                                _this._callbackHover(_this.focus);
-                                _this.updateClasses();
-                            };
-                        };
-                        dataSelection.on("mouseover", hoverSelected(true));
-                        dataSelection.on("mouseout", hoverSelected(false));
-                    } else {
-                        // remove all mouseover/mouseout listeners
-                        this.content.on("mouseover", null);
-                        this.content.on("mouseout", null);
-                        dataSelection.on("mouseover", null);
-                        dataSelection.on("mouseout", null);
-                    }
-
-                    if (this._callbackClick != null) {
-                        dataSelection.on("click", function (datum) {
-                            var turningOn = _this.isOff.has(datum);
-                            if (turningOn) {
-                                _this.isOff.remove(datum);
-                            } else {
-                                _this.isOff.add(datum);
-                            }
-                            _this._callbackClick(datum, turningOn);
-                            _this.updateClasses();
-                        });
-                    } else {
-                        // remove all click listeners
-                        dataSelection.on("click", null);
-                    }
+                if (this._toggleCallback != null) {
+                    dataSelection.on("click", function (datum) {
+                        var turningOn = _this.isOff.has(datum);
+                        if (turningOn) {
+                            _this.isOff.remove(datum);
+                        } else {
+                            _this.isOff.add(datum);
+                        }
+                        _this._toggleCallback(datum, turningOn);
+                        _this.updateClasses();
+                    });
+                } else {
+                    // remove all click listeners
+                    dataSelection.on("click", null);
                 }
             };
 
             Legend.prototype.updateClasses = function (updateHover) {
                 var _this = this;
-                if (this._isSetup) {
-                    var dataSelection = this.content.selectAll("." + Plottable.Component.Legend._SUBELEMENT_CLASS);
-                    if (this._callbackHover != null) {
-                        dataSelection.classed("focus", function (d) {
-                            return _this.focus === d;
-                        });
-                        dataSelection.classed("not-focus", function (d) {
-                            return _this.focus !== d;
-                        });
-                        if (updateHover != null) {
-                            dataSelection.classed("hover", updateHover);
-                        }
+                if (!this._isSetup) {
+                    return;
+                }
+                var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
+                if (this._hoverCallback != null) {
+                    dataSelection.classed("focus", function (d) {
+                        return _this.datumCurrentlyFocusedOn === d;
+                    });
+                    dataSelection.classed("not-focus", function (d) {
+                        return _this.datumCurrentlyFocusedOn !== d;
+                    });
+                    if (updateHover != null) {
+                        dataSelection.classed("hover", updateHover);
                     }
-                    if (this._callbackClick != null) {
-                        dataSelection.classed("toggled-on", function (d) {
-                            return !_this.isOff.has(d);
-                        });
-                        dataSelection.classed("toggled-off", function (d) {
-                            return _this.isOff.has(d);
-                        });
-                    }
+                } else {
+                    dataSelection.classed("focus", false);
+                    dataSelection.classed("not-focus", false);
+                }
+                if (this._toggleCallback != null) {
+                    dataSelection.classed("toggled-on", function (d) {
+                        return !_this.isOff.has(d);
+                    });
+                    dataSelection.classed("toggled-off", function (d) {
+                        return _this.isOff.has(d);
+                    });
+                } else {
+                    dataSelection.classed("toggled-on", false);
+                    dataSelection.classed("toggled-off", false);
                 }
             };
-            Legend._SUBELEMENT_CLASS = "legend-row";
+            Legend.SUBELEMENT_CLASS = "legend-row";
             Legend.MARGIN = 5;
             return Legend;
         })(Plottable.Abstract.Component);
