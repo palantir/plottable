@@ -172,7 +172,9 @@ export module Abstract {
       this._rendererID2Extent[rendererID] = extent;
       var extents = d3.values(this._rendererID2Extent);
       var newDomain = extents.reduce((a, b) => [Math.min(a[0], b[0]), Math.max(a[1], b[1])]);
-      this._setDomain(newDomain);
+      if (newDomain.length > 0) {
+        this._setDomain(newDomain);
+      }
       return this;
     }
   }

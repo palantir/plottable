@@ -63,6 +63,7 @@ export module Abstract {
         case "y":
         case "x0":
         case "y0":
+        case "r":
         return Plot.includeExtent(extent, mappedData);
 
         default:

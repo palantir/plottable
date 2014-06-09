@@ -2337,7 +2337,7 @@ var Plottable;
                 if (mappedData.length === 0) {
                     return extent;
                 }
-                if (typeof mappedData[0] === "number") {
+                if (typeof mappedData[0] === "number" || mappedData[0] instanceof Date) {
                     var min = d3.min(mappedData);
                     var max = d3.max(mappedData);
                     if (extent.length === 0) {
@@ -2602,7 +2602,9 @@ var Plottable;
                 var newDomain = extents.reduce(function (a, b) {
                     return [Math.min(a[0], b[0]), Math.max(a[1], b[1])];
                 });
-                this._setDomain(newDomain);
+                if (newDomain.length > 0) {
+                    this._setDomain(newDomain);
+                }
                 return this;
             };
             return QuantitiveScale;
@@ -4541,6 +4543,7 @@ var Plottable;
                     case "y":
                     case "x0":
                     case "y0":
+                    case "r":
                         return Plottable.Abstract.Plot.includeExtent(extent, mappedData);
 
                     default:

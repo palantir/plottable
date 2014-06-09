@@ -206,7 +206,7 @@ export module Abstract {
       if (mappedData.length === 0) {
         return extent;
       }
-      if (typeof mappedData[0] === "number") {
+      if (typeof mappedData[0] === "number" || mappedData[0] instanceof Date) {
         var min = d3.min(mappedData);
         var max = d3.max(mappedData);
         if (extent.length === 0) {
