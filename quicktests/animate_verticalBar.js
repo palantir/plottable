@@ -17,6 +17,5 @@ var quicktest = function(svg, data, Plottable) {
       vBarChart.renderTo(svg);
 }
 
-quicktest.quicktestName = "verticalBar_animate";
-quicktest.categories = ["verticalbar", "animate"];
+quicktest.quicktestName = "animate_verticalBar";
 quicktests.push(quicktest);
