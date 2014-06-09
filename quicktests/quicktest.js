@@ -41,7 +41,7 @@ function loadQuicktests(qts, callback) {
 }
 
 function loadAllQuicktests(callback) {
-  if(list_of_quicktests.length > 0){
+  if(list_of_quicktests. != undefined){
     list_of_quicktests.splice(0, 0);
     console.log( "lengther of list of quicktest is " + list_of_quicktests.length);
   }
