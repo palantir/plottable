@@ -75,12 +75,13 @@ function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
   loadSingleQuicktest(tr.append("td"), quickTest, Plottable2);
 }
 
-function() {
+/*function() {
   var table = d3.select("table");
   quicktests.forEach(function(q) {
     runQuicktest(table, q, Plottables["master"], Plottables["master"]);
   });
 }
+*/
 
 window.onload = function() {loadQuickTestsAndPlottables("master", function() {
               var table = d3.select("table");
