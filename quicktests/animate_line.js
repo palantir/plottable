@@ -17,6 +17,5 @@ var quicktest = function(svg, data, Plottable) {
       lineChart.renderTo(svg);
 }
 
-quicktest.quicktestName = "line-animate";
-quicktest.categories = ["line", "animate"]
+quicktest.quicktestName = "animate_line";
 quicktests.push(quicktest);
