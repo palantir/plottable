@@ -37,6 +37,5 @@ var quicktest = function(svg, data, Plottable) {
                   .renderTo(svg);
 }
 
-quicktest.quicktestName = "areaRenderer";
-quicktest.categories = ["area", "basic"];
+quicktest.quicktestName = "basic_area";
 quicktests.push(quicktest);
