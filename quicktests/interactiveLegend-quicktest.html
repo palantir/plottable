@@ -12,17 +12,17 @@
         var renderers = [];
 
         var colors = new Plottable.Scale.Color("10").range();
-        var maxRenderers = 10;
-        var numRenderers = 5;
+        var maxPlots = 10;
+        var numPlots = 5;
         var names = ["bat", "cat", "hat", "rat", "pat", "mat", "sat", "vat", "at", "splat"];
         var colorScale = new Plottable.Scale.Color();
         colorScale.range(colors);
-        colorScale.domain(names.slice(0, numRenderers));
+        colorScale.domain(names.slice(0, numPlots));
 
         var xScale = new Plottable.Scale.Linear();
         var yScale = new Plottable.Scale.Linear();
 
-        for (var i=0; i<numRenderers; i++) {
+        for (var i=0; i<numPlots; i++) {
             var data = makeRandomData(20);
             var renderer = new Plottable.Plot.Line(data, xScale, yScale);
                 renderers.push(renderer);
@@ -69,11 +69,55 @@
         outerTable.renderTo("#legend-toggle-test");
       }
 
+      function shuffle() {
+        for (var i = 1; i < numPlots; i++) {
+            var j = Math.floor(Math.random() * (i + 1));
+            if (j == i) {
+                continue;
+            }
+            var t = names[i]; names[i] = names[j]; names[j] = t;
+            t = renderers[i]; renderers[i] = renderers[j]; renderers[j] = t;
+            t = colors[i]; colors[i] = colors[j]; colors[j] = t;
+        }
+        renderers.forEach(function(renderer, i) {
+            renderer.project("stroke", function() { return colors[i]; });
+        });
+        colorScale.range(colors);
+        colorScale.domain(names.slice(0, numPlots));
+      }
+
+      function removePlot() {
+        if (numPlots > 0) {
+          renderers[numPlots - 1].remove();
+          ["toggled-on", "toggled-off", "hover", "focus", "not-focus"].forEach(function(d) {
+            renderers[numPlots - 1].classed(d, false);
+          });
+          numPlots--;
+          colorScale.domain(names.slice(0, numPlots));
+        }
+      }
+
+      function addPlot() {
+        if (numPlots < maxPlots) {
+          var data = makeRandomData(20);
+          var renderer = new Plottable.Plot.Line(data, xScale, yScale);
+          var nextColor = colors[numPlots]
+          renderer.project("stroke", function() { return nextColor; });
+          renderers.push(renderer);
+          cg.merge(renderers[numPlots]);
+          numPlots++;
+          colorScale.domain(names.slice(0, numPlots));
+        }
+      }
+
     </script>
   </head>
   <body>
     <svg id="legend-toggle-test" width="480" height="320"></svg>
     <p />
+    <button name="shuffle" onclick="shuffle()">Shuffle</button>
+    <button name="remove" onclick="removePlot()">Remove</button>
+    <button name="add" onclick="addPlot()">Add</button>
   </body>
 
 </html>
