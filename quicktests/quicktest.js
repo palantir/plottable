@@ -36,7 +36,7 @@ function loadQuicktests(qts, callback) {
   }
   
   var filterword = $('#filterWord').val();
-  if(filterword === undefined){
+  if(filterword === undefined || filterword ===""){
     qts.forEach(function(q) {
       loadScript("quicktests/" + q.name + ".js", inner);
     });
