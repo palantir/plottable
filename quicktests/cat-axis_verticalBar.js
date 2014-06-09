@@ -26,7 +26,7 @@ var quicktest = function(svg, data, Plottable) {
 
 
       chart.renderTo(svg);
-
+}
 quicktest.quicktestName = "area_animate";
 
 quicktests.push(quicktest);
