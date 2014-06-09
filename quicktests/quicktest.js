@@ -75,26 +75,19 @@ function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
   loadSingleQuicktest(tr.append("td"), quickTest, Plottable2);
 }
 
-/*function() {
-  var table = d3.select("table");
-  quicktests.forEach(function(q) {
-    runQuicktest(table, q, Plottables["master"], Plottables["master"]);
-  });
+function makeMainFunctionForGivenBranch(branch) {
+  return function () {
+    var table = d3.select("table");
+    quicktests.forEach(function(q) {
+      runQuicktest(table, q, Plottables["master"], Plottables[branch]);
+    });
+  }
 }
-*/
-
-window.onload = function() {loadQuickTestsAndPlottables("master", function() {
-              var table = d3.select("table");
-              quicktests.forEach(function(q) {
-                runQuicktest(table, q, Plottables["master"], Plottables["master"]);
-              });
-            }
-);
 
 
 var button = document.getElementById('button');
 button.onclick = function () {
   var fb = $('#featureBranch').val();
   console.log(fb);
-  loadQuickTestsAndPlottables(fb, main);
-);
+  loadQuickTestsAndPlottables(fb, makeMainFunctionForGivenBranch(fb));
+};
