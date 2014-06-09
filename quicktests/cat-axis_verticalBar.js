@@ -1,12 +1,5 @@
-<html>
-  <head>
-    <title>Bar Renderer Quicktest</title>
-    <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../bower_components/d3/d3.min.js"></script>
-    <script src="../../plottable_multifile.js"></script>
-    <script src="../../examples/exampleUtil.js"></script>
+var quicktest = function(svg, data, Plottable) {
 
-    <script>
       var data = [
           { name: "Spot", age: 8 },
           { name: "Poptart", age: 1 },
@@ -32,23 +25,8 @@
                                        [null,  xAxis]]);
 
 
-      window.onload = function() { chart.renderTo(svg); }
+      chart.renderTo(svg);
 
-      function younger() {
-        var data = ds.data();
-        data.forEach(function(d) { d.age--; });
-        ds.data(data);
-      }
-      function older() {
-        var data = ds.data();
-        data.forEach(function(d) { d.age++; });
-        ds.data(data);
-      }
-    </script>
-  </head>
-  <body>
-    <svg id="meow" width="480" height="320"></svg>
-    <p />
-    <button name="minus-age" onclick="younger()">-1 year</button><button name="plus-age" onclick="older()">+1 year</button>
-  </body>
-</html>
+quicktest.quicktestName = "area_animate";
+
+quicktests.push(quicktest);
