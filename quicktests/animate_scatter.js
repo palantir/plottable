@@ -19,6 +19,7 @@ var quicktest = function(svg, data, Plottable) {
 }
 
 quicktest.quicktestName = "scatter_animate";
+quicktest.categories = ["scatter", "animate"]
 quicktests.push(quicktest);
 
 
