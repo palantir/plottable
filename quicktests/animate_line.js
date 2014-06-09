@@ -8,7 +8,7 @@ var quicktest = function(svg, data, Plottable) {
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-      lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 21), xScale, yScale);
+      lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
       lineRenderer.project("opacity", 0.75);
       lineRenderer.animate(doAnimate);
 
@@ -18,4 +18,5 @@ var quicktest = function(svg, data, Plottable) {
 }
 
 quicktest.quicktestName = "line-animate";
+quicktest.categories = ["line", "animate"]
 quicktests.push(quicktest);
