@@ -1,0 +1,632 @@
+[
+  {
+    "date": "2014/1/23", 
+    "nTotal": 2, 
+    "nOpen": 2, 
+    "nClosed": 0
+  }, 
+  {
+    "date": "2014/1/24", 
+    "nTotal": 3, 
+    "nOpen": 2, 
+    "nClosed": 1
+  }, 
+  {
+    "date": "2014/1/27", 
+    "nTotal": 4, 
+    "nOpen": 3, 
+    "nClosed": 1
+  }, 
+  {
+    "date": "2014/1/28", 
+    "nTotal": 15, 
+    "nOpen": 7, 
+    "nClosed": 8
+  }, 
+  {
+    "date": "2014/1/29", 
+    "nTotal": 16, 
+    "nOpen": 8, 
+    "nClosed": 8
+  }, 
+  {
+    "date": "2014/1/30", 
+    "nTotal": 33, 
+    "nOpen": 18, 
+    "nClosed": 15
+  }, 
+  {
+    "date": "2014/1/31", 
+    "nTotal": 35, 
+    "nOpen": 17, 
+    "nClosed": 18
+  }, 
+  {
+    "date": "2014/2/1", 
+    "nTotal": 44, 
+    "nOpen": 23, 
+    "nClosed": 21
+  }, 
+  {
+    "date": "2014/2/3", 
+    "nTotal": 48, 
+    "nOpen": 25, 
+    "nClosed": 23
+  }, 
+  {
+    "date": "2014/2/4", 
+    "nTotal": 60, 
+    "nOpen": 29, 
+    "nClosed": 31
+  }, 
+  {
+    "date": "2014/2/5", 
+    "nTotal": 69, 
+    "nOpen": 38, 
+    "nClosed": 31
+  }, 
+  {
+    "date": "2014/2/6", 
+    "nTotal": 76, 
+    "nOpen": 41, 
+    "nClosed": 35
+  }, 
+  {
+    "date": "2014/2/7", 
+    "nTotal": 77, 
+    "nOpen": 35, 
+    "nClosed": 42
+  }, 
+  {
+    "date": "2014/2/8", 
+    "nTotal": 78, 
+    "nOpen": 31, 
+    "nClosed": 47
+  }, 
+  {
+    "date": "2014/2/10", 
+    "nTotal": 91, 
+    "nOpen": 38, 
+    "nClosed": 53
+  }, 
+  {
+    "date": "2014/2/11", 
+    "nTotal": 93, 
+    "nOpen": 31, 
+    "nClosed": 62
+  }, 
+  {
+    "date": "2014/2/12", 
+    "nTotal": 95, 
+    "nOpen": 28, 
+    "nClosed": 67
+  }, 
+  {
+    "date": "2014/2/13", 
+    "nTotal": 99, 
+    "nOpen": 29, 
+    "nClosed": 70
+  }, 
+  {
+    "date": "2014/2/14", 
+    "nTotal": 100, 
+    "nOpen": 29, 
+    "nClosed": 71
+  }, 
+  {
+    "date": "2014/2/17", 
+    "nTotal": 104, 
+    "nOpen": 31, 
+    "nClosed": 73
+  }, 
+  {
+    "date": "2014/2/18", 
+    "nTotal": 105, 
+    "nOpen": 32, 
+    "nClosed": 73
+  }, 
+  {
+    "date": "2014/2/19", 
+    "nTotal": 110, 
+    "nOpen": 34, 
+    "nClosed": 76
+  }, 
+  {
+    "date": "2014/2/20", 
+    "nTotal": 111, 
+    "nOpen": 34, 
+    "nClosed": 77
+  }, 
+  {
+    "date": "2014/2/21", 
+    "nTotal": 114, 
+    "nOpen": 28, 
+    "nClosed": 86
+  }, 
+  {
+    "date": "2014/2/22", 
+    "nTotal": 116, 
+    "nOpen": 28, 
+    "nClosed": 88
+  }, 
+  {
+    "date": "2014/2/24", 
+    "nTotal": 118, 
+    "nOpen": 28, 
+    "nClosed": 90
+  }, 
+  {
+    "date": "2014/2/25", 
+    "nTotal": 122, 
+    "nOpen": 29, 
+    "nClosed": 93
+  }, 
+  {
+    "date": "2014/2/26", 
+    "nTotal": 123, 
+    "nOpen": 29, 
+    "nClosed": 94
+  }, 
+  {
+    "date": "2014/2/27", 
+    "nTotal": 130, 
+    "nOpen": 34, 
+    "nClosed": 96
+  }, 
+  {
+    "date": "2014/2/28", 
+    "nTotal": 132, 
+    "nOpen": 34, 
+    "nClosed": 98
+  }, 
+  {
+    "date": "2014/3/1", 
+    "nTotal": 135, 
+    "nOpen": 33, 
+    "nClosed": 102
+  }, 
+  {
+    "date": "2014/3/4", 
+    "nTotal": 139, 
+    "nOpen": 34, 
+    "nClosed": 105
+  }, 
+  {
+    "date": "2014/3/5", 
+    "nTotal": 139, 
+    "nOpen": 29, 
+    "nClosed": 110
+  }, 
+  {
+    "date": "2014/3/6", 
+    "nTotal": 148, 
+    "nOpen": 30, 
+    "nClosed": 118
+  }, 
+  {
+    "date": "2014/3/7", 
+    "nTotal": 153, 
+    "nOpen": 30, 
+    "nClosed": 123
+  }, 
+  {
+    "date": "2014/3/8", 
+    "nTotal": 158, 
+    "nOpen": 30, 
+    "nClosed": 128
+  }, 
+  {
+    "date": "2014/3/10", 
+    "nTotal": 160, 
+    "nOpen": 32, 
+    "nClosed": 128
+  }, 
+  {
+    "date": "2014/3/11", 
+    "nTotal": 163, 
+    "nOpen": 33, 
+    "nClosed": 130
+  }, 
+  {
+    "date": "2014/3/12", 
+    "nTotal": 180, 
+    "nOpen": 43, 
+    "nClosed": 137
+  }, 
+  {
+    "date": "2014/3/13", 
+    "nTotal": 186, 
+    "nOpen": 41, 
+    "nClosed": 145
+  }, 
+  {
+    "date": "2014/3/14", 
+    "nTotal": 192, 
+    "nOpen": 37, 
+    "nClosed": 155
+  }, 
+  {
+    "date": "2014/3/15", 
+    "nTotal": 196, 
+    "nOpen": 39, 
+    "nClosed": 157
+  }, 
+  {
+    "date": "2014/3/17", 
+    "nTotal": 201, 
+    "nOpen": 39, 
+    "nClosed": 162
+  }, 
+  {
+    "date": "2014/3/18", 
+    "nTotal": 215, 
+    "nOpen": 51, 
+    "nClosed": 164
+  }, 
+  {
+    "date": "2014/3/19", 
+    "nTotal": 220, 
+    "nOpen": 51, 
+    "nClosed": 169
+  }, 
+  {
+    "date": "2014/3/20", 
+    "nTotal": 223, 
+    "nOpen": 53, 
+    "nClosed": 170
+  }, 
+  {
+    "date": "2014/3/21", 
+    "nTotal": 225, 
+    "nOpen": 53, 
+    "nClosed": 172
+  }, 
+  {
+    "date": "2014/3/24", 
+    "nTotal": 226, 
+    "nOpen": 54, 
+    "nClosed": 172
+  }, 
+  {
+    "date": "2014/3/25", 
+    "nTotal": 228, 
+    "nOpen": 53, 
+    "nClosed": 175
+  }, 
+  {
+    "date": "2014/3/27", 
+    "nTotal": 235, 
+    "nOpen": 50, 
+    "nClosed": 185
+  }, 
+  {
+    "date": "2014/3/28", 
+    "nTotal": 239, 
+    "nOpen": 51, 
+    "nClosed": 188
+  }, 
+  {
+    "date": "2014/3/31", 
+    "nTotal": 243, 
+    "nOpen": 51, 
+    "nClosed": 192
+  }, 
+  {
+    "date": "2014/4/1", 
+    "nTotal": 248, 
+    "nOpen": 54, 
+    "nClosed": 194
+  }, 
+  {
+    "date": "2014/4/2", 
+    "nTotal": 253, 
+    "nOpen": 57, 
+    "nClosed": 196
+  }, 
+  {
+    "date": "2014/4/3", 
+    "nTotal": 254, 
+    "nOpen": 58, 
+    "nClosed": 196
+  }, 
+  {
+    "date": "2014/4/4", 
+    "nTotal": 256, 
+    "nOpen": 60, 
+    "nClosed": 196
+  }, 
+  {
+    "date": "2014/4/9", 
+    "nTotal": 267, 
+    "nOpen": 66, 
+    "nClosed": 201
+  }, 
+  {
+    "date": "2014/4/10", 
+    "nTotal": 277, 
+    "nOpen": 62, 
+    "nClosed": 215
+  }, 
+  {
+    "date": "2014/4/11", 
+    "nTotal": 281, 
+    "nOpen": 64, 
+    "nClosed": 217
+  }, 
+  {
+    "date": "2014/4/12", 
+    "nTotal": 284, 
+    "nOpen": 66, 
+    "nClosed": 218
+  }, 
+  {
+    "date": "2014/4/14", 
+    "nTotal": 290, 
+    "nOpen": 66, 
+    "nClosed": 224
+  }, 
+  {
+    "date": "2014/4/15", 
+    "nTotal": 299, 
+    "nOpen": 71, 
+    "nClosed": 228
+  }, 
+  {
+    "date": "2014/4/16", 
+    "nTotal": 320, 
+    "nOpen": 62, 
+    "nClosed": 258
+  }, 
+  {
+    "date": "2014/4/17", 
+    "nTotal": 330, 
+    "nOpen": 59, 
+    "nClosed": 271
+  }, 
+  {
+    "date": "2014/4/18", 
+    "nTotal": 335, 
+    "nOpen": 60, 
+    "nClosed": 275
+  }, 
+  {
+    "date": "2014/4/21", 
+    "nTotal": 337, 
+    "nOpen": 60, 
+    "nClosed": 277
+  }, 
+  {
+    "date": "2014/4/22", 
+    "nTotal": 344, 
+    "nOpen": 56, 
+    "nClosed": 288
+  }, 
+  {
+    "date": "2014/4/23", 
+    "nTotal": 349, 
+    "nOpen": 59, 
+    "nClosed": 290
+  }, 
+  {
+    "date": "2014/4/24", 
+    "nTotal": 353, 
+    "nOpen": 59, 
+    "nClosed": 294
+  }, 
+  {
+    "date": "2014/4/25", 
+    "nTotal": 354, 
+    "nOpen": 60, 
+    "nClosed": 294
+  }, 
+  {
+    "date": "2014/4/28", 
+    "nTotal": 359, 
+    "nOpen": 60, 
+    "nClosed": 299
+  }, 
+  {
+    "date": "2014/4/29", 
+    "nTotal": 364, 
+    "nOpen": 58, 
+    "nClosed": 306
+  }, 
+  {
+    "date": "2014/4/30", 
+    "nTotal": 365, 
+    "nOpen": 58, 
+    "nClosed": 307
+  }, 
+  {
+    "date": "2014/5/1", 
+    "nTotal": 367, 
+    "nOpen": 60, 
+    "nClosed": 307
+  }, 
+  {
+    "date": "2014/5/2", 
+    "nTotal": 369, 
+    "nOpen": 59, 
+    "nClosed": 310
+  }, 
+  {
+    "date": "2014/5/5", 
+    "nTotal": 371, 
+    "nOpen": 59, 
+    "nClosed": 312
+  }, 
+  {
+    "date": "2014/5/6", 
+    "nTotal": 372, 
+    "nOpen": 59, 
+    "nClosed": 313
+  }, 
+  {
+    "date": "2014/5/7", 
+    "nTotal": 374, 
+    "nOpen": 60, 
+    "nClosed": 314
+  }, 
+  {
+    "date": "2014/5/8", 
+    "nTotal": 378, 
+    "nOpen": 64, 
+    "nClosed": 314
+  }, 
+  {
+    "date": "2014/5/9", 
+    "nTotal": 386, 
+    "nOpen": 69, 
+    "nClosed": 317
+  }, 
+  {
+    "date": "2014/5/10", 
+    "nTotal": 387, 
+    "nOpen": 70, 
+    "nClosed": 317
+  }, 
+  {
+    "date": "2014/5/11", 
+    "nTotal": 388, 
+    "nOpen": 71, 
+    "nClosed": 317
+  }, 
+  {
+    "date": "2014/5/12", 
+    "nTotal": 394, 
+    "nOpen": 73, 
+    "nClosed": 321
+  }, 
+  {
+    "date": "2014/5/13", 
+    "nTotal": 401, 
+    "nOpen": 80, 
+    "nClosed": 321
+  }, 
+  {
+    "date": "2014/5/14", 
+    "nTotal": 413, 
+    "nOpen": 90, 
+    "nClosed": 323
+  }, 
+  {
+    "date": "2014/5/15", 
+    "nTotal": 422, 
+    "nOpen": 93, 
+    "nClosed": 329
+  }, 
+  {
+    "date": "2014/5/16", 
+    "nTotal": 427, 
+    "nOpen": 95, 
+    "nClosed": 332
+  }, 
+  {
+    "date": "2014/5/17", 
+    "nTotal": 428, 
+    "nOpen": 96, 
+    "nClosed": 332
+  }, 
+  {
+    "date": "2014/5/19", 
+    "nTotal": 434, 
+    "nOpen": 98, 
+    "nClosed": 336
+  }, 
+  {
+    "date": "2014/5/20", 
+    "nTotal": 442, 
+    "nOpen": 91, 
+    "nClosed": 351
+  }, 
+  {
+    "date": "2014/5/21", 
+    "nTotal": 450, 
+    "nOpen": 97, 
+    "nClosed": 353
+  }, 
+  {
+    "date": "2014/5/22", 
+    "nTotal": 457, 
+    "nOpen": 100, 
+    "nClosed": 357
+  }, 
+  {
+    "date": "2014/5/23", 
+    "nTotal": 465, 
+    "nOpen": 59, 
+    "nClosed": 406
+  }, 
+  {
+    "date": "2014/5/24", 
+    "nTotal": 467, 
+    "nOpen": 58, 
+    "nClosed": 409
+  }, 
+  {
+    "date": "2014/5/26", 
+    "nTotal": 467, 
+    "nOpen": 57, 
+    "nClosed": 410
+  }, 
+  {
+    "date": "2014/5/27", 
+    "nTotal": 472, 
+    "nOpen": 52, 
+    "nClosed": 420
+  }, 
+  {
+    "date": "2014/5/28", 
+    "nTotal": 475, 
+    "nOpen": 53, 
+    "nClosed": 422
+  }, 
+  {
+    "date": "2014/5/29", 
+    "nTotal": 480, 
+    "nOpen": 58, 
+    "nClosed": 422
+  }, 
+  {
+    "date": "2014/5/30", 
+    "nTotal": 485, 
+    "nOpen": 58, 
+    "nClosed": 427
+  }, 
+  {
+    "date": "2014/5/31", 
+    "nTotal": 485, 
+    "nOpen": 57, 
+    "nClosed": 428
+  }, 
+  {
+    "date": "2014/6/2", 
+    "nTotal": 494, 
+    "nOpen": 65, 
+    "nClosed": 429
+  }, 
+  {
+    "date": "2014/6/3", 
+    "nTotal": 507, 
+    "nOpen": 60, 
+    "nClosed": 447
+  }, 
+  {
+    "date": "2014/6/4", 
+    "nTotal": 512, 
+    "nOpen": 60, 
+    "nClosed": 452
+  }, 
+  {
+    "date": "2014/6/5", 
+    "nTotal": 516, 
+    "nOpen": 58, 
+    "nClosed": 458
+  }, 
+  {
+    "date": "2014/6/6", 
+    "nTotal": 525, 
+    "nOpen": 57, 
+    "nClosed": 468
+  }
+]
