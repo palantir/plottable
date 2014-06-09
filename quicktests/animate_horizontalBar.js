@@ -8,7 +8,7 @@ var quicktest = function(svg, data, Plottable) {
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-      hBarRenderer = new Plottable.Plot.VerticalBar(data[0].slice(0, 6), xScale, yScale);
+      hBarRenderer = new Plottable.Plot.HorizontalBar(data[0].slice(0, 6), xScale, yScale);
       hBarRenderer.project("opacity", 0.75);
       hBarRenderer.animate(doAnimate);
 
