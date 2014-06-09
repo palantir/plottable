@@ -37,4 +37,9 @@ var quicktest = function(svg, data, Plottable) {
         var pzi = new Plottable.Interaction.PanZoom(renderAreaD1, xScale, yScale);
         pzi.registerWithComponent();
 }
+
+
+quicktest.quicktestName = "scale_interactive";
+
+quicktests.push(quicktest);
  
