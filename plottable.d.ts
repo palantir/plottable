@@ -237,6 +237,52 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Util {
+        interface IFormatter {
+            (d: any): String;
+        }
+        module Formatters {
+            function identity(): IFormatter;
+            /**
+            * Creates a formatter that displays no more than [precision] decimal places.
+            *
+            * @param {number} [precision] The maximum number of decimal places to display.
+            *
+            * @returns {IFormatter} A formatter that shows no more than [precision] decimal places.
+            */
+            function general(precision?: number): IFormatter;
+            /**
+            * Creates a formatter that displays exactly [precision] decimal places.
+            *
+            * @param {number} [precision] The number of decimal places to display.
+            *
+            * @returns {IFormatter} A formatter that displays exactly [precision] decimal places.
+            */
+            function fixed(precision?: number): IFormatter;
+            /**
+            * Creates a formatter for currency values.
+            *
+            * @param {number} [precision] The number of decimal places to show.
+            * @param {string} [symbol] The currency symbol to use.
+            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
+            *
+            * @returns {IFormatter} A formatter for currency values.
+            */
+            function currency(precision?: number, symbol?: string, prefix?: boolean): IFormatter;
+            /**
+            * Creates a formatter for percentage values.
+            *
+            * @param {number} [precision] The number of decimal places to display.
+            *
+            * @returns {IFormatter} A formatter for percentage values.
+            */
+            function percentage(precision?: number): IFormatter;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Abstract {
         class PlottableObject {
         }
@@ -1512,6 +1558,15 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class YDragBox extends DragBox {
+            public setBox(y0: number, y1: number): YDragBox;
         }
     }
 }

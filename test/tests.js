@@ -1432,6 +1432,63 @@ describe("Util.DOM", function () {
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
+describe("Formatters", function () {
+    describe("general", function () {
+        it("shows at most [precision] digits", function () {
+            var general = Plottable.Util.Formatters.general();
+            var result = general(1);
+            assert.strictEqual(result, "1", "shows no decimals if formatting an integer");
+            result = general(1.2345);
+            assert.strictEqual(result, "1.235", "longer numbers are rounded and truncated appropriately");
+        });
+    });
+
+    describe("fixed", function () {
+        it("shows exactly [precision] digits", function () {
+            var fixed3 = Plottable.Util.Formatters.fixed();
+            var result = fixed3(1);
+            var decimals = result.substring(result.indexOf(".") + 1, result.length);
+            assert.strictEqual(decimals.length, 3, "defaults to three decimal places");
+            result = fixed3(1.2345);
+            decimals = result.substring(result.indexOf(".") + 1, result.length);
+            assert.strictEqual(decimals.length, 3, "rounds to three decimal places");
+        });
+    });
+
+    describe("currency", function () {
+        it("uses reasonable defaults", function () {
+            var currencyFormatter = Plottable.Util.Formatters.currency();
+            var result = currencyFormatter(1);
+            assert.strictEqual(result.charAt(0), "$", "defaults to $ for currency symbol");
+            var decimals = result.substring(result.indexOf(".") + 1, result.length);
+            assert.strictEqual(decimals.length, 2, "defaults to 2 decimal places");
+
+            result = currencyFormatter(-1);
+            assert.strictEqual(result.charAt(0), "-", "prefixes negative values with \"-\"");
+            assert.strictEqual(result.charAt(1), "$", "places the currency symbol after the negative sign");
+        });
+
+        it("can change the type and position of the currency symbol", function () {
+            var centsFormatter = Plottable.Util.Formatters.currency(0, "¢", false);
+            var result = centsFormatter(1);
+            assert.strictEqual(result.charAt(result.length - 1), "¢", "The specified currency symbol was appended");
+        });
+    });
+
+    describe("percentage", function () {
+        it("uses reasonable defaults", function () {
+            var percentFormatter = Plottable.Util.Formatters.percentage();
+            var result = percentFormatter(1);
+            assert.strictEqual(result.charAt(result.length - 1), "%", "the percent sign was appended");
+            var decimalPosition = result.indexOf(".");
+            assert.strictEqual(decimalPosition, -1, "Shows no decimal places by default");
+        });
+    });
+});
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
 describe("Gridlines", function () {
     it("Gridlines and axis tick marks align", function () {
         var svg = generateSVG(640, 480);
@@ -1643,6 +1700,82 @@ describe("Interactions", function () {
             var expectedStartPosition = { x: Math.min(dragstartX, dragendX), y: Math.min(dragstartY, dragendY) };
             assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
             assert.equal(parseFloat(dragBox.attr("width")), Math.abs(dragstartX - dragendX), "highlighted box has correct width");
+            assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
+
+            interaction.clearBox();
+            var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
+            assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
+        });
+
+        after(function () {
+            svg.remove();
+        });
+    });
+
+    describe("YDragBoxInteraction", function () {
+        var svgWidth = 400;
+        var svgHeight = 400;
+        var svg;
+        var dataset;
+        var xScale;
+        var yScale;
+        var renderer;
+        var interaction;
+
+        var dragstartX = 20;
+        var dragstartY = svgHeight - 100;
+        var dragendX = 100;
+        var dragendY = svgHeight - 20;
+
+        before(function () {
+            svg = generateSVG(svgWidth, svgHeight);
+            dataset = new Plottable.DataSource(makeLinearSeries(10));
+            xScale = new Plottable.Scale.Linear();
+            yScale = new Plottable.Scale.Linear();
+            renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
+            renderer.renderTo(svg);
+            interaction = new Plottable.Interaction.YDragBox(renderer);
+            interaction.registerWithComponent();
+        });
+
+        afterEach(function () {
+            interaction.callback();
+            interaction.clearBox();
+        });
+
+        it("All callbacks are notified with appropriate data when a drag finishes", function () {
+            var timesCalled = 0;
+            var areaCallback = function (a) {
+                timesCalled++;
+                if (timesCalled === 1) {
+                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
+                }
+                if (timesCalled === 2) {
+                    var expectedPixelArea = {
+                        yMin: dragstartY,
+                        yMax: dragendY
+                    };
+                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
+                }
+            };
+
+            interaction.callback(areaCallback);
+
+            // fake a drag event
+            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+
+            assert.equal(timesCalled, 2, "areaCallback was called twice");
+        });
+
+        it("Highlights and un-highlights areas appropriately", function () {
+            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+            var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
+            var dragBox = renderer.foregroundContainer.select(dragBoxClass);
+            assert.isNotNull(dragBox, "the dragbox was created");
+            var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
+            var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };
+            assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
+            assert.equal(parseFloat(dragBox.attr("width")), svgWidth, "highlighted box has correct width");
             assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
 
             interaction.clearBox();

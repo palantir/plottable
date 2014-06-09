@@ -779,6 +779,99 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    (function (Util) {
+        (function (Formatters) {
+            function identity() {
+                return function (d) {
+                    return String(d);
+                };
+            }
+            Formatters.identity = identity;
+
+            /**
+            * Creates a formatter that displays no more than [precision] decimal places.
+            *
+            * @param {number} [precision] The maximum number of decimal places to display.
+            *
+            * @returns {IFormatter} A formatter that shows no more than [precision] decimal places.
+            */
+            function general(precision) {
+                if (typeof precision === "undefined") { precision = 3; }
+                var formatter = function (d) {
+                    var multiplier = Math.pow(10, precision);
+                    return String(Math.round(d * multiplier) / multiplier);
+                };
+                return formatter;
+            }
+            Formatters.general = general;
+
+            /**
+            * Creates a formatter that displays exactly [precision] decimal places.
+            *
+            * @param {number} [precision] The number of decimal places to display.
+            *
+            * @returns {IFormatter} A formatter that displays exactly [precision] decimal places.
+            */
+            function fixed(precision) {
+                if (typeof precision === "undefined") { precision = 3; }
+                return function (d) {
+                    return d.toFixed(precision);
+                };
+            }
+            Formatters.fixed = fixed;
+
+            /**
+            * Creates a formatter for currency values.
+            *
+            * @param {number} [precision] The number of decimal places to show.
+            * @param {string} [symbol] The currency symbol to use.
+            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
+            *
+            * @returns {IFormatter} A formatter for currency values.
+            */
+            function currency(precision, symbol, prefix) {
+                if (typeof precision === "undefined") { precision = 2; }
+                if (typeof symbol === "undefined") { symbol = "$"; }
+                if (typeof prefix === "undefined") { prefix = true; }
+                return function (d) {
+                    var isNegative = d < 0;
+                    var value = Math.abs(d).toFixed(precision);
+                    var output = (d < 0) ? "-" : "";
+                    if (prefix) {
+                        output += symbol;
+                    }
+                    output += value;
+                    if (!prefix) {
+                        output += symbol;
+                    }
+                    return output;
+                };
+            }
+            Formatters.currency = currency;
+
+            /**
+            * Creates a formatter for percentage values.
+            *
+            * @param {number} [precision] The number of decimal places to display.
+            *
+            * @returns {IFormatter} A formatter for percentage values.
+            */
+            function percentage(precision) {
+                if (typeof precision === "undefined") { precision = 0; }
+                return function (d) {
+                    return d.toFixed(precision) + "%";
+                };
+            }
+            Formatters.percentage = percentage;
+        })(Util.Formatters || (Util.Formatters = {}));
+        var Formatters = Util.Formatters;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     (function (Abstract) {
         var PlottableObject = (function () {
             function PlottableObject() {
@@ -5601,6 +5694,47 @@ var Plottable;
             return XYDragBox;
         })(Plottable.Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Interaction) {
+        var YDragBox = (function (_super) {
+            __extends(YDragBox, _super);
+            function YDragBox() {
+                _super.apply(this, arguments);
+            }
+            YDragBox.prototype._drag = function () {
+                _super.prototype._drag.call(this);
+                this.setBox(this.origin[1], this.location[1]);
+            };
+
+            YDragBox.prototype._doDragend = function () {
+                if (this.callbackToCall == null) {
+                    return;
+                }
+                var yMin = Math.min(this.origin[1], this.location[1]);
+                var yMax = Math.max(this.origin[1], this.location[1]);
+                var pixelArea = { yMin: yMin, yMax: yMax };
+                this.callbackToCall(pixelArea);
+            };
+
+            YDragBox.prototype.setBox = function (y0, y1) {
+                _super.prototype.setBox.call(this, 0, this.componentToListenTo.availableWidth, y0, y1);
+                return this;
+            };
+            return YDragBox;
+        })(Plottable.Interaction.DragBox);
+        Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
