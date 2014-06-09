@@ -1,9 +1,3 @@
-/*!
-Plottable 0.15.2 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -4069,6 +4063,10 @@ var Plottable;
             __extends(Legend, _super);
             /**
             * Creates a Legend.
+            * A legend consists of a series of legend rows, each with a color and label taken from the colorScale.
+            * The rows will be displayed in the order of the colorScale domain.
+            * This legend also allows interactions, through the functions "toggleCallback" and "hoverCallback"
+            * Setting a callback will also put classes on the individual rows.
             *
             * @constructor
             * @param {ColorScale} colorScale

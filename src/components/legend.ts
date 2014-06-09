@@ -27,6 +27,10 @@ export module Component {
 
     /**
      * Creates a Legend.
+     * A legend consists of a series of legend rows, each with a color and label taken from the colorScale.
+     * The rows will be displayed in the order of the colorScale domain.
+     * This legend also allows interactions, through the functions "toggleCallback" and "hoverCallback"
+     * Setting a callback will also put classes on the individual rows.
      *
      * @constructor
      * @param {ColorScale} colorScale
@@ -42,6 +46,7 @@ export module Component {
     /**
      * Assigns or gets the callback to the Legend
      * This callback is associated with toggle events, which trigger when a legend row is clicked.
+     * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
      * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      * 
