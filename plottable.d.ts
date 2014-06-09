@@ -546,10 +546,9 @@ declare module Plottable {
             * @param {number} rendererID A unique indentifier of the renderer sending
             *                 the new extent.
             * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-            * @param {any[]} mappedData Either a string[] or a number[], the list of
-            *                new data points for this (renderer, number) pair.
+            * @param {any[]} extent The new extent to be included in the scale.
             */
-            public extentChanged(rendererID: number, attr: string, mappedData: any[]): Scale;
+            public extentChanged(rendererID: number, attr: string, extent: any[]): Scale;
         }
     }
 }
@@ -591,20 +590,6 @@ declare module Plottable {
             * have an extent that includes all the data that is projected onto them.
             */
             public updateProjectors(): Plot;
-            /**
-            * Returns a new extent that includes mappedData into the existing extent.
-            *
-            * @param {any[]} extent If an array of numbers, this is a [min, max] pair.
-            *                If an array of strings, this is a list of all seen strings.
-            *                extent is empty to begin with.
-            * @param {any[]} mappedData A list of numbers or strings to be included in
-            *                           extent.
-            * @param {string} attr What kind of projection is being included, e.g.
-            *                      "x", "y", "r". "r" for example should probably be
-            *                      ignored, since a value having a radius of 5 doesn't
-            *                      mean that 5 must be in the extent.
-            */
-            public expandExtent(extent: any[], mappedData: any[], attr: string): any[];
         }
     }
 }
@@ -740,7 +725,7 @@ declare module Plottable {
             * @returns {QuantitiveScale} The calling QuantitiveScale.
             */
             public padDomain(padProportion?: number): QuantitiveScale;
-            public extentChanged(rendererID: number, attr: string, mappedData: any[]): QuantitiveScale;
+            public extentChanged(rendererID: number, attr: string, extent: any[]): QuantitiveScale;
         }
     }
 }
@@ -838,7 +823,7 @@ declare module Plottable {
             */
             public rangeType(): string;
             public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
-            public extentChanged(rendererID: number, attr: string, mappedData: any[]): Ordinal;
+            public extentChanged(rendererID: number, attr: string, extent: any[]): Ordinal;
         }
     }
 }

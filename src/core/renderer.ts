@@ -169,27 +169,23 @@ export module Abstract {
         var scale = projector.scale;
         var appliedAccessor = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
         var mappedData = this._dataSource.data().map(appliedAccessor);
-        scale.extentChanged(this._plottableID, attr, mappedData);
+        var extent = this.dataToExtent(mappedData);
+        if (extent.length > 0) {
+          scale.extentChanged(this._plottableID, attr, extent);
+        }
       });
       return this;
     }
 
-    /**
-     * Returns a new extent that includes mappedData into the existing extent.
-     *
-     * @param {any[]} extent If an array of numbers, this is a [min, max] pair.
-     *                If an array of strings, this is a list of all seen strings.
-     *                extent is empty to begin with.
-     * @param {any[]} mappedData A list of numbers or strings to be included in
-     *                           extent.
-     * @param {string} attr What kind of projection is being included, e.g.
-     *                      "x", "y", "r". "r" for example should probably be
-     *                      ignored, since a value having a radius of 5 doesn't
-     *                      mean that 5 must be in the extent.
-     */
-    public expandExtent(extent: any[], mappedData: any[], attr: string): any[] {
-      // will override
-      return [];
+    private dataToExtent(mappedData: any[]): any[] {
+      if (typeof mappedData[0] === "number" || mappedData[0] instanceof Date) {
+        return d3.extent(mappedData);
+      } else if (typeof mappedData[0] === "string") {
+        return Util.Methods.uniq(mappedData);
+      } else {
+        // undefined or something
+        return [];
+      }
     }
   }
 }

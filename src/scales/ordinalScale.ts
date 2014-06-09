@@ -24,12 +24,8 @@ export module Scale {
     }
 
     public _getExtent(): any[] {
-      var extents = this._getAllExtents();
-      var concatenatedExtents: string[] = [];
-      extents.forEach((e) => {
-        concatenatedExtents = concatenatedExtents.concat(e);
-      });
-      return Util.Methods.uniq(concatenatedExtents);
+      var extents: string[][] = d3.values(this._rendererAttrID2Extent);
+      return Util.Methods.uniq(Util.Methods.flatten(extents));
     }
 
     /**
@@ -129,10 +125,9 @@ export module Scale {
       }
     }
 
-    public extentChanged(rendererID: number, attr: string, mappedData: any[]) {
-      this._rendererAttrID2Extent[rendererID + attr] = mappedData;
-      var all: any[] = Util.Methods.flatten(d3.values(this._rendererAttrID2Extent));
-      this._setDomain(Util.Methods.uniq(all));
+    public extentChanged(rendererID: number, attr: string, extent: any[]) {
+      this._rendererAttrID2Extent[rendererID + attr] = extent;
+      this._setDomain(this._getExtent());
       return this;
     }
   }

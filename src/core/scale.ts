@@ -155,11 +155,11 @@ export module Abstract {
      * @param {number} rendererID A unique indentifier of the renderer sending
      *                 the new extent.
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-     * @param {any[]} mappedData Either a string[] or a number[], the list of
-     *                new data points for this (renderer, number) pair.
+     * @param {any[]} extent The new extent to be included in the scale.
      */
-    public extentChanged(rendererID: number, attr: string, mappedData: any[]) {
-      // will override
+    public extentChanged(rendererID: number, attr: string, extent: any[]) {
+      this._rendererAttrID2Extent[rendererID + attr] = extent;
+      this._setDomain(this._getExtent());
       return this;
     }
   }

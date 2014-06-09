@@ -2134,11 +2134,11 @@ var Plottable;
             * @param {number} rendererID A unique indentifier of the renderer sending
             *                 the new extent.
             * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-            * @param {any[]} mappedData Either a string[] or a number[], the list of
-            *                new data points for this (renderer, number) pair.
+            * @param {any[]} extent The new extent to be included in the scale.
             */
-            Scale.prototype.extentChanged = function (rendererID, attr, mappedData) {
-                // will override
+            Scale.prototype.extentChanged = function (rendererID, attr, extent) {
+                this._rendererAttrID2Extent[rendererID + attr] = extent;
+                this._setDomain(this._getExtent());
                 return this;
             };
             return Scale;
@@ -2298,27 +2298,23 @@ var Plottable;
                     var scale = projector.scale;
                     var appliedAccessor = Plottable.Util.Methods.applyAccessor(projector.accessor, _this._dataSource);
                     var mappedData = _this._dataSource.data().map(appliedAccessor);
-                    scale.extentChanged(_this._plottableID, attr, mappedData);
+                    var extent = _this.dataToExtent(mappedData);
+                    if (extent.length > 0) {
+                        scale.extentChanged(_this._plottableID, attr, extent);
+                    }
                 });
                 return this;
             };
 
-            /**
-            * Returns a new extent that includes mappedData into the existing extent.
-            *
-            * @param {any[]} extent If an array of numbers, this is a [min, max] pair.
-            *                If an array of strings, this is a list of all seen strings.
-            *                extent is empty to begin with.
-            * @param {any[]} mappedData A list of numbers or strings to be included in
-            *                           extent.
-            * @param {string} attr What kind of projection is being included, e.g.
-            *                      "x", "y", "r". "r" for example should probably be
-            *                      ignored, since a value having a radius of 5 doesn't
-            *                      mean that 5 must be in the extent.
-            */
-            Plot.prototype.expandExtent = function (extent, mappedData, attr) {
-                // will override
-                return [];
+            Plot.prototype.dataToExtent = function (mappedData) {
+                if (typeof mappedData[0] === "number" || mappedData[0] instanceof Date) {
+                    return d3.extent(mappedData);
+                } else if (typeof mappedData[0] === "string") {
+                    return Plottable.Util.Methods.uniq(mappedData);
+                } else {
+                    // undefined or something
+                    return [];
+                }
             };
             return Plot;
         })(Plottable.Abstract.Component);
@@ -2427,15 +2423,13 @@ var Plottable;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
             }
             QuantitiveScale.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
-                var starts = extents.map(function (e) {
-                    return e[0];
-                });
-                var ends = extents.map(function (e) {
-                    return e[1];
-                });
-                if (starts.length > 0) {
-                    return [d3.min(starts), d3.max(ends)];
+                var extents = d3.values(this._rendererAttrID2Extent);
+                if (extents.length > 0) {
+                    return [d3.min(extents, function (e) {
+                            return e[0];
+                        }), d3.max(extents, function (e) {
+                            return e[1];
+                        })];
                 } else {
                     return [0, 1];
                 }
@@ -2565,13 +2559,11 @@ var Plottable;
                 return this;
             };
 
-            QuantitiveScale.prototype.extentChanged = function (rendererID, attr, mappedData) {
-                this._rendererAttrID2Extent[rendererID + attr] = d3.extent(mappedData);
-                var extents = d3.values(this._rendererAttrID2Extent);
-                var newDomain = extents.reduce(function (a, b) {
-                    return [Math.min(a[0], b[0]), Math.max(a[1], b[1])];
-                });
-                this._setDomain(newDomain);
+            QuantitiveScale.prototype.extentChanged = function (rendererID, attr, extent) {
+                _super.prototype.extentChanged.call(this, rendererID, attr, extent);
+                if (this._autoDomain) {
+                    this.autoDomain();
+                }
                 return this;
             };
             return QuantitiveScale;
@@ -2670,12 +2662,8 @@ var Plottable;
                 }
             }
             Ordinal.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
-                var concatenatedExtents = [];
-                extents.forEach(function (e) {
-                    concatenatedExtents = concatenatedExtents.concat(e);
-                });
-                return Plottable.Util.Methods.uniq(concatenatedExtents);
+                var extents = d3.values(this._rendererAttrID2Extent);
+                return Plottable.Util.Methods.uniq(Plottable.Util.Methods.flatten(extents));
             };
 
             Ordinal.prototype.domain = function (values) {
@@ -2744,10 +2732,9 @@ var Plottable;
                 }
             };
 
-            Ordinal.prototype.extentChanged = function (rendererID, attr, mappedData) {
-                this._rendererAttrID2Extent[rendererID + attr] = mappedData;
-                var all = Plottable.Util.Methods.flatten(d3.values(this._rendererAttrID2Extent));
-                this._setDomain(Plottable.Util.Methods.uniq(all));
+            Ordinal.prototype.extentChanged = function (rendererID, attr, extent) {
+                this._rendererAttrID2Extent[rendererID + attr] = extent;
+                this._setDomain(this._getExtent());
                 return this;
             };
             return Ordinal;

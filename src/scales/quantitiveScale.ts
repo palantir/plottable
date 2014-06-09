@@ -17,12 +17,10 @@ export module Abstract {
       super(scale);
     }
 
-    public _getExtent(): any[] {
-      var extents = this._getAllExtents();
-      var starts: number[] = extents.map((e) => e[0]);
-      var ends: number[] = extents.map((e) => e[1]);
-      if (starts.length > 0) {
-        return [d3.min(starts), d3.max(ends)];
+    public _getExtent(): number[] {
+      var extents = d3.values(this._rendererAttrID2Extent);
+      if (extents.length > 0) {
+        return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
       } else {
         return [0, 1];
       }
@@ -168,11 +166,11 @@ export module Abstract {
       return this;
     }
 
-    public extentChanged(rendererID: number, attr: string, mappedData: any[]) {
-      this._rendererAttrID2Extent[rendererID + attr] = d3.extent(mappedData);
-      var extents = d3.values(this._rendererAttrID2Extent);
-      var newDomain = extents.reduce((a, b) => [Math.min(a[0], b[0]), Math.max(a[1], b[1])]);
-      this._setDomain(newDomain);
+    public extentChanged(rendererID: number, attr: string, extent: any[]) {
+      super.extentChanged(rendererID, attr, extent);
+      if (this._autoDomain) {
+        this.autoDomain();
+      }
       return this;
     }
   }
