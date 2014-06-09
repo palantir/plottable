@@ -8,7 +8,7 @@ export module Abstract {
   }
   export class Scale extends Broadcaster {
     public _d3Scale: D3.Scale.Scale;
-    public _autoDomain = true;
+    public _autoDomainAutomatically = true;
     private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
     private dataSourceReferenceCounter = new Util.IDCounter();
     public _autoNice = false;
@@ -59,12 +59,12 @@ export module Abstract {
       var dataSourceID = dataSource._plottableID;
       if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
         dataSource.registerListener(this, () => {
-          if (this._autoDomain) {
+          if (this._autoDomainAutomatically) {
             this.autoDomain();
           }
         });
       }
-      if (this._autoDomain) {
+      if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
       return this;
@@ -78,7 +78,7 @@ export module Abstract {
       }
 
       delete this.rendererID2Perspective[rendererIDAttr];
-      if (this._autoDomain) {
+      if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
       return this;
@@ -109,7 +109,7 @@ export module Abstract {
       if (values == null) {
         return this._d3Scale.domain();
       } else {
-        this._autoDomain = false;
+        this._autoDomainAutomatically = false;
         this._setDomain(values);
         return this;
       }
