@@ -34,5 +34,4 @@ var quicktest = function(svg, data, Plottable){
 
 }
 quicktest.quicktestName = "dragzoom_x";
-quicktest.categories = ["area", "interaction"];
 quicktests.push(quicktest)
