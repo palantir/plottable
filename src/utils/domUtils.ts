@@ -19,10 +19,10 @@ export module Util {
       return parseFloat(value);
     }
 
-    export function isSelectionRemoved(selection: D3.Selection) {
-      var e = selection.node();
-      var n = e.parentNode;
-      while (n !== null && n.nodeName !== "#document") {
+    //
+    export function isSelectionRemovedFromSVG(selection: D3.Selection) {
+      var n = (<Node> selection.node());
+      while (n !== null && n.nodeName !== "svg") {
         n = n.parentNode;
       }
       return (n == null);
