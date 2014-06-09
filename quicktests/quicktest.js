@@ -47,7 +47,6 @@ function loadQuicktests(qts, callback) {
   quicktestsToLoad.forEach(function(q) {
     loadScript("quicktests/" + q.name + ".js", inner);
   });
-  }
 }
 
 function loadAllQuicktests(callback) {
