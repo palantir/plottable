@@ -1,5 +1,5 @@
 /*!
-Plottable 0.15.3 (https://github.com/palantir/plottable)
+Plottable 0.15.4 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -268,7 +268,7 @@ var Plottable;
                     if (s.trim() === "") {
                         return [0, 0];
                     }
-                    if (Plottable.Util.DOM.isSelectionRemoved(selection)) {
+                    if (Plottable.Util.DOM.isSelectionRemovedFromSVG(selection)) {
                         throw new Error("Cannot measure text in a removed node");
                     }
                     var bb;
@@ -711,15 +711,15 @@ var Plottable;
                 return parseFloat(value);
             }
 
-            function isSelectionRemoved(selection) {
-                var e = selection.node();
-                var n = e.parentNode;
-                while (n !== null && n.nodeName !== "#document") {
+            //
+            function isSelectionRemovedFromSVG(selection) {
+                var n = selection.node();
+                while (n !== null && n.nodeName !== "svg") {
                     n = n.parentNode;
                 }
                 return (n == null);
             }
-            DOM.isSelectionRemoved = isSelectionRemoved;
+            DOM.isSelectionRemovedFromSVG = isSelectionRemovedFromSVG;
 
             function getElementWidth(elem) {
                 var style = window.getComputedStyle(elem);
