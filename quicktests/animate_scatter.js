@@ -18,8 +18,7 @@ var quicktest = function(svg, data, Plottable) {
       circleChart.renderTo(svg);
 }
 
-quicktest.quicktestName = "scatter_animate";
-quicktest.categories = ["scatter", "animate"]
+quicktest.quicktestName = "animate_scatter";
 quicktests.push(quicktest);
 
 
