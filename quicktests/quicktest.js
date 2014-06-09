@@ -27,28 +27,26 @@ function loadPlottable(branchName, callback) {
 }
 
 
-var quicktests = []
+var quicktests = [];
+var quicktestsToLoad = [];
+
 function loadQuicktests(qts, callback) {
   var nLoaded = 0;
 
-  var inner = function() {
-    if (++nLoaded === qts.length) callback();
+  var filterword = $('#filterWord').val();
+  if(filterword === "" || filterword === undefined){ 
+    quicktestsToLoad = qts; 
+  } else {
+    quicktestsToLoad = qts.filter(function(q) {return q.categories.indexOf(filterword) > -1})
   }
   
-  var filterword = $('#filterWord').val();
-  if(filterword === undefined || filterword ===""){
-    qts.forEach(function(q) {
-      loadScript("quicktests/" + q.name + ".js", inner);
-    });
+  var inner = function() {
+    if (++nLoaded === quicktestsToLoad.length) callback();
   }
-  else{
-    console.log(filterword);
-    qts.forEach(function(q) {
-      if ( q.categories.indexOf( filterword ) > -1 ){ 
-        loadScript("quicktests/" + q.name + ".js", inner); 
-        console.log("loaded " + q.name);
-      }
-    });    
+  
+  quicktestsToLoad.forEach(function(q) {
+    loadScript("quicktests/" + q.name + ".js", inner);
+  });
   }
 }
 
