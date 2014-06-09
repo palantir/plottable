@@ -88,5 +88,6 @@ window.onload = function() {loadQuickTestsAndPlottables("master", main)};
 var button = document.getElementById('button');
 button.onclick = function () {
   var fb = $('#featureBranch').val();
+  console.log(fb);
   loadQuickTestsAndPlottables("master", fb);
 }
