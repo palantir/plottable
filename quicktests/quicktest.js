@@ -83,3 +83,8 @@ function main() {
 }
 
 window.onload = function() {loadQuickTestsAndPlottables("master", main)};
+
+function buttonPress(){
+  var fb = $('#featureBranch').val();
+  loadQuickTestsAndPlottables("master", fb)
+}
