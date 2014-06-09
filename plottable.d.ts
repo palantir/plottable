@@ -1518,6 +1518,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Interaction {
+        class YDragBox extends DragBox {
+            public setBox(y0: number, y1: number): YDragBox;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Template {
         class StandardChart extends Component.Table {
             constructor();
