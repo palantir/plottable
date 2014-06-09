@@ -46,7 +46,7 @@ function loadQuicktests(qts, callback) {
     qts.forEach(function(q) {
       if ( q.categories.indexOf( filterword ) > -1 ){ 
         loadScript("quicktests/" + q.name + ".js", inner); 
-        console.log("loaded" + q.name);
+        console.log("loaded " + q.name);
       }
     });    
   }
