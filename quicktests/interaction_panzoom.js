@@ -20,7 +20,6 @@ var quicktest = function(svg, data, Plottable) {
 
 }
 
-quicktest.quicktestName = "gridlines";
-quicktest.categories = ["scatter", "gridlines", "interaction"];
+quicktest.quicktestName = "interaction_panzoom";
 quicktests.push(quicktest);
 
