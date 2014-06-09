@@ -63,5 +63,5 @@ function button6Callback() {
 
 
 quicktest.quicktestName = "layout-invalidate";
-quicktest.categories = ["layout", "legend", "scatter", "line", "title"]
+quicktest.categories = ["layout", "legend", "scatter", "line", "title"];
 quicktests.push(quicktest);
