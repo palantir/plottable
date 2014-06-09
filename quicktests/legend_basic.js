@@ -62,6 +62,5 @@ function button6Callback() {
 }
 
 
-quicktest.quicktestName = "layout-invalidate";
-quicktest.categories = ["layout", "legend", "scatter", "line", "title"];
+quicktest.quicktestName = "legend_basic";
 quicktests.push(quicktest);
