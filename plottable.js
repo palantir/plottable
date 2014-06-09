@@ -5621,6 +5621,47 @@ var Plottable;
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
 
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Interaction) {
+        var YDragBox = (function (_super) {
+            __extends(YDragBox, _super);
+            function YDragBox() {
+                _super.apply(this, arguments);
+            }
+            YDragBox.prototype._drag = function () {
+                _super.prototype._drag.call(this);
+                this.setBox(this.origin[1], this.location[1]);
+            };
+
+            YDragBox.prototype._doDragend = function () {
+                if (this.callbackToCall == null) {
+                    return;
+                }
+                var yMin = Math.min(this.origin[1], this.location[1]);
+                var yMax = Math.max(this.origin[1], this.location[1]);
+                var pixelArea = { yMin: yMin, yMax: yMax };
+                this.callbackToCall(pixelArea);
+            };
+
+            YDragBox.prototype.setBox = function (y0, y1) {
+                _super.prototype.setBox.call(this, 0, this.componentToListenTo.availableWidth, y0, y1);
+                return this;
+            };
+            return YDragBox;
+        })(Plottable.Interaction.DragBox);
+        Interaction.YDragBox = YDragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
