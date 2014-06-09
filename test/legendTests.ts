@@ -14,20 +14,20 @@ describe("Legends", () => {
     legend = new Plottable.Component.Legend(color);
   });
 
-  it.skip("a basic legend renders", () => {
+  it("a basic legend renders", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var legends = legend.content.selectAll(".legend-row");
+    var rows = legend.content.selectAll(".legend-row");
+    assert.lengthOf(rows[0], 3, "there are 3 legend entries");
 
-    legends.each(function(d, i) {
-      assert.equal(d, color.domain()[i], "the data was set properly");
+    rows.each(function(d, i) {
+      assert.equal(d, color.domain()[i], "the data is set properly");
       var d3this = d3.select(this);
       var text = d3this.select("text").text();
       assert.equal(text, d, "the text node has correct text");
-      var rectFill = d3this.select("rect").attr("fill");
-      assert.equal(rectFill, color.scale(d), "the rect fill was set properly");
+      var circle = d3this.select("circle");
+      assert.equal(circle.attr("fill"), color.scale(d), "the circle's fill is set properly");
     });
-    assert.lengthOf(legends[0], 3, "there were 3 legends");
     svg.remove();
   });
 
@@ -48,17 +48,16 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  it.skip("a legend with many labels does not overflow vertically", () => {
+  it("a legend with many labels does not overflow vertically", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
     legend.renderTo(svg);
 
-    var totalHeight = 0;
-    var legends = legend.content.selectAll(".legend-row");
-    legends.each(function(d, i) {
-      totalHeight += Plottable.Util.DOM.getBBox(d3.select(this).select("text")).height;
-    });
-    assert.lengthOf(legends[0], 8, "there were 8 legends");
-    assert.operator(totalHeight, "<=", legend.availableHeight, "the legend did not overflow its space");
+    var contentBBox = Plottable.Util.DOM.getBBox(legend.content);
+    var contentBottomEdge = contentBBox.y + contentBBox.height;
+    var bboxBBox = Plottable.Util.DOM.getBBox(legend.element.select(".bounding-box"));
+    var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
+
+    assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
     svg.remove();
   });
 
@@ -69,7 +68,8 @@ describe("Legends", () => {
     var text = legend.content.select("text").text();
     assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
     var rightEdge = legend.content.select("text").node().getBoundingClientRect().right;
-    var rightEdgeBBox = legend.element.select(".bounding-box").node().getBoundingClientRect().right;
+    var bbox = legend.element.select(".bounding-box");
+    var rightEdgeBBox = bbox.node().getBoundingClientRect().right;
     assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
     svg.remove();
   });

@@ -21,6 +21,15 @@
           { name: "Temporal Async Cat Tiger Man", age: -5 }
         ];
 
+      var data2 = [
+          { name: "Supercalifragilisticexpialidocious", age: 8 },
+          { name: "Poptart", age: 1 },
+          { name: "Budoka", age: 3 },
+          { name: "Long Naaaaaaaaaaaaaaaaaaaaaaaaaaame", age: 4 },
+          { name: "Temporal Async Cat Tiger Man", age: -5 },
+          { name: "Foobar", age: -3},
+        ];
+
       var cuteFormatter = function(d) { return d + " is a pretty darn cute cat"; } ;
 
       var ds = new Plottable.DataSource(data);
@@ -75,12 +84,21 @@
         ds.data(data);
       }
 
+      var idx = 1;
+      function changedata() {
+        var datas = [data, data2];
+        var newData = datas[idx++%2];
+        ds.data(newData);
+      }
+
     </script>
   </head>
   <body>
     <svg id="meow" width="480" height="320"></svg>
     <p />
     <button name="minus-age" onclick="younger()">-1 year</button><button name="plus-age" onclick="older()">+1 year</button>
+    <p />
+    <button name="change-data" onclick="changedata()">change data</button>
     <p />
     <svg id="nya" width="480" height="320"></svg>
   </body>
