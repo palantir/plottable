@@ -38,4 +38,5 @@ var quicktest = function(svg, data, Plottable) {
 }
 
 quicktest.quicktestName = "areaRenderer";
+quicktest.categories = ["area", "basic"];
 quicktests.push(quicktest);
