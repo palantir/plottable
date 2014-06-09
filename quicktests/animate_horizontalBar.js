@@ -18,5 +18,5 @@ var quicktest = function(svg, data, Plottable) {
 }
 
 quicktest.quicktestName = "horizontalBar_animate";
-
+quicktest.categories = ["verticalbar", "animate"]
 quicktests.push(quicktest);
