@@ -96,6 +96,8 @@ function makeMainFunctionForGivenBranch(branch) {
 
 var button = document.getElementById('button');
 button.onclick = function () {
+  var quicktests = [];
+  var quicktestsToLoad = [];
   var fb = $('#featureBranch').val();
   loadQuickTestsAndPlottables(fb, makeMainFunctionForGivenBranch(fb));
 };
