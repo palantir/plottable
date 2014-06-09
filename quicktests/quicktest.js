@@ -87,7 +87,7 @@ window.onload = function() {loadQuickTestsAndPlottables("master",
     var table = d3.select("table");
     quicktests.forEach(function(q) {
       runQuicktest(table, q, Plottables["master"], Plottables["master"]);
-    });
+    }
   }
 )};
 
@@ -101,6 +101,6 @@ button.onclick = function () {
     var table = d3.select("table");
     quicktests.forEach(function(q) {
       runQuicktest(table, q, Plottables["fb"], Plottables["master"]);
-    });
-  });
+    }
+  }
 }
