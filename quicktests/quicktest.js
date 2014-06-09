@@ -89,7 +89,7 @@ window.onload = function() {loadQuickTestsAndPlottables("master",
       runQuicktest(table, q, Plottables["master"], Plottables["master"]);
     }
   }
-)};
+);
 
 
 var button = document.getElementById('button');
@@ -103,4 +103,4 @@ button.onclick = function () {
       runQuicktest(table, q, Plottables["fb"], Plottables["master"]);
     }
   }
-}
+);
