@@ -7,7 +7,9 @@ var list_of_quicktests = [
   {name:"interaction_panzoom", categories:["scatter", "gridlines", "interaction"]},
   {name:"legend_basic", categories:["layout", "legend", "scatter", "line", "title"]},
   {name:"scale_interactive", categories:["scale", "interaction", "scatter", "gridlines"]},
-  {name:"basic_area", categories:["area", "basic"]}
+  {name:"basic_area", categories:["area", "basic"]},
+  {name:"cat-axis_verticalBar", categories:["verticalbar", "cat-axis", "animate"]}
+
 ]
 
 
