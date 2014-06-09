@@ -8,7 +8,7 @@ var quicktest = function(svg, data, Plottable) {
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-      areaRenderer = new Plottable.Plot.Area(data[0].slice(0, 21), xScale, yScale);
+      areaRenderer = new Plottable.Plot.Area(data[0].slice(0, 20), xScale, yScale);
       areaRenderer.project("opacity", 0.75);
       areaRenderer.animate(doAnimate);
 
@@ -18,4 +18,5 @@ var quicktest = function(svg, data, Plottable) {
 }
 
 quicktest.quicktestName = "area_animate";
+quicktest.categories = ["area", "animate"]
 quicktests.push(quicktest);
