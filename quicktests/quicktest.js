@@ -83,12 +83,12 @@ function() {
 }
 
 window.onload = function() {loadQuickTestsAndPlottables("master", 
-  function() {
+  (function() {
     var table = d3.select("table");
     quicktests.forEach(function(q) {
       runQuicktest(table, q, Plottables["master"], Plottables["master"]);
     }
-  }
+  })
 );
 
 
@@ -97,10 +97,10 @@ button.onclick = function () {
   var fb = $('#featureBranch').val();
   console.log(fb);
   loadQuickTestsAndPlottables(fb,   
-  function() {
+  (function() {
     var table = d3.select("table");
     quicktests.forEach(function(q) {
       runQuicktest(table, q, Plottables["fb"], Plottables["master"]);
     }
-  }
+  })
 );
