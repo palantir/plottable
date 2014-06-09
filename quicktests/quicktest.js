@@ -84,7 +84,9 @@ function main() {
 
 window.onload = function() {loadQuickTestsAndPlottables("master", main)};
 
-function buttonPress(){
+
+var button = document.getElementById('button');
+button.onclick = function () {
   var fb = $('#featureBranch').val();
-  loadQuickTestsAndPlottables("master", fb)
+  loadQuickTestsAndPlottables("master", fb);
 }
