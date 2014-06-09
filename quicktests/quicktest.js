@@ -34,10 +34,18 @@ function loadQuicktests(qts, callback) {
   var inner = function() {
     if (++nLoaded === qts.length) callback();
   }
-
-  qts.forEach(function(q) {
-    loadScript("quicktests/" + q.name + ".js", inner);
-  });
+  
+  var filterword = $('#filterword').val();
+  if(filterword === undefined){
+    qts.forEach(function(q) {
+      loadScript("quicktests/" + q.name + ".js", inner);
+    });
+  }
+  else{
+    qts.forEach(function(q) {
+      if ( q.categories.indexOf( filterword ) > -1 ){ loadScript("quicktests/" + q.name + ".js", inner); }
+    });    
+  }
 }
 
 function loadAllQuicktests(callback) {
@@ -88,6 +96,5 @@ function makeMainFunctionForGivenBranch(branch) {
 var button = document.getElementById('button');
 button.onclick = function () {
   var fb = $('#featureBranch').val();
-  console.log(fb);
   loadQuickTestsAndPlottables(fb, makeMainFunctionForGivenBranch(fb));
 };
