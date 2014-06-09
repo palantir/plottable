@@ -11,7 +11,7 @@ export module Abstract {
     public _autoDomain = true;
     private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
     private dataSourceReferenceCounter = new Util.IDCounter();
-    public _rendererID2Extent: {[rendererID: number]: any[]} = {};
+    public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
     public _autoNice = false;
     public _autoPad  = false;
     /**
@@ -154,9 +154,11 @@ export module Abstract {
      * 
      * @param {number} rendererID A unique indentifier of the renderer sending
      *                 the new extent.
-     * @param {any[]} extent The new extent, as computed by the renderer.
+     * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+     * @param {any[]} mappedData Either a string[] or a number[], the list of
+     *                new data points for this (renderer, number) pair.
      */
-    public extentChanged(rendererID: number, extent: any[]) {
+    public extentChanged(rendererID: number, attr: string, mappedData: any[]) {
       // will override
       return this;
     }

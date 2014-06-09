@@ -545,9 +545,11 @@ declare module Plottable {
             *
             * @param {number} rendererID A unique indentifier of the renderer sending
             *                 the new extent.
-            * @param {any[]} extent The new extent, as computed by the renderer.
+            * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+            * @param {any[]} mappedData Either a string[] or a number[], the list of
+            *                new data points for this (renderer, number) pair.
             */
-            public extentChanged(rendererID: number, extent: any[]): Scale;
+            public extentChanged(rendererID: number, attr: string, mappedData: any[]): Scale;
         }
     }
 }
@@ -603,13 +605,6 @@ declare module Plottable {
             *                      mean that 5 must be in the extent.
             */
             public expandExtent(extent: any[], mappedData: any[], attr: string): any[];
-            /**
-            * Returns a new extent including both the old extent and mappedData.
-            *
-            * @param {any[]} extent
-            * @param {any[]} mappedData
-            */
-            static includeExtent(extent: any[], mappedData: any[]): any[];
         }
     }
 }
@@ -745,7 +740,7 @@ declare module Plottable {
             * @returns {QuantitiveScale} The calling QuantitiveScale.
             */
             public padDomain(padProportion?: number): QuantitiveScale;
-            public extentChanged(rendererID: number, extent: any[]): QuantitiveScale;
+            public extentChanged(rendererID: number, attr: string, mappedData: any[]): QuantitiveScale;
         }
     }
 }
@@ -843,7 +838,7 @@ declare module Plottable {
             */
             public rangeType(): string;
             public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
-            public extentChanged(rendererID: number, extent: any[]): Ordinal;
+            public extentChanged(rendererID: number, attr: string, mappedData: any[]): Ordinal;
         }
     }
 }
@@ -1230,7 +1225,6 @@ declare module Plottable {
             */
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             public project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
-            public expandExtent(extent: any[], mappedData: any[], attr: string): any[];
         }
     }
 }
@@ -1315,7 +1309,6 @@ declare module Plottable {
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             public deselectAll(): BarPlot;
-            public expandExtent(extent: any[], mappedData: any[], attr: string): any[];
         }
     }
 }

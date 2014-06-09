@@ -162,18 +162,14 @@ export module Abstract {
      * have an extent that includes all the data that is projected onto them.
      */
     public updateProjectors(): Plot {
-      var scales = d3.values(this._projectors).map((p: _IProjector) => p.scale);
-      scales.filter((s) => s != null).forEach((scale: Scale) => {
-        var extent: any[] = [];
-        d3.keys(this._projectors).forEach((attr: string) => {
-          var projector = this._projectors[attr];
-          var appliedAccessor = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
-          var mappedData = this._dataSource.data().map(appliedAccessor);
-          if (projector.scale === scale && mappedData.length > 0) {
-            extent = this.expandExtent(extent, mappedData, attr);
-          }
-        });
-        scale.extentChanged(this._plottableID, extent);
+      d3.keys(this._projectors)
+        .filter((attr: string) => this._projectors[attr].scale != null)
+        .forEach((attr: string) => {
+        var projector = this._projectors[attr];
+        var scale = projector.scale;
+        var appliedAccessor = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
+        var mappedData = this._dataSource.data().map(appliedAccessor);
+        scale.extentChanged(this._plottableID, attr, mappedData);
       });
       return this;
     }
@@ -194,31 +190,6 @@ export module Abstract {
     public expandExtent(extent: any[], mappedData: any[], attr: string): any[] {
       // will override
       return [];
-    }
-
-    /**
-     * Returns a new extent including both the old extent and mappedData.
-     *
-     * @param {any[]} extent
-     * @param {any[]} mappedData
-     */
-    public static includeExtent(extent: any[], mappedData: any[]): any[] {
-      if (mappedData.length === 0) {
-        return extent;
-      }
-      if (typeof mappedData[0] === "number" || mappedData[0] instanceof Date) {
-        var min = d3.min(mappedData);
-        var max = d3.max(mappedData);
-        if (extent.length === 0) {
-          return [min, max];
-        }
-        return [Math.min(min, extent[0]), Math.max(max, extent[1])];
-      } else if (typeof mappedData[0] === "string") {
-        return Util.Methods.uniq(extent.concat(mappedData));
-      } else {
-        // undefined or something
-        return extent;
-      }
     }
   }
 }

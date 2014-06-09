@@ -2015,7 +2015,7 @@ var Plottable;
                 this._autoDomain = true;
                 this.rendererID2Perspective = {};
                 this.dataSourceReferenceCounter = new Plottable.Util.IDCounter();
-                this._rendererID2Extent = {};
+                this._rendererAttrID2Extent = {};
                 this._autoNice = false;
                 this._autoPad = false;
                 this._d3Scale = scale;
@@ -2133,9 +2133,11 @@ var Plottable;
             *
             * @param {number} rendererID A unique indentifier of the renderer sending
             *                 the new extent.
-            * @param {any[]} extent The new extent, as computed by the renderer.
+            * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+            * @param {any[]} mappedData Either a string[] or a number[], the list of
+            *                new data points for this (renderer, number) pair.
             */
-            Scale.prototype.extentChanged = function (rendererID, extent) {
+            Scale.prototype.extentChanged = function (rendererID, attr, mappedData) {
                 // will override
                 return this;
             };
@@ -2289,22 +2291,14 @@ var Plottable;
             */
             Plot.prototype.updateProjectors = function () {
                 var _this = this;
-                var scales = d3.values(this._projectors).map(function (p) {
-                    return p.scale;
-                });
-                scales.filter(function (s) {
-                    return s != null;
-                }).forEach(function (scale) {
-                    var extent = [];
-                    d3.keys(_this._projectors).forEach(function (attr) {
-                        var projector = _this._projectors[attr];
-                        var appliedAccessor = Plottable.Util.Methods.applyAccessor(projector.accessor, _this._dataSource);
-                        var mappedData = _this._dataSource.data().map(appliedAccessor);
-                        if (projector.scale === scale && mappedData.length > 0) {
-                            extent = _this.expandExtent(extent, mappedData, attr);
-                        }
-                    });
-                    scale.extentChanged(_this._plottableID, extent);
+                d3.keys(this._projectors).filter(function (attr) {
+                    return _this._projectors[attr].scale != null;
+                }).forEach(function (attr) {
+                    var projector = _this._projectors[attr];
+                    var scale = projector.scale;
+                    var appliedAccessor = Plottable.Util.Methods.applyAccessor(projector.accessor, _this._dataSource);
+                    var mappedData = _this._dataSource.data().map(appliedAccessor);
+                    scale.extentChanged(_this._plottableID, attr, mappedData);
                 });
                 return this;
             };
@@ -2325,31 +2319,6 @@ var Plottable;
             Plot.prototype.expandExtent = function (extent, mappedData, attr) {
                 // will override
                 return [];
-            };
-
-            /**
-            * Returns a new extent including both the old extent and mappedData.
-            *
-            * @param {any[]} extent
-            * @param {any[]} mappedData
-            */
-            Plot.includeExtent = function (extent, mappedData) {
-                if (mappedData.length === 0) {
-                    return extent;
-                }
-                if (typeof mappedData[0] === "number" || mappedData[0] instanceof Date) {
-                    var min = d3.min(mappedData);
-                    var max = d3.max(mappedData);
-                    if (extent.length === 0) {
-                        return [min, max];
-                    }
-                    return [Math.min(min, extent[0]), Math.max(max, extent[1])];
-                } else if (typeof mappedData[0] === "string") {
-                    return Plottable.Util.Methods.uniq(extent.concat(mappedData));
-                } else {
-                    // undefined or something
-                    return extent;
-                }
             };
             return Plot;
         })(Plottable.Abstract.Component);
@@ -2596,15 +2565,13 @@ var Plottable;
                 return this;
             };
 
-            QuantitiveScale.prototype.extentChanged = function (rendererID, extent) {
-                this._rendererID2Extent[rendererID] = extent;
-                var extents = d3.values(this._rendererID2Extent);
+            QuantitiveScale.prototype.extentChanged = function (rendererID, attr, mappedData) {
+                this._rendererAttrID2Extent[rendererID + attr] = d3.extent(mappedData);
+                var extents = d3.values(this._rendererAttrID2Extent);
                 var newDomain = extents.reduce(function (a, b) {
                     return [Math.min(a[0], b[0]), Math.max(a[1], b[1])];
                 });
-                if (newDomain.length > 0) {
-                    this._setDomain(newDomain);
-                }
+                this._setDomain(newDomain);
                 return this;
             };
             return QuantitiveScale;
@@ -2777,9 +2744,9 @@ var Plottable;
                 }
             };
 
-            Ordinal.prototype.extentChanged = function (rendererID, extent) {
-                this._rendererID2Extent[rendererID] = extent;
-                var all = Plottable.Util.Methods.flatten(d3.values(this._rendererID2Extent));
+            Ordinal.prototype.extentChanged = function (rendererID, attr, mappedData) {
+                this._rendererAttrID2Extent[rendererID + attr] = mappedData;
+                var all = Plottable.Util.Methods.flatten(d3.values(this._rendererAttrID2Extent));
                 this._setDomain(Plottable.Util.Methods.uniq(all));
                 return this;
             };
@@ -4536,20 +4503,6 @@ var Plottable;
                     this._render();
                 }
             };
-
-            XYPlot.prototype.expandExtent = function (extent, mappedData, attr) {
-                switch (attr) {
-                    case "x":
-                    case "y":
-                    case "x0":
-                    case "y0":
-                    case "r":
-                        return Plottable.Abstract.Plot.includeExtent(extent, mappedData);
-
-                    default:
-                        return extent;
-                }
-            };
             return XYPlot;
         })(Plottable.Abstract.Plot);
         Abstract.XYPlot = XYPlot;
@@ -4793,19 +4746,6 @@ var Plottable;
             BarPlot.prototype.deselectAll = function () {
                 this._bars.classed("selected", false);
                 return this;
-            };
-
-            BarPlot.prototype.expandExtent = function (extent, mappedData, attr) {
-                switch (attr) {
-                    case "x":
-                    case "y":
-                    case "x0":
-                    case "y0":
-                        return Plottable.Abstract.Plot.includeExtent(extent, mappedData);
-
-                    default:
-                        return extent;
-                }
             };
             return BarPlot;
         })(Plottable.Abstract.XYPlot);

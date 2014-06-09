@@ -90,19 +90,6 @@ export module Abstract {
       this._bars.classed("selected", false);
       return this;
     }
-
-    public expandExtent(extent: any[], mappedData: any[], attr: string): any[] {
-      switch (attr) {
-        case "x":
-        case "y":
-        case "x0":
-        case "y0":
-        return Plot.includeExtent(extent, mappedData);
-
-        default:
-        return extent;
-      }
-    }
   }
 }
 }

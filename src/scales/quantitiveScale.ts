@@ -168,13 +168,11 @@ export module Abstract {
       return this;
     }
 
-    public extentChanged(rendererID: number, extent: any[]) {
-      this._rendererID2Extent[rendererID] = extent;
-      var extents = d3.values(this._rendererID2Extent);
+    public extentChanged(rendererID: number, attr: string, mappedData: any[]) {
+      this._rendererAttrID2Extent[rendererID + attr] = d3.extent(mappedData);
+      var extents = d3.values(this._rendererAttrID2Extent);
       var newDomain = extents.reduce((a, b) => [Math.min(a[0], b[0]), Math.max(a[1], b[1])]);
-      if (newDomain.length > 0) {
-        this._setDomain(newDomain);
-      }
+      this._setDomain(newDomain);
       return this;
     }
   }
