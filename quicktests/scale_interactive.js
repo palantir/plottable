@@ -1,25 +1,5 @@
-<html>
-  <head>
-    <title>Axes Quicktest</title>
-    <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <style>
-      .plottable .bounding-box {
-        stroke: none;
-      }
-      .plottable .axis text {
-        /*font-size: 12px;*/
-      }
-      .plottable .axis path {
-        /*stroke: none;*/
-      }
-    </style>
-    <script src="../bower_components/d3/d3.min.js"></script>
-    <script src="../../plottable_multifile.js"></script>
-    <script src="../../examples/exampleUtil.js"></script>
-
-    <script>
-      window.onload = function() {
-        var dataseries = makeRandomData(20);
+var quicktest = function(svg, data, Plottable) {
+        var dataseries = data[0].splice(0, 20);
 
         var xScale = new Plottable.Scale.Linear();
         var xAxisLeft = new Plottable.Axis.XAxis(xScale, "bottom").tickLabelPosition("left");
@@ -53,14 +33,8 @@
         var basicTable = new Plottable.Component.Table([[null, xAxisTable2, null],
                                               [yAxisTable, renderAreaD1.merge(gridlines), yAxisTable2],
                                               [null, xAxisTable, null]]);
-        basicTable.renderTo("#axis-test");
+        basicTable.renderTo(svg);
         var pzi = new Plottable.Interaction.PanZoom(renderAreaD1, xScale, yScale);
         pzi.registerWithComponent();
-      }
-    </script>
-  </head>
-  <body>
-    <svg id="axis-test" width="640" height="480"></svg>
-  </body>
-
-</html>
+}
+ 
