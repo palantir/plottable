@@ -82,13 +82,12 @@ function() {
   });
 }
 
-window.onload = function() {loadQuickTestsAndPlottables("master", 
-  (function() {
-    var table = d3.select("table");
-    quicktests.forEach(function(q) {
-      runQuicktest(table, q, Plottables["master"], Plottables["master"]);
-    }
-  })
+window.onload = function() {loadQuickTestsAndPlottables("master", function() {
+              var table = d3.select("table");
+              quicktests.forEach(function(q) {
+                runQuicktest(table, q, Plottables["master"], Plottables["master"]);
+              });
+            }
 );
 
 
@@ -96,11 +95,5 @@ var button = document.getElementById('button');
 button.onclick = function () {
   var fb = $('#featureBranch').val();
   console.log(fb);
-  loadQuickTestsAndPlottables(fb,   
-  (function() {
-    var table = d3.select("table");
-    quicktests.forEach(function(q) {
-      runQuicktest(table, q, Plottables["fb"], Plottables["master"]);
-    }
-  })
+  loadQuickTestsAndPlottables(fb, main);
 );
