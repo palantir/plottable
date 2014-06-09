@@ -1,7 +1,7 @@
 var quicktest = function(svg, data, Plottable) {
-          var dataseries1 = new Plottable.DataSource(data[0].slice(0, 21));
+          var dataseries1 = new Plottable.DataSource(data[0].slice(0, 20));
           dataseries1.metadata({name: "series1"});
-          var dataseries2 = new Plottable.DataSource(data[1].slice(0, 21));
+          var dataseries2 = new Plottable.DataSource(data[1].slice(0, 20));
           dataseries2.metadata({name: "series2"});
           colorScale1 = new Plottable.Scale.Color("10");
           colorScale1.domain(["series1", "series2"]);
@@ -63,4 +63,5 @@ function button6Callback() {
 
 
 quicktest.quicktestName = "layout-invalidate";
+quicktest.categories = ["layout", "legend", "scatter", "line", "title"]
 quicktests.push(quicktest);
