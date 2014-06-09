@@ -239,7 +239,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class PlottableObject {
-            public _plottableID: number;
         }
     }
 }
@@ -260,13 +259,6 @@ declare module Plottable {
             * @returns {Broadcaster} this object
             */
             public registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
-            /**
-            * Call all listening callbacks, optionally with arguments passed through.
-            *
-            * @param ...args A variable number of optional arguments
-            * @returns {Broadcaster} this object
-            */
-            public _broadcast(...args: any[]): Broadcaster;
             /**
             * Registers deregister the callback associated with a listener.
             *
@@ -305,7 +297,6 @@ declare module Plottable {
         */
         public metadata(): any;
         public metadata(metadata: any): DataSource;
-        public _getExtent(accessor: IAccessor): any[];
     }
 }
 
@@ -313,57 +304,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
-            public element: D3.Selection;
-            public content: D3.Selection;
-            public backgroundContainer: D3.Selection;
-            public foregroundContainer: D3.Selection;
-            public clipPathEnabled: boolean;
-            public _parent: ComponentContainer;
-            public availableWidth: number;
-            public availableHeight: number;
-            public xOrigin: number;
-            public yOrigin: number;
-            public _xAlignProportion: number;
-            public _yAlignProportion: number;
-            public _isSetup: boolean;
-            public _isAnchored: boolean;
-            /**
-            * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
-            *
-            * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
-            * @returns {Component} The calling component.
-            */
-            public _anchor(element: D3.Selection): Component;
-            /**
-            * Creates additional elements as necessary for the Component to function.
-            * Called during _anchor() if the Component's element has not been created yet.
-            * Override in subclasses to provide additional functionality.
-            *
-            * @returns {Component} The calling Component.
-            */
-            public _setup(): Component;
-            public _requestedSpace(availableWidth: number, availableHeight: number): ISpaceRequest;
-            /**
-            * Computes the size, position, and alignment from the specified values.
-            * If no parameters are supplied and the component is a root node,
-            * they are inferred from the size of the component's element.
-            *
-            * @param {number} xOrigin
-            * @param {number} yOrigin
-            * @param {number} availableWidth
-            * @param {number} availableHeight
-            * @returns {Component} The calling Component.
-            */
-            public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Component;
-            /**
-            * Renders the component.
-            *
-            * @returns {Component} The calling Component.
-            */
-            public _render(): Component;
-            public _scheduleComputeLayout(): Component;
-            public _doRender(): Component;
-            public _invalidateLayout(): void;
             /**
             * Renders the Component into a given DOM element.
             *
@@ -413,8 +353,6 @@ declare module Plottable {
             * @return {Component} The calling Component.
             */
             public registerInteraction(interaction: Interaction): Component;
-            public _registerToBroadcaster(broadcaster: Broadcaster, callback: IBroadcasterCallback): void;
-            public _deregisterFromBroadcaster(broadcaster: Broadcaster): void;
             /**
             * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
             *
@@ -424,20 +362,6 @@ declare module Plottable {
             */
             public classed(cssClass: string): boolean;
             public classed(cssClass: string, addClass: boolean): Component;
-            /**
-            * Checks if the Component has a fixed width or false if it grows to fill available space.
-            * Returns false by default on the base Component class.
-            *
-            * @return {boolean} Whether the component has a fixed width.
-            */
-            public _isFixedWidth(): boolean;
-            /**
-            * Checks if the Component has a fixed height or false if it grows to fill available space.
-            * Returns false by default on the base Component class.
-            *
-            * @return {boolean} Whether the component has a fixed height.
-            */
-            public _isFixedHeight(): boolean;
             /**
             * Merges this Component with another Component, returning a ComponentGroup.
             * There are four cases:
@@ -462,11 +386,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class ComponentContainer extends Component {
-            public _components: Component[];
-            public _anchor(element: D3.Selection): ComponentContainer;
-            public _render(): ComponentContainer;
-            public _removeComponent(c: Component): ComponentContainer;
-            public _addComponent(c: Component, prepend?: boolean): boolean;
             /**
             * Returns a list of components in the ComponentContainer
             *
@@ -500,11 +419,7 @@ declare module Plottable {
             * @param {Component[]} [components] The Components in the Group.
             */
             constructor(components?: Abstract.Component[]);
-            public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
             public merge(c: Abstract.Component): Group;
-            public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Group;
-            public _isFixedWidth(): boolean;
-            public _isFixedHeight(): boolean;
         }
     }
 }
@@ -537,9 +452,6 @@ declare module Plottable {
             * @param {Component} component The Component to be added.
             */
             public addComponent(row: number, col: number, component: Abstract.Component): Table;
-            public _removeComponent(c: Abstract.Component): Table;
-            public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
-            public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Table;
             /**
             * Sets the row and column padding on the Table.
             *
@@ -566,8 +478,6 @@ declare module Plottable {
             * @returns {Table} The calling Table.
             */
             public colWeight(index: number, weight: number): Table;
-            public _isFixedWidth(): boolean;
-            public _isFixedHeight(): boolean;
         }
     }
 }
@@ -576,10 +486,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Scale extends Broadcaster {
-            public _d3Scale: D3.Scale.Scale;
-            public _autoDomain: boolean;
-            public _autoNice: boolean;
-            public _autoPad: boolean;
             /**
             * Creates a new Scale.
             *
@@ -587,8 +493,6 @@ declare module Plottable {
             * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
             */
             constructor(scale: D3.Scale.Scale);
-            public _getAllExtents(): any[][];
-            public _getExtent(): any[];
             /**
             * Modify the domain on the scale so that it includes the extent of all
             * perspectives it depends on. Extent: The (min, max) pair for a
@@ -597,8 +501,6 @@ declare module Plottable {
             * represents a view in to the data.
             */
             public autoDomain(): Scale;
-            public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any): Scale;
-            public _removePerspective(rendererIDAttr: string): Scale;
             /**
             * Returns the range value corresponding to a given domain value.
             *
@@ -617,7 +519,6 @@ declare module Plottable {
             */
             public domain(): any[];
             public domain(values: any[]): Scale;
-            public _setDomain(values: any[]): void;
             /**
             * Retrieves the current range, or sets the Scale's range to the specified values.
             *
@@ -644,19 +545,6 @@ declare module Plottable {
             scale?: Scale;
         }
         class Plot extends Component {
-            public _dataSource: DataSource;
-            public _dataChanged: boolean;
-            public renderArea: D3.Selection;
-            public element: D3.Selection;
-            public scales: Scale[];
-            public _colorAccessor: IAccessor;
-            public _animate: boolean;
-            public _ANIMATION_DURATION: number;
-            public _projectors: {
-                [attrToSet: string]: _IProjector;
-            };
-            public _rerenderUpdateSelection: boolean;
-            public _requireRerender: boolean;
             /**
             * Creates a Plot.
             *
@@ -666,7 +554,6 @@ declare module Plottable {
             constructor();
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
-            public _anchor(element: D3.Selection): Plot;
             /**
             * Retrieves the current DataSource, or sets a DataSource if the Plot doesn't yet have one.
             *
@@ -676,12 +563,6 @@ declare module Plottable {
             public dataSource(): DataSource;
             public dataSource(source: DataSource): Plot;
             public project(attrToSet: string, accessor: any, scale?: Scale): Plot;
-            public _generateAttrToProjector(): {
-                [attrToSet: string]: IAppliedAccessor;
-            };
-            public _doRender(): Plot;
-            public _paint(): void;
-            public _setup(): Plot;
             /**
             * Enables or disables animation.
             *
@@ -750,8 +631,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class QuantitiveScale extends Scale {
-            public _d3Scale: D3.Scale.QuantitiveScale;
-            public _PADDING_FOR_IDENTICAL_DOMAIN: number;
             /**
             * Creates a new QuantitiveScale.
             *
@@ -759,7 +638,6 @@ declare module Plottable {
             * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
             */
             constructor(scale: D3.Scale.QuantitiveScale);
-            public _getExtent(): any[];
             public autoDomain(): QuantitiveScale;
             /**
             * Retrieves the domain value corresponding to a supplied range value.
@@ -878,14 +756,12 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class Ordinal extends Abstract.Scale {
-            public _d3Scale: D3.Scale.OrdinalScale;
             /**
             * Creates a new OrdinalScale. Domain and Range are set later.
             *
             * @constructor
             */
             constructor(scale?: D3.Scale.OrdinalScale);
-            public _getExtent(): any[];
             /**
             * Retrieves the current domain, or sets the Scale's domain to the specified values.
             *
@@ -894,7 +770,6 @@ declare module Plottable {
             */
             public domain(): any[];
             public domain(values: any[]): Ordinal;
-            public _setDomain(values: any[]): void;
             /**
             * Returns the range of pixels spanned by the scale, or sets the range.
             *
@@ -942,7 +817,6 @@ declare module Plottable {
             *     (Category10/Category20/Category20b/Category20c).
             */
             constructor(scaleType?: string);
-            public _getExtent(): any[];
         }
     }
 }
@@ -951,14 +825,12 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class Time extends Abstract.QuantitiveScale {
-            public _PADDING_FOR_IDENTICAL_DOMAIN: number;
             /**
             * Creates a new TimeScale.
             *
             * @constructor
             */
             constructor();
-            public _setDomain(values: any[]): void;
         }
     }
 }
@@ -1030,11 +902,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Axis extends Abstract.Component {
-            public axisElement: D3.Selection;
-            public _axisScale: Abstract.Scale;
-            public orientToAlign: {
-                [s: string]: string;
-            };
             static _DEFAULT_TICK_SIZE: number;
             /**
             * Creates an Axis.
@@ -1045,12 +912,8 @@ declare module Plottable {
             * @param {any} [formatter] a D3 formatter
             */
             constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any);
-            public _setup(): Axis;
-            public _doRender(): Axis;
             public showEndTickLabels(): boolean;
             public showEndTickLabels(show: boolean): Axis;
-            public _hideCutOffTickLabels(): Axis;
-            public _hideOverlappingTickLabels(): void;
             public scale(): Abstract.Scale;
             public scale(newScale: Abstract.Scale): Axis;
             /**
@@ -1097,8 +960,6 @@ declare module Plottable {
             */
             constructor(scale: Abstract.Scale, orientation?: string, formatter?: any);
             public height(h: number): XAxis;
-            public _setup(): XAxis;
-            public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
             /**
             * Sets or gets the tick label position relative to the tick marks.
             *
@@ -1107,7 +968,6 @@ declare module Plottable {
             */
             public tickLabelPosition(): string;
             public tickLabelPosition(position: string): XAxis;
-            public _doRender(): XAxis;
         }
         class YAxis extends Axis {
             /**
@@ -1119,9 +979,7 @@ declare module Plottable {
             * @param {any} [formatter] a D3 formatter
             */
             constructor(scale: Abstract.Scale, orientation?: string, formatter?: any);
-            public _setup(): YAxis;
             public width(w: number): YAxis;
-            public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
             /**
             * Sets or gets the tick label position relative to the tick marks.
             *
@@ -1130,7 +988,6 @@ declare module Plottable {
             */
             public tickLabelPosition(): string;
             public tickLabelPosition(position: string): YAxis;
-            public _doRender(): YAxis;
         }
     }
 }
@@ -1139,13 +996,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
-            public axisElement: D3.Selection;
-            public _ticksContainer: D3.Selection;
-            public _ticks: D3.UpdateSelection;
-            public _baseline: D3.Selection;
-            public _scale: Scale;
-            public _formatter: (n: any) => string;
-            public _orientation: string;
             /**
             * Creates a BaseAxis.
             *
@@ -1155,22 +1005,6 @@ declare module Plottable {
             * @param {(n: any) => string} [formatter] A function to format tick labels.
             */
             constructor(scale: Scale, orientation: string, formatter?: (n: any) => string);
-            public _isHorizontal(): boolean;
-            public _setup(): Axis;
-            public _getTickValues(): any[];
-            public _doRender(): Axis;
-            public _generateBaselineAttrHash(): {
-                x1: number;
-                y1: number;
-                x2: number;
-                y2: number;
-            };
-            public _generateTickMarkAttrHash(): {
-                x1: number;
-                y1: number;
-                x2: number;
-                y2: number;
-            };
             /**
             * Sets a new tick formatter.
             *
@@ -1204,8 +1038,6 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends Abstract.Axis {
-            public _scale: Scale.Ordinal;
-            public _tickLabelsG: D3.Selection;
             /**
             * Creates a CategoryAxis.
             *
@@ -1217,10 +1049,6 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Ordinal, orientation?: string);
-            public _setup(): Category;
-            public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
-            public _getTickValues(): string[];
-            public _doRender(): Category;
         }
     }
 }
@@ -1237,8 +1065,6 @@ declare module Plottable {
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
             constructor(text?: string, orientation?: string);
-            public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest;
-            public _setup(): Label;
             /**
             * Sets the text on the Label.
             *
@@ -1246,7 +1072,6 @@ declare module Plottable {
             * @returns {Label} The calling Label.
             */
             public setText(text: string): Label;
-            public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): Label;
         }
         class TitleLabel extends Label {
             constructor(text?: string, orientation?: string);
@@ -1286,8 +1111,9 @@ declare module Plottable {
             public toggleCallback(): ToggleCallback;
             /**
             * Assigns or gets the callback to the Legend
-            * This callback is associated with hover events, which trigger when a legend row is hovered over or left
-            * Setting a callback will also set a class to each individual legend row as "focus" or "not-focus" when a legend row is hovered over.
+            * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
+            * Setting a callback will also set the class "hover" to all legend row,
+            * as well as the class "focus" to the legend row being hovered over.
             * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
             *
             * @param{HoverCallback} callback The new callback function
@@ -1302,9 +1128,6 @@ declare module Plottable {
             */
             public scale(scale: Scale.Color): Legend;
             public scale(): Scale.Color;
-            public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number): Legend;
-            public _requestedSpace(offeredWidth: number, offeredY: number): ISpaceRequest;
-            public _doRender(): Legend;
         }
     }
 }
@@ -1321,8 +1144,6 @@ declare module Plottable {
             * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
             */
             constructor(xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale);
-            public _setup(): Gridlines;
-            public _doRender(): Gridlines;
         }
     }
 }
@@ -1348,10 +1169,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
-            public xScale: Scale;
-            public yScale: Scale;
-            public _xAccessor: any;
-            public _yAccessor: any;
             /**
             * Creates an XYPlot.
             *
@@ -1362,7 +1179,6 @@ declare module Plottable {
             */
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             public project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
-            public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number): XYPlot;
         }
     }
 }
@@ -1371,8 +1187,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Scatter extends Abstract.XYPlot {
-            public _ANIMATION_DURATION: number;
-            public _ANIMATION_DELAY: number;
             /**
             * Creates a ScatterPlot.
             *
@@ -1383,7 +1197,6 @@ declare module Plottable {
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
             public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Scatter;
-            public _paint(): void;
         }
     }
 }
@@ -1392,9 +1205,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Grid extends Abstract.XYPlot {
-            public colorScale: Abstract.Scale;
-            public xScale: Scale.Ordinal;
-            public yScale: Scale.Ordinal;
             /**
             * Creates a GridPlot.
             *
@@ -1407,7 +1217,6 @@ declare module Plottable {
             */
             constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale);
             public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Grid;
-            public _paint(): void;
         }
     }
 }
@@ -1416,10 +1225,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-            public _bars: D3.UpdateSelection;
-            public _baseline: D3.Selection;
-            public _baselineValue: number;
-            public _barAlignment: string;
             /**
             * Creates an AbstractBarPlot.
             *
@@ -1429,7 +1234,6 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Scale, yScale: Scale);
-            public _setup(): BarPlot;
             /**
             * Sets the baseline for the bars to the specified value.
             *
@@ -1467,9 +1271,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class VerticalBar extends Abstract.BarPlot {
-            public _barAlignment: string;
-            public _ANIMATION_DURATION: number;
-            public _ANIMATION_DELAY: number;
             /**
             * Creates a VerticalBarPlot.
             *
@@ -1479,7 +1280,6 @@ declare module Plottable {
             * @param {QuantitiveScale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitiveScale);
-            public _paint(): void;
             /**
             * Sets the horizontal alignment of the bars.
             *
@@ -1495,9 +1295,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class HorizontalBar extends Abstract.BarPlot {
-            public _barAlignment: string;
-            public _ANIMATION_DURATION: number;
-            public _ANIMATION_DELAY: number;
             /**
             * Creates a HorizontalBarPlot.
             *
@@ -1507,7 +1304,6 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.QuantitiveScale, yScale: Abstract.Scale);
-            public _paint(): void;
             /**
             * Sets the vertical alignment of the bars.
             *
@@ -1523,7 +1319,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Area extends Abstract.XYPlot {
-            public _ANIMATION_DURATION: number;
             /**
             * Creates an AreaPlot.
             *
@@ -1533,8 +1328,6 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
-            public _setup(): Area;
-            public _paint(): void;
         }
     }
 }
@@ -1543,7 +1336,6 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Line extends Area {
-            public _ANIMATION_DURATION: number;
             /**
             * Creates a LinePlot.
             *
@@ -1574,8 +1366,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Interaction {
-            public hitBox: D3.Selection;
-            public componentToListenTo: Component;
             /**
             * Creates an Interaction.
             *
@@ -1583,7 +1373,6 @@ declare module Plottable {
             * @param {Component} componentToListenTo The component to listen for interactions on.
             */
             constructor(componentToListenTo: Component);
-            public _anchor(hitBox: D3.Selection): void;
             /**
             * Registers the Interaction on the Component it's listening to.
             * This needs to be called to activate the interaction.
@@ -1604,7 +1393,6 @@ declare module Plottable {
             * @param {Component} componentToListenTo The component to listen for clicks on.
             */
             constructor(componentToListenTo: Abstract.Component);
-            public _anchor(hitBox: D3.Selection): void;
             /**
             * Sets an callback to be called when a click is received.
             *
@@ -1620,7 +1408,6 @@ declare module Plottable {
     module Interaction {
         class Mousemove extends Abstract.Interaction {
             constructor(componentToListenTo: Abstract.Component);
-            public _anchor(hitBox: D3.Selection): void;
             public mousemove(x: number, y: number): void;
         }
     }
@@ -1638,7 +1425,6 @@ declare module Plottable {
             * @param {number} keyCode The key code to listen for.
             */
             constructor(componentToListenTo: Abstract.Component, keyCode: number);
-            public _anchor(hitBox: D3.Selection): void;
             /**
             * Sets an callback to be called when the designated key is pressed.
             *
@@ -1653,8 +1439,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Abstract.Interaction {
-            public xScale: Abstract.QuantitiveScale;
-            public yScale: Abstract.QuantitiveScale;
             /**
             * Creates a PanZoomInteraction.
             *
@@ -1665,7 +1449,6 @@ declare module Plottable {
             */
             constructor(componentToListenTo: Abstract.Component, xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale);
             public resetZoom(): void;
-            public _anchor(hitBox: D3.Selection): void;
         }
     }
 }
@@ -1674,8 +1457,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends Abstract.Interaction {
-            public origin: number[];
-            public location: number[];
             public callbackToCall: (dragInfo: any) => any;
             /**
             * Creates a Drag.
@@ -1690,11 +1471,6 @@ declare module Plottable {
             * @returns {AreaInteraction} The calling AreaInteraction.
             */
             public callback(cb?: (a: any) => any): Drag;
-            public _dragstart(): void;
-            public _drag(): void;
-            public _dragend(): void;
-            public _doDragend(): void;
-            public _anchor(hitBox: D3.Selection): Drag;
             public setupZoomCallback(xScale?: Abstract.QuantitiveScale, yScale?: Abstract.QuantitiveScale): Drag;
         }
     }
@@ -1704,9 +1480,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class DragBox extends Drag {
-            public dragBox: D3.Selection;
-            public boxIsDrawn: boolean;
-            public _dragstart(): void;
             /**
             * Clears the highlighted drag-selection box drawn by the AreaInteraction.
             *
@@ -1714,7 +1487,6 @@ declare module Plottable {
             */
             public clearBox(): DragBox;
             public setBox(x0: number, x1: number, y0: number, y1: number): DragBox;
-            public _anchor(hitBox: D3.Selection): DragBox;
         }
     }
 }
@@ -1723,8 +1495,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XDragBox extends DragBox {
-            public _drag(): void;
-            public _doDragend(): void;
             public setBox(x0: number, x1: number): XDragBox;
         }
     }
@@ -1734,8 +1504,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
-            public _drag(): void;
-            public _doDragend(): void;
         }
     }
 }
@@ -1744,8 +1512,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
-            public _drag(): void;
-            public _doDragend(): void;
             public setBox(y0: number, y1: number): YDragBox;
         }
     }

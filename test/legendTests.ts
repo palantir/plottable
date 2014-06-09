@@ -194,7 +194,7 @@ describe("Legends", () => {
       svg.remove();
     });
 
-    it("toggleLegend.scale() works as intended", () => {
+    it("scale() works as intended with toggling", () => {
       var domain = ["a", "b", "c", "d", "e"];
       color.domain(domain);
       toggleLegend.renderTo(svg);
@@ -319,9 +319,14 @@ describe("Legends", () => {
       hoverLegend.hoverCallback(function(d) {/* no-op */});
     });
 
-    function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
-      assert.equal(selection.classed("toggled-on"), b, msg);
-      assert.equal(selection.classed("toggled-off"), !b, msg);
+    function _verifyFocus(selection: D3.Selection, b: boolean, msg?: string) {
+      assert.equal(selection.classed("hover"), true, msg);
+      assert.equal(selection.classed("focus"), b, msg);
+    }
+
+    function _verifyEmpty(selection: D3.Selection, msg?: string) {
+      assert.equal(selection.classed("hover"), false, msg);
+      assert.equal(selection.classed("focus"), false, msg);
     }
 
     function getSelection(datum: any) {
@@ -330,54 +335,63 @@ describe("Legends", () => {
       return selection;
     }
 
-    function verifyEntry(datum: any, b: boolean, msg?: string) {
-      verifyState(getSelection(datum), b, msg);
+    function verifyFocus(datum: any, b: boolean, msg?: string) {
+      _verifyFocus(getSelection(datum), b, msg);
     }
 
-    function toggleEntry(datum: any, index: number) {
-      getSelection(datum).on("click")(datum, index);
+    function verifyEmpty(datum: string, msg?: string) {
+      _verifyEmpty(getSelection(datum), msg);
+    }
+
+    function hoverEntry(datum: any, index: number) {
+      getSelection(datum).on("mouseover")(datum, index);
+    }
+
+    function leaveEntry(datum: any, index: number) {
+      getSelection(datum).on("mouseout")(datum, index);
     }
 
     it("basic initialization test", () => {
       color.domain(["a", "b", "c", "d", "e"]);
       hoverLegend.renderTo(svg);
       hoverLegend.content.selectAll(".legend-row").each(function(d, i) {
-        var selection = d3.select(this);
-        verifyState(selection, true);
+        verifyEmpty(d);
       });
       svg.remove();
     });
 
-    it("basic toggling test", () => {
+    it("basic hover test", () => {
       color.domain(["a"]);
       hoverLegend.renderTo(svg);
-      hoverLegend.content.selectAll(".legend-row").each(function(d, i) {
-        var selection = d3.select(this);
-        selection.on("click")(d, i);
-        verifyState(selection, false);
-        selection.on("click")(d, i);
-        verifyState(selection, true);
-      });
+      hoverEntry("a", 0);
+      verifyFocus("a", true);
+      leaveEntry("a", 0);
+      verifyEmpty("a");
       svg.remove();
     });
 
-    it("hoverLegend.scale() works as intended", () => {
+    it("scale() works as intended with hovering", () => {
       var domain = ["a", "b", "c", "d", "e"];
       color.domain(domain);
       hoverLegend.renderTo(svg);
-      toggleEntry("a", 0);
-      toggleEntry("d", 3);
-      toggleEntry("c", 2);
+
+      hoverEntry("a", 0);
 
       var newDomain = ["r", "a", "d", "g"];
       var newColorScale = new Plottable.Scale.Color("Category10");
       newColorScale.domain(newDomain);
       hoverLegend.scale(newColorScale);
 
-      verifyEntry("r", true);
-      verifyEntry("a", false);
-      verifyEntry("g", true);
-      verifyEntry("d", false);
+      verifyFocus("r", false, "r");
+      verifyFocus("a", true, "a");
+      verifyFocus("g", false, "g");
+      verifyFocus("d", false, "d");
+
+      leaveEntry("a", 0);
+      verifyEmpty("r");
+      verifyEmpty("a");
+      verifyEmpty("g");
+      verifyEmpty("d");
 
       svg.remove();
     });
@@ -385,94 +399,87 @@ describe("Legends", () => {
     it("listeners on scale will correctly update states", () =>  {
       color.domain(["a", "b", "c", "d", "e"]);
       hoverLegend.renderTo(svg);
-      toggleEntry("a", 0);
-      toggleEntry("d", 3);
-      toggleEntry("c", 2);
+      hoverEntry("c", 2);
 
       color.domain(["e", "d", "b", "a", "c"]);
-      verifyEntry("a", false);
-      verifyEntry("b", true);
-      verifyEntry("c", false);
-      verifyEntry("d", false);
-      verifyEntry("e", true);
+      verifyFocus("a", false);
+      verifyFocus("b", false);
+      verifyFocus("c", true);
+      verifyFocus("d", false);
+      verifyFocus("e", false);
       svg.remove();
     });
 
     it("Testing callback works correctly", () =>  {
       var domain = ["a", "b", "c", "d", "e"];
       color.domain(domain);
-      var state = [true, true, true, true, true];
+      var focused: string = undefined;
 
-      hoverLegend.toggleCallback((d, b) => {
-        state[domain.indexOf(d)] = b;
+      hoverLegend.hoverCallback((d) => {
+        focused = d;
       });
       hoverLegend.renderTo(svg);
 
-      toggleEntry("a", 0);
-      verifyEntry("a", false);
-      assert.equal(state[0], false, "callback was successful");
+      hoverEntry("a", 0);
+      verifyFocus("a", true);
+      assert.equal(focused, "a", "callback was successful");
 
-      toggleEntry("d", 3);
-      verifyEntry("d", false);
-      assert.equal(state[3], false, "callback was successful");
+      leaveEntry("a", 0);
+      assert.equal(focused, undefined, "callback was successful");
 
-      toggleEntry("a", 0);
-      verifyEntry("a", true);
-      assert.equal(state[0], true, "callback was successful");
-
-      toggleEntry("c", 2);
-      verifyEntry("c", false);
-      assert.equal(state[2], false, "callback was successful");
+      hoverEntry("d", 3);
+      verifyFocus("d", true);
+      assert.equal(focused, "d", "callback was successful");
       svg.remove();
     });
 
     it("Overwriting callback is successfull", () => {
       var domain = ["a"];
       color.domain(domain);
-      var state = true;
+      var focused: string = undefined;
       hoverLegend.renderTo(svg);
 
-      hoverLegend.toggleCallback((d, b) => {
-        state = b;
+      hoverLegend.hoverCallback((d) => {
+        focused = d;
       });
 
-      toggleEntry("a", 0);
-      assert.equal(state, false, "callback was successful");
+      hoverEntry("a", 0);
+      assert.equal(focused, "a", "callback was successful");
+      leaveEntry("a", 0);
 
       var count = 0;
-      hoverLegend.toggleCallback((d, b) => {
+      hoverLegend.hoverCallback((d) => {
         count++;
       });
 
-      toggleEntry("a", 0);
-      assert.equal(state, false, "callback was overwritten");
-      assert.equal(count, 1, "new callback was successfully called");
+      hoverEntry("a", 0);
+      assert.equal(focused, undefined, "old callback was not called");
+      assert.equal(count, 1, "new callbcak was called");
+      leaveEntry("a", 0);
+      assert.equal(count, 2, "new callback was called");
       svg.remove();
     });
 
     it("Removing callback is successful", () =>  {
       var domain = ["a"];
       color.domain(domain);
-      var state = true;
+      var focused: string = undefined;
       hoverLegend.renderTo(svg);
 
-      hoverLegend.toggleCallback((d, b) => {
-        state = b;
+      hoverLegend.hoverCallback((d) => {
+        focused = d;
       });
 
-      toggleEntry("a", 0);
-      assert.equal(state, false, "callback was successful");
+      hoverEntry("a", 0);
+      assert.equal(focused, "a", "callback was successful");
 
-      hoverLegend.toggleCallback(); // this should not remove the callback
-      toggleEntry("a", 0);
-      assert.equal(state, true, "callback was successful");
+      hoverLegend.hoverCallback(); // this should not remove the callback
+      leaveEntry("a", 0);
+      assert.equal(focused, undefined, "callback was successful");
 
-      hoverLegend.toggleCallback(null); // this should remove the callback
-      assert.throws(function() {toggleEntry("a", 0);}, "not a function");
-      var selection = getSelection("a");
-      // should have no classes
-      assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
-      assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
+      hoverLegend.hoverCallback(null); // this should remove the callback
+      assert.throws(function() {hoverEntry("a", 0);}, "not a function");
+      verifyEmpty("a");
 
       svg.remove();
     });

@@ -63,8 +63,9 @@ export module Component {
 
     /**
      * Assigns or gets the callback to the Legend
-     * This callback is associated with hover events, which trigger when a legend row is hovered over or left
-     * Setting a callback will also set a class to each individual legend row as "focus" or "not-focus" when a legend row is hovered over.
+     * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
+     * Setting a callback will also set the class "hover" to all legend row, 
+     * as well as the class "focus" to the legend row being hovered over.
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      * 
      * @param{HoverCallback} callback The new callback function
@@ -111,7 +112,8 @@ export module Component {
         this.isOff = Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
       }
       if (this._hoverCallback != null) {
-        this.datumCurrentlyFocusedOn = undefined;
+        this.datumCurrentlyFocusedOn = this.scale().domain().indexOf(this.datumCurrentlyFocusedOn) >= 0 ?
+          this.datumCurrentlyFocusedOn : undefined;
       }
       this._invalidateLayout();
     }
@@ -186,7 +188,7 @@ export module Component {
         var hoverRow = (mouseover: boolean) => (datum: string) => {
           this.datumCurrentlyFocusedOn = mouseover ? datum : undefined;
           this._hoverCallback(this.datumCurrentlyFocusedOn);
-          this.updateClasses(mouseover);
+          this.updateClasses();
         };
         dataSelection.on("mouseover", hoverRow(true));
         dataSelection.on("mouseout", hoverRow(false));
@@ -213,18 +215,15 @@ export module Component {
       }
     }
 
-    private updateClasses(updateHover?: boolean) {
+    private updateClasses() {
       if (!this._isSetup) { return; }
       var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
         dataSelection.classed("focus", (d: string) => this.datumCurrentlyFocusedOn === d);
-        dataSelection.classed("not-focus", (d: string) => this.datumCurrentlyFocusedOn !== d);
-        if (updateHover != null) {
-          dataSelection.classed("hover", updateHover);
-        }
+        dataSelection.classed("hover", this.datumCurrentlyFocusedOn !== undefined);
       } else {
+        dataSelection.classed("hover", false);
         dataSelection.classed("focus", false);
-        dataSelection.classed("not-focus", false);
       }
       if (this._toggleCallback != null) {
         dataSelection.classed("toggled-on", (d: string) => !this.isOff.has(d));

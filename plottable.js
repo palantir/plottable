@@ -1,3 +1,9 @@
+/*!
+Plottable 0.15.2 (https://github.com/palantir/plottable)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -4120,7 +4126,7 @@ var Plottable;
                     this.isOff = Plottable.Util.Methods.intersection(this.isOff, d3.set(this.scale().domain()));
                 }
                 if (this._hoverCallback != null) {
-                    this.datumCurrentlyFocusedOn = undefined;
+                    this.datumCurrentlyFocusedOn = this.scale().domain().indexOf(this.datumCurrentlyFocusedOn) >= 0 ? this.datumCurrentlyFocusedOn : undefined;
                 }
                 this._invalidateLayout();
             };
@@ -4200,7 +4206,7 @@ var Plottable;
                         return function (datum) {
                             _this.datumCurrentlyFocusedOn = mouseover ? datum : undefined;
                             _this._hoverCallback(_this.datumCurrentlyFocusedOn);
-                            _this.updateClasses(mouseover);
+                            _this.updateClasses();
                         };
                     };
                     dataSelection.on("mouseover", hoverRow(true));
@@ -4228,7 +4234,7 @@ var Plottable;
                 }
             };
 
-            Legend.prototype.updateClasses = function (updateHover) {
+            Legend.prototype.updateClasses = function () {
                 var _this = this;
                 if (!this._isSetup) {
                     return;
@@ -4238,15 +4244,10 @@ var Plottable;
                     dataSelection.classed("focus", function (d) {
                         return _this.datumCurrentlyFocusedOn === d;
                     });
-                    dataSelection.classed("not-focus", function (d) {
-                        return _this.datumCurrentlyFocusedOn !== d;
-                    });
-                    if (updateHover != null) {
-                        dataSelection.classed("hover", updateHover);
-                    }
+                    dataSelection.classed("hover", this.datumCurrentlyFocusedOn !== undefined);
                 } else {
+                    dataSelection.classed("hover", false);
                     dataSelection.classed("focus", false);
-                    dataSelection.classed("not-focus", false);
                 }
                 if (this._toggleCallback != null) {
                     dataSelection.classed("toggled-on", function (d) {

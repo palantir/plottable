@@ -89,7 +89,7 @@ svg.plottable {
   visibility:visible;
 }
 
-.plottable .hover.not-focus {
+.plottable .hover {
   opacity:.2;
 }
 
