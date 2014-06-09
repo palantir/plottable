@@ -147,7 +147,15 @@ export module Abstract {
       return new Scale(this._d3Scale.copy());
     }
 
-    // this is called by renderer whenever there is an update from the dataSource
+    /**
+     * When a renderer determines that the scale's extent has changed,
+     * it will call this function. This function should ensure that
+     * the scale has a domain at least large enough to include extent.
+     * 
+     * @param {number} rendererID A unique indentifier of the renderer sending
+     *                 the new extent.
+     * @param {any[]} extent The new extent, as computed by the renderer.
+     */
     public extentChanged(rendererID: number, extent: any[]) {
       // will override
       return this;

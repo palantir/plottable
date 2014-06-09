@@ -82,7 +82,7 @@ export module Util {
       }
       return out;
     }
- 
+
     /**
      * @param {T[][]} a The 2D array that will have its elements joined together.
      * @return {T[]} Every array in a, concatenated together in the order they appear.

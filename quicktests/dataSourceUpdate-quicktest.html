@@ -5,27 +5,18 @@
     <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../../plottable_multifile.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
-    <style>
-      .plottable .axis line {
-/*        stroke: black;
-        opacity: 1;*/
-      }
-    </style>
 
     <script>
-      var dataseries;
-      var renderAreaD1;
       var ds;
 
       window.onload = function() {
-        Plottable.Singleton.RenderController.enabled=false;
         var dataseries = makeRandomData(20, 0.3);
 
-        xScale = new Plottable.Scale.Linear();
-        xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+        var xScale = new Plottable.Scale.Linear();
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-        yScale = new Plottable.Scale.Linear();
-        yAxis = new Plottable.Axis.YAxis(yScale, "left");
+        var yScale = new Plottable.Scale.Linear();
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
         ds = new Plottable.DataSource(dataseries);
 
@@ -45,8 +36,7 @@
       }
 
       function newData() {
-      	ds.data(makeRandomData(20, Math.random()));
-        ds.data(data);
+        ds.data(makeRandomData(20, Math.random()));
       }
     </script>
   </head>

@@ -16,11 +16,11 @@
         ];
 
       var ds = new Plottable.DataSource(data);
-      xScale = new Plottable.Scale.Ordinal().rangeType("bands");
-      xAxis = new Plottable.Axis.XAxis(xScale, "bottom", function(d) { return d; } );
+      var xScale = new Plottable.Scale.Ordinal().rangeType("bands");
+      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", function(d) { return d; } );
 
-      yScale = new Plottable.Scale.Linear();
-      yAxis = new Plottable.Axis.YAxis(yScale, "left");
+      var yScale = new Plottable.Scale.Linear();
+      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
       yAxis.showEndTickLabels(true);
 
       var barPlot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)

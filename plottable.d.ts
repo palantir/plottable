@@ -538,6 +538,15 @@ declare module Plottable {
             * @returns {Scale} A copy of the calling Scale.
             */
             public copy(): Scale;
+            /**
+            * When a renderer determines that the scale's extent has changed,
+            * it will call this function. This function should ensure that
+            * the scale has a domain at least large enough to include extent.
+            *
+            * @param {number} rendererID A unique indentifier of the renderer sending
+            *                 the new extent.
+            * @param {any[]} extent The new extent, as computed by the renderer.
+            */
             public extentChanged(rendererID: number, extent: any[]): Scale;
         }
     }
@@ -575,9 +584,32 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
+            /**
+            * This function makes sure that all of the scales in this._projectors
+            * have an extent that includes all the data that is projected onto them.
+            */
             public updateProjectors(): Plot;
-            public newExtent(extent: any[], mappedData: any[], attr: string): any[];
-            static expandExtent(extent: any[], mappedData: any[]): any[];
+            /**
+            * Returns a new extent that includes mappedData into the existing extent.
+            *
+            * @param {any[]} extent If an array of numbers, this is a [min, max] pair.
+            *                If an array of strings, this is a list of all seen strings.
+            *                extent is empty to begin with.
+            * @param {any[]} mappedData A list of numbers or strings to be included in
+            *                           extent.
+            * @param {string} attr What kind of projection is being included, e.g.
+            *                      "x", "y", "r". "r" for example should probably be
+            *                      ignored, since a value having a radius of 5 doesn't
+            *                      mean that 5 must be in the extent.
+            */
+            public expandExtent(extent: any[], mappedData: any[], attr: string): any[];
+            /**
+            * Returns a new extent including both the old extent and mappedData.
+            *
+            * @param {any[]} extent
+            * @param {any[]} mappedData
+            */
+            static includeExtent(extent: any[], mappedData: any[]): any[];
         }
     }
 }
@@ -1198,7 +1230,7 @@ declare module Plottable {
             */
             constructor(dataset: any, xScale: Scale, yScale: Scale);
             public project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
-            public newExtent(extent: any[], mappedData: any[], attr: string): any[];
+            public expandExtent(extent: any[], mappedData: any[], attr: string): any[];
         }
     }
 }
@@ -1283,7 +1315,7 @@ declare module Plottable {
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             public deselectAll(): BarPlot;
-            public newExtent(extent: any[], mappedData: any[], attr: string): any[];
+            public expandExtent(extent: any[], mappedData: any[], attr: string): any[];
         }
     }
 }

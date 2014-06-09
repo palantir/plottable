@@ -173,9 +173,6 @@ export module Abstract {
       var extents = d3.values(this._rendererID2Extent);
       var newDomain = extents.reduce((a, b) => [Math.min(a[0], b[0]), Math.max(a[1], b[1])]);
       this._setDomain(newDomain);
-      // this.autoDomain will automatically broadcast for us.
-      // In the future, if we detect that the domain hasn't changed,
-      // we won't signal.
       return this;
     }
   }

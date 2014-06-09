@@ -83,7 +83,7 @@ export module Abstract {
         this._rerenderUpdateSelection = true;
       }
       this._dataSource = source;
-      this._registerToBroadcaster(this._dataSource, (newDataSource) => {
+      this._registerToBroadcaster(this._dataSource, () => {
 
         this.updateProjectors();
         this._dataChanged = true;
@@ -121,10 +121,7 @@ export module Abstract {
         var projector = this._projectors[a];
         var accessor = Util.Methods.applyAccessor(projector.accessor, this.dataSource());
         var scale = projector.scale;
-        var fn = scale == null ? accessor : (d: any, i: number) => {
-          var x = scale.scale(accessor(d, i));
-          return x;
-        };
+        var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
         h[a] = fn;
       });
       return h;
@@ -160,16 +157,20 @@ export module Abstract {
       return this;
     }
 
+    /**
+     * This function makes sure that all of the scales in this._projectors
+     * have an extent that includes all the data that is projected onto them.
+     */
     public updateProjectors(): Plot {
       var scales = d3.values(this._projectors).map((p: _IProjector) => p.scale);
       scales.filter((s) => s != null).forEach((scale: Scale) => {
         var extent: any[] = [];
         d3.keys(this._projectors).forEach((attr: string) => {
           var projector = this._projectors[attr];
-          var appliedAccessor: (d: any, i: number) => any = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
+          var appliedAccessor = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
           var mappedData = this._dataSource.data().map(appliedAccessor);
           if (projector.scale === scale && mappedData.length > 0) {
-            extent = this.newExtent(extent, mappedData, attr);
+            extent = this.expandExtent(extent, mappedData, attr);
           }
         });
         scale.extentChanged(this._plottableID, extent);
@@ -177,12 +178,31 @@ export module Abstract {
       return this;
     }
 
-    public newExtent(extent: any[], mappedData: any[], attr: string): any[] {
+    /**
+     * Returns a new extent that includes mappedData into the existing extent.
+     *
+     * @param {any[]} extent If an array of numbers, this is a [min, max] pair.
+     *                If an array of strings, this is a list of all seen strings.
+     *                extent is empty to begin with.
+     * @param {any[]} mappedData A list of numbers or strings to be included in
+     *                           extent.
+     * @param {string} attr What kind of projection is being included, e.g.
+     *                      "x", "y", "r". "r" for example should probably be
+     *                      ignored, since a value having a radius of 5 doesn't
+     *                      mean that 5 must be in the extent.
+     */
+    public expandExtent(extent: any[], mappedData: any[], attr: string): any[] {
       // will override
       return [];
     }
 
-    public static expandExtent(extent: any[], mappedData: any[]): any[] {
+    /**
+     * Returns a new extent including both the old extent and mappedData.
+     *
+     * @param {any[]} extent
+     * @param {any[]} mappedData
+     */
+    public static includeExtent(extent: any[], mappedData: any[]): any[] {
       if (mappedData.length === 0) {
         return extent;
       }

@@ -91,13 +91,13 @@ export module Abstract {
       return this;
     }
 
-    public newExtent(extent: any[], mappedData: any[], attr: string): any[] {
+    public expandExtent(extent: any[], mappedData: any[], attr: string): any[] {
       switch (attr) {
         case "x":
         case "y":
         case "x0":
         case "y0":
-        return Plot.expandExtent(extent, mappedData);
+        return Plot.includeExtent(extent, mappedData);
 
         default:
         return extent;

@@ -2126,7 +2126,15 @@ var Plottable;
                 return new Scale(this._d3Scale.copy());
             };
 
-            // this is called by renderer whenever there is an update from the dataSource
+            /**
+            * When a renderer determines that the scale's extent has changed,
+            * it will call this function. This function should ensure that
+            * the scale has a domain at least large enough to include extent.
+            *
+            * @param {number} rendererID A unique indentifier of the renderer sending
+            *                 the new extent.
+            * @param {any[]} extent The new extent, as computed by the renderer.
+            */
             Scale.prototype.extentChanged = function (rendererID, extent) {
                 // will override
                 return this;
@@ -2196,7 +2204,7 @@ var Plottable;
                     this._rerenderUpdateSelection = true;
                 }
                 this._dataSource = source;
-                this._registerToBroadcaster(this._dataSource, function (newDataSource) {
+                this._registerToBroadcaster(this._dataSource, function () {
                     _this.updateProjectors();
                     _this._dataChanged = true;
                     _this._render();
@@ -2238,8 +2246,7 @@ var Plottable;
                     var accessor = Plottable.Util.Methods.applyAccessor(projector.accessor, _this.dataSource());
                     var scale = projector.scale;
                     var fn = scale == null ? accessor : function (d, i) {
-                        var x = scale.scale(accessor(d, i));
-                        return x;
+                        return scale.scale(accessor(d, i));
                     };
                     h[a] = fn;
                 });
@@ -2276,6 +2283,10 @@ var Plottable;
                 return this;
             };
 
+            /**
+            * This function makes sure that all of the scales in this._projectors
+            * have an extent that includes all the data that is projected onto them.
+            */
             Plot.prototype.updateProjectors = function () {
                 var _this = this;
                 var scales = d3.values(this._projectors).map(function (p) {
@@ -2290,7 +2301,7 @@ var Plottable;
                         var appliedAccessor = Plottable.Util.Methods.applyAccessor(projector.accessor, _this._dataSource);
                         var mappedData = _this._dataSource.data().map(appliedAccessor);
                         if (projector.scale === scale && mappedData.length > 0) {
-                            extent = _this.newExtent(extent, mappedData, attr);
+                            extent = _this.expandExtent(extent, mappedData, attr);
                         }
                     });
                     scale.extentChanged(_this._plottableID, extent);
@@ -2298,12 +2309,31 @@ var Plottable;
                 return this;
             };
 
-            Plot.prototype.newExtent = function (extent, mappedData, attr) {
+            /**
+            * Returns a new extent that includes mappedData into the existing extent.
+            *
+            * @param {any[]} extent If an array of numbers, this is a [min, max] pair.
+            *                If an array of strings, this is a list of all seen strings.
+            *                extent is empty to begin with.
+            * @param {any[]} mappedData A list of numbers or strings to be included in
+            *                           extent.
+            * @param {string} attr What kind of projection is being included, e.g.
+            *                      "x", "y", "r". "r" for example should probably be
+            *                      ignored, since a value having a radius of 5 doesn't
+            *                      mean that 5 must be in the extent.
+            */
+            Plot.prototype.expandExtent = function (extent, mappedData, attr) {
                 // will override
                 return [];
             };
 
-            Plot.expandExtent = function (extent, mappedData) {
+            /**
+            * Returns a new extent including both the old extent and mappedData.
+            *
+            * @param {any[]} extent
+            * @param {any[]} mappedData
+            */
+            Plot.includeExtent = function (extent, mappedData) {
                 if (mappedData.length === 0) {
                     return extent;
                 }
@@ -2573,10 +2603,6 @@ var Plottable;
                     return [Math.min(a[0], b[0]), Math.max(a[1], b[1])];
                 });
                 this._setDomain(newDomain);
-
-                // this.autoDomain will automatically broadcast for us.
-                // In the future, if we detect that the domain hasn't changed,
-                // we won't signal.
                 return this;
             };
             return QuantitiveScale;
@@ -2752,8 +2778,6 @@ var Plottable;
             Ordinal.prototype.extentChanged = function (rendererID, extent) {
                 this._rendererID2Extent[rendererID] = extent;
                 var all = Plottable.Util.Methods.flatten(d3.values(this._rendererID2Extent));
-
-                // this.domain will broadcast for us
                 this._setDomain(Plottable.Util.Methods.uniq(all));
                 return this;
             };
@@ -4511,13 +4535,13 @@ var Plottable;
                 }
             };
 
-            XYPlot.prototype.newExtent = function (extent, mappedData, attr) {
+            XYPlot.prototype.expandExtent = function (extent, mappedData, attr) {
                 switch (attr) {
                     case "x":
                     case "y":
                     case "x0":
                     case "y0":
-                        return Plottable.Abstract.Plot.expandExtent(extent, mappedData);
+                        return Plottable.Abstract.Plot.includeExtent(extent, mappedData);
 
                     default:
                         return extent;
@@ -4768,13 +4792,13 @@ var Plottable;
                 return this;
             };
 
-            BarPlot.prototype.newExtent = function (extent, mappedData, attr) {
+            BarPlot.prototype.expandExtent = function (extent, mappedData, attr) {
                 switch (attr) {
                     case "x":
                     case "y":
                     case "x0":
                     case "y0":
-                        return Plottable.Abstract.Plot.expandExtent(extent, mappedData);
+                        return Plottable.Abstract.Plot.includeExtent(extent, mappedData);
 
                     default:
                         return extent;
