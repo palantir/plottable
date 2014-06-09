@@ -1839,6 +1839,7 @@ var Plottable;
                     wantsHeight: layout.wantsHeight };
             };
 
+            // xOffset is relative to parent element, not absolute
             Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
