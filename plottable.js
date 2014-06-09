@@ -2004,7 +2004,7 @@ var Plottable;
             */
             function Scale(scale) {
                 _super.call(this);
-                this._autoDomain = true;
+                this._autoDomainAutomatically = true;
                 this.rendererID2Perspective = {};
                 this.dataSourceReferenceCounter = new Plottable.Util.IDCounter();
                 this._autoNice = false;
@@ -2049,12 +2049,12 @@ var Plottable;
                 var dataSourceID = dataSource._plottableID;
                 if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1) {
                     dataSource.registerListener(this, function () {
-                        if (_this._autoDomain) {
+                        if (_this._autoDomainAutomatically) {
                             _this.autoDomain();
                         }
                     });
                 }
-                if (this._autoDomain) {
+                if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
                 return this;
@@ -2068,7 +2068,7 @@ var Plottable;
                 }
 
                 delete this.rendererID2Perspective[rendererIDAttr];
-                if (this._autoDomain) {
+                if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
                 return this;
@@ -2088,7 +2088,7 @@ var Plottable;
                 if (values == null) {
                     return this._d3Scale.domain();
                 } else {
-                    this._autoDomain = false;
+                    this._autoDomainAutomatically = false;
                     this._setDomain(values);
                     return this;
                 }
@@ -2903,7 +2903,7 @@ var Plottable;
 
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
-                if (this._autoDomain) {
+                if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
                 this._broadcast();
