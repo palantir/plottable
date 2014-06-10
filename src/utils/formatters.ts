@@ -5,7 +5,7 @@ export module Util {
   export interface IFormatter {
     (d: any): String;
   }
-  export module Formatters {
+  export module Formatter {
     export function identity(): IFormatter {
       return function(d: any) { return String(d); };
     }

@@ -780,13 +780,13 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (Util) {
-        (function (Formatters) {
+        (function (Formatter) {
             function identity() {
                 return function (d) {
                     return String(d);
                 };
             }
-            Formatters.identity = identity;
+            Formatter.identity = identity;
 
             /**
             * Creates a formatter that displays no more than [precision] decimal places.
@@ -803,7 +803,7 @@ var Plottable;
                 };
                 return formatter;
             }
-            Formatters.general = general;
+            Formatter.general = general;
 
             /**
             * Creates a formatter that displays exactly [precision] decimal places.
@@ -818,7 +818,7 @@ var Plottable;
                     return d.toFixed(precision);
                 };
             }
-            Formatters.fixed = fixed;
+            Formatter.fixed = fixed;
 
             /**
             * Creates a formatter for currency values.
@@ -847,7 +847,7 @@ var Plottable;
                     return output;
                 };
             }
-            Formatters.currency = currency;
+            Formatter.currency = currency;
 
             /**
             * Creates a formatter for percentage values.
@@ -862,9 +862,9 @@ var Plottable;
                     return d.toFixed(precision) + "%";
                 };
             }
-            Formatters.percentage = percentage;
-        })(Util.Formatters || (Util.Formatters = {}));
-        var Formatters = Util.Formatters;
+            Formatter.percentage = percentage;
+        })(Util.Formatter || (Util.Formatter = {}));
+        var Formatter = Util.Formatter;
     })(Plottable.Util || (Plottable.Util = {}));
     var Util = Plottable.Util;
 })(Plottable || (Plottable = {}));
