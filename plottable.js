@@ -3885,8 +3885,9 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), function (d) {
+                    return d;
+                });
 
                 var getTickLabelTransform = function (d, i) {
                     var startAndWidth = _this._scale.fullBandStartAndWidth(d);

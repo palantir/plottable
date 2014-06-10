@@ -94,8 +94,7 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var startAndWidth = this._scale.fullBandStartAndWidth(d);
