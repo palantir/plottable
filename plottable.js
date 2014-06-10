@@ -3808,9 +3808,11 @@ var Plottable;
                 return this;
             };
 
+            // public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+            //   var widthRequiredByTicks
+            // }
             Time.prototype._getTickValues = function () {
-                var nTicks = 10;
-                return this._scale.ticks(nTicks);
+                return this._scale.ticks(this._nTicks);
             };
 
             Time.prototype._doRender = function () {
@@ -3821,7 +3823,7 @@ var Plottable;
                     return d;
                 });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-                tickLabelsEnter.append("text").attr("x", 0).attr("y", 0);
+                tickLabelsEnter.append("text").attr("x", 0).attr("y", 20);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d, i) {
                     return "translate(" + _this._scale._d3Scale(d) + ",0)";
@@ -3829,7 +3831,6 @@ var Plottable;
                 tickLabels.selectAll("text").text(function (d) {
                     return _this._formatter(d);
                 });
-
                 return this;
             };
             return Time;
@@ -3949,9 +3950,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), function (d) {
-                    return d;
-                });
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
 
                 var getTickLabelTransform = function (d, i) {
                     var startAndWidth = _this._scale.fullBandStartAndWidth(d);

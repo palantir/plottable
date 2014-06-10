@@ -8,8 +8,9 @@
 
 var data = [
     {x: "5/2/2014", y: 2},
-    {x: "5/3/2014", y: 3},
-    {x: "5/4/2024", y: 4}
+    {x: "2/24/2017", y: 150},
+    {x: "8/8/2020", y: -50},
+    {x: "1/23/2025", y: 100}
     ]
 
 
@@ -25,15 +26,26 @@ var customTimeFormat = d3.time.format.multi([
   [":%S", function(d) { return d.getSeconds(); }],
   ["%I:%M", function(d) { return d.getMinutes(); }],
   ["%I %p", function(d) { return d.getHours(); }],
-  // ["%a %d", function(d) { return d.getDay() && d.getDate() != 1; }],
+  ["%a %d", function(d) { return d.getDay() && d.getDate() != 1; }],
   ["%b %d", function(d) { return d.getDate() != 1; }],
   ["%b", function(d) { return d.getMonth(); }],
   ["%Y", function() { return true; }]
 ]);
 
-    xAxis = new Plottable.Axis.Time(xScale, "bottom", customTimeFormat);
+
+
+    xAxisB = new Plottable.Axis.Time(xScale, "bottom", customTimeFormat);
+    xAxisB._nTicks = 2;
+    xAxisA = new Plottable.Axis.Time(xScale, "bottom", customTimeFormat);
+    xAxisA._nTicks = 10;
+
+    xAxis = new Plottable.Component.Table([[xAxisA], [xAxisB]]);
     yAxis = new Plottable.Axis.YAxis(yScale);
-    new Plottable.Template.StandardChart().center(linePlot).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
+
+
+    gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+    renderGroup = linePlot.merge(gridlines);
+    new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
     new Plottable.Interaction.PanZoom(linePlot, xScale, yScale).registerWithComponent();
 };
 

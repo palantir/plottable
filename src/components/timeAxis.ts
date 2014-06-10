@@ -5,6 +5,7 @@ export module Axis {
   export class Time extends Abstract.Axis {
     public _scale: Scale.Time;
     public _tickLabelsG: D3.Selection;
+    public _nTicks: number;
 
     /**
      * Creates a CategoryAxis.
@@ -27,9 +28,12 @@ export module Axis {
       return this;
     }
 
+    // public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+    //   var widthRequiredByTicks
+    // }
+
     public _getTickValues(): string[] {
-      var nTicks = 10;
-      return this._scale.ticks(nTicks);
+      return this._scale.ticks(this._nTicks);
     }
 
     public _doRender() {
@@ -37,11 +41,10 @@ export module Axis {
       var tickValues = this._getTickValues();
       var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._getTickValues(), (d) => d);
       var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-      tickLabelsEnter.append("text").attr("x", 0).attr("y", 0);
+      tickLabelsEnter.append("text").attr("x", 0).attr("y", 20);
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any, i: number) => "translate(" + this._scale._d3Scale(d) + ",0)");
       tickLabels.selectAll("text").text((d: any) => this._formatter(d));
-
       return this;
     }
   }
