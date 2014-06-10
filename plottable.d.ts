@@ -1037,6 +1037,25 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
+        class Time extends Abstract.Axis {
+            /**
+            * Creates a CategoryAxis.
+            *
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * display the scale as efficiently as possible.
+            *
+            * @constructor
+            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            */
+            constructor(scale: Scale.Time, orientation?: string, formatter?: (n: any) => string);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
         class Category extends Abstract.Axis {
             /**
             * Creates a CategoryAxis.
@@ -1512,6 +1531,15 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class YDragBox extends DragBox {
+            public setBox(y0: number, y1: number): YDragBox;
         }
     }
 }

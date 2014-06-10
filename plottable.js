@@ -3785,6 +3785,70 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Axis) {
+        var Time = (function (_super) {
+            __extends(Time, _super);
+            /**
+            * Creates a CategoryAxis.
+            *
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * display the scale as efficiently as possible.
+            *
+            * @constructor
+            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            */
+            function Time(scale, orientation, formatter) {
+                if (typeof orientation === "undefined") { orientation = "bottom"; }
+                _super.call(this, scale, orientation, formatter);
+                this.classed("time-axis", true);
+            }
+            Time.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
+                return this;
+            };
+
+            Time.prototype._getTickValues = function () {
+                var nTicks = 10;
+                return this._scale.ticks(nTicks);
+            };
+
+            Time.prototype._doRender = function () {
+                var _this = this;
+                _super.prototype._doRender.call(this);
+                var tickValues = this._getTickValues();
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._getTickValues(), function (d) {
+                    return d;
+                });
+                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+                tickLabelsEnter.append("text").attr("x", 0).attr("y", 0);
+                tickLabels.exit().remove();
+                tickLabels.attr("transform", function (d, i) {
+                    return "translate(" + _this._scale._d3Scale(d) + ",0)";
+                });
+                tickLabels.selectAll("text").text(function (d) {
+                    return _this._formatter(d);
+                });
+
+                return this;
+            };
+            return Time;
+        })(Plottable.Abstract.Axis);
+        Axis.Time = Time;
+    })(Plottable.Axis || (Plottable.Axis = {}));
+    var Axis = Plottable.Axis;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Axis) {
         var Category = (function (_super) {
             __extends(Category, _super);
             /**
@@ -3885,7 +3949,9 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), function (d) {
+                    return d;
+                });
 
                 var getTickLabelTransform = function (d, i) {
                     var startAndWidth = _this._scale.fullBandStartAndWidth(d);
@@ -5601,6 +5667,47 @@ var Plottable;
             return XYDragBox;
         })(Plottable.Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Interaction) {
+        var YDragBox = (function (_super) {
+            __extends(YDragBox, _super);
+            function YDragBox() {
+                _super.apply(this, arguments);
+            }
+            YDragBox.prototype._drag = function () {
+                _super.prototype._drag.call(this);
+                this.setBox(this.origin[1], this.location[1]);
+            };
+
+            YDragBox.prototype._doDragend = function () {
+                if (this.callbackToCall == null) {
+                    return;
+                }
+                var yMin = Math.min(this.origin[1], this.location[1]);
+                var yMax = Math.max(this.origin[1], this.location[1]);
+                var pixelArea = { yMin: yMin, yMax: yMax };
+                this.callbackToCall(pixelArea);
+            };
+
+            YDragBox.prototype.setBox = function (y0, y1) {
+                _super.prototype.setBox.call(this, 0, this.componentToListenTo.availableWidth, y0, y1);
+                return this;
+            };
+            return YDragBox;
+        })(Plottable.Interaction.DragBox);
+        Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));
