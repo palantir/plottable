@@ -1,21 +1,18 @@
-var quicktest = function(svg, data, Plottable) {
+// Will receive function arguments: (svg, data, Plottable)
 
-      var doAnimate = true;
-      var lineRenderer;
-      var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+var doAnimate = true;
+var lineRenderer;
+var xScale = new Plottable.Scale.Linear();
+var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-      var yScale = new Plottable.Scale.Linear();
-      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+var yScale = new Plottable.Scale.Linear();
+var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-      lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
-      lineRenderer.project("opacity", 0.75);
-      lineRenderer.animate(doAnimate);
+lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
+lineRenderer.project("opacity", 0.75);
+lineRenderer.animate(doAnimate);
 
-      var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
-                                               [null,  xAxis]]);
-      lineChart.renderTo(svg);
-}
+var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
+                                         [null,  xAxis]]);
+lineChart.renderTo(svg);
 
-quicktest.quicktestName = "animate_line";
-quicktests.push(quicktest);
