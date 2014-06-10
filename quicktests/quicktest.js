@@ -79,7 +79,7 @@ function loadSingleQuicktest(container, quickTest, Plottable) {
 }
 
 function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
-  var tr = tableSelection.append("tr");
+  var tr = tableSelection.append("tr").classed("quicktest-row", true);
   loadSingleQuicktest(tr.append("td"), quickTest, Plottable1);
   tr.append("td");
   loadSingleQuicktest(tr.append("td"), quickTest, Plottable2);
@@ -97,7 +97,7 @@ function makeMainFunctionForGivenBranch(branch) {
 
 var button = document.getElementById('button');
 button.onclick = function () {
-  d3.selectAll("tr").remove();
+  d3.selectAll(".quicktest-row").remove();
 
   var fb = $('#featureBranch').val();
   loadQuickTestsAndPlottables(fb, makeMainFunctionForGivenBranch(fb));
