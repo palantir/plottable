@@ -2,6 +2,28 @@
 
 module Plottable {
 export module Singleton {
+  export class ResizeBroadcaster {
+    private static _broadcaster: Abstract.Broadcaster;
+
+    private static _lazyInitialize() {
+      if (ResizeBroadcaster._broadcaster === undefined) {
+        ResizeBroadcaster._broadcaster = new Abstract.Broadcaster();
+        window.addEventListener("resize", () => ResizeBroadcaster._broadcaster._broadcast());
+      }
+    }
+
+    public static register(c: Abstract.Component) {
+      ResizeBroadcaster._lazyInitialize();
+      ResizeBroadcaster._broadcaster.registerListener(c._plottableID, () => c._invalidateLayout());
+    }
+
+    public static deregister(c: Abstract.Component) {
+      if (ResizeBroadcaster._broadcaster) {
+        ResizeBroadcaster._broadcaster.deregisterListener(c._plottableID);
+      }
+    }
+  }
+
   export class RenderController {
     private static IE_TIMEOUT = 1000 / 60; // 60 fps
     private static componentsNeedingRender: {[key: string]: Abstract.Component} = {};
@@ -28,13 +50,17 @@ export module Singleton {
       RenderController.requestFrame();
     }
 
+    private static requestAnimationFramePolyfill(fn: () => any) {
+        if (window.requestAnimationFrame != null) {
+          requestAnimationFrame(fn);
+        } else {
+          setTimeout(fn, RenderController.IE_TIMEOUT);
+        }
+    }
+
     private static requestFrame() {
       if (!RenderController.animationRequested) {
-        if (window.requestAnimationFrame != null) {
-          requestAnimationFrame(RenderController.flush);
-        } else {
-          setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
-        }
+        RenderController.requestAnimationFramePolyfill(RenderController.flush);
         RenderController.animationRequested = true;
       }
     }

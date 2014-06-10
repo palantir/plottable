@@ -229,6 +229,15 @@ export module Abstract {
       return this;
     }
 
+    public autoResize(flag: boolean): Component {
+      if (flag) {
+        Singleton.ResizeBroadcaster.register(this);
+      } else {
+        Singleton.ResizeBroadcaster.deregister(this);
+      }
+      return this;
+    }
+
     /**
      * Sets the x alignment of the Component.
      *
