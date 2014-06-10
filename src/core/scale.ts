@@ -102,7 +102,7 @@ export module Abstract {
     }
 
     /**
-     * When a renderer determines that the scale's extent has changed,
+     * When a renderer determines that the extent of a projector has changed,
      * it will call this function. This function should ensure that
      * the scale has a domain at least large enough to include extent.
      * 

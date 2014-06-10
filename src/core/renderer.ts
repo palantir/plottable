@@ -84,11 +84,11 @@ export module Abstract {
       }
       this._dataSource = source;
       this._registerToBroadcaster(this._dataSource, () => {
-        this.updateProjectors();
+        this.updateAllProjectors();
         this._dataChanged = true;
         this._render();
       });
-      this.updateProjectors();
+      this.updateAllProjectors();
       this._dataChanged = true;
       this._render();
       return this;
@@ -111,7 +111,7 @@ export module Abstract {
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
       this._requireRerender = true;
       this._rerenderUpdateSelection = true;
-      this.updateProjectors();
+      this.updateProjector(attrToSet);
       return this;
     }
 
@@ -161,16 +161,19 @@ export module Abstract {
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
      */
-    public updateProjectors(): Plot {
-      d3.keys(this._projectors)
-        .filter((attr: string) => this._projectors[attr].scale != null)
-        .forEach((attr: string) => {
-          var projector = this._projectors[attr];
-          var extent = this.dataSource()._getExtent(projector.accessor);
-          if (extent != null) {
-            projector.scale.updateExtent(this._plottableID, attr, extent);
-          }
-      });
+    private updateAllProjectors(): Plot {
+      d3.keys(this._projectors).forEach((attr: string) => this.updateProjector(attr));
+      return this;
+    }
+
+    private updateProjector(attr: string) {
+      var projector = this._projectors[attr];
+      if (projector.scale != null) {
+        var extent = this.dataSource()._getExtent(projector.accessor);
+        if (extent != null) {
+          projector.scale.updateExtent(this._plottableID, attr, extent);
+        }
+      }
       return this;
     }
   }

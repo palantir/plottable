@@ -2083,7 +2083,7 @@ var Plottable;
             };
 
             /**
-            * When a renderer determines that the scale's extent has changed,
+            * When a renderer determines that the extent of a projector has changed,
             * it will call this function. This function should ensure that
             * the scale has a domain at least large enough to include extent.
             *
@@ -2173,11 +2173,11 @@ var Plottable;
                 }
                 this._dataSource = source;
                 this._registerToBroadcaster(this._dataSource, function () {
-                    _this.updateProjectors();
+                    _this.updateAllProjectors();
                     _this._dataChanged = true;
                     _this._render();
                 });
-                this.updateProjectors();
+                this.updateAllProjectors();
                 this._dataChanged = true;
                 this._render();
                 return this;
@@ -2203,7 +2203,7 @@ var Plottable;
                 this._projectors[attrToSet] = { accessor: accessor, scale: scale };
                 this._requireRerender = true;
                 this._rerenderUpdateSelection = true;
-                this.updateProjectors();
+                this.updateProjector(attrToSet);
                 return this;
             };
 
@@ -2256,17 +2256,22 @@ var Plottable;
             * This function makes sure that all of the scales in this._projectors
             * have an extent that includes all the data that is projected onto them.
             */
-            Plot.prototype.updateProjectors = function () {
+            Plot.prototype.updateAllProjectors = function () {
                 var _this = this;
-                d3.keys(this._projectors).filter(function (attr) {
-                    return _this._projectors[attr].scale != null;
-                }).forEach(function (attr) {
-                    var projector = _this._projectors[attr];
-                    var extent = _this.dataSource()._getExtent(projector.accessor);
-                    if (extent != null) {
-                        projector.scale.updateExtent(_this._plottableID, attr, extent);
-                    }
+                d3.keys(this._projectors).forEach(function (attr) {
+                    return _this.updateProjector(attr);
                 });
+                return this;
+            };
+
+            Plot.prototype.updateProjector = function (attr) {
+                var projector = this._projectors[attr];
+                if (projector.scale != null) {
+                    var extent = this.dataSource()._getExtent(projector.accessor);
+                    if (extent != null) {
+                        projector.scale.updateExtent(this._plottableID, attr, extent);
+                    }
+                }
                 return this;
             };
             return Plot;

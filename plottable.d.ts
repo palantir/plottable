@@ -539,7 +539,7 @@ declare module Plottable {
             */
             public copy(): Scale;
             /**
-            * When a renderer determines that the scale's extent has changed,
+            * When a renderer determines that the extent of a projector has changed,
             * it will call this function. This function should ensure that
             * the scale has a domain at least large enough to include extent.
             *
@@ -586,11 +586,6 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
-            /**
-            * This function makes sure that all of the scales in this._projectors
-            * have an extent that includes all the data that is projected onto them.
-            */
-            public updateProjectors(): Plot;
         }
     }
 }
