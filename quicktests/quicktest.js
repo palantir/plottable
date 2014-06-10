@@ -1,7 +1,7 @@
 
 var Plottables = {};
 
-function loadScript(url, callback) {
+function loadScript(url, id, callback) {
   var element = document.createElement("script");
   element.type = "text/javascript";
   element.src = url;
@@ -23,7 +23,7 @@ function loadPlottable(branchName, callback) {
     Plottable = null;
     callback();
   }
-  loadScript(url, inner);
+  loadScript(url, branchName, inner);
 }
 
 
@@ -45,7 +45,7 @@ function loadQuicktests(qts, callback) {
   }
   
   quicktestsToLoad.forEach(function(q) {
-    loadScript("quicktests/" + q.name + ".js", inner);
+    loadScript("quicktests/" + q.name + ".js", q.name, inner);
   });
 }
 
