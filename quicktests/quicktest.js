@@ -97,20 +97,8 @@ function makeMainFunctionForGivenBranch(branch) {
 
 var button = document.getElementById('button');
 button.onclick = function () {
-  var quicktests = [];
-  var quicktestsToLoad = [];
-  
-  if(list_of_quicktests !== undefined){
-      list_of_quicktests.forEach(function(entry) {
-      if($('#'+list_of_quicktests.name) !== undefined){
-        $('#'+list_of_quicktests.name).remove();
-      }
-    });
-  }
-  
-  $("tr").each(function (index) {
-    if (index > 0){  $(this).remove();}
-  } ); 
+  d3.selectAll("tr").remove();
+
   var fb = $('#featureBranch').val();
   loadQuickTestsAndPlottables(fb, makeMainFunctionForGivenBranch(fb));
 };
