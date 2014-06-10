@@ -29,8 +29,9 @@
         new Plottable.Template.StandardChart()
                       .xAxis(xAxis).yAxis(yAxis)
                       .center(renderGroup)
-                      .renderTo("#xy-test");
-        window.xy = new Plottable.Interaction.XYDragBox(renderGroup).setupZoomCallback(xScale, yScale).registerWithComponent();
+                      .renderTo(svg);
+        cb = function(xy) {console.log("XY drag area: ", xy);}
+        window.xy = new Plottable.Interaction.XYDragBox(renderGroup).callback(cb).registerWithComponent();
       }
       function xdrag() {
         var dataseries = makeRandomData(20, 0.3);
@@ -61,9 +62,10 @@
 
         var chart = new Plottable.Template.StandardChart()
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-                        .renderTo("#x-test");
+                        .renderTo(svg);
 
-        window.x = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
+        cb = function(x) {console.log("X drag area: ", x);}
+        window.x = new Plottable.Interaction.XDragBox(renderGroup).callback(cb).registerWithComponent();
       }
 
 

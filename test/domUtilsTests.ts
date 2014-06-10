@@ -70,10 +70,13 @@ describe("Util.DOM", () => {
     });
   });
 
-  it("isSelectionRemoved works", () => {
+  it("isSelectionRemovedFromSVG works", () => {
     var svg = generateSVG();
-    assert.isFalse(Plottable.Util.DOM.isSelectionRemoved(svg), "svg is in DOM");
+    var g = svg.append("g");
+    assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is in svg");
+    g.remove();
+    assert.isTrue(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is no longer in svg");
+    assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(svg), "svg is not considered removed");
     svg.remove();
-    assert.isTrue(Plottable.Util.DOM.isSelectionRemoved(svg), "svg is no longer in DOM");
     });
 });

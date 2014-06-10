@@ -1421,11 +1421,14 @@ describe("Util.DOM", function () {
         });
     });
 
-    it("isSelectionRemoved works", function () {
+    it("isSelectionRemovedFromSVG works", function () {
         var svg = generateSVG();
-        assert.isFalse(Plottable.Util.DOM.isSelectionRemoved(svg), "svg is in DOM");
+        var g = svg.append("g");
+        assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is in svg");
+        g.remove();
+        assert.isTrue(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is no longer in svg");
+        assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(svg), "svg is not considered removed");
         svg.remove();
-        assert.isTrue(Plottable.Util.DOM.isSelectionRemoved(svg), "svg is no longer in DOM");
     });
 });
 
@@ -3222,9 +3225,9 @@ describe("Scales", function () {
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
             scale._addPerspective("1", dataSource, "foo");
             scale.autoDomain().padDomain().nice();
-            assert.isTrue(scale._autoDomain, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+            assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
-            assert.isFalse(scale._autoDomain, "the autoDomain flag is false after domain explicitly set");
+            assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
         });
 
         it("scale autorange works as expected with single dataSource", function () {
@@ -3250,17 +3253,17 @@ describe("Scales", function () {
         });
 
         it("scale perspectives can be removed appropriately", function () {
-            assert.isTrue(scale._autoDomain, "autoDomain enabled1");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
             scale._addPerspective("1x", dataSource, "foo");
             scale._addPerspective("2x", dataSource, "bar");
-            assert.isTrue(scale._autoDomain, "autoDomain enabled2");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-            assert.isTrue(scale._autoDomain, "autoDomain enabled3");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
             scale._removePerspective("1x");
-            assert.isTrue(scale._autoDomain, "autoDomain enabled4");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
             scale._addPerspective("2x", dataSource, "foo");
-            assert.isTrue(scale._autoDomain, "autoDomain enabled5");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
     });
