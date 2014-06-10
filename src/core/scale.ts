@@ -4,7 +4,7 @@ module Plottable {
 export module Abstract {
   export class Scale extends Broadcaster {
     public _d3Scale: D3.Scale.Scale;
-    public _autoDomain = true;
+    public _autoDomainAutomatically = true;
     public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
     public _autoNice = false;
     public _autoPad  = false;
@@ -64,7 +64,7 @@ export module Abstract {
       if (values == null) {
         return this._d3Scale.domain();
       } else {
-        this._autoDomain = false;
+        this._autoDomainAutomatically = false;
         this._setDomain(values);
         return this;
       }
@@ -113,7 +113,7 @@ export module Abstract {
      */
     public updateExtent(rendererID: number, attr: string, extent: any[]) {
       this._rendererAttrID2Extent[rendererID + attr] = extent;
-      if (this._autoDomain) {
+      if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
       return this;
@@ -121,7 +121,7 @@ export module Abstract {
 
     public removeExtent(rendererID: number, attr: string) {
       delete this._rendererAttrID2Extent[rendererID + attr];
-      if (this._autoDomain) {
+      if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
       return this;

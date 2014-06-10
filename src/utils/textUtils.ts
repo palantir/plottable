@@ -19,7 +19,7 @@ export module Util {
         if (s.trim() === "") {
           return [0, 0];
         }
-        if (DOM.isSelectionRemoved(selection)) {
+        if (DOM.isSelectionRemovedFromSVG(selection)) {
           throw new Error("Cannot measure text in a removed node");
         }
         var bb: SVGRect;

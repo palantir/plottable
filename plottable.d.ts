@@ -231,7 +231,7 @@ declare module Plottable {
             * @returns {SVGRed} The bounding box.
             */
             function getBBox(element: D3.Selection): SVGRect;
-            function isSelectionRemoved(selection: D3.Selection): boolean;
+            function isSelectionRemovedFromSVG(selection: D3.Selection): boolean;
             function getElementWidth(elem: HTMLScriptElement): number;
             function getElementHeight(elem: HTMLScriptElement): number;
             function getSVGPixelWidth(svg: D3.Selection): number;
@@ -1534,6 +1534,15 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Interaction {
+        class YDragBox extends DragBox {
+            public setBox(y0: number, y1: number): YDragBox;
         }
     }
 }

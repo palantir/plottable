@@ -1,5 +1,5 @@
 /*!
-Plottable 0.15.2 (https://github.com/palantir/plottable)
+Plottable 0.15.4 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -277,7 +277,7 @@ var Plottable;
                     if (s.trim() === "") {
                         return [0, 0];
                     }
-                    if (Plottable.Util.DOM.isSelectionRemoved(selection)) {
+                    if (Plottable.Util.DOM.isSelectionRemovedFromSVG(selection)) {
                         throw new Error("Cannot measure text in a removed node");
                     }
                     var bb;
@@ -720,15 +720,15 @@ var Plottable;
                 return parseFloat(value);
             }
 
-            function isSelectionRemoved(selection) {
-                var e = selection.node();
-                var n = e.parentNode;
-                while (n !== null && n.nodeName !== "#document") {
+            //
+            function isSelectionRemovedFromSVG(selection) {
+                var n = selection.node();
+                while (n !== null && n.nodeName !== "svg") {
                     n = n.parentNode;
                 }
                 return (n == null);
             }
-            DOM.isSelectionRemoved = isSelectionRemoved;
+            DOM.isSelectionRemovedFromSVG = isSelectionRemovedFromSVG;
 
             function getElementWidth(elem) {
                 var style = window.getComputedStyle(elem);
@@ -1848,6 +1848,7 @@ var Plottable;
                     wantsHeight: layout.wantsHeight };
             };
 
+            // xOffset is relative to parent element, not absolute
             Table.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -2012,7 +2013,7 @@ var Plottable;
             */
             function Scale(scale) {
                 _super.call(this);
-                this._autoDomain = true;
+                this._autoDomainAutomatically = true;
                 this._rendererAttrID2Extent = {};
                 this._autoNice = false;
                 this._autoPad = false;
@@ -2052,7 +2053,7 @@ var Plottable;
                 if (values == null) {
                     return this._d3Scale.domain();
                 } else {
-                    this._autoDomain = false;
+                    this._autoDomainAutomatically = false;
                     this._setDomain(values);
                     return this;
                 }
@@ -2093,7 +2094,7 @@ var Plottable;
             */
             Scale.prototype.updateExtent = function (rendererID, attr, extent) {
                 this._rendererAttrID2Extent[rendererID + attr] = extent;
-                if (this._autoDomain) {
+                if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
                 return this;
@@ -2101,7 +2102,7 @@ var Plottable;
 
             Scale.prototype.removeExtent = function (rendererID, attr) {
                 delete this._rendererAttrID2Extent[rendererID + attr];
-                if (this._autoDomain) {
+                if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
                 return this;
@@ -2910,7 +2911,7 @@ var Plottable;
 
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
-                if (this._autoDomain) {
+                if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
                 this._broadcast();
@@ -5609,6 +5610,47 @@ var Plottable;
             return XYDragBox;
         })(Plottable.Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
+    })(Plottable.Interaction || (Plottable.Interaction = {}));
+    var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Interaction) {
+        var YDragBox = (function (_super) {
+            __extends(YDragBox, _super);
+            function YDragBox() {
+                _super.apply(this, arguments);
+            }
+            YDragBox.prototype._drag = function () {
+                _super.prototype._drag.call(this);
+                this.setBox(this.origin[1], this.location[1]);
+            };
+
+            YDragBox.prototype._doDragend = function () {
+                if (this.callbackToCall == null) {
+                    return;
+                }
+                var yMin = Math.min(this.origin[1], this.location[1]);
+                var yMax = Math.max(this.origin[1], this.location[1]);
+                var pixelArea = { yMin: yMin, yMax: yMax };
+                this.callbackToCall(pixelArea);
+            };
+
+            YDragBox.prototype.setBox = function (y0, y1) {
+                _super.prototype.setBox.call(this, 0, this.componentToListenTo.availableWidth, y0, y1);
+                return this;
+            };
+            return YDragBox;
+        })(Plottable.Interaction.DragBox);
+        Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));

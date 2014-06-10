@@ -29,7 +29,7 @@
         new Plottable.Template.StandardChart()
                       .xAxis(xAxis).yAxis(yAxis)
                       .center(renderGroup)
-                      .renderTo("#xy-test");
+                      .renderTo(svg);
         cb = function(xy) {console.log("XY drag area: ", xy);}
         window.xy = new Plottable.Interaction.XYDragBox(renderGroup).callback(cb).registerWithComponent();
       }
@@ -62,7 +62,7 @@
 
         var chart = new Plottable.Template.StandardChart()
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-                        .renderTo("#x-test");
+                        .renderTo(svg);
 
         cb = function(x) {console.log("X drag area: ", x);}
         window.x = new Plottable.Interaction.XDragBox(renderGroup).callback(cb).registerWithComponent();

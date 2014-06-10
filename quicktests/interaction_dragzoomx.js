@@ -1,21 +1,7 @@
-<html>
-  <head>
-    <title>Area Renderer Quicktest</title>
-    <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../bower_components/d3/d3.min.js"></script>
-    <script src="../../plottable_multifile.js"></script>
-    <script src="../../examples/exampleUtil.js"></script>
-    <style>
-      .plottable .axis line {
-/*        stroke: black;
-        opacity: 1;*/
-      }
-    </style>
+var quicktest = function(svg, data, Plottable){
 
-    <script>
-      window.onload = function() {
-        var dataseries = makeRandomData(20, 0.3);
-        var dataseries_top = makeRandomData(20, 0.3);
+        var dataseries = data[0].slice(0, 20);
+        var dataseries_top = data[1].slice(0, 20);
         for (var i = 0; i < 20; ++i) {
           dataseries_top[i].x = dataseries[i].x;
           dataseries_top[i].y += dataseries[i].y;
@@ -42,12 +28,10 @@
 
         var chart = new Plottable.Template.StandardChart()
                         .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-                        .renderTo("#areaPlot-test");
-      }
-    </script>
-  </head>
-  <body>
-    <svg id="areaPlot-test" width="480" height="320"></svg>
-  </body>
+                        .renderTo(svg);
 
-</html>
+        window.x = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
+
+}
+quicktest.quicktestName = "dragzoom_x";
+quicktests.push(quicktest)
