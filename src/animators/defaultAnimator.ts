@@ -29,7 +29,7 @@ export module Animator {
     public duration(): Number;
     public duration(duration: Number): DefaultAnimator;
     public duration(duration?: Number): any{
-      if (duration == null) {
+      if (duration === undefined) {
         return this._durationMsec;
       } else {
         this._durationMsec = duration;
@@ -47,7 +47,7 @@ export module Animator {
     public delay(): Number;
     public delay(delay: Number): DefaultAnimator;
     public delay(delay?: Number): any{
-      if (delay == null) {
+      if (delay === undefined) {
         return this._delayMsec;
       } else {
         this._delayMsec = delay;
@@ -65,7 +65,7 @@ export module Animator {
     public easing(): string;
     public easing(easing: string): DefaultAnimator;
     public easing(easing?: string): any{
-      if (easing == null) {
+      if (easing === undefined) {
         return this._easing;
       } else {
         this._easing = easing;
