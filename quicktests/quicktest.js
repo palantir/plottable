@@ -34,13 +34,6 @@ var quicktestsToLoad = [];
 function loadQuicktests(qts, callback) {
   var nLoaded = 0;
 
-  qts.forEach(function(entry) {
-      if($('#'+qts.name) !== undefined){
-        $('#'+qts.name).remove();
-      }
-  });
-
-
   var filterword = $('#filterWord').val();
   if(filterword === "" || filterword === undefined){ 
     quicktestsToLoad = qts; 
@@ -106,6 +99,15 @@ var button = document.getElementById('button');
 button.onclick = function () {
   var quicktests = [];
   var quicktestsToLoad = [];
+  
+  if(qts !== undefined){
+      qts.forEach(function(entry) {
+      if($('#'+qts.name) !== undefined){
+        $('#'+qts.name).remove();
+      }
+    });
+  }
+  
   $("tr").each(function (index) {
     if (index > 0){  $(this).remove();}
   } ); 
