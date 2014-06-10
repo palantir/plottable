@@ -3896,10 +3896,10 @@ var Plottable;
                     var y = _this._isHorizontal() ? 0 : bandStartPosition;
                     return "translate(" + x + "," + y + ")";
                 };
-                tickLabels.enter().append("g").classed("tick-label", true);
+                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
-                this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
+                this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabelsEnter);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
