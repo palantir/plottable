@@ -1,5 +1,5 @@
 /*!
-Plottable 0.15.4 (https://github.com/palantir/plottable)
+Plottable 0.16.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
