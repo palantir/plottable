@@ -19,7 +19,7 @@ export module Abstract {
     public element: D3.Selection;
     public scales: Abstract.Scale[];
     public _colorAccessor: IAccessor;
-    public _animate: Boolean = false;
+    public _animate: boolean = false;
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
@@ -113,17 +113,17 @@ export module Abstract {
       var rendererIDAttr = this._plottableID + attrToSet;
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
-      if (scale == null) {
-        scale = existingScale;
-      }
+
       if (existingScale != null) {
         existingScale._removePerspective(rendererIDAttr);
         this._deregisterFromBroadcaster(existingScale);
       }
+
       if (scale != null) {
         scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
         this._registerToBroadcaster(scale, () => this._render());
       }
+
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
       this._requireRerender = true;
       this._rerenderUpdateSelection = true;
@@ -206,7 +206,7 @@ export module Abstract {
     public animator(animatorKey: string): Animator.IPlotAnimator;
     public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
     public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
-      if (animator == null){
+      if (animator === undefined){
         return this._animators[animatorKey];
       } else {
         this._animators[animatorKey] = animator;
