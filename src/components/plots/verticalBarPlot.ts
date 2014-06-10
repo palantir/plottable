@@ -4,8 +4,11 @@ module Plottable {
 export module Plot {
   export class VerticalBar extends Abstract.BarPlot {
     public _barAlignment = "left";
-    public _ANIMATION_DURATION = 300; //milliseconds
-    public _ANIMATION_DELAY = 15; //milliseconds
+    public _animators: Animator.IPlotAnimatorMap = {
+      "bars-reset" : new Animator.NullAnimator(),
+      "bars"       : new Animator.IterativeDelayAnimator(),
+      "baseline"   : new Animator.NullAnimator()
+    };
 
     /**
      * Creates a VerticalBarPlot.
@@ -26,13 +29,12 @@ export module Plot {
       this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
       this._bars.enter().append("rect");
 
-      var attrToProjector = this._generateAttrToProjector();
+      var attrToProjector: Abstract.IAttributeToProjector = this._generateAttrToProjector();
 
-      var xF = attrToProjector["x"];
-      var widthF = attrToProjector["width"];
-
+      var xF         = attrToProjector["x"];
+      var widthF     = attrToProjector["width"];
       var castXScale = (<Scale.Ordinal> this.xScale);
-      var rangeType = (castXScale.rangeType == null) ? "points" : castXScale.rangeType();
+      var rangeType  = (castXScale.rangeType == null) ? "points" : castXScale.rangeType();
 
       if (rangeType === "points") {
         if (this._barAlignment === "center") {
@@ -46,12 +48,14 @@ export module Plot {
 
       var yFunction = attrToProjector["y"];
 
-      if (this._animate && this._dataChanged) {
+      // Apply reset if data changed
+      if (this._dataChanged) {
         attrToProjector["y"] = () => scaledBaseline;
         attrToProjector["height"] = () => 0;
-        this._bars.attr(attrToProjector);
+        this._applyAnimatedAttributes(this._bars, "bars-reset", attrToProjector);
       }
 
+      // Prepare attributes for bars
       attrToProjector["y"] = (d: any, i: number) => {
         var originalY = yFunction(d, i);
         return (originalY > scaledBaseline) ? scaledBaseline : originalY;
@@ -66,22 +70,19 @@ export module Plot {
         this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
 
-      var updateSelection: any = this._bars;
-      if (this._animate) {
-        var n = this.dataSource().data().length;
-        updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION)
-                                            .delay((d: any, i: number) => i * this._ANIMATION_DELAY);
-      }
+      // Apply bar updates
+      this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
 
-      updateSelection.attr(attrToProjector);
       this._bars.exit().remove();
 
-      this._baseline.attr({
+      // Apply baseline updates
+      var baselineAttr: Abstract.IAttributeToProjector = {
         "x1": 0,
         "y1": scaledBaseline,
         "x2": this.availableWidth,
         "y2": scaledBaseline
-      });
+      };
+      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
     }
 
     /**
