@@ -241,7 +241,7 @@ declare module Plottable {
         interface IFormatter {
             (d: any): String;
         }
-        module Formatters {
+        module Formatter {
             function identity(): IFormatter;
             /**
             * Creates a formatter that displays no more than [precision] decimal places.
