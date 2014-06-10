@@ -5,7 +5,7 @@ function loadScript(url, id, callback) {
   var element = document.createElement("script");
   element.type = "text/javascript";
   element.src = url;
-  //element.id = id;
+  element.id = id;
   element.onload = callback;
   document.head.appendChild(element);
 }
@@ -33,6 +33,13 @@ var quicktestsToLoad = [];
 
 function loadQuicktests(qts, callback) {
   var nLoaded = 0;
+
+  qts.forEach(function(entry) {
+      if($('#'+qts.name) !== undefined){
+        $('#'+qts.name).remove();
+      }
+  });
+
 
   var filterword = $('#filterWord').val();
   if(filterword === "" || filterword === undefined){ 
