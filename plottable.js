@@ -2262,26 +2262,12 @@ var Plottable;
                     return _this._projectors[attr].scale != null;
                 }).forEach(function (attr) {
                     var projector = _this._projectors[attr];
-                    var scale = projector.scale;
-                    var appliedAccessor = Plottable.Util.Methods.applyAccessor(projector.accessor, _this._dataSource);
-                    var mappedData = _this._dataSource.data().map(appliedAccessor);
-                    var extent = _this.dataToExtent(mappedData);
-                    if (extent.length > 0) {
-                        scale.updateExtent(_this._plottableID, attr, extent);
+                    var extent = _this.dataSource()._getExtent(projector.accessor);
+                    if (extent != null) {
+                        projector.scale.updateExtent(_this._plottableID, attr, extent);
                     }
                 });
                 return this;
-            };
-
-            Plot.prototype.dataToExtent = function (mappedData) {
-                if (typeof mappedData[0] === "number" || mappedData[0] instanceof Date) {
-                    return d3.extent(mappedData);
-                } else if (typeof mappedData[0] === "string") {
-                    return Plottable.Util.Methods.uniq(mappedData);
-                } else {
-                    // undefined or something
-                    return [];
-                }
             };
             return Plot;
         })(Plottable.Abstract.Component);

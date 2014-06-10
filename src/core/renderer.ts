@@ -166,26 +166,12 @@ export module Abstract {
         .filter((attr: string) => this._projectors[attr].scale != null)
         .forEach((attr: string) => {
           var projector = this._projectors[attr];
-          var scale = projector.scale;
-          var appliedAccessor = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
-          var mappedData = this._dataSource.data().map(appliedAccessor);
-          var extent = this.dataToExtent(mappedData);
-          if (extent.length > 0) {
-            scale.updateExtent(this._plottableID, attr, extent);
+          var extent = this.dataSource()._getExtent(projector.accessor);
+          if (extent != null) {
+            projector.scale.updateExtent(this._plottableID, attr, extent);
           }
       });
       return this;
-    }
-
-    private dataToExtent(mappedData: any[]): any[] {
-      if (typeof mappedData[0] === "number" || mappedData[0] instanceof Date) {
-        return d3.extent(mappedData);
-      } else if (typeof mappedData[0] === "string") {
-        return Util.Methods.uniq(mappedData);
-      } else {
-        // undefined or something
-        return [];
-      }
     }
   }
 }
