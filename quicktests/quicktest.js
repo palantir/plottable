@@ -5,6 +5,7 @@ function loadScript(url, id, callback) {
   var element = document.createElement("script");
   element.type = "text/javascript";
   element.src = url;
+  element.id = id;
   element.onload = callback;
   document.head.appendChild(element);
 }
