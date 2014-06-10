@@ -100,10 +100,10 @@ button.onclick = function () {
   var quicktests = [];
   var quicktestsToLoad = [];
   
-  if(qts !== undefined){
-      qts.forEach(function(entry) {
-      if($('#'+qts.name) !== undefined){
-        $('#'+qts.name).remove();
+  if(list_of_quicktests !== undefined){
+      list_of_quicktests.forEach(function(entry) {
+      if($('#'+list_of_quicktests.name) !== undefined){
+        $('#'+list_of_quicktests.name).remove();
       }
     });
   }
