@@ -1,73 +1,38 @@
 
 var Plottables = {};
 
-function loadScript(url, id, callback) {
-  var element = document.createElement("script");
-  element.type = "text/javascript";
-  element.src = url;
-  element.id = id;
-  element.onload = callback;
-  document.head.appendChild(element);
-}
-
-function loadPlottable(branchName, callback) {
-  var url;
-  if (branchName != null) {
-    url = "https://rawgithub.com/palantir/plottable/" + branchName + "/plottable.js";
-  } else {
-    branchName = "#local";
-    url = "../plottable.js"; //load local version
-  }
-  var inner = function() {
-    console.log("loaded Plottable:" + branchName);
-    Plottables[branchName] = Plottable;
-    Plottable = null;
-    callback();
-  }
-  loadScript(url, branchName, inner);
-}
-
-
-var quicktests = [];
-var quicktestsToLoad = [];
-
-function loadQuicktests(qts, callback) {
-  var nLoaded = 0;
-
-  var filterword = $('#filterWord').val();
-  if(filterword === "" || filterword === undefined){ 
-    quicktestsToLoad = qts; 
-  } else {
-    quicktestsToLoad = qts.filter(function(q) {return q.categories.indexOf(filterword) > -1})
-  }
-  
-  var inner = function() {
-    if (++nLoaded === quicktestsToLoad.length) callback();
-  }
-  
-  quicktestsToLoad.forEach(function(q) {
-    loadScript("quicktests/" + q.name + ".js", q.name, inner);
+function loadScript(url) {
+  return new Promise(function(resolve, reject) {
+    var element = document.createElement("script");
+    element.type = "text/javascript";
+    element.src = url;
+    element.onload = function() {console.log("loaded", url); resolve();};
+    document.head.appendChild(element);
   });
 }
 
-function loadAllQuicktests(callback) {
-  loadScript("quicktests/list_of_quicktests.js", "list_of_quicktests", function() {
-    console.log("about to load quicktests", callback);
-    loadQuicktests(list_of_quicktests, callback);
+
+function loadPlottable(branchName) {
+  Plottables = Plottables || {};
+  return new Promise(function (fulfill, reject) {
+    if (Plottables[branchName] != null) {
+      fulfill();
+    }
+    var url;
+    if (branchName != null) {
+      url = "https://rawgithub.com/palantir/plottable/" + branchName + "/plottable.js";
+    } else {
+      branchName = "#local";
+      url = "../plottable.js"; //load local version
+    }
+    loadScript(url, branchName, inner).then(function() {
+      Plottables[branchName] = Plottable;
+      Plottable = null;
+      fulfill();
+    });
   });
 }
 
-function loadQuickTestsAndPlottables(otherBranch, callback) {
-  var loaded = 0;
-  var inner = function() {
-    if (++loaded === 3) callback();
-  }
-
-  loadPlottable("master", inner);
-  loadPlottable(otherBranch, inner);
-  console.log("about to load all quicktests", inner);
-  loadAllQuicktests(inner);
-}
 
 var data1 = makeRandomData(50);
 var data2 = makeRandomData(50);
@@ -94,11 +59,63 @@ function makeMainFunctionForGivenBranch(branch) {
   }
 }
 
+function initializeByLoadingAllQuicktests() {
+  console.log("started from the bottom now we here")
+  return new Promise(function(f, r) {
+    console.log("function in promise is executing", window.list_of_quicktests);
+    if (window.list_of_quicktests == null) {
+      window.list_of_quicktests = [];
+      console.log("loading quicktests");
+      loadScript("quicktests/list_of_quicktests.js").then(f);
+    } else {
+      console.log("quicktests already loaded, resolving");
+      f();
+    }
+  });
+}
+
+function reporter(n) {
+  return function(x) {
+    console.log(n, x);
+    return x;
+  }
+}
+
+
+function main() {
+  console.log("calling main");
+  var table = d3.select("table");
+  table.selectAll(".quicktest-row").remove();
+  var firstBranch = "master";
+  var secondBranch = $('#featureBranch').val() || "#local";
+  var quicktestCategory = $('#filterWord').val();
+  initializeByLoadingAllQuicktests()
+      .then(reporter("LOADED QUICKTESTS"))
+      .then(loadPlottable(firstBranch))
+      .then(reporter("LOADED PLOTTABLE1"))
+      .then(loadPlottable(secondBranch))
+      .then(reporter("LOADED PLOTTABLE2"))
+      .then(function() {console.log(window.list_of_quicktests)})
+      .then(function () {
+        return window.list_of_quicktests.filter(function(q) {
+          console.log(q.categories);
+          if (quicktestCategory === "" || quicktestCategory === undefined) {
+            return true;
+          } else {
+            return q.categories.indexOf(quicktestCategory) !== -1
+          };
+        });
+      })
+      .then(reporter("filtered quicktests"))
+      .then(function(qts) {
+        qts.forEach(function(q) {
+          runQuicktest(table, q, Plottables[firstBranch], Plottables[secondBranch]);
+        });
+      });
+}
+
 
 var button = document.getElementById('button');
-button.onclick = function () {
-  d3.selectAll(".quicktest-row").remove();
+button.onclick = main;
 
-  var fb = $('#featureBranch').val();
-  loadQuickTestsAndPlottables(fb, makeMainFunctionForGivenBranch(fb));
-};
+window.onload = main;
