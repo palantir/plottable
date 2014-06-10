@@ -3822,10 +3822,18 @@ var Plottable;
 
                 if (offeredWidth < 0 || offeredHeight < 0) {
                     return {
-                        width: widthRequiredByTicks,
-                        height: heightRequiredByTicks,
+                        width: offeredWidth,
+                        height: offeredHeight,
                         wantsWidth: !this._isHorizontal(),
                         wantsHeight: this._isHorizontal()
+                    };
+                }
+                if (this._scale.domain().length === 0) {
+                    return {
+                        width: 0,
+                        height: 0,
+                        wantsWidth: false,
+                        wantsHeight: false
                     };
                 }
                 if (this._isHorizontal()) {

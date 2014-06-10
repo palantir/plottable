@@ -433,6 +433,19 @@ describe("Axes", function () {
             assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
             svg.remove();
         });
+
+        it("requests appropriate space when the scale has no domain", function () {
+            var svg = generateSVG(400, 400);
+            var scale = new Plottable.Scale.Ordinal();
+            var ca = new Plottable.Axis.Category(scale);
+            ca._anchor(svg);
+            var s = ca._requestedSpace(400, 400);
+            assert.operator(s.width, ">=", 0, "it requested 0 or more width");
+            assert.operator(s.height, ">=", 0, "it requested 0 or more height");
+            assert.isFalse(s.wantsWidth, "it doesn't want width");
+            assert.isFalse(s.wantsHeight, "it doesn't want height");
+            svg.remove();
+        });
     });
 });
 
