@@ -248,6 +248,7 @@ export module Component {
               wantsHeight: layout.wantsHeight};
     }
 
+    // xOffset is relative to parent element, not absolute
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth , availableHeight);
       var layout = this.iterateLayout(this.availableWidth , this.availableHeight);
