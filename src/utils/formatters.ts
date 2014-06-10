@@ -72,7 +72,7 @@ export module Util {
      */
     export function percentage(precision = 0): IFormatter {
       return function(d: any) {
-        return (<number> d).toFixed(precision) + "%";
+        return (d * 100).toFixed(precision) + "%";
       };
     }
   }

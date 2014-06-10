@@ -859,7 +859,7 @@ var Plottable;
             function percentage(precision) {
                 if (typeof precision === "undefined") { precision = 0; }
                 return function (d) {
-                    return d.toFixed(precision) + "%";
+                    return (d * 100).toFixed(precision) + "%";
                 };
             }
             Formatter.percentage = percentage;

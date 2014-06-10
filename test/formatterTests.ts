@@ -49,9 +49,8 @@ describe("Formatters", () => {
     it("uses reasonable defaults", ()=> {
       var percentFormatter = Plottable.Util.Formatter.percentage();
       var result = percentFormatter(1);
-      assert.strictEqual(result.charAt(result.length-1), "%", "the percent sign was appended");
-      var decimalPosition = result.indexOf(".");
-      assert.strictEqual(decimalPosition, -1, "Shows no decimal places by default");
+      assert.strictEqual(result, "100%",
+        "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
     });
   });
 });
