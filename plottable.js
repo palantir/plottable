@@ -933,7 +933,7 @@ var Plottable;
             var appliedAccessor = Plottable.Util.Methods.applyAccessor(accessor, this);
             var mappedData = this._data.map(appliedAccessor);
             if (mappedData.length === 0) {
-                return undefined;
+                return [];
             } else if (typeof (mappedData[0]) === "string") {
                 return Plottable.Util.Methods.uniq(mappedData);
             } else {
@@ -2268,7 +2268,7 @@ var Plottable;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     var extent = this.dataSource()._getExtent(projector.accessor);
-                    if (extent != null) {
+                    if (extent.length > 0) {
                         projector.scale.updateExtent(this._plottableID, attr, extent);
                     }
                 }
