@@ -185,7 +185,9 @@ export module Component {
     }
 
     private updateListeners() {
-      if (!this._isSetup) { return; }
+      if (!this._isSetup) {
+        return;
+      }
       var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
         // tag the element that is being hovered over with the class "focus"
@@ -221,7 +223,9 @@ export module Component {
     }
 
     private updateClasses() {
-      if (!this._isSetup) { return; }
+      if (!this._isSetup) {
+        return;
+      }
       var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
         dataSelection.classed("focus", (d: string) => this.datumCurrentlyFocusedOn === d);
