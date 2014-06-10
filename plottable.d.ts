@@ -1085,15 +1085,46 @@ declare module Plottable {
 
 declare module Plottable {
     module Component {
+        interface ToggleCallback {
+            (datum: string, newState: boolean): any;
+        }
+        interface HoverCallback {
+            (datum?: string): any;
+        }
         class Legend extends Abstract.Component {
-            static _SUBELEMENT_CLASS: string;
             /**
             * Creates a Legend.
+            * A legend consists of a series of legend rows, each with a color and label taken from the colorScale.
+            * The rows will be displayed in the order of the colorScale domain.
+            * This legend also allows interactions, through the functions "toggleCallback" and "hoverCallback"
+            * Setting a callback will also put classes on the individual rows.
             *
             * @constructor
             * @param {ColorScale} colorScale
             */
             constructor(colorScale?: Scale.Color);
+            /**
+            * Assigns or gets the callback to the Legend
+            * This callback is associated with toggle events, which trigger when a legend row is clicked.
+            * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
+            * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
+            * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
+            *
+            * @param{ToggleCallback} callback The new callback function
+            */
+            public toggleCallback(callback: ToggleCallback): Legend;
+            public toggleCallback(): ToggleCallback;
+            /**
+            * Assigns or gets the callback to the Legend
+            * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
+            * Setting a callback will also set the class "hover" to all legend row,
+            * as well as the class "focus" to the legend row being hovered over.
+            * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
+            *
+            * @param{HoverCallback} callback The new callback function
+            */
+            public hoverCallback(callback: HoverCallback): Legend;
+            public hoverCallback(): HoverCallback;
             /**
             * Assigns a new ColorScale to the Legend.
             *
@@ -1102,40 +1133,6 @@ declare module Plottable {
             */
             public scale(scale: Scale.Color): Legend;
             public scale(): Scale.Color;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Component {
-        interface ToggleCallback {
-            (datum: any, newState: boolean): any;
-        }
-        class ToggleLegend extends Legend {
-            /**
-            * Creates a ToggleLegend.
-            *
-            * @constructor
-            * @param {ColorScale} colorScale
-            * @param {ToggleCallback} callback The function to be called when a legend entry is clicked.
-            */
-            constructor(colorScale: Scale.Color, callback?: ToggleCallback);
-            /**
-            * Assigns or gets the callback to the ToggleLegend
-            * Call with argument of null to remove the callback
-            *
-            * @param{ToggleCallback} callback The new callback function
-            */
-            public callback(callback: ToggleCallback): ToggleLegend;
-            public callback(): ToggleCallback;
-            /**
-            * Assigns a new ColorScale to the ToggleLegend.
-            *
-            * @param {ColorScale} scale
-            * @returns {ToggleLegend} The calling ToggleLegend.
-            */
-            public scale(scale?: Scale.Color): any;
         }
     }
 }

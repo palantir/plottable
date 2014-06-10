@@ -1,16 +1,15 @@
 <html>
   <head>
-    <title>Legend Toggle Quicktest</title>
+    <title>Interactive Legend Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../bower_components/d3/d3.min.js"></script>
-    <script src="../../plottable.js"></script>
-    <script src="../../examples/exampleUtil.js"></script>
+    <script src="../../bower_components/d3/d3.min.js"></script>
+    <script src="../../../plottable.js"></script>
+    <script src="../exampleUtil.js"></script>
     <style>
     </style>
 
     <script>
         var renderers = [];
-
 
         var colors = new Plottable.Scale.Color("10").range();
         var maxPlots = 10;
@@ -38,26 +37,36 @@
         var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
         var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-        var chart = new Plottable.Component.Table([
+        var chart = new Plottable.Component.Table ([
                                   [yAxis, cg],
                                   [null,  xAxis]
                                 ]);
 
         var legendLabel = new Plottable.Component.TitleLabel("fat");
         var legend = new Plottable.Component.Legend(colorScale);
-        legend.callbackClick(
+        legend.toggleCallback(
             function (d, b) {
                 var index = names.indexOf(d);
                 renderers[index].classed("toggled-on", b);
                 renderers[index].classed("toggled-off", !b);
             }
         );
-        var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
+        legend.hoverCallback(
+            function (d) {
+                var index = names.indexOf(d);
+                renderers.forEach(function(r, i) {
+                    r.classed("hover", d !== undefined);
+                    r.classed("focus", d !== undefined && i === index);
+                    r.classed("not-focus", d === undefined || i !== index);
+                });
+            }
+        );
 
+        var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);
         var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
 
       window.onload = function() {
-        outerTable.renderTo(svg);
+        outerTable.renderTo("#legend-toggle-test");
       }
 
       function shuffle() {
@@ -79,7 +88,10 @@
 
       function removePlot() {
         if (numPlots > 0) {
-          (renderers[numPlots - 1]).remove();
+          renderers[numPlots - 1].remove();
+          ["toggled-on", "toggled-off", "hover", "focus", "not-focus"].forEach(function(d) {
+            renderers[numPlots - 1].classed(d, false);
+          });
           numPlots--;
           colorScale.domain(names.slice(0, numPlots));
         }
@@ -97,6 +109,7 @@
           colorScale.domain(names.slice(0, numPlots));
         }
       }
+
     </script>
   </head>
   <body>
