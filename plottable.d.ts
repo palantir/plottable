@@ -548,7 +548,8 @@ declare module Plottable {
             * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
             * @param {any[]} extent The new extent to be included in the scale.
             */
-            public extentChanged(rendererID: number, attr: string, extent: any[]): Scale;
+            public updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
+            public removeExtent(rendererID: number, attr: string): Scale;
         }
     }
 }
@@ -725,7 +726,6 @@ declare module Plottable {
             * @returns {QuantitiveScale} The calling QuantitiveScale.
             */
             public padDomain(padProportion?: number): QuantitiveScale;
-            public extentChanged(rendererID: number, attr: string, extent: any[]): QuantitiveScale;
         }
     }
 }
@@ -823,7 +823,6 @@ declare module Plottable {
             */
             public rangeType(): string;
             public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
-            public extentChanged(rendererID: number, attr: string, extent: any[]): Ordinal;
         }
     }
 }

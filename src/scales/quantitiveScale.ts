@@ -18,7 +18,7 @@ export module Abstract {
     }
 
     public _getExtent(): number[] {
-      var extents = d3.values(this._rendererAttrID2Extent);
+      var extents = this._getAllExtents();
       if (extents.length > 0) {
         return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
       } else {
@@ -163,14 +163,6 @@ export module Abstract {
         newDomain[1] = 0;
       }
       this._setDomain(newDomain);
-      return this;
-    }
-
-    public extentChanged(rendererID: number, attr: string, extent: any[]) {
-      super.extentChanged(rendererID, attr, extent);
-      if (this._autoDomain) {
-        this.autoDomain();
-      }
       return this;
     }
   }

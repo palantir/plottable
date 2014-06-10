@@ -24,7 +24,7 @@ export module Scale {
     }
 
     public _getExtent(): any[] {
-      var extents: string[][] = d3.values(this._rendererAttrID2Extent);
+      var extents: string[][] = this._getAllExtents();
       return Util.Methods.uniq(Util.Methods.flatten(extents));
     }
 
@@ -123,12 +123,6 @@ export module Scale {
         this._broadcast();
         return this;
       }
-    }
-
-    public extentChanged(rendererID: number, attr: string, extent: any[]) {
-      this._rendererAttrID2Extent[rendererID + attr] = extent;
-      this._setDomain(this._getExtent());
-      return this;
     }
   }
 }

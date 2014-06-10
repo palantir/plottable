@@ -84,11 +84,11 @@ export module Abstract {
       }
       this._dataSource = source;
       this._registerToBroadcaster(this._dataSource, () => {
-
         this.updateProjectors();
         this._dataChanged = true;
         this._render();
       });
+      this.updateProjectors();
       this._dataChanged = true;
       this._render();
       return this;
@@ -96,13 +96,13 @@ export module Abstract {
 
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       attrToSet = attrToSet.toLowerCase();
-      var rendererIDAttr = this._plottableID + attrToSet;
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
       if (scale == null) {
         scale = existingScale;
       }
       if (existingScale != null) {
+        existingScale.removeExtent(this._plottableID, attrToSet);
         this._deregisterFromBroadcaster(existingScale);
       }
       if (scale != null) {
@@ -165,14 +165,14 @@ export module Abstract {
       d3.keys(this._projectors)
         .filter((attr: string) => this._projectors[attr].scale != null)
         .forEach((attr: string) => {
-        var projector = this._projectors[attr];
-        var scale = projector.scale;
-        var appliedAccessor = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
-        var mappedData = this._dataSource.data().map(appliedAccessor);
-        var extent = this.dataToExtent(mappedData);
-        if (extent.length > 0) {
-          scale.extentChanged(this._plottableID, attr, extent);
-        }
+          var projector = this._projectors[attr];
+          var scale = projector.scale;
+          var appliedAccessor = Util.Methods.applyAccessor(projector.accessor, this._dataSource);
+          var mappedData = this._dataSource.data().map(appliedAccessor);
+          var extent = this.dataToExtent(mappedData);
+          if (extent.length > 0) {
+            scale.updateExtent(this._plottableID, attr, extent);
+          }
       });
       return this;
     }
