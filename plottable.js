@@ -3899,7 +3899,10 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
-                this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabelsEnter);
+
+                // erase all text first, then rewrite
+                tickLabels.text("");
+                this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
