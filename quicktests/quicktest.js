@@ -51,9 +51,9 @@ function loadQuicktests(qts, callback) {
 }
 
 function loadAllQuicktests(callback) {
-  loadScript("quicktests/list_of_quicktests.js", function() {
+  loadScript("quicktests/list_of_quicktests.js", "list_of_quicktests", function() {
     console.log("about to load quicktests", callback);
-    loadQuicktests(list_of_quicktests, "list_of_quicktests", callback);
+    loadQuicktests(list_of_quicktests, callback);
   });
 }
 
