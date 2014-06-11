@@ -2398,7 +2398,13 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
-            var _renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
+            var _renderPolicy;
+
+            if (window.PlottableTestCode == null) {
+                _renderPolicy = new Plottable.Core.RenderController.RenderPolicy.Immediate();
+            } else {
+                _renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
+            }
 
             function setRenderPolicy(policy) {
                 _renderPolicy = policy;

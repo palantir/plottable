@@ -17,7 +17,13 @@ export module Core {
     var _componentsNeedingRender: {[key: string]: Abstract.Component} = {};
     var _componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
     var _animationRequested: boolean = false;
-    var _renderPolicy: RenderPolicy.IRenderPolicy = new RenderPolicy.AnimationFrame();
+    var _renderPolicy: RenderPolicy.IRenderPolicy;
+
+    if ((<any>window).PlottableTestCode == null) {
+      _renderPolicy = new RenderPolicy.AnimationFrame();
+    } else{
+      _renderPolicy = new RenderPolicy.Immediate();
+    }
 
     export function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any {
       _renderPolicy = policy;
