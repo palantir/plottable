@@ -248,21 +248,34 @@ declare module Plottable {
             */
             public format(d: any): string;
             /**
-            * Gets or sets the precision of the Formatter. The meaning depends on the implementation.
+            * Gets the current precision of the Formatter.
+            * The meaning depends on the implementation.
             *
-            * @param {number} [value] The new precision.
-            * @returns {Formatter} The current precision, or the calling Formatter.
+            * @returns {number} The current precision.
             */
             public precision(): number;
+            /**
+            * Sets the precision of the Formatter.
+            * The meaning depends on the implementation.
+            *
+            * @param {number} [value] The new precision.
+            * @returns {Formatter} The calling Formatter.
+            */
             public precision(value: number): Formatter;
             /**
-            * Checks if this formatter should show only unchanged values, or sets
-            * whether or not to show only unchanged values.
+            * Checks if this formatter will show only unchanged values.
+            *
+            * @returns {boolean}
+            */
+            public showOnlyUnchangedValues(): boolean;
+            /**
+            * Sets whether this formatter will show only unchanged values.
+            * If true, inputs whose value is changed by the formatter will be formatted
+            * to an empty string.
             *
             * @param {boolean} showUnchanged Whether or not to show only unchanged values.
             * @returns {Formatter} The calling Formatter.
             */
-            public showOnlyUnchangedValues(): boolean;
             public showOnlyUnchangedValues(showUnchanged: boolean): Formatter;
         }
     }
@@ -270,101 +283,90 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Util {
-        module Formatter {
-            class Identity extends Abstract.Formatter {
-                /**
-                * Creates an formatter that simply stringifies the input.
-                *
-                * @constructor
-                */
-                constructor();
-            }
+    module Formatter {
+        class Identity extends Abstract.Formatter {
+            /**
+            * Creates an formatter that simply stringifies the input.
+            *
+            * @constructor
+            */
+            constructor();
         }
     }
 }
 
 
 declare module Plottable {
-    module Util {
-        module Formatter {
-            class General extends Abstract.Formatter {
-                /**
-                * Creates a formatter that displays no more than [precision] decimal places.
-                *
-                * @constructor
-                * @param {number} [precision] The maximum number of decimal places to display.
-                */
-                constructor(precision?: number);
-            }
+    module Formatter {
+        class General extends Abstract.Formatter {
+            /**
+            * Creates a formatter that formats numbers to show no more than
+            * [precision] decimal places. All other values are stringified.
+            *
+            * @constructor
+            * @param {number} [precision] The maximum number of decimal places to display.
+            */
+            constructor(precision?: number);
         }
     }
 }
 
 
 declare module Plottable {
-    module Util {
-        module Formatter {
-            class Fixed extends Abstract.Formatter {
-                /**
-                * Creates a formatter that displays exactly [precision] decimal places.
-                *
-                * @constructor
-                * @param {number} [precision] The number of decimal places to display.
-                */
-                constructor(precision?: number);
-            }
+    module Formatter {
+        class Fixed extends Abstract.Formatter {
+            /**
+            * Creates a formatter that displays exactly [precision] decimal places.
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            constructor(precision?: number);
         }
     }
 }
 
 
 declare module Plottable {
-    module Util {
-        module Formatter {
-            class Currency extends Fixed {
-                /**
-                * Creates a formatter for currency values.
-                *
-                * @param {number} [precision] The number of decimal places to show.
-                * @param {string} [symbol] The currency symbol to use.
-                * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
-                *
-                * @returns {IFormatter} A formatter for currency values.
-                */
-                constructor(precision?: number, symbol?: string, prefix?: boolean);
-                public format(d: any): string;
-            }
+    module Formatter {
+        class Currency extends Fixed {
+            /**
+            * Creates a formatter for currency values.
+            *
+            * @param {number} [precision] The number of decimal places to show.
+            * @param {string} [symbol] The currency symbol to use.
+            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
+            *
+            * @returns {IFormatter} A formatter for currency values.
+            */
+            constructor(precision?: number, symbol?: string, prefix?: boolean);
+            public format(d: any): string;
         }
     }
 }
 
 
 declare module Plottable {
-    module Util {
-        module Formatter {
-            class Percentage extends Fixed {
-                /**
-                * Creates a formatter for percentage values.
-                * Multiplies the supplied value by 100 and appends "%".
-                *
-                * @constructor
-                * @param {number} [precision] The number of decimal places to display.
-                */
-                constructor(precision?: number);
-                public format(d: any): string;
-            }
+    module Formatter {
+        class Percentage extends Fixed {
+            /**
+            * Creates a formatter for percentage values.
+            * Multiplies the supplied value by 100 and appends "%".
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            constructor(precision?: number);
+            public format(d: any): string;
         }
     }
 }
 
 
 declare module Plottable {
-    module Util {
-        module Formatter {
-            class Custom extends Abstract.Formatter {
-                constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
-            }
+    module Formatter {
+        class Custom extends Abstract.Formatter {
+            constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
         }
     }
 }

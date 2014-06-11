@@ -1,7 +1,6 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Util {
   export module Formatter {
     export class Percentage extends Formatter.Fixed {
       /**
@@ -24,5 +23,4 @@ export module Util {
       }
     }
   }
-}
 }

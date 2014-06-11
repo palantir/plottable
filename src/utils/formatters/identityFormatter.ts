@@ -1,7 +1,6 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Util {
   export module Formatter {
     export class Identity extends Abstract.Formatter {
       /**
@@ -10,12 +9,11 @@ export module Util {
        * @constructor
        */
       constructor() {
-        super(0);
+        super(null);
         this._formatFunction = function(d: any) {
-          return d.toString();
+          return String(d);
         };
       }
     }
   }
-}
 }
