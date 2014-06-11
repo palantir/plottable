@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Singleton {
+export module Core {
 
   /**
    * The ResizeBroadcaster will broadcast a notification to any registered
@@ -13,28 +13,32 @@ export module Singleton {
    * flush of the RenderController. This is used, for example, to disable
    * animations during resize.
    */
-  export class ResizeBroadcaster {
-    private static _broadcaster: Abstract.Broadcaster;
-    public static _resized: boolean = false;
+  export module ResizeBroadcaster {
+    var _broadcaster: Abstract.Broadcaster;
+    var _resizing: boolean = false;
 
-    private static _lazyInitialize() {
-      if (ResizeBroadcaster._broadcaster === undefined) {
-        ResizeBroadcaster._broadcaster = new Abstract.Broadcaster();
-        window.addEventListener("resize", ResizeBroadcaster._onResize);
+    function _lazyInitialize() {
+      if (_broadcaster === undefined) {
+        _broadcaster = new Abstract.Broadcaster();
+        window.addEventListener("resize", _onResize);
       }
     }
 
-    private static _onResize(){
-      ResizeBroadcaster._resized = true;
-      ResizeBroadcaster._broadcaster._broadcast();
+    function _onResize(){
+      _resizing = true;
+      _broadcaster._broadcast();
     }
 
     /**
      * Returns true if the window has been resized and the RenderController
      * has not yet been flushed.
      */
-    public static resizing(): boolean {
-      return this._resized;
+    export function resizing(): boolean {
+      return _resizing;
+    }
+
+    export function clearResizing(): any {
+      _resizing = false;
     }
 
     /**
@@ -46,9 +50,9 @@ export module Singleton {
      *
      * @param {Abstract.Component} component Any Plottable component.
      */
-    public static register(c: Abstract.Component) {
-      ResizeBroadcaster._lazyInitialize();
-      ResizeBroadcaster._broadcaster.registerListener(c._plottableID, () => c._invalidateLayout());
+    export function register(c: Abstract.Component) {
+      _lazyInitialize();
+      _broadcaster.registerListener(c._plottableID, () => c._invalidateLayout());
     }
 
     /**
@@ -58,9 +62,9 @@ export module Singleton {
      *
      * @param {Abstract.Component} component Any Plottable component.
      */
-    public static deregister(c: Abstract.Component) {
-      if (ResizeBroadcaster._broadcaster) {
-        ResizeBroadcaster._broadcaster.deregisterListener(c._plottableID);
+    export function deregister(c: Abstract.Component) {
+      if (_broadcaster) {
+        _broadcaster.deregisterListener(c._plottableID);
       }
     }
   }

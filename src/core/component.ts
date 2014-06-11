@@ -165,14 +165,14 @@ export module Abstract {
      */
     public _render() {
       if (this._isAnchored && this._isSetup) {
-        Singleton.RenderController.registerToRender(this);
+        Core.RenderController.registerToRender(this);
       }
       return this;
     }
 
     public _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Singleton.RenderController.registerToComputeLayout(this);
+        Core.RenderController.registerToComputeLayout(this);
       }
       return this;
     }
@@ -240,9 +240,9 @@ export module Abstract {
      */
     public autoResize(flag: boolean): Component {
       if (flag) {
-        Singleton.ResizeBroadcaster.register(this);
+        Core.ResizeBroadcaster.register(this);
       } else {
-        Singleton.ResizeBroadcaster.deregister(this);
+        Core.ResizeBroadcaster.deregister(this);
       }
       return this;
     }

@@ -23,6 +23,7 @@
 /// <reference path="core/table.ts" />
 /// <reference path="core/scale.ts" />
 /// <reference path="core/renderer.ts" />
+/// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/resizeBroadcaster.ts" />
 /// <reference path="core/animator.ts" />
