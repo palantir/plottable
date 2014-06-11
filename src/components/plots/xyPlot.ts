@@ -27,18 +27,22 @@ export module Abstract {
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
-      if (attrToSet === "x" && scale != null) {
-        this.xScale = scale;
+      if (attrToSet === "x") {
         this._xAccessor = accessor;
-        this.xScale._autoNice = true;
-        this.xScale._autoPad = true;
+        if (scale != null) {
+          this.xScale = scale;
+          this.xScale._autoNice = true;
+          this.xScale._autoPad = true;
+        }
       }
 
-      if (attrToSet === "y" && scale != null) {
-        this.yScale = scale;
+      if (attrToSet === "y") {
         this._yAccessor = accessor;
-        this.yScale._autoNice = true;
-        this.yScale._autoPad = true;
+        if (scale != null) {
+          this.yScale = scale;
+          this.yScale._autoNice = true;
+          this.yScale._autoPad = true;
+        }
       }
 
       super.project(attrToSet, accessor, scale);
