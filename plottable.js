@@ -3788,10 +3788,7 @@ var Plottable;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
-            * Creates a CategoryAxis.
-            *
-            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
-            * display the scale as efficiently as possible.
+            * Creates a TimeAxis
             *
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
@@ -3800,6 +3797,7 @@ var Plottable;
             function Time(scale, orientation, formatter) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 _super.call(this, scale, orientation, formatter);
+                this._height = 50;
                 this.classed("time-axis", true);
             }
             Time.prototype._setup = function () {
@@ -3808,9 +3806,15 @@ var Plottable;
                 return this;
             };
 
-            // public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-            //   var widthRequiredByTicks
-            // }
+            Time.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                return {
+                    width: 0,
+                    height: Math.min(offeredHeight, this._height),
+                    wantsWidth: false,
+                    wantsHeight: offeredHeight < this._height
+                };
+            };
+
             Time.prototype._getTickValues = function () {
                 return this._scale.ticks(this._nTicks);
             };
@@ -3823,7 +3827,7 @@ var Plottable;
                     return d;
                 });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-                tickLabelsEnter.append("text").attr("x", 0).attr("y", 20);
+                tickLabelsEnter.append("text").attr("transform", "translate(0,20)");
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d, i) {
                     return "translate(" + _this._scale._d3Scale(d) + ",0)";

@@ -6,13 +6,11 @@ export module Axis {
     public _scale: Scale.Time;
     public _tickLabelsG: D3.Selection;
     public _nTicks: number;
+    private _height = 50;
 
     /**
-     * Creates a CategoryAxis.
-     *
-     * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
-     * display the scale as efficiently as possible.
-     *
+     * Creates a TimeAxis
+     * 
      * @constructor
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
@@ -28,9 +26,14 @@ export module Axis {
       return this;
     }
 
-    // public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-    //   var widthRequiredByTicks
-    // }
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+      return {
+        width: 0,
+        height: Math.min(offeredHeight, this._height),
+        wantsWidth: false,
+        wantsHeight: offeredHeight < this._height
+      };
+    }
 
     public _getTickValues(): string[] {
       return this._scale.ticks(this._nTicks);
@@ -41,7 +44,7 @@ export module Axis {
       var tickValues = this._getTickValues();
       var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._getTickValues(), (d) => d);
       var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-      tickLabelsEnter.append("text").attr("x", 0).attr("y", 20);
+      tickLabelsEnter.append("text").attr("transform", "translate(0,20)");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any, i: number) => "translate(" + this._scale._d3Scale(d) + ",0)");
       tickLabels.selectAll("text").text((d: any) => this._formatter(d));

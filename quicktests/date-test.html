@@ -1,45 +1,46 @@
 <html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../bower_components/d3/d3.min.js"></script>
-    <script src="../../plottable_multifile.js"></script>
-    <script src="../../examples/exampleUtil.js"></script>
-    <script>
+<head>
+  <link rel="stylesheet" type="text/css" href="../../plottable.css">
+  <script src="../bower_components/d3/d3.min.js"></script>
+  <script src="../../plottable_multifile.js"></script>
+  <script src="../../examples/exampleUtil.js"></script>
+  <script>
 
-var data = [
-    {x: "5/2/2014", y: 2},
-    {x: "2/24/2017", y: 150},
-    {x: "8/8/2020", y: -50},
-    {x: "1/23/2025", y: 100}
-    ]
+  var data = [
+  {x: "5/2/2014", y: 2},
+  {x: "2/24/2017", y: 150},
+  {x: "8/8/2020", y: -50},
+  {x: "1/23/2025", y: 100}
+  ]
 
 
 
-window.onload = function () {
+  window.onload = function () {
     xScale = new Plottable.Scale.Time();
     yScale = new Plottable.Scale.Linear();
     linePlot = new Plottable.Plot.Line(data, xScale, yScale)
-                                .project("x", function (d) { return d3.time.format("%x").parse(d.x)});
+    .project("x", function (d) { return d3.time.format("%x").parse(d.x)});
 
-var customTimeFormat = d3.time.format.multi([
-  [".%L", function(d) { return d.getMilliseconds(); }],
-  [":%S", function(d) { return d.getSeconds(); }],
-  ["%I:%M", function(d) { return d.getMinutes(); }],
-  ["%I %p", function(d) { return d.getHours(); }],
-  ["%a %d", function(d) { return d.getDay() && d.getDate() != 1; }],
-  ["%b %d", function(d) { return d.getDate() != 1; }],
-  ["%b", function(d) { return d.getMonth(); }],
-  ["%Y", function() { return true; }]
-]);
+    var customTimeFormat = d3.time.format.multi([
+      [".%L", function(d) { return d.getMilliseconds(); }],
+      [":%S", function(d) { return d.getSeconds(); }],
+      ["%I:%M", function(d) { return d.getMinutes(); }],
+      ["%I %p", function(d) { return d.getHours(); }],
+      ["%a %d", function(d) { return d.getDay() && d.getDate() != 1; }],
+      ["%b %d", function(d) { return d.getDate() != 1; }],
+      ["%b", function(d) { return d.getMonth(); }],
+      ["%Y", function() { return true; }]
+      ]);
 
 
-
-    xAxisB = new Plottable.Axis.Time(xScale, "bottom", customTimeFormat);
-    xAxisB._nTicks = 2;
-    xAxisA = new Plottable.Axis.Time(xScale, "bottom", customTimeFormat);
-    xAxisA._nTicks = 10;
-
-    xAxis = new Plottable.Component.Table([[xAxisA], [xAxisB]]);
+    xAxisC = new Plottable.Axis.Time(xScale, "top", customTimeFormat);
+    xAxisC._nTicks = 2;
+    xAxisB = new Plottable.Axis.Time(xScale, "top", customTimeFormat);
+    xAxisB._nTicks = 8;
+    xAxisA = new Plottable.Axis.Time(xScale, "top", customTimeFormat);
+    xAxisA._nTicks = 20;
+    
+    xAxis = new Plottable.Component.Table([[xAxisA], [xAxisB], [xAxisC]]);
     yAxis = new Plottable.Axis.YAxis(yScale);
 
 
@@ -47,25 +48,25 @@ var customTimeFormat = d3.time.format.multi([
     renderGroup = linePlot.merge(gridlines);
     new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
     new Plottable.Interaction.PanZoom(linePlot, xScale, yScale).registerWithComponent();
-};
+  };
 
 
 
 
 
-    </script>
-    </head>
+  </script>
+</head>
 
 <body>
-<div class="demo-title">Simple Chart</div>
-<br>
+  <div class="demo-title">Simple Chart</div>
+  <br>
 
 
-<br>
-<svg id="chart"></svg>
+  <br>
+  <svg id="chart"></svg>
 
 
 
-<p />
+  <p />
 </body>
 </html>

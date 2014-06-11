@@ -1039,10 +1039,7 @@ declare module Plottable {
     module Axis {
         class Time extends Abstract.Axis {
             /**
-            * Creates a CategoryAxis.
-            *
-            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
-            * display the scale as efficiently as possible.
+            * Creates a TimeAxis
             *
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
