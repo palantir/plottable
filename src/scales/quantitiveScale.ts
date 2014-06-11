@@ -6,6 +6,7 @@ export module Abstract {
     public _d3Scale: D3.Scale.QuantitiveScale;
     private lastRequestedTickCount = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
+    public _padProportion : number = 0.05;
 
     /**
      * Creates a new QuantitiveScale.
@@ -31,7 +32,7 @@ export module Abstract {
     public autoDomain() {
       super.autoDomain();
       if (this._autoPad) {
-        this.padDomain();
+        this._padDomain();
       }
       if (this._autoNice) {
         this.nice();
@@ -142,12 +143,20 @@ export module Abstract {
     }
 
     /**
-     * Pads out the domain of the scale by a specified ratio.
+     * Pads out the domain of the scale by a specified ratio. Note
+     * that this method is cumulative; each call enlarges the domain
+     * by the given padProportion.
      *
      * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
      * @returns {QuantitiveScale} The calling QuantitiveScale.
      */
     public padDomain(padProportion = 0.05): QuantitiveScale {
+      this._padProportion = padProportion;
+      this._padDomain();
+      return this;
+    }
+
+    public _padDomain() {
       var currentDomain = this.domain();
       if (currentDomain[0] === currentDomain[1]) {
         var d = currentDomain[0].valueOf(); // valueOf accounts for dates properly
@@ -157,7 +166,7 @@ export module Abstract {
 
       var extent = currentDomain[1] - currentDomain[0];
       // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
-      var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1].valueOf() + padProportion/2 * extent];
+      var newDomain = [currentDomain[0] - this._padProportion/2 * extent, currentDomain[1].valueOf() + this._padProportion/2 * extent];
       if (currentDomain[0] === 0) {
         newDomain[0] = 0;
       }
@@ -165,7 +174,6 @@ export module Abstract {
         newDomain[1] = 0;
       }
       this._setDomain(newDomain);
-      return this;
     }
   }
 }

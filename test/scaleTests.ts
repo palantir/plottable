@@ -113,6 +113,24 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [90, 210]);
     });
 
+    it("autoDomain shouldn't eat padding", () => {
+      var scale = new Plottable.Scale.Linear();
+      scale._autoPad = true; // plots will set this when scale added to them
+      var dataSource = new Plottable.DataSource([1,2,3,4,5]);
+      scale._addPerspective("a", dataSource, (x: any) => x);
+
+      assert.deepEqual(scale.domain(), [0.9, 5.1],
+        "_addPerspective fires an autoDomain(), which uses the default paddingProportion");
+
+      scale.padDomain(0.20).autoDomain();
+      assert.deepEqual(scale.domain(), [0.6, 5.4],
+        "we don't want 0.20 * default padding, so call autoDomain()");
+
+      dataSource.data([1,2,3,4,5]);
+      assert.deepEqual(scale.domain(), [0.6, 5.4],
+        "changing data (even to the same values) will trigger autoDomain on scale");
+    });
+
     it("autoPad works for date scales", () => {
       var scale = new Plottable.Scale.Time();
       var f = d3.time.format("%x");
