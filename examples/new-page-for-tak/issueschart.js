@@ -2,10 +2,10 @@ function makeIssuesChart(svg, data) {
   var xScale = new Plottable.Scale.Time();
   var yScale = new Plottable.Scale.Linear();
 
+  var format = d3.time.format("%Y/%m/%d");
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", format);
   var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-  var format = d3.time.format("%Y/%m/%d");
   var closedArea = new Plottable.Plot.Area(data, xScale, yScale)
                         .project("x", "parsedDate", xScale)
                         .project("y", "nClosed", yScale)
