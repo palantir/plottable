@@ -30,6 +30,14 @@ export module Singleton {
     }
 
     /**
+     * Returns true if the window has been resized and the RenderController
+     * has not yet been flushed.
+     */
+    public static resizing(): boolean {
+      return this._resized;
+    }
+
+    /**
      * Registers a component.
      *
      * When the window is resized, we invoke ._invalidateLayout() on the
