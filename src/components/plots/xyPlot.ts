@@ -5,9 +5,6 @@ export module Abstract {
   export class XYPlot extends Plot {
     public xScale: Abstract.Scale;
     public yScale: Abstract.Scale;
-    public _xAccessor: any;
-    public _yAccessor: any;
-
     /**
      * Creates an XYPlot.
      *

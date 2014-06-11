@@ -24,6 +24,7 @@
 /// <reference path="core/scale.ts" />
 /// <reference path="core/renderer.ts" />
 /// <reference path="core/renderController.ts" />
+/// <reference path="core/resize.ts" />
 /// <reference path="core/animator.ts" />
 /// <reference path="core/interfaces.ts" />
 
