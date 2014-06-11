@@ -36,6 +36,8 @@ export module Axis {
           }
           return d;
         };
+      } else if (formatter instanceof Abstract.Formatter) {
+        formatter = (<Abstract.Formatter> formatter).format;
       }
       this.tickFormat(formatter);
       this._registerToBroadcaster(this._axisScale, () => this._render());
