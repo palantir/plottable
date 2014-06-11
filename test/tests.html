@@ -31,7 +31,6 @@
         ui: "bdd"
       });
       mocha.checkLeaks();
-      Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
       if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
       } else {
