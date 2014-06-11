@@ -17,18 +17,15 @@ export module Axis {
      * @constructor
      * @param {Scale} scale The Scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-     * @param {any} [formatter] a D3 formatter
+     * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
      */
-    constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any) {
+    constructor(axisScale: Abstract.Scale, orientation: string, formatter: any = new Formatter.General()) {
       super();
       this._axisScale = axisScale;
       orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
       this.classed("axis", true);
       var formatFunction = formatter;
-      if (formatter == null) {
-        formatter = new Formatter.General();
-      }
       if (formatter instanceof Abstract.Formatter) {
         formatFunction = (d: any) => (<Abstract.Formatter> formatter).format(d);
       }
