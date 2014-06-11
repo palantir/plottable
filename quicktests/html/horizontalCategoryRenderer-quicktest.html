@@ -1,8 +1,8 @@
 <html>
   <head>
-    <title>Bar Renderer Quicktest</title>
+    <title>Horizontal Category Renderer Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../bower_components/d3/d3.js"></script>
     <script src="../../plottable_multifile.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
 
@@ -16,23 +16,25 @@
         ];
 
       var ds = new Plottable.DataSource(data);
-      var xScale = new Plottable.Scale.Ordinal().rangeType("bands");
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", function(d) { return d; } );
+      var xScale = new Plottable.Scale.Linear();
+      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-      var yScale = new Plottable.Scale.Linear();
-      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
-      yAxis.showEndTickLabels(true);
+      var yScale = new Plottable.Scale.Ordinal();
+      yAxis = new Plottable.Axis.Category(yScale, "left");
 
-      var barPlot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
-                              .project("x", "name", xScale)
-                              .project("y", "age", yScale)
-                              .project("fill", function() {return "steelblue"});
-      barPlot.animate(true);
-      var chart = new Plottable.Component.Table([[yAxis, barPlot],
-                                       [null,  xAxis]]);
+      var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
+                              .project("x", "age", xScale)
+                              .project("y", "name", yScale)
+                              .animate(true);
 
+      var chart = new Plottable.Component.Table([
+        [yAxis, barPlot],
+        [null, xAxis]
+      ]);
 
-      window.onload = function() { chart.renderTo("#meow"); }
+      window.onload = function() {
+        chart.renderTo(svg);
+      }
 
       function younger() {
         var data = ds.data();

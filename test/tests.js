@@ -433,6 +433,19 @@ describe("Axes", function () {
             assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
             svg.remove();
         });
+
+        it("requests appropriate space when the scale has no domain", function () {
+            var svg = generateSVG(400, 400);
+            var scale = new Plottable.Scale.Ordinal();
+            var ca = new Plottable.Axis.Category(scale);
+            ca._anchor(svg);
+            var s = ca._requestedSpace(400, 400);
+            assert.operator(s.width, ">=", 0, "it requested 0 or more width");
+            assert.operator(s.height, ">=", 0, "it requested 0 or more height");
+            assert.isFalse(s.wantsWidth, "it doesn't want width");
+            assert.isFalse(s.wantsHeight, "it doesn't want height");
+            svg.remove();
+        });
     });
 });
 
@@ -1421,11 +1434,14 @@ describe("Util.DOM", function () {
         });
     });
 
-    it("isSelectionRemoved works", function () {
+    it("isSelectionRemovedFromSVG works", function () {
         var svg = generateSVG();
-        assert.isFalse(Plottable.Util.DOM.isSelectionRemoved(svg), "svg is in DOM");
+        var g = svg.append("g");
+        assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is in svg");
+        g.remove();
+        assert.isTrue(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is no longer in svg");
+        assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(svg), "svg is not considered removed");
         svg.remove();
-        assert.isTrue(Plottable.Util.DOM.isSelectionRemoved(svg), "svg is no longer in DOM");
     });
 });
 
@@ -2109,11 +2125,13 @@ describe("Legends", function () {
         svg.remove();
     });
 
-    describe("ToggleLegend tests", function () {
+    describe("Legend toggle tests", function () {
         var toggleLegend;
 
         beforeEach(function () {
-            toggleLegend = new Plottable.Component.ToggleLegend(color);
+            toggleLegend = new Plottable.Component.Legend(color);
+            toggleLegend.toggleCallback(function (d, b) {
+            });
         });
 
         function verifyState(selection, b, msg) {
@@ -2159,7 +2177,7 @@ describe("Legends", function () {
             svg.remove();
         });
 
-        it("toggleLegend.scale() works as intended", function () {
+        it("scale() works as intended with toggling", function () {
             var domain = ["a", "b", "c", "d", "e"];
             color.domain(domain);
             toggleLegend.renderTo(svg);
@@ -2201,7 +2219,7 @@ describe("Legends", function () {
             color.domain(domain);
             var state = [true, true, true, true, true];
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.toggleCallback(function (d, b) {
                 state[domain.indexOf(d)] = b;
             });
             toggleLegend.renderTo(svg);
@@ -2230,7 +2248,7 @@ describe("Legends", function () {
             var state = true;
             toggleLegend.renderTo(svg);
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.toggleCallback(function (d, b) {
                 state = b;
             });
 
@@ -2238,7 +2256,7 @@ describe("Legends", function () {
             assert.equal(state, false, "callback was successful");
 
             var count = 0;
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.toggleCallback(function (d, b) {
                 count++;
             });
 
@@ -2254,20 +2272,204 @@ describe("Legends", function () {
             var state = true;
             toggleLegend.renderTo(svg);
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.toggleCallback(function (d, b) {
                 state = b;
             });
 
             toggleEntry("a", 0);
             assert.equal(state, false, "callback was successful");
 
-            toggleLegend.callback(); // this should not remove the callback
+            toggleLegend.toggleCallback(); // this should not remove the callback
             toggleEntry("a", 0);
             assert.equal(state, true, "callback was successful");
 
-            toggleLegend.callback(null); // this should remove the callback
-            toggleEntry("a", 0);
-            assert.equal(state, true, "callback was removed");
+            toggleLegend.toggleCallback(null); // this should remove the callback
+            assert.throws(function () {
+                toggleEntry("a", 0);
+            }, "not a function");
+            var selection = getSelection("a");
+
+            // should have no classes
+            assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
+            assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
+
+            svg.remove();
+        });
+    });
+
+    describe("Legend hover tests", function () {
+        var hoverLegend;
+
+        beforeEach(function () {
+            hoverLegend = new Plottable.Component.Legend(color);
+            hoverLegend.hoverCallback(function (d) {
+            });
+        });
+
+        function _verifyFocus(selection, b, msg) {
+            assert.equal(selection.classed("hover"), true, msg);
+            assert.equal(selection.classed("focus"), b, msg);
+        }
+
+        function _verifyEmpty(selection, msg) {
+            assert.equal(selection.classed("hover"), false, msg);
+            assert.equal(selection.classed("focus"), false, msg);
+        }
+
+        function getSelection(datum) {
+            var selection = hoverLegend.content.selectAll(".legend-row").filter(function (d, i) {
+                return d === datum;
+            });
+            return selection;
+        }
+
+        function verifyFocus(datum, b, msg) {
+            _verifyFocus(getSelection(datum), b, msg);
+        }
+
+        function verifyEmpty(datum, msg) {
+            _verifyEmpty(getSelection(datum), msg);
+        }
+
+        function hoverEntry(datum, index) {
+            getSelection(datum).on("mouseover")(datum, index);
+        }
+
+        function leaveEntry(datum, index) {
+            getSelection(datum).on("mouseout")(datum, index);
+        }
+
+        it("basic initialization test", function () {
+            color.domain(["a", "b", "c", "d", "e"]);
+            hoverLegend.renderTo(svg);
+            hoverLegend.content.selectAll(".legend-row").each(function (d, i) {
+                verifyEmpty(d);
+            });
+            svg.remove();
+        });
+
+        it("basic hover test", function () {
+            color.domain(["a"]);
+            hoverLegend.renderTo(svg);
+            hoverEntry("a", 0);
+            verifyFocus("a", true);
+            leaveEntry("a", 0);
+            verifyEmpty("a");
+            svg.remove();
+        });
+
+        it("scale() works as intended with hovering", function () {
+            var domain = ["a", "b", "c", "d", "e"];
+            color.domain(domain);
+            hoverLegend.renderTo(svg);
+
+            hoverEntry("a", 0);
+
+            var newDomain = ["r", "a", "d", "g"];
+            var newColorScale = new Plottable.Scale.Color("Category10");
+            newColorScale.domain(newDomain);
+            hoverLegend.scale(newColorScale);
+
+            verifyFocus("r", false, "r");
+            verifyFocus("a", true, "a");
+            verifyFocus("g", false, "g");
+            verifyFocus("d", false, "d");
+
+            leaveEntry("a", 0);
+            verifyEmpty("r");
+            verifyEmpty("a");
+            verifyEmpty("g");
+            verifyEmpty("d");
+
+            svg.remove();
+        });
+
+        it("listeners on scale will correctly update states", function () {
+            color.domain(["a", "b", "c", "d", "e"]);
+            hoverLegend.renderTo(svg);
+            hoverEntry("c", 2);
+
+            color.domain(["e", "d", "b", "a", "c"]);
+            verifyFocus("a", false);
+            verifyFocus("b", false);
+            verifyFocus("c", true);
+            verifyFocus("d", false);
+            verifyFocus("e", false);
+            svg.remove();
+        });
+
+        it("Testing callback works correctly", function () {
+            var domain = ["a", "b", "c", "d", "e"];
+            color.domain(domain);
+            var focused = undefined;
+
+            hoverLegend.hoverCallback(function (d) {
+                focused = d;
+            });
+            hoverLegend.renderTo(svg);
+
+            hoverEntry("a", 0);
+            verifyFocus("a", true);
+            assert.equal(focused, "a", "callback was successful");
+
+            leaveEntry("a", 0);
+            assert.equal(focused, undefined, "callback was successful");
+
+            hoverEntry("d", 3);
+            verifyFocus("d", true);
+            assert.equal(focused, "d", "callback was successful");
+            svg.remove();
+        });
+
+        it("Overwriting callback is successfull", function () {
+            var domain = ["a"];
+            color.domain(domain);
+            var focused = undefined;
+            hoverLegend.renderTo(svg);
+
+            hoverLegend.hoverCallback(function (d) {
+                focused = d;
+            });
+
+            hoverEntry("a", 0);
+            assert.equal(focused, "a", "callback was successful");
+            leaveEntry("a", 0);
+
+            var count = 0;
+            hoverLegend.hoverCallback(function (d) {
+                count++;
+            });
+
+            hoverEntry("a", 0);
+            assert.equal(focused, undefined, "old callback was not called");
+            assert.equal(count, 1, "new callbcak was called");
+            leaveEntry("a", 0);
+            assert.equal(count, 2, "new callback was called");
+            svg.remove();
+        });
+
+        it("Removing callback is successful", function () {
+            var domain = ["a"];
+            color.domain(domain);
+            var focused = undefined;
+            hoverLegend.renderTo(svg);
+
+            hoverLegend.hoverCallback(function (d) {
+                focused = d;
+            });
+
+            hoverEntry("a", 0);
+            assert.equal(focused, "a", "callback was successful");
+
+            hoverLegend.hoverCallback(); // this should not remove the callback
+            leaveEntry("a", 0);
+            assert.equal(focused, undefined, "callback was successful");
+
+            hoverLegend.hoverCallback(null); // this should remove the callback
+            assert.throws(function () {
+                hoverEntry("a", 0);
+            }, "not a function");
+            verifyEmpty("a");
 
             svg.remove();
         });
@@ -3107,9 +3309,9 @@ describe("Scales", function () {
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
             scale._addPerspective("1", dataSource, "foo");
             scale.autoDomain().padDomain().nice();
-            assert.isTrue(scale._autoDomain, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+            assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
-            assert.isFalse(scale._autoDomain, "the autoDomain flag is false after domain explicitly set");
+            assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
         });
 
         it("scale autorange works as expected with single dataSource", function () {
@@ -3135,17 +3337,17 @@ describe("Scales", function () {
         });
 
         it("scale perspectives can be removed appropriately", function () {
-            assert.isTrue(scale._autoDomain, "autoDomain enabled1");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
             scale._addPerspective("1x", dataSource, "foo");
             scale._addPerspective("2x", dataSource, "bar");
-            assert.isTrue(scale._autoDomain, "autoDomain enabled2");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-            assert.isTrue(scale._autoDomain, "autoDomain enabled3");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
             scale._removePerspective("1x");
-            assert.isTrue(scale._autoDomain, "autoDomain enabled4");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
             scale._addPerspective("2x", dataSource, "foo");
-            assert.isTrue(scale._autoDomain, "autoDomain enabled5");
+            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
     });
