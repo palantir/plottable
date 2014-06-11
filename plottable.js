@@ -703,6 +703,16 @@ var Plottable;
             }
             DOM.getBBox = getBBox;
 
+            DOM.POLYFILL_TIMEOUT_MSEC = 1000 / 60;
+            function requestAnimationFramePolyfill(fn) {
+                if (window.requestAnimationFrame != null) {
+                    window.requestAnimationFrame(fn);
+                } else {
+                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MSEC);
+                }
+            }
+            DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
+
             function _getParsedStyleValue(style, prop) {
                 var value = style.getPropertyValue(prop);
                 if (value == null) {
@@ -1103,14 +1113,14 @@ var Plottable;
             */
             Component.prototype._render = function () {
                 if (this._isAnchored && this._isSetup) {
-                    Plottable.Singleton.RenderController.registerToRender(this);
+                    Plottable.Core.RenderController.registerToRender(this);
                 }
                 return this;
             };
 
             Component.prototype._scheduleComputeLayout = function () {
                 if (this._isAnchored && this._isSetup) {
-                    Plottable.Singleton.RenderController.registerToComputeLayout(this);
+                    Plottable.Core.RenderController.registerToComputeLayout(this);
                 }
                 return this;
             };
@@ -1177,9 +1187,9 @@ var Plottable;
             */
             Component.prototype.autoResize = function (flag) {
                 if (flag) {
-                    Plottable.Singleton.ResizeBroadcaster.register(this);
+                    Plottable.Core.ResizeBroadcaster.register(this);
                 } else {
-                    Plottable.Singleton.ResizeBroadcaster.deregister(this);
+                    Plottable.Core.ResizeBroadcaster.deregister(this);
                 }
                 return this;
             };
@@ -2304,7 +2314,7 @@ var Plottable;
             * @return {D3.Selection} The resulting selection (potentially after the transition)
             */
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this._animators[animatorKey] != null && !Plottable.Singleton.ResizeBroadcaster.resizing()) {
+                if (this._animate && this._animators[animatorKey] != null && !Plottable.Core.ResizeBroadcaster.resizing()) {
                     return this._animators[animatorKey].animate(selection, attrToProjector, this);
                 } else {
                     return selection.attr(attrToProjector);
@@ -2329,7 +2339,51 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (Singleton) {
+    (function (Core) {
+        (function (RenderController) {
+            (function (RenderPolicy) {
+                var Immediate = (function () {
+                    function Immediate() {
+                    }
+                    Immediate.prototype.render = function () {
+                        Plottable.Core.RenderController.flush();
+                    };
+                    return Immediate;
+                })();
+                RenderPolicy.Immediate = Immediate;
+
+                var AnimationFrame = (function () {
+                    function AnimationFrame() {
+                    }
+                    AnimationFrame.prototype.render = function () {
+                        Plottable.Util.DOM.requestAnimationFramePolyfill(Plottable.Core.RenderController.flush);
+                    };
+                    return AnimationFrame;
+                })();
+                RenderPolicy.AnimationFrame = AnimationFrame;
+
+                var Timeout = (function () {
+                    function Timeout() {
+                        this._timeoutMsec = Plottable.Util.DOM.POLYFILL_TIMEOUT_MSEC;
+                    }
+                    Timeout.prototype.render = function () {
+                        setTimeout(Plottable.Core.RenderController.flush, this._timeoutMsec);
+                    };
+                    return Timeout;
+                })();
+                RenderPolicy.Timeout = Timeout;
+            })(RenderController.RenderPolicy || (RenderController.RenderPolicy = {}));
+            var RenderPolicy = RenderController.RenderPolicy;
+        })(Core.RenderController || (Core.RenderController = {}));
+        var RenderController = Core.RenderController;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Core) {
         /**
         * The RenderController is responsible for enqueueing and synchronizing
         * layout and render calls for Plottable components.
@@ -2340,23 +2394,28 @@ var Plottable;
         * If you require immediate rendering, call RenderController.flush() to
         * perform enqueued layout and rendering serially.
         */
-        var RenderController = (function () {
-            function RenderController() {
+        (function (RenderController) {
+            var _componentsNeedingRender = {};
+            var _componentsNeedingComputeLayout = {};
+            var _animationRequested = false;
+            var _renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
+
+            function setRenderPolicy(policy) {
+                _renderPolicy = policy;
             }
+            RenderController.setRenderPolicy = setRenderPolicy;
+
             /**
             * If the RenderController is enabled, we enqueue the component for
             * render. Otherwise, it is rendered immediately.
             *
             * @param {Abstract.Component} component Any Plottable component.
             */
-            RenderController.registerToRender = function (c) {
-                if (!RenderController.enabled) {
-                    c._doRender();
-                    return;
-                }
-                RenderController.componentsNeedingRender[c._plottableID] = c;
-                RenderController.requestFrame();
-            };
+            function registerToRender(c) {
+                _componentsNeedingRender[c._plottableID] = c;
+                requestRender();
+            }
+            RenderController.registerToRender = registerToRender;
 
             /**
             * If the RenderController is enabled, we enqueue the component for
@@ -2364,77 +2423,62 @@ var Plottable;
             *
             * @param {Abstract.Component} component Any Plottable component.
             */
-            RenderController.registerToComputeLayout = function (c) {
-                if (!RenderController.enabled) {
-                    c._computeLayout()._render();
-                    return;
-                }
-                RenderController.componentsNeedingComputeLayout[c._plottableID] = c;
-                RenderController.componentsNeedingRender[c._plottableID] = c;
-                RenderController.requestFrame();
-            };
+            function registerToComputeLayout(c) {
+                _componentsNeedingComputeLayout[c._plottableID] = c;
+                _componentsNeedingRender[c._plottableID] = c;
+                requestRender();
+            }
+            RenderController.registerToComputeLayout = registerToComputeLayout;
 
-            RenderController.requestAnimationFramePolyfill = function (fn) {
-                if (window.requestAnimationFrame != null) {
-                    requestAnimationFrame(fn);
-                } else {
-                    setTimeout(fn, RenderController.IE_TIMEOUT);
+            function requestRender() {
+                // Only run or enqueue flush on first request.
+                if (!_animationRequested) {
+                    _animationRequested = true;
+                    _renderPolicy.render();
                 }
-            };
+            }
 
-            RenderController.requestFrame = function () {
-                if (!RenderController.animationRequested) {
-                    RenderController.requestAnimationFramePolyfill(RenderController.flush);
-                    RenderController.animationRequested = true;
-                }
-            };
-
-            RenderController.flush = function () {
-                if (RenderController.animationRequested) {
+            function flush() {
+                if (_animationRequested) {
                     // Layout
-                    var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
+                    var toCompute = d3.values(_componentsNeedingComputeLayout);
                     toCompute.forEach(function (c) {
                         return c._computeLayout();
                     });
 
                     // Top level render.
                     // Containers will put their children in the toRender queue
-                    var toRender = d3.values(RenderController.componentsNeedingRender);
+                    var toRender = d3.values(_componentsNeedingRender);
                     toRender.forEach(function (c) {
                         return c._render();
                     });
 
                     // Finally, perform render of all components
-                    toRender = d3.values(RenderController.componentsNeedingRender);
+                    toRender = d3.values(_componentsNeedingRender);
                     toRender.forEach(function (c) {
                         return c._doRender();
                     });
 
                     // Reset queues
-                    RenderController.componentsNeedingComputeLayout = {};
-                    RenderController.componentsNeedingRender = {};
-                    RenderController.animationRequested = false;
+                    _componentsNeedingComputeLayout = {};
+                    _componentsNeedingRender = {};
+                    _animationRequested = false;
                 }
 
                 // Reset resize flag regardless of queue'd components
-                Plottable.Singleton.ResizeBroadcaster._resized = false;
-            };
-            RenderController.IE_TIMEOUT = 1000 / 60;
-            RenderController.componentsNeedingRender = {};
-            RenderController.componentsNeedingComputeLayout = {};
-            RenderController.animationRequested = false;
-            RenderController.enabled = window.PlottableTestCode == null;
-            return RenderController;
-        })();
-        Singleton.RenderController = RenderController;
-    })(Plottable.Singleton || (Plottable.Singleton = {}));
-    var Singleton = Plottable.Singleton;
+                Plottable.Core.ResizeBroadcaster.clearResizing();
+            }
+            RenderController.flush = flush;
+        })(Core.RenderController || (Core.RenderController = {}));
+        var RenderController = Core.RenderController;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (Singleton) {
+    (function (Core) {
         /**
         * The ResizeBroadcaster will broadcast a notification to any registered
         * components when the window is resized.
@@ -2445,28 +2489,35 @@ var Plottable;
         * flush of the RenderController. This is used, for example, to disable
         * animations during resize.
         */
-        var ResizeBroadcaster = (function () {
-            function ResizeBroadcaster() {
-            }
-            ResizeBroadcaster._lazyInitialize = function () {
-                if (ResizeBroadcaster._broadcaster === undefined) {
-                    ResizeBroadcaster._broadcaster = new Plottable.Abstract.Broadcaster();
-                    window.addEventListener("resize", ResizeBroadcaster._onResize);
-                }
-            };
+        (function (ResizeBroadcaster) {
+            var _broadcaster;
+            var _resizing = false;
 
-            ResizeBroadcaster._onResize = function () {
-                ResizeBroadcaster._resized = true;
-                ResizeBroadcaster._broadcaster._broadcast();
-            };
+            function _lazyInitialize() {
+                if (_broadcaster === undefined) {
+                    _broadcaster = new Plottable.Abstract.Broadcaster();
+                    window.addEventListener("resize", _onResize);
+                }
+            }
+
+            function _onResize() {
+                _resizing = true;
+                _broadcaster._broadcast();
+            }
 
             /**
             * Returns true if the window has been resized and the RenderController
             * has not yet been flushed.
             */
-            ResizeBroadcaster.resizing = function () {
-                return this._resized;
-            };
+            function resizing() {
+                return _resizing;
+            }
+            ResizeBroadcaster.resizing = resizing;
+
+            function clearResizing() {
+                _resizing = false;
+            }
+            ResizeBroadcaster.clearResizing = clearResizing;
 
             /**
             * Registers a component.
@@ -2477,12 +2528,13 @@ var Plottable;
             *
             * @param {Abstract.Component} component Any Plottable component.
             */
-            ResizeBroadcaster.register = function (c) {
-                ResizeBroadcaster._lazyInitialize();
-                ResizeBroadcaster._broadcaster.registerListener(c._plottableID, function () {
+            function register(c) {
+                _lazyInitialize();
+                _broadcaster.registerListener(c._plottableID, function () {
                     return c._invalidateLayout();
                 });
-            };
+            }
+            ResizeBroadcaster.register = register;
 
             /**
             * Deregisters the components.
@@ -2491,17 +2543,16 @@ var Plottable;
             *
             * @param {Abstract.Component} component Any Plottable component.
             */
-            ResizeBroadcaster.deregister = function (c) {
-                if (ResizeBroadcaster._broadcaster) {
-                    ResizeBroadcaster._broadcaster.deregisterListener(c._plottableID);
+            function deregister(c) {
+                if (_broadcaster) {
+                    _broadcaster.deregisterListener(c._plottableID);
                 }
-            };
-            ResizeBroadcaster._resized = false;
-            return ResizeBroadcaster;
-        })();
-        Singleton.ResizeBroadcaster = ResizeBroadcaster;
-    })(Plottable.Singleton || (Plottable.Singleton = {}));
-    var Singleton = Plottable.Singleton;
+            }
+            ResizeBroadcaster.deregister = deregister;
+        })(Core.ResizeBroadcaster || (Core.ResizeBroadcaster = {}));
+        var ResizeBroadcaster = Core.ResizeBroadcaster;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5324,46 +5375,46 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (Singleton) {
-        var KeyEventListener = (function () {
-            function KeyEventListener() {
+    (function (Core) {
+        (function (KeyEventListener) {
+            var _initialized = false;
+            var _callbacks = [];
+
+            function initialize() {
+                if (_initialized) {
+                    return;
+                }
+                d3.select(document).on("keydown", processEvent);
+                _initialized = true;
             }
-            KeyEventListener.initialize = function () {
-                if (KeyEventListener.initialized) {
-                    return;
-                }
-                d3.select(document).on("keydown", KeyEventListener.processEvent);
-                KeyEventListener.initialized = true;
-            };
+            KeyEventListener.initialize = initialize;
 
-            KeyEventListener.addCallback = function (keyCode, cb) {
-                if (!KeyEventListener.initialized) {
-                    KeyEventListener.initialize();
+            function addCallback(keyCode, cb) {
+                if (!_initialized) {
+                    initialize();
                 }
 
-                if (KeyEventListener.callbacks[keyCode] == null) {
-                    KeyEventListener.callbacks[keyCode] = [];
+                if (_callbacks[keyCode] == null) {
+                    _callbacks[keyCode] = [];
                 }
 
-                KeyEventListener.callbacks[keyCode].push(cb);
-            };
+                _callbacks[keyCode].push(cb);
+            }
+            KeyEventListener.addCallback = addCallback;
 
-            KeyEventListener.processEvent = function () {
-                if (KeyEventListener.callbacks[d3.event.keyCode] == null) {
+            function processEvent() {
+                if (_callbacks[d3.event.keyCode] == null) {
                     return;
                 }
 
-                KeyEventListener.callbacks[d3.event.keyCode].forEach(function (cb) {
+                _callbacks[d3.event.keyCode].forEach(function (cb) {
                     cb(d3.event);
                 });
-            };
-            KeyEventListener.initialized = false;
-            KeyEventListener.callbacks = [];
-            return KeyEventListener;
-        })();
-        Singleton.KeyEventListener = KeyEventListener;
-    })(Plottable.Singleton || (Plottable.Singleton = {}));
-    var Singleton = Plottable.Singleton;
+            }
+        })(Core.KeyEventListener || (Core.KeyEventListener = {}));
+        var KeyEventListener = Core.KeyEventListener;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5517,7 +5568,7 @@ var Plottable;
                     _this.activated = false;
                 });
 
-                Plottable.Singleton.KeyEventListener.addCallback(this.keyCode, function (e) {
+                Plottable.Core.KeyEventListener.addCallback(this.keyCode, function (e) {
                     if (_this.activated && _this._callback != null) {
                         _this._callback();
                     }

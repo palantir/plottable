@@ -226,6 +226,8 @@ declare module Plottable {
             * @returns {SVGRed} The bounding box.
             */
             function getBBox(element: D3.Selection): SVGRect;
+            var POLYFILL_TIMEOUT_MSEC: number;
+            function requestAnimationFramePolyfill(fn: () => any): void;
             function isSelectionRemovedFromSVG(selection: D3.Selection): boolean;
             function getElementWidth(elem: HTMLScriptElement): number;
             function getElementHeight(elem: HTMLScriptElement): number;
@@ -600,7 +602,29 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Singleton {
+    module Core {
+        module RenderController {
+            module RenderPolicy {
+                interface IRenderPolicy {
+                    render(): any;
+                }
+                class Immediate implements IRenderPolicy {
+                    public render(): void;
+                }
+                class AnimationFrame implements IRenderPolicy {
+                    public render(): void;
+                }
+                class Timeout implements IRenderPolicy {
+                    public render(): void;
+                }
+            }
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Core {
         /**
         * The RenderController is responsible for enqueueing and synchronizing
         * layout and render calls for Plottable components.
@@ -611,30 +635,30 @@ declare module Plottable {
         * If you require immediate rendering, call RenderController.flush() to
         * perform enqueued layout and rendering serially.
         */
-        class RenderController {
-            static enabled: boolean;
+        module RenderController {
+            function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any;
             /**
             * If the RenderController is enabled, we enqueue the component for
             * render. Otherwise, it is rendered immediately.
             *
             * @param {Abstract.Component} component Any Plottable component.
             */
-            static registerToRender(c: Abstract.Component): void;
+            function registerToRender(c: Abstract.Component): void;
             /**
             * If the RenderController is enabled, we enqueue the component for
             * layout and render. Otherwise, it is rendered immediately.
             *
             * @param {Abstract.Component} component Any Plottable component.
             */
-            static registerToComputeLayout(c: Abstract.Component): void;
-            static flush(): void;
+            function registerToComputeLayout(c: Abstract.Component): void;
+            function flush(): void;
         }
     }
 }
 
 
 declare module Plottable {
-    module Singleton {
+    module Core {
         /**
         * The ResizeBroadcaster will broadcast a notification to any registered
         * components when the window is resized.
@@ -645,13 +669,13 @@ declare module Plottable {
         * flush of the RenderController. This is used, for example, to disable
         * animations during resize.
         */
-        class ResizeBroadcaster {
-            static _resized: boolean;
+        module ResizeBroadcaster {
             /**
             * Returns true if the window has been resized and the RenderController
             * has not yet been flushed.
             */
-            static resizing(): boolean;
+            function resizing(): boolean;
+            function clearResizing(): any;
             /**
             * Registers a component.
             *
@@ -661,7 +685,7 @@ declare module Plottable {
             *
             * @param {Abstract.Component} component Any Plottable component.
             */
-            static register(c: Abstract.Component): void;
+            function register(c: Abstract.Component): void;
             /**
             * Deregisters the components.
             *
@@ -669,7 +693,7 @@ declare module Plottable {
             *
             * @param {Abstract.Component} component Any Plottable component.
             */
-            static deregister(c: Abstract.Component): void;
+            function deregister(c: Abstract.Component): void;
         }
     }
 }
@@ -1538,13 +1562,13 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Singleton {
+    module Core {
         interface IKeyEventListenerCallback {
             (e: D3.Event): any;
         }
-        class KeyEventListener {
-            static initialize(): void;
-            static addCallback(keyCode: number, cb: IKeyEventListenerCallback): void;
+        module KeyEventListener {
+            function initialize(): void;
+            function addCallback(keyCode: number, cb: IKeyEventListenerCallback): void;
         }
     }
 }

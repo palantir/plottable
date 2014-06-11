@@ -28,7 +28,7 @@ export module Interaction {
         this.activated = false;
       });
 
-      Plottable.Singleton.KeyEventListener.addCallback(this.keyCode, (e: D3.Event) => {
+      Core.KeyEventListener.addCallback(this.keyCode, (e: D3.Event) => {
         if (this.activated && this._callback != null) {
           this._callback();
         }
