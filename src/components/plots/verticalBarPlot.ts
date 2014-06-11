@@ -5,9 +5,9 @@ export module Plot {
   export class VerticalBar extends Abstract.BarPlot {
     public _barAlignment = "left";
     public _animators: Animator.IPlotAnimatorMap = {
-      "bars-reset" : new Animator.NullAnimator(),
-      "bars"       : new Animator.IterativeDelayAnimator(),
-      "baseline"   : new Animator.NullAnimator()
+      "bars-reset" : new Animator.Null(),
+      "bars"       : new Animator.IterativeDelay(),
+      "baseline"   : new Animator.Null()
     };
 
     /**

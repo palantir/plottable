@@ -42,7 +42,7 @@ export module Singleton {
      */
     public static registerToComputeLayout(c: Abstract.Component) {
       if (!RenderController.enabled) {
-        c._computeLayout()._render(); // TODO (bdwyer) - should this be _computeLayout()?
+        c._computeLayout()._render();
         return;
       }
       RenderController.componentsNeedingComputeLayout[c._plottableID] = c;
