@@ -15,7 +15,10 @@
 /// <reference path="core/table.ts" />
 /// <reference path="core/scale.ts" />
 /// <reference path="core/renderer.ts" />
+/// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
+/// <reference path="core/resizeBroadcaster.ts" />
+/// <reference path="core/animator.ts" />
 /// <reference path="core/interfaces.ts" />
 
 /// <reference path="scales/quantitiveScale.ts" />
@@ -43,6 +46,10 @@
 /// <reference path="components/plots/horizontalBarPlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />
+
+/// <reference path="animators/nullAnimator.ts" />
+/// <reference path="animators/defaultAnimator.ts" />
+/// <reference path="animators/iterativeDelayAnimator.ts" />
 
 /// <reference path="interactions/keyEventListener.ts" />
 /// <reference path="interactions/interaction.ts" />
