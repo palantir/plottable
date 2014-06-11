@@ -844,6 +844,7 @@ var Plottable;
             */
             function Identity() {
                 _super.call(this, null);
+                this.showOnlyUnchangedValues(false);
                 this._formatFunction = function (d) {
                     return String(d);
                 };
