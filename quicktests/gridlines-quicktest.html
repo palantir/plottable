@@ -17,7 +17,8 @@
         dataseries = makeRandomData(20);
 
         xScale = new Plottable.Scale.Linear();
-        xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+        var f = new Plottable.Util.Formatter.Fixed();
+        xAxis = new Plottable.Axis.XAxis(xScale, "bottom", f);
 
         yScale = new Plottable.Scale.Linear();
         yAxis = new Plottable.Axis.YAxis(yScale, "left").tickLabelPosition("bottom");
