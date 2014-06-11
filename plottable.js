@@ -3313,21 +3313,24 @@ var Plottable;
                 orientation = orientation.toLowerCase();
                 this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
                 this.classed("axis", true);
+                var formatFunction = formatter;
                 if (formatter == null) {
                     var numberFormatter = d3.format(".3s");
-                    formatter = function (d) {
+                    formatFunction = function (d) {
                         if (typeof d === "number") {
                             if (Math.abs(d) < 1) {
                                 return String(Math.round(1000 * d) / 1000);
                             }
                             return numberFormatter(d);
                         }
-                        return d;
+                        return d.toString();
                     };
                 } else if (formatter instanceof Plottable.Abstract.Formatter) {
-                    formatter = formatter.format;
+                    formatFunction = function (d) {
+                        return formatter.format(d);
+                    };
                 }
-                this.tickFormat(formatter);
+                this.tickFormat(formatFunction);
                 this._registerToBroadcaster(this._axisScale, function () {
                     return _this._render();
                 });

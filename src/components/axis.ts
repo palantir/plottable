@@ -25,21 +25,22 @@ export module Axis {
       orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
       this.classed("axis", true);
+      var formatFunction = formatter;
       if (formatter == null) {
         var numberFormatter = d3.format(".3s");
-        formatter = function(d: any) {
+        formatFunction = function(d: any) {
           if (typeof d === "number") {
             if (Math.abs(d) < 1) {
               return String(Math.round(1000 * d) / 1000); // round to 3 decimal places
             }
             return numberFormatter(d);
           }
-          return d;
+          return d.toString();
         };
       } else if (formatter instanceof Abstract.Formatter) {
-        formatter = (<Abstract.Formatter> formatter).format;
+        formatFunction = (d: any) => (<Abstract.Formatter> formatter).format(d);
       }
-      this.tickFormat(formatter);
+      this.tickFormat(formatFunction);
       this._registerToBroadcaster(this._axisScale, () => this._render());
     }
 
