@@ -10,7 +10,7 @@ export module Animator {
    * The delay between animations can be configured with the .delay getter/setter.
    */
   export class IterativeDelayAnimator extends DefaultAnimator {
-    _delayMsec = 10;
+    _delayMsec = 15;
 
     public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any {
       return selection.transition()
