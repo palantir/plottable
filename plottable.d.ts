@@ -772,6 +772,7 @@ declare module Plottable {
         * perform enqueued layout and rendering serially.
         */
         module RenderController {
+            var _renderPolicy: RenderPolicy.IRenderPolicy;
             function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any;
             /**
             * If the RenderController is enabled, we enqueue the component for

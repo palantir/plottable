@@ -2668,16 +2668,10 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
-            var _renderPolicy;
-
-            if (window.PlottableTestCode == null) {
-                _renderPolicy = new Plottable.Core.RenderController.RenderPolicy.Immediate();
-            } else {
-                _renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
-            }
+            RenderController._renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
 
             function setRenderPolicy(policy) {
-                _renderPolicy = policy;
+                RenderController._renderPolicy = policy;
             }
             RenderController.setRenderPolicy = setRenderPolicy;
 
@@ -2710,7 +2704,7 @@ var Plottable;
                 // Only run or enqueue flush on first request.
                 if (!_animationRequested) {
                     _animationRequested = true;
-                    _renderPolicy.render();
+                    RenderController._renderPolicy.render();
                 }
             }
 
