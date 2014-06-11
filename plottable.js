@@ -3893,8 +3893,9 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), function (d) {
+                    return d;
+                });
 
                 var getTickLabelTransform = function (d, i) {
                     var startAndWidth = _this._scale.fullBandStartAndWidth(d);
@@ -3903,9 +3904,12 @@ var Plottable;
                     var y = _this._isHorizontal() ? 0 : bandStartPosition;
                     return "translate(" + x + "," + y + ")";
                 };
-                tickLabels.enter().append("g").classed("tick-label", true);
+                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
+
+                // erase all text first, then rewrite
+                tickLabels.text("");
                 this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
