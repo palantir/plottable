@@ -453,6 +453,16 @@ declare module Plottable {
             */
             public resize(width?: number, height?: number): Component;
             /**
+            * Enables and disables auto-resize.
+            *
+            * If enabled, window resizes will enqueue this component for a re-layout
+            * and re-render. Animations are disabled during window resizes when auto-
+            * resize is enabled.
+            *
+            * @param {boolean} flag - Enables (true) or disables (false) auto-resize.
+            */
+            public autoResize(flag: boolean): Component;
+            /**
             * Sets the x alignment of the Component.
             *
             * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
@@ -678,6 +688,9 @@ declare module Plottable {
             accessor: IAccessor;
             scale?: Scale;
         }
+        interface IAttributeToProjector {
+            [attrToSet: string]: IAppliedAccessor;
+        }
         class Plot extends Component {
             /**
             * Creates a Plot.
@@ -703,6 +716,18 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
+            /**
+            * Gets or sets the animator associated with the specified animator key.
+            *
+            * @param {string} animatorKey The key for the animator.
+            * @param {Animator.IPlotAnimator} animator If specified, will be stored as the
+            *     animator for the key.
+            * @return {Animator.IPlotAnimator|Plot} If an animator is specified, we return
+            *     this object to enable chaining, otherwise we return the animator
+            *     stored at the specified key.
+            */
+            public animator(animatorKey: string): Animator.IPlotAnimator;
+            public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
         }
     }
 }
@@ -710,11 +735,98 @@ declare module Plottable {
 
 declare module Plottable {
     module Singleton {
+        /**
+        * The RenderController is responsible for enqueueing and synchronizing
+        * layout and render calls for Plottable components.
+        *
+        * Layouts and renders occur inside an animation callback
+        * (window.requestAnimationFrame if available).
+        *
+        * If you require immediate rendering, call RenderController.flush() to
+        * perform enqueued layout and rendering serially.
+        */
         class RenderController {
             static enabled: boolean;
+            /**
+            * If the RenderController is enabled, we enqueue the component for
+            * render. Otherwise, it is rendered immediately.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
             static registerToRender(c: Abstract.Component): void;
+            /**
+            * If the RenderController is enabled, we enqueue the component for
+            * layout and render. Otherwise, it is rendered immediately.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
             static registerToComputeLayout(c: Abstract.Component): void;
             static flush(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Singleton {
+        /**
+        * The ResizeBroadcaster will broadcast a notification to any registered
+        * components when the window is resized.
+        *
+        * The broadcaster and single event listener are lazily constructed.
+        *
+        * Upon resize, the _resized flag will be set to true until after the next
+        * flush of the RenderController. This is used, for example, to disable
+        * animations during resize.
+        */
+        class ResizeBroadcaster {
+            static _resized: boolean;
+            /**
+            * Returns true if the window has been resized and the RenderController
+            * has not yet been flushed.
+            */
+            static resizing(): boolean;
+            /**
+            * Registers a component.
+            *
+            * When the window is resized, we invoke ._invalidateLayout() on the
+            * component, which will enqueue the component for layout and rendering
+            * with the RenderController.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            static register(c: Abstract.Component): void;
+            /**
+            * Deregisters the components.
+            *
+            * The component will no longer receive updates on window resize.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            static deregister(c: Abstract.Component): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        interface IPlotAnimator {
+            /**
+            * Applies the supplied attributes to a D3.Selection with some animation.
+            *
+            * @param {D3.Selection} selection The update selection or transition selection that we wish to animate.
+            * @param {Abstract.IAttributeToProjector} attrToProjector The set of
+            *     IAccessors that we will use to set attributes on the selection.
+            * @param {Abstract.Plot} plot The plot being animated.
+            * @return {D3.Selection} Animators should return the selection or
+            *     transition object so that plots may chain the transitions between
+            *     animators.
+            */
+            animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+        }
+        interface IPlotAnimatorMap {
+            [animatorKey: string]: IPlotAnimator;
         }
     }
 }
@@ -1484,6 +1596,73 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        /**
+        * An animator implementation with no animation. The attributes are
+        * immediately set on the selection.
+        */
+        class Null implements IPlotAnimator {
+            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        /**
+        * The default animator implementation with easing, duration, and delay.
+        */
+        class Default implements IPlotAnimator {
+            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+            /**
+            * Gets or sets the duration of the animation in milliseconds.
+            *
+            * @param {Number} duration The duration in milliseconds.
+            * @return {Number|Default} Returns this object for chaining or
+            *     the current duration if no argument is supplied.
+            */
+            public duration(): Number;
+            public duration(duration: Number): Default;
+            /**
+            * Gets or sets the delay of the animation in milliseconds.
+            *
+            * @param {Number} delay The delay in milliseconds.
+            * @return {Number|Default} Returns this object for chaining or
+            *     the current delay if no argument is supplied.
+            */
+            public delay(): Number;
+            public delay(delay: Number): Default;
+            /**
+            * Gets or sets the easing string of the animation in milliseconds.
+            *
+            * @param {string} easing The easing string.
+            * @return {string|Default} Returns this object for chaining or
+            *     the current easing string if no argument is supplied.
+            */
+            public easing(): string;
+            public easing(easing: string): Default;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        /**
+        * An animator that delays the animation of the attributes using the index
+        * of the selection data.
+        *
+        * The delay between animations can be configured with the .delay getter/setter.
+        */
+        class IterativeDelay extends Default {
+            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
         }
     }
 }

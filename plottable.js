@@ -1439,6 +1439,24 @@ var Plottable;
             };
 
             /**
+            * Enables and disables auto-resize.
+            *
+            * If enabled, window resizes will enqueue this component for a re-layout
+            * and re-render. Animations are disabled during window resizes when auto-
+            * resize is enabled.
+            *
+            * @param {boolean} flag - Enables (true) or disables (false) auto-resize.
+            */
+            Component.prototype.autoResize = function (flag) {
+                if (flag) {
+                    Plottable.Singleton.ResizeBroadcaster.register(this);
+                } else {
+                    Plottable.Singleton.ResizeBroadcaster.deregister(this);
+                }
+                return this;
+            };
+
+            /**
             * Sets the x alignment of the Component.
             *
             * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
@@ -2411,6 +2429,7 @@ var Plottable;
                 _super.call(this);
                 this._dataChanged = false;
                 this._animate = false;
+                this._animators = {};
                 this._ANIMATION_DURATION = 250;
                 this._projectors = {};
                 this._rerenderUpdateSelection = false;
@@ -2478,19 +2497,19 @@ var Plottable;
                 var rendererIDAttr = this._plottableID + attrToSet;
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
-                if (scale == null) {
-                    scale = existingScale;
-                }
+
                 if (existingScale != null) {
                     existingScale._removePerspective(rendererIDAttr);
                     this._deregisterFromBroadcaster(existingScale);
                 }
+
                 if (scale != null) {
                     scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
                     this._registerToBroadcaster(scale, function () {
                         return _this._render();
                     });
                 }
+
                 this._projectors[attrToSet] = { accessor: accessor, scale: scale };
                 this._requireRerender = true;
                 this._rerenderUpdateSelection = true;
@@ -2541,6 +2560,37 @@ var Plottable;
                 this._animate = enabled;
                 return this;
             };
+
+            /**
+            * Apply attributes to the selection.
+            *
+            * If animation is enabled and a valid animator's key is specified, the
+            * attributes are applied with the animator. Otherwise, they are applied
+            * immediately to the selection.
+            *
+            * The animation will not animate during auto-resize renders.
+            *
+            * @param {D3.Selection} selection The selection of elements to update.
+            * @param {string} animatorKey The key for the animator.
+            * @param {Abstract.IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
+            * @return {D3.Selection} The resulting selection (potentially after the transition)
+            */
+            Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
+                if (this._animate && this._animators[animatorKey] != null && !Plottable.Singleton.ResizeBroadcaster.resizing()) {
+                    return this._animators[animatorKey].animate(selection, attrToProjector, this);
+                } else {
+                    return selection.attr(attrToProjector);
+                }
+            };
+
+            Plot.prototype.animator = function (animatorKey, animator) {
+                if (animator === undefined) {
+                    return this._animators[animatorKey];
+                } else {
+                    this._animators[animatorKey] = animator;
+                    return this;
+                }
+            };
             return Plot;
         })(Plottable.Abstract.Component);
         Abstract.Plot = Plot;
@@ -2552,9 +2602,25 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (Singleton) {
+        /**
+        * The RenderController is responsible for enqueueing and synchronizing
+        * layout and render calls for Plottable components.
+        *
+        * Layouts and renders occur inside an animation callback
+        * (window.requestAnimationFrame if available).
+        *
+        * If you require immediate rendering, call RenderController.flush() to
+        * perform enqueued layout and rendering serially.
+        */
         var RenderController = (function () {
             function RenderController() {
             }
+            /**
+            * If the RenderController is enabled, we enqueue the component for
+            * render. Otherwise, it is rendered immediately.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
             RenderController.registerToRender = function (c) {
                 if (!RenderController.enabled) {
                     c._doRender();
@@ -2564,6 +2630,12 @@ var Plottable;
                 RenderController.requestFrame();
             };
 
+            /**
+            * If the RenderController is enabled, we enqueue the component for
+            * layout and render. Otherwise, it is rendered immediately.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
             RenderController.registerToComputeLayout = function (c) {
                 if (!RenderController.enabled) {
                     c._computeLayout()._render();
@@ -2574,38 +2646,50 @@ var Plottable;
                 RenderController.requestFrame();
             };
 
+            RenderController.requestAnimationFramePolyfill = function (fn) {
+                if (window.requestAnimationFrame != null) {
+                    requestAnimationFrame(fn);
+                } else {
+                    setTimeout(fn, RenderController.IE_TIMEOUT);
+                }
+            };
+
             RenderController.requestFrame = function () {
                 if (!RenderController.animationRequested) {
-                    if (window.requestAnimationFrame != null) {
-                        requestAnimationFrame(RenderController.flush);
-                    } else {
-                        setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
-                    }
+                    RenderController.requestAnimationFramePolyfill(RenderController.flush);
                     RenderController.animationRequested = true;
                 }
             };
 
             RenderController.flush = function () {
                 if (RenderController.animationRequested) {
+                    // Layout
                     var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
                     toCompute.forEach(function (c) {
                         return c._computeLayout();
                     });
-                    var toRender = d3.values(RenderController.componentsNeedingRender);
 
-                    // call _render on everything, so that containers will put their children in the toRender queue
+                    // Top level render.
+                    // Containers will put their children in the toRender queue
+                    var toRender = d3.values(RenderController.componentsNeedingRender);
                     toRender.forEach(function (c) {
                         return c._render();
                     });
 
+                    // Finally, perform render of all components
                     toRender = d3.values(RenderController.componentsNeedingRender);
                     toRender.forEach(function (c) {
                         return c._doRender();
                     });
+
+                    // Reset queues
                     RenderController.componentsNeedingComputeLayout = {};
                     RenderController.componentsNeedingRender = {};
                     RenderController.animationRequested = false;
                 }
+
+                // Reset resize flag regardless of queue'd components
+                Plottable.Singleton.ResizeBroadcaster._resized = false;
             };
             RenderController.IE_TIMEOUT = 1000 / 60;
             RenderController.componentsNeedingRender = {};
@@ -2618,6 +2702,81 @@ var Plottable;
     })(Plottable.Singleton || (Plottable.Singleton = {}));
     var Singleton = Plottable.Singleton;
 })(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Singleton) {
+        /**
+        * The ResizeBroadcaster will broadcast a notification to any registered
+        * components when the window is resized.
+        *
+        * The broadcaster and single event listener are lazily constructed.
+        *
+        * Upon resize, the _resized flag will be set to true until after the next
+        * flush of the RenderController. This is used, for example, to disable
+        * animations during resize.
+        */
+        var ResizeBroadcaster = (function () {
+            function ResizeBroadcaster() {
+            }
+            ResizeBroadcaster._lazyInitialize = function () {
+                if (ResizeBroadcaster._broadcaster === undefined) {
+                    ResizeBroadcaster._broadcaster = new Plottable.Abstract.Broadcaster();
+                    window.addEventListener("resize", ResizeBroadcaster._onResize);
+                }
+            };
+
+            ResizeBroadcaster._onResize = function () {
+                ResizeBroadcaster._resized = true;
+                ResizeBroadcaster._broadcaster._broadcast();
+            };
+
+            /**
+            * Returns true if the window has been resized and the RenderController
+            * has not yet been flushed.
+            */
+            ResizeBroadcaster.resizing = function () {
+                return this._resized;
+            };
+
+            /**
+            * Registers a component.
+            *
+            * When the window is resized, we invoke ._invalidateLayout() on the
+            * component, which will enqueue the component for layout and rendering
+            * with the RenderController.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            ResizeBroadcaster.register = function (c) {
+                ResizeBroadcaster._lazyInitialize();
+                ResizeBroadcaster._broadcaster.registerListener(c._plottableID, function () {
+                    return c._invalidateLayout();
+                });
+            };
+
+            /**
+            * Deregisters the components.
+            *
+            * The component will no longer receive updates on window resize.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            ResizeBroadcaster.deregister = function (c) {
+                if (ResizeBroadcaster._broadcaster) {
+                    ResizeBroadcaster._broadcaster.deregisterListener(c._plottableID);
+                }
+            };
+            ResizeBroadcaster._resized = false;
+            return ResizeBroadcaster;
+        })();
+        Singleton.ResizeBroadcaster = ResizeBroadcaster;
+    })(Plottable.Singleton || (Plottable.Singleton = {}));
+    var Singleton = Plottable.Singleton;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 
 var Plottable;
 (function (Plottable) {
@@ -4708,18 +4867,18 @@ var Plottable;
             XYPlot.prototype.project = function (attrToSet, accessor, scale) {
                 // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
-                if (attrToSet === "x") {
-                    this.xScale = scale != null ? scale : this.xScale;
-                    this._xAccessor = accessor;
+                if (attrToSet === "x" && scale != null) {
+                    this.xScale = scale;
                     this.xScale._autoNice = true;
                     this.xScale._autoPad = true;
                 }
-                if (attrToSet === "y") {
-                    this.yScale = scale != null ? scale : this.yScale;
-                    this._yAccessor = accessor;
+
+                if (attrToSet === "y" && scale != null) {
+                    this.yScale = scale;
                     this.yScale._autoNice = true;
                     this.yScale._autoPad = true;
                 }
+
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
 
                 return this;
@@ -5011,11 +5170,13 @@ var Plottable;
             function VerticalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._barAlignment = "left";
-                this._ANIMATION_DURATION = 300;
-                this._ANIMATION_DELAY = 15;
+                this._animators = {
+                    "bars-reset": new Plottable.Animator.Null(),
+                    "bars": new Plottable.Animator.IterativeDelay(),
+                    "baseline": new Plottable.Animator.Null()
+                };
             }
             VerticalBar.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
                 var scaledBaseline = this.yScale.scale(this._baselineValue);
 
@@ -5026,7 +5187,6 @@ var Plottable;
 
                 var xF = attrToProjector["x"];
                 var widthF = attrToProjector["width"];
-
                 var castXScale = this.xScale;
                 var rangeType = (castXScale.rangeType == null) ? "points" : castXScale.rangeType();
 
@@ -5048,16 +5208,18 @@ var Plottable;
 
                 var yFunction = attrToProjector["y"];
 
-                if (this._animate && this._dataChanged) {
+                // Apply reset if data changed
+                if (this._dataChanged) {
                     attrToProjector["y"] = function () {
                         return scaledBaseline;
                     };
                     attrToProjector["height"] = function () {
                         return 0;
                     };
-                    this._bars.attr(attrToProjector);
+                    this._applyAnimatedAttributes(this._bars, "bars-reset", attrToProjector);
                 }
 
+                // Prepare attributes for bars
                 attrToProjector["y"] = function (d, i) {
                     var originalY = yFunction(d, i);
                     return (originalY > scaledBaseline) ? scaledBaseline : originalY;
@@ -5072,23 +5234,19 @@ var Plottable;
                     this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
 
-                var updateSelection = this._bars;
-                if (this._animate) {
-                    var n = this.dataSource().data().length;
-                    updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
-                        return i * _this._ANIMATION_DELAY;
-                    });
-                }
+                // Apply bar updates
+                this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
 
-                updateSelection.attr(attrToProjector);
                 this._bars.exit().remove();
 
-                this._baseline.attr({
+                // Apply baseline updates
+                var baselineAttr = {
                     "x1": 0,
                     "y1": scaledBaseline,
                     "x2": this.availableWidth,
                     "y2": scaledBaseline
-                });
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
 
             /**
@@ -5357,6 +5515,112 @@ var Plottable;
         Plot.Line = Line;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        /**
+        * An animator implementation with no animation. The attributes are
+        * immediately set on the selection.
+        */
+        var Null = (function () {
+            function Null() {
+            }
+            Null.prototype.animate = function (selection, attrToProjector, plot) {
+                return selection.attr(attrToProjector);
+            };
+            return Null;
+        })();
+        Animator.Null = Null;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        /**
+        * The default animator implementation with easing, duration, and delay.
+        */
+        var Default = (function () {
+            function Default() {
+                this._durationMsec = 300;
+                this._delayMsec = 0;
+                this._easing = "exp-out";
+            }
+            Default.prototype.animate = function (selection, attrToProjector, plot) {
+                return selection.transition().ease(this._easing).duration(this._durationMsec).delay(this._delayMsec).attr(attrToProjector);
+            };
+
+            Default.prototype.duration = function (duration) {
+                if (duration === undefined) {
+                    return this._durationMsec;
+                } else {
+                    this._durationMsec = duration;
+                    return this;
+                }
+            };
+
+            Default.prototype.delay = function (delay) {
+                if (delay === undefined) {
+                    return this._delayMsec;
+                } else {
+                    this._delayMsec = delay;
+                    return this;
+                }
+            };
+
+            Default.prototype.easing = function (easing) {
+                if (easing === undefined) {
+                    return this._easing;
+                } else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            return Default;
+        })();
+        Animator.Default = Default;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        /**
+        * An animator that delays the animation of the attributes using the index
+        * of the selection data.
+        *
+        * The delay between animations can be configured with the .delay getter/setter.
+        */
+        var IterativeDelay = (function (_super) {
+            __extends(IterativeDelay, _super);
+            function IterativeDelay() {
+                _super.apply(this, arguments);
+                this._delayMsec = 15;
+            }
+            IterativeDelay.prototype.animate = function (selection, attrToProjector, plot) {
+                var _this = this;
+                return selection.transition().ease(this._easing).duration(this._durationMsec).delay(function (d, i) {
+                    return i * _this._delayMsec;
+                }).attr(attrToProjector);
+            };
+            return IterativeDelay;
+        })(Plottable.Animator.Default);
+        Animator.IterativeDelay = IterativeDelay;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
