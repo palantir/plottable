@@ -1,7 +1,6 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Util {
   export module Formatter {
     export class Fixed extends Abstract.Formatter {
       /**
@@ -18,5 +17,4 @@ export module Util {
       }
     }
   }
-}
 }

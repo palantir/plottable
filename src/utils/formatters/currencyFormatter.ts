@@ -1,7 +1,6 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Util {
   export module Formatter {
     export class Currency extends Formatter.Fixed {
       private symbol: string;
@@ -38,5 +37,4 @@ export module Util {
       }
     }
   }
-}
 }

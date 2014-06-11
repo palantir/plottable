@@ -27,17 +27,9 @@ export module Axis {
       this.classed("axis", true);
       var formatFunction = formatter;
       if (formatter == null) {
-        var numberFormatter = d3.format(".3s");
-        formatFunction = function(d: any) {
-          if (typeof d === "number") {
-            if (Math.abs(d) < 1) {
-              return String(Math.round(1000 * d) / 1000); // round to 3 decimal places
-            }
-            return numberFormatter(d);
-          }
-          return d.toString();
-        };
-      } else if (formatter instanceof Abstract.Formatter) {
+        formatter = new Formatter.General();
+      }
+      if (formatter instanceof Abstract.Formatter) {
         formatFunction = (d: any) => (<Abstract.Formatter> formatter).format(d);
       }
       this.tickFormat(formatFunction);

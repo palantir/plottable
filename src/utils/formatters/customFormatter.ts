@@ -1,7 +1,6 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Util {
   export module Formatter {
     export class Custom extends Abstract.Formatter {
       constructor(precision: number, customFormatFunction: (d: any, formatter: Formatter.Custom) => string) {
@@ -13,5 +12,4 @@ export module Util {
       }
     }
   }
-}
 }
