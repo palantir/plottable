@@ -229,6 +229,15 @@ export module Abstract {
       return this;
     }
 
+    /**
+     * Enables and disables auto-resize.
+     *
+     * If enabled, window resizes will enqueue this component for a re-layout
+     * and re-render. Animations are disabled during window resizes when auto-
+     * resize is enabled.
+     *
+     * @param {boolean} flag - Enables (true) or disables (false) auto-resize.
+     */
     public autoResize(flag: boolean): Component {
       if (flag) {
         Singleton.ResizeBroadcaster.register(this);

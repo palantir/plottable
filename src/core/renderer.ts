@@ -179,14 +179,15 @@ export module Abstract {
      * attributes are applied with the animator. Otherwise, they are applied
      * immediately to the selection.
      *
+     * The animation will not animate during auto-resize renders.
+     *
      * @param {D3.Selection} selection The selection of elements to update.
      * @param {string} animatorKey The key for the animator.
      * @param {Abstract.IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
      * @return {D3.Selection} The resulting selection (potentially after the transition)
      */
     public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: Abstract.IAttributeToProjector): any {
-      if (this._animate && this._animators[animatorKey]) {
-        // invoke animator with plot context
+      if (this._animate && this._animators[animatorKey] && !Singleton.ResizeBroadcaster._resized) {
         return this._animators[animatorKey].animate(selection, attrToProjector, this);
       } else {
         return selection.attr(attrToProjector);
