@@ -49,6 +49,20 @@ describe("Formatters", () => {
     });
   });
 
+  describe("identity", () => {
+    it("stringifies inputs", () => {
+      var identity = new Plottable.Formatter.Identity();
+      var result = identity.format(1);
+      assert.strictEqual(result, "1", "numbers are stringified");
+      result = identity.format(0.999999);
+      assert.strictEqual(result, "0.999999", "long numbers are stringified");
+      result = identity.format(null);
+      assert.strictEqual(result, "null", "formats null");
+      result = identity.format(undefined);
+      assert.strictEqual(result, "undefined", "formats undefined");
+    });
+  });
+
   describe("currency", () => {
     it("uses reasonable defaults", () => {
       var currencyFormatter = new Plottable.Formatter.Currency();

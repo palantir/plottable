@@ -10,6 +10,7 @@ module Plottable {
        */
       constructor() {
         super(null);
+        this.showOnlyUnchangedValues(false);
         this._formatFunction = function(d: any) {
           return String(d);
         };
