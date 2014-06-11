@@ -776,93 +776,272 @@ var Plottable;
     var Util = Plottable.Util;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
+///<reference path="../../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Formatter = (function () {
+            function Formatter(precision) {
+                this._onlyShowUnchanged = true;
+                this._precision = precision;
+            }
+            /**
+            * Format an input value.
+            *
+            * @param {any} d The value to be formatted.
+            * @returns {string} The formatted value.
+            */
+            Formatter.prototype.format = function (d) {
+                var formattedValue = this._formatFunction(d);
+                if (this._onlyShowUnchanged && d !== parseFloat(formattedValue)) {
+                    return "";
+                }
+                return formattedValue;
+            };
+
+            Formatter.prototype.precision = function (value) {
+                if (value === undefined) {
+                    return this._precision;
+                }
+                this._precision = value;
+                return this;
+            };
+
+            Formatter.prototype.showOnlyUnchangedValues = function (showUnchanged) {
+                if (showUnchanged === undefined) {
+                    return this._onlyShowUnchanged;
+                }
+                this._onlyShowUnchanged = showUnchanged;
+                return this;
+            };
+            return Formatter;
+        })();
+        Abstract.Formatter = Formatter;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Plottable;
 (function (Plottable) {
     (function (Util) {
         (function (Formatter) {
-            function identity() {
-                return function (d) {
-                    return String(d);
-                };
-            }
-            Formatter.identity = identity;
+            var Identity = (function (_super) {
+                __extends(Identity, _super);
+                /**
+                * Creates an formatter that simply stringifies the input.
+                *
+                * @constructor
+                */
+                function Identity() {
+                    _super.call(this, 0);
+                    this._formatFunction = function (d) {
+                        return d.toString();
+                    };
+                }
+                return Identity;
+            })(Plottable.Abstract.Formatter);
+            Formatter.Identity = Identity;
+        })(Util.Formatter || (Util.Formatter = {}));
+        var Formatter = Util.Formatter;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
 
-            /**
-            * Creates a formatter that displays no more than [precision] decimal places.
-            *
-            * @param {number} [precision] The maximum number of decimal places to display.
-            *
-            * @returns {IFormatter} A formatter that shows no more than [precision] decimal places.
-            */
-            function general(precision) {
-                if (typeof precision === "undefined") { precision = 3; }
-                var formatter = function (d) {
-                    var multiplier = Math.pow(10, precision);
-                    return String(Math.round(d * multiplier) / multiplier);
-                };
-                return formatter;
-            }
-            Formatter.general = general;
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Util) {
+        (function (Formatter) {
+            var General = (function (_super) {
+                __extends(General, _super);
+                /**
+                * Creates a formatter that displays no more than [precision] decimal places.
+                *
+                * @constructor
+                * @param {number} [precision] The maximum number of decimal places to display.
+                */
+                function General(precision) {
+                    if (typeof precision === "undefined") { precision = 3; }
+                    _super.call(this, precision);
+                    this._formatFunction = function (d) {
+                        var multiplier = Math.pow(10, this._precision);
+                        return String(Math.round(d * multiplier) / multiplier);
+                    };
+                }
+                return General;
+            })(Plottable.Abstract.Formatter);
+            Formatter.General = General;
+        })(Util.Formatter || (Util.Formatter = {}));
+        var Formatter = Util.Formatter;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
 
-            /**
-            * Creates a formatter that displays exactly [precision] decimal places.
-            *
-            * @param {number} [precision] The number of decimal places to display.
-            *
-            * @returns {IFormatter} A formatter that displays exactly [precision] decimal places.
-            */
-            function fixed(precision) {
-                if (typeof precision === "undefined") { precision = 3; }
-                return function (d) {
-                    return d.toFixed(precision);
-                };
-            }
-            Formatter.fixed = fixed;
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Util) {
+        (function (Formatter) {
+            var Fixed = (function (_super) {
+                __extends(Fixed, _super);
+                /**
+                * Creates a formatter that displays exactly [precision] decimal places.
+                *
+                * @constructor
+                * @param {number} [precision] The number of decimal places to display.
+                */
+                function Fixed(precision) {
+                    if (typeof precision === "undefined") { precision = 3; }
+                    _super.call(this, precision);
+                    this._formatFunction = function (d) {
+                        return d.toFixed(this._precision);
+                    };
+                }
+                return Fixed;
+            })(Plottable.Abstract.Formatter);
+            Formatter.Fixed = Fixed;
+        })(Util.Formatter || (Util.Formatter = {}));
+        var Formatter = Util.Formatter;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
 
-            /**
-            * Creates a formatter for currency values.
-            *
-            * @param {number} [precision] The number of decimal places to show.
-            * @param {string} [symbol] The currency symbol to use.
-            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
-            *
-            * @returns {IFormatter} A formatter for currency values.
-            */
-            function currency(precision, symbol, prefix) {
-                if (typeof precision === "undefined") { precision = 2; }
-                if (typeof symbol === "undefined") { symbol = "$"; }
-                if (typeof prefix === "undefined") { prefix = true; }
-                return function (d) {
-                    var isNegative = d < 0;
-                    var value = Math.abs(d).toFixed(precision);
-                    var output = (d < 0) ? "-" : "";
-                    if (prefix) {
-                        output += symbol;
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Util) {
+        (function (Formatter) {
+            var Currency = (function (_super) {
+                __extends(Currency, _super);
+                /**
+                * Creates a formatter for currency values.
+                *
+                * @param {number} [precision] The number of decimal places to show.
+                * @param {string} [symbol] The currency symbol to use.
+                * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
+                *
+                * @returns {IFormatter} A formatter for currency values.
+                */
+                function Currency(precision, symbol, prefix) {
+                    if (typeof precision === "undefined") { precision = 2; }
+                    if (typeof symbol === "undefined") { symbol = "$"; }
+                    if (typeof prefix === "undefined") { prefix = true; }
+                    _super.call(this, precision);
+                    this.symbol = symbol;
+                    this.prefix = prefix;
+                }
+                Currency.prototype.format = function (d) {
+                    var formattedValue = _super.prototype.format.call(this, Math.abs(d));
+                    if (formattedValue !== "") {
+                        if (this.prefix) {
+                            formattedValue = this.symbol + formattedValue;
+                        } else {
+                            formattedValue += this.symbol;
+                        }
+
+                        if (d < 0) {
+                            formattedValue = "-" + formattedValue;
+                        }
                     }
-                    output += value;
-                    if (!prefix) {
-                        output += symbol;
-                    }
-                    return output;
+                    return formattedValue;
                 };
-            }
-            Formatter.currency = currency;
+                return Currency;
+            })(Plottable.Util.Formatter.Fixed);
+            Formatter.Currency = Currency;
+        })(Util.Formatter || (Util.Formatter = {}));
+        var Formatter = Util.Formatter;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
 
-            /**
-            * Creates a formatter for percentage values.
-            *
-            * @param {number} [precision] The number of decimal places to display.
-            *
-            * @returns {IFormatter} A formatter for percentage values.
-            */
-            function percentage(precision) {
-                if (typeof precision === "undefined") { precision = 0; }
-                return function (d) {
-                    return (d * 100).toFixed(precision) + "%";
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Util) {
+        (function (Formatter) {
+            var Percentage = (function (_super) {
+                __extends(Percentage, _super);
+                /**
+                * Creates a formatter for percentage values.
+                * Multiplies the supplied value by 100 and appends "%".
+                *
+                * @constructor
+                * @param {number} [precision] The number of decimal places to display.
+                */
+                function Percentage(precision) {
+                    if (typeof precision === "undefined") { precision = 0; }
+                    _super.call(this, precision);
+                }
+                Percentage.prototype.format = function (d) {
+                    var formattedValue = _super.prototype.format.call(this, d * 100);
+                    if (formattedValue !== "") {
+                        formattedValue += "%";
+                    }
+                    return formattedValue;
                 };
-            }
-            Formatter.percentage = percentage;
+                return Percentage;
+            })(Plottable.Util.Formatter.Fixed);
+            Formatter.Percentage = Percentage;
+        })(Util.Formatter || (Util.Formatter = {}));
+        var Formatter = Util.Formatter;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Util) {
+        (function (Formatter) {
+            var Custom = (function (_super) {
+                __extends(Custom, _super);
+                function Custom(precision, customFormatFunction) {
+                    _super.call(this, precision);
+                    this._onlyShowUnchanged = false;
+                    this._formatFunction = function (d) {
+                        return customFormatFunction(d, this);
+                    };
+                }
+                return Custom;
+            })(Plottable.Abstract.Formatter);
+            Formatter.Custom = Custom;
         })(Util.Formatter || (Util.Formatter = {}));
         var Formatter = Util.Formatter;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -3145,6 +3324,8 @@ var Plottable;
                         }
                         return d;
                     };
+                } else if (formatter instanceof Plottable.Abstract.Formatter) {
+                    formatter = formatter.format;
                 }
                 this.tickFormat(formatter);
                 this._registerToBroadcaster(this._axisScale, function () {
