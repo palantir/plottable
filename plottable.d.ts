@@ -1045,7 +1045,7 @@ declare module Plottable {
             * @constructor
             * @param {Scale} scale The Scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {any} [formatter] a D3 formatter
+            * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
             */
             constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any);
             public showEndTickLabels(): boolean;
