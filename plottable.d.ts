@@ -646,6 +646,16 @@ declare module Plottable {
 
 
 declare module Plottable {
+    class Domainer {
+        constructor(scale: Abstract.QuantitiveScale);
+        public pad(padProportion?: number): Domainer;
+        public nice(count?: number): Domainer;
+        public computeDomain(extents: any[][]): any[];
+    }
+}
+
+
+declare module Plottable {
     module Abstract {
         class QuantitiveScale extends Scale {
             /**

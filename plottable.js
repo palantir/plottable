@@ -2358,6 +2358,37 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+// is this the right module location? Probably not,
+// but I'll worry about that later
+var Plottable;
+(function (Plottable) {
+    var Domainer = (function () {
+        function Domainer(scale) {
+            this.doNice = false;
+            this.padProportion = 0.0;
+            this.scale = scale;
+        }
+        Domainer.prototype.pad = function (padProportion) {
+            if (typeof padProportion === "undefined") { padProportion = 0.05; }
+            this.padProportion = padProportion;
+            return this;
+        };
+
+        Domainer.prototype.nice = function (count) {
+            this.doNice = true;
+            this.niceCount = count;
+            return this;
+        };
+
+        Domainer.prototype.computeDomain = function (extents) {
+            return extents[0];
+        };
+        return Domainer;
+    })();
+    Plottable.Domainer = Domainer;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
