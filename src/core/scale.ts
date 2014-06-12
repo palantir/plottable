@@ -2,15 +2,10 @@
 
 module Plottable {
 export module Abstract {
-  interface IPerspective {
-    dataSource: DataSource;
-    accessor: IAccessor;
-  }
   export class Scale extends Broadcaster {
     public _d3Scale: D3.Scale.Scale;
-    public _autoDomain = true;
-    private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
-    private dataSourceReferenceCounter = new Util.IDCounter();
+    public _autoDomainAutomatically = true;
+    public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
     public _autoNice = false;
     public _autoPad  = false;
     /**
@@ -25,13 +20,7 @@ export module Abstract {
     }
 
     public _getAllExtents(): any[][] {
-      var perspectives: IPerspective[] = d3.values(this.rendererID2Perspective);
-      var extents = perspectives.map((p) => {
-        var source = p.dataSource;
-        var accessor = p.accessor;
-        return source._getExtent(accessor);
-      }).filter((e) => e != null);
-      return extents;
+      return d3.values(this._rendererAttrID2Extent);
     }
 
     public _getExtent(): any[] {
@@ -47,40 +36,6 @@ export module Abstract {
      */
     public autoDomain() {
       this._setDomain(this._getExtent());
-      return this;
-    }
-
-    public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any) {
-      if (this.rendererID2Perspective[rendererIDAttr] != null) {
-        this._removePerspective(rendererIDAttr);
-      }
-      this.rendererID2Perspective[rendererIDAttr] = {dataSource: dataSource, accessor: accessor};
-
-      var dataSourceID = dataSource._plottableID;
-      if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
-        dataSource.registerListener(this, () => {
-          if (this._autoDomain) {
-            this.autoDomain();
-          }
-        });
-      }
-      if (this._autoDomain) {
-        this.autoDomain();
-      }
-      return this;
-    }
-
-    public _removePerspective(rendererIDAttr: string) {
-      var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
-      var dataSourceID = dataSource._plottableID;
-      if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-        dataSource.deregisterListener(this);
-      }
-
-      delete this.rendererID2Perspective[rendererIDAttr];
-      if (this._autoDomain) {
-        this.autoDomain();
-      }
       return this;
     }
 
@@ -109,7 +64,7 @@ export module Abstract {
       if (values == null) {
         return this._d3Scale.domain();
       } else {
-        this._autoDomain = false;
+        this._autoDomainAutomatically = false;
         this._setDomain(values);
         return this;
       }
@@ -144,6 +99,32 @@ export module Abstract {
      */
     public copy(): Scale {
       return new Scale(this._d3Scale.copy());
+    }
+
+    /**
+     * When a renderer determines that the extent of a projector has changed,
+     * it will call this function. This function should ensure that
+     * the scale has a domain at least large enough to include extent.
+     * 
+     * @param {number} rendererID A unique indentifier of the renderer sending
+     *                 the new extent.
+     * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+     * @param {any[]} extent The new extent to be included in the scale.
+     */
+    public updateExtent(rendererID: number, attr: string, extent: any[]) {
+      this._rendererAttrID2Extent[rendererID + attr] = extent;
+      if (this._autoDomainAutomatically) {
+        this.autoDomain();
+      }
+      return this;
+    }
+
+    public removeExtent(rendererID: number, attr: string) {
+      delete this._rendererAttrID2Extent[rendererID + attr];
+      if (this._autoDomainAutomatically) {
+        this.autoDomain();
+      }
+      return this;
     }
   }
 }

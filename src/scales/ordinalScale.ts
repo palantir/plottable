@@ -24,12 +24,8 @@ export module Scale {
     }
 
     public _getExtent(): any[] {
-      var extents = this._getAllExtents();
-      var concatenatedExtents: string[] = [];
-      extents.forEach((e) => {
-        concatenatedExtents = concatenatedExtents.concat(e);
-      });
-      return Util.Methods.uniq(concatenatedExtents);
+      var extents: string[][] = this._getAllExtents();
+      return Util.Methods.uniq(Util.Methods.flatten(extents));
     }
 
     /**

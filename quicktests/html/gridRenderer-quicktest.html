@@ -1,0 +1,128 @@
+<html>
+  <head>
+    <title>Grid Renderer Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <style>
+      svg {
+        background-color: #EEE;
+      }
+
+
+      .demo-title {
+        font-size: 24pt;
+      }
+
+      div {
+        padding: 20px;
+      }
+    </style>
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+
+    <script>
+window.onload = function() {
+
+    var c1, c2, c3;
+    var xScale, yScale, colorScale, xAxisB, xAxisT, yAxisL, yAxisR, gridPlot;
+      function randomData() {
+        var data = [];
+        ["Work", "Food Is Tasty And I like it", "Sex", "Sleep"].forEach(function(category) {
+          ["May-01", "May-02", "May-03", "May the Fourth Be With You", "May-05"].forEach(function(day){
+            data.push({category:category, day:day, awesomeness:10*Math.random()});
+          });
+        });
+        return data;
+      }
+
+      function staticData() {
+        return [
+          { category: "Work",  day : "May-01", awesomeness: 0 },
+          { category: "Work",  day : "May-02", awesomeness: 1 },
+          { category: "Work",  day : "May-03", awesomeness: 2 },
+          { category: "Work",  day : "May the Fourth Be With You", awesomeness: 3 },
+          { category: "Work",  day : "May-05", awesomeness: 4 },
+          { category: "Food Is Tasty And I like it",  day : "May-01", awesomeness: 5 },
+          { category: "Food Is Tasty And I like it",  day : "May-02", awesomeness: 6 },
+          { category: "Food Is Tasty And I like it",  day : "May-03", awesomeness: 7 },
+          { category: "Food Is Tasty And I like it",  day : "May the Fourth Be With You", awesomeness: 8 },
+          { category: "Food Is Tasty And I like it",  day : "May-05", awesomeness: 9 },
+          { category: "Sex",   day : "May-01", awesomeness: 10 },
+          { category: "Sex",   day : "May-02", awesomeness: 11 },
+          { category: "Sex",   day : "May-03", awesomeness: 12 },
+          { category: "Sex",   day : "May the Fourth Be With You", awesomeness: 13 },
+          { category: "Sex",   day : "May-05", awesomeness: 14 },
+          { category: "Sleep", day : "May-01", awesomeness: 15 },
+          { category: "Sleep", day : "May-02", awesomeness: 16 },
+          { category: "Sleep", day : "May-03", awesomeness: 17 },
+          { category: "Sleep", day : "May the Fourth Be With You", awesomeness: 18 },
+          { category: "Sleep", day : "May-05", awesomeness: 19 }
+        ];
+    }
+
+      function makeChart(selector, colors, data) {
+          xScale       = new Plottable.Scale.Ordinal().rangeType("bands");
+          yScale       = new Plottable.Scale.Ordinal().rangeType("bands");
+          colorScale   = new Plottable.Scale.InterpolatedColor(colors);
+
+          identity     = function(d){return d;};
+          xAxisB        = new Plottable.Axis.Category(xScale, "bottom");
+          xAxisT        = new Plottable.Axis.Category(xScale, "top");
+          yAxisL        = new Plottable.Axis.Category(yScale, "left");
+          yAxisR        = new Plottable.Axis.Category(yScale, "right");
+          gridPlot = new Plottable.Plot.Grid(data, xScale, yScale, colorScale)
+                                  .project("x", "category")
+                                  .project("y", "day")
+                                  .project("fill", "awesomeness");
+
+          return new Plottable.Component.Table()
+            .addComponent(1, 0, yAxisL)
+            .addComponent(1, 2, yAxisR)
+            .addComponent(1, 1, gridPlot)
+            .addComponent(0, 1, xAxisT)
+            .addComponent(2, 1, xAxisB)
+            .renderTo(svg);
+      };
+
+        c1 = makeChart("#life0", "reds", randomData());
+        c2 = makeChart("#life1", ["red", "orange", "yellow", "green", "blue", "purple", "pink"], staticData());
+        c3 = makeChart("#life2", ["lime", "gray"], randomData());
+
+
+      function x(align) {
+        window.xOrient = align;
+        c1._invalidateLayout();
+        c2._invalidateLayout();
+        c3._invalidateLayout();
+      }
+
+      function y(align) {
+        window.yOrient = align;
+        c1._invalidateLayout();
+        c2._invalidateLayout();
+        c3._invalidateLayout();
+      }
+}
+
+    </script>
+  </head>
+
+  <body>
+    <div><svg id="life0" width="600" height="300"></svg></div>
+    <div><svg id="life1" width="600" height="300"></svg></div>
+    <div><svg id="life2" width="600" height="300"></svg></div>
+
+    <button onclick='x("right")'>x: right</button> <br>
+    <button onclick='x("middle")'>x: middle</button> <br>
+    <button onclick='x("left")'>x: left</button> <br>
+
+<br><br>
+
+    <button onclick='y("top")'>y: top</button> <br>
+    <button onclick='y("middle")'>y: middle</button> <br>
+    <button onclick='y("bottom")'>y: bottom</button> <br>
+
+
+
+  </body>
+
+</html>

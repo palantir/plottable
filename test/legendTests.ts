@@ -144,11 +144,12 @@ describe("Legends", () => {
     svg.remove();
   });
 
-  describe("ToggleLegend tests", () => {
-    var toggleLegend: Plottable.Component.ToggleLegend;
+  describe("Legend toggle tests", () => {
+    var toggleLegend: Plottable.Component.Legend;
 
     beforeEach(() => {
-      toggleLegend = new Plottable.Component.ToggleLegend(color);
+      toggleLegend = new Plottable.Component.Legend(color);
+      toggleLegend.toggleCallback(function(d, b) {/* no-op */});
     });
 
     function verifyState(selection: D3.Selection, b: boolean, msg?: string) {
@@ -193,7 +194,7 @@ describe("Legends", () => {
       svg.remove();
     });
 
-    it("toggleLegend.scale() works as intended", () => {
+    it("scale() works as intended with toggling", () => {
       var domain = ["a", "b", "c", "d", "e"];
       color.domain(domain);
       toggleLegend.renderTo(svg);
@@ -235,7 +236,7 @@ describe("Legends", () => {
       color.domain(domain);
       var state = [true, true, true, true, true];
 
-      toggleLegend.callback((d, b) => {
+      toggleLegend.toggleCallback((d, b) => {
         state[domain.indexOf(d)] = b;
       });
       toggleLegend.renderTo(svg);
@@ -264,7 +265,7 @@ describe("Legends", () => {
       var state = true;
       toggleLegend.renderTo(svg);
 
-      toggleLegend.callback((d, b) => {
+      toggleLegend.toggleCallback((d, b) => {
         state = b;
       });
 
@@ -272,7 +273,7 @@ describe("Legends", () => {
       assert.equal(state, false, "callback was successful");
 
       var count = 0;
-      toggleLegend.callback((d, b) => {
+      toggleLegend.toggleCallback((d, b) => {
         count++;
       });
 
@@ -288,20 +289,197 @@ describe("Legends", () => {
       var state = true;
       toggleLegend.renderTo(svg);
 
-      toggleLegend.callback((d, b) => {
+      toggleLegend.toggleCallback((d, b) => {
         state = b;
       });
 
       toggleEntry("a", 0);
       assert.equal(state, false, "callback was successful");
 
-      toggleLegend.callback(); // this should not remove the callback
+      toggleLegend.toggleCallback(); // this should not remove the callback
       toggleEntry("a", 0);
       assert.equal(state, true, "callback was successful");
 
-      toggleLegend.callback(null); // this should remove the callback
-      toggleEntry("a", 0);
-      assert.equal(state, true, "callback was removed");
+      toggleLegend.toggleCallback(null); // this should remove the callback
+      assert.throws(function() {toggleEntry("a", 0);}, "not a function");
+      var selection = getSelection("a");
+      // should have no classes
+      assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
+      assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
+
+      svg.remove();
+    });
+  });
+
+  describe("Legend hover tests", () => {
+    var hoverLegend: Plottable.Component.Legend;
+
+    beforeEach(() => {
+      hoverLegend = new Plottable.Component.Legend(color);
+      hoverLegend.hoverCallback(function(d) {/* no-op */});
+    });
+
+    function _verifyFocus(selection: D3.Selection, b: boolean, msg?: string) {
+      assert.equal(selection.classed("hover"), true, msg);
+      assert.equal(selection.classed("focus"), b, msg);
+    }
+
+    function _verifyEmpty(selection: D3.Selection, msg?: string) {
+      assert.equal(selection.classed("hover"), false, msg);
+      assert.equal(selection.classed("focus"), false, msg);
+    }
+
+    function getSelection(datum: any) {
+      var selection = hoverLegend.content.selectAll(".legend-row")
+        .filter((d, i) => d === datum);
+      return selection;
+    }
+
+    function verifyFocus(datum: any, b: boolean, msg?: string) {
+      _verifyFocus(getSelection(datum), b, msg);
+    }
+
+    function verifyEmpty(datum: string, msg?: string) {
+      _verifyEmpty(getSelection(datum), msg);
+    }
+
+    function hoverEntry(datum: any, index: number) {
+      getSelection(datum).on("mouseover")(datum, index);
+    }
+
+    function leaveEntry(datum: any, index: number) {
+      getSelection(datum).on("mouseout")(datum, index);
+    }
+
+    it("basic initialization test", () => {
+      color.domain(["a", "b", "c", "d", "e"]);
+      hoverLegend.renderTo(svg);
+      hoverLegend.content.selectAll(".legend-row").each(function(d, i) {
+        verifyEmpty(d);
+      });
+      svg.remove();
+    });
+
+    it("basic hover test", () => {
+      color.domain(["a"]);
+      hoverLegend.renderTo(svg);
+      hoverEntry("a", 0);
+      verifyFocus("a", true);
+      leaveEntry("a", 0);
+      verifyEmpty("a");
+      svg.remove();
+    });
+
+    it("scale() works as intended with hovering", () => {
+      var domain = ["a", "b", "c", "d", "e"];
+      color.domain(domain);
+      hoverLegend.renderTo(svg);
+
+      hoverEntry("a", 0);
+
+      var newDomain = ["r", "a", "d", "g"];
+      var newColorScale = new Plottable.Scale.Color("Category10");
+      newColorScale.domain(newDomain);
+      hoverLegend.scale(newColorScale);
+
+      verifyFocus("r", false, "r");
+      verifyFocus("a", true, "a");
+      verifyFocus("g", false, "g");
+      verifyFocus("d", false, "d");
+
+      leaveEntry("a", 0);
+      verifyEmpty("r");
+      verifyEmpty("a");
+      verifyEmpty("g");
+      verifyEmpty("d");
+
+      svg.remove();
+    });
+
+    it("listeners on scale will correctly update states", () =>  {
+      color.domain(["a", "b", "c", "d", "e"]);
+      hoverLegend.renderTo(svg);
+      hoverEntry("c", 2);
+
+      color.domain(["e", "d", "b", "a", "c"]);
+      verifyFocus("a", false);
+      verifyFocus("b", false);
+      verifyFocus("c", true);
+      verifyFocus("d", false);
+      verifyFocus("e", false);
+      svg.remove();
+    });
+
+    it("Testing callback works correctly", () =>  {
+      var domain = ["a", "b", "c", "d", "e"];
+      color.domain(domain);
+      var focused: string = undefined;
+
+      hoverLegend.hoverCallback((d) => {
+        focused = d;
+      });
+      hoverLegend.renderTo(svg);
+
+      hoverEntry("a", 0);
+      verifyFocus("a", true);
+      assert.equal(focused, "a", "callback was successful");
+
+      leaveEntry("a", 0);
+      assert.equal(focused, undefined, "callback was successful");
+
+      hoverEntry("d", 3);
+      verifyFocus("d", true);
+      assert.equal(focused, "d", "callback was successful");
+      svg.remove();
+    });
+
+    it("Overwriting callback is successfull", () => {
+      var domain = ["a"];
+      color.domain(domain);
+      var focused: string = undefined;
+      hoverLegend.renderTo(svg);
+
+      hoverLegend.hoverCallback((d) => {
+        focused = d;
+      });
+
+      hoverEntry("a", 0);
+      assert.equal(focused, "a", "callback was successful");
+      leaveEntry("a", 0);
+
+      var count = 0;
+      hoverLegend.hoverCallback((d) => {
+        count++;
+      });
+
+      hoverEntry("a", 0);
+      assert.equal(focused, undefined, "old callback was not called");
+      assert.equal(count, 1, "new callbcak was called");
+      leaveEntry("a", 0);
+      assert.equal(count, 2, "new callback was called");
+      svg.remove();
+    });
+
+    it("Removing callback is successful", () =>  {
+      var domain = ["a"];
+      color.domain(domain);
+      var focused: string = undefined;
+      hoverLegend.renderTo(svg);
+
+      hoverLegend.hoverCallback((d) => {
+        focused = d;
+      });
+
+      hoverEntry("a", 0);
+      assert.equal(focused, "a", "callback was successful");
+
+      hoverLegend.hoverCallback(); // this should not remove the callback
+      leaveEntry("a", 0);
+      assert.equal(focused, undefined, "callback was successful");
+
+      hoverLegend.hoverCallback(null); // this should remove the callback
+      assert.throws(function() {hoverEntry("a", 0);}, "not a function");
+      verifyEmpty("a");
 
       svg.remove();
     });

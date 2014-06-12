@@ -305,7 +305,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
-                                  "tslint",
                                   "blanket_mocha",
                                   "uglify",
                                   "compress"

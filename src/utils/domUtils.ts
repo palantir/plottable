@@ -11,6 +11,15 @@ export module Util {
       return (<any> element.node()).getBBox();
     }
 
+    export var POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
+    export function requestAnimationFramePolyfill(fn: () => any): void {
+      if (window.requestAnimationFrame != null) {
+        window.requestAnimationFrame(fn);
+      } else {
+        setTimeout(fn, POLYFILL_TIMEOUT_MSEC);
+      }
+    }
+
     function _getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
       var value: any = style.getPropertyValue(prop);
       if (value == null){
@@ -19,10 +28,10 @@ export module Util {
       return parseFloat(value);
     }
 
-    export function isSelectionRemoved(selection: D3.Selection) {
-      var e = selection.node();
-      var n = e.parentNode;
-      while (n !== null && n.nodeName !== "#document") {
+    //
+    export function isSelectionRemovedFromSVG(selection: D3.Selection) {
+      var n = (<Node> selection.node());
+      while (n !== null && n.nodeName !== "svg") {
         n = n.parentNode;
       }
       return (n == null);
