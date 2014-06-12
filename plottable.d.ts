@@ -240,6 +240,142 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
+        class Formatter {
+            constructor(precision: number);
+            /**
+            * Format an input value.
+            *
+            * @param {any} d The value to be formatted.
+            * @returns {string} The formatted value.
+            */
+            public format(d: any): string;
+            /**
+            * Gets the current precision of the Formatter.
+            * The meaning depends on the implementation.
+            *
+            * @returns {number} The current precision.
+            */
+            public precision(): number;
+            /**
+            * Sets the precision of the Formatter.
+            * The meaning depends on the implementation.
+            *
+            * @param {number} [value] The new precision.
+            * @returns {Formatter} The calling Formatter.
+            */
+            public precision(value: number): Formatter;
+            /**
+            * Checks if this formatter will show only unchanged values.
+            *
+            * @returns {boolean}
+            */
+            public showOnlyUnchangedValues(): boolean;
+            /**
+            * Sets whether this formatter will show only unchanged values.
+            * If true, inputs whose value is changed by the formatter will be formatted
+            * to an empty string.
+            *
+            * @param {boolean} showUnchanged Whether or not to show only unchanged values.
+            * @returns {Formatter} The calling Formatter.
+            */
+            public showOnlyUnchangedValues(showUnchanged: boolean): Formatter;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Identity extends Abstract.Formatter {
+            /**
+            * Creates an formatter that simply stringifies the input.
+            *
+            * @constructor
+            */
+            constructor();
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class General extends Abstract.Formatter {
+            /**
+            * Creates a formatter that formats numbers to show no more than
+            * [precision] decimal places. All other values are stringified.
+            *
+            * @constructor
+            * @param {number} [precision] The maximum number of decimal places to display.
+            */
+            constructor(precision?: number);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Fixed extends Abstract.Formatter {
+            /**
+            * Creates a formatter that displays exactly [precision] decimal places.
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            constructor(precision?: number);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Currency extends Fixed {
+            /**
+            * Creates a formatter for currency values.
+            *
+            * @param {number} [precision] The number of decimal places to show.
+            * @param {string} [symbol] The currency symbol to use.
+            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
+            *
+            * @returns {IFormatter} A formatter for currency values.
+            */
+            constructor(precision?: number, symbol?: string, prefix?: boolean);
+            public format(d: any): string;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Percentage extends Fixed {
+            /**
+            * Creates a formatter for percentage values.
+            * Multiplies the supplied value by 100 and appends "%".
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            constructor(precision?: number);
+            public format(d: any): string;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Custom extends Abstract.Formatter {
+            constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
         class PlottableObject {
         }
     }
@@ -1047,7 +1183,7 @@ declare module Plottable {
             * @constructor
             * @param {Scale} scale The Scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {any} [formatter] a D3 formatter
+            * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
             */
             constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any);
             public showEndTickLabels(): boolean;

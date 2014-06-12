@@ -5,6 +5,14 @@
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
+/// <reference path="utils/formatters/formatter.ts" />
+/// <reference path="utils/formatters/identityFormatter.ts" />
+/// <reference path="utils/formatters/generalFormatter.ts" />
+/// <reference path="utils/formatters/fixedFormatter.ts" />
+/// <reference path="utils/formatters/currencyFormatter.ts" />
+/// <reference path="utils/formatters/percentageFormatter.ts" />
+/// <reference path="utils/formatters/customFormatter.ts" />
+
 
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
@@ -14,7 +22,7 @@
 /// <reference path="core/componentGroup.ts" />
 /// <reference path="core/table.ts" />
 /// <reference path="core/scale.ts" />
-/// <reference path="core/renderer.ts" />
+/// <reference path="core/plot.ts" />
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/resizeBroadcaster.ts" />
