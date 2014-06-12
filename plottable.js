@@ -4314,15 +4314,6 @@ var Plottable;
                 }
             };
 
-            Time.prototype.ticks = function (setTicks) {
-                if (setTicks !== undefined) {
-                    this._nTicks = setTicks;
-                    return this;
-                } else {
-                    return this._nTicks;
-                }
-            };
-
             Time.prototype._getTickValues = function () {
                 var nticks = 0;
                 switch (this._tickDensity) {

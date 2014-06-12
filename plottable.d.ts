@@ -1339,8 +1339,6 @@ declare module Plottable {
             constructor(scale: Scale.Time, orientation?: string, density?: string, formatter?: (n: any) => string);
             public tickDensity(): string;
             public tickDensity(newDensity: string): Time;
-            public ticks(): number;
-            public ticks(setTicks: number): Time;
         }
     }
 }

@@ -5,7 +5,6 @@ export module Axis {
   export class Time extends Abstract.Axis {
     public _scale: Scale.Time;
     public _tickLabelsG: D3.Selection;
-    public _nTicks: number;
     public _tickDensity: string;
     private _height = 30;
 
@@ -48,17 +47,6 @@ export module Axis {
         return this;
       } else {
         return this._tickDensity;
-      }
-    }
-
-    public ticks(): number;
-    public ticks(setTicks: number): Time;
-    public ticks(setTicks?: number): any {
-      if (setTicks !== undefined) {
-        this._nTicks = setTicks;
-        return this;
-      } else {
-        return this._nTicks;
       }
     }
 
