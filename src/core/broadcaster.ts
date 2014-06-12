@@ -43,12 +43,8 @@ export module Abstract {
      * @returns {Broadcaster} this object
      */
     public deregisterListener(listener: any) {
-      var listenerWasFound = this.listener2Callback.delete(listener);
-      if (listenerWasFound) {
-        return this;
-      } else {
-      throw new Error("Attempted to deregister listener, but listener not found");
-      }
+      this.listener2Callback.delete(listener);
+      return this;
     }
   }
 }

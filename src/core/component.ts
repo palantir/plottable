@@ -32,6 +32,7 @@ export module Abstract {
 
     public _isSetup = false;
     public _isAnchored = false;
+    public static AUTORESIZE_BY_DEFAULT = true;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -68,6 +69,9 @@ export module Abstract {
      * @returns {Component} The calling Component.
      */
     public _setup() {
+      if (this._isSetup) {
+        return;
+      }
       this.cssClasses.forEach((cssClass: string) => {
         this.element.classed(cssClass, true);
       });
@@ -86,6 +90,9 @@ export module Abstract {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
+      if (this.isTopLevelComponent) {
+        this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
+      }
       this._isSetup = true;
       return this;
     }
