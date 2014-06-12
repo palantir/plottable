@@ -18,6 +18,9 @@ export module Util {
      * @return {boolean} True if key already in store, false otherwise
      */
     public set(key: any, value: any) {
+      if (key !== key) {
+        throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
+      }
       for (var i = 0; i < this.keyValuePairs.length; i++) {
         if (this.keyValuePairs[i][0] === key) {
           this.keyValuePairs[i][1] = value;
