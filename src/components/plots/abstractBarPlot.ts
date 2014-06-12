@@ -8,6 +8,12 @@ export module Abstract {
     public _baselineValue = 0;
     public _barAlignment: string;
 
+    public _animators: Animator.IPlotAnimatorMap = {
+      "bars-reset" : new Animator.Null(),
+      "bars"       : new Animator.IterativeDelay(),
+      "baseline"   : new Animator.Null()
+    };
+
     /**
      * Creates an AbstractBarPlot.
      *

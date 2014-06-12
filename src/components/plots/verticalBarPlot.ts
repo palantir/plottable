@@ -4,11 +4,6 @@ module Plottable {
 export module Plot {
   export class VerticalBar extends Abstract.BarPlot {
     public _barAlignment = "left";
-    public _animators: Animator.IPlotAnimatorMap = {
-      "bars-reset" : new Animator.Null(),
-      "bars"       : new Animator.IterativeDelay(),
-      "baseline"   : new Animator.Null()
-    };
 
     /**
      * Creates a VerticalBarPlot.
