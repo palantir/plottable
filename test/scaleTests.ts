@@ -78,7 +78,8 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
       renderer2.project("x", "foo", otherScale);
       // "scale not listening to the dataSource after all perspectives removed"
-      assert.throws(() => dataSource.deregisterListener(scale));
+      dataSource.data([{foo: 99}, {foo: 100}]);
+      assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
     });
 
     it("scale perspectives can be removed appropriately", () => {
