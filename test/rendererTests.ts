@@ -125,6 +125,21 @@ describe("Renderers", () => {
       var projector = attrToProjector["attr"];
       assert.equal(projector({"a": 0.5}, 0), 5, "projector works as intended");
     });
+
+    it("Changing Renderer.dataSource to [] causes scale to contract", () => {
+      var ds1 = new Plottable.DataSource([0, 1, 2]);
+      var ds2 = new Plottable.DataSource([1, 2, 3]);
+      var s = new Plottable.Scale.Linear();
+      var r1 = new Plottable.Abstract.Plot()
+                    .dataSource(ds1)
+                    .project("x", (x: number) => x, s);
+      var r2 = new Plottable.Abstract.Plot()
+                    .dataSource(ds2)
+                    .project("x", (x: number) => x, s);
+      assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
+      ds1.data([]);
+      assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
+    });
   });
 
   describe("XYPlot functionality", () => {

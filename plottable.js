@@ -2268,7 +2268,9 @@ var Plottable;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     var extent = this.dataSource()._getExtent(projector.accessor);
-                    if (extent.length > 0) {
+                    if (extent.length === 0) {
+                        projector.scale.removeExtent(this._plottableID, attr);
+                    } else {
                         projector.scale.updateExtent(this._plottableID, attr, extent);
                     }
                 }
