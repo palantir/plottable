@@ -11,6 +11,15 @@ export module Util {
       return (<any> element.node()).getBBox();
     }
 
+    export var POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
+    export function requestAnimationFramePolyfill(fn: () => any): void {
+      if (window.requestAnimationFrame != null) {
+        window.requestAnimationFrame(fn);
+      } else {
+        setTimeout(fn, POLYFILL_TIMEOUT_MSEC);
+      }
+    }
+
     function _getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
       var value: any = style.getPropertyValue(prop);
       if (value == null){

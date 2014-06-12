@@ -104,6 +104,12 @@ var MultiTestVerifier = (function () {
 })();
 
 ///<reference path="testReference.ts" />
+before(function () {
+    // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
+    Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
+});
+
+///<reference path="testReference.ts" />
 var assert = chai.assert;
 
 describe("Axes", function () {
@@ -431,6 +437,19 @@ describe("Axes", function () {
                 return xScale.domain(["bar", "baz", "bam"]);
             });
             assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+            svg.remove();
+        });
+
+        it("requests appropriate space when the scale has no domain", function () {
+            var svg = generateSVG(400, 400);
+            var scale = new Plottable.Scale.Ordinal();
+            var ca = new Plottable.Axis.Category(scale);
+            ca._anchor(svg);
+            var s = ca._requestedSpace(400, 400);
+            assert.operator(s.width, ">=", 0, "it requested 0 or more width");
+            assert.operator(s.height, ">=", 0, "it requested 0 or more height");
+            assert.isFalse(s.wantsWidth, "it doesn't want width");
+            assert.isFalse(s.wantsHeight, "it doesn't want height");
             svg.remove();
         });
     });
@@ -1435,6 +1454,112 @@ describe("Util.DOM", function () {
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
 
+describe("Formatters", function () {
+    describe("fixed", function () {
+        it("shows exactly [precision] digits", function () {
+            var fixed3 = new Plottable.Formatter.Fixed();
+            var result = fixed3.format(1);
+            assert.strictEqual(result, "1.000", "defaults to three decimal places");
+            result = fixed3.format(1.234);
+            assert.strictEqual(result, "1.234", "shows three decimal places");
+            result = fixed3.format(1.2345);
+            assert.strictEqual(result, "", "changed values are not shown (get turned into empty strings)");
+        });
+
+        it("precision can be changed", function () {
+            var fixed2 = new Plottable.Formatter.Fixed();
+            fixed2.precision(2);
+            var result = fixed2.format(1);
+            assert.strictEqual(result, "1.00", "formatter was changed to show only two decimal places");
+        });
+
+        it("can be set to show rounded values", function () {
+            var fixed3 = new Plottable.Formatter.Fixed();
+            fixed3.showOnlyUnchangedValues(false);
+            var result = fixed3.format(1.2349);
+            assert.strictEqual(result, "1.235", "long values are rounded correctly");
+        });
+    });
+
+    describe("general", function () {
+        it("formats number to show at most [precision] digits", function () {
+            var general = new Plottable.Formatter.General();
+            var result = general.format(1);
+            assert.strictEqual(result, "1", "shows no decimals if formatting an integer");
+            result = general.format(1.234);
+            assert.strictEqual(result, "1.234", "shows up to three decimal places");
+            result = general.format(1.2345);
+            assert.strictEqual(result, "", "(changed) values with more than three decimal places are not shown");
+        });
+
+        it("stringifies non-number values", function () {
+            var general = new Plottable.Formatter.General();
+            var result = general.format("blargh");
+            assert.strictEqual(result, "blargh", "string values are passed through unchanged");
+            result = general.format(null);
+            assert.strictEqual(result, "null", "non-number inputs are stringified");
+        });
+    });
+
+    describe("identity", function () {
+        it("stringifies inputs", function () {
+            var identity = new Plottable.Formatter.Identity();
+            var result = identity.format(1);
+            assert.strictEqual(result, "1", "numbers are stringified");
+            result = identity.format(0.999999);
+            assert.strictEqual(result, "0.999999", "long numbers are stringified");
+            result = identity.format(null);
+            assert.strictEqual(result, "null", "formats null");
+            result = identity.format(undefined);
+            assert.strictEqual(result, "undefined", "formats undefined");
+        });
+    });
+
+    describe("currency", function () {
+        it("uses reasonable defaults", function () {
+            var currencyFormatter = new Plottable.Formatter.Currency();
+            var result = currencyFormatter.format(1);
+            assert.strictEqual(result.charAt(0), "$", "defaults to $ for currency symbol");
+            var decimals = result.substring(result.indexOf(".") + 1, result.length);
+            assert.strictEqual(decimals.length, 2, "defaults to 2 decimal places");
+
+            result = currencyFormatter.format(-1);
+            assert.strictEqual(result.charAt(0), "-", "prefixes negative values with \"-\"");
+            assert.strictEqual(result.charAt(1), "$", "places the currency symbol after the negative sign");
+        });
+
+        it("can change the type and position of the currency symbol", function () {
+            var centsFormatter = new Plottable.Formatter.Currency(0, "c", false);
+            var result = centsFormatter.format(1);
+            assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
+        });
+    });
+
+    describe("percentage", function () {
+        it("uses reasonable defaults", function () {
+            var percentFormatter = new Plottable.Formatter.Percentage();
+            var result = percentFormatter.format(1);
+            assert.strictEqual(result, "100%", "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
+        });
+    });
+
+    describe("custom", function () {
+        it("can take a custom formatting function", function () {
+            var customFormatter;
+            var blargify = function (d, f) {
+                assert.strictEqual(f, customFormatter, "Formatter itself was supplied as second argument");
+                return String(d) + "-blargh";
+            };
+            customFormatter = new Plottable.Formatter.Custom(0, blargify);
+            var result = customFormatter.format(1);
+            assert.strictEqual(result, "1-blargh", "it uses the custom formatting function");
+        });
+    });
+});
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
 describe("Gridlines", function () {
     it("Gridlines and axis tick marks align", function () {
         var svg = generateSVG(640, 480);
@@ -2041,11 +2166,13 @@ describe("Legends", function () {
         svg.remove();
     });
 
-    describe("ToggleLegend tests", function () {
+    describe("Legend toggle tests", function () {
         var toggleLegend;
 
         beforeEach(function () {
-            toggleLegend = new Plottable.Component.ToggleLegend(color);
+            toggleLegend = new Plottable.Component.Legend(color);
+            toggleLegend.toggleCallback(function (d, b) {
+            });
         });
 
         function verifyState(selection, b, msg) {
@@ -2091,7 +2218,7 @@ describe("Legends", function () {
             svg.remove();
         });
 
-        it("toggleLegend.scale() works as intended", function () {
+        it("scale() works as intended with toggling", function () {
             var domain = ["a", "b", "c", "d", "e"];
             color.domain(domain);
             toggleLegend.renderTo(svg);
@@ -2133,7 +2260,7 @@ describe("Legends", function () {
             color.domain(domain);
             var state = [true, true, true, true, true];
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.toggleCallback(function (d, b) {
                 state[domain.indexOf(d)] = b;
             });
             toggleLegend.renderTo(svg);
@@ -2162,7 +2289,7 @@ describe("Legends", function () {
             var state = true;
             toggleLegend.renderTo(svg);
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.toggleCallback(function (d, b) {
                 state = b;
             });
 
@@ -2170,7 +2297,7 @@ describe("Legends", function () {
             assert.equal(state, false, "callback was successful");
 
             var count = 0;
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.toggleCallback(function (d, b) {
                 count++;
             });
 
@@ -2186,20 +2313,204 @@ describe("Legends", function () {
             var state = true;
             toggleLegend.renderTo(svg);
 
-            toggleLegend.callback(function (d, b) {
+            toggleLegend.toggleCallback(function (d, b) {
                 state = b;
             });
 
             toggleEntry("a", 0);
             assert.equal(state, false, "callback was successful");
 
-            toggleLegend.callback(); // this should not remove the callback
+            toggleLegend.toggleCallback(); // this should not remove the callback
             toggleEntry("a", 0);
             assert.equal(state, true, "callback was successful");
 
-            toggleLegend.callback(null); // this should remove the callback
-            toggleEntry("a", 0);
-            assert.equal(state, true, "callback was removed");
+            toggleLegend.toggleCallback(null); // this should remove the callback
+            assert.throws(function () {
+                toggleEntry("a", 0);
+            }, "not a function");
+            var selection = getSelection("a");
+
+            // should have no classes
+            assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
+            assert.equal(selection.classed("toggled-off"), false, "is not toggled-off");
+
+            svg.remove();
+        });
+    });
+
+    describe("Legend hover tests", function () {
+        var hoverLegend;
+
+        beforeEach(function () {
+            hoverLegend = new Plottable.Component.Legend(color);
+            hoverLegend.hoverCallback(function (d) {
+            });
+        });
+
+        function _verifyFocus(selection, b, msg) {
+            assert.equal(selection.classed("hover"), true, msg);
+            assert.equal(selection.classed("focus"), b, msg);
+        }
+
+        function _verifyEmpty(selection, msg) {
+            assert.equal(selection.classed("hover"), false, msg);
+            assert.equal(selection.classed("focus"), false, msg);
+        }
+
+        function getSelection(datum) {
+            var selection = hoverLegend.content.selectAll(".legend-row").filter(function (d, i) {
+                return d === datum;
+            });
+            return selection;
+        }
+
+        function verifyFocus(datum, b, msg) {
+            _verifyFocus(getSelection(datum), b, msg);
+        }
+
+        function verifyEmpty(datum, msg) {
+            _verifyEmpty(getSelection(datum), msg);
+        }
+
+        function hoverEntry(datum, index) {
+            getSelection(datum).on("mouseover")(datum, index);
+        }
+
+        function leaveEntry(datum, index) {
+            getSelection(datum).on("mouseout")(datum, index);
+        }
+
+        it("basic initialization test", function () {
+            color.domain(["a", "b", "c", "d", "e"]);
+            hoverLegend.renderTo(svg);
+            hoverLegend.content.selectAll(".legend-row").each(function (d, i) {
+                verifyEmpty(d);
+            });
+            svg.remove();
+        });
+
+        it("basic hover test", function () {
+            color.domain(["a"]);
+            hoverLegend.renderTo(svg);
+            hoverEntry("a", 0);
+            verifyFocus("a", true);
+            leaveEntry("a", 0);
+            verifyEmpty("a");
+            svg.remove();
+        });
+
+        it("scale() works as intended with hovering", function () {
+            var domain = ["a", "b", "c", "d", "e"];
+            color.domain(domain);
+            hoverLegend.renderTo(svg);
+
+            hoverEntry("a", 0);
+
+            var newDomain = ["r", "a", "d", "g"];
+            var newColorScale = new Plottable.Scale.Color("Category10");
+            newColorScale.domain(newDomain);
+            hoverLegend.scale(newColorScale);
+
+            verifyFocus("r", false, "r");
+            verifyFocus("a", true, "a");
+            verifyFocus("g", false, "g");
+            verifyFocus("d", false, "d");
+
+            leaveEntry("a", 0);
+            verifyEmpty("r");
+            verifyEmpty("a");
+            verifyEmpty("g");
+            verifyEmpty("d");
+
+            svg.remove();
+        });
+
+        it("listeners on scale will correctly update states", function () {
+            color.domain(["a", "b", "c", "d", "e"]);
+            hoverLegend.renderTo(svg);
+            hoverEntry("c", 2);
+
+            color.domain(["e", "d", "b", "a", "c"]);
+            verifyFocus("a", false);
+            verifyFocus("b", false);
+            verifyFocus("c", true);
+            verifyFocus("d", false);
+            verifyFocus("e", false);
+            svg.remove();
+        });
+
+        it("Testing callback works correctly", function () {
+            var domain = ["a", "b", "c", "d", "e"];
+            color.domain(domain);
+            var focused = undefined;
+
+            hoverLegend.hoverCallback(function (d) {
+                focused = d;
+            });
+            hoverLegend.renderTo(svg);
+
+            hoverEntry("a", 0);
+            verifyFocus("a", true);
+            assert.equal(focused, "a", "callback was successful");
+
+            leaveEntry("a", 0);
+            assert.equal(focused, undefined, "callback was successful");
+
+            hoverEntry("d", 3);
+            verifyFocus("d", true);
+            assert.equal(focused, "d", "callback was successful");
+            svg.remove();
+        });
+
+        it("Overwriting callback is successfull", function () {
+            var domain = ["a"];
+            color.domain(domain);
+            var focused = undefined;
+            hoverLegend.renderTo(svg);
+
+            hoverLegend.hoverCallback(function (d) {
+                focused = d;
+            });
+
+            hoverEntry("a", 0);
+            assert.equal(focused, "a", "callback was successful");
+            leaveEntry("a", 0);
+
+            var count = 0;
+            hoverLegend.hoverCallback(function (d) {
+                count++;
+            });
+
+            hoverEntry("a", 0);
+            assert.equal(focused, undefined, "old callback was not called");
+            assert.equal(count, 1, "new callbcak was called");
+            leaveEntry("a", 0);
+            assert.equal(count, 2, "new callback was called");
+            svg.remove();
+        });
+
+        it("Removing callback is successful", function () {
+            var domain = ["a"];
+            color.domain(domain);
+            var focused = undefined;
+            hoverLegend.renderTo(svg);
+
+            hoverLegend.hoverCallback(function (d) {
+                focused = d;
+            });
+
+            hoverEntry("a", 0);
+            assert.equal(focused, "a", "callback was successful");
+
+            hoverLegend.hoverCallback(); // this should not remove the callback
+            leaveEntry("a", 0);
+            assert.equal(focused, undefined, "callback was successful");
+
+            hoverLegend.hoverCallback(null); // this should remove the callback
+            assert.throws(function () {
+                hoverEntry("a", 0);
+            }, "not a function");
+            verifyEmpty("a");
 
             svg.remove();
         });
@@ -2401,6 +2712,21 @@ describe("Renderers", function () {
             var attrToProjector = r._generateAttrToProjector();
             var projector = attrToProjector["attr"];
             assert.equal(projector({ "a": 0.5 }, 0), 5, "projector works as intended");
+        });
+
+        it("Changing Renderer.dataSource to [] causes scale to contract", function () {
+            var ds1 = new Plottable.DataSource([0, 1, 2]);
+            var ds2 = new Plottable.DataSource([1, 2, 3]);
+            var s = new Plottable.Scale.Linear();
+            var r1 = new Plottable.Abstract.Plot().dataSource(ds1).project("x", function (x) {
+                return x;
+            }, s);
+            var r2 = new Plottable.Abstract.Plot().dataSource(ds2).project("x", function (x) {
+                return x;
+            }, s);
+            assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
+            ds1.data([]);
+            assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
         });
     });
 

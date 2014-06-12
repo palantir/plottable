@@ -1,104 +1,142 @@
 
+
+function loadScript(url) {
+  console.log("loadScript called with url", url);
+  return new Promise(function(resolve, reject) {
+    var element = document.createElement("script");
+    element.type = "text/javascript";
+    element.src = url;
+    element.onload = function() {console.log("loaded", url); resolve();};
+    document.head.appendChild(element);
+  });
+}
+
+
 var Plottables = {};
-
-function loadScript(url, id, callback) {
-  var element = document.createElement("script");
-  element.type = "text/javascript";
-  element.src = url;
-  element.id = id;
-  element.onload = callback;
-  document.head.appendChild(element);
-}
-
-function loadPlottable(branchName, callback) {
-  var url;
-  if (branchName != null) {
-    url = "https://rawgithub.com/palantir/plottable/" + branchName + "/plottable.js";
-  } else {
-    branchName = "#local";
-    url = "../plottable.js"; //load local version
-  }
-  var inner = function() {
-    console.log("loaded Plottable:" + branchName);
-    Plottables[branchName] = Plottable;
-    Plottable = null;
-    callback();
-  }
-  loadScript(url, branchName, inner);
-}
-
-
-var quicktests = [];
-var quicktestsToLoad = [];
-
-function loadQuicktests(qts, callback) {
-  var nLoaded = 0;
-
-  var filterword = $('#filterWord').val();
-  if(filterword === "" || filterword === undefined){ 
-    quicktestsToLoad = qts; 
-  } else {
-    quicktestsToLoad = qts.filter(function(q) {return q.categories.indexOf(filterword) > -1})
-  }
-  
-  var inner = function() {
-    if (++nLoaded === quicktestsToLoad.length) callback();
-  }
-  
-  quicktestsToLoad.forEach(function(q) {
-    loadScript("quicktests/" + q.name + ".js", q.name, inner);
+function loadPlottable(branchName) {
+  return new Promise(function (fulfill, reject) {
+    if (Plottables[branchName] != null) {
+      fulfill();
+    }
+    var url;
+    if (branchName !== "#local") {
+      url = "https://rawgithub.com/palantir/plottable/" + branchName + "/plottable.js";
+    } else {
+      url = "plottable.js"; //load local version
+    }
+    loadScript(url).then(function() {
+      Plottables[branchName] = Plottable;
+      Plottable = null;
+      fulfill();
+    });
   });
 }
 
-function loadAllQuicktests(callback) {
-  loadScript("quicktests/list_of_quicktests.js", "list_of_quicktests", function() {
-    console.log("about to load quicktests", callback);
-    loadQuicktests(list_of_quicktests, callback);
-  });
-}
-
-function loadQuickTestsAndPlottables(otherBranch, callback) {
-  var loaded = 0;
-  var inner = function() {
-    if (++loaded === 3) callback();
-  }
-
-  loadPlottable("master", inner);
-  loadPlottable(otherBranch, inner);
-  console.log("about to load all quicktests", inner);
-  loadAllQuicktests(inner);
-}
 
 var data1 = makeRandomData(50);
 var data2 = makeRandomData(50);
 
-function loadSingleQuicktest(container, quickTest, Plottable) {
-  container.append("p").text(quickTest.quicktestName);
+function runSingleQuicktest(container, quickTest, Plottable) {
+  console.log("running single quicktest");
+  container.append("p").text(quickTest.name);
   var svg = container.append("svg").attr("height", 500);
-  quickTest(svg, _.cloneDeep([data1, data2]), Plottable);
+  quickTest.function(svg, _.cloneDeep([data1, data2]), Plottable);
+  console.log("--finished single quicktest");
 }
 
 function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
   var tr = tableSelection.append("tr").classed("quicktest-row", true);
-  loadSingleQuicktest(tr.append("td"), quickTest, Plottable1);
+  runSingleQuicktest(tr.append("td"), quickTest, Plottable1);
   tr.append("td");
-  loadSingleQuicktest(tr.append("td"), quickTest, Plottable2);
+  runSingleQuicktest(tr.append("td"), quickTest, Plottable2);
 }
 
-function makeMainFunctionForGivenBranch(branch) {
-  return function () {
-    var table = d3.select("table");
-    quicktests.forEach(function(q) {
-      runQuicktest(table, q, Plottables["master"], Plottables[branch]);
+function initializeByLoadingAllQuicktests() {
+  return new Promise(function(f, r) {
+    if (window.list_of_quicktests == null) {
+      loadListOfQuicktests()
+        .then(reporter("JSON->LOAD"))
+        .then(loadTheQuicktests)
+        .then(reporter("load->fulfill"))
+        .then(f)
+    } else {
+      f();
+    }
+  });
+}
+
+function loadListOfQuicktests() {
+  return new Promise(function (f, r) {
+    d3.json("quicktests/list_of_quicktests.json", function (error, json) {
+      if (json !== undefined) {
+        f(json)
+      } else {
+        console.log("got an error loading quicktests json", error);
+        r(error);
+      }
     });
+  });
+}
+
+function loadTheQuicktests(quicktestsJSONArray) {
+  window.quicktests = [];
+  var numToLoad = quicktestsJSONArray.length;
+  var numLoaded = 0;
+  return new Promise(function (f, r) {
+    quicktestsJSONArray.forEach(function(q) {
+      var name = q.name;
+      d3.text("quicktests/quicktests/" + name + ".js", function(error, text) {
+        q.function = new Function("svg", "data", "Plottable", text);
+        window.quicktests.push(q);
+        if (++numLoaded === numToLoad) f();
+      });
+    });
+  });
+
+}
+
+function reporter(n, v) {
+  return function(x) {
+    console.log(n, x, v);
+    return x;
   }
 }
 
 
-var button = document.getElementById('button');
-button.onclick = function () {
-  d3.selectAll(".quicktest-row").remove();
+function main() {
+  var table = d3.select("table");
+  table.selectAll(".quicktest-row").remove();
+  var firstBranch = "master";
+  var secondBranch = $('#featureBranch').val();
+  if (secondBranch === "") {secondBranch = "#local"};
+  var quicktestCategory = $('#filterWord').val();
+  initializeByLoadingAllQuicktests()
+      .then(reporter("LOAD -> PLOTTABLE1"), Plottables)
+      .then(loadPlottable(firstBranch))
+      .then(reporter("PLOTTABLE1 -> PLOTTABLE2", Plottables))
+      .then(loadPlottable(secondBranch))
+      .then(reporter("PLOTTABLE2 -> FILTER", Plottables))
+      .then(function () {
+        return window.quicktests.filter(function(q) {
+          if (quicktestCategory === "" || quicktestCategory === undefined) {
+            return true;
+          } else {
+            return q.categories.indexOf(quicktestCategory) !== -1
+          };
+        });
+      })
+      .then(reporter("filtered quicktests"))
+      .then(function(qts) {
+        console.log(qts);
+        qts.forEach(function(q) {
+          console.log("iterate", q);
+          runQuicktest(table, q, Plottables[firstBranch], Plottables[secondBranch]);
+        });
+      });
+}
 
-  var fb = $('#featureBranch').val();
-  loadQuickTestsAndPlottables(fb, makeMainFunctionForGivenBranch(fb));
-};
+
+var button = document.getElementById('button');
+button.onclick = main;
+
+window.onload = main;

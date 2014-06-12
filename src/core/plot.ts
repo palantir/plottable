@@ -7,6 +7,10 @@ export module Abstract {
     scale?: Abstract.Scale;
   }
 
+  export interface IAttributeToProjector {
+    [attrToSet: string]: IAppliedAccessor;
+  }
+
   export class Plot extends Component {
     public _dataSource: DataSource;
     public _dataChanged = false;
@@ -15,9 +19,11 @@ export module Abstract {
     public element: D3.Selection;
     private scales: Abstract.Scale[];
     public _colorAccessor: IAccessor;
-    public _animate = false;
+    public _animate: boolean = false;
+    public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
+
 
     public _rerenderUpdateSelection = false;
     // A perf-efficient manner of rendering would be to calculate attributes only
@@ -98,16 +104,16 @@ export module Abstract {
       attrToSet = attrToSet.toLowerCase();
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
-      if (scale == null) {
-        scale = existingScale;
-      }
+
       if (existingScale != null) {
         existingScale.removeExtent(this._plottableID, attrToSet);
         this._deregisterFromBroadcaster(existingScale);
       }
+
       if (scale != null) {
         this._registerToBroadcaster(scale, () => this._render());
       }
+
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
       this._requireRerender = true;
       this._rerenderUpdateSelection = true;
@@ -115,8 +121,8 @@ export module Abstract {
       return this;
     }
 
-    public _generateAttrToProjector(): { [attrToSet: string]: IAppliedAccessor; } {
-      var h: { [attrName: string]: IAppliedAccessor; } = {};
+    public _generateAttrToProjector(): IAttributeToProjector {
+      var h: IAttributeToProjector = {};
       d3.keys(this._projectors).forEach((a) => {
         var projector = this._projectors[a];
         var accessor = Util.Methods.applyAccessor(projector.accessor, this.dataSource());
@@ -170,11 +176,56 @@ export module Abstract {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
-        if (extent.length > 0) {
+        if (extent.length === 0) {
+          projector.scale.removeExtent(this._plottableID, attr);
+        } else {
           projector.scale.updateExtent(this._plottableID, attr, extent);
         }
       }
       return this;
+    }
+
+    /**
+     * Apply attributes to the selection.
+     *
+     * If animation is enabled and a valid animator's key is specified, the
+     * attributes are applied with the animator. Otherwise, they are applied
+     * immediately to the selection.
+     *
+     * The animation will not animate during auto-resize renders.
+     *
+     * @param {D3.Selection} selection The selection of elements to update.
+     * @param {string} animatorKey The key for the animator.
+     * @param {Abstract.IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
+     * @return {D3.Selection} The resulting selection (potentially after the transition)
+     */
+    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: Abstract.IAttributeToProjector): any {
+      if (this._animate && this._animators[animatorKey] != null && !Core.ResizeBroadcaster.resizing()) {
+        return this._animators[animatorKey].animate(selection, attrToProjector, this);
+      } else {
+        return selection.attr(attrToProjector);
+      }
+    }
+
+    /**
+     * Gets or sets the animator associated with the specified animator key.
+     *
+     * @param {string} animatorKey The key for the animator.
+     * @param {Animator.IPlotAnimator} animator If specified, will be stored as the
+     *     animator for the key.
+     * @return {Animator.IPlotAnimator|Plot} If an animator is specified, we return
+     *     this object to enable chaining, otherwise we return the animator
+     *     stored at the specified key.
+     */
+    public animator(animatorKey: string): Animator.IPlotAnimator;
+    public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
+    public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
+      if (animator === undefined){
+        return this._animators[animatorKey];
+      } else {
+        this._animators[animatorKey] = animator;
+        return this;
+      }
     }
   }
 }

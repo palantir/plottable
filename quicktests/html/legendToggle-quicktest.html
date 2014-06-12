@@ -20,7 +20,6 @@
         colorScale.range(colors);
         colorScale.domain(names.slice(0, numPlots));
 
-
         var xScale = new Plottable.Scale.Linear();
         var yScale = new Plottable.Scale.Linear();
 
@@ -45,14 +44,12 @@
                                 ]);
 
         var legendLabel = new Plottable.Component.TitleLabel("fat");
-        var legend = new Plottable.ToggleLegend(colorScale,
+        var legend = new Plottable.Component.Legend(colorScale);
+        legend.callbackClick(
             function (d, b) {
                 var index = names.indexOf(d);
-                if (b) {
-                    cg.merge(renderers[index]);
-                } else {
-                    renderers[index].remove();
-                }
+                renderers[index].classed("toggled-on", b);
+                renderers[index].classed("toggled-off", !b);
             }
         );
         var legendTable = new Plottable.Component.Table([[legendLabel], [legend]]);

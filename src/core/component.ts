@@ -165,14 +165,14 @@ export module Abstract {
      */
     public _render() {
       if (this._isAnchored && this._isSetup) {
-        Singleton.RenderController.registerToRender(this);
+        Core.RenderController.registerToRender(this);
       }
       return this;
     }
 
     public _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Singleton.RenderController.registerToComputeLayout(this);
+        Core.RenderController.registerToComputeLayout(this);
       }
       return this;
     }
@@ -226,6 +226,24 @@ export module Abstract {
         this.rootSVG.attr({width: width, height: height});
       }
       this._invalidateLayout();
+      return this;
+    }
+
+    /**
+     * Enables and disables auto-resize.
+     *
+     * If enabled, window resizes will enqueue this component for a re-layout
+     * and re-render. Animations are disabled during window resizes when auto-
+     * resize is enabled.
+     *
+     * @param {boolean} flag - Enables (true) or disables (false) auto-resize.
+     */
+    public autoResize(flag: boolean): Component {
+      if (flag) {
+        Core.ResizeBroadcaster.register(this);
+      } else {
+        Core.ResizeBroadcaster.deregister(this);
+      }
       return this;
     }
 
