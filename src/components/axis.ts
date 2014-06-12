@@ -19,13 +19,16 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
      */
-    constructor(axisScale: Abstract.Scale, orientation: string, formatter: any = new Formatter.General()) {
+    constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any) {
       super();
       this._axisScale = axisScale;
       orientation = orientation.toLowerCase();
       this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
       this.classed("axis", true);
       var formatFunction = formatter;
+      if (formatter == null) {
+        formatter = new Formatter.General();
+      }
       if (formatter instanceof Abstract.Formatter) {
         formatFunction = (d: any) => (<Abstract.Formatter> formatter).format(d);
       }
