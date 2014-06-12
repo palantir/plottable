@@ -6,6 +6,7 @@
 ///<reference path="testUtils.ts" />
 ///<reference path="../build/plottable.d.ts" />
 
+///<reference path="globalInitialization.ts" />
 ///<reference path="axisTests.ts" />
 ///<reference path="baseAxisTests.ts" />
 ///<reference path="broadcasterTests.ts" />
@@ -15,6 +16,7 @@
 ///<reference path="coordinatorTests.ts" />
 ///<reference path="dataSourceTests.ts" />
 ///<reference path="domUtilsTests.ts" />
+///<reference path="formatterTests.ts" />
 ///<reference path="gridlinesTests.ts" />
 ///<reference path="idCounterTests.ts" />
 ///<reference path="interactionTests.ts" />

@@ -104,6 +104,12 @@ var MultiTestVerifier = (function () {
 })();
 
 ///<reference path="testReference.ts" />
+before(function () {
+    // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
+    Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
+});
+
+///<reference path="testReference.ts" />
 var assert = chai.assert;
 
 describe("Axes", function () {
@@ -618,8 +624,8 @@ describe("Broadcasters", function () {
         assert.isTrue(called, "the cb was called");
     });
 
-    it("deregistering an unregistered listener throws an error", function () {
-        assert.throws(function () {
+    it("deregistering an unregistered listener doesn't throw an error", function () {
+        assert.doesNotThrow(function () {
             return b.deregisterListener({});
         });
     });
@@ -1442,6 +1448,112 @@ describe("Util.DOM", function () {
         assert.isTrue(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is no longer in svg");
         assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(svg), "svg is not considered removed");
         svg.remove();
+    });
+});
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("Formatters", function () {
+    describe("fixed", function () {
+        it("shows exactly [precision] digits", function () {
+            var fixed3 = new Plottable.Formatter.Fixed();
+            var result = fixed3.format(1);
+            assert.strictEqual(result, "1.000", "defaults to three decimal places");
+            result = fixed3.format(1.234);
+            assert.strictEqual(result, "1.234", "shows three decimal places");
+            result = fixed3.format(1.2345);
+            assert.strictEqual(result, "", "changed values are not shown (get turned into empty strings)");
+        });
+
+        it("precision can be changed", function () {
+            var fixed2 = new Plottable.Formatter.Fixed();
+            fixed2.precision(2);
+            var result = fixed2.format(1);
+            assert.strictEqual(result, "1.00", "formatter was changed to show only two decimal places");
+        });
+
+        it("can be set to show rounded values", function () {
+            var fixed3 = new Plottable.Formatter.Fixed();
+            fixed3.showOnlyUnchangedValues(false);
+            var result = fixed3.format(1.2349);
+            assert.strictEqual(result, "1.235", "long values are rounded correctly");
+        });
+    });
+
+    describe("general", function () {
+        it("formats number to show at most [precision] digits", function () {
+            var general = new Plottable.Formatter.General();
+            var result = general.format(1);
+            assert.strictEqual(result, "1", "shows no decimals if formatting an integer");
+            result = general.format(1.234);
+            assert.strictEqual(result, "1.234", "shows up to three decimal places");
+            result = general.format(1.2345);
+            assert.strictEqual(result, "", "(changed) values with more than three decimal places are not shown");
+        });
+
+        it("stringifies non-number values", function () {
+            var general = new Plottable.Formatter.General();
+            var result = general.format("blargh");
+            assert.strictEqual(result, "blargh", "string values are passed through unchanged");
+            result = general.format(null);
+            assert.strictEqual(result, "null", "non-number inputs are stringified");
+        });
+    });
+
+    describe("identity", function () {
+        it("stringifies inputs", function () {
+            var identity = new Plottable.Formatter.Identity();
+            var result = identity.format(1);
+            assert.strictEqual(result, "1", "numbers are stringified");
+            result = identity.format(0.999999);
+            assert.strictEqual(result, "0.999999", "long numbers are stringified");
+            result = identity.format(null);
+            assert.strictEqual(result, "null", "formats null");
+            result = identity.format(undefined);
+            assert.strictEqual(result, "undefined", "formats undefined");
+        });
+    });
+
+    describe("currency", function () {
+        it("uses reasonable defaults", function () {
+            var currencyFormatter = new Plottable.Formatter.Currency();
+            var result = currencyFormatter.format(1);
+            assert.strictEqual(result.charAt(0), "$", "defaults to $ for currency symbol");
+            var decimals = result.substring(result.indexOf(".") + 1, result.length);
+            assert.strictEqual(decimals.length, 2, "defaults to 2 decimal places");
+
+            result = currencyFormatter.format(-1);
+            assert.strictEqual(result.charAt(0), "-", "prefixes negative values with \"-\"");
+            assert.strictEqual(result.charAt(1), "$", "places the currency symbol after the negative sign");
+        });
+
+        it("can change the type and position of the currency symbol", function () {
+            var centsFormatter = new Plottable.Formatter.Currency(0, "c", false);
+            var result = centsFormatter.format(1);
+            assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
+        });
+    });
+
+    describe("percentage", function () {
+        it("uses reasonable defaults", function () {
+            var percentFormatter = new Plottable.Formatter.Percentage();
+            var result = percentFormatter.format(1);
+            assert.strictEqual(result, "100%", "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
+        });
+    });
+
+    describe("custom", function () {
+        it("can take a custom formatting function", function () {
+            var customFormatter;
+            var blargify = function (d, f) {
+                assert.strictEqual(f, customFormatter, "Formatter itself was supplied as second argument");
+                return String(d) + "-blargh";
+            };
+            customFormatter = new Plottable.Formatter.Custom(0, blargify);
+            var result = customFormatter.format(1);
+            assert.strictEqual(result, "1-blargh", "it uses the custom formatting function");
+        });
     });
 });
 
@@ -2648,31 +2760,41 @@ describe("Renderers", function () {
 
         describe("Basic AreaPlot functionality", function () {
             var svg;
-            var xScale = new Plottable.Scale.Linear().domain([0, 1]);
-            var yScale = new Plottable.Scale.Linear().domain([0, 1]);
-            var xAccessor = function (d) {
-                return d.foo;
-            };
-            var yAccessor = function (d) {
-                return d.bar;
-            };
-            var y0Accessor = function () {
-                return 0;
-            };
-            var colorAccessor = function (d, i, m) {
-                return d3.rgb(d.foo, d.bar, i).toString();
-            };
-            var fillAccessor = function () {
-                return "steelblue";
-            };
-            var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
-            var areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("y0", y0Accessor).project("fill", fillAccessor).project("stroke", colorAccessor);
+            var xScale;
+            var yScale;
+            var xAccessor;
+            var yAccessor;
+            var y0Accessor;
+            var colorAccessor;
+            var fillAccessor;
+            var simpleDataset;
+            var areaPlot;
             var renderArea;
-            var verifier = new MultiTestVerifier();
+            var verifier;
 
             before(function () {
                 svg = generateSVG(500, 500);
-                areaPlot.renderTo(svg);
+                verifier = new MultiTestVerifier();
+                xScale = new Plottable.Scale.Linear().domain([0, 1]);
+                yScale = new Plottable.Scale.Linear().domain([0, 1]);
+                xAccessor = function (d) {
+                    return d.foo;
+                };
+                yAccessor = function (d) {
+                    return d.bar;
+                };
+                y0Accessor = function () {
+                    return 0;
+                };
+                colorAccessor = function (d, i, m) {
+                    return d3.rgb(d.foo, d.bar, i).toString();
+                };
+                fillAccessor = function () {
+                    return "steelblue";
+                };
+                simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+                areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
+                areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
                 renderArea = areaPlot.renderArea;
             });
 
@@ -2716,7 +2838,7 @@ describe("Renderers", function () {
             it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
                 areaPlot.project("y0", function (d) {
                     return d.bar / 2;
-                });
+                }, yScale);
                 areaPlot.renderTo(svg);
                 renderArea = areaPlot.renderArea;
                 var areaPath = renderArea.select(".area");
@@ -3131,7 +3253,7 @@ describe("Renderers", function () {
                 var yScale = new Plottable.Scale.Ordinal();
                 var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
                 var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var renderer = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale).project("fill", "magnitude");
+                var renderer = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
                 renderer.renderTo(svg);
                 VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
                 svg.remove();
@@ -3142,7 +3264,7 @@ describe("Renderers", function () {
                 var yScale = new Plottable.Scale.Ordinal();
                 var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
                 var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude");
+                var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
                 renderer.renderTo(svg);
                 renderer.dataSource().data(DATA);
                 VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
@@ -3258,11 +3380,8 @@ describe("Scales", function () {
             dataSource.data([{ foo: 10 }, { foo: 11 }]);
             assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
             scale._removePerspective("2x");
-
-            // "scale not listening to the dataSource after all perspectives removed"
-            assert.throws(function () {
-                return dataSource.deregisterListener(scale);
-            });
+            dataSource.data([{ foo: 99 }, { foo: 100 }]);
+            assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
         });
 
         it("scale perspectives can be removed appropriately", function () {

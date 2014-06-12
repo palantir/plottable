@@ -1,5 +1,5 @@
 /*!
-Plottable 0.16.0 (https://github.com/palantir/plottable)
+Plottable 0.17.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -703,6 +703,16 @@ var Plottable;
             }
             DOM.getBBox = getBBox;
 
+            DOM.POLYFILL_TIMEOUT_MSEC = 1000 / 60;
+            function requestAnimationFramePolyfill(fn) {
+                if (window.requestAnimationFrame != null) {
+                    window.requestAnimationFrame(fn);
+                } else {
+                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MSEC);
+                }
+            }
+            DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
+
             function _getParsedStyleValue(style, prop) {
                 var value = style.getPropertyValue(prop);
                 if (value == null) {
@@ -774,6 +784,277 @@ var Plottable;
         var DOM = Util.DOM;
     })(Plottable.Util || (Plottable.Util = {}));
     var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Formatter = (function () {
+            function Formatter(precision) {
+                this._onlyShowUnchanged = true;
+                this._precision = precision;
+            }
+            /**
+            * Format an input value.
+            *
+            * @param {any} d The value to be formatted.
+            * @returns {string} The formatted value.
+            */
+            Formatter.prototype.format = function (d) {
+                var formattedValue = this._formatFunction(d);
+                if (this._onlyShowUnchanged && this._valueChanged(d, formattedValue)) {
+                    return "";
+                }
+                return formattedValue;
+            };
+
+            Formatter.prototype._valueChanged = function (d, formattedValue) {
+                return d !== parseFloat(formattedValue);
+            };
+
+            Formatter.prototype.precision = function (value) {
+                if (value === undefined) {
+                    return this._precision;
+                }
+                this._precision = value;
+                return this;
+            };
+
+            Formatter.prototype.showOnlyUnchangedValues = function (showUnchanged) {
+                if (showUnchanged === undefined) {
+                    return this._onlyShowUnchanged;
+                }
+                this._onlyShowUnchanged = showUnchanged;
+                return this;
+            };
+            return Formatter;
+        })();
+        Abstract.Formatter = Formatter;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var Identity = (function (_super) {
+            __extends(Identity, _super);
+            /**
+            * Creates an formatter that simply stringifies the input.
+            *
+            * @constructor
+            */
+            function Identity() {
+                _super.call(this, null);
+                this.showOnlyUnchangedValues(false);
+                this._formatFunction = function (d) {
+                    return String(d);
+                };
+            }
+            return Identity;
+        })(Plottable.Abstract.Formatter);
+        Formatter.Identity = Identity;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var General = (function (_super) {
+            __extends(General, _super);
+            /**
+            * Creates a formatter that formats numbers to show no more than
+            * [precision] decimal places. All other values are stringified.
+            *
+            * @constructor
+            * @param {number} [precision] The maximum number of decimal places to display.
+            */
+            function General(precision) {
+                if (typeof precision === "undefined") { precision = 3; }
+                _super.call(this, precision);
+                this._formatFunction = function (d) {
+                    if (typeof d === "number") {
+                        var multiplier = Math.pow(10, this._precision);
+                        return String(Math.round(d * multiplier) / multiplier);
+                    } else {
+                        return String(d);
+                    }
+                };
+            }
+            General.prototype._valueChanged = function (d, formattedValue) {
+                if (typeof d === "number") {
+                    return d !== parseFloat(formattedValue);
+                } else {
+                    return false;
+                }
+            };
+            return General;
+        })(Plottable.Abstract.Formatter);
+        Formatter.General = General;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var Fixed = (function (_super) {
+            __extends(Fixed, _super);
+            /**
+            * Creates a formatter that displays exactly [precision] decimal places.
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            function Fixed(precision) {
+                if (typeof precision === "undefined") { precision = 3; }
+                _super.call(this, precision);
+                this._formatFunction = function (d) {
+                    return d.toFixed(this._precision);
+                };
+            }
+            return Fixed;
+        })(Plottable.Abstract.Formatter);
+        Formatter.Fixed = Fixed;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var Currency = (function (_super) {
+            __extends(Currency, _super);
+            /**
+            * Creates a formatter for currency values.
+            *
+            * @param {number} [precision] The number of decimal places to show.
+            * @param {string} [symbol] The currency symbol to use.
+            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
+            *
+            * @returns {IFormatter} A formatter for currency values.
+            */
+            function Currency(precision, symbol, prefix) {
+                if (typeof precision === "undefined") { precision = 2; }
+                if (typeof symbol === "undefined") { symbol = "$"; }
+                if (typeof prefix === "undefined") { prefix = true; }
+                _super.call(this, precision);
+                this.symbol = symbol;
+                this.prefix = prefix;
+            }
+            Currency.prototype.format = function (d) {
+                var formattedValue = _super.prototype.format.call(this, Math.abs(d));
+                if (formattedValue !== "") {
+                    if (this.prefix) {
+                        formattedValue = this.symbol + formattedValue;
+                    } else {
+                        formattedValue += this.symbol;
+                    }
+
+                    if (d < 0) {
+                        formattedValue = "-" + formattedValue;
+                    }
+                }
+                return formattedValue;
+            };
+            return Currency;
+        })(Plottable.Formatter.Fixed);
+        Formatter.Currency = Currency;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var Percentage = (function (_super) {
+            __extends(Percentage, _super);
+            /**
+            * Creates a formatter for percentage values.
+            * Multiplies the supplied value by 100 and appends "%".
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            function Percentage(precision) {
+                if (typeof precision === "undefined") { precision = 0; }
+                _super.call(this, precision);
+            }
+            Percentage.prototype.format = function (d) {
+                var formattedValue = _super.prototype.format.call(this, d * 100);
+                if (formattedValue !== "") {
+                    formattedValue += "%";
+                }
+                return formattedValue;
+            };
+            return Percentage;
+        })(Plottable.Formatter.Fixed);
+        Formatter.Percentage = Percentage;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var Custom = (function (_super) {
+            __extends(Custom, _super);
+            function Custom(precision, customFormatFunction) {
+                _super.call(this, precision);
+                this._onlyShowUnchanged = false;
+                this._formatFunction = function (d) {
+                    return customFormatFunction(d, this);
+                };
+            }
+            return Custom;
+        })(Plottable.Abstract.Formatter);
+        Formatter.Custom = Custom;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -849,12 +1130,8 @@ var Plottable;
             * @returns {Broadcaster} this object
             */
             Broadcaster.prototype.deregisterListener = function (listener) {
-                var listenerWasFound = this.listener2Callback.delete(listener);
-                if (listenerWasFound) {
-                    return this;
-                } else {
-                    throw new Error("Attempted to deregister listener, but listener not found");
-                }
+                this.listener2Callback.delete(listener);
+                return this;
             };
             return Broadcaster;
         })(Plottable.Abstract.PlottableObject);
@@ -1000,6 +1277,9 @@ var Plottable;
             */
             Component.prototype._setup = function () {
                 var _this = this;
+                if (this._isSetup) {
+                    return;
+                }
                 this.cssClasses.forEach(function (cssClass) {
                     _this.element.classed(cssClass, true);
                 });
@@ -1021,6 +1301,9 @@ var Plottable;
                     return _this.registerInteraction(r);
                 });
                 this.interactionsToRegister = null;
+                if (this.isTopLevelComponent) {
+                    this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
+                }
                 this._isSetup = true;
                 return this;
             };
@@ -1103,14 +1386,14 @@ var Plottable;
             */
             Component.prototype._render = function () {
                 if (this._isAnchored && this._isSetup) {
-                    Plottable.Singleton.RenderController.registerToRender(this);
+                    Plottable.Core.RenderController.registerToRender(this);
                 }
                 return this;
             };
 
             Component.prototype._scheduleComputeLayout = function () {
                 if (this._isAnchored && this._isSetup) {
-                    Plottable.Singleton.RenderController.registerToComputeLayout(this);
+                    Plottable.Core.RenderController.registerToComputeLayout(this);
                 }
                 return this;
             };
@@ -1163,6 +1446,24 @@ var Plottable;
                     this.rootSVG.attr({ width: width, height: height });
                 }
                 this._invalidateLayout();
+                return this;
+            };
+
+            /**
+            * Enables and disables auto-resize.
+            *
+            * If enabled, window resizes will enqueue this component for a re-layout
+            * and re-render. Animations are disabled during window resizes when auto-
+            * resize is enabled.
+            *
+            * @param {boolean} flag - Enables (true) or disables (false) auto-resize.
+            */
+            Component.prototype.autoResize = function (flag) {
+                if (flag) {
+                    Plottable.Core.ResizeBroadcaster.register(this);
+                } else {
+                    Plottable.Core.ResizeBroadcaster.deregister(this);
+                }
                 return this;
             };
 
@@ -1379,6 +1680,7 @@ var Plottable;
                 this._parent = null;
                 return this;
             };
+            Component.AUTORESIZE_BY_DEFAULT = true;
             return Component;
         })(Plottable.Abstract.PlottableObject);
         Abstract.Component = Component;
@@ -2139,6 +2441,7 @@ var Plottable;
                 _super.call(this);
                 this._dataChanged = false;
                 this._animate = false;
+                this._animators = {};
                 this._ANIMATION_DURATION = 250;
                 this._projectors = {};
                 this._rerenderUpdateSelection = false;
@@ -2206,19 +2509,19 @@ var Plottable;
                 var rendererIDAttr = this._plottableID + attrToSet;
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
-                if (scale == null) {
-                    scale = existingScale;
-                }
+
                 if (existingScale != null) {
                     existingScale._removePerspective(rendererIDAttr);
                     this._deregisterFromBroadcaster(existingScale);
                 }
+
                 if (scale != null) {
                     scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
                     this._registerToBroadcaster(scale, function () {
                         return _this._render();
                     });
                 }
+
                 this._projectors[attrToSet] = { accessor: accessor, scale: scale };
                 this._requireRerender = true;
                 this._rerenderUpdateSelection = true;
@@ -2269,6 +2572,37 @@ var Plottable;
                 this._animate = enabled;
                 return this;
             };
+
+            /**
+            * Apply attributes to the selection.
+            *
+            * If animation is enabled and a valid animator's key is specified, the
+            * attributes are applied with the animator. Otherwise, they are applied
+            * immediately to the selection.
+            *
+            * The animation will not animate during auto-resize renders.
+            *
+            * @param {D3.Selection} selection The selection of elements to update.
+            * @param {string} animatorKey The key for the animator.
+            * @param {Abstract.IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
+            * @return {D3.Selection} The resulting selection (potentially after the transition)
+            */
+            Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
+                if (this._animate && this._animators[animatorKey] != null && !Plottable.Core.ResizeBroadcaster.resizing()) {
+                    return this._animators[animatorKey].animate(selection, attrToProjector, this);
+                } else {
+                    return selection.attr(attrToProjector);
+                }
+            };
+
+            Plot.prototype.animator = function (animatorKey, animator) {
+                if (animator === undefined) {
+                    return this._animators[animatorKey];
+                } else {
+                    this._animators[animatorKey] = animator;
+                    return this;
+                }
+            };
             return Plot;
         })(Plottable.Abstract.Component);
         Abstract.Plot = Plot;
@@ -2279,73 +2613,223 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (Singleton) {
-        var RenderController = (function () {
-            function RenderController() {
-            }
-            RenderController.registerToRender = function (c) {
-                if (!RenderController.enabled) {
-                    c._doRender();
-                    return;
-                }
-                RenderController.componentsNeedingRender[c._plottableID] = c;
-                RenderController.requestFrame();
-            };
-
-            RenderController.registerToComputeLayout = function (c) {
-                if (!RenderController.enabled) {
-                    c._computeLayout()._render();
-                    return;
-                }
-                RenderController.componentsNeedingComputeLayout[c._plottableID] = c;
-                RenderController.componentsNeedingRender[c._plottableID] = c;
-                RenderController.requestFrame();
-            };
-
-            RenderController.requestFrame = function () {
-                if (!RenderController.animationRequested) {
-                    if (window.requestAnimationFrame != null) {
-                        requestAnimationFrame(RenderController.flush);
-                    } else {
-                        setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
+    (function (Core) {
+        (function (RenderController) {
+            (function (RenderPolicy) {
+                var Immediate = (function () {
+                    function Immediate() {
                     }
-                    RenderController.animationRequested = true;
-                }
-            };
+                    Immediate.prototype.render = function () {
+                        Plottable.Core.RenderController.flush();
+                    };
+                    return Immediate;
+                })();
+                RenderPolicy.Immediate = Immediate;
 
-            RenderController.flush = function () {
-                if (RenderController.animationRequested) {
-                    var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
+                var AnimationFrame = (function () {
+                    function AnimationFrame() {
+                    }
+                    AnimationFrame.prototype.render = function () {
+                        Plottable.Util.DOM.requestAnimationFramePolyfill(Plottable.Core.RenderController.flush);
+                    };
+                    return AnimationFrame;
+                })();
+                RenderPolicy.AnimationFrame = AnimationFrame;
+
+                var Timeout = (function () {
+                    function Timeout() {
+                        this._timeoutMsec = Plottable.Util.DOM.POLYFILL_TIMEOUT_MSEC;
+                    }
+                    Timeout.prototype.render = function () {
+                        setTimeout(Plottable.Core.RenderController.flush, this._timeoutMsec);
+                    };
+                    return Timeout;
+                })();
+                RenderPolicy.Timeout = Timeout;
+            })(RenderController.RenderPolicy || (RenderController.RenderPolicy = {}));
+            var RenderPolicy = RenderController.RenderPolicy;
+        })(Core.RenderController || (Core.RenderController = {}));
+        var RenderController = Core.RenderController;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Core) {
+        /**
+        * The RenderController is responsible for enqueueing and synchronizing
+        * layout and render calls for Plottable components.
+        *
+        * Layouts and renders occur inside an animation callback
+        * (window.requestAnimationFrame if available).
+        *
+        * If you require immediate rendering, call RenderController.flush() to
+        * perform enqueued layout and rendering serially.
+        */
+        (function (RenderController) {
+            var _componentsNeedingRender = {};
+            var _componentsNeedingComputeLayout = {};
+            var _animationRequested = false;
+            RenderController._renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
+
+            function setRenderPolicy(policy) {
+                RenderController._renderPolicy = policy;
+            }
+            RenderController.setRenderPolicy = setRenderPolicy;
+
+            /**
+            * If the RenderController is enabled, we enqueue the component for
+            * render. Otherwise, it is rendered immediately.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            function registerToRender(c) {
+                _componentsNeedingRender[c._plottableID] = c;
+                requestRender();
+            }
+            RenderController.registerToRender = registerToRender;
+
+            /**
+            * If the RenderController is enabled, we enqueue the component for
+            * layout and render. Otherwise, it is rendered immediately.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            function registerToComputeLayout(c) {
+                _componentsNeedingComputeLayout[c._plottableID] = c;
+                _componentsNeedingRender[c._plottableID] = c;
+                requestRender();
+            }
+            RenderController.registerToComputeLayout = registerToComputeLayout;
+
+            function requestRender() {
+                // Only run or enqueue flush on first request.
+                if (!_animationRequested) {
+                    _animationRequested = true;
+                    RenderController._renderPolicy.render();
+                }
+            }
+
+            function flush() {
+                if (_animationRequested) {
+                    // Layout
+                    var toCompute = d3.values(_componentsNeedingComputeLayout);
                     toCompute.forEach(function (c) {
                         return c._computeLayout();
                     });
-                    var toRender = d3.values(RenderController.componentsNeedingRender);
 
-                    // call _render on everything, so that containers will put their children in the toRender queue
+                    // Top level render.
+                    // Containers will put their children in the toRender queue
+                    var toRender = d3.values(_componentsNeedingRender);
                     toRender.forEach(function (c) {
                         return c._render();
                     });
 
-                    toRender = d3.values(RenderController.componentsNeedingRender);
+                    // Finally, perform render of all components
+                    toRender = d3.values(_componentsNeedingRender);
                     toRender.forEach(function (c) {
                         return c._doRender();
                     });
-                    RenderController.componentsNeedingComputeLayout = {};
-                    RenderController.componentsNeedingRender = {};
-                    RenderController.animationRequested = false;
+
+                    // Reset queues
+                    _componentsNeedingComputeLayout = {};
+                    _componentsNeedingRender = {};
+                    _animationRequested = false;
                 }
-            };
-            RenderController.IE_TIMEOUT = 1000 / 60;
-            RenderController.componentsNeedingRender = {};
-            RenderController.componentsNeedingComputeLayout = {};
-            RenderController.animationRequested = false;
-            RenderController.enabled = window.PlottableTestCode == null;
-            return RenderController;
-        })();
-        Singleton.RenderController = RenderController;
-    })(Plottable.Singleton || (Plottable.Singleton = {}));
-    var Singleton = Plottable.Singleton;
+
+                // Reset resize flag regardless of queue'd components
+                Plottable.Core.ResizeBroadcaster.clearResizing();
+            }
+            RenderController.flush = flush;
+        })(Core.RenderController || (Core.RenderController = {}));
+        var RenderController = Core.RenderController;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Core) {
+        /**
+        * The ResizeBroadcaster will broadcast a notification to any registered
+        * components when the window is resized.
+        *
+        * The broadcaster and single event listener are lazily constructed.
+        *
+        * Upon resize, the _resized flag will be set to true until after the next
+        * flush of the RenderController. This is used, for example, to disable
+        * animations during resize.
+        */
+        (function (ResizeBroadcaster) {
+            var _broadcaster;
+            var _resizing = false;
+
+            function _lazyInitialize() {
+                if (_broadcaster === undefined) {
+                    _broadcaster = new Plottable.Abstract.Broadcaster();
+                    window.addEventListener("resize", _onResize);
+                }
+            }
+
+            function _onResize() {
+                _resizing = true;
+                _broadcaster._broadcast();
+            }
+
+            /**
+            * Returns true if the window has been resized and the RenderController
+            * has not yet been flushed.
+            */
+            function resizing() {
+                return _resizing;
+            }
+            ResizeBroadcaster.resizing = resizing;
+
+            function clearResizing() {
+                _resizing = false;
+            }
+            ResizeBroadcaster.clearResizing = clearResizing;
+
+            /**
+            * Registers a component.
+            *
+            * When the window is resized, we invoke ._invalidateLayout() on the
+            * component, which will enqueue the component for layout and rendering
+            * with the RenderController.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            function register(c) {
+                _lazyInitialize();
+                _broadcaster.registerListener(c._plottableID, function () {
+                    return c._invalidateLayout();
+                });
+            }
+            ResizeBroadcaster.register = register;
+
+            /**
+            * Deregisters the components.
+            *
+            * The component will no longer receive updates on window resize.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            function deregister(c) {
+                if (_broadcaster) {
+                    _broadcaster.deregisterListener(c._plottableID);
+                }
+            }
+            ResizeBroadcaster.deregister = deregister;
+        })(Core.ResizeBroadcaster || (Core.ResizeBroadcaster = {}));
+        var ResizeBroadcaster = Core.ResizeBroadcaster;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 
 var Plottable;
 (function (Plottable) {
@@ -3029,7 +3513,7 @@ var Plottable;
             * @constructor
             * @param {Scale} scale The Scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {any} [formatter] a D3 formatter
+            * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
             */
             function Axis(axisScale, orientation, formatter) {
                 var _this = this;
@@ -3041,19 +3525,16 @@ var Plottable;
                 orientation = orientation.toLowerCase();
                 this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
                 this.classed("axis", true);
+                var formatFunction = formatter;
                 if (formatter == null) {
-                    var numberFormatter = d3.format(".3s");
-                    formatter = function (d) {
-                        if (typeof d === "number") {
-                            if (Math.abs(d) < 1) {
-                                return String(Math.round(1000 * d) / 1000);
-                            }
-                            return numberFormatter(d);
-                        }
-                        return d;
+                    formatter = new Plottable.Formatter.General();
+                }
+                if (formatter instanceof Plottable.Abstract.Formatter) {
+                    formatFunction = function (d) {
+                        return formatter.format(d);
                     };
                 }
-                this.tickFormat(formatter);
+                this.tickFormat(formatFunction);
                 this._registerToBroadcaster(this._axisScale, function () {
                     return _this._render();
                 });
@@ -3893,8 +4374,9 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), function (d) {
+                    return d;
+                });
 
                 var getTickLabelTransform = function (d, i) {
                     var startAndWidth = _this._scale.fullBandStartAndWidth(d);
@@ -3903,9 +4385,12 @@ var Plottable;
                     var y = _this._isHorizontal() ? 0 : bandStartPosition;
                     return "translate(" + x + "," + y + ")";
                 };
-                tickLabels.enter().append("g").classed("tick-label", true);
+                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
+
+                // erase all text first, then rewrite
+                tickLabels.text("");
                 this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
@@ -4427,18 +4912,18 @@ var Plottable;
             XYPlot.prototype.project = function (attrToSet, accessor, scale) {
                 // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
-                if (attrToSet === "x") {
-                    this.xScale = scale != null ? scale : this.xScale;
-                    this._xAccessor = accessor;
+                if (attrToSet === "x" && scale != null) {
+                    this.xScale = scale;
                     this.xScale._autoNice = true;
                     this.xScale._autoPad = true;
                 }
-                if (attrToSet === "y") {
-                    this.yScale = scale != null ? scale : this.yScale;
-                    this._yAccessor = accessor;
+
+                if (attrToSet === "y" && scale != null) {
+                    this.yScale = scale;
                     this.yScale._autoNice = true;
                     this.yScale._autoPad = true;
                 }
+
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
 
                 return this;
@@ -4730,11 +5215,13 @@ var Plottable;
             function VerticalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._barAlignment = "left";
-                this._ANIMATION_DURATION = 300;
-                this._ANIMATION_DELAY = 15;
+                this._animators = {
+                    "bars-reset": new Plottable.Animator.Null(),
+                    "bars": new Plottable.Animator.IterativeDelay(),
+                    "baseline": new Plottable.Animator.Null()
+                };
             }
             VerticalBar.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
                 var scaledBaseline = this.yScale.scale(this._baselineValue);
 
@@ -4745,7 +5232,6 @@ var Plottable;
 
                 var xF = attrToProjector["x"];
                 var widthF = attrToProjector["width"];
-
                 var castXScale = this.xScale;
                 var rangeType = (castXScale.rangeType == null) ? "points" : castXScale.rangeType();
 
@@ -4767,16 +5253,18 @@ var Plottable;
 
                 var yFunction = attrToProjector["y"];
 
-                if (this._animate && this._dataChanged) {
+                // Apply reset if data changed
+                if (this._dataChanged) {
                     attrToProjector["y"] = function () {
                         return scaledBaseline;
                     };
                     attrToProjector["height"] = function () {
                         return 0;
                     };
-                    this._bars.attr(attrToProjector);
+                    this._applyAnimatedAttributes(this._bars, "bars-reset", attrToProjector);
                 }
 
+                // Prepare attributes for bars
                 attrToProjector["y"] = function (d, i) {
                     var originalY = yFunction(d, i);
                     return (originalY > scaledBaseline) ? scaledBaseline : originalY;
@@ -4791,23 +5279,19 @@ var Plottable;
                     this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
 
-                var updateSelection = this._bars;
-                if (this._animate) {
-                    var n = this.dataSource().data().length;
-                    updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
-                        return i * _this._ANIMATION_DELAY;
-                    });
-                }
+                // Apply bar updates
+                this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
 
-                updateSelection.attr(attrToProjector);
                 this._bars.exit().remove();
 
-                this._baseline.attr({
+                // Apply baseline updates
+                var baselineAttr = {
                     "x1": 0,
                     "y1": scaledBaseline,
                     "x2": this.availableWidth,
                     "y2": scaledBaseline
-                });
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
 
             /**
@@ -5081,46 +5565,152 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (Singleton) {
-        var KeyEventListener = (function () {
-            function KeyEventListener() {
+    (function (Animator) {
+        /**
+        * An animator implementation with no animation. The attributes are
+        * immediately set on the selection.
+        */
+        var Null = (function () {
+            function Null() {
             }
-            KeyEventListener.initialize = function () {
-                if (KeyEventListener.initialized) {
-                    return;
-                }
-                d3.select(document).on("keydown", KeyEventListener.processEvent);
-                KeyEventListener.initialized = true;
+            Null.prototype.animate = function (selection, attrToProjector, plot) {
+                return selection.attr(attrToProjector);
+            };
+            return Null;
+        })();
+        Animator.Null = Null;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        /**
+        * The default animator implementation with easing, duration, and delay.
+        */
+        var Default = (function () {
+            function Default() {
+                this._durationMsec = 300;
+                this._delayMsec = 0;
+                this._easing = "exp-out";
+            }
+            Default.prototype.animate = function (selection, attrToProjector, plot) {
+                return selection.transition().ease(this._easing).duration(this._durationMsec).delay(this._delayMsec).attr(attrToProjector);
             };
 
-            KeyEventListener.addCallback = function (keyCode, cb) {
-                if (!KeyEventListener.initialized) {
-                    KeyEventListener.initialize();
+            Default.prototype.duration = function (duration) {
+                if (duration === undefined) {
+                    return this._durationMsec;
+                } else {
+                    this._durationMsec = duration;
+                    return this;
                 }
-
-                if (KeyEventListener.callbacks[keyCode] == null) {
-                    KeyEventListener.callbacks[keyCode] = [];
-                }
-
-                KeyEventListener.callbacks[keyCode].push(cb);
             };
 
-            KeyEventListener.processEvent = function () {
-                if (KeyEventListener.callbacks[d3.event.keyCode] == null) {
+            Default.prototype.delay = function (delay) {
+                if (delay === undefined) {
+                    return this._delayMsec;
+                } else {
+                    this._delayMsec = delay;
+                    return this;
+                }
+            };
+
+            Default.prototype.easing = function (easing) {
+                if (easing === undefined) {
+                    return this._easing;
+                } else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            return Default;
+        })();
+        Animator.Default = Default;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Animator) {
+        /**
+        * An animator that delays the animation of the attributes using the index
+        * of the selection data.
+        *
+        * The delay between animations can be configured with the .delay getter/setter.
+        */
+        var IterativeDelay = (function (_super) {
+            __extends(IterativeDelay, _super);
+            function IterativeDelay() {
+                _super.apply(this, arguments);
+                this._delayMsec = 15;
+            }
+            IterativeDelay.prototype.animate = function (selection, attrToProjector, plot) {
+                var _this = this;
+                return selection.transition().ease(this._easing).duration(this._durationMsec).delay(function (d, i) {
+                    return i * _this._delayMsec;
+                }).attr(attrToProjector);
+            };
+            return IterativeDelay;
+        })(Plottable.Animator.Default);
+        Animator.IterativeDelay = IterativeDelay;
+    })(Plottable.Animator || (Plottable.Animator = {}));
+    var Animator = Plottable.Animator;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Core) {
+        (function (KeyEventListener) {
+            var _initialized = false;
+            var _callbacks = [];
+
+            function initialize() {
+                if (_initialized) {
+                    return;
+                }
+                d3.select(document).on("keydown", processEvent);
+                _initialized = true;
+            }
+            KeyEventListener.initialize = initialize;
+
+            function addCallback(keyCode, cb) {
+                if (!_initialized) {
+                    initialize();
+                }
+
+                if (_callbacks[keyCode] == null) {
+                    _callbacks[keyCode] = [];
+                }
+
+                _callbacks[keyCode].push(cb);
+            }
+            KeyEventListener.addCallback = addCallback;
+
+            function processEvent() {
+                if (_callbacks[d3.event.keyCode] == null) {
                     return;
                 }
 
-                KeyEventListener.callbacks[d3.event.keyCode].forEach(function (cb) {
+                _callbacks[d3.event.keyCode].forEach(function (cb) {
                     cb(d3.event);
                 });
-            };
-            KeyEventListener.initialized = false;
-            KeyEventListener.callbacks = [];
-            return KeyEventListener;
-        })();
-        Singleton.KeyEventListener = KeyEventListener;
-    })(Plottable.Singleton || (Plottable.Singleton = {}));
-    var Singleton = Plottable.Singleton;
+            }
+        })(Core.KeyEventListener || (Core.KeyEventListener = {}));
+        var KeyEventListener = Core.KeyEventListener;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5274,7 +5864,7 @@ var Plottable;
                     _this.activated = false;
                 });
 
-                Plottable.Singleton.KeyEventListener.addCallback(this.keyCode, function (e) {
+                Plottable.Core.KeyEventListener.addCallback(this.keyCode, function (e) {
                     if (_this.activated && _this._callback != null) {
                         _this._callback();
                     }

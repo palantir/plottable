@@ -1,41 +1,41 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Singleton {
+export module Core {
   export interface IKeyEventListenerCallback {
     (e: D3.Event): any
   }
 
-  export class KeyEventListener {
-    private static initialized = false;
-    private static callbacks: IKeyEventListenerCallback[][] = [];
+  export module KeyEventListener {
+    var _initialized: boolean = false;
+    var _callbacks: IKeyEventListenerCallback[][] = [];
 
-    public static initialize() {
-      if (KeyEventListener.initialized) {
+    export function initialize() {
+      if (_initialized) {
         return;
       }
-      d3.select(document).on("keydown", KeyEventListener.processEvent);
-      KeyEventListener.initialized = true;
+      d3.select(document).on("keydown", processEvent);
+      _initialized = true;
     }
 
-    public static addCallback(keyCode: number, cb: IKeyEventListenerCallback) {
-      if (!KeyEventListener.initialized) {
-        KeyEventListener.initialize();
+    export function addCallback(keyCode: number, cb: IKeyEventListenerCallback) {
+      if (!_initialized) {
+        initialize();
       }
 
-      if (KeyEventListener.callbacks[keyCode] == null) {
-        KeyEventListener.callbacks[keyCode] = [];
+      if (_callbacks[keyCode] == null) {
+        _callbacks[keyCode] = [];
       }
 
-      KeyEventListener.callbacks[keyCode].push(cb);
+      _callbacks[keyCode].push(cb);
     }
 
-    private static processEvent() {
-      if (KeyEventListener.callbacks[d3.event.keyCode] == null) {
+    function processEvent() {
+      if (_callbacks[d3.event.keyCode] == null) {
         return;
       }
 
-      KeyEventListener.callbacks[d3.event.keyCode].forEach((cb: IKeyEventListenerCallback) => {
+      _callbacks[d3.event.keyCode].forEach((cb: IKeyEventListenerCallback) => {
         cb(d3.event);
       });
     }

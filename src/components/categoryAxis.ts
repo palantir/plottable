@@ -102,8 +102,7 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      this._tickLabelsG.selectAll(".tick-label").remove(); // HACKHACK #523
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain());
+      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var startAndWidth = this._scale.fullBandStartAndWidth(d);
@@ -112,9 +111,11 @@ export module Axis {
         var y = this._isHorizontal() ? 0 : bandStartPosition;
         return "translate(" + x + "," + y + ")";
       };
-      tickLabels.enter().append("g").classed("tick-label", true);
+      var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
       tickLabels.exit().remove();
       tickLabels.attr("transform", getTickLabelTransform);
+      // erase all text first, then rewrite
+      tickLabels.text("");
       this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
