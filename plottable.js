@@ -3801,15 +3801,6 @@ var Plottable;
                 if (typeof density === "undefined") { density = "normal"; }
                 _super.call(this, scale, orientation, formatter);
                 this._height = 30;
-                this.intervals = [
-                    d3.time.year,
-                    d3.time.month,
-                    d3.time.week,
-                    d3.time.day,
-                    d3.time.hour,
-                    d3.time.minute,
-                    d3.time.second
-                ];
                 this.tickDensity(density);
                 this.classed("time-axis", true);
             }
@@ -3850,17 +3841,6 @@ var Plottable;
             };
 
             Time.prototype._getTickValues = function () {
-                var dom = this._scale.domain();
-                var i = 0;
-                while (i < this.intervals.length) {
-                    if (this.intervals[i].floor(dom[0]).getTime() !== this.intervals[i].floor(dom[1]).getTime()) {
-                        break;
-                    }
-                    i++;
-                }
-                console.log(i);
-                console.log(this._formatter(this.intervals[i].floor(dom[0])));
-                console.log(this._formatter(this.intervals[i].floor(dom[1])));
                 var nticks = 0;
                 switch (this._tickDensity) {
                     case "sparse":
