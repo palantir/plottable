@@ -32,6 +32,8 @@ export module Abstract {
 
     public _isSetup = false;
     public _isAnchored = false;
+    public _autoresizeEnabled: boolean;
+    public static AUTORESIZE_BY_DEFAULT = true;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -110,6 +112,7 @@ export module Abstract {
         if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
         } else if (this.isTopLevelComponent) {
+          this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
           // we are the root node, retrieve height/width from root SVG
           xOrigin = 0;
           yOrigin = 0;

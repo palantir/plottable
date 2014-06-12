@@ -306,6 +306,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
+            static AUTORESIZE_BY_DEFAULT: boolean;
             /**
             * Renders the Component into a given DOM element.
             *

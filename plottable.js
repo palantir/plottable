@@ -859,12 +859,8 @@ var Plottable;
             * @returns {Broadcaster} this object
             */
             Broadcaster.prototype.deregisterListener = function (listener) {
-                var listenerWasFound = this.listener2Callback.delete(listener);
-                if (listenerWasFound) {
-                    return this;
-                } else {
-                    throw new Error("Attempted to deregister listener, but listener not found");
-                }
+                this.listener2Callback.delete(listener);
+                return this;
             };
             return Broadcaster;
         })(Plottable.Abstract.PlottableObject);
@@ -1056,6 +1052,8 @@ var Plottable;
                     if (this.element == null) {
                         throw new Error("anchor must be called before computeLayout");
                     } else if (this.isTopLevelComponent) {
+                        this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
+
                         // we are the root node, retrieve height/width from root SVG
                         xOrigin = 0;
                         yOrigin = 0;
@@ -1407,6 +1405,7 @@ var Plottable;
                 this._parent = null;
                 return this;
             };
+            Component.AUTORESIZE_BY_DEFAULT = true;
             return Component;
         })(Plottable.Abstract.PlottableObject);
         Abstract.Component = Component;
