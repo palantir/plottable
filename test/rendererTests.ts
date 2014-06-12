@@ -170,26 +170,36 @@ describe("Renderers", () => {
 
     describe("Basic AreaPlot functionality", () => {
       var svg: D3.Selection;
-      var xScale = new Plottable.Scale.Linear().domain([0, 1]);
-      var yScale = new Plottable.Scale.Linear().domain([0, 1]);
-      var xAccessor = (d: any) => d.foo;
-      var yAccessor = (d: any) => d.bar;
-      var y0Accessor = () => 0;
-      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
-      var fillAccessor = () => "steelblue";
-      var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      var areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale)
-                                  .project("x", xAccessor)
-                                  .project("y", yAccessor)
-                                  .project("y0", y0Accessor)
-                                  .project("fill", fillAccessor)
-                                  .project("stroke", colorAccessor);
+      var xScale: Plottable.Scale.Linear;
+      var yScale: Plottable.Scale.Linear;
+      var xAccessor: any;
+      var yAccessor: any;
+      var y0Accessor: any;
+      var colorAccessor: any;
+      var fillAccessor: any;
+      var simpleDataset: Plottable.DataSource;
+      var areaPlot: Plottable.Plot.Area;
       var renderArea: D3.Selection;
-      var verifier = new MultiTestVerifier();
+      var verifier: MultiTestVerifier;
 
       before(() => {
         svg = generateSVG(500, 500);
-        areaPlot.renderTo(svg);
+        verifier = new MultiTestVerifier();
+        xScale = new Plottable.Scale.Linear().domain([0, 1]);
+        yScale = new Plottable.Scale.Linear().domain([0, 1]);
+        xAccessor = (d: any) => d.foo;
+        yAccessor = (d: any) => d.bar;
+        y0Accessor = () => 0;
+        colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
+        fillAccessor = () => "steelblue";
+        simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
+        areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
+        areaPlot.project("x", xAccessor, xScale)
+                .project("y", yAccessor, yScale)
+                .project("y0", y0Accessor, yScale)
+                .project("fill", fillAccessor)
+                .project("stroke", colorAccessor)
+                .renderTo(svg);
         renderArea = areaPlot.renderArea;
       });
 
@@ -229,7 +239,7 @@ describe("Renderers", () => {
       });
 
       it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-        areaPlot.project("y0", (d: any) => d.bar/2);
+        areaPlot.project("y0", (d: any) => d.bar/2, yScale);
         areaPlot.renderTo(svg);
         renderArea = areaPlot.renderArea;
         var areaPath = renderArea.select(".area");
@@ -625,7 +635,7 @@ describe("Renderers", () => {
         var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale)
-                                                            .project("fill", "magnitude");
+                                                            .project("fill", "magnitude", colorScale);
         renderer.renderTo(svg);
         VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
         svg.remove();
@@ -638,7 +648,7 @@ describe("Renderers", () => {
         var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
-                                                            .project("fill", "magnitude");
+                                                            .project("fill", "magnitude", colorScale);
         renderer.renderTo(svg);
         renderer.dataSource().data(DATA);
         VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
