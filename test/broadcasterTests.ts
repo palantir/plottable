@@ -51,7 +51,7 @@ describe("Broadcasters", () => {
     assert.isTrue(called, "the cb was called");
   });
 
-  it("deregistering an unregistered listener throws an error", () => {
-    assert.throws(() => b.deregisterListener({}) );
+  it("deregistering an unregistered listener doesn't throw an error", () => {
+    assert.doesNotThrow(() => b.deregisterListener({}) );
   });
 });
