@@ -5076,8 +5076,10 @@ var Plottable;
             */
             function Scatter(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._ANIMATION_DURATION = 250;
-                this._ANIMATION_DELAY = 5;
+                this._animators = {
+                    "circles-reset": new Plottable.Animator.Null(),
+                    "circles": new Plottable.Animator.IterativeDelay().duration(250).delay(5)
+                };
                 this.classed("circle-renderer", true);
                 this.project("r", 3); // default
                 this.project("fill", function () {
@@ -5092,32 +5094,27 @@ var Plottable;
             };
 
             Scatter.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
+
                 var attrToProjector = this._generateAttrToProjector();
                 attrToProjector["cx"] = attrToProjector["x"];
                 attrToProjector["cy"] = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
 
-                var rFunction = attrToProjector["r"];
-                attrToProjector["r"] = function () {
-                    return 0;
-                };
-
                 var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
                 circles.enter().append("circle");
-                circles.attr(attrToProjector);
 
-                var updateSelection = circles;
-                if (this._animate && this._dataChanged) {
-                    var n = this.dataSource().data().length;
-                    updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
-                        return i * _this._ANIMATION_DELAY;
-                    });
+                if (this._dataChanged) {
+                    var rFunction = attrToProjector["r"];
+                    attrToProjector["r"] = function () {
+                        return 0;
+                    };
+                    this._applyAnimatedAttributes(circles, "circles-reset", attrToProjector);
+                    attrToProjector["r"] = rFunction;
                 }
-                updateSelection.attr("r", rFunction);
 
+                this._applyAnimatedAttributes(circles, "circles", attrToProjector);
                 circles.exit().remove();
             };
             return Scatter;
@@ -5151,6 +5148,9 @@ var Plottable;
             */
             function Grid(dataset, xScale, yScale, colorScale) {
                 _super.call(this, dataset, xScale, yScale);
+                this._animators = {
+                    "cells": new Plottable.Animator.Null()
+                };
                 this.classed("grid-renderer", true);
 
                 // The x and y scales should render in bands with no padding
@@ -5185,7 +5185,7 @@ var Plottable;
                     return yStep;
                 };
 
-                cells.attr(attrToProjector);
+                this._applyAnimatedAttributes(cells, "cells", attrToProjector);
                 cells.exit().remove();
             };
             return Grid;
@@ -5218,6 +5218,11 @@ var Plottable;
             function BarPlot(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
+                this._animators = {
+                    "bars-reset": new Plottable.Animator.Null(),
+                    "bars": new Plottable.Animator.IterativeDelay(),
+                    "baseline": new Plottable.Animator.Null()
+                };
                 this.classed("bar-renderer", true);
                 this.project("width", 10);
                 this.project("fill", function () {
@@ -5321,11 +5326,6 @@ var Plottable;
             function VerticalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._barAlignment = "left";
-                this._animators = {
-                    "bars-reset": new Plottable.Animator.Null(),
-                    "bars": new Plottable.Animator.IterativeDelay(),
-                    "baseline": new Plottable.Animator.Null()
-                };
             }
             VerticalBar.prototype._paint = function () {
                 _super.prototype._paint.call(this);
@@ -5448,11 +5448,8 @@ var Plottable;
             function HorizontalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._barAlignment = "top";
-                this._ANIMATION_DURATION = 300;
-                this._ANIMATION_DELAY = 15;
             }
             HorizontalBar.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
                 this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
                 this._bars.enter().append("rect");
@@ -5493,7 +5490,7 @@ var Plottable;
                     attrToProjector["width"] = function () {
                         return 0;
                     };
-                    this._bars.attr(attrToProjector);
+                    this._applyAnimatedAttributes(this._bars, "bars-reset", attrToProjector);
                 }
 
                 attrToProjector["x"] = function (d, i) {
@@ -5510,23 +5507,18 @@ var Plottable;
                     this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
 
-                var updateSelection = this._bars;
-                if (this._animate) {
-                    var n = this.dataSource().data().length;
-                    updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
-                        return i * _this._ANIMATION_DELAY;
-                    });
-                }
+                // Apply bar updates
+                this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
 
-                updateSelection.attr(attrToProjector);
                 this._bars.exit().remove();
 
-                this._baseline.attr({
+                var baselineAttr = {
                     "x1": scaledBaseline,
                     "y1": 0,
                     "x2": scaledBaseline,
                     "y2": this.availableHeight
-                });
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
 
             /**
@@ -5576,7 +5568,10 @@ var Plottable;
             */
             function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._ANIMATION_DURATION = 600;
+                this._animators = {
+                    "area-reset": new Plottable.Animator.Null(),
+                    "area": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
+                };
                 this.classed("area-renderer", true);
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
@@ -5605,23 +5600,20 @@ var Plottable;
 
                 this.areaPath.datum(this._dataSource.data());
                 this.linePath.datum(this._dataSource.data());
-                if (this._animate && this._dataChanged) {
-                    var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
-                    this.areaPath.attr("d", animationStartArea).attr(attrToProjector);
-                    var animationStartLine = d3.svg.line().x(xFunction).y(y0Function);
-                    this.linePath.attr("d", animationStartLine).attr(attrToProjector);
+
+                if (this._dataChanged) {
+                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
+                    this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
+
+                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(y0Function);
+                    this._applyAnimatedAttributes(this.linePath, "area-reset", attrToProjector);
                 }
 
-                var area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-                var areaUpdateSelection = this.areaPath;
-                var lineUpdateSelection = this.linePath;
-                if (this._animate) {
-                    areaUpdateSelection = this.areaPath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
-                    lineUpdateSelection = this.linePath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
-                }
-                var line = d3.svg.line().x(xFunction).y(yFunction);
-                areaUpdateSelection.attr("d", area).attr(attrToProjector);
-                lineUpdateSelection.attr("d", line).attr(attrToProjector);
+                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
+
+                attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
+                this._applyAnimatedAttributes(this.linePath, "area", attrToProjector);
             };
             return Area;
         })(Plottable.Abstract.XYPlot);
@@ -5652,7 +5644,6 @@ var Plottable;
             */
             function Line(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._ANIMATION_DURATION = 600;
                 this.classed("line-renderer", true);
                 this.project("stroke", function () {
                     return "steelblue";
