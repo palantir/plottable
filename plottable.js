@@ -2858,6 +2858,7 @@ var Plottable;
                 _super.call(this, scale);
                 this.lastRequestedTickCount = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
+                this._padProportion = 0.05;
             }
             QuantitiveScale.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
@@ -2877,7 +2878,7 @@ var Plottable;
             QuantitiveScale.prototype.autoDomain = function () {
                 _super.prototype.autoDomain.call(this);
                 if (this._autoPad) {
-                    this.padDomain();
+                    this._padDomain();
                 }
                 if (this._autoNice) {
                     this.nice();
@@ -2970,13 +2971,21 @@ var Plottable;
             };
 
             /**
-            * Pads out the domain of the scale by a specified ratio.
+            * Pads out the domain of the scale by a specified ratio. Note
+            * that this method is cumulative; each call enlarges the domain
+            * by the given padProportion.
             *
             * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
             * @returns {QuantitiveScale} The calling QuantitiveScale.
             */
             QuantitiveScale.prototype.padDomain = function (padProportion) {
                 if (typeof padProportion === "undefined") { padProportion = 0.05; }
+                this._padProportion = padProportion;
+                this._padDomain();
+                return this;
+            };
+
+            QuantitiveScale.prototype._padDomain = function () {
                 var currentDomain = this.domain();
                 if (currentDomain[0] === currentDomain[1]) {
                     var d = currentDomain[0].valueOf();
@@ -2987,7 +2996,7 @@ var Plottable;
                 var extent = currentDomain[1] - currentDomain[0];
 
                 // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
-                var newDomain = [currentDomain[0] - padProportion / 2 * extent, currentDomain[1].valueOf() + padProportion / 2 * extent];
+                var newDomain = [currentDomain[0] - this._padProportion / 2 * extent, currentDomain[1].valueOf() + this._padProportion / 2 * extent];
                 if (currentDomain[0] === 0) {
                     newDomain[0] = 0;
                 }
@@ -2995,7 +3004,6 @@ var Plottable;
                     newDomain[1] = 0;
                 }
                 this._setDomain(newDomain);
-                return this;
             };
             return QuantitiveScale;
         })(Plottable.Abstract.Scale);
@@ -6213,47 +6221,6 @@ var Plottable;
             return XYDragBox;
         })(Plottable.Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
-    })(Plottable.Interaction || (Plottable.Interaction = {}));
-    var Interaction = Plottable.Interaction;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Interaction) {
-        var YDragBox = (function (_super) {
-            __extends(YDragBox, _super);
-            function YDragBox() {
-                _super.apply(this, arguments);
-            }
-            YDragBox.prototype._drag = function () {
-                _super.prototype._drag.call(this);
-                this.setBox(this.origin[1], this.location[1]);
-            };
-
-            YDragBox.prototype._doDragend = function () {
-                if (this.callbackToCall == null) {
-                    return;
-                }
-                var yMin = Math.min(this.origin[1], this.location[1]);
-                var yMax = Math.max(this.origin[1], this.location[1]);
-                var pixelArea = { yMin: yMin, yMax: yMax };
-                this.callbackToCall(pixelArea);
-            };
-
-            YDragBox.prototype.setBox = function (y0, y1) {
-                _super.prototype.setBox.call(this, 0, this.componentToListenTo.availableWidth, y0, y1);
-                return this;
-            };
-            return YDragBox;
-        })(Plottable.Interaction.DragBox);
-        Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));

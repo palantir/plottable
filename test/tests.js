@@ -1859,82 +1859,6 @@ describe("Interactions", function () {
         });
     });
 
-    describe("YDragBoxInteraction", function () {
-        var svgWidth = 400;
-        var svgHeight = 400;
-        var svg;
-        var dataset;
-        var xScale;
-        var yScale;
-        var renderer;
-        var interaction;
-
-        var dragstartX = 20;
-        var dragstartY = svgHeight - 100;
-        var dragendX = 100;
-        var dragendY = svgHeight - 20;
-
-        before(function () {
-            svg = generateSVG(svgWidth, svgHeight);
-            dataset = new Plottable.DataSource(makeLinearSeries(10));
-            xScale = new Plottable.Scale.Linear();
-            yScale = new Plottable.Scale.Linear();
-            renderer = new Plottable.Plot.Scatter(dataset, xScale, yScale);
-            renderer.renderTo(svg);
-            interaction = new Plottable.Interaction.YDragBox(renderer);
-            interaction.registerWithComponent();
-        });
-
-        afterEach(function () {
-            interaction.callback();
-            interaction.clearBox();
-        });
-
-        it("All callbacks are notified with appropriate data when a drag finishes", function () {
-            var timesCalled = 0;
-            var areaCallback = function (a) {
-                timesCalled++;
-                if (timesCalled === 1) {
-                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
-                }
-                if (timesCalled === 2) {
-                    var expectedPixelArea = {
-                        yMin: dragstartY,
-                        yMax: dragendY
-                    };
-                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
-                }
-            };
-
-            interaction.callback(areaCallback);
-
-            // fake a drag event
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-
-            assert.equal(timesCalled, 2, "areaCallback was called twice");
-        });
-
-        it("Highlights and un-highlights areas appropriately", function () {
-            fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
-            var dragBoxClass = "." + Plottable.Interaction.XYDragBox.CLASS_DRAG_BOX;
-            var dragBox = renderer.foregroundContainer.select(dragBoxClass);
-            assert.isNotNull(dragBox, "the dragbox was created");
-            var actualStartPosition = { x: parseFloat(dragBox.attr("x")), y: parseFloat(dragBox.attr("y")) };
-            var expectedStartPosition = { x: 0, y: Math.min(dragstartY, dragendY) };
-            assert.deepEqual(actualStartPosition, expectedStartPosition, "highlighted box is positioned correctly");
-            assert.equal(parseFloat(dragBox.attr("width")), svgWidth, "highlighted box has correct width");
-            assert.equal(parseFloat(dragBox.attr("height")), Math.abs(dragstartY - dragendY), "highlighted box has correct height");
-
-            interaction.clearBox();
-            var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
-            assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
-        });
-
-        after(function () {
-            svg.remove();
-        });
-    });
-
     describe("KeyInteraction", function () {
         it("Triggers the callback only when the Component is moused over and appropriate key is pressed", function () {
             var svg = generateSVG(400, 400);
@@ -3498,6 +3422,23 @@ describe("Scales", function () {
             scale.domain([100, 200]);
             scale.padDomain(0.20);
             assert.deepEqual(scale.domain(), [90, 210]);
+        });
+
+        it("autoDomain shouldn't eat padding", function () {
+            var scale = new Plottable.Scale.Linear();
+            scale._autoPad = true; // plots will set this when scale added to them
+            var dataSource = new Plottable.DataSource([1, 2, 3, 4, 5]);
+            scale._addPerspective("a", dataSource, function (x) {
+                return x;
+            });
+
+            assert.deepEqual(scale.domain(), [0.9, 5.1], "_addPerspective fires an autoDomain(), which uses the default paddingProportion");
+
+            scale.padDomain(0.20).autoDomain();
+            assert.deepEqual(scale.domain(), [0.6, 5.4], "we don't want 0.20 * default padding, so call autoDomain()");
+
+            dataSource.data([1, 2, 3, 4, 5]);
+            assert.deepEqual(scale.domain(), [0.6, 5.4], "changing data (even to the same values) will trigger autoDomain on scale");
         });
 
         it("autoPad works for date scales", function () {

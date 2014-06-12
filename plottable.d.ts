@@ -972,7 +972,9 @@ declare module Plottable {
             */
             public tickFormat(count: number, format?: string): (n: number) => string;
             /**
-            * Pads out the domain of the scale by a specified ratio.
+            * Pads out the domain of the scale by a specified ratio. Note
+            * that this method is cumulative; each call enlarges the domain
+            * by the given padProportion.
             *
             * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
             * @returns {QuantitiveScale} The calling QuantitiveScale.
@@ -1850,15 +1852,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Interaction {
-        class YDragBox extends DragBox {
-            public setBox(y0: number, y1: number): YDragBox;
         }
     }
 }
