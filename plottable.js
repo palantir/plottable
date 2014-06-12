@@ -3303,7 +3303,6 @@ var Plottable;
             * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
             */
             function Axis(axisScale, orientation, formatter) {
-                if (typeof formatter === "undefined") { formatter = new Plottable.Formatter.General(); }
                 var _this = this;
                 _super.call(this);
                 this._showEndTickLabels = false;
@@ -3314,6 +3313,9 @@ var Plottable;
                 this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
                 this.classed("axis", true);
                 var formatFunction = formatter;
+                if (formatter == null) {
+                    formatter = new Plottable.Formatter.General();
+                }
                 if (formatter instanceof Plottable.Abstract.Formatter) {
                     formatFunction = function (d) {
                         return formatter.format(d);
