@@ -1277,6 +1277,9 @@ var Plottable;
             */
             Component.prototype._setup = function () {
                 var _this = this;
+                if (this._isSetup) {
+                    throw new Error("Setup may only be called once");
+                }
                 this.cssClasses.forEach(function (cssClass) {
                     _this.element.classed(cssClass, true);
                 });
@@ -1298,6 +1301,9 @@ var Plottable;
                     return _this.registerInteraction(r);
                 });
                 this.interactionsToRegister = null;
+                if (this.isTopLevelComponent) {
+                    this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
+                }
                 this._isSetup = true;
                 return this;
             };
@@ -1323,8 +1329,6 @@ var Plottable;
                     if (this.element == null) {
                         throw new Error("anchor must be called before computeLayout");
                     } else if (this.isTopLevelComponent) {
-                        this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
-
                         // we are the root node, retrieve height/width from root SVG
                         xOrigin = 0;
                         yOrigin = 0;

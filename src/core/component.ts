@@ -69,6 +69,9 @@ export module Abstract {
      * @returns {Component} The calling Component.
      */
     public _setup() {
+      if (this._isSetup) {
+        return;
+      }
       this.cssClasses.forEach((cssClass: string) => {
         this.element.classed(cssClass, true);
       });
@@ -87,6 +90,9 @@ export module Abstract {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
+      if (this.isTopLevelComponent) {
+        this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
+      }
       this._isSetup = true;
       return this;
     }
@@ -111,7 +117,6 @@ export module Abstract {
         if (this.element == null) {
           throw new Error("anchor must be called before computeLayout");
         } else if (this.isTopLevelComponent) {
-          this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
           // we are the root node, retrieve height/width from root SVG
           xOrigin = 0;
           yOrigin = 0;
