@@ -1278,7 +1278,7 @@ var Plottable;
             Component.prototype._setup = function () {
                 var _this = this;
                 if (this._isSetup) {
-                    throw new Error("Setup may only be called once");
+                    return;
                 }
                 this.cssClasses.forEach(function (cssClass) {
                     _this.element.classed(cssClass, true);
