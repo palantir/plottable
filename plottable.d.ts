@@ -1529,14 +1529,19 @@ declare module Plottable {
             */
             public barAlignment(alignment: string): BarPlot;
             /**
-            * Selects the bar under the given pixel position.
+            * Selects the bar under the given pixel position (if [xMax] and
+            * [yMax] are not given), under a given line (if only one of [xMax]
+            * and [yMax] given) or are under a 2D area (if [xMax] and [yMax]
+            * are both given).
             *
-            * @param {number} x The pixel x position.
-            * @param {number} y The pixel y position.
+            * @param {number} xMin The pixel xMin position.
+            * @param {number} yMin The pixel yMin position.
+            * @param {number} xMax If given, bars between the xMin & xMax pixels will be selected.
+            * @param {number} yMax If given, bars between the yMin & yMax pixels will be selected.
             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
             * @return {D3.Selection} The selected bar, or null if no bar was selected.
             */
-            public selectBar(x: number, y: number, select?: boolean): D3.Selection;
+            public selectBar(xMin: number, yMin: number, select?: boolean, xMax?: number, yMax?: number): D3.Selection;
             /**
             * Deselects all bars.
             * @return {AbstractBarPlot} The calling AbstractBarPlot.

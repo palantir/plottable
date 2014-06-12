@@ -5151,30 +5151,44 @@ var Plottable;
             };
 
             /**
-            * Selects the bar under the given pixel position.
+            * Selects the bar under the given pixel position (if [xMax] and
+            * [yMax] are not given), under a given line (if only one of [xMax]
+            * and [yMax] given) or are under a 2D area (if [xMax] and [yMax]
+            * are both given).
             *
-            * @param {number} x The pixel x position.
-            * @param {number} y The pixel y position.
+            * @param {number} xMin The pixel xMin position.
+            * @param {number} yMin The pixel yMin position.
+            * @param {number} xMax If given, bars between the xMin & xMax pixels will be selected.
+            * @param {number} yMax If given, bars between the yMin & yMax pixels will be selected.
             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
             * @return {D3.Selection} The selected bar, or null if no bar was selected.
             */
-            BarPlot.prototype.selectBar = function (x, y, select) {
+            BarPlot.prototype.selectBar = function (xMin, yMin, select, xMax, yMax) {
                 if (typeof select === "undefined") { select = true; }
-                var selectedBar = null;
+                var selectedBars = [];
+
+                if (xMax === undefined) {
+                    xMax = xMin;
+                }
+                if (yMax === undefined) {
+                    yMax = yMin;
+                }
 
                 // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
                 this._bars.each(function (d) {
                     var bbox = this.getBBox();
-                    if (bbox.x <= x && x <= bbox.x + bbox.width && bbox.y <= y && y <= bbox.y + bbox.height) {
-                        selectedBar = d3.select(this);
+                    if (bbox.x + bbox.width >= xMin && bbox.x <= xMax && bbox.y + bbox.height >= yMin && bbox.y <= yMax) {
+                        selectedBars.push(this);
                     }
                 });
 
-                if (selectedBar != null) {
-                    selectedBar.classed("selected", select);
+                if (selectedBars.length > 0) {
+                    var selection = d3.selectAll(selectedBars);
+                    selection.classed("selected", select);
+                    return selection;
+                } else {
+                    return null;
                 }
-
-                return selectedBar;
             };
 
             /**
