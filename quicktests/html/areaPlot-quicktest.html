@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Scatter Plot Quicktest</title>
+    <title>Area Plot Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
     <style>
       svg {
@@ -18,9 +18,11 @@
       window.onload = function() {
         function randomData() {
           data = [];
-          n = 100;
-          while(n--) {
-            data.push({x : Math.random() * 100, y: Math.random() * 100});
+          i = 0;
+          y = Math.random() * 5;
+          while(i++ < 100) {
+            y += (Math.random() - 0.5);
+            data.push({x : i, y: y});
           }
           return data;
         }
@@ -30,7 +32,8 @@
         function makeChart(svg, data) {
           xScale = new Plottable.Scale.Linear();
           yScale = new Plottable.Scale.Linear();
-          return new Plottable.Plot.Scatter(dataSource, xScale, yScale)
+          return new Plottable.Plot.Area(dataSource, xScale, yScale)
+            .project("stroke", function(){return "blue";})
             .animate(true)
             .autoResize(true)
             .renderTo(svg);
@@ -39,6 +42,7 @@
         window.more = function() {
           dataSource.data(randomData());
         }
+
         makeChart(d3.select("#things"), dataSource);
       }
   </script>
