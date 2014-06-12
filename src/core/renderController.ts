@@ -1,59 +1,84 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Singleton {
-  export class RenderController {
-    private static IE_TIMEOUT = 1000 / 60; // 60 fps
-    private static componentsNeedingRender: {[key: string]: Abstract.Component} = {};
-    private static componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
-    private static animationRequested = false;
-    public static enabled = (<any> window).PlottableTestCode == null;
+export module Core {
 
-    public static registerToRender(c: Abstract.Component) {
-      if (!RenderController.enabled) {
-        c._doRender();
-        return;
-      }
-      RenderController.componentsNeedingRender[c._plottableID] = c;
-      RenderController.requestFrame();
+  /**
+   * The RenderController is responsible for enqueueing and synchronizing
+   * layout and render calls for Plottable components.
+   *
+   * Layouts and renders occur inside an animation callback
+   * (window.requestAnimationFrame if available).
+   *
+   * If you require immediate rendering, call RenderController.flush() to
+   * perform enqueued layout and rendering serially.
+   */
+  export module RenderController {
+    var _componentsNeedingRender: {[key: string]: Abstract.Component} = {};
+    var _componentsNeedingComputeLayout: {[key: string]: Abstract.Component} = {};
+    var _animationRequested: boolean = false;
+    export var _renderPolicy: RenderPolicy.IRenderPolicy = new RenderPolicy.AnimationFrame();
+
+    export function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any {
+      _renderPolicy = policy;
     }
 
-    public static registerToComputeLayout(c: Abstract.Component) {
-      if (!RenderController.enabled) {
-        c._computeLayout()._render();
-        return;
-      }
-      RenderController.componentsNeedingComputeLayout[c._plottableID] = c;
-      RenderController.componentsNeedingRender[c._plottableID] = c;
-      RenderController.requestFrame();
+    /**
+     * If the RenderController is enabled, we enqueue the component for
+     * render. Otherwise, it is rendered immediately.
+     *
+     * @param {Abstract.Component} component Any Plottable component.
+     */
+    export function registerToRender(c: Abstract.Component) {
+      _componentsNeedingRender[c._plottableID] = c;
+      requestRender();
     }
 
-    private static requestFrame() {
-      if (!RenderController.animationRequested) {
-        if (window.requestAnimationFrame != null) {
-          requestAnimationFrame(RenderController.flush);
-        } else {
-          setTimeout(RenderController.flush, RenderController.IE_TIMEOUT);
-        }
-        RenderController.animationRequested = true;
+    /**
+     * If the RenderController is enabled, we enqueue the component for
+     * layout and render. Otherwise, it is rendered immediately.
+     *
+     * @param {Abstract.Component} component Any Plottable component.
+     */
+    export function registerToComputeLayout(c: Abstract.Component) {
+      _componentsNeedingComputeLayout[c._plottableID] = c;
+      _componentsNeedingRender[c._plottableID] = c;
+      requestRender();
+    }
+
+    function requestRender() {
+      // Only run or enqueue flush on first request.
+      if (!_animationRequested) {
+        _animationRequested = true;
+        _renderPolicy.render();
       }
     }
 
-    public static flush() {
-      if (RenderController.animationRequested) {
-        var toCompute = d3.values(RenderController.componentsNeedingComputeLayout);
+    export function flush() {
+      if (_animationRequested) {
+        // Layout
+        var toCompute = d3.values(_componentsNeedingComputeLayout);
         toCompute.forEach((c) => c._computeLayout());
-        var toRender = d3.values(RenderController.componentsNeedingRender);
-        // call _render on everything, so that containers will put their children in the toRender queue
+
+        // Top level render.
+        // Containers will put their children in the toRender queue
+        var toRender = d3.values(_componentsNeedingRender);
         toRender.forEach((c) => c._render());
 
-        toRender = d3.values(RenderController.componentsNeedingRender);
+        // Finally, perform render of all components
+        toRender = d3.values(_componentsNeedingRender);
         toRender.forEach((c) => c._doRender());
-        RenderController.componentsNeedingComputeLayout = {};
-        RenderController.componentsNeedingRender = {};
-        RenderController.animationRequested = false;
+
+        // Reset queues
+        _componentsNeedingComputeLayout = {};
+        _componentsNeedingRender = {};
+        _animationRequested = false;
       }
+
+      // Reset resize flag regardless of queue'd components
+      ResizeBroadcaster.clearResizing();
     }
   }
+
 }
 }

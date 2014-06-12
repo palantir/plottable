@@ -5,9 +5,6 @@ export module Abstract {
   export class XYPlot extends Plot {
     public xScale: Abstract.Scale;
     public yScale: Abstract.Scale;
-    public _xAccessor: any;
-    public _yAccessor: any;
-
     /**
      * Creates an XYPlot.
      *
@@ -27,18 +24,18 @@ export module Abstract {
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
-      if (attrToSet === "x") {
-        this.xScale = scale != null ? scale : this.xScale;
-        this._xAccessor = accessor;
+      if (attrToSet === "x" && scale != null) {
+        this.xScale = scale;
         this.xScale._autoNice = true;
         this.xScale._autoPad = true;
       }
-      if (attrToSet === "y") {
-        this.yScale = scale != null ? scale : this.yScale;
-        this._yAccessor = accessor;
+
+      if (attrToSet === "y" && scale != null) {
+        this.yScale = scale;
         this.yScale._autoNice = true;
         this.yScale._autoPad = true;
       }
+
       super.project(attrToSet, accessor, scale);
 
       return this;

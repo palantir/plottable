@@ -84,3 +84,19 @@ svg.plottable {
 .plottable .legend .toggled-off circle {
   fill: #d3d3d3;
 }
+
+.plottable .renderer.toggled-on {
+  visibility:visible;
+}
+
+.plottable .hover {
+  opacity:.2;
+}
+
+.plottable .hover.focus {
+  opacity:1;
+}
+
+.plottable .renderer.toggled-off {
+  visibility:hidden;
+}
