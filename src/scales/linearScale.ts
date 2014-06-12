@@ -24,6 +24,10 @@ export module Scale {
     public copy(): Linear {
       return new Linear(this._d3Scale.copy());
     }
+
+    public niceDomain(domain: any[], count?: number): any[] {
+      return d3.scale.linear().domain(domain).nice(count).domain();
+    }
   }
 }
 }

@@ -165,6 +165,12 @@ export module Abstract {
       this._setDomain(newDomain);
       return this;
     }
+
+    public niceDomain(domain: any[], count?: number): any[] {
+      debugger;
+      // will override
+      return domain;
+    }
   }
 }
 }

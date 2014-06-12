@@ -921,9 +921,9 @@ declare module Plottable {
 declare module Plottable {
     class Domainer {
         constructor(scale: Abstract.QuantitiveScale);
+        public computeDomain(extents: any[][]): any[];
         public pad(padProportion?: number): Domainer;
         public nice(count?: number): Domainer;
-        public computeDomain(extents: any[][]): any[];
     }
 }
 
@@ -1004,6 +1004,7 @@ declare module Plottable {
             * @returns {QuantitiveScale} The calling QuantitiveScale.
             */
             public padDomain(padProportion?: number): QuantitiveScale;
+            public niceDomain(domain: any[], count?: number): any[];
         }
     }
 }
@@ -1026,6 +1027,7 @@ declare module Plottable {
             * @returns {LinearScale} A copy of the calling LinearScale.
             */
             public copy(): Linear;
+            public niceDomain(domain: any[], count?: number): any[];
         }
     }
 }
@@ -1048,6 +1050,7 @@ declare module Plottable {
             * @returns {Scale.Log} A copy of the calling Scale.Log.
             */
             public copy(): Log;
+            public niceDomain(domain: any[], count?: number): any[];
         }
     }
 }
@@ -1131,6 +1134,7 @@ declare module Plottable {
             * @constructor
             */
             constructor();
+            public niceDomain(domain: any[], count?: number): any[];
         }
     }
 }

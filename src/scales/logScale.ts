@@ -24,6 +24,10 @@ export module Scale {
     public copy(): Log {
       return new Log(this._d3Scale.copy());
     }
+
+    public niceDomain(domain: any[], count?: number): any[] {
+      return d3.scale.log().domain(domain).nice(count).domain();
+    }
   }
 }
 }

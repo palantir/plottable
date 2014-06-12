@@ -2851,6 +2851,10 @@ var Plottable;
             this.padProportion = 0.0;
             this.scale = scale;
         }
+        Domainer.prototype.computeDomain = function (extents) {
+            return this.padDomain(this.combineExtents(extents));
+        };
+
         Domainer.prototype.pad = function (padProportion) {
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
             this.padProportion = padProportion;
@@ -2863,9 +2867,42 @@ var Plottable;
             return this;
         };
 
-        Domainer.prototype.computeDomain = function (extents) {
-            return extents[0];
+        Domainer.prototype.combineExtents = function (extents) {
+            return [d3.min(extents, function (e) {
+                    return e[0];
+                }), d3.max(extents, function (e) {
+                    return e[1];
+                })];
         };
+
+        Domainer.prototype.padDomain = function (domain) {
+            if (domain[0] === domain[1]) {
+                var d = domain[0].valueOf();
+                return [
+                    d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
+                    d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
+            }
+            var extent = domain[1] - domain[0];
+            var newDomain = [
+                domain[0].valueOf() - this.padProportion / 2 * extent,
+                domain[1].valueOf() + this.padProportion / 2 * extent];
+            if (domain[0] === 0) {
+                newDomain[0] = 0;
+            }
+            if (domain[1] === 0) {
+                newDomain[1] = 0;
+            }
+            return newDomain;
+        };
+
+        Domainer.prototype.niceDomain = function (domain) {
+            if (this.doNice) {
+                return this.scale.niceDomain(domain, this.niceCount);
+            } else {
+                return domain;
+            }
+        };
+        Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
         return Domainer;
     })();
     Plottable.Domainer = Domainer;
@@ -3030,6 +3067,13 @@ var Plottable;
                 this._setDomain(newDomain);
                 return this;
             };
+
+            QuantitiveScale.prototype.niceDomain = function (domain, count) {
+                debugger;
+
+                // will override
+                return [];
+            };
             return QuantitiveScale;
         })(Plottable.Abstract.Scale);
         Abstract.QuantitiveScale = QuantitiveScale;
@@ -3060,6 +3104,10 @@ var Plottable;
             Linear.prototype.copy = function () {
                 return new Linear(this._d3Scale.copy());
             };
+
+            Linear.prototype.niceDomain = function (domain, count) {
+                return d3.scale.linear().domain(domain).nice(count).domain();
+            };
             return Linear;
         })(Plottable.Abstract.QuantitiveScale);
         Scale.Linear = Linear;
@@ -3089,6 +3137,10 @@ var Plottable;
             */
             Log.prototype.copy = function () {
                 return new Log(this._d3Scale.copy());
+            };
+
+            Log.prototype.niceDomain = function (domain, count) {
+                return d3.scale.log().domain(domain).nice(count).domain();
             };
             return Log;
         })(Plottable.Abstract.QuantitiveScale);
@@ -3279,6 +3331,7 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Scale) {
+        // TODO: test padding on time scales
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -3294,6 +3347,10 @@ var Plottable;
                 _super.prototype._setDomain.call(this, values.map(function (d) {
                     return new Date(d);
                 }));
+            };
+
+            Time.prototype.niceDomain = function (domain, count) {
+                return d3.time.scale().domain(domain).nice(count).domain();
             };
             return Time;
         })(Plottable.Abstract.QuantitiveScale);
@@ -3314,6 +3371,8 @@ var Plottable;
     (function (Scale) {
         ;
 
+        // TODO: what the heck is an interpolated color scale?
+        // also, I should probably deal with this
         var InterpolatedColor = (function (_super) {
             __extends(InterpolatedColor, _super);
             /**
