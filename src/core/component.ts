@@ -32,7 +32,6 @@ export module Abstract {
 
     public _isSetup = false;
     public _isAnchored = false;
-    public _autoresizeEnabled: boolean;
     public static AUTORESIZE_BY_DEFAULT = true;
 
     /**
