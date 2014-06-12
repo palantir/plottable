@@ -3622,7 +3622,9 @@ var Plottable;
             Axis.prototype._doRender = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
-                this._ticks = this._ticksContainer.selectAll(".tick").data(tickValues);
+                this._ticks = this._ticksContainer.selectAll(".tick").data(tickValues, function (d) {
+                    return d;
+                });
                 var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
                 tickEnterSelection.append("line").classed("tick-mark", true);
                 this._ticks.exit().remove();
@@ -3794,10 +3796,21 @@ var Plottable;
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
-            function Time(scale, orientation, formatter) {
+            function Time(scale, orientation, density, formatter) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
+                if (typeof density === "undefined") { density = "normal"; }
                 _super.call(this, scale, orientation, formatter);
-                this._height = 50;
+                this._height = 30;
+                this.intervals = [
+                    d3.time.year,
+                    d3.time.month,
+                    d3.time.week,
+                    d3.time.day,
+                    d3.time.hour,
+                    d3.time.minute,
+                    d3.time.second
+                ];
+                this.tickDensity(density);
                 this.classed("time-axis", true);
             }
             Time.prototype._setup = function () {
@@ -3815,8 +3828,60 @@ var Plottable;
                 };
             };
 
+            Time.prototype.tickDensity = function (newDensity) {
+                if (newDensity !== undefined) {
+                    if (newDensity !== "sparse" && newDensity !== "normal" && newDensity !== "dense") {
+                        throw new Error(newDensity + " tick density not supported");
+                    }
+                    this._tickDensity = newDensity;
+                    return this;
+                } else {
+                    return this._tickDensity;
+                }
+            };
+
+            Time.prototype.ticks = function (setTicks) {
+                if (setTicks !== undefined) {
+                    this._nTicks = setTicks;
+                    return this;
+                } else {
+                    return this._nTicks;
+                }
+            };
+
             Time.prototype._getTickValues = function () {
-                return this._scale.ticks(this._nTicks);
+                var dom = this._scale.domain();
+                var i = 0;
+                while (i < this.intervals.length) {
+                    if (this.intervals[i].floor(dom[0]).getTime() !== this.intervals[i].floor(dom[1]).getTime()) {
+                        break;
+                    }
+                    i++;
+                }
+                console.log(i);
+                console.log(this._formatter(this.intervals[i].floor(dom[0])));
+                console.log(this._formatter(this.intervals[i].floor(dom[1])));
+                var nticks = 0;
+                switch (this._tickDensity) {
+                    case "sparse":
+                        nticks = Math.ceil(this.availableWidth / 500);
+                        break;
+                    case "normal":
+                        nticks = Math.ceil(this.availableWidth / 250);
+                        break;
+                    case "dense":
+                        nticks = Math.ceil(this.availableWidth / 100);
+                        break;
+                }
+
+                return this._scale.ticks(nticks);
+            };
+
+            Time.prototype.measureTextHeight = function () {
+                var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
+                var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
+                fakeTickLabel.remove();
+                return textHeight;
             };
 
             Time.prototype._doRender = function () {
@@ -3827,7 +3892,7 @@ var Plottable;
                     return d;
                 });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-                tickLabelsEnter.append("text").attr("transform", "translate(0,20)");
+                tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ? (this.tickLength() + this.measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d, i) {
                     return "translate(" + _this._scale._d3Scale(d) + ",0)";

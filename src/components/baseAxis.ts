@@ -61,7 +61,7 @@ export module Abstract {
 
     public _doRender() {
       var tickValues = this._getTickValues();
-      this._ticks = this._ticksContainer.selectAll(".tick").data(tickValues);
+      this._ticks = this._ticksContainer.selectAll(".tick").data(tickValues, (d) => d);
       var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
       tickEnterSelection.append("line").classed("tick-mark", true);
       this._ticks.exit().remove();

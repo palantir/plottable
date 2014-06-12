@@ -21,24 +21,21 @@
     linePlot = new Plottable.Plot.Line(data, xScale, yScale)
     .project("x", function (d) { return d3.time.format("%x").parse(d.x)});
 
-    var customTimeFormat = d3.time.format.multi([
+    
+    var defaultFormatter = d3.time.format.multi([
       [".%L", function(d) { return d.getMilliseconds(); }],
       [":%S", function(d) { return d.getSeconds(); }],
       ["%I:%M", function(d) { return d.getMinutes(); }],
       ["%I %p", function(d) { return d.getHours(); }],
-      ["%a %d", function(d) { return d.getDay() && d.getDate() != 1; }],
       ["%b %d", function(d) { return d.getDate() != 1; }],
       ["%b", function(d) { return d.getMonth(); }],
       ["%Y", function() { return true; }]
-      ]);
+    ]);
 
 
-    xAxisC = new Plottable.Axis.Time(xScale, "top", customTimeFormat);
-    xAxisC._nTicks = 2;
-    xAxisB = new Plottable.Axis.Time(xScale, "top", customTimeFormat);
-    xAxisB._nTicks = 8;
-    xAxisA = new Plottable.Axis.Time(xScale, "top", customTimeFormat);
-    xAxisA._nTicks = 20;
+    xAxisC = new Plottable.Axis.Time(xScale, "bottom", "sparse", defaultFormatter);
+    xAxisB = new Plottable.Axis.Time(xScale, "bottom", "normal", defaultFormatter);
+    xAxisA = new Plottable.Axis.Time(xScale, "bottom", "dense", defaultFormatter);
     
     xAxis = new Plottable.Component.Table([[xAxisA], [xAxisB], [xAxisC]]);
     yAxis = new Plottable.Axis.YAxis(yScale);

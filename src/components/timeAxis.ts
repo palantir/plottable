@@ -6,7 +6,17 @@ export module Axis {
     public _scale: Scale.Time;
     public _tickLabelsG: D3.Selection;
     public _nTicks: number;
-    private _height = 50;
+    public _tickDensity: string;
+    private _height = 30;
+    public intervals: any[] = [
+      d3.time.year,
+      d3.time.month,
+      d3.time.week,
+      d3.time.day,
+      d3.time.hour,
+      d3.time.minute,
+      d3.time.second
+    ];
 
     /**
      * Creates a TimeAxis
@@ -15,8 +25,9 @@ export module Axis {
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      */
-    constructor(scale: Scale.Time, orientation = "bottom", formatter?: (n: any) => string) {
+    constructor(scale: Scale.Time, orientation = "bottom", density = "normal", formatter?: (n: any) => string) {
       super(scale, orientation, formatter);
+      this.tickDensity(density);
       this.classed("time-axis", true);
     }
 
@@ -35,8 +46,64 @@ export module Axis {
       };
     }
 
+    public tickDensity(): string;
+    public tickDensity(newDensity: string): Time;
+    public tickDensity(newDensity?: string): any {
+      if (newDensity !== undefined) {
+        if (newDensity !== "sparse" && newDensity !== "normal" && newDensity !== "dense") {
+          throw new Error (newDensity + " tick density not supported");
+        }
+        this._tickDensity = newDensity;
+        return this;
+      } else {
+        return this._tickDensity;
+      }
+    }
+
+    public ticks(): number;
+    public ticks(setTicks: number): Time;
+    public ticks(setTicks?: number): any {
+      if (setTicks !== undefined) {
+        this._nTicks = setTicks;
+        return this;
+      } else {
+        return this._nTicks;
+      }
+    }
+
     public _getTickValues(): string[] {
-      return this._scale.ticks(this._nTicks);
+      var dom = this._scale.domain();
+      var i = 0;
+      while (i < this.intervals.length) {
+        if (this.intervals[i].floor(dom[0]).getTime() !== this.intervals[i].floor(dom[1]).getTime()) {
+          break;
+        }
+        i++;
+      }
+      console.log(i);
+      console.log(this._formatter(this.intervals[i].floor(dom[0])));
+      console.log(this._formatter(this.intervals[i].floor(dom[1])));
+      var nticks = 0;
+      switch(this._tickDensity) {
+        case "sparse":
+          nticks = Math.ceil(this.availableWidth / 500);
+          break;
+        case "normal":
+          nticks = Math.ceil(this.availableWidth / 250);
+          break;
+        case "dense":
+          nticks = Math.ceil(this.availableWidth / 100);
+          break;
+      }
+
+      return this._scale.ticks(nticks);
+    }
+
+    private measureTextHeight(): number {
+      var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
+      var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
+      fakeTickLabel.remove();
+      return textHeight;
     }
 
     public _doRender() {
@@ -44,7 +111,8 @@ export module Axis {
       var tickValues = this._getTickValues();
       var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._getTickValues(), (d) => d);
       var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-      tickLabelsEnter.append("text").attr("transform", "translate(0,20)");
+      tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ?
+                     (this.tickLength() + this.measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any, i: number) => "translate(" + this._scale._d3Scale(d) + ",0)");
       tickLabels.selectAll("text").text((d: any) => this._formatter(d));
