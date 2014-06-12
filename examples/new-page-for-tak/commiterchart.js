@@ -10,10 +10,10 @@ function makeCommiterChart(svg, commitData, contributorData) {
   var yAxisCommits = new Plottable.Axis.YAxis(yScaleCommits, "left");
   var yAxisContrib = new Plottable.Axis.YAxis(yScaleContrib, "right");
 
-  var lineCommits = new Plottable.Plot.Line(commitData, xScale, yScaleCommits)
+  var lineCommits = new Plottable.Plot.Area(commitData, xScale, yScaleCommits)
                     .project("x", "parsedDate", xScale)
                     .project("y", "nCommits", yScaleCommits)
-                    .project("stroke", function() {return "Commits"}, colorScale);
+                    .project("fill", function() {return "Commits"}, colorScale);
 
   var lineContrib = new Plottable.Plot.Line(contributorData, xScale, yScaleContrib)
                     .project("x", "parsedDate", xScale)
@@ -26,10 +26,10 @@ function makeCommiterChart(svg, commitData, contributorData) {
 
   var leftLabel = new Plottable.Component.AxisLabel("Number of Commits", "vertical-left");
   var rightLabel = new Plottable.Component.AxisLabel("Number of Contributors", "vertical-left");
-  var legend = new Plottable.Component.Legend(colorScale).yAlign("center");
+  var legend = new Plottable.Component.Legend(colorScale).xAlign("center");
 
   var title = new Plottable.Component.TitleLabel("Plottable - Commits & Contributors over Time");
-  var titleAndLegend = new Plottable.Component.Table([[title, legend]]).xAlign("center");
+  var titleAndLegend = new Plottable.Component.Table([[title], [legend]]).xAlign("center");
 
   var table = new Plottable.Component.Table([
     [leftLabel, yAxisCommits, group, yAxisContrib, rightLabel],
@@ -37,5 +37,8 @@ function makeCommiterChart(svg, commitData, contributorData) {
     ]);
 
   var outerMost = new Plottable.Component.Table([[titleAndLegend], [table]]).renderTo(svg);
+
+  xScale._autoPad = false;
+  xScale.autoDomain();
 
 }
