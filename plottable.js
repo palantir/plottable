@@ -105,6 +105,15 @@ var Plottable;
                 return out;
             }
             Methods.createFilledArray = createFilledArray;
+
+            /**
+            * @param {T[][]} a The 2D array that will have its elements joined together.
+            * @return {T[]} Every array in a, concatenated together in the order they appear.
+            */
+            function flatten(a) {
+                return Array.prototype.concat.apply([], a);
+            }
+            Methods.flatten = flatten;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -1201,7 +1210,7 @@ var Plottable;
             var appliedAccessor = Plottable.Util.Methods.applyAccessor(accessor, this);
             var mappedData = this._data.map(appliedAccessor);
             if (mappedData.length === 0) {
-                return undefined;
+                return [];
             } else if (typeof (mappedData[0]) === "string") {
                 return Plottable.Util.Methods.uniq(mappedData);
             } else {
@@ -2307,22 +2316,13 @@ var Plottable;
             function Scale(scale) {
                 _super.call(this);
                 this._autoDomainAutomatically = true;
-                this.rendererID2Perspective = {};
-                this.dataSourceReferenceCounter = new Plottable.Util.IDCounter();
+                this._rendererAttrID2Extent = {};
                 this._autoNice = false;
                 this._autoPad = false;
                 this._d3Scale = scale;
             }
             Scale.prototype._getAllExtents = function () {
-                var perspectives = d3.values(this.rendererID2Perspective);
-                var extents = perspectives.map(function (p) {
-                    var source = p.dataSource;
-                    var accessor = p.accessor;
-                    return source._getExtent(accessor);
-                }).filter(function (e) {
-                    return e != null;
-                });
-                return extents;
+                return d3.values(this._rendererAttrID2Extent);
             };
 
             Scale.prototype._getExtent = function () {
@@ -2338,41 +2338,6 @@ var Plottable;
             */
             Scale.prototype.autoDomain = function () {
                 this._setDomain(this._getExtent());
-                return this;
-            };
-
-            Scale.prototype._addPerspective = function (rendererIDAttr, dataSource, accessor) {
-                var _this = this;
-                if (this.rendererID2Perspective[rendererIDAttr] != null) {
-                    this._removePerspective(rendererIDAttr);
-                }
-                this.rendererID2Perspective[rendererIDAttr] = { dataSource: dataSource, accessor: accessor };
-
-                var dataSourceID = dataSource._plottableID;
-                if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1) {
-                    dataSource.registerListener(this, function () {
-                        if (_this._autoDomainAutomatically) {
-                            _this.autoDomain();
-                        }
-                    });
-                }
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
-                return this;
-            };
-
-            Scale.prototype._removePerspective = function (rendererIDAttr) {
-                var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
-                var dataSourceID = dataSource._plottableID;
-                if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-                    dataSource.deregisterListener(this);
-                }
-
-                delete this.rendererID2Perspective[rendererIDAttr];
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
                 return this;
             };
 
@@ -2417,6 +2382,32 @@ var Plottable;
             */
             Scale.prototype.copy = function () {
                 return new Scale(this._d3Scale.copy());
+            };
+
+            /**
+            * When a renderer determines that the extent of a projector has changed,
+            * it will call this function. This function should ensure that
+            * the scale has a domain at least large enough to include extent.
+            *
+            * @param {number} rendererID A unique indentifier of the renderer sending
+            *                 the new extent.
+            * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+            * @param {any[]} extent The new extent to be included in the scale.
+            */
+            Scale.prototype.updateExtent = function (rendererID, attr, extent) {
+                this._rendererAttrID2Extent[rendererID + attr] = extent;
+                if (this._autoDomainAutomatically) {
+                    this.autoDomain();
+                }
+                return this;
+            };
+
+            Scale.prototype.removeExtent = function (rendererID, attr) {
+                delete this._rendererAttrID2Extent[rendererID + attr];
+                if (this._autoDomainAutomatically) {
+                    this.autoDomain();
+                }
+                return this;
             };
             return Scale;
         })(Plottable.Abstract.Broadcaster);
@@ -2482,22 +2473,14 @@ var Plottable;
                     this._deregisterFromBroadcaster(this._dataSource);
                     this._requireRerender = true;
                     this._rerenderUpdateSelection = true;
-
-                    // point all scales at the new datasource
-                    d3.keys(this._projectors).forEach(function (attrToSet) {
-                        var projector = _this._projectors[attrToSet];
-                        if (projector.scale != null) {
-                            var rendererIDAttr = _this._plottableID + attrToSet;
-                            projector.scale._removePerspective(rendererIDAttr);
-                            projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
-                        }
-                    });
                 }
                 this._dataSource = source;
                 this._registerToBroadcaster(this._dataSource, function () {
+                    _this.updateAllProjectors();
                     _this._dataChanged = true;
                     _this._render();
                 });
+                this.updateAllProjectors();
                 this._dataChanged = true;
                 this._render();
                 return this;
@@ -2506,17 +2489,15 @@ var Plottable;
             Plot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();
-                var rendererIDAttr = this._plottableID + attrToSet;
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
                 if (existingScale != null) {
-                    existingScale._removePerspective(rendererIDAttr);
+                    existingScale.removeExtent(this._plottableID, attrToSet);
                     this._deregisterFromBroadcaster(existingScale);
                 }
 
                 if (scale != null) {
-                    scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
                     this._registerToBroadcaster(scale, function () {
                         return _this._render();
                     });
@@ -2525,6 +2506,7 @@ var Plottable;
                 this._projectors[attrToSet] = { accessor: accessor, scale: scale };
                 this._requireRerender = true;
                 this._rerenderUpdateSelection = true;
+                this.updateProjector(attrToSet);
                 return this;
             };
 
@@ -2570,6 +2552,31 @@ var Plottable;
             */
             Plot.prototype.animate = function (enabled) {
                 this._animate = enabled;
+                return this;
+            };
+
+            /**
+            * This function makes sure that all of the scales in this._projectors
+            * have an extent that includes all the data that is projected onto them.
+            */
+            Plot.prototype.updateAllProjectors = function () {
+                var _this = this;
+                d3.keys(this._projectors).forEach(function (attr) {
+                    return _this.updateProjector(attr);
+                });
+                return this;
+            };
+
+            Plot.prototype.updateProjector = function (attr) {
+                var projector = this._projectors[attr];
+                if (projector.scale != null) {
+                    var extent = this.dataSource()._getExtent(projector.accessor);
+                    if (extent.length === 0) {
+                        projector.scale.removeExtent(this._plottableID, attr);
+                    } else {
+                        projector.scale.updateExtent(this._plottableID, attr, extent);
+                    }
+                }
                 return this;
             };
 
@@ -2861,14 +2868,12 @@ var Plottable;
             }
             QuantitiveScale.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
-                var starts = extents.map(function (e) {
-                    return e[0];
-                });
-                var ends = extents.map(function (e) {
-                    return e[1];
-                });
-                if (starts.length > 0) {
-                    return [d3.min(starts), d3.max(ends)];
+                if (extents.length > 0) {
+                    return [d3.min(extents, function (e) {
+                            return e[0];
+                        }), d3.max(extents, function (e) {
+                            return e[1];
+                        })];
                 } else {
                     return [0, 1];
                 }
@@ -3094,11 +3099,7 @@ var Plottable;
             }
             Ordinal.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
-                var concatenatedExtents = [];
-                extents.forEach(function (e) {
-                    concatenatedExtents = concatenatedExtents.concat(e);
-                });
-                return Plottable.Util.Methods.uniq(concatenatedExtents);
+                return Plottable.Util.Methods.uniq(Plottable.Util.Methods.flatten(extents));
             };
 
             Ordinal.prototype.domain = function (values) {
@@ -3546,7 +3547,7 @@ var Plottable;
             };
 
             Axis.prototype._doRender = function () {
-                var domain = this.d3Axis.scale().domain();
+                var domain = this._axisScale.domain();
                 var extent = Math.abs(domain[1] - domain[0]);
                 var min = +d3.min(domain);
                 var max = +d3.max(domain);
