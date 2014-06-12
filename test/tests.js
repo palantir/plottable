@@ -2775,31 +2775,41 @@ describe("Renderers", function () {
 
         describe("Basic AreaPlot functionality", function () {
             var svg;
-            var xScale = new Plottable.Scale.Linear().domain([0, 1]);
-            var yScale = new Plottable.Scale.Linear().domain([0, 1]);
-            var xAccessor = function (d) {
-                return d.foo;
-            };
-            var yAccessor = function (d) {
-                return d.bar;
-            };
-            var y0Accessor = function () {
-                return 0;
-            };
-            var colorAccessor = function (d, i, m) {
-                return d3.rgb(d.foo, d.bar, i).toString();
-            };
-            var fillAccessor = function () {
-                return "steelblue";
-            };
-            var simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
-            var areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale).project("x", xAccessor).project("y", yAccessor).project("y0", y0Accessor).project("fill", fillAccessor).project("stroke", colorAccessor);
+            var xScale;
+            var yScale;
+            var xAccessor;
+            var yAccessor;
+            var y0Accessor;
+            var colorAccessor;
+            var fillAccessor;
+            var simpleDataset;
+            var areaPlot;
             var renderArea;
-            var verifier = new MultiTestVerifier();
+            var verifier;
 
             before(function () {
                 svg = generateSVG(500, 500);
-                areaPlot.renderTo(svg);
+                verifier = new MultiTestVerifier();
+                xScale = new Plottable.Scale.Linear().domain([0, 1]);
+                yScale = new Plottable.Scale.Linear().domain([0, 1]);
+                xAccessor = function (d) {
+                    return d.foo;
+                };
+                yAccessor = function (d) {
+                    return d.bar;
+                };
+                y0Accessor = function () {
+                    return 0;
+                };
+                colorAccessor = function (d, i, m) {
+                    return d3.rgb(d.foo, d.bar, i).toString();
+                };
+                fillAccessor = function () {
+                    return "steelblue";
+                };
+                simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+                areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
+                areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
                 renderArea = areaPlot.renderArea;
             });
 
@@ -2843,7 +2853,7 @@ describe("Renderers", function () {
             it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
                 areaPlot.project("y0", function (d) {
                     return d.bar / 2;
-                });
+                }, yScale);
                 areaPlot.renderTo(svg);
                 renderArea = areaPlot.renderArea;
                 var areaPath = renderArea.select(".area");
@@ -3258,7 +3268,7 @@ describe("Renderers", function () {
                 var yScale = new Plottable.Scale.Ordinal();
                 var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
                 var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var renderer = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale).project("fill", "magnitude");
+                var renderer = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
                 renderer.renderTo(svg);
                 VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
                 svg.remove();
@@ -3269,7 +3279,7 @@ describe("Renderers", function () {
                 var yScale = new Plottable.Scale.Ordinal();
                 var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
                 var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude");
+                var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
                 renderer.renderTo(svg);
                 renderer.dataSource().data(DATA);
                 VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
