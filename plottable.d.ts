@@ -1405,6 +1405,15 @@ declare module Plottable {
             */
             public callback(cb: (x: number, y: number) => any): Click;
         }
+        class DoubleClick extends Click {
+            /**
+            * Creates a DoubleClickInteraction.
+            *
+            * @constructor
+            * @param {Component} componentToListenTo The component to listen for clicks on.
+            */
+            constructor(componentToListenTo: Abstract.Component);
+        }
     }
 }
 
