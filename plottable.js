@@ -2314,8 +2314,6 @@ var Plottable;
                 _super.call(this);
                 this._autoDomainAutomatically = true;
                 this._rendererAttrID2Extent = {};
-                this._autoNice = false;
-                this._autoPad = false;
                 this._d3Scale = scale;
             }
             Scale.prototype._getAllExtents = function () {
@@ -2404,6 +2402,12 @@ var Plottable;
                 if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
+                return this;
+            };
+
+            Scale.prototype.setDomainerIfDefault = function (x) {
+                // only QuantitiveScale will be affected by the domainer
+                // Color and Ordinal should ignore domainers
                 return this;
             };
             return Scale;
@@ -2841,41 +2845,72 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-// is this the right module location? Probably not,
-// but I'll worry about that later
 var Plottable;
 (function (Plottable) {
     var Domainer = (function () {
-        function Domainer(scale) {
+        /**
+        * @param {(extents: any[][]) => any[]} combineExtents
+        *        If present, this function will be used by the Domainer to merge
+        *        all the extents that are present on a scale due to having
+        *        multiple things drawn relative to the same graph. If you want
+        *        your own logic, this is the place to put it.
+        */
+        function Domainer(combineExtents) {
+            if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
             this.doNice = false;
             this.padProportion = 0.0;
-            this.scale = scale;
+            this.combineExtents = combineExtents;
         }
-        Domainer.prototype.computeDomain = function (extents) {
-            return this.padDomain(this.combineExtents(extents));
+        /**
+        * @param {any[][]} extents The list of extents to be reduced to a single
+        *        extent.
+        * @param {Abstract.QuantitiveScale} scale
+        *        Since nice() must do different things depending on Linear, Log,
+        *        or Time scale, the scale must be passed in for nice() to work.
+        */
+        Domainer.prototype.computeDomain = function (extents, scale) {
+            return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
         };
 
+        /**
+        * Pads out the domain of the scale by a specified ratio.
+        *
+        * @param {number} [padProportion] Proportionally how much bigger the
+        *         new domain should be (0.05 = 5% larger).
+        */
         Domainer.prototype.pad = function (padProportion) {
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
             this.padProportion = padProportion;
             return this;
         };
 
+        /**
+        * Extends the scale's domain so it starts and ends with "nice" values.
+        *
+        * @param {number} [count] The number of ticks that should fit inside the new domain.
+        */
         Domainer.prototype.nice = function (count) {
             this.doNice = true;
             this.niceCount = count;
             return this;
         };
 
-        Domainer.prototype.combineExtents = function (extents) {
-            return [d3.min(extents, function (e) {
-                    return e[0];
-                }), d3.max(extents, function (e) {
-                    return e[1];
-                })];
+        Domainer.defaultCombineExtents = function (extents) {
+            if (extents.length === 0) {
+                return [0, 1];
+            } else {
+                return [d3.min(extents, function (e) {
+                        return e[0];
+                    }), d3.max(extents, function (e) {
+                        return e[1];
+                    })];
+            }
         };
 
         Domainer.prototype.padDomain = function (domain) {
+            if (domain.length === 0) {
+                return [];
+            }
             if (domain[0] === domain[1]) {
                 var d = domain[0].valueOf();
                 return [
@@ -2895,9 +2930,11 @@ var Plottable;
             return newDomain;
         };
 
-        Domainer.prototype.niceDomain = function (domain) {
-            if (this.doNice) {
-                return this.scale.niceDomain(domain, this.niceCount);
+        Domainer.prototype.niceDomain = function (scale, domain) {
+            if (domain.length === 0) {
+                return [];
+            } else if (this.doNice) {
+                return scale.niceDomain(domain, this.niceCount);
             } else {
                 return domain;
             }
@@ -2931,27 +2968,9 @@ var Plottable;
                 this.lastRequestedTickCount = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
             }
-            QuantitiveScale.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
-                if (extents.length > 0) {
-                    return [d3.min(extents, function (e) {
-                            return e[0];
-                        }), d3.max(extents, function (e) {
-                            return e[1];
-                        })];
-                } else {
-                    return [0, 1];
-                }
-            };
-
             QuantitiveScale.prototype.autoDomain = function () {
-                _super.prototype.autoDomain.call(this);
-                if (this._autoPad) {
-                    this.padDomain();
-                }
-                if (this._autoNice) {
-                    this.nice();
-                }
+                var domainer = this.domainer ? this.domainer : new Plottable.Domainer();
+                this._setDomain(domainer.computeDomain(this._getAllExtents(), this));
                 return this;
             };
 
@@ -3005,17 +3024,6 @@ var Plottable;
             };
 
             /**
-            * Extends the scale's domain so it starts and ends with "nice" values.
-            *
-            * @param {number} [count] The number of ticks that should fit inside the new domain.
-            */
-            QuantitiveScale.prototype.nice = function (count) {
-                this._d3Scale.nice(count);
-                this._setDomain(this._d3Scale.domain()); // nice() can change the domain, so update all listeners
-                return this;
-            };
-
-            /**
             * Generates tick values.
             *
             * @param {number} [count] The number of ticks to generate.
@@ -3040,39 +3048,35 @@ var Plottable;
             };
 
             /**
-            * Pads out the domain of the scale by a specified ratio.
-            *
-            * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-            * @returns {QuantitiveScale} The calling QuantitiveScale.
+            * Given a domain, expands its domain onto "nice" values, e.g. whole
+            * numbers.
             */
-            QuantitiveScale.prototype.padDomain = function (padProportion) {
-                if (typeof padProportion === "undefined") { padProportion = 0.05; }
-                var currentDomain = this.domain();
-                if (currentDomain[0] === currentDomain[1]) {
-                    var d = currentDomain[0].valueOf();
-                    this._setDomain([d - this._PADDING_FOR_IDENTICAL_DOMAIN, d + this._PADDING_FOR_IDENTICAL_DOMAIN]);
-                    return this;
-                }
+            QuantitiveScale.prototype.niceDomain = function (domain, count) {
+                // will override
+                return domain;
+            };
 
-                var extent = currentDomain[1] - currentDomain[0];
-
-                // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
-                var newDomain = [currentDomain[0] - padProportion / 2 * extent, currentDomain[1].valueOf() + padProportion / 2 * extent];
-                if (currentDomain[0] === 0) {
-                    newDomain[0] = 0;
+            /**
+            * Sets a Domainer of a scale. A Domainer is responsible for combining
+            * multiple extents into a single domain.
+            */
+            QuantitiveScale.prototype.setDomainer = function (domainer) {
+                this.domainer = domainer;
+                if (this._autoDomainAutomatically) {
+                    this.autoDomain();
                 }
-                if (currentDomain[1] === 0) {
-                    newDomain[1] = 0;
-                }
-                this._setDomain(newDomain);
                 return this;
             };
 
-            QuantitiveScale.prototype.niceDomain = function (domain, count) {
-                debugger;
-
-                // will override
-                return [];
+            /**
+            * If the Domainer has been set at all, this function does nothing.
+            * Otherwise, it sets the Domainer to domainer.
+            */
+            QuantitiveScale.prototype.setDomainerIfDefault = function (domainer) {
+                if (this.domainer == null) {
+                    return this.setDomainer(domainer);
+                }
+                return this;
             };
             return QuantitiveScale;
         })(Plottable.Abstract.Scale);
@@ -3331,7 +3335,6 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Scale) {
-        // TODO: test padding on time scales
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -3371,8 +3374,6 @@ var Plottable;
     (function (Scale) {
         ;
 
-        // TODO: what the heck is an interpolated color scale?
-        // also, I should probably deal with this
         var InterpolatedColor = (function (_super) {
             __extends(InterpolatedColor, _super);
             /**
@@ -5002,14 +5003,12 @@ var Plottable;
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale != null) {
                     this.xScale = scale;
-                    this.xScale._autoNice = true;
-                    this.xScale._autoPad = true;
+                    this.xScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
                 }
 
                 if (attrToSet === "y" && scale != null) {
                     this.yScale = scale;
-                    this.yScale._autoNice = true;
-                    this.yScale._autoPad = true;
+                    this.yScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
                 }
 
                 _super.prototype.project.call(this, attrToSet, accessor, scale);

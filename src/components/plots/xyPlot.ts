@@ -26,14 +26,12 @@ export module Abstract {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale != null) {
         this.xScale = scale;
-        this.xScale._autoNice = true;
-        this.xScale._autoPad = true;
+        this.xScale.setDomainerIfDefault(new Domainer().pad().nice());
       }
 
       if (attrToSet === "y" && scale != null) {
         this.yScale = scale;
-        this.yScale._autoNice = true;
-        this.yScale._autoPad = true;
+        this.yScale.setDomainerIfDefault(new Domainer().pad().nice());
       }
 
       super.project(attrToSet, accessor, scale);

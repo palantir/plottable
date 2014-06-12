@@ -316,9 +316,9 @@ describe("Axes", function () {
         var startDate = new Date(2000, 0, 1);
         var endDate = new Date(2001, 0, 1);
         var timeScale = new Plottable.Scale.Linear();
-        timeScale.domain([startDate, endDate]);
+        timeScale.updateExtent(1, "x", [startDate, endDate]);
         timeScale.range([0, 500]);
-        timeScale.nice();
+        timeScale.setDomainer(new Plottable.Domainer().nice());
         var xAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
         var baseDate = d3.min(timeScale.domain());
 
@@ -3343,13 +3343,14 @@ describe("Scales", function () {
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-        scale.domain([0.08, 9.92]);
+        scale._autoDomainAutomatically = true;
+        scale.updateExtent(1, "x", [0.08, 9.92]);
         callbackWasCalled = false;
-        scale.nice();
+        scale.setDomainer(new Plottable.Domainer().nice());
         assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
 
         callbackWasCalled = false;
-        scale.padDomain(0.2);
+        scale.setDomainer(new Plottable.Domainer().pad());
         assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
     });
     describe("autoranging behavior", function () {
@@ -3366,7 +3367,7 @@ describe("Scales", function () {
             scale.updateExtent(1, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
-            scale.autoDomain().padDomain().nice();
+            scale.setDomainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
             assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
@@ -3420,7 +3421,6 @@ describe("Scales", function () {
     describe("Quantitive Scales", function () {
         it("autorange defaults to [0, 1] if no perspectives set", function () {
             var scale = new Plottable.Scale.Linear();
-            scale.domain([]);
             scale.autoDomain();
             var d = scale.domain();
             assert.equal(d[0], 0);
@@ -3429,15 +3429,15 @@ describe("Scales", function () {
 
         it("autoPad defaults to [v-1, v+1] if there's only one value", function () {
             var scale = new Plottable.Scale.Linear();
-            scale.domain([5, 5]);
-            scale.padDomain();
+            scale.updateExtent(1, "x", [5, 5]);
+            scale.setDomainer(new Plottable.Domainer().pad());
             assert.deepEqual(scale.domain(), [4, 6]);
         });
 
         it("autoPad works in general case", function () {
             var scale = new Plottable.Scale.Linear();
-            scale.domain([100, 200]);
-            scale.padDomain(0.20);
+            scale.updateExtent(1, "x", [100, 200]);
+            scale.setDomainer(new Plottable.Domainer().pad(0.2));
             assert.deepEqual(scale.domain(), [90, 210]);
         });
 
@@ -3446,8 +3446,8 @@ describe("Scales", function () {
             var f = d3.time.format("%x");
             var d1 = f.parse("06/02/2014");
             var d2 = f.parse("06/03/2014");
-            scale.domain([d1, d2]);
-            scale.padDomain();
+            scale.updateExtent(1, "x", [d1, d2]);
+            scale.setDomainer(new Plottable.Domainer().pad());
             var dd1 = scale.domain()[0];
             var dd2 = scale.domain()[1];
             assert.isDefined(dd1.toDateString, "padDomain produced dates");

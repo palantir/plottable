@@ -6,8 +6,6 @@ export module Abstract {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomainAutomatically = true;
     public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
-    public _autoNice = false;
-    public _autoPad  = false;
     /**
      * Creates a new Scale.
      *
@@ -124,6 +122,12 @@ export module Abstract {
       if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
+      return this;
+    }
+
+    public setDomainerIfDefault(x: any): Scale {
+      // only QuantitiveScale will be affected by the domainer
+      // Color and Ordinal should ignore domainers
       return this;
     }
   }

@@ -6,9 +6,6 @@ export module Scale {
     [key: string]: string[];
   };
 
-  // TODO: what the heck is an interpolated color scale?
-  // also, I should probably deal with this
-
   export class InterpolatedColor extends Abstract.QuantitiveScale {
     private static COLOR_SCALES: ColorGroups = {
       reds : [

@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <title>Domainer Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable_multifile.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+
+    <script>
+      window.onload = function() {
+        var dataseries = makeRandomData(20);
+
+        var xScale = new Plottable.Scale.Linear()
+                         .setDomainer(new Plottable.Domainer().pad(1.0).nice());
+        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+
+        var yScale = new Plottable.Scale.Linear()
+                         .setDomainer(new Plottable.Domainer(function(extents) {
+                          if (extents.length === 0) {
+                            return [0, 1];
+                          }
+                          return [-2, d3.max(extents, function(extent) {
+                            return extent[1];
+                          })];
+                         }));
+        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+
+        renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
+        renderAreaD1.animate(true);
+
+        var fillAccessor = function() { return "steelblue"; };
+        renderAreaD1.project("fill", fillAccessor);
+
+        var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+        var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1]);
+
+        var chart = new Plottable.Template.StandardChart()
+                        .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
+                        .renderTo("#areaRenderer-test");
+        console.log(d3.extent(dataseries, function(d) { return d.x; }));
+        console.log(xScale.domain());
+      }
+    </script>
+  </head>
+  <body>
+    <svg id="areaRenderer-test" width="480" height="320"></svg>
+    <button onclick="newData()">new data</button>
+  </body>
+
+</html>

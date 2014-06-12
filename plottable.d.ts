@@ -698,6 +698,7 @@ declare module Plottable {
             */
             public updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
             public removeExtent(rendererID: number, attr: string): Scale;
+            public setDomainerIfDefault(x: any): Scale;
         }
     }
 }
@@ -920,9 +921,34 @@ declare module Plottable {
 
 declare module Plottable {
     class Domainer {
-        constructor(scale: Abstract.QuantitiveScale);
-        public computeDomain(extents: any[][]): any[];
+        /**
+        * @param {(extents: any[][]) => any[]} combineExtents
+        *        If present, this function will be used by the Domainer to merge
+        *        all the extents that are present on a scale due to having
+        *        multiple things drawn relative to the same graph. If you want
+        *        your own logic, this is the place to put it.
+        */
+        constructor(combineExtents?: (extents: any[][]) => any[]);
+        /**
+        * @param {any[][]} extents The list of extents to be reduced to a single
+        *        extent.
+        * @param {Abstract.QuantitiveScale} scale
+        *        Since nice() must do different things depending on Linear, Log,
+        *        or Time scale, the scale must be passed in for nice() to work.
+        */
+        public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[];
+        /**
+        * Pads out the domain of the scale by a specified ratio.
+        *
+        * @param {number} [padProportion] Proportionally how much bigger the
+        *         new domain should be (0.05 = 5% larger).
+        */
         public pad(padProportion?: number): Domainer;
+        /**
+        * Extends the scale's domain so it starts and ends with "nice" values.
+        *
+        * @param {number} [count] The number of ticks that should fit inside the new domain.
+        */
         public nice(count?: number): Domainer;
     }
 }
@@ -977,12 +1003,6 @@ declare module Plottable {
             public clamp(): boolean;
             public clamp(clamp: boolean): QuantitiveScale;
             /**
-            * Extends the scale's domain so it starts and ends with "nice" values.
-            *
-            * @param {number} [count] The number of ticks that should fit inside the new domain.
-            */
-            public nice(count?: number): QuantitiveScale;
-            /**
             * Generates tick values.
             *
             * @param {number} [count] The number of ticks to generate.
@@ -998,13 +1018,20 @@ declare module Plottable {
             */
             public tickFormat(count: number, format?: string): (n: number) => string;
             /**
-            * Pads out the domain of the scale by a specified ratio.
-            *
-            * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-            * @returns {QuantitiveScale} The calling QuantitiveScale.
+            * Given a domain, expands its domain onto "nice" values, e.g. whole
+            * numbers.
             */
-            public padDomain(padProportion?: number): QuantitiveScale;
             public niceDomain(domain: any[], count?: number): any[];
+            /**
+            * Sets a Domainer of a scale. A Domainer is responsible for combining
+            * multiple extents into a single domain.
+            */
+            public setDomainer(domainer: Domainer): QuantitiveScale;
+            /**
+            * If the Domainer has been set at all, this function does nothing.
+            * Otherwise, it sets the Domainer to domainer.
+            */
+            public setDomainerIfDefault(domainer: Domainer): QuantitiveScale;
         }
     }
 }

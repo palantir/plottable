@@ -2,7 +2,6 @@
 
 module Plottable {
 export module Scale {
-  // TODO: test padding on time scales
   export class Time extends Abstract.QuantitiveScale {
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
     /**
