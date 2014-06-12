@@ -624,8 +624,8 @@ describe("Broadcasters", function () {
         assert.isTrue(called, "the cb was called");
     });
 
-    it("deregistering an unregistered listener throws an error", function () {
-        assert.throws(function () {
+    it("deregistering an unregistered listener doesn't throw an error", function () {
+        assert.doesNotThrow(function () {
             return b.deregisterListener({});
         });
     });
@@ -3380,11 +3380,8 @@ describe("Scales", function () {
             dataSource.data([{ foo: 10 }, { foo: 11 }]);
             assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
             scale._removePerspective("2x");
-
-            // "scale not listening to the dataSource after all perspectives removed"
-            assert.throws(function () {
-                return dataSource.deregisterListener(scale);
-            });
+            dataSource.data([{ foo: 99 }, { foo: 100 }]);
+            assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
         });
 
         it("scale perspectives can be removed appropriately", function () {
