@@ -1214,7 +1214,12 @@ var Plottable;
             } else if (typeof (mappedData[0]) === "string") {
                 return Plottable.Util.Methods.uniq(mappedData);
             } else {
-                return d3.extent(mappedData);
+                var extent = d3.extent(mappedData);
+                if (extent[0] == null || extent[1] == null) {
+                    return [];
+                } else {
+                    return extent;
+                }
             }
         };
         return DataSource;
@@ -2872,7 +2877,11 @@ var Plottable;
         *        or Time scale, the scale must be passed in for nice() to work.
         */
         Domainer.prototype.computeDomain = function (extents, scale) {
-            return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
+            if (extents.length === 0) {
+                return [0, 1];
+            } else {
+                return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
+            }
         };
 
         /**
@@ -2899,21 +2908,14 @@ var Plottable;
         };
 
         Domainer.defaultCombineExtents = function (extents) {
-            if (extents.length === 0) {
-                return [0, 1];
-            } else {
-                return [d3.min(extents, function (e) {
-                        return e[0];
-                    }), d3.max(extents, function (e) {
-                        return e[1];
-                    })];
-            }
+            return [d3.min(extents, function (e) {
+                    return e[0];
+                }), d3.max(extents, function (e) {
+                    return e[1];
+                })];
         };
 
         Domainer.prototype.padDomain = function (domain) {
-            if (domain.length === 0) {
-                return [];
-            }
             if (domain[0] === domain[1]) {
                 var d = domain[0].valueOf();
                 return [
@@ -2934,9 +2936,7 @@ var Plottable;
         };
 
         Domainer.prototype.niceDomain = function (scale, domain) {
-            if (domain.length === 0) {
-                return [];
-            } else if (this.doNice) {
+            if (this.doNice) {
                 return scale.niceDomain(domain, this.niceCount);
             } else {
                 return domain;

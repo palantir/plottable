@@ -28,7 +28,11 @@ module Plottable {
      *        or Time scale, the scale must be passed in for nice() to work.
      */
     public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[] {
-      return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
+      if (extents.length === 0) {
+        return [0, 1];
+      } else {
+        return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
+      }
     }
 
     /**
@@ -54,17 +58,10 @@ module Plottable {
     }
 
     private static defaultCombineExtents(extents: any[][]): any[] {
-      if (extents.length === 0) {
-        return [0, 1];
-      } else {
-        return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
-      }
+      return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
     }
 
     private padDomain(domain: any[]): any[] {
-      if (domain.length === 0) {
-        return [];
-      }
       if (domain[0] === domain[1]) {
         var d = domain[0].valueOf(); // valueOf accounts for dates properly
         return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
@@ -83,9 +80,7 @@ module Plottable {
     }
 
     private niceDomain(scale: Abstract.QuantitiveScale, domain: any[]): any[] {
-      if (domain.length === 0) {
-        return [];
-      } else if (this.doNice) {
+      if (this.doNice) {
         return scale.niceDomain(domain, this.niceCount);
       } else {
         return domain;

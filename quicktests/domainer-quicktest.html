@@ -16,9 +16,6 @@
 
         var yScale = new Plottable.Scale.Linear()
                          .setDomainer(new Plottable.Domainer(function(extents) {
-                          if (extents.length === 0) {
-                            return [0, 1];
-                          }
                           return [-2, d3.max(extents, function(extent) {
                             return extent[1];
                           })];
