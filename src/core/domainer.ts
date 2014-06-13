@@ -62,7 +62,7 @@ module Plottable {
     }
 
     private padDomain(domain: any[]): any[] {
-      if (domain[0] === domain[1]) {
+      if (domain[0] === domain[1] && this.padProportion > 0.0) {
         var d = domain[0].valueOf(); // valueOf accounts for dates properly
         return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
                 d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];

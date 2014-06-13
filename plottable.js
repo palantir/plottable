@@ -2916,7 +2916,7 @@ var Plottable;
         };
 
         Domainer.prototype.padDomain = function (domain) {
-            if (domain[0] === domain[1]) {
+            if (domain[0] === domain[1] && this.padProportion > 0.0) {
                 var d = domain[0].valueOf();
                 return [
                     d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
