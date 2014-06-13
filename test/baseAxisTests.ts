@@ -15,11 +15,12 @@ describe("BaseAxis", () => {
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
-    (<any> baseAxis)._getTickValues = function() { return scale.ticks(10); };
+    var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
 
     var ticks = svg.selectAll(".tick");
-    assert.strictEqual(ticks[0].length, scale.ticks(10).length, "A line was drawn for each tick");
+    assert.strictEqual(ticks[0].length, tickValues.length, "A line was drawn for each tick");
     var baseline = svg.select(".baseline");
 
     assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -45,11 +46,12 @@ describe("BaseAxis", () => {
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Abstract.Axis(scale, "left");
-    (<any> baseAxis)._getTickValues = function() { return scale.ticks(10); };
+    var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
 
     var ticks = svg.selectAll(".tick");
-    assert.strictEqual(ticks[0].length, scale.ticks(10).length, "A line was drawn for each tick");
+    assert.strictEqual(ticks[0].length, tickValues.length, "A line was drawn for each tick");
     var baseline = svg.select(".baseline");
 
     assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -75,7 +77,8 @@ describe("BaseAxis", () => {
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
     var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
-    (<any> baseAxis)._getTickValues = function() { return scale.ticks(10); };
+    var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
 
     var firstTick = svg.select(".tick").select("line");

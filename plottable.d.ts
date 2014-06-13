@@ -1287,22 +1287,49 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
+            static TICK_LABEL_CLASS: string;
             /**
             * Creates a BaseAxis.
             *
             * @constructor
             * @param {Scale} scale The Scale to base the BaseAxis on.
             * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
-            * @param {(n: any) => string} [formatter] A function to format tick labels.
+            * @param {Formatter} [formatter]
             */
-            constructor(scale: Scale, orientation: string, formatter?: (n: any) => string);
+            constructor(scale: Scale, orientation: string, formatter?: Formatter);
+            /**
+            * Gets the current width.
+            *
+            * @returns {number} The current width.
+            */
+            public width(): number;
+            /**
+            * Sets a user-specified width.
+            *
+            * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
+            * @returns {Axis} The calling Axis.
+            */
+            public width(w: any): Axis;
+            /**
+            * Gets the current height.
+            *
+            * @returns {number} The current height.
+            */
+            public height(): number;
+            /**
+            * Sets a user-specified height.
+            *
+            * @param {number|String} w A fixed height for the Axis, or "auto" for automatic mode.
+            * @returns {Axis} The calling Axis.
+            */
+            public height(h: any): Axis;
             /**
             * Sets a new tick formatter.
             *
-            * @param {(n: any) => string} formatter A function to format tick labels.
+            * @param {Abstract.Formatter} formatter
             * @returns {BaseAxis} The calling BaseAxis.
             */
-            public formatter(formatFunction: (n: any) => string): Axis;
+            public formatter(formatter: Formatter): Axis;
             /**
             * Gets or sets the length of each tick mark.
             *
@@ -1336,7 +1363,24 @@ declare module Plottable {
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
-            constructor(scale: Scale.Time, orientation?: string, formatter?: (n: any) => string);
+            constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
+        class Number extends Abstract.Axis {
+            /**
+            * Creates a NumberAxis.
+            *
+            * @constructor
+            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumberAxis on.
+            * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
+            * @param {Formatter} [formatter] A function to format tick labels.
+            */
+            constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: Abstract.Formatter);
         }
     }
 }
