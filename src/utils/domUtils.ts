@@ -78,6 +78,24 @@ export module Util {
       return width;
     }
 
+    export function isInsideBBox(boundingBox: ClientRect, testBox: ClientRect) {
+      return (
+        Math.floor(boundingBox.left) <= Math.ceil(testBox.left) &&
+        Math.floor(boundingBox.top)  <= Math.ceil(testBox.top)  &&
+        Math.floor(testBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
+        Math.floor(testBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+      );
+    };
+
+    export function isOverlapBBox(boundingBox: ClientRect, testBox: ClientRect){
+      return !(
+        boundingBox.right < testBox.left ||
+        boundingBox.left > testBox.right ||
+        boundingBox.bottom < testBox.top ||
+        boundingBox.top > testBox.bottom
+      );
+    }
+
     export function translate(s: D3.Selection, x?: number, y?: number) {
       var xform = d3.transform(s.attr("transform"));
       if (x == null) {

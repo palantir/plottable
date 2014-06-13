@@ -57,18 +57,17 @@ export module Axis {
 
       // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
       if ((<Abstract.QuantitiveScale> this._axisScale).ticks != null) {
-        var scale = <Abstract.QuantitiveScale> this._axisScale;
-        var nTicks = 10;
-        var ticks = scale.ticks(nTicks);
+        var scale         = <Abstract.QuantitiveScale> this._axisScale;
+        var nTicks        = 10;
+        var ticks         = scale.ticks(nTicks);
         var numericDomain = scale.domain();
-        var interval = numericDomain[1] - numericDomain[0];
-        var cleanTick = (n: number) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
+        var interval      = numericDomain[1] - numericDomain[0];
+        var cleanTick     = (n: number) => Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
         ticks = ticks.map(cleanTick);
         this.d3Axis.tickValues(ticks);
       }
 
       this.axisElement.call(this.d3Axis);
-
       this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
 
       return this;
@@ -87,21 +86,11 @@ export module Axis {
     public _hideCutOffTickLabels() {
       var availableWidth  = this.availableWidth ;
       var availableHeight = this.availableHeight;
-      var tickLabels = this.axisElement.selectAll(".tick").select("text");
-
-      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-      var isInsideBBox = (tickBox: ClientRect) => {
-        return (
-          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
-          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
-        );
-      };
+      var tickLabels      = this.axisElement.selectAll(".tick").select("text");
+      var boundingBox     = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
       tickLabels.each(function (d: any){
-        if (!isInsideBBox(this.getBoundingClientRect())) {
+        if (!Util.DOM.isInsideBBox(boundingBox, this.getBoundingClientRect())) {
           d3.select(this).style("visibility", "hidden");
         }
       });
@@ -113,17 +102,9 @@ export module Axis {
       var tickLabels = this.axisElement.selectAll(".tick").select("text");
       var lastLabelClientRect: ClientRect;
 
-      function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-        if (boxA.right < boxB.left) { return false; }
-        if (boxA.left > boxB.right) { return false; }
-        if (boxA.bottom < boxB.top) { return false; }
-        if (boxA.top > boxB.bottom) { return false; }
-        return true;
-      }
-
       tickLabels.each(function (d: any) {
         var clientRect = this.getBoundingClientRect();
-        if (lastLabelClientRect != null  && boxesOverlap(clientRect, lastLabelClientRect)) {
+        if (lastLabelClientRect != null  && Util.DOM.isOverlapBBox(clientRect, lastLabelClientRect)) {
           d3.select(this).style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;
@@ -145,8 +126,9 @@ export module Axis {
     }
 
     /**
-     * Sets or gets the tick label position relative to the tick marks.
-     * The exact consequences of particular tick label positionings depends on the subclass implementation.
+     * Sets or gets the tick label position relative to the tick marks. The
+     * exact consequences of particular tick label positionings depends on the
+     * subclass implementation.
      *
      * @param {string} [position] The relative position of the tick label.
      * @returns {string|Axis} The current tick label position, or the calling Axis.
@@ -297,10 +279,10 @@ export module Axis {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       return {
-        width : 0,
-        height: Math.min(offeredHeight, this._height),
-        wantsWidth : false,
-        wantsHeight: offeredHeight < this._height
+        width       : 0,
+        height      : Math.min(offeredHeight, this._height),
+        wantsWidth  : false,
+        wantsHeight : offeredHeight < this._height
       };
     }
 
@@ -437,10 +419,10 @@ export module Axis {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       return {
-        width : Math.min(offeredWidth, this._width),
-        height: 0,
-        wantsWidth : offeredWidth < this._width,
-        wantsHeight: false
+        width       : Math.min(offeredWidth, this._width),
+        height      : 0,
+        wantsWidth  : offeredWidth < this._width,
+        wantsHeight : false
       };
     }
 
