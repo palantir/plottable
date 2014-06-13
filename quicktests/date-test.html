@@ -19,7 +19,7 @@
     xScale = new Plottable.Scale.Time();
     yScale = new Plottable.Scale.Linear();
     linePlot = new Plottable.Plot.Line(data, xScale, yScale)
-    .project("x", function (d) { return d3.time.format("%x").parse(d.x)});
+    .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
 
     
     var defaultFormatter = d3.time.format.multi([
@@ -32,23 +32,14 @@
       ["%Y", function() { return true; }]
     ]);
 
-
-    xAxisC = new Plottable.Axis.Time(xScale, "bottom", "sparse", defaultFormatter);
-    xAxisB = new Plottable.Axis.Time(xScale, "bottom", "normal", defaultFormatter);
-    xAxisA = new Plottable.Axis.Time(xScale, "bottom", "dense", defaultFormatter);
-    
-    xAxis = new Plottable.Component.Table([[xAxisA], [xAxisB], [xAxisC]]);
+    xAxis = new Plottable.Axis.Time(xScale, "bottom", defaultFormatter);
     yAxis = new Plottable.Axis.YAxis(yScale);
-
 
     gridlines = new Plottable.Component.Gridlines(xScale, yScale);
     renderGroup = linePlot.merge(gridlines);
     new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
     new Plottable.Interaction.PanZoom(linePlot, xScale, yScale).registerWithComponent();
   };
-
-
-
 
 
   </script>

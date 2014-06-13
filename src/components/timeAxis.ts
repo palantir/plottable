@@ -5,7 +5,6 @@ export module Axis {
   export class Time extends Abstract.Axis {
     public _scale: Scale.Time;
     public _tickLabelsG: D3.Selection;
-    public _tickDensity: string;
     private _height = 30;
 
     /**
@@ -15,9 +14,8 @@ export module Axis {
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      */
-    constructor(scale: Scale.Time, orientation = "bottom", density = "normal", formatter?: (n: any) => string) {
+    constructor(scale: Scale.Time, orientation = "bottom", formatter?: (n: any) => string) {
       super(scale, orientation, formatter);
-      this.tickDensity(density);
       this.classed("time-axis", true);
     }
 
@@ -36,35 +34,8 @@ export module Axis {
       };
     }
 
-    public tickDensity(): string;
-    public tickDensity(newDensity: string): Time;
-    public tickDensity(newDensity?: string): any {
-      if (newDensity !== undefined) {
-        if (newDensity !== "sparse" && newDensity !== "normal" && newDensity !== "dense") {
-          throw new Error (newDensity + " tick density not supported");
-        }
-        this._tickDensity = newDensity;
-        return this;
-      } else {
-        return this._tickDensity;
-      }
-    }
-
     public _getTickValues(): string[] {
-      var nticks = 0;
-      switch(this._tickDensity) {
-        case "sparse":
-          nticks = Math.ceil(this.availableWidth / 500);
-          break;
-        case "normal":
-          nticks = Math.ceil(this.availableWidth / 250);
-          break;
-        case "dense":
-          nticks = Math.ceil(this.availableWidth / 100);
-          break;
-      }
-
-      return this._scale.ticks(nticks);
+      return this._scale.ticks(10);
     }
 
     private measureTextHeight(): number {

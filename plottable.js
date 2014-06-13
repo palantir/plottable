@@ -4279,12 +4279,10 @@ var Plottable;
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
-            function Time(scale, orientation, density, formatter) {
+            function Time(scale, orientation, formatter) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
-                if (typeof density === "undefined") { density = "normal"; }
                 _super.call(this, scale, orientation, formatter);
                 this._height = 30;
-                this.tickDensity(density);
                 this.classed("time-axis", true);
             }
             Time.prototype._setup = function () {
@@ -4302,33 +4300,8 @@ var Plottable;
                 };
             };
 
-            Time.prototype.tickDensity = function (newDensity) {
-                if (newDensity !== undefined) {
-                    if (newDensity !== "sparse" && newDensity !== "normal" && newDensity !== "dense") {
-                        throw new Error(newDensity + " tick density not supported");
-                    }
-                    this._tickDensity = newDensity;
-                    return this;
-                } else {
-                    return this._tickDensity;
-                }
-            };
-
             Time.prototype._getTickValues = function () {
-                var nticks = 0;
-                switch (this._tickDensity) {
-                    case "sparse":
-                        nticks = Math.ceil(this.availableWidth / 500);
-                        break;
-                    case "normal":
-                        nticks = Math.ceil(this.availableWidth / 250);
-                        break;
-                    case "dense":
-                        nticks = Math.ceil(this.availableWidth / 100);
-                        break;
-                }
-
-                return this._scale.ticks(nticks);
+                return this._scale.ticks(10);
             };
 
             Time.prototype.measureTextHeight = function () {

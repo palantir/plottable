@@ -1336,9 +1336,7 @@ declare module Plottable {
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
-            constructor(scale: Scale.Time, orientation?: string, density?: string, formatter?: (n: any) => string);
-            public tickDensity(): string;
-            public tickDensity(newDensity: string): Time;
+            constructor(scale: Scale.Time, orientation?: string, formatter?: (n: any) => string);
         }
     }
 }
