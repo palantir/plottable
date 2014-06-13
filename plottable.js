@@ -4063,6 +4063,8 @@ var Plottable;
                 _super.call(this);
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
+                this._width = "auto";
+                this._height = "auto";
                 this._scale = scale;
                 this.orient(orientation);
 
@@ -4200,26 +4202,46 @@ var Plottable;
                 return (this.element != null) ? this._render() : null;
             };
 
+            Axis.prototype._invalidateLayout = function () {
+                _super.prototype._invalidateLayout.call(this);
+                this._computedWidth = null;
+                this._computedHeight = null;
+            };
+
             Axis.prototype.width = function (w) {
                 if (w == null) {
+                    if (this._width === "auto") {
+                        return this._computedWidth;
+                    }
                     return this._width;
                 } else {
                     if (this._isHorizontal()) {
                         throw new Error("width cannot be set on a horizontal Axis");
                     }
+                    if (w !== "auto" && w < 0) {
+                        throw new Error("invalid value for width");
+                    }
                     this._width = w;
+                    this._invalidateLayout();
                     return this;
                 }
             };
 
             Axis.prototype.height = function (h) {
                 if (h == null) {
+                    if (this._height === "auto") {
+                        return this._computedHeight;
+                    }
                     return this._height;
                 } else {
-                    if (!this._isHorizontal()) {
+                    if (this._isHorizontal()) {
                         throw new Error("height cannot be set on a vertical Axis");
                     }
+                    if (h !== "auto" && h < 0) {
+                        throw new Error("invalid value for height");
+                    }
                     this._height = h;
+                    this._invalidateLayout();
                     return this;
                 }
             };
@@ -4313,18 +4335,18 @@ var Plottable;
                 var fakeTick;
                 var testTextEl;
                 if (this._isHorizontal()) {
-                    if (this.computedHeight == null) {
+                    if (this._computedHeight == null) {
                         fakeTick = this._ticksContainer.append("g").classed("tick", true);
                         testTextEl = fakeTick.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                         var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
-                        this.computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+                        this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
                         fakeTick.remove();
                     }
 
                     requestedWidth = 0;
-                    requestedHeight = (this._height == null) ? this.computedHeight : this._height;
+                    requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
                 } else {
-                    if (this.computedWidth == null) {
+                    if (this._computedWidth == null) {
                         // generate a test value to measure width
                         var tickValues = this._getTickValues();
                         var valueLength = function (v) {
@@ -4339,10 +4361,10 @@ var Plottable;
                         testTextEl = fakeTick.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                         var formattedTestValue = this._formatter.format(testValue);
                         var textLength = testTextEl.text(formattedTestValue).node().getComputedTextLength();
-                        this.computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+                        this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
                         fakeTick.remove();
                     }
-                    requestedWidth = (this._width == null) ? this.computedWidth : this._width;
+                    requestedWidth = (this._width === "auto") ? this._computedWidth : this._width;
                     requestedHeight = 0;
                 }
 
@@ -4405,12 +4427,6 @@ var Plottable;
                 });
 
                 return this;
-            };
-
-            Number.prototype._invalidateLayout = function () {
-                _super.prototype._invalidateLayout.call(this);
-                this.computedWidth = null;
-                this.computedHeight = null;
             };
             return Number;
         })(Plottable.Abstract.Axis);

@@ -1298,31 +1298,31 @@ declare module Plottable {
             */
             constructor(scale: Scale, orientation: string, formatter?: Formatter);
             /**
-            * Gets the current user-specified width.
+            * Gets the current width.
             *
-            * @returns {number} The current user-specified width.
+            * @returns {number} The current width.
             */
             public width(): number;
             /**
             * Sets a user-specified width.
             *
-            * @param {number} w A fixed width for the Axis.
+            * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
             * @returns {Axis} The calling Axis.
             */
-            public width(w: number): Axis;
+            public width(w: any): Axis;
             /**
-            * Gets the current user-specified height.
+            * Gets the current height.
             *
-            * @returns {number} The current user-specified height.
+            * @returns {number} The current height.
             */
             public height(): number;
             /**
             * Sets a user-specified height.
             *
-            * @param {number} h A fixed height for the Axis.
+            * @param {number|String} w A fixed height for the Axis, or "auto" for automatic mode.
             * @returns {Axis} The calling Axis.
             */
-            public height(h: number): Axis;
+            public height(h: any): Axis;
             /**
             * Sets a new tick formatter.
             *

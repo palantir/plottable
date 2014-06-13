@@ -13,8 +13,10 @@ export module Abstract {
     public _orientation: string;
     private _tickLength = 5;
     private _tickLabelPadding = 3;
-    public _width: number;
-    public _height: number;
+    public _width: any = "auto";
+    public _height: any = "auto";
+    public _computedWidth: number;
+    public _computedHeight: number;
 
     /**
      * Creates a BaseAxis.
@@ -153,52 +155,72 @@ export module Abstract {
       return (this.element != null) ? this._render() : null;
     }
 
+    public _invalidateLayout() {
+      super._invalidateLayout();
+      this._computedWidth = null;
+      this._computedHeight = null;
+    }
+
     /**
-     * Gets the current user-specified width.
+     * Gets the current width.
      *
-     * @returns {number} The current user-specified width.
+     * @returns {number} The current width.
      */
     public width(): number;
     /**
      * Sets a user-specified width.
      *
-     * @param {number} w A fixed width for the Axis.
+     * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
      * @returns {Axis} The calling Axis.
      */
-    public width(w: number): Axis;
-    public width(w?: number): any {
+    public width(w: any): Axis;
+    public width(w?: any): any {
       if (w == null) {
-        return this._width;
+        if (this._width === "auto") {
+          return this._computedWidth;
+        }
+        return <number> this._width;
       } else {
         if (this._isHorizontal()) {
           throw new Error("width cannot be set on a horizontal Axis");
         }
+        if (w !== "auto" && w < 0) {
+          throw new Error("invalid value for width");
+        }
         this._width = w;
+        this._invalidateLayout();
         return this;
       }
     }
 
     /**
-     * Gets the current user-specified height.
+     * Gets the current height.
      *
-     * @returns {number} The current user-specified height.
+     * @returns {number} The current height.
      */
     public height(): number;
     /**
      * Sets a user-specified height.
      *
-     * @param {number} h A fixed height for the Axis.
+     * @param {number|String} w A fixed height for the Axis, or "auto" for automatic mode.
      * @returns {Axis} The calling Axis.
      */
-    public height(h: number): Axis;
-    public height(h?: number): any {
+    public height(h: any): Axis;
+    public height(h?: any): any {
       if (h == null) {
-        return this._height;
+        if (this._height === "auto") {
+          return this._computedHeight;
+        }
+        return <number> this._height;
       } else {
-        if (!this._isHorizontal()) {
+        if (this._isHorizontal()) {
           throw new Error("height cannot be set on a vertical Axis");
         }
+        if (h !== "auto" && h < 0) {
+          throw new Error("invalid value for height");
+        }
         this._height = h;
+        this._invalidateLayout();
         return this;
       }
     }

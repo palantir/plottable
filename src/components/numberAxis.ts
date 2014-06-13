@@ -4,8 +4,6 @@ module Plottable {
 export module Axis {
   export class Number extends Abstract.Axis {
     public _scale: Abstract.QuantitiveScale;
-    private computedWidth: number;
-    private computedHeight: number;
 
     /**
      * Creates a NumberAxis.
@@ -27,18 +25,18 @@ export module Axis {
       var fakeTick: D3.Selection;
       var testTextEl: D3.Selection;
       if (this._isHorizontal()) {
-        if (this.computedHeight == null) {
+        if (this._computedHeight == null) {
           fakeTick = this._ticksContainer.append("g").classed("tick", true);
           testTextEl = fakeTick.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
           var textHeight = Util.DOM.getBBox(testTextEl.text("test")).height;
-          this.computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+          this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
           fakeTick.remove();
         }
 
         requestedWidth = 0;
-        requestedHeight = (this._height == null) ? this.computedHeight : this._height;
+        requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
       } else { // vertical
-        if (this.computedWidth == null) {
+        if (this._computedWidth == null) {
           // generate a test value to measure width
           var tickValues = this._getTickValues();
           var valueLength = function(v: any) {
@@ -53,10 +51,10 @@ export module Axis {
           testTextEl = fakeTick.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
           var formattedTestValue = this._formatter.format(testValue);
           var textLength = (<SVGTextElement> testTextEl.text(formattedTestValue).node()).getComputedTextLength();
-          this.computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+          this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
           fakeTick.remove();
         }
-        requestedWidth = (this._width == null) ? this.computedWidth : this._width;
+        requestedWidth = (this._width === "auto") ? this._computedWidth : this._width;
         requestedHeight = 0;
       }
 
@@ -119,12 +117,6 @@ export module Axis {
       });
 
       return this;
-    }
-
-    public _invalidateLayout() {
-      super._invalidateLayout();
-      this.computedWidth = null;
-      this.computedHeight = null;
     }
   }
 }
