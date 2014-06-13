@@ -13,7 +13,6 @@
 /// <reference path="utils/formatters/percentageFormatter.ts" />
 /// <reference path="utils/formatters/customFormatter.ts" />
 
-
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
@@ -33,6 +32,7 @@
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/logScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
+/// <reference path="scales/compositeOrdinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />

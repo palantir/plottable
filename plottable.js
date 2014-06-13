@@ -776,6 +776,17 @@ var Plottable;
             }
             DOM.getSVGPixelWidth = getSVGPixelWidth;
 
+            function isInsideBBox(boundingBox, testBox) {
+                return (Math.floor(boundingBox.left) <= Math.ceil(testBox.left) && Math.floor(boundingBox.top) <= Math.ceil(testBox.top) && Math.floor(testBox.right) <= Math.ceil(boundingBox.left + this.availableWidth) && Math.floor(testBox.bottom) <= Math.ceil(boundingBox.top + this.availableHeight));
+            }
+            DOM.isInsideBBox = isInsideBBox;
+            ;
+
+            function isOverlapBBox(boundingBox, testBox) {
+                return !(boundingBox.right < testBox.left || boundingBox.left > testBox.right || boundingBox.bottom < testBox.top || boundingBox.top > testBox.bottom);
+            }
+            DOM.isOverlapBBox = isOverlapBBox;
+
             function translate(s, x, y) {
                 var xform = d3.transform(s.attr("transform"));
                 if (x == null) {
@@ -3184,6 +3195,110 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Scale) {
+        var CompositeOrdinal = (function (_super) {
+            __extends(CompositeOrdinal, _super);
+            function CompositeOrdinal() {
+                _super.call(this);
+                this._subScales = [];
+
+                // (bdwyer) - this may not be necessary depending on how the new domainers work
+                this._autoDomainAutomatically = false;
+            }
+            CompositeOrdinal.prototype.addSubscale = function (scale) {
+                this._subScales.push(scale);
+                return this;
+            };
+
+            CompositeOrdinal.prototype.rangeBand = function () {
+                // (bdwyer) This is necessary to override because vertical bars does not allow us
+                // to override width. Once that issue is fixed, we can remove this
+                return this.smallestRangeBand();
+            };
+
+            CompositeOrdinal.prototype.smallestRangeBand = function () {
+                if (this._subScales.length > 0) {
+                    return this._subScales[this._subScales.length - 1].rangeBand();
+                } else {
+                    return _super.prototype.rangeBand.call(this);
+                }
+            };
+
+            CompositeOrdinal.prototype.range = function (values) {
+                // Store result of super call so we can return it
+                var val = _super.prototype.range.call(this, values);
+
+                // Hierarchically apply range to children
+                if (!(values === undefined)) {
+                    // (bdwyer) this can be change back to this.rangeBand() when we fix the above rangeBand issue
+                    var parentBand = _super.prototype.rangeBand.call(this);
+                    this._subScales.forEach(function (subScale) {
+                        subScale.range([0, parentBand]);
+                        parentBand = subScale.rangeBand();
+                    });
+                }
+                return val;
+            };
+
+            // Here we composite the scaling from our _subscales using variable arguments
+            // So, usage is like .project('x', (d) -> xScale.scale(d.primary, d.secondary, d.tertiary))
+            CompositeOrdinal.prototype.scale = function () {
+                var args = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    args[_i] = arguments[_i + 0];
+                }
+                var result = _super.prototype.scale.call(this, args[0]);
+                this._subScales.forEach(function (subScale, i) {
+                    if (!(args[i + 1] === undefined)) {
+                        result += subScale.scale(args[i + 1]);
+                    }
+                });
+                return result;
+            };
+
+            // (bdwyer) - to be updated once we have custom domainers? This makes
+            // assumptions about the layout of data and how it is mapped to the sub
+            // scales. Deserves some more thought depending on how the domainers are
+            // going to work.
+            CompositeOrdinal.prototype.updateDomains = function (data) {
+                var keys = [];
+                for (var _i = 0; _i < (arguments.length - 1); _i++) {
+                    keys[_i] = arguments[_i + 1];
+                }
+                this._subScales.forEach(function (subScale, i) {
+                    if (keys[i + 1] === undefined) {
+                        return;
+                    }
+
+                    // (bdwyer) - THIS USES LODASH. Re-implmementing this functionality may be anoying.
+                    // var subDomain = _(data).map(keys[i + 1]).sortBy().uniq().value();
+                    var subDomain = [0, 1];
+                    subScale.domain(subDomain);
+                });
+
+                // MORE LODASH.
+                //var mainDomain = _(data).map(keys[0]).sortBy().uniq().value()
+                var mainDomain = [0, 1];
+                this.domain(mainDomain);
+
+                return this;
+            };
+            return CompositeOrdinal;
+        })(Plottable.Scale.Ordinal);
+        Scale.CompositeOrdinal = CompositeOrdinal;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Scale) {
         var Color = (function (_super) {
             __extends(Color, _super);
             /**
@@ -3574,7 +3689,6 @@ var Plottable;
                 }
 
                 this.axisElement.call(this.d3Axis);
-
                 this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
 
                 return this;
@@ -3589,19 +3703,13 @@ var Plottable;
             };
 
             Axis.prototype._hideCutOffTickLabels = function () {
-                var _this = this;
                 var availableWidth = this.availableWidth;
                 var availableHeight = this.availableHeight;
                 var tickLabels = this.axisElement.selectAll(".tick").select("text");
-
                 var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
-                var isInsideBBox = function (tickBox) {
-                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
-                };
-
                 tickLabels.each(function (d) {
-                    if (!isInsideBBox(this.getBoundingClientRect())) {
+                    if (!Plottable.Util.DOM.isInsideBBox(boundingBox, this.getBoundingClientRect())) {
                         d3.select(this).style("visibility", "hidden");
                     }
                 });
@@ -3613,25 +3721,9 @@ var Plottable;
                 var tickLabels = this.axisElement.selectAll(".tick").select("text");
                 var lastLabelClientRect;
 
-                function boxesOverlap(boxA, boxB) {
-                    if (boxA.right < boxB.left) {
-                        return false;
-                    }
-                    if (boxA.left > boxB.right) {
-                        return false;
-                    }
-                    if (boxA.bottom < boxB.top) {
-                        return false;
-                    }
-                    if (boxA.top > boxB.bottom) {
-                        return false;
-                    }
-                    return true;
-                }
-
                 tickLabels.each(function (d) {
                     var clientRect = this.getBoundingClientRect();
-                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+                    if (lastLabelClientRect != null && Plottable.Util.DOM.isOverlapBBox(clientRect, lastLabelClientRect)) {
                         d3.select(this).style("visibility", "hidden");
                     } else {
                         lastLabelClientRect = clientRect;

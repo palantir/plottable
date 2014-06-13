@@ -237,6 +237,8 @@ declare module Plottable {
             function getElementWidth(elem: HTMLScriptElement): number;
             function getElementHeight(elem: HTMLScriptElement): number;
             function getSVGPixelWidth(svg: D3.Selection): number;
+            function isInsideBBox(boundingBox: ClientRect, testBox: ClientRect): boolean;
+            function isOverlapBBox(boundingBox: ClientRect, testBox: ClientRect): boolean;
             function translate(s: D3.Selection, x?: number, y?: number): any;
         }
     }
@@ -1099,6 +1101,22 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
+        class CompositeOrdinal extends Ordinal {
+            constructor();
+            public addSubscale(scale: Ordinal): CompositeOrdinal;
+            public rangeBand(): number;
+            public smallestRangeBand(): number;
+            public range(): any[];
+            public range(values: number[]): CompositeOrdinal;
+            public scale(...args: any[]): any;
+            public updateDomains(data: any[], ...keys: any[]): CompositeOrdinal;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Scale {
         class Color extends Abstract.Scale {
             /**
             * Creates a ColorScale.
@@ -1208,8 +1226,9 @@ declare module Plottable {
             public scale(): Abstract.Scale;
             public scale(newScale: Abstract.Scale): Axis;
             /**
-            * Sets or gets the tick label position relative to the tick marks.
-            * The exact consequences of particular tick label positionings depends on the subclass implementation.
+            * Sets or gets the tick label position relative to the tick marks. The
+            * exact consequences of particular tick label positionings depends on the
+            * subclass implementation.
             *
             * @param {string} [position] The relative position of the tick label.
             * @returns {string|Axis} The current tick label position, or the calling Axis.
