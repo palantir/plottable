@@ -308,6 +308,10 @@ describe("Axes", () => {
     svg.remove();
   });
 
+  // describe("Number Axes", () => {
+  //   it ()
+  // });
+
   describe("Category Axes", () => {
     it("re-renders appropriately when data is changed", () => {
       var svg = generateSVG(400, 400);

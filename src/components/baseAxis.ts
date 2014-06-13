@@ -3,17 +3,18 @@
 module Plottable {
 export module Abstract {
   export class Axis extends Abstract.Component {
+    public static TICK_LABEL_CLASS = "tick-label";
     public axisElement: D3.Selection;
     public _ticksContainer: D3.Selection;
     public _ticks: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _scale: Abstract.Scale;
-    public _formatter: (n: any) => string;
+    public _formatter: Abstract.Formatter;
     public _orientation: string;
     private _tickLength = 5;
     private _tickLabelPadding = 3;
-    private _maxWidth = 0;
-    private _maxHeight = 0;
+    public _width: number;
+    public _height: number;
 
     /**
      * Creates a BaseAxis.
@@ -21,9 +22,9 @@ export module Abstract {
      * @constructor
      * @param {Scale} scale The Scale to base the BaseAxis on.
      * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
-     * @param {(n: any) => string} [formatter] A function to format tick labels.
+     * @param {Formatter} [formatter]
      */
-    constructor(scale: Abstract.Scale, orientation: string, formatter?: (n: any) => string) {
+    constructor(scale: Abstract.Scale, orientation: string, formatter?: Abstract.Formatter) {
       super();
       this._scale = scale;
       this.orient(orientation);
@@ -35,7 +36,11 @@ export module Abstract {
         this.classed("y-axis", true);
       }
 
-      this._formatter = (formatter != null) ? formatter : (n: any) => String(n);
+      if (formatter == null) {
+        formatter = new Plottable.Formatter.General();
+        formatter.showOnlyUnchangedValues(false);
+      }
+      this.formatter(formatter);
 
       this._registerToBroadcaster(this._scale, () => this.rescale());
     }
@@ -149,14 +154,64 @@ export module Abstract {
     }
 
     /**
+     * Gets the current user-specified width.
+     *
+     * @returns {number} The current user-specified width.
+     */
+    public width(): number;
+    /**
+     * Sets a user-specified width.
+     *
+     * @param {number} w A fixed width for the Axis.
+     * @returns {Axis} The calling Axis.
+     */
+    public width(w: number): Axis;
+    public width(w?: number): any {
+      if (w == null) {
+        return this._width;
+      } else {
+        if (this._isHorizontal()) {
+          throw new Error("width cannot be set on a horizontal Axis");
+        }
+        this._width = w;
+        return this;
+      }
+    }
+
+    /**
+     * Gets the current user-specified height.
+     *
+     * @returns {number} The current user-specified height.
+     */
+    public height(): number;
+    /**
+     * Sets a user-specified height.
+     *
+     * @param {number} h A fixed height for the Axis.
+     * @returns {Axis} The calling Axis.
+     */
+    public height(h: number): Axis;
+    public height(h?: number): any {
+      if (h == null) {
+        return this._height;
+      } else {
+        if (!this._isHorizontal()) {
+          throw new Error("height cannot be set on a vertical Axis");
+        }
+        this._height = h;
+        return this;
+      }
+    }
+
+    /**
      * Sets a new tick formatter.
      *
-     * @param {(n: any) => string} formatter A function to format tick labels.
+     * @param {Abstract.Formatter} formatter
      * @returns {BaseAxis} The calling BaseAxis.
      */
-    public formatter(formatFunction: (n: any) => string) {
-      this._formatter = formatFunction;
-      this._render();
+    public formatter(formatter: Abstract.Formatter) {
+      this._formatter = formatter;
+      this._invalidateLayout();
       return this;
     }
 

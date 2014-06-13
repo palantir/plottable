@@ -4056,15 +4056,13 @@ var Plottable;
             * @constructor
             * @param {Scale} scale The Scale to base the BaseAxis on.
             * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
-            * @param {(n: any) => string} [formatter] A function to format tick labels.
+            * @param {Formatter} [formatter]
             */
             function Axis(scale, orientation, formatter) {
                 var _this = this;
                 _super.call(this);
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
-                this._maxWidth = 0;
-                this._maxHeight = 0;
                 this._scale = scale;
                 this.orient(orientation);
 
@@ -4075,9 +4073,11 @@ var Plottable;
                     this.classed("y-axis", true);
                 }
 
-                this._formatter = (formatter != null) ? formatter : function (n) {
-                    return String(n);
-                };
+                if (formatter == null) {
+                    formatter = new Plottable.Formatter.General();
+                    formatter.showOnlyUnchangedValues(false);
+                }
+                this.formatter(formatter);
 
                 this._registerToBroadcaster(this._scale, function () {
                     return _this.rescale();
@@ -4200,15 +4200,39 @@ var Plottable;
                 return (this.element != null) ? this._render() : null;
             };
 
+            Axis.prototype.width = function (w) {
+                if (w == null) {
+                    return this._width;
+                } else {
+                    if (this._isHorizontal()) {
+                        throw new Error("width cannot be set on a horizontal Axis");
+                    }
+                    this._width = w;
+                    return this;
+                }
+            };
+
+            Axis.prototype.height = function (h) {
+                if (h == null) {
+                    return this._height;
+                } else {
+                    if (!this._isHorizontal()) {
+                        throw new Error("height cannot be set on a vertical Axis");
+                    }
+                    this._height = h;
+                    return this;
+                }
+            };
+
             /**
             * Sets a new tick formatter.
             *
-            * @param {(n: any) => string} formatter A function to format tick labels.
+            * @param {Abstract.Formatter} formatter
             * @returns {BaseAxis} The calling BaseAxis.
             */
-            Axis.prototype.formatter = function (formatFunction) {
-                this._formatter = formatFunction;
-                this._render();
+            Axis.prototype.formatter = function (formatter) {
+                this._formatter = formatter;
+                this._invalidateLayout();
                 return this;
             };
 
@@ -4251,11 +4275,148 @@ var Plottable;
                     return this;
                 }
             };
+            Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
         })(Plottable.Abstract.Component);
         Abstract.Axis = Axis;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Axis) {
+        var Number = (function (_super) {
+            __extends(Number, _super);
+            /**
+            * Creates a NumberAxis.
+            *
+            * @constructor
+            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumberAxis on.
+            * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
+            * @param {Formatter} [formatter] A function to format tick labels.
+            */
+            function Number(scale, orientation, formatter) {
+                _super.call(this, scale, orientation, formatter);
+            }
+            Number.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                var requestedWidth = this._width;
+                var requestedHeight = this._height;
+
+                var fakeTick;
+                var testTextEl;
+                if (this._isHorizontal()) {
+                    if (this.computedHeight == null) {
+                        fakeTick = this._ticksContainer.append("g").classed("tick", true);
+                        testTextEl = fakeTick.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                        var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
+                        this.computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+                        fakeTick.remove();
+                    }
+
+                    requestedWidth = 0;
+                    requestedHeight = (this._height == null) ? this.computedHeight : this._height;
+                } else {
+                    if (this.computedWidth == null) {
+                        // generate a test value to measure width
+                        var tickValues = this._getTickValues();
+                        var valueLength = function (v) {
+                            var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
+                            return (logLength > 0) ? logLength : 1;
+                        };
+                        var pow10 = Math.max.apply(null, tickValues.map(valueLength));
+                        var precision = this._formatter.precision();
+                        var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision));
+
+                        fakeTick = this._ticksContainer.append("g").classed("tick", true);
+                        testTextEl = fakeTick.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                        var formattedTestValue = this._formatter.format(testValue);
+                        var textLength = testTextEl.text(formattedTestValue).node().getComputedTextLength();
+                        this.computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+                        fakeTick.remove();
+                    }
+                    requestedWidth = (this._width == null) ? this.computedWidth : this._width;
+                    requestedHeight = 0;
+                }
+
+                return {
+                    width: Math.min(offeredWidth, requestedWidth),
+                    height: Math.min(offeredHeight, requestedHeight),
+                    wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
+                    wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
+                };
+            };
+
+            Number.prototype._getTickValues = function () {
+                return this._scale.ticks(10);
+            };
+
+            Number.prototype._doRender = function () {
+                var _this = this;
+                _super.prototype._doRender.call(this);
+
+                var tickLabelTextAnchor = "middle";
+                var tickLabelAttrHash = {
+                    x: 0,
+                    y: 0,
+                    dx: "0em",
+                    dy: "0.3em"
+                };
+                var tickMarkAttrHash = this._generateTickMarkAttrHash();
+                switch (this._orientation) {
+                    case "bottom":
+                        tickLabelAttrHash["y"] = tickMarkAttrHash["y2"] + this.tickLabelPadding();
+                        tickLabelAttrHash["dy"] = "0.95em";
+                        break;
+
+                    case "top":
+                        tickLabelAttrHash["y"] = tickMarkAttrHash["y2"] - this.tickLabelPadding();
+                        tickLabelAttrHash["dy"] = "-.25em";
+                        break;
+
+                    case "left":
+                        tickLabelTextAnchor = "end";
+                        tickLabelAttrHash["x"] = tickMarkAttrHash["x2"] - this.tickLabelPadding();
+                        break;
+
+                    case "right":
+                        tickLabelTextAnchor = "start";
+                        tickLabelAttrHash["x"] = tickMarkAttrHash["x2"] + this.tickLabelPadding();
+                        break;
+                }
+
+                var formatFunction = function (d) {
+                    return _this._formatter.format(d);
+                };
+                this._ticks.each(function (d, i) {
+                    var d3El = d3.select(this);
+                    var textEl = d3El.select("text");
+                    if (textEl.empty()) {
+                        textEl = d3El.append("text");
+                    }
+                    textEl.classed("tick-label", true).style("text-anchor", tickLabelTextAnchor).attr(tickLabelAttrHash).text(formatFunction(d));
+                });
+
+                return this;
+            };
+
+            Number.prototype._invalidateLayout = function () {
+                _super.prototype._invalidateLayout.call(this);
+                this.computedWidth = null;
+                this.computedHeight = null;
+            };
+            return Number;
+        })(Plottable.Abstract.Axis);
+        Axis.Number = Number;
+    })(Plottable.Axis || (Plottable.Axis = {}));
+    var Axis = Plottable.Axis;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
