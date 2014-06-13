@@ -88,6 +88,42 @@ declare module Plottable {
             *  OTHER DEALINGS IN THE SOFTWARE.
             */
             function sortedIndex(val: number, arr: number[]): number;
+            /**
+            * Returns the sortedIndex for inserting a value into an array.
+            * Takes a number and an array of numbers OR an array of objects and an accessor that returns a number.
+            * @param {number} value: The numerical value to insert
+            * @param {any[]} arr: Array to find insertion index, can be number[] or any[] (if accessor provided)
+            * @param {IAccessor} accessor: If provided, this function is called on members of arr to determine insertion index
+            * @returns {number} The insertion index.
+            * The behavior is undefined for arrays that are unsorted
+            * If there are multiple valid insertion indices that maintain sorted order (e.g. addign 1 to [1,1,1,1,1]) then
+            * the behavior must satisfy that the array is sorted post-insertion, but is otherwise unspecified.
+            * This is a modified version of Underscore.js's implementation of sortedIndex.
+            * Underscore.js is released under the MIT License:
+            *  Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative
+            *  Reporters & Editors
+            *
+            *  Permission is hereby granted, free of charge, to any person
+            *  obtaining a copy of this software and associated documentation
+            *  files (the "Software"), to deal in the Software without
+            *  restriction, including without limitation the rights to use,
+            *  copy, modify, merge, publish, distribute, sublicense, and/or sell
+            *  copies of the Software, and to permit persons to whom the
+            *  Software is furnished to do so, subject to the following
+            *  conditions:
+            *
+            *  The above copyright notice and this permission notice shall be
+            *  included in all copies or substantial portions of the Software.
+            *
+            *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+            *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+            *  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+            *  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+            *  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+            *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+            *  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+            *  OTHER DEALINGS IN THE SOFTWARE.
+            */
             function sortedIndex(val: number, arr: any[], accessor: IAccessor): number;
         }
     }
@@ -431,6 +467,12 @@ declare module Plottable {
         * @returns {any[]|DataSource} The current data, or the calling DataSource.
         */
         public data(): any[];
+        /**
+        * Retrieves the current data from the DataSource, or sets the data.
+        *
+        * @param {any[]} [data] The new data.
+        * @returns {any[]|DataSource} The current data, or the calling DataSource.
+        */
         public data(data: any[]): DataSource;
         /**
         * Retrieves the current metadata from the DataSource, or sets the metadata.
@@ -439,6 +481,12 @@ declare module Plottable {
         * @returns {any[]|DataSource} The current metadata, or the calling DataSource.
         */
         public metadata(): any;
+        /**
+        * Retrieves the current metadata from the DataSource, or sets the metadata.
+        *
+        * @param {any[]} [metadata] The new metadata.
+        * @returns {any[]|DataSource} The current metadata, or the calling DataSource.
+        */
         public metadata(metadata: any): DataSource;
     }
 }
@@ -515,6 +563,13 @@ declare module Plottable {
             * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
             */
             public classed(cssClass: string): boolean;
+            /**
+            * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+            *
+            * @param {string} cssClass The CSS class to add/remove/check for.
+            * @param {boolean} [addClass] Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
+            * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+            */
             public classed(cssClass: string, addClass: boolean): Component;
             /**
             * Merges this Component with another Component, returning a ComponentGroup.
@@ -672,6 +727,15 @@ declare module Plottable {
             * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
             */
             public domain(): any[];
+            /**
+            * Retrieves the current domain, or sets the Scale's domain to the specified values.
+            *
+            * @param {any[]} [values] The new value for the domain. This array may
+            *     contain more than 2 values if the scale type allows it (e.g.
+            *     ordinal scales). Other scales such as quantitative scales accept
+            *     only a 2-value extent array.
+            * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+            */
             public domain(values: any[]): Scale;
             /**
             * Retrieves the current range, or sets the Scale's range to the specified values.
@@ -680,6 +744,12 @@ declare module Plottable {
             * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
             */
             public range(): any[];
+            /**
+            * Retrieves the current range, or sets the Scale's range to the specified values.
+            *
+            * @param {any[]} [values] The new value for the range.
+            * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
+            */
             public range(values: any[]): Scale;
             /**
             * Creates a copy of the Scale with the same domain and range but without any registered listeners.
@@ -721,7 +791,19 @@ declare module Plottable {
             * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Plot.
             */
             constructor();
+            /**
+            * Creates a Plot.
+            *
+            * @constructor
+            * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Plot.
+            */
             constructor(dataset: any[]);
+            /**
+            * Creates a Plot.
+            *
+            * @constructor
+            * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Plot.
+            */
             constructor(dataset: DataSource);
             /**
             * Retrieves the current DataSource, or sets a DataSource if the Plot doesn't yet have one.
@@ -730,6 +812,12 @@ declare module Plottable {
             * @return {DataSource|Plot} The current DataSource or the calling Plot.
             */
             public dataSource(): DataSource;
+            /**
+            * Retrieves the current DataSource, or sets a DataSource if the Plot doesn't yet have one.
+            *
+            * @param {DataSource} [source] The DataSource the Plot should use, if it doesn't yet have one.
+            * @return {DataSource|Plot} The current DataSource or the calling Plot.
+            */
             public dataSource(source: DataSource): Plot;
             public project(attrToSet: string, accessor: any, scale?: Scale): Plot;
             /**
@@ -749,6 +837,16 @@ declare module Plottable {
             *     stored at the specified key.
             */
             public animator(animatorKey: string): Animator.IPlotAnimator;
+            /**
+            * Gets or sets the animator associated with the specified animator key.
+            *
+            * @param {string} animatorKey The key for the animator.
+            * @param {Animator.IPlotAnimator} animator If specified, will be stored as the
+            *     animator for the key.
+            * @return {Animator.IPlotAnimator|Plot} If an animator is specified, we return
+            *     this object to enable chaining, otherwise we return the animator
+            *     stored at the specified key.
+            */
             public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
         }
     }
@@ -952,6 +1050,12 @@ declare module Plottable {
             * @returns {D3.Transition.Interpolate|QuantitiveScale} The current output interpolator, or the calling QuantitiveScale.
             */
             public interpolate(): D3.Transition.Interpolate;
+            /**
+            * Sets or gets the QuantitiveScale's output interpolator
+            *
+            * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
+            * @returns {D3.Transition.Interpolate|QuantitiveScale} The current output interpolator, or the calling QuantitiveScale.
+            */
             public interpolate(factory: D3.Transition.Interpolate): QuantitiveScale;
             /**
             * Sets the range of the QuantitiveScale and sets the interpolator to d3.interpolateRound.
@@ -966,6 +1070,12 @@ declare module Plottable {
             * @returns {boolean|QuantitiveScale} The current clamp status, or the calling QuantitiveScale.
             */
             public clamp(): boolean;
+            /**
+            * Gets or sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+            *
+            * @param {boolean} [clamp] Whether or not to clamp the QuantitiveScale.
+            * @returns {boolean|QuantitiveScale} The current clamp status, or the calling QuantitiveScale.
+            */
             public clamp(clamp: boolean): QuantitiveScale;
             /**
             * Extends the scale's domain so it starts and ends with "nice" values.
@@ -1010,6 +1120,12 @@ declare module Plottable {
             * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the LinearScale. If not supplied, uses a default scale.
             */
             constructor();
+            /**
+            * Creates a new LinearScale.
+            *
+            * @constructor
+            * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the LinearScale. If not supplied, uses a default scale.
+            */
             constructor(scale: D3.Scale.LinearScale);
             /**
             * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
@@ -1032,6 +1148,12 @@ declare module Plottable {
             * @param {D3.Scale.LogScale} [scale] The D3 Scale.Log backing the Scale.Log. If not supplied, uses a default scale.
             */
             constructor();
+            /**
+            * Creates a new Scale.Log.
+            *
+            * @constructor
+            * @param {D3.Scale.LogScale} [scale] The D3 Scale.Log backing the Scale.Log. If not supplied, uses a default scale.
+            */
             constructor(scale: D3.Scale.LogScale);
             /**
             * Creates a copy of the Scale.Log with the same domain and range but without any registered listeners.
@@ -1060,6 +1182,12 @@ declare module Plottable {
             * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
             */
             public domain(): any[];
+            /**
+            * Retrieves the current domain, or sets the Scale's domain to the specified values.
+            *
+            * @param {any[]} [values] The new values for the domain. This array may contain more than 2 values.
+            * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+            */
             public domain(values: any[]): Ordinal;
             /**
             * Returns the range of pixels spanned by the scale, or sets the range.
@@ -1068,6 +1196,12 @@ declare module Plottable {
             * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
             */
             public range(): any[];
+            /**
+            * Returns the range of pixels spanned by the scale, or sets the range.
+            *
+            * @param {number[]} [values] The pixel range to set on the scale.
+            * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
+            */
             public range(values: number[]): Ordinal;
             /**
             * Returns the width of the range band. Only valid when rangeType is set to "bands".
@@ -1091,6 +1225,19 @@ declare module Plottable {
             *     OrdinalScale.
             */
             public rangeType(): string;
+            /**
+            * Returns the range type, or sets the range type.
+            *
+            * @param {string} [rangeType] Either "points" or "bands" indicating the
+            *     d3 method used to generate range bounds.
+            * @param {number} [outerPadding] The padding outside the range,
+            *     proportional to the range step.
+            * @param {number} [innerPadding] The padding between bands in the range,
+            *     proportional to the range step. This parameter is only used in
+            *     "bands" type ranges.
+            * @returns {string|OrdinalScale} The current range type, or the calling
+            *     OrdinalScale.
+            */
             public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
         }
     }
@@ -1156,6 +1303,19 @@ declare module Plottable {
             *     InterpolatedColorScale object.
             */
             public colorRange(): string[];
+            /**
+            * Gets or sets the color range.
+            *
+            * @param {string|string[]} [colorRange]. If no argument is passed,
+            *     returns the current range of colors. If the param is one of
+            *     (reds/blues/posneg) we lookup the scale from the built-in color
+            *     groups. Finally, if params is an array of strings with at least 2
+            *     values (e.g. ["#FF00FF", "red", "dodgerblue"], the resulting scale
+            *     will interpolate between the color values across the domain.
+            *
+            * @returns the current color values for the range as strings or this
+            *     InterpolatedColorScale object.
+            */
             public colorRange(colorRange: any): InterpolatedColor;
             /**
             * Gets or sets the internal scale type.
@@ -1168,6 +1328,16 @@ declare module Plottable {
             * @returns the current scale type or this InterpolatedColorScale object.
             */
             public scaleType(): string;
+            /**
+            * Gets or sets the internal scale type.
+            *
+            * @param {string} [scaleType]. If no argument is passed, returns the
+            *     current scale type string. Otherwise, we set the internal scale
+            *     using the d3 scale name. These scales must be quantitative scales,
+            *     so the valid values are (linear/log/sqrt/pow).
+            *
+            * @returns the current scale type or this InterpolatedColorScale object.
+            */
             public scaleType(scaleType: string): InterpolatedColor;
         }
     }
@@ -1215,6 +1385,13 @@ declare module Plottable {
             * @returns {string|Axis} The current tick label position, or the calling Axis.
             */
             public tickLabelPosition(): string;
+            /**
+            * Sets or gets the tick label position relative to the tick marks.
+            * The exact consequences of particular tick label positionings depends on the subclass implementation.
+            *
+            * @param {string} [position] The relative position of the tick label.
+            * @returns {string|Axis} The current tick label position, or the calling Axis.
+            */
             public tickLabelPosition(position: string): Axis;
             public orient(): string;
             public orient(newOrient: string): Axis;
@@ -1238,6 +1415,12 @@ declare module Plottable {
             * @returns The current tick formatting function, or the calling Axis.
             */
             public tickFormat(): (value: any) => string;
+            /**
+            * Gets the current tick formatting function, or sets the tick formatting function.
+            *
+            * @param {(value: any) => string} [formatter] The new tick formatting function.
+            * @returns The current tick formatting function, or the calling Axis.
+            */
             public tickFormat(formatter: (value: any) => string): Axis;
         }
         class XAxis extends Axis {
@@ -1258,6 +1441,12 @@ declare module Plottable {
             * @returns {string|XAxis} The current tick label position, or the calling XAxis.
             */
             public tickLabelPosition(): string;
+            /**
+            * Sets or gets the tick label position relative to the tick marks.
+            *
+            * @param {string} [position] The relative position of the tick label (left/center/right).
+            * @returns {string|XAxis} The current tick label position, or the calling XAxis.
+            */
             public tickLabelPosition(position: string): XAxis;
         }
         class YAxis extends Axis {
@@ -1278,6 +1467,12 @@ declare module Plottable {
             * @returns {string|YAxis} The current tick label position, or the calling YAxis.
             */
             public tickLabelPosition(): string;
+            /**
+            * Sets or gets the tick label position relative to the tick marks.
+            *
+            * @param {string} [position] The relative position of the tick label (top/middle/bottom).
+            * @returns {string|YAxis} The current tick label position, or the calling YAxis.
+            */
             public tickLabelPosition(position: string): YAxis;
         }
     }
@@ -1310,6 +1505,12 @@ declare module Plottable {
             * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
             */
             public tickLength(): number;
+            /**
+            * Gets or sets the length of each tick mark.
+            *
+            * @param {number} [length] The length of each tick.
+            * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+            */
             public tickLength(length: number): Axis;
             /**
             * Gets or sets the padding between each tick mark and its associated label.
@@ -1318,6 +1519,12 @@ declare module Plottable {
             * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
             */
             public tickLabelPadding(): number;
+            /**
+            * Gets or sets the padding between each tick mark and its associated label.
+            *
+            * @param {number} [length] The length of each tick.
+            * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+            */
             public tickLabelPadding(padding: number): Axis;
             public orient(): string;
             public orient(newOrientation: string): Axis;
@@ -1404,6 +1611,15 @@ declare module Plottable {
             * @param{ToggleCallback} callback The new callback function
             */
             public toggleCallback(callback: ToggleCallback): Legend;
+            /**
+            * Assigns or gets the callback to the Legend
+            * This callback is associated with toggle events, which trigger when a legend row is clicked.
+            * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
+            * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
+            * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
+            *
+            * @param{ToggleCallback} callback The new callback function
+            */
             public toggleCallback(): ToggleCallback;
             /**
             * Assigns or gets the callback to the Legend
@@ -1415,6 +1631,15 @@ declare module Plottable {
             * @param{HoverCallback} callback The new callback function
             */
             public hoverCallback(callback: HoverCallback): Legend;
+            /**
+            * Assigns or gets the callback to the Legend
+            * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
+            * Setting a callback will also set the class "hover" to all legend row,
+            * as well as the class "focus" to the legend row being hovered over.
+            * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
+            *
+            * @param{HoverCallback} callback The new callback function
+            */
             public hoverCallback(): HoverCallback;
             /**
             * Assigns a new ColorScale to the Legend.
@@ -1423,6 +1648,12 @@ declare module Plottable {
             * @returns {Legend} The calling Legend.
             */
             public scale(scale: Scale.Color): Legend;
+            /**
+            * Assigns a new ColorScale to the Legend.
+            *
+            * @param {ColorScale} scale
+            * @returns {Legend} The calling Legend.
+            */
             public scale(): Scale.Color;
         }
     }
@@ -1674,6 +1905,13 @@ declare module Plottable {
             *     the current duration if no argument is supplied.
             */
             public duration(): Number;
+            /**
+            * Gets or sets the duration of the animation in milliseconds.
+            *
+            * @param {Number} duration The duration in milliseconds.
+            * @return {Number|Default} Returns this object for chaining or
+            *     the current duration if no argument is supplied.
+            */
             public duration(duration: Number): Default;
             /**
             * Gets or sets the delay of the animation in milliseconds.
@@ -1683,6 +1921,13 @@ declare module Plottable {
             *     the current delay if no argument is supplied.
             */
             public delay(): Number;
+            /**
+            * Gets or sets the delay of the animation in milliseconds.
+            *
+            * @param {Number} delay The delay in milliseconds.
+            * @return {Number|Default} Returns this object for chaining or
+            *     the current delay if no argument is supplied.
+            */
             public delay(delay: Number): Default;
             /**
             * Gets or sets the easing string of the animation in milliseconds.
@@ -1692,6 +1937,13 @@ declare module Plottable {
             *     the current easing string if no argument is supplied.
             */
             public easing(): string;
+            /**
+            * Gets or sets the easing string of the animation in milliseconds.
+            *
+            * @param {string} easing The easing string.
+            * @return {string|Default} Returns this object for chaining or
+            *     the current easing string if no argument is supplied.
+            */
             public easing(easing: string): Default;
         }
     }
