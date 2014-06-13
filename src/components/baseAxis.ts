@@ -213,7 +213,7 @@ export module Abstract {
         }
         return <number> this._height;
       } else {
-        if (this._isHorizontal()) {
+        if (!this._isHorizontal()) {
           throw new Error("height cannot be set on a vertical Axis");
         }
         if (h !== "auto" && h < 0) {
