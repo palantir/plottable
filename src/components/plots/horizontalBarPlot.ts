@@ -97,6 +97,11 @@ export module Plot {
       }
       return this;
     }
+
+    public _setXDomainer() {
+      this.xScale.setDomainerIfDefault(new Domainer().padUnlessZero().nice());
+      return this;
+    }
   }
 }
 }

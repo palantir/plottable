@@ -26,12 +26,12 @@ export module Abstract {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale != null) {
         this.xScale = scale;
-        this.xScale.setDomainerIfDefault(new Domainer().pad().nice());
+        this._setXDomainer();
       }
 
       if (attrToSet === "y" && scale != null) {
         this.yScale = scale;
-        this.yScale.setDomainerIfDefault(new Domainer().pad().nice());
+        this._setYDomainer();
       }
 
       super.project(attrToSet, accessor, scale);
@@ -50,6 +50,16 @@ export module Abstract {
       if (this.element != null) {
         this._render();
       }
+    }
+
+    public _setXDomainer(): XYPlot {
+      this.xScale.setDomainerIfDefault(new Domainer().pad().nice());
+      return this;
+    }
+
+    public _setYDomainer(): XYPlot {
+      this.yScale.setDomainerIfDefault(new Domainer().pad().nice());
+      return this;
     }
   }
 }

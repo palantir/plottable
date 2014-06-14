@@ -6,6 +6,7 @@ module Plottable {
     private doNice = false;
     private niceCount: number;
     private padProportion = 0.0;
+    private padBeyondZero = true;
     private combineExtents: (extents: any[][]) => any[];
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
 
@@ -43,6 +44,13 @@ module Plottable {
      */
     public pad(padProportion = 0.05): Domainer {
       this.padProportion = padProportion;
+      this.padBeyondZero = true;
+      return this;
+    }
+
+    public padUnlessZero(padProportion = 0.05): Domainer {
+      this.padProportion = padProportion;
+      this.padBeyondZero = false;
       return this;
     }
 
@@ -70,11 +78,13 @@ module Plottable {
       var extent = domain[1] - domain[0];
       var newDomain = [domain[0].valueOf() - this.padProportion/2 * extent,
                        domain[1].valueOf() + this.padProportion/2 * extent];
-      if (domain[0] === 0) {
-        newDomain[0] = 0;
-      }
-      if (domain[1] === 0) {
-        newDomain[1] = 0;
+      if (!this.padBeyondZero) {
+        if (domain[0] === 0) {
+          newDomain[0] = 0;
+        }
+        if (domain[1] === 0) {
+          newDomain[1] = 0;
+        }
       }
       return newDomain;
     }

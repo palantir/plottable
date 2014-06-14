@@ -945,6 +945,7 @@ declare module Plottable {
         *         new domain should be (0.05 = 5% larger).
         */
         public pad(padProportion?: number): Domainer;
+        public padUnlessZero(padProportion?: number): Domainer;
         /**
         * Extends the scale's domain so it starts and ends with "nice" values.
         *

@@ -2867,6 +2867,7 @@ var Plottable;
             if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
             this.doNice = false;
             this.padProportion = 0.0;
+            this.padBeyondZero = true;
             this.combineExtents = combineExtents;
         }
         /**
@@ -2893,6 +2894,14 @@ var Plottable;
         Domainer.prototype.pad = function (padProportion) {
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
             this.padProportion = padProportion;
+            this.padBeyondZero = true;
+            return this;
+        };
+
+        Domainer.prototype.padUnlessZero = function (padProportion) {
+            if (typeof padProportion === "undefined") { padProportion = 0.05; }
+            this.padProportion = padProportion;
+            this.padBeyondZero = false;
             return this;
         };
 
@@ -2926,11 +2935,13 @@ var Plottable;
             var newDomain = [
                 domain[0].valueOf() - this.padProportion / 2 * extent,
                 domain[1].valueOf() + this.padProportion / 2 * extent];
-            if (domain[0] === 0) {
-                newDomain[0] = 0;
-            }
-            if (domain[1] === 0) {
-                newDomain[1] = 0;
+            if (!this.padBeyondZero) {
+                if (domain[0] === 0) {
+                    newDomain[0] = 0;
+                }
+                if (domain[1] === 0) {
+                    newDomain[1] = 0;
+                }
             }
             return newDomain;
         };
@@ -5006,12 +5017,12 @@ var Plottable;
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale != null) {
                     this.xScale = scale;
-                    this.xScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                    this._setXDomainer();
                 }
 
                 if (attrToSet === "y" && scale != null) {
                     this.yScale = scale;
-                    this.yScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                    this._setYDomainer();
                 }
 
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
@@ -5030,6 +5041,16 @@ var Plottable;
                 if (this.element != null) {
                     this._render();
                 }
+            };
+
+            XYPlot.prototype._setXDomainer = function () {
+                this.xScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                return this;
+            };
+
+            XYPlot.prototype._setYDomainer = function () {
+                this.yScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                return this;
             };
             return XYPlot;
         })(Plottable.Abstract.Plot);
@@ -5402,6 +5423,11 @@ var Plottable;
                 }
                 return this;
             };
+
+            VerticalBar.prototype._setYDomainer = function () {
+                this.yScale.setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                return this;
+            };
             return VerticalBar;
         })(Plottable.Abstract.BarPlot);
         Plot.VerticalBar = VerticalBar;
@@ -5521,6 +5547,11 @@ var Plottable;
                 if (this.element != null) {
                     this._render();
                 }
+                return this;
+            };
+
+            HorizontalBar.prototype._setXDomainer = function () {
+                this.xScale.setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
                 return this;
             };
             return HorizontalBar;

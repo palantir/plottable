@@ -98,6 +98,11 @@ export module Plot {
       }
       return this;
     }
+
+    public _setYDomainer() {
+      this.yScale.setDomainerIfDefault(new Domainer().padUnlessZero().nice());
+      return this;
+    }
   }
 }
 }
