@@ -2368,16 +2368,8 @@ var Plottable;
             function Scale(scale) {
                 _super.call(this);
                 this._autoDomainAutomatically = true;
-<<<<<<< HEAD
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
-                this.rendererID2Perspective = {};
-                this.dataSourceReferenceCounter = new Plottable.Util.IDCounter();
-||||||| merged common ancestors
-                this.rendererID2Perspective = {};
-                this.dataSourceReferenceCounter = new Plottable.Util.IDCounter();
-=======
                 this._rendererAttrID2Extent = {};
->>>>>>> master
                 this._autoNice = false;
                 this._autoPad = false;
                 this._d3Scale = scale;
@@ -2402,80 +2394,6 @@ var Plottable;
                 return this;
             };
 
-<<<<<<< HEAD
-            Scale.prototype._addPerspective = function (rendererIDAttr, dataSource, accessor) {
-                var _this = this;
-                if (this.rendererID2Perspective[rendererIDAttr] != null) {
-                    this._removePerspective(rendererIDAttr);
-                }
-                this.rendererID2Perspective[rendererIDAttr] = { dataSource: dataSource, accessor: accessor };
-
-                var dataSourceID = dataSource._plottableID;
-                if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1) {
-                    dataSource.broadcaster.registerListener(this, function () {
-                        if (_this._autoDomainAutomatically) {
-                            _this.autoDomain();
-                        }
-                    });
-                }
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
-                return this;
-            };
-
-            Scale.prototype._removePerspective = function (rendererIDAttr) {
-                var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
-                var dataSourceID = dataSource._plottableID;
-                if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-                    dataSource.broadcaster.deregisterListener(this);
-                }
-
-                delete this.rendererID2Perspective[rendererIDAttr];
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
-                return this;
-            };
-
-||||||| merged common ancestors
-            Scale.prototype._addPerspective = function (rendererIDAttr, dataSource, accessor) {
-                var _this = this;
-                if (this.rendererID2Perspective[rendererIDAttr] != null) {
-                    this._removePerspective(rendererIDAttr);
-                }
-                this.rendererID2Perspective[rendererIDAttr] = { dataSource: dataSource, accessor: accessor };
-
-                var dataSourceID = dataSource._plottableID;
-                if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1) {
-                    dataSource.registerListener(this, function () {
-                        if (_this._autoDomainAutomatically) {
-                            _this.autoDomain();
-                        }
-                    });
-                }
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
-                return this;
-            };
-
-            Scale.prototype._removePerspective = function (rendererIDAttr) {
-                var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
-                var dataSourceID = dataSource._plottableID;
-                if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-                    dataSource.deregisterListener(this);
-                }
-
-                delete this.rendererID2Perspective[rendererIDAttr];
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
-                return this;
-            };
-
-=======
->>>>>>> master
             /**
             * Returns the range value corresponding to a given domain value.
             *
@@ -2610,14 +2528,8 @@ var Plottable;
                     this._rerenderUpdateSelection = true;
                 }
                 this._dataSource = source;
-<<<<<<< HEAD
                 this._dataSource.broadcaster.registerListener(this, function () {
-||||||| merged common ancestors
-                this._registerToBroadcaster(this._dataSource, function () {
-=======
-                this._registerToBroadcaster(this._dataSource, function () {
                     _this.updateAllProjectors();
->>>>>>> master
                     _this._dataChanged = true;
                     _this._render();
                 });
@@ -2634,28 +2546,12 @@ var Plottable;
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
                 if (existingScale != null) {
-<<<<<<< HEAD
-                    existingScale._removePerspective(rendererIDAttr);
-                    existingScale.broadcaster.deregisterListener(this);
-||||||| merged common ancestors
-                    existingScale._removePerspective(rendererIDAttr);
-                    this._deregisterFromBroadcaster(existingScale);
-=======
                     existingScale.removeExtent(this._plottableID, attrToSet);
-                    this._deregisterFromBroadcaster(existingScale);
->>>>>>> master
+                    existingScale.broadcaster.deregisterListener(this);
                 }
 
                 if (scale != null) {
-<<<<<<< HEAD
-                    scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
                     scale.broadcaster.registerListener(this, function () {
-||||||| merged common ancestors
-                    scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
-                    this._registerToBroadcaster(scale, function () {
-=======
-                    this._registerToBroadcaster(scale, function () {
->>>>>>> master
                         return _this._render();
                     });
                 }

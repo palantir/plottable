@@ -77,22 +77,10 @@ describe("Renderers", () => {
       var yScaleCalls: number = 0;
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-<<<<<<< HEAD
-      r.project("x", null, xScale);
-      r.project("y", null, yScale);
-      xScale.broadcaster.registerListener(null, (listenable: Plottable.Core.IListenable) => {
-        assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
-||||||| merged common ancestors
-      r.project("x", null, xScale);
-      r.project("y", null, yScale);
-      xScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
-        assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
-=======
       r.project("x", "x", xScale);
       r.project("y", "y", yScale);
-      xScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
-        assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
->>>>>>> master
+      xScale.broadcaster.registerListener(null, (listenable: Plottable.Core.IListenable) => {
+        assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
       yScale.broadcaster.registerListener(null, (listenable: Plottable.Core.IListenable) => {
@@ -112,33 +100,13 @@ describe("Renderers", () => {
       assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
       assert.equal(2, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
-<<<<<<< HEAD
       d1.broadcaster.broadcast();
-      assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
-      assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
-||||||| merged common ancestors
-      d1._broadcast();
-      assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
-      assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
-=======
-      d1._broadcast();
       assert.equal(2, xScaleCalls, "X scale was unhooked from old datasource");
       assert.equal(2, yScaleCalls, "Y scale was unhooked from old datasource");
->>>>>>> master
 
-<<<<<<< HEAD
       d2.broadcaster.broadcast();
-      assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
-      assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
-||||||| merged common ancestors
-      d2._broadcast();
-      assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
-      assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
-=======
-      d2._broadcast();
       assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
       assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
->>>>>>> master
     });
 
     it("Renderer automatically generates a DataSource if only data is provided", () => {

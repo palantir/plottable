@@ -2,33 +2,11 @@
 
 module Plottable {
 export module Abstract {
-<<<<<<< HEAD
-  interface IPerspective {
-    dataSource: DataSource;
-    accessor: IAccessor;
-  }
   export class Scale extends PlottableObject implements Core.IListenable {
-||||||| merged common ancestors
-  interface IPerspective {
-    dataSource: DataSource;
-    accessor: IAccessor;
-  }
-  export class Scale extends Broadcaster {
-=======
-  export class Scale extends Broadcaster {
->>>>>>> master
     public _d3Scale: D3.Scale.Scale;
     public _autoDomainAutomatically = true;
-<<<<<<< HEAD
     public broadcaster = new Plottable.Core.Broadcaster(this);
-    private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
-    private dataSourceReferenceCounter = new Util.IDCounter();
-||||||| merged common ancestors
-    private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
-    private dataSourceReferenceCounter = new Util.IDCounter();
-=======
     public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
->>>>>>> master
     public _autoNice = false;
     public _autoPad  = false;
     /**
@@ -62,78 +40,6 @@ export module Abstract {
       return this;
     }
 
-<<<<<<< HEAD
-    public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any) {
-      if (this.rendererID2Perspective[rendererIDAttr] != null) {
-        this._removePerspective(rendererIDAttr);
-      }
-      this.rendererID2Perspective[rendererIDAttr] = {dataSource: dataSource, accessor: accessor};
-
-      var dataSourceID = dataSource._plottableID;
-      if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
-        dataSource.broadcaster.registerListener(this, () => {
-          if (this._autoDomainAutomatically) {
-            this.autoDomain();
-          }
-        });
-      }
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
-      return this;
-    }
-
-    public _removePerspective(rendererIDAttr: string) {
-      var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
-      var dataSourceID = dataSource._plottableID;
-      if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-        dataSource.broadcaster.deregisterListener(this);
-      }
-
-      delete this.rendererID2Perspective[rendererIDAttr];
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
-      return this;
-    }
-
-||||||| merged common ancestors
-    public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any) {
-      if (this.rendererID2Perspective[rendererIDAttr] != null) {
-        this._removePerspective(rendererIDAttr);
-      }
-      this.rendererID2Perspective[rendererIDAttr] = {dataSource: dataSource, accessor: accessor};
-
-      var dataSourceID = dataSource._plottableID;
-      if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
-        dataSource.registerListener(this, () => {
-          if (this._autoDomainAutomatically) {
-            this.autoDomain();
-          }
-        });
-      }
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
-      return this;
-    }
-
-    public _removePerspective(rendererIDAttr: string) {
-      var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
-      var dataSourceID = dataSource._plottableID;
-      if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-        dataSource.deregisterListener(this);
-      }
-
-      delete this.rendererID2Perspective[rendererIDAttr];
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
-      return this;
-    }
-
-=======
->>>>>>> master
     /**
      * Returns the range value corresponding to a given domain value.
      *
@@ -200,7 +106,7 @@ export module Abstract {
      * When a renderer determines that the extent of a projector has changed,
      * it will call this function. This function should ensure that
      * the scale has a domain at least large enough to include extent.
-     * 
+     *
      * @param {number} rendererID A unique indentifier of the renderer sending
      *                 the new extent.
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"

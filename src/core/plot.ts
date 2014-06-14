@@ -89,14 +89,8 @@ export module Abstract {
         this._rerenderUpdateSelection = true;
       }
       this._dataSource = source;
-<<<<<<< HEAD
       this._dataSource.broadcaster.registerListener(this, () => {
-||||||| merged common ancestors
-      this._registerToBroadcaster(this._dataSource, () => {
-=======
-      this._registerToBroadcaster(this._dataSource, () => {
         this.updateAllProjectors();
->>>>>>> master
         this._dataChanged = true;
         this._render();
       });
@@ -112,28 +106,12 @@ export module Abstract {
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
       if (existingScale != null) {
-<<<<<<< HEAD
-        existingScale._removePerspective(rendererIDAttr);
-        existingScale.broadcaster.deregisterListener(this);
-||||||| merged common ancestors
-        existingScale._removePerspective(rendererIDAttr);
-        this._deregisterFromBroadcaster(existingScale);
-=======
         existingScale.removeExtent(this._plottableID, attrToSet);
-        this._deregisterFromBroadcaster(existingScale);
->>>>>>> master
+        existingScale.broadcaster.deregisterListener(this);
       }
 
       if (scale != null) {
-<<<<<<< HEAD
-        scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
         scale.broadcaster.registerListener(this, () => this._render());
-||||||| merged common ancestors
-        scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
-        this._registerToBroadcaster(scale, () => this._render());
-=======
-        this._registerToBroadcaster(scale, () => this._render());
->>>>>>> master
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
