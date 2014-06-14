@@ -105,6 +105,15 @@ var Plottable;
                 return out;
             }
             Methods.createFilledArray = createFilledArray;
+
+            /**
+            * @param {T[][]} a The 2D array that will have its elements joined together.
+            * @return {T[]} Every array in a, concatenated together in the order they appear.
+            */
+            function flatten(a) {
+                return Array.prototype.concat.apply([], a);
+            }
+            Methods.flatten = flatten;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -1264,7 +1273,7 @@ var Plottable;
             var appliedAccessor = Plottable.Util.Methods.applyAccessor(accessor, this);
             var mappedData = this._data.map(appliedAccessor);
             if (mappedData.length === 0) {
-                return undefined;
+                return [];
             } else if (typeof (mappedData[0]) === "string") {
                 return Plottable.Util.Methods.uniq(mappedData);
             } else {
@@ -2359,23 +2368,22 @@ var Plottable;
             function Scale(scale) {
                 _super.call(this);
                 this._autoDomainAutomatically = true;
+<<<<<<< HEAD
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this.rendererID2Perspective = {};
                 this.dataSourceReferenceCounter = new Plottable.Util.IDCounter();
+||||||| merged common ancestors
+                this.rendererID2Perspective = {};
+                this.dataSourceReferenceCounter = new Plottable.Util.IDCounter();
+=======
+                this._rendererAttrID2Extent = {};
+>>>>>>> master
                 this._autoNice = false;
                 this._autoPad = false;
                 this._d3Scale = scale;
             }
             Scale.prototype._getAllExtents = function () {
-                var perspectives = d3.values(this.rendererID2Perspective);
-                var extents = perspectives.map(function (p) {
-                    var source = p.dataSource;
-                    var accessor = p.accessor;
-                    return source._getExtent(accessor);
-                }).filter(function (e) {
-                    return e != null;
-                });
-                return extents;
+                return d3.values(this._rendererAttrID2Extent);
             };
 
             Scale.prototype._getExtent = function () {
@@ -2394,6 +2402,7 @@ var Plottable;
                 return this;
             };
 
+<<<<<<< HEAD
             Scale.prototype._addPerspective = function (rendererIDAttr, dataSource, accessor) {
                 var _this = this;
                 if (this.rendererID2Perspective[rendererIDAttr] != null) {
@@ -2429,6 +2438,44 @@ var Plottable;
                 return this;
             };
 
+||||||| merged common ancestors
+            Scale.prototype._addPerspective = function (rendererIDAttr, dataSource, accessor) {
+                var _this = this;
+                if (this.rendererID2Perspective[rendererIDAttr] != null) {
+                    this._removePerspective(rendererIDAttr);
+                }
+                this.rendererID2Perspective[rendererIDAttr] = { dataSource: dataSource, accessor: accessor };
+
+                var dataSourceID = dataSource._plottableID;
+                if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1) {
+                    dataSource.registerListener(this, function () {
+                        if (_this._autoDomainAutomatically) {
+                            _this.autoDomain();
+                        }
+                    });
+                }
+                if (this._autoDomainAutomatically) {
+                    this.autoDomain();
+                }
+                return this;
+            };
+
+            Scale.prototype._removePerspective = function (rendererIDAttr) {
+                var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
+                var dataSourceID = dataSource._plottableID;
+                if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
+                    dataSource.deregisterListener(this);
+                }
+
+                delete this.rendererID2Perspective[rendererIDAttr];
+                if (this._autoDomainAutomatically) {
+                    this.autoDomain();
+                }
+                return this;
+            };
+
+=======
+>>>>>>> master
             /**
             * Returns the range value corresponding to a given domain value.
             *
@@ -2470,6 +2517,32 @@ var Plottable;
             */
             Scale.prototype.copy = function () {
                 return new Scale(this._d3Scale.copy());
+            };
+
+            /**
+            * When a renderer determines that the extent of a projector has changed,
+            * it will call this function. This function should ensure that
+            * the scale has a domain at least large enough to include extent.
+            *
+            * @param {number} rendererID A unique indentifier of the renderer sending
+            *                 the new extent.
+            * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+            * @param {any[]} extent The new extent to be included in the scale.
+            */
+            Scale.prototype.updateExtent = function (rendererID, attr, extent) {
+                this._rendererAttrID2Extent[rendererID + attr] = extent;
+                if (this._autoDomainAutomatically) {
+                    this.autoDomain();
+                }
+                return this;
+            };
+
+            Scale.prototype.removeExtent = function (rendererID, attr) {
+                delete this._rendererAttrID2Extent[rendererID + attr];
+                if (this._autoDomainAutomatically) {
+                    this.autoDomain();
+                }
+                return this;
             };
             return Scale;
         })(Plottable.Abstract.PlottableObject);
@@ -2535,22 +2608,20 @@ var Plottable;
                     this._dataSource.broadcaster.deregisterListener(this);
                     this._requireRerender = true;
                     this._rerenderUpdateSelection = true;
-
-                    // point all scales at the new datasource
-                    d3.keys(this._projectors).forEach(function (attrToSet) {
-                        var projector = _this._projectors[attrToSet];
-                        if (projector.scale != null) {
-                            var rendererIDAttr = _this._plottableID + attrToSet;
-                            projector.scale._removePerspective(rendererIDAttr);
-                            projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
-                        }
-                    });
                 }
                 this._dataSource = source;
+<<<<<<< HEAD
                 this._dataSource.broadcaster.registerListener(this, function () {
+||||||| merged common ancestors
+                this._registerToBroadcaster(this._dataSource, function () {
+=======
+                this._registerToBroadcaster(this._dataSource, function () {
+                    _this.updateAllProjectors();
+>>>>>>> master
                     _this._dataChanged = true;
                     _this._render();
                 });
+                this.updateAllProjectors();
                 this._dataChanged = true;
                 this._render();
                 return this;
@@ -2559,18 +2630,32 @@ var Plottable;
             Plot.prototype.project = function (attrToSet, accessor, scale) {
                 var _this = this;
                 attrToSet = attrToSet.toLowerCase();
-                var rendererIDAttr = this._plottableID + attrToSet;
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
                 if (existingScale != null) {
+<<<<<<< HEAD
                     existingScale._removePerspective(rendererIDAttr);
                     existingScale.broadcaster.deregisterListener(this);
+||||||| merged common ancestors
+                    existingScale._removePerspective(rendererIDAttr);
+                    this._deregisterFromBroadcaster(existingScale);
+=======
+                    existingScale.removeExtent(this._plottableID, attrToSet);
+                    this._deregisterFromBroadcaster(existingScale);
+>>>>>>> master
                 }
 
                 if (scale != null) {
+<<<<<<< HEAD
                     scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
                     scale.broadcaster.registerListener(this, function () {
+||||||| merged common ancestors
+                    scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
+                    this._registerToBroadcaster(scale, function () {
+=======
+                    this._registerToBroadcaster(scale, function () {
+>>>>>>> master
                         return _this._render();
                     });
                 }
@@ -2578,6 +2663,7 @@ var Plottable;
                 this._projectors[attrToSet] = { accessor: accessor, scale: scale };
                 this._requireRerender = true;
                 this._rerenderUpdateSelection = true;
+                this.updateProjector(attrToSet);
                 return this;
             };
 
@@ -2623,6 +2709,31 @@ var Plottable;
             */
             Plot.prototype.animate = function (enabled) {
                 this._animate = enabled;
+                return this;
+            };
+
+            /**
+            * This function makes sure that all of the scales in this._projectors
+            * have an extent that includes all the data that is projected onto them.
+            */
+            Plot.prototype.updateAllProjectors = function () {
+                var _this = this;
+                d3.keys(this._projectors).forEach(function (attr) {
+                    return _this.updateProjector(attr);
+                });
+                return this;
+            };
+
+            Plot.prototype.updateProjector = function (attr) {
+                var projector = this._projectors[attr];
+                if (projector.scale != null) {
+                    var extent = this.dataSource()._getExtent(projector.accessor);
+                    if (extent.length === 0) {
+                        projector.scale.removeExtent(this._plottableID, attr);
+                    } else {
+                        projector.scale.updateExtent(this._plottableID, attr, extent);
+                    }
+                }
                 return this;
             };
 
@@ -2914,14 +3025,12 @@ var Plottable;
             }
             QuantitiveScale.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
-                var starts = extents.map(function (e) {
-                    return e[0];
-                });
-                var ends = extents.map(function (e) {
-                    return e[1];
-                });
-                if (starts.length > 0) {
-                    return [d3.min(starts), d3.max(ends)];
+                if (extents.length > 0) {
+                    return [d3.min(extents, function (e) {
+                            return e[0];
+                        }), d3.max(extents, function (e) {
+                            return e[1];
+                        })];
                 } else {
                     return [0, 1];
                 }
@@ -3147,11 +3256,7 @@ var Plottable;
             }
             Ordinal.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
-                var concatenatedExtents = [];
-                extents.forEach(function (e) {
-                    concatenatedExtents = concatenatedExtents.concat(e);
-                });
-                return Plottable.Util.Methods.uniq(concatenatedExtents);
+                return Plottable.Util.Methods.uniq(Plottable.Util.Methods.flatten(extents));
             };
 
             Ordinal.prototype.domain = function (values) {
@@ -3599,7 +3704,7 @@ var Plottable;
             };
 
             Axis.prototype._doRender = function () {
-                var domain = this.d3Axis.scale().domain();
+                var domain = this._axisScale.domain();
                 var extent = Math.abs(domain[1] - domain[0]);
                 var min = +d3.min(domain);
                 var max = +d3.max(domain);
@@ -5022,8 +5127,10 @@ var Plottable;
             */
             function Scatter(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._ANIMATION_DURATION = 250;
-                this._ANIMATION_DELAY = 5;
+                this._animators = {
+                    "circles-reset": new Plottable.Animator.Null(),
+                    "circles": new Plottable.Animator.IterativeDelay().duration(250).delay(5)
+                };
                 this.classed("circle-renderer", true);
                 this.project("r", 3); // default
                 this.project("fill", function () {
@@ -5038,32 +5145,27 @@ var Plottable;
             };
 
             Scatter.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
+
                 var attrToProjector = this._generateAttrToProjector();
                 attrToProjector["cx"] = attrToProjector["x"];
                 attrToProjector["cy"] = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
 
-                var rFunction = attrToProjector["r"];
-                attrToProjector["r"] = function () {
-                    return 0;
-                };
-
                 var circles = this.renderArea.selectAll("circle").data(this._dataSource.data());
                 circles.enter().append("circle");
-                circles.attr(attrToProjector);
 
-                var updateSelection = circles;
-                if (this._animate && this._dataChanged) {
-                    var n = this.dataSource().data().length;
-                    updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
-                        return i * _this._ANIMATION_DELAY;
-                    });
+                if (this._dataChanged) {
+                    var rFunction = attrToProjector["r"];
+                    attrToProjector["r"] = function () {
+                        return 0;
+                    };
+                    this._applyAnimatedAttributes(circles, "circles-reset", attrToProjector);
+                    attrToProjector["r"] = rFunction;
                 }
-                updateSelection.attr("r", rFunction);
 
+                this._applyAnimatedAttributes(circles, "circles", attrToProjector);
                 circles.exit().remove();
             };
             return Scatter;
@@ -5097,6 +5199,9 @@ var Plottable;
             */
             function Grid(dataset, xScale, yScale, colorScale) {
                 _super.call(this, dataset, xScale, yScale);
+                this._animators = {
+                    "cells": new Plottable.Animator.Null()
+                };
                 this.classed("grid-renderer", true);
 
                 // The x and y scales should render in bands with no padding
@@ -5131,7 +5236,7 @@ var Plottable;
                     return yStep;
                 };
 
-                cells.attr(attrToProjector);
+                this._applyAnimatedAttributes(cells, "cells", attrToProjector);
                 cells.exit().remove();
             };
             return Grid;
@@ -5164,6 +5269,11 @@ var Plottable;
             function BarPlot(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
+                this._animators = {
+                    "bars-reset": new Plottable.Animator.Null(),
+                    "bars": new Plottable.Animator.IterativeDelay(),
+                    "baseline": new Plottable.Animator.Null()
+                };
                 this.classed("bar-renderer", true);
                 this.project("width", 10);
                 this.project("fill", function () {
@@ -5267,11 +5377,6 @@ var Plottable;
             function VerticalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._barAlignment = "left";
-                this._animators = {
-                    "bars-reset": new Plottable.Animator.Null(),
-                    "bars": new Plottable.Animator.IterativeDelay(),
-                    "baseline": new Plottable.Animator.Null()
-                };
             }
             VerticalBar.prototype._paint = function () {
                 _super.prototype._paint.call(this);
@@ -5394,11 +5499,8 @@ var Plottable;
             function HorizontalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._barAlignment = "top";
-                this._ANIMATION_DURATION = 300;
-                this._ANIMATION_DELAY = 15;
             }
             HorizontalBar.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
                 this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
                 this._bars.enter().append("rect");
@@ -5439,7 +5541,7 @@ var Plottable;
                     attrToProjector["width"] = function () {
                         return 0;
                     };
-                    this._bars.attr(attrToProjector);
+                    this._applyAnimatedAttributes(this._bars, "bars-reset", attrToProjector);
                 }
 
                 attrToProjector["x"] = function (d, i) {
@@ -5456,23 +5558,18 @@ var Plottable;
                     this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
 
-                var updateSelection = this._bars;
-                if (this._animate) {
-                    var n = this.dataSource().data().length;
-                    updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION).delay(function (d, i) {
-                        return i * _this._ANIMATION_DELAY;
-                    });
-                }
+                // Apply bar updates
+                this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
 
-                updateSelection.attr(attrToProjector);
                 this._bars.exit().remove();
 
-                this._baseline.attr({
+                var baselineAttr = {
                     "x1": scaledBaseline,
                     "y1": 0,
                     "x2": scaledBaseline,
                     "y2": this.availableHeight
-                });
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
 
             /**
@@ -5522,7 +5619,10 @@ var Plottable;
             */
             function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._ANIMATION_DURATION = 600;
+                this._animators = {
+                    "area-reset": new Plottable.Animator.Null(),
+                    "area": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
+                };
                 this.classed("area-renderer", true);
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
@@ -5551,23 +5651,20 @@ var Plottable;
 
                 this.areaPath.datum(this._dataSource.data());
                 this.linePath.datum(this._dataSource.data());
-                if (this._animate && this._dataChanged) {
-                    var animationStartArea = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
-                    this.areaPath.attr("d", animationStartArea).attr(attrToProjector);
-                    var animationStartLine = d3.svg.line().x(xFunction).y(y0Function);
-                    this.linePath.attr("d", animationStartLine).attr(attrToProjector);
+
+                if (this._dataChanged) {
+                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
+                    this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
+
+                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(y0Function);
+                    this._applyAnimatedAttributes(this.linePath, "area-reset", attrToProjector);
                 }
 
-                var area = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-                var areaUpdateSelection = this.areaPath;
-                var lineUpdateSelection = this.linePath;
-                if (this._animate) {
-                    areaUpdateSelection = this.areaPath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
-                    lineUpdateSelection = this.linePath.transition().duration(this._ANIMATION_DURATION).ease("exp-in-out");
-                }
-                var line = d3.svg.line().x(xFunction).y(yFunction);
-                areaUpdateSelection.attr("d", area).attr(attrToProjector);
-                lineUpdateSelection.attr("d", line).attr(attrToProjector);
+                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
+
+                attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
+                this._applyAnimatedAttributes(this.linePath, "area", attrToProjector);
             };
             return Area;
         })(Plottable.Abstract.XYPlot);
@@ -5598,7 +5695,6 @@ var Plottable;
             */
             function Line(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._ANIMATION_DURATION = 600;
                 this.classed("line-renderer", true);
                 this.project("stroke", function () {
                     return "steelblue";

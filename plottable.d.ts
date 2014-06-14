@@ -38,6 +38,11 @@ declare module Plottable {
             * @return {any[]}
             */
             function createFilledArray(value: any, count: number): any[];
+            /**
+            * @param {T[][]} a The 2D array that will have its elements joined together.
+            * @return {T[]} Every array in a, concatenated together in the order they appear.
+            */
+            function flatten<T>(a: T[][]): T[];
         }
     }
 }
@@ -741,6 +746,18 @@ declare module Plottable {
             * @returns {Scale} A copy of the calling Scale.
             */
             public copy(): Scale;
+            /**
+            * When a renderer determines that the extent of a projector has changed,
+            * it will call this function. This function should ensure that
+            * the scale has a domain at least large enough to include extent.
+            *
+            * @param {number} rendererID A unique indentifier of the renderer sending
+            *                 the new extent.
+            * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+            * @param {any[]} extent The new extent to be included in the scale.
+            */
+            public updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
+            public removeExtent(rendererID: number, attr: string): Scale;
         }
     }
 }

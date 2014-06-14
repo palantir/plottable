@@ -17,12 +17,10 @@ export module Abstract {
       super(scale);
     }
 
-    public _getExtent(): any[] {
+    public _getExtent(): number[] {
       var extents = this._getAllExtents();
-      var starts: number[] = extents.map((e) => e[0]);
-      var ends: number[] = extents.map((e) => e[1]);
-      if (starts.length > 0) {
-        return [d3.min(starts), d3.max(ends)];
+      if (extents.length > 0) {
+        return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
       } else {
         return [0, 1];
       }

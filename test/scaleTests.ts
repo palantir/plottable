@@ -47,7 +47,7 @@ describe("Scales", () => {
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-      scale._addPerspective("1", dataSource, "foo");
+      scale.updateExtent(1, "x", d3.extent(data, (e) => e.foo));
       scale.autoDomain().padDomain().nice();
       assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
@@ -55,7 +55,9 @@ describe("Scales", () => {
     });
 
     it("scale autorange works as expected with single dataSource", () => {
-      scale._addPerspective("1x", dataSource, "foo");
+      var renderer = new Plottable.Abstract.Plot()
+                        .dataSource(dataSource)
+                        .project("x", "foo", scale);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
       dataSource.data(data);
@@ -63,27 +65,33 @@ describe("Scales", () => {
     });
 
     it("scale reference counting works as expected", () => {
-      scale._addPerspective("1x", dataSource, "foo");
-      scale._addPerspective("2x", dataSource, "foo");
-      scale._removePerspective("1x");
+      var renderer1 = new Plottable.Abstract.Plot()
+                          .dataSource(dataSource)
+                          .project("x", "foo", scale);
+      var renderer2 = new Plottable.Abstract.Plot()
+                          .dataSource(dataSource)
+                          .project("x", "foo", scale);
+      var otherScale = new Plottable.Scale.Linear();
+      renderer1.project("x", "foo", otherScale);
       dataSource.data([{foo: 10}, {foo: 11}]);
       assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataSource after one perspective deregistered");
-      scale._removePerspective("2x");
+      renderer2.project("x", "foo", otherScale);
+      // "scale not listening to the dataSource after all perspectives removed"
       dataSource.data([{foo: 99}, {foo: 100}]);
       assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
     });
 
     it("scale perspectives can be removed appropriately", () => {
       assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
-      scale._addPerspective("1x", dataSource, "foo");
-      scale._addPerspective("2x", dataSource, "bar");
+      scale.updateExtent(1, "x", d3.extent(data, (e) => e.foo));
+      scale.updateExtent(2, "x", d3.extent(data, (e) => e.bar));
       assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
       assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
       assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
-      scale._removePerspective("1x");
+      scale.removeExtent(1, "x");
       assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
       assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
-      scale._addPerspective("2x", dataSource, "foo");
+      scale.updateExtent(2, "x", d3.extent(data, (e) => e.foo));
       assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
       assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
     });
