@@ -1066,6 +1066,69 @@ var Plottable;
     var Formatter = Plottable.Formatter;
 })(Plottable || (Plottable = {}));
 
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var Time = (function (_super) {
+            __extends(Time, _super);
+            /**
+            * Creates a formatter that displays dates
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            function Time(precision) {
+                if (typeof precision === "undefined") { precision = 0; }
+                _super.call(this, precision);
+                var filter = [
+                    [".%L", function (d) {
+                            return d.getMilliseconds();
+                        }],
+                    [":%S", function (d) {
+                            return d.getSeconds();
+                        }],
+                    ["%I:%M", function (d) {
+                            return d.getMinutes();
+                        }],
+                    ["%I %p", function (d) {
+                            return d.getHours();
+                        }],
+                    ["%a %d", function (d) {
+                            return d.getDay() && d.getDate() !== 1;
+                        }],
+                    ["%b %d", function (d) {
+                            return d.getDate() !== 1;
+                        }],
+                    ["%B", function (d) {
+                            return d.getMonth();
+                        }],
+                    ["%Y", function () {
+                            return true;
+                        }]
+                ];
+
+                this._formatFunction = function (d) {
+                    debugger;
+                    for (var i = 0; i < filter.length; i++) {
+                        console.log(filter[i][1]);
+                    }
+                    return String(d);
+                };
+            }
+            return Time;
+        })(Plottable.Abstract.Formatter);
+        Formatter.Time = Time;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -4337,11 +4400,22 @@ var Plottable;
             };
 
             Time.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                var requestedWidth = this._width;
+                var requestedHeight = this._height;
+
+                var fakeTick;
+                var testTextEl;
+                if (this._computedHeight == null) {
+                    this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
+                }
+                requestedWidth = 0;
+                requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
+
                 return {
-                    width: 0,
-                    height: Math.min(offeredHeight, this._height),
+                    width: Math.min(offeredWidth, requestedWidth),
+                    height: Math.min(offeredHeight, requestedHeight),
                     wantsWidth: false,
-                    wantsHeight: offeredHeight < this._height
+                    wantsHeight: offeredHeight < requestedHeight
                 };
             };
 

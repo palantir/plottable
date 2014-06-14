@@ -12,6 +12,7 @@
 /// <reference path="utils/formatters/currencyFormatter.ts" />
 /// <reference path="utils/formatters/percentageFormatter.ts" />
 /// <reference path="utils/formatters/customFormatter.ts" />
+/// <reference path="utils/formatters/timeFormatter.ts" />
 
 
 /// <reference path="core/plottableObject.ts" />

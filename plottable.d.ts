@@ -380,6 +380,21 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Formatter {
+        class Time extends Abstract.Formatter {
+            /**
+            * Creates a formatter that displays dates
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            constructor(precision?: number);
+        }
+    }
+}
+
+
+declare module Plottable {
     module Abstract {
         class PlottableObject {
         }

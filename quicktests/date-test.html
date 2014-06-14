@@ -16,23 +16,15 @@
 
 
   window.onload = function () {
+    var format = new Plottable.Formatter.Time();
+    var date = d3.time.format("%x").parse("3/14/2015");
+    
     xScale = new Plottable.Scale.Time();
     yScale = new Plottable.Scale.Linear();
     linePlot = new Plottable.Plot.Line(data, xScale, yScale)
     .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
 
-    
-    var defaultFormatter = d3.time.format.multi([
-      [".%L", function(d) { return d.getMilliseconds(); }],
-      [":%S", function(d) { return d.getSeconds(); }],
-      ["%I:%M", function(d) { return d.getMinutes(); }],
-      ["%I %p", function(d) { return d.getHours(); }],
-      ["%b %d", function(d) { return d.getDate() != 1; }],
-      ["%b", function(d) { return d.getMonth(); }],
-      ["%Y", function() { return true; }]
-    ]);
-
-    xAxis = new Plottable.Axis.Time(xScale, "bottom", defaultFormatter);
+    xAxis = new Plottable.Axis.Time(xScale, "bottom", new Plottable.Formatter.Time());
     yAxis = new Plottable.Axis.YAxis(yScale);
 
     gridlines = new Plottable.Component.Gridlines(xScale, yScale);

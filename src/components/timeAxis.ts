@@ -5,6 +5,7 @@ export module Axis {
   export class Time extends Abstract.Axis {
     public _scale: Scale.Time;
     public _tickLabelsG: D3.Selection;
+    public _intervals: D3.Time.Interval[];
 
     /**
      * Creates a TimeAxis
@@ -25,11 +26,22 @@ export module Axis {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+      var requestedWidth = this._width;
+      var requestedHeight = this._height;
+
+      var fakeTick: D3.Selection;
+      var testTextEl: D3.Selection;
+      if (this._computedHeight == null) {
+        this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
+      }
+      requestedWidth = 0;
+      requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
+
       return {
-        width: 0,
-        height: Math.min(offeredHeight, this._height),
+        width : Math.min(offeredWidth, requestedWidth),
+        height: Math.min(offeredHeight, requestedHeight),
         wantsWidth: false,
-        wantsHeight: offeredHeight < this._height
+        wantsHeight: offeredHeight < requestedHeight
       };
     }
 
