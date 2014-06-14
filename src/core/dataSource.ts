@@ -5,10 +5,11 @@ module Plottable {
     accessor: IAccessor;
     extent: any[];
   }
-  export class DataSource extends Abstract.Broadcaster {
+  export class DataSource extends Abstract.PlottableObject implements Core.IListenable {
     private _data: any[];
     private _metadata: any;
     private accessor2cachedExtent: Util.StrictEqualityAssociativeArray;
+    public broadcaster = new Core.Broadcaster(this);
     /**
      * Creates a new DataSource.
      *
@@ -37,7 +38,7 @@ module Plottable {
       } else {
         this._data = data;
         this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
-        this._broadcast();
+        this.broadcaster.broadcast();
         return this;
       }
     }
@@ -56,7 +57,7 @@ module Plottable {
       } else {
         this._metadata = metadata;
         this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
-        this._broadcast();
+        this.broadcaster.broadcast();
         return this;
       }
     }

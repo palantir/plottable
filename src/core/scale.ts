@@ -6,9 +6,10 @@ export module Abstract {
     dataSource: DataSource;
     accessor: IAccessor;
   }
-  export class Scale extends Broadcaster {
+  export class Scale extends PlottableObject implements Core.IListenable {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomainAutomatically = true;
+    public broadcaster = new Plottable.Core.Broadcaster(this);
     private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
     private dataSourceReferenceCounter = new Util.IDCounter();
     public _autoNice = false;
@@ -58,7 +59,7 @@ export module Abstract {
 
       var dataSourceID = dataSource._plottableID;
       if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
-        dataSource.registerListener(this, () => {
+        dataSource.broadcaster.registerListener(this, () => {
           if (this._autoDomainAutomatically) {
             this.autoDomain();
           }
@@ -74,7 +75,7 @@ export module Abstract {
       var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
       var dataSourceID = dataSource._plottableID;
       if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-        dataSource.deregisterListener(this);
+        dataSource.broadcaster.deregisterListener(this);
       }
 
       delete this.rendererID2Perspective[rendererIDAttr];
@@ -117,7 +118,7 @@ export module Abstract {
 
     public _setDomain(values: any[]) {
       this._d3Scale.domain(values);
-      this._broadcast();
+      this.broadcaster.broadcast();
     }
 
     /**

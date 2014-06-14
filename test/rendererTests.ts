@@ -52,7 +52,7 @@ describe("Renderers", () => {
 
       assert.equal(0, r.renders, "initially hasn't rendered anything");
 
-      d1._broadcast();
+      d1.broadcaster.broadcast();
       assert.equal(1, r.renders, "we re-render when our datasource changes");
 
       r.dataSource();
@@ -62,10 +62,10 @@ describe("Renderers", () => {
       r.dataSource(d2);
       assert.equal(2, r.renders, "we should redraw when we change datasource");
 
-      d1._broadcast();
+      d1.broadcaster.broadcast();
       assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
 
-      d2._broadcast();
+      d2.broadcaster.broadcast();
       assert.equal(3, r.renders, "we should listen to the new datasource");
     });
 
@@ -79,19 +79,19 @@ describe("Renderers", () => {
       var yScale = new Plottable.Scale.Linear();
       r.project("x", null, xScale);
       r.project("y", null, yScale);
-      xScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
-        assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
+      xScale.broadcaster.registerListener(null, (listenable: Plottable.Core.IListenable) => {
+        assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
-      yScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
-        assert.equal(broadcaster, yScale, "Callback received the calling scale as the first argument");
+      yScale.broadcaster.registerListener(null, (listenable: Plottable.Core.IListenable) => {
+        assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
         ++yScaleCalls;
       });
 
       assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
       assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
 
-      d1._broadcast();
+      d1.broadcaster.broadcast();
       assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
@@ -100,11 +100,11 @@ describe("Renderers", () => {
       assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
       assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
-      d1._broadcast();
+      d1.broadcaster.broadcast();
       assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
       assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
 
-      d2._broadcast();
+      d2.broadcaster.broadcast();
       assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
       assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
     });

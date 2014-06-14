@@ -84,7 +84,7 @@ export module Abstract {
       }
       var oldSource = this._dataSource;
       if (oldSource != null) {
-        this._deregisterFromBroadcaster(this._dataSource);
+        this._dataSource.broadcaster.deregisterListener(this);
         this._requireRerender = true;
         this._rerenderUpdateSelection = true;
 
@@ -99,7 +99,7 @@ export module Abstract {
         });
       }
       this._dataSource = source;
-      this._registerToBroadcaster(this._dataSource, () => {
+      this._dataSource.broadcaster.registerListener(this, () => {
         this._dataChanged = true;
         this._render();
       });
@@ -116,12 +116,12 @@ export module Abstract {
 
       if (existingScale != null) {
         existingScale._removePerspective(rendererIDAttr);
-        this._deregisterFromBroadcaster(existingScale);
+        existingScale.broadcaster.deregisterListener(this);
       }
 
       if (scale != null) {
         scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
-        this._registerToBroadcaster(scale, () => this._render());
+        scale.broadcaster.registerListener(this, () => this._render());
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};

@@ -422,8 +422,15 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Broadcaster extends PlottableObject {
+    module Core {
+        interface IListenable {
+            broadcaster: Broadcaster;
+        }
+        interface IBroadcasterCallback {
+            (listenable: IListenable, ...args: any[]): any;
+        }
+        class Broadcaster extends Abstract.PlottableObject {
+            constructor(listenable: IListenable);
             /**
             * Registers a callback to be called when the broadcast method is called. Also takes a listener which
             * is used to support deregistering the same callback later, by passing in the same listener.
@@ -437,19 +444,32 @@ declare module Plottable {
             */
             public registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
             /**
-            * Registers deregister the callback associated with a listener.
+            * Call all listening callbacks, optionally with arguments passed through.
+            *
+            * @param ...args A variable number of optional arguments
+            * @returns {Broadcaster} this object
+            */
+            public broadcast(...args: any[]): Broadcaster;
+            /**
+            * Deregisters the callback associated with a listener.
             *
             * @param listener The listener to deregister.
             * @returns {Broadcaster} this object
             */
             public deregisterListener(listener: any): Broadcaster;
+            /**
+            * Deregisters all listeners and callbacks associated with the broadcaster.
+            *
+            * @returns {Broadcaster} this object
+            */
+            public deregisterAllListeners(): void;
         }
     }
 }
 
 
 declare module Plottable {
-    class DataSource extends Abstract.Broadcaster {
+    class DataSource extends Abstract.PlottableObject implements Core.IListenable {
         /**
         * Creates a new DataSource.
         *
@@ -673,7 +693,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Scale extends Broadcaster {
+        class Scale extends PlottableObject implements Core.IListenable {
             /**
             * Creates a new Scale.
             *
@@ -922,9 +942,6 @@ declare module Plottable {
     interface FullSelectionArea {
         pixel: SelectionArea;
         data: SelectionArea;
-    }
-    interface IBroadcasterCallback {
-        (broadcaster: Abstract.Broadcaster, ...args: any[]): any;
     }
     interface ISpaceRequest {
         width: number;

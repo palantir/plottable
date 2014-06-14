@@ -13,7 +13,6 @@ export module Abstract {
     public backgroundContainer: D3.Selection;
     public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
-    private broadcastersCurrentlyListeningTo: {[key: string]: Broadcaster} = {};
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
@@ -364,15 +363,6 @@ export module Abstract {
       return this;
     }
 
-    public _registerToBroadcaster(broadcaster: Broadcaster, callback: IBroadcasterCallback) {
-      broadcaster.registerListener(this, callback);
-      this.broadcastersCurrentlyListeningTo[broadcaster._plottableID] = broadcaster;
-    }
-
-    public _deregisterFromBroadcaster(broadcaster: Broadcaster) {
-      broadcaster.deregisterListener(this);
-      delete this.broadcastersCurrentlyListeningTo[broadcaster._plottableID];
-    }
 
     /**
      * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.

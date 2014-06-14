@@ -1134,12 +1134,13 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Abstract) {
+    (function (Core) {
         var Broadcaster = (function (_super) {
             __extends(Broadcaster, _super);
-            function Broadcaster() {
-                _super.apply(this, arguments);
+            function Broadcaster(listenable) {
+                _super.call(this);
                 this.listener2Callback = new Plottable.Util.StrictEqualityAssociativeArray();
+                this.listenable = listenable;
             }
             /**
             * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -1163,20 +1164,20 @@ var Plottable;
             * @param ...args A variable number of optional arguments
             * @returns {Broadcaster} this object
             */
-            Broadcaster.prototype._broadcast = function () {
+            Broadcaster.prototype.broadcast = function () {
                 var _this = this;
                 var args = [];
                 for (var _i = 0; _i < (arguments.length - 0); _i++) {
                     args[_i] = arguments[_i + 0];
                 }
                 this.listener2Callback.values().forEach(function (callback) {
-                    return callback(_this, args);
+                    return callback(_this.listenable, args);
                 });
                 return this;
             };
 
             /**
-            * Registers deregister the callback associated with a listener.
+            * Deregisters the callback associated with a listener.
             *
             * @param listener The listener to deregister.
             * @returns {Broadcaster} this object
@@ -1185,11 +1186,20 @@ var Plottable;
                 this.listener2Callback.delete(listener);
                 return this;
             };
+
+            /**
+            * Deregisters all listeners and callbacks associated with the broadcaster.
+            *
+            * @returns {Broadcaster} this object
+            */
+            Broadcaster.prototype.deregisterAllListeners = function () {
+                this.listener2Callback = new Plottable.Util.StrictEqualityAssociativeArray();
+            };
             return Broadcaster;
         })(Plottable.Abstract.PlottableObject);
-        Abstract.Broadcaster = Broadcaster;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
+        Core.Broadcaster = Broadcaster;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1214,6 +1224,7 @@ var Plottable;
             if (typeof data === "undefined") { data = []; }
             if (typeof metadata === "undefined") { metadata = {}; }
             _super.call(this);
+            this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._data = data;
             this._metadata = metadata;
             this.accessor2cachedExtent = new Plottable.Util.StrictEqualityAssociativeArray();
@@ -1224,7 +1235,7 @@ var Plottable;
             } else {
                 this._data = data;
                 this.accessor2cachedExtent = new Plottable.Util.StrictEqualityAssociativeArray();
-                this._broadcast();
+                this.broadcaster.broadcast();
                 return this;
             }
         };
@@ -1235,7 +1246,7 @@ var Plottable;
             } else {
                 this._metadata = metadata;
                 this.accessor2cachedExtent = new Plottable.Util.StrictEqualityAssociativeArray();
-                this._broadcast();
+                this.broadcaster.broadcast();
                 return this;
             }
         };
@@ -1261,7 +1272,7 @@ var Plottable;
             }
         };
         return DataSource;
-    })(Plottable.Abstract.Broadcaster);
+    })(Plottable.Abstract.PlottableObject);
     Plottable.DataSource = DataSource;
 })(Plottable || (Plottable = {}));
 
@@ -1282,7 +1293,6 @@ var Plottable;
                 this.interactionsToRegister = [];
                 this.boxes = [];
                 this.clipPathEnabled = false;
-                this.broadcastersCurrentlyListeningTo = {};
                 this.isTopLevelComponent = false;
                 this._xOffset = 0;
                 this._yOffset = 0;
@@ -1629,16 +1639,6 @@ var Plottable;
                     this.interactionsToRegister.push(interaction);
                 }
                 return this;
-            };
-
-            Component.prototype._registerToBroadcaster = function (broadcaster, callback) {
-                broadcaster.registerListener(this, callback);
-                this.broadcastersCurrentlyListeningTo[broadcaster._plottableID] = broadcaster;
-            };
-
-            Component.prototype._deregisterFromBroadcaster = function (broadcaster) {
-                broadcaster.deregisterListener(this);
-                delete this.broadcastersCurrentlyListeningTo[broadcaster._plottableID];
             };
 
             Component.prototype.classed = function (cssClass, addClass) {
@@ -2359,6 +2359,7 @@ var Plottable;
             function Scale(scale) {
                 _super.call(this);
                 this._autoDomainAutomatically = true;
+                this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this.rendererID2Perspective = {};
                 this.dataSourceReferenceCounter = new Plottable.Util.IDCounter();
                 this._autoNice = false;
@@ -2402,7 +2403,7 @@ var Plottable;
 
                 var dataSourceID = dataSource._plottableID;
                 if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1) {
-                    dataSource.registerListener(this, function () {
+                    dataSource.broadcaster.registerListener(this, function () {
                         if (_this._autoDomainAutomatically) {
                             _this.autoDomain();
                         }
@@ -2418,7 +2419,7 @@ var Plottable;
                 var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
                 var dataSourceID = dataSource._plottableID;
                 if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-                    dataSource.deregisterListener(this);
+                    dataSource.broadcaster.deregisterListener(this);
                 }
 
                 delete this.rendererID2Perspective[rendererIDAttr];
@@ -2450,7 +2451,7 @@ var Plottable;
 
             Scale.prototype._setDomain = function (values) {
                 this._d3Scale.domain(values);
-                this._broadcast();
+                this.broadcaster.broadcast();
             };
 
             Scale.prototype.range = function (values) {
@@ -2471,7 +2472,7 @@ var Plottable;
                 return new Scale(this._d3Scale.copy());
             };
             return Scale;
-        })(Plottable.Abstract.Broadcaster);
+        })(Plottable.Abstract.PlottableObject);
         Abstract.Scale = Scale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2531,7 +2532,7 @@ var Plottable;
                 }
                 var oldSource = this._dataSource;
                 if (oldSource != null) {
-                    this._deregisterFromBroadcaster(this._dataSource);
+                    this._dataSource.broadcaster.deregisterListener(this);
                     this._requireRerender = true;
                     this._rerenderUpdateSelection = true;
 
@@ -2546,7 +2547,7 @@ var Plottable;
                     });
                 }
                 this._dataSource = source;
-                this._registerToBroadcaster(this._dataSource, function () {
+                this._dataSource.broadcaster.registerListener(this, function () {
                     _this._dataChanged = true;
                     _this._render();
                 });
@@ -2564,12 +2565,12 @@ var Plottable;
 
                 if (existingScale != null) {
                     existingScale._removePerspective(rendererIDAttr);
-                    this._deregisterFromBroadcaster(existingScale);
+                    existingScale.broadcaster.deregisterListener(this);
                 }
 
                 if (scale != null) {
                     scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
-                    this._registerToBroadcaster(scale, function () {
+                    scale.broadcaster.registerListener(this, function () {
                         return _this._render();
                     });
                 }
@@ -2816,19 +2817,19 @@ var Plottable;
         * animations during resize.
         */
         (function (ResizeBroadcaster) {
-            var _broadcaster;
+            var broadcaster;
             var _resizing = false;
 
             function _lazyInitialize() {
-                if (_broadcaster === undefined) {
-                    _broadcaster = new Plottable.Abstract.Broadcaster();
+                if (broadcaster === undefined) {
+                    broadcaster = new Plottable.Core.Broadcaster(ResizeBroadcaster);
                     window.addEventListener("resize", _onResize);
                 }
             }
 
             function _onResize() {
                 _resizing = true;
-                _broadcaster._broadcast();
+                broadcaster.broadcast();
             }
 
             /**
@@ -2856,7 +2857,7 @@ var Plottable;
             */
             function register(c) {
                 _lazyInitialize();
-                _broadcaster.registerListener(c._plottableID, function () {
+                broadcaster.registerListener(c._plottableID, function () {
                     return c._invalidateLayout();
                 });
             }
@@ -2870,8 +2871,8 @@ var Plottable;
             * @param {Abstract.Component} component Any Plottable component.
             */
             function deregister(c) {
-                if (_broadcaster) {
-                    _broadcaster.deregisterListener(c._plottableID);
+                if (broadcaster) {
+                    broadcaster.deregisterListener(c._plottableID);
                 }
             }
             ResizeBroadcaster.deregister = deregister;
@@ -3214,7 +3215,7 @@ var Plottable;
                     if (innerPadding != null) {
                         this._innerPadding = innerPadding;
                     }
-                    this._broadcast();
+                    this.broadcaster.broadcast();
                     return this;
                 }
             };
@@ -3442,7 +3443,7 @@ var Plottable;
                 if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
-                this._broadcast();
+                this.broadcaster.broadcast();
             };
 
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
@@ -3524,7 +3525,7 @@ var Plottable;
                 this.rescaleInProgress = false;
                 this.scales = scales;
                 this.scales.forEach(function (s) {
-                    return s.registerListener(_this, function (sx) {
+                    return s.broadcaster.registerListener(_this, function (sx) {
                         return _this.rescale(sx);
                     });
                 });
@@ -3587,7 +3588,7 @@ var Plottable;
                     };
                 }
                 this.tickFormat(formatFunction);
-                this._registerToBroadcaster(this._axisScale, function () {
+                this._axisScale.broadcaster.registerListener(this, function () {
                     return _this._render();
                 });
             }
@@ -4129,8 +4130,7 @@ var Plottable;
                 this._formatter = (formatter != null) ? formatter : function (n) {
                     return String(n);
                 };
-
-                this._registerToBroadcaster(this._scale, function () {
+                this._scale.broadcaster.registerListener(this, function () {
                     return _this.rescale();
                 });
             }
@@ -4339,7 +4339,7 @@ var Plottable;
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
                 }
-                this._registerToBroadcaster(this._scale, function () {
+                this._scale.broadcaster.registerListener(this, function () {
                     return _this._invalidateLayout();
                 });
             }
@@ -4658,10 +4658,10 @@ var Plottable;
                 var _this = this;
                 if (scale != null) {
                     if (this.colorScale != null) {
-                        this._deregisterFromBroadcaster(this.colorScale);
+                        this.colorScale.broadcaster.deregisterListener(this);
                     }
                     this.colorScale = scale;
-                    this._registerToBroadcaster(this.colorScale, function () {
+                    this.colorScale.broadcaster.registerListener(this, function () {
                         return _this.updateDomain();
                     });
                     this.updateDomain();
@@ -4846,12 +4846,12 @@ var Plottable;
                 this.xScale = xScale;
                 this.yScale = yScale;
                 if (this.xScale != null) {
-                    this._registerToBroadcaster(this.xScale, function () {
+                    this.xScale.broadcaster.registerListener(this, function () {
                         return _this._render();
                     });
                 }
                 if (this.yScale != null) {
-                    this._registerToBroadcaster(this.yScale, function () {
+                    this.yScale.broadcaster.registerListener(this, function () {
                         return _this._render();
                     });
                 }
