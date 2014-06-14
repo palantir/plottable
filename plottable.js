@@ -2927,6 +2927,7 @@ var Plottable;
                 domain[0].valueOf() - this.padProportion / 2 * extent,
                 domain[1].valueOf() + this.padProportion / 2 * extent];
             if (domain[0] === 0) {
+                console.log("@@@@");
                 newDomain[0] = 0;
             }
             if (domain[1] === 0) {
