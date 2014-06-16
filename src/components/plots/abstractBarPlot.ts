@@ -93,7 +93,9 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
-      this._bars.classed("selected", false);
+      if (this._bars != null) {
+        this._bars.classed("selected", false);
+      }
       return this;
     }
   }

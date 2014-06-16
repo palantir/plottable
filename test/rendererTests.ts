@@ -486,6 +486,10 @@ describe("Renderers", () => {
         selectedBar = renderer.selectBar(-1, -1); // no bars here
         assert.isNull(selectedBar, "returns null if no bar was selected");
 
+        assert.isNotNull(
+          new Plottable.Plot.VerticalBar(dataset, xScale, yScale).deselectAll(),
+          "shouldn't explode if you deselect bars before the first render");
+
         verifier.end();
       });
 
