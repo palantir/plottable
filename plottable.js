@@ -4541,8 +4541,7 @@ var Plottable;
                 });
                 tickLabels.selectAll("text").text(function (d) {
                     return _this._formatter.format(d);
-                });
-                tickLabels.selectAll("text").style("text-anchor", "middle");
+                }).style("text-anchor", "middle");
                 return this;
             };
             return Time;

@@ -64,8 +64,8 @@ export module Axis {
                      (this.tickLength() + this.measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any, i: number) => "translate(" + this._scale._d3Scale(d) + ",0)");
-      tickLabels.selectAll("text").text((d: any) => this._formatter.format(d));
-      tickLabels.selectAll("text").style("text-anchor", "middle");
+      tickLabels.selectAll("text").text((d: any) => this._formatter.format(d))
+                                  .style("text-anchor", "middle");
       return this;
     }
   }
