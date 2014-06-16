@@ -924,9 +924,13 @@ declare module Plottable {
         /**
         * @param {(extents: any[][]) => any[]} combineExtents
         *        If present, this function will be used by the Domainer to merge
-        *        all the extents that are present on a scale due to having
-        *        multiple things drawn relative to the same graph. If you want
-        *        your own logic, this is the place to put it.
+        *        all the extents that are present on a scale.
+        *
+        *        A plot may draw multiple things relative to a scale, e.g.
+        *        different stocks over time. The plot computes their extents,
+        *        which are a [min, max] pair. combineExtents is responsible for
+        *        merging them all into one [min, max] pair. It defaults to taking
+        *        the min of the first elements and the max of the second arguments.
         */
         constructor(combineExtents?: (extents: any[][]) => any[]);
         /**
@@ -1019,20 +1023,10 @@ declare module Plottable {
             */
             public tickFormat(count: number, format?: string): (n: number) => string;
             /**
-            * Given a domain, expands its domain onto "nice" values, e.g. whole
-            * numbers.
-            */
-            public niceDomain(domain: any[], count?: number): any[];
-            /**
             * Sets a Domainer of a scale. A Domainer is responsible for combining
             * multiple extents into a single domain.
             */
             public setDomainer(domainer: Domainer): QuantitiveScale;
-            /**
-            * If the Domainer has been set at all, this function does nothing.
-            * Otherwise, it sets the Domainer to domainer.
-            */
-            public setDomainerIfDefault(domainer: Domainer): QuantitiveScale;
         }
     }
 }

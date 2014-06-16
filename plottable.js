@@ -2856,9 +2856,13 @@ var Plottable;
         /**
         * @param {(extents: any[][]) => any[]} combineExtents
         *        If present, this function will be used by the Domainer to merge
-        *        all the extents that are present on a scale due to having
-        *        multiple things drawn relative to the same graph. If you want
-        *        your own logic, this is the place to put it.
+        *        all the extents that are present on a scale.
+        *
+        *        A plot may draw multiple things relative to a scale, e.g.
+        *        different stocks over time. The plot computes their extents,
+        *        which are a [min, max] pair. combineExtents is responsible for
+        *        merging them all into one [min, max] pair. It defaults to taking
+        *        the min of the first elements and the max of the second arguments.
         */
         function Domainer(combineExtents) {
             if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
@@ -2949,14 +2953,13 @@ var Plottable;
 
         Domainer.prototype.niceDomain = function (scale, domain) {
             if (this.doNice) {
-                return scale.niceDomain(domain, this.niceCount);
+                return scale._niceDomain(domain, this.niceCount);
             } else {
                 return domain;
             }
         };
         Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
         Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
-        Domainer.PADDING_FOR_IDENTICAL_DOMAIN_DATE = Domainer.ONE_DAY;
         return Domainer;
     })();
     Plottable.Domainer = Domainer;
@@ -3068,7 +3071,7 @@ var Plottable;
             * Given a domain, expands its domain onto "nice" values, e.g. whole
             * numbers.
             */
-            QuantitiveScale.prototype.niceDomain = function (domain, count) {
+            QuantitiveScale.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
             };
 
@@ -3087,8 +3090,17 @@ var Plottable;
             /**
             * If the Domainer has been set at all, this function does nothing.
             * Otherwise, it sets the Domainer to domainer.
+            *
+            * This function exists becaus in the case of an xyPlot, we want to
+            * pad and nice the domain, but only if the user hasn't set a domainer
+            * explicitly. We want to make sure that this code:
+            *
+            *   var scale = new QuantitiveScale().setDomainer(myDomainer);
+            *   var plot = new XYPlot(..., scale, ...);
+            *
+            * doesn't mysteriously ignore myDomainer.
             */
-            QuantitiveScale.prototype.setDomainerIfDefault = function (domainer) {
+            QuantitiveScale.prototype._setDomainerIfDefault = function (domainer) {
                 if (this.domainer == null) {
                     return this.setDomainer(domainer);
                 }
@@ -5035,14 +5047,14 @@ var Plottable;
 
             XYPlot.prototype._setXDomainer = function () {
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.xScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                    this.xScale._setDomainerIfDefault(new Plottable.Domainer().pad().nice());
                 }
                 return this;
             };
 
             XYPlot.prototype._setYDomainer = function () {
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.yScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                    this.yScale._setDomainerIfDefault(new Plottable.Domainer().pad().nice());
                 }
                 return this;
             };
@@ -5420,7 +5432,7 @@ var Plottable;
 
             VerticalBar.prototype._setYDomainer = function () {
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.yScale.setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                    this.yScale._setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
                 }
                 return this;
             };
@@ -5548,7 +5560,7 @@ var Plottable;
 
             HorizontalBar.prototype._setXDomainer = function () {
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.xScale.setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                    this.xScale._setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
                 }
                 return this;
             };

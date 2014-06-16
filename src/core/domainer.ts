@@ -10,14 +10,17 @@ module Plottable {
     private combineExtents: (extents: any[][]) => any[];
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;
-    private static PADDING_FOR_IDENTICAL_DOMAIN_DATE = Domainer.ONE_DAY;
 
     /**
      * @param {(extents: any[][]) => any[]} combineExtents
      *        If present, this function will be used by the Domainer to merge
-     *        all the extents that are present on a scale due to having
-     *        multiple things drawn relative to the same graph. If you want
-     *        your own logic, this is the place to put it.
+     *        all the extents that are present on a scale.
+     *
+     *        A plot may draw multiple things relative to a scale, e.g.
+     *        different stocks over time. The plot computes their extents,
+     *        which are a [min, max] pair. combineExtents is responsible for
+     *        merging them all into one [min, max] pair. It defaults to taking
+     *        the min of the first elements and the max of the second arguments.
      */
     constructor(combineExtents: (extents: any[][]) => any[] = Domainer.defaultCombineExtents) {
       this.combineExtents = combineExtents;
@@ -97,7 +100,7 @@ module Plottable {
 
     private niceDomain(scale: Abstract.QuantitiveScale, domain: any[]): any[] {
       if (this.doNice) {
-        return scale.niceDomain(domain, this.niceCount);
+        return scale._niceDomain(domain, this.niceCount);
       } else {
         return domain;
       }

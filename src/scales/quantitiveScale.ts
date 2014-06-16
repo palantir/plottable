@@ -119,7 +119,7 @@ export module Abstract {
      * Given a domain, expands its domain onto "nice" values, e.g. whole
      * numbers.
      */
-    public niceDomain(domain: any[], count?: number): any[] {
+    public _niceDomain(domain: any[], count?: number): any[] {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
 
@@ -138,8 +138,17 @@ export module Abstract {
     /**
      * If the Domainer has been set at all, this function does nothing.
      * Otherwise, it sets the Domainer to domainer.
+     *
+     * This function exists becaus in the case of an xyPlot, we want to
+     * pad and nice the domain, but only if the user hasn't set a domainer
+     * explicitly. We want to make sure that this code:
+     *
+     *   var scale = new QuantitiveScale().setDomainer(myDomainer);
+     *   var plot = new XYPlot(..., scale, ...);
+     *
+     * doesn't mysteriously ignore myDomainer.
      */
-    public setDomainerIfDefault(domainer: Domainer): QuantitiveScale {
+    public _setDomainerIfDefault(domainer: Domainer): QuantitiveScale {
       if (this.domainer == null) {
         return this.setDomainer(domainer);
       }
