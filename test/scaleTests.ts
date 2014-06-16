@@ -123,47 +123,6 @@ describe("Scales", () => {
       assert.equal(d[0], 0);
       assert.equal(d[1], 1);
     });
-
-    it("autoPad defaults to [v-1, v+1] if there's only one value", () => {
-      var scale = new Plottable.Scale.Linear();
-      scale.updateExtent(1, "x", [5, 5]);
-      scale.setDomainer(new Plottable.Domainer().pad());
-      assert.deepEqual(scale.domain(), [4, 6]);
-    });
-
-    it("autoPad defaults to [v-1 day, v+1 day] if there's only one date value", () => {
-      var d = new Date(2000, 5, 5);
-      var dayBefore = new Date(2000, 5, 4);
-      var dayAfter = new Date(2000, 5, 6);
-      var scale = new Plottable.Scale.Time();
-      scale.updateExtent(1, "x", [d, d]);
-      scale.setDomainer(new Plottable.Domainer().pad());
-      assert.deepEqual(scale.domain(), [dayBefore, dayAfter]);
-    });
-
-    it("autoPad works in general case", () => {
-      var scale = new Plottable.Scale.Linear();
-      scale.updateExtent(1, "x", [100, 200]);
-      scale.setDomainer(new Plottable.Domainer().pad(0.2));
-      assert.deepEqual(scale.domain(), [90, 210]);
-    });
-
-    it("autoPad works for date scales", () => {
-      var scale = new Plottable.Scale.Time();
-      var f = d3.time.format("%x");
-      var d1 = f.parse("06/02/2014");
-      var d2 = f.parse("06/03/2014");
-      scale.updateExtent(1, "x", [d1, d2]);
-      scale.setDomainer(new Plottable.Domainer().pad());
-      var dd1 = scale.domain()[0];
-      var dd2 = scale.domain()[1];
-      assert.isDefined(dd1.toDateString, "padDomain produced dates");
-      assert.isNotNull(dd1.toDateString, "padDomain produced dates");
-      assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
-      assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-      assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-      assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
-    });
   });
 
   describe("Ordinal Scales", () => {
