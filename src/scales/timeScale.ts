@@ -77,6 +77,10 @@ export module Scale {
       return this._d3Scale.ticks(this.lastRequestedTickCount);
     }
 
+    public tickInterval(interval: D3.Time.Interval, step?: number) {
+      return this._d3Scale.ticks(interval, step);
+    }
+
     public domain(): any[];
     public domain(values: any[]): Time;
     public domain(values?: any[]): any {
@@ -100,12 +104,6 @@ export module Scale {
       var extent = currentDomain[1] - currentDomain[0];
       // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
       var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1].valueOf() + padProportion/2 * extent];
-      if (currentDomain[0] === 0) {
-        newDomain[0] = 0;
-      }
-      if (currentDomain[1] === 0) {
-        newDomain[1] = 0;
-      }
       this._setDomain(newDomain);
       return this;
     }

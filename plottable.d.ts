@@ -1159,6 +1159,7 @@ declare module Plottable {
             * @returns {any[]} The generated ticks.
             */
             public ticks(count?: number): any[];
+            public tickInterval(interval: D3.Time.Interval, step?: number): any[];
             public domain(): any[];
             public domain(values: any[]): Time;
             /**

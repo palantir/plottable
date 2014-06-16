@@ -3396,6 +3396,10 @@ var Plottable;
                 return this._d3Scale.ticks(this.lastRequestedTickCount);
             };
 
+            Time.prototype.tickInterval = function (interval, step) {
+                return this._d3Scale.ticks(interval, step);
+            };
+
             Time.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
@@ -3419,12 +3423,6 @@ var Plottable;
 
                 // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
                 var newDomain = [currentDomain[0] - padProportion / 2 * extent, currentDomain[1].valueOf() + padProportion / 2 * extent];
-                if (currentDomain[0] === 0) {
-                    newDomain[0] = 0;
-                }
-                if (currentDomain[1] === 0) {
-                    newDomain[1] = 0;
-                }
                 this._setDomain(newDomain);
                 return this;
             };
