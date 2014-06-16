@@ -77,10 +77,6 @@ export module Scale {
       return this._d3Scale.ticks(this.lastRequestedTickCount);
     }
 
-    public tickInterval(range: D3.Time.Range, step: number) {
-      return this._d3Scale.ticks(range, step);
-    }
-
     public domain(): any[];
     public domain(values: any[]): Time;
     public domain(values?: any[]): any {

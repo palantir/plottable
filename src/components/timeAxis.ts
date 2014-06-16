@@ -45,8 +45,7 @@ export module Axis {
     }
 
     public _getTickValues(): string[] {
-      // return this._scale.tickInterval(d3.time.months, 2);
-      return this._scale.ticks(10);
+      return this._scale.ticks(7);
     }
 
     private measureTextHeight(): number {
@@ -66,6 +65,7 @@ export module Axis {
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any, i: number) => "translate(" + this._scale._d3Scale(d) + ",0)");
       tickLabels.selectAll("text").text((d: any) => this._formatter.format(d));
+      tickLabels.selectAll("text").style("text-anchor", "middle");
       return this;
     }
   }

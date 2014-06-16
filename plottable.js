@@ -3396,10 +3396,6 @@ var Plottable;
                 return this._d3Scale.ticks(this.lastRequestedTickCount);
             };
 
-            Time.prototype.tickInterval = function (range, step) {
-                return this._d3Scale.ticks(range, step);
-            };
-
             Time.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
@@ -4522,8 +4518,7 @@ var Plottable;
             };
 
             Time.prototype._getTickValues = function () {
-                return this._scale.tickInterval(d3.time.month, 2);
-                // return this._scale.ticks(10);
+                return this._scale.ticks(7);
             };
 
             Time.prototype.measureTextHeight = function () {
@@ -4549,6 +4544,7 @@ var Plottable;
                 tickLabels.selectAll("text").text(function (d) {
                     return _this._formatter.format(d);
                 });
+                tickLabels.selectAll("text").style("text-anchor", "middle");
                 return this;
             };
             return Time;
