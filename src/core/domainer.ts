@@ -6,7 +6,7 @@ module Plottable {
     private doNice = false;
     private niceCount: number;
     private padProportion = 0.0;
-    private padBeyondZero = true;
+    private paddingExceptions: D3.Set = d3.set([]);
     private combineExtents: (extents: any[][]) => any[];
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;
@@ -49,13 +49,28 @@ module Plottable {
      */
     public pad(padProportion = 0.05): Domainer {
       this.padProportion = padProportion;
-      this.padBeyondZero = true;
       return this;
     }
 
-    public padUnlessZero(padProportion = 0.05): Domainer {
-      this.padProportion = padProportion;
-      this.padBeyondZero = false;
+    /**
+     * Adds a value that will not be padded if either end of the domain.
+     * For example, after addPaddingException(0), a domainer will pad
+     * [0, 100] to [0, 102.5].
+     *
+     * @param {any} exception The value that will not be padded.
+     */
+    public addPaddingException(exception: any): Domainer {
+      this.paddingExceptions.add(exception);
+      return this;
+    }
+
+    /**
+     * Reverses the effect of addPaddingException.
+     *
+     * @param {any} exception The value to be padded again.
+     */
+    public removePaddingException(exception: any): Domainer {
+      this.paddingExceptions.remove(exception);
       return this;
     }
 
@@ -87,13 +102,11 @@ module Plottable {
       var extent = domain[1] - domain[0];
       var newDomain = [domain[0].valueOf() - this.padProportion/2 * extent,
                        domain[1].valueOf() + this.padProportion/2 * extent];
-      if (!this.padBeyondZero) {
-        if (domain[0] === 0) {
-          newDomain[0] = 0;
-        }
-        if (domain[1] === 0) {
-          newDomain[1] = 0;
-        }
+      if (this.paddingExceptions.has(domain[0])) {
+        newDomain[0] = domain[0];
+      }
+      if (this.paddingExceptions.has(domain[1])) {
+        newDomain[1] = domain[1];
       }
       return newDomain;
     }

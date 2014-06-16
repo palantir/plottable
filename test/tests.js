@@ -4344,11 +4344,13 @@ describe("Domainer", function () {
         assert.deepEqual(domain, [-5, 105]);
     });
 
-    it("padUnlessZero() will not pad beyond 0", function () {
-        domainer.padUnlessZero(0.1);
+    it("addPaddingException(n) will not pad beyond n", function () {
+        domainer.pad(0.1).addPaddingException(0).addPaddingException(200);
         var domain = domainer.computeDomain([[0, 100]], scale);
         assert.deepEqual(domain, [0, 105]);
         domain = domainer.computeDomain([[-100, 0]], scale);
         assert.deepEqual(domain, [-105, 0]);
+        domain = domainer.computeDomain([[0, 200]], scale);
+        assert.deepEqual(domain, [0, 200]);
     });
 });

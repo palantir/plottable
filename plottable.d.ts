@@ -916,6 +916,10 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
+    interface IExtent {
+        min: number;
+        max: number;
+    }
 }
 
 
@@ -948,7 +952,20 @@ declare module Plottable {
         *         new domain should be (0.05 = 5% larger).
         */
         public pad(padProportion?: number): Domainer;
-        public padUnlessZero(padProportion?: number): Domainer;
+        /**
+        * Adds a value that will not be padded if either end of the domain.
+        * For example, after addPaddingException(0), a domainer will pad
+        * [0, 100] to [0, 102.5].
+        *
+        * @param {any} exception The value that will not be padded.
+        */
+        public addPaddingException(exception: any): Domainer;
+        /**
+        * Reverses the effect of addPaddingException.
+        *
+        * @param {any} exception The value to be padded again.
+        */
+        public removePaddingException(exception: any): Domainer;
         /**
         * Extends the scale's domain so it starts and ends with "nice" values.
         *

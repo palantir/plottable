@@ -2868,7 +2868,7 @@ var Plottable;
             if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
             this.doNice = false;
             this.padProportion = 0.0;
-            this.padBeyondZero = true;
+            this.paddingExceptions = d3.set([]);
             this.combineExtents = combineExtents;
         }
         /**
@@ -2895,14 +2895,28 @@ var Plottable;
         Domainer.prototype.pad = function (padProportion) {
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
             this.padProportion = padProportion;
-            this.padBeyondZero = true;
             return this;
         };
 
-        Domainer.prototype.padUnlessZero = function (padProportion) {
-            if (typeof padProportion === "undefined") { padProportion = 0.05; }
-            this.padProportion = padProportion;
-            this.padBeyondZero = false;
+        /**
+        * Adds a value that will not be padded if either end of the domain.
+        * For example, after addPaddingException(0), a domainer will pad
+        * [0, 100] to [0, 102.5].
+        *
+        * @param {any} exception The value that will not be padded.
+        */
+        Domainer.prototype.addPaddingException = function (exception) {
+            this.paddingExceptions.add(exception);
+            return this;
+        };
+
+        /**
+        * Reverses the effect of addPaddingException.
+        *
+        * @param {any} exception The value to be padded again.
+        */
+        Domainer.prototype.removePaddingException = function (exception) {
+            this.paddingExceptions.remove(exception);
             return this;
         };
 
@@ -2940,13 +2954,11 @@ var Plottable;
             var newDomain = [
                 domain[0].valueOf() - this.padProportion / 2 * extent,
                 domain[1].valueOf() + this.padProportion / 2 * extent];
-            if (!this.padBeyondZero) {
-                if (domain[0] === 0) {
-                    newDomain[0] = 0;
-                }
-                if (domain[1] === 0) {
-                    newDomain[1] = 0;
-                }
+            if (this.paddingExceptions.has(domain[0])) {
+                newDomain[0] = domain[0];
+            }
+            if (this.paddingExceptions.has(domain[1])) {
+                newDomain[1] = domain[1];
             }
             return newDomain;
         };
@@ -5432,7 +5444,7 @@ var Plottable;
 
             VerticalBar.prototype._setYDomainer = function () {
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.yScale._setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                    this.yScale._setDomainerIfDefault(new Plottable.Domainer().pad().addPaddingException(0).nice());
                 }
                 return this;
             };
@@ -5560,7 +5572,7 @@ var Plottable;
 
             HorizontalBar.prototype._setXDomainer = function () {
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.xScale._setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                    this.xScale._setDomainerIfDefault(new Plottable.Domainer().pad().addPaddingException(0).nice());
                 }
                 return this;
             };
