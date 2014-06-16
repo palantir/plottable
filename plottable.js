@@ -1087,40 +1087,52 @@ var Plottable;
             function Time(precision) {
                 if (typeof precision === "undefined") { precision = 0; }
                 _super.call(this, precision);
-                var filter = [
-                    [".%L", function (d) {
-                            return d.getMilliseconds();
-                        }],
-                    [":%S", function (d) {
-                            return d.getSeconds();
-                        }],
-                    ["%I:%M", function (d) {
-                            return d.getMinutes();
-                        }],
-                    ["%I %p", function (d) {
-                            return d.getHours();
-                        }],
-                    ["%a %d", function (d) {
-                            return d.getDay() && d.getDate() !== 1;
-                        }],
-                    ["%b %d", function (d) {
-                            return d.getDate() !== 1;
-                        }],
-                    ["%B", function (d) {
-                            return d.getMonth();
-                        }],
-                    ["%Y", function () {
-                            return true;
-                        }]
-                ];
+
+                var numFormats = 8;
+                var formats = {};
+                var filters = {};
+
+                formats[0] = ".%L";
+                filters[0] = function (d) {
+                    return d.getMilliseconds();
+                };
+                formats[1] = ":%S";
+                filters[1] = function (d) {
+                    return d.getSeconds();
+                };
+                formats[2] = "%I:%M";
+                filters[2] = function (d) {
+                    return d.getMinutes();
+                };
+                formats[3] = "%I %p";
+                filters[3] = function (d) {
+                    return d.getHours();
+                };
+                formats[4] = "%a %d";
+                filters[4] = function (d) {
+                    return d.getDay() && d.getDate() !== 1;
+                };
+                formats[5] = "%b %d";
+                filters[5] = function (d) {
+                    return d.getDate() !== 1;
+                };
+                formats[6] = "%b";
+                filters[6] = function (d) {
+                    return d.getMonth();
+                };
+                formats[7] = "%Y";
+                filters[7] = function () {
+                    return true;
+                };
 
                 this._formatFunction = function (d) {
-                    debugger;
-                    for (var i = 0; i < filter.length; i++) {
-                        console.log(filter[i][1]);
+                    for (var i = 0; i < numFormats; i++) {
+                        if (filters[i](d)) {
+                            return d3.time.format(formats[i])(d);
+                        }
                     }
-                    return String(d);
                 };
+                this.showOnlyUnchangedValues(false);
             }
             return Time;
         })(Plottable.Abstract.Formatter);

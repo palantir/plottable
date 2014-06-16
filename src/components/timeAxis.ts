@@ -5,7 +5,6 @@ export module Axis {
   export class Time extends Abstract.Axis {
     public _scale: Scale.Time;
     public _tickLabelsG: D3.Selection;
-    public _intervals: D3.Time.Interval[];
 
     /**
      * Creates a TimeAxis
