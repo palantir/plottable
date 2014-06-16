@@ -1130,13 +1130,45 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Time extends Abstract.QuantitiveScale {
+        class Time extends Abstract.Scale {
             /**
-            * Creates a new TimeScale.
+            * Creates a new Time.
             *
             * @constructor
             */
-            constructor();
+            constructor(scale?: D3.Scale.TimeScale);
+            public autoDomain(): Time;
+            /**
+            * Sets the range of the Time and sets the interpolator to d3.interpolateRound.
+            *
+            * @param {number[]} values The new range value for the range.
+            */
+            public rangeRound(values: number[]): Time;
+            /**
+            * Gets or sets the clamp status of the Time (whether to cut off values outside the ouput range).
+            *
+            * @param {boolean} [clamp] Whether or not to clamp the Time.
+            * @returns {boolean|Time} The current clamp status, or the calling Time.
+            */
+            public clamp(): boolean;
+            public clamp(clamp: boolean): Time;
+            /**
+            * Generates tick values.
+            *
+            * @param {number} [count] The number of ticks to generate.
+            * @returns {any[]} The generated ticks.
+            */
+            public ticks(count?: number): any[];
+            public tickInterval(range: D3.Time.Interval, step: number): any[];
+            public domain(): any[];
+            public domain(values: any[]): Time;
+            /**
+            * Pads out the domain of the scale by a specified ratio.
+            *
+            * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
+            * @returns {Time} The calling Time.
+            */
+            public padDomain(padProportion?: number): Time;
         }
     }
 }

@@ -45,6 +45,7 @@ export module Axis {
     }
 
     public _getTickValues(): string[] {
+      // return this._scale.tickInterval(d3.time.months, 2);
       return this._scale.ticks(10);
     }
 
