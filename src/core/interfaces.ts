@@ -46,4 +46,9 @@ module Plottable {
     yMin: number;
     yMax: number;
   }
+
+  export interface IExtent {
+    min: number;
+    max: number;
+  }
 }
