@@ -1055,7 +1055,6 @@ declare module Plottable {
             * @returns {LinearScale} A copy of the calling LinearScale.
             */
             public copy(): Linear;
-            public niceDomain(domain: any[], count?: number): any[];
         }
     }
 }
@@ -1078,7 +1077,6 @@ declare module Plottable {
             * @returns {Scale.Log} A copy of the calling Scale.Log.
             */
             public copy(): Log;
-            public niceDomain(domain: any[], count?: number): any[];
         }
     }
 }
@@ -1162,7 +1160,6 @@ declare module Plottable {
             * @constructor
             */
             constructor();
-            public niceDomain(domain: any[], count?: number): any[];
         }
     }
 }

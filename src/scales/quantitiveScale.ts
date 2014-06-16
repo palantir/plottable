@@ -120,8 +120,7 @@ export module Abstract {
      * numbers.
      */
     public niceDomain(domain: any[], count?: number): any[] {
-      // will override
-      return domain;
+      return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
 
     /**

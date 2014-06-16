@@ -16,10 +16,6 @@ export module Scale {
     public _setDomain(values: any[]) {
       super._setDomain(values.map((d: any) => new Date(d)));
     }
-
-    public niceDomain(domain: any[], count?: number): any[] {
-      return d3.time.scale().domain(domain).nice(count).domain();
-    }
   }
 }
 }

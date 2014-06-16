@@ -3069,8 +3069,7 @@ var Plottable;
             * numbers.
             */
             QuantitiveScale.prototype.niceDomain = function (domain, count) {
-                // will override
-                return domain;
+                return this._d3Scale.copy().domain(domain).nice(count).domain();
             };
 
             /**
@@ -3125,10 +3124,6 @@ var Plottable;
             Linear.prototype.copy = function () {
                 return new Linear(this._d3Scale.copy());
             };
-
-            Linear.prototype.niceDomain = function (domain, count) {
-                return d3.scale.linear().domain(domain).nice(count).domain();
-            };
             return Linear;
         })(Plottable.Abstract.QuantitiveScale);
         Scale.Linear = Linear;
@@ -3158,10 +3153,6 @@ var Plottable;
             */
             Log.prototype.copy = function () {
                 return new Log(this._d3Scale.copy());
-            };
-
-            Log.prototype.niceDomain = function (domain, count) {
-                return d3.scale.log().domain(domain).nice(count).domain();
             };
             return Log;
         })(Plottable.Abstract.QuantitiveScale);
@@ -3367,10 +3358,6 @@ var Plottable;
                 _super.prototype._setDomain.call(this, values.map(function (d) {
                     return new Date(d);
                 }));
-            };
-
-            Time.prototype.niceDomain = function (domain, count) {
-                return d3.time.scale().domain(domain).nice(count).domain();
             };
             return Time;
         })(Plottable.Abstract.QuantitiveScale);
