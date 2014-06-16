@@ -61,6 +61,17 @@ export module Abstract {
       return this;
     }
 
+
+    private parseExtent(input: any): IExtent {
+      if (typeof(input) === "number") {
+        return {min: input, max: input};
+      } else if (input instanceof Object && "min" in input && "max" in input) {
+        return <IExtent> input;
+      } else {
+        throw new Error("input '" + input + "' can't be parsed as an IExtent");
+      }
+    }
+
     /**
      * Selects the bar under the given pixel position (if [xMax] and
      * [yMax] are not given), under a given line (if only one of [xMax]
@@ -74,21 +85,17 @@ export module Abstract {
      * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
      * @return {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public selectBar(xMin: number, yMin: number, select = true, xMax?: number, yMax?: number): D3.Selection {
+    public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
       var selectedBars: any[] = [];
 
-      if (xMax === undefined) {
-        xMax = xMin;
-      }
-      if (yMax === undefined) {
-        yMax = yMin;
-      }
+      var xExtent: IExtent = this.parseExtent(xValOrExtent);
+      var yExtent: IExtent = this.parseExtent(yValOrExtent);
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
       this._bars.each(function(d: any) {
         var bbox = this.getBBox();
-        if (bbox.x + bbox.width >= xMin && bbox.x <= xMax &&
-            bbox.y + bbox.height >= yMin && bbox.y <= yMax) {
+        if (bbox.x + bbox.width >= xExtent.min && bbox.x <= xExtent.max &&
+            bbox.y + bbox.height >= yExtent.min && bbox.y <= yExtent.max) {
           selectedBars.push(this);
         }
       });
