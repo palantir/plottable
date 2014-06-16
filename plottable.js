@@ -5156,6 +5156,16 @@ var Plottable;
                 return this;
             };
 
+            BarPlot.prototype.parseExtent = function (input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                } else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                } else {
+                    throw new Error("input '" + input + "' can't be parsed as an IExtent");
+                }
+            };
+
             /**
             * Selects the bar under the given pixel position (if [xMax] and
             * [yMax] are not given), under a given line (if only one of [xMax]
@@ -5169,21 +5179,17 @@ var Plottable;
             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
             * @return {D3.Selection} The selected bar, or null if no bar was selected.
             */
-            BarPlot.prototype.selectBar = function (xMin, yMin, select, xMax, yMax) {
+            BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (typeof select === "undefined") { select = true; }
                 var selectedBars = [];
 
-                if (xMax === undefined) {
-                    xMax = xMin;
-                }
-                if (yMax === undefined) {
-                    yMax = yMin;
-                }
+                var xExtent = this.parseExtent(xValOrExtent);
+                var yExtent = this.parseExtent(yValOrExtent);
 
                 // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
                 this._bars.each(function (d) {
                     var bbox = this.getBBox();
-                    if (bbox.x + bbox.width >= xMin && bbox.x <= xMax && bbox.y + bbox.height >= yMin && bbox.y <= yMax) {
+                    if (bbox.x + bbox.width >= xExtent.min && bbox.x <= xExtent.max && bbox.y + bbox.height >= yExtent.min && bbox.y <= yExtent.max) {
                         selectedBars.push(this);
                     }
                 });

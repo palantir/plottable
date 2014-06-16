@@ -916,6 +916,10 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
+    interface IExtent {
+        min: number;
+        max: number;
+    }
 }
 
 
@@ -1558,7 +1562,7 @@ declare module Plottable {
             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
             * @return {D3.Selection} The selected bar, or null if no bar was selected.
             */
-            public selectBar(xMin: number, yMin: number, select?: boolean, xMax?: number, yMax?: number): D3.Selection;
+            public selectBar(xValOrExtent: any, yValOrExtent: any, select?: boolean): D3.Selection;
             /**
             * Deselects all bars.
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
