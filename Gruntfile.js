@@ -257,6 +257,9 @@ module.exports = function(grunt) {
       sublime: {
         command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts",
       },
+      definitions_jsdoc_copy: {
+        command: "./jsdoc_copy.py plottable.d.ts plottable.d.ts",
+      },
     },
   };
 
@@ -295,6 +298,7 @@ module.exports = function(grunt) {
                                   "handle-header",
                                   "sed:protected_definitions",
                                   "sed:public_member_vars",
+                                  "shell:definitions_jsdoc_copy",
                                   "concat:plottable_multifile",
                                   "sed:plottable_multifile",
                                   "clean:tscommand"]);
