@@ -3460,6 +3460,16 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [4, 6]);
         });
 
+        it("autoPad defaults to [v-1 day, v+1 day] if there's only one date value", function () {
+            var d = new Date(2000, 5, 5);
+            var dayBefore = new Date(2000, 5, 4);
+            var dayAfter = new Date(2000, 5, 6);
+            var scale = new Plottable.Scale.Time();
+            scale.updateExtent(1, "x", [d, d]);
+            scale.setDomainer(new Plottable.Domainer().pad());
+            assert.deepEqual(scale.domain(), [dayBefore, dayAfter]);
+        });
+
         it("autoPad works in general case", function () {
             var scale = new Plottable.Scale.Linear();
             scale.updateExtent(1, "x", [100, 200]);

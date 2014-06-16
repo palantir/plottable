@@ -9,6 +9,8 @@ module Plottable {
     private padBeyondZero = true;
     private combineExtents: (extents: any[][]) => any[];
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
+    private static ONE_DAY = 1000 * 60 * 60 * 24;
+    private static PADDING_FOR_IDENTICAL_DOMAIN_DATE = Domainer.ONE_DAY;
 
     /**
      * @param {(extents: any[][]) => any[]} combineExtents
@@ -72,8 +74,12 @@ module Plottable {
     private padDomain(domain: any[]): any[] {
       if (domain[0] === domain[1] && this.padProportion > 0.0) {
         var d = domain[0].valueOf(); // valueOf accounts for dates properly
-        return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
-                d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
+        if (domain[0] instanceof Date) {
+          return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
+        } else {
+          return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
+                  d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
+        }
       }
       var extent = domain[1] - domain[0];
       var newDomain = [domain[0].valueOf() - this.padProportion/2 * extent,

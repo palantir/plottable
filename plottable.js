@@ -2930,9 +2930,13 @@ var Plottable;
         Domainer.prototype.padDomain = function (domain) {
             if (domain[0] === domain[1] && this.padProportion > 0.0) {
                 var d = domain[0].valueOf();
-                return [
-                    d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
-                    d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
+                if (domain[0] instanceof Date) {
+                    return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
+                } else {
+                    return [
+                        d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
+                        d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
+                }
             }
             var extent = domain[1] - domain[0];
             var newDomain = [
@@ -2957,6 +2961,8 @@ var Plottable;
             }
         };
         Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
+        Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
+        Domainer.PADDING_FOR_IDENTICAL_DOMAIN_DATE = Domainer.ONE_DAY;
         return Domainer;
     })();
     Plottable.Domainer = Domainer;
