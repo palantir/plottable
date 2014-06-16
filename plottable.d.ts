@@ -699,7 +699,6 @@ declare module Plottable {
             */
             public updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
             public removeExtent(rendererID: number, attr: string): Scale;
-            public setDomainerIfDefault(x: any): Scale;
         }
     }
 }

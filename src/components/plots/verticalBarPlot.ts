@@ -100,7 +100,11 @@ export module Plot {
     }
 
     public _setYDomainer() {
-      this.yScale.setDomainerIfDefault(new Domainer().padUnlessZero().nice());
+      if (this.yScale instanceof Abstract.QuantitiveScale) {
+        (<Abstract.QuantitiveScale>this.yScale).setDomainerIfDefault(
+          new Domainer().padUnlessZero().nice()
+        );
+      }
       return this;
     }
   }

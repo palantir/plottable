@@ -2415,12 +2415,6 @@ var Plottable;
                 }
                 return this;
             };
-
-            Scale.prototype.setDomainerIfDefault = function (x) {
-                // only QuantitiveScale will be affected by the domainer
-                // Color and Ordinal should ignore domainers
-                return this;
-            };
             return Scale;
         })(Plottable.Abstract.Broadcaster);
         Abstract.Scale = Scale;
@@ -5053,12 +5047,16 @@ var Plottable;
             };
 
             XYPlot.prototype._setXDomainer = function () {
-                this.xScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
+                    this.xScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                }
                 return this;
             };
 
             XYPlot.prototype._setYDomainer = function () {
-                this.yScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
+                    this.yScale.setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                }
                 return this;
             };
             return XYPlot;
@@ -5434,7 +5432,9 @@ var Plottable;
             };
 
             VerticalBar.prototype._setYDomainer = function () {
-                this.yScale.setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
+                    this.yScale.setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                }
                 return this;
             };
             return VerticalBar;
@@ -5560,7 +5560,9 @@ var Plottable;
             };
 
             HorizontalBar.prototype._setXDomainer = function () {
-                this.xScale.setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
+                    this.xScale.setDomainerIfDefault(new Plottable.Domainer().padUnlessZero().nice());
+                }
                 return this;
             };
             return HorizontalBar;

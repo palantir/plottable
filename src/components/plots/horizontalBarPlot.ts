@@ -99,7 +99,11 @@ export module Plot {
     }
 
     public _setXDomainer() {
-      this.xScale.setDomainerIfDefault(new Domainer().padUnlessZero().nice());
+      if (this.xScale instanceof Abstract.QuantitiveScale) {
+        (<Abstract.QuantitiveScale>this.xScale).setDomainerIfDefault(
+          new Domainer().padUnlessZero().nice()
+        );
+      }
       return this;
     }
   }

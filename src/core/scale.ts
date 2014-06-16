@@ -128,12 +128,6 @@ export module Abstract {
       }
       return this;
     }
-
-    public setDomainerIfDefault(x: any): Scale {
-      // only QuantitiveScale will be affected by the domainer
-      // Color and Ordinal should ignore domainers
-      return this;
-    }
   }
 }
 }

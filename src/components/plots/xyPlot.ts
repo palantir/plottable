@@ -53,12 +53,16 @@ export module Abstract {
     }
 
     public _setXDomainer(): XYPlot {
-      this.xScale.setDomainerIfDefault(new Domainer().pad().nice());
+      if (this.xScale instanceof QuantitiveScale) {
+        (<QuantitiveScale>this.xScale).setDomainerIfDefault(new Domainer().pad().nice());
+      }
       return this;
     }
 
     public _setYDomainer(): XYPlot {
-      this.yScale.setDomainerIfDefault(new Domainer().pad().nice());
+      if (this.yScale instanceof QuantitiveScale) {
+        (<QuantitiveScale>this.yScale).setDomainerIfDefault(new Domainer().pad().nice());
+      }
       return this;
     }
   }
