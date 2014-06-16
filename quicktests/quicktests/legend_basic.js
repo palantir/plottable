@@ -23,6 +23,9 @@ renderAreaD1.project("fill", colorProjector);
 renderAreaD2.project("stroke", colorProjector);
 var renderAreas = renderAreaD1.merge(renderAreaD2);
 
+var gridlines = new Plottable.Component.Gridlines(null, yScale);
+renderAreas.merge(gridlines);
+
 
 title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
 legend1 = new Plottable.Component.Legend(colorScale1);
