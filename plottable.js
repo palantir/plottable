@@ -2398,6 +2398,9 @@ var Plottable;
             * @param {any[]} extent The new extent to be included in the scale.
             */
             Scale.prototype.updateExtent = function (rendererID, attr, extent) {
+                if (extent[0] === Infinity || extent[0] === -Infinity || extent[1] === Infinity || extent[1] === -Infinity) {
+                    throw new Error("data cannot contain Infinity or -Infinity");
+                }
                 this._rendererAttrID2Extent[rendererID + attr] = extent;
                 if (this._autoDomainAutomatically) {
                     this.autoDomain();

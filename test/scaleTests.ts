@@ -96,6 +96,23 @@ describe("Scales", () => {
       assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
       assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
     });
+
+    it("scales don't allow Infinity", () => {
+      var exceptionThrown = false;
+      try {
+        scale.updateExtent(1, "x", [5, Infinity]);
+      } catch (e) {
+        exceptionThrown = true;
+      }
+      assert.isTrue(exceptionThrown, "extent including Infinity throws an error");
+      exceptionThrown = false;
+      try {
+        scale.updateExtent(1, "x", [-Infinity, 6]);
+      } catch (e) {
+        exceptionThrown = true;
+      }
+      assert.isTrue(exceptionThrown, "extent including -Infinity throws an error");
+    });
   });
 
   describe("Quantitive Scales", () => {
