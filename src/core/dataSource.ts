@@ -74,7 +74,7 @@ module Plottable {
       var appliedAccessor = Util.Methods.applyAccessor(accessor, this);
       var mappedData = this._data.map(appliedAccessor);
       if (mappedData.length === 0){
-        return undefined;
+        return [];
       } else if (typeof(mappedData[0]) === "string") {
         return Util.Methods.uniq(mappedData);
       } else {

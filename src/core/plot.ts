@@ -17,7 +17,7 @@ export module Abstract {
 
     public renderArea: D3.Selection;
     public element: D3.Selection;
-    public scales: Abstract.Scale[];
+    private scales: Abstract.Scale[];
     public _colorAccessor: IAccessor;
     public _animate: boolean = false;
     public _animators: Animator.IPlotAnimatorMap = {};
@@ -87,22 +87,14 @@ export module Abstract {
         this._deregisterFromBroadcaster(this._dataSource);
         this._requireRerender = true;
         this._rerenderUpdateSelection = true;
-
-        // point all scales at the new datasource
-        d3.keys(this._projectors).forEach((attrToSet: string) => {
-          var projector = this._projectors[attrToSet];
-          if (projector.scale != null) {
-            var rendererIDAttr = this._plottableID + attrToSet;
-            projector.scale._removePerspective(rendererIDAttr);
-            projector.scale._addPerspective(rendererIDAttr, source, projector.accessor);
-          }
-        });
       }
       this._dataSource = source;
       this._registerToBroadcaster(this._dataSource, () => {
+        this.updateAllProjectors();
         this._dataChanged = true;
         this._render();
       });
+      this.updateAllProjectors();
       this._dataChanged = true;
       this._render();
       return this;
@@ -110,23 +102,22 @@ export module Abstract {
 
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       attrToSet = attrToSet.toLowerCase();
-      var rendererIDAttr = this._plottableID + attrToSet;
       var currentProjection = this._projectors[attrToSet];
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
       if (existingScale != null) {
-        existingScale._removePerspective(rendererIDAttr);
+        existingScale.removeExtent(this._plottableID, attrToSet);
         this._deregisterFromBroadcaster(existingScale);
       }
 
       if (scale != null) {
-        scale._addPerspective(rendererIDAttr, this.dataSource(), accessor);
         this._registerToBroadcaster(scale, () => this._render());
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
       this._requireRerender = true;
       this._rerenderUpdateSelection = true;
+      this.updateProjector(attrToSet);
       return this;
     }
 
@@ -169,6 +160,28 @@ export module Abstract {
      */
     public animate(enabled: boolean) {
       this._animate = enabled;
+      return this;
+    }
+
+    /**
+     * This function makes sure that all of the scales in this._projectors
+     * have an extent that includes all the data that is projected onto them.
+     */
+    private updateAllProjectors(): Plot {
+      d3.keys(this._projectors).forEach((attr: string) => this.updateProjector(attr));
+      return this;
+    }
+
+    private updateProjector(attr: string) {
+      var projector = this._projectors[attr];
+      if (projector.scale != null) {
+        var extent = this.dataSource()._getExtent(projector.accessor);
+        if (extent.length === 0) {
+          projector.scale.removeExtent(this._plottableID, attr);
+        } else {
+          projector.scale.updateExtent(this._plottableID, attr, extent);
+        }
+      }
       return this;
     }
 
