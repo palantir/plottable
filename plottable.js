@@ -5188,7 +5188,9 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.deselectAll = function () {
-                this._bars.classed("selected", false);
+                if (this._bars != null) {
+                    this._bars.classed("selected", false);
+                }
                 return this;
             };
             return BarPlot;
