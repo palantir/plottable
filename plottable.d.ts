@@ -750,6 +750,7 @@ declare module Plottable {
             */
             public animator(animatorKey: string): Animator.IPlotAnimator;
             public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
+            public remove(): Component;
         }
     }
 }
@@ -915,6 +916,10 @@ declare module Plottable {
         xMax: number;
         yMin: number;
         yMax: number;
+    }
+    interface IExtent {
+        min: number;
+        max: number;
     }
 }
 

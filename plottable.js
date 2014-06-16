@@ -2610,6 +2610,12 @@ var Plottable;
                     return this;
                 }
             };
+
+            Plot.prototype.remove = function () {
+                // make the domain resize
+                this.dataSource(new Plottable.DataSource([]));
+                return _super.prototype.remove.call(this);
+            };
             return Plot;
         })(Plottable.Abstract.Component);
         Abstract.Plot = Plot;

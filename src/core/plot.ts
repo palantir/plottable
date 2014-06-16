@@ -227,6 +227,12 @@ export module Abstract {
         return this;
       }
     }
+
+    public remove() {
+      // make the domain resize
+      this.dataSource(new DataSource([]));
+      return super.remove();
+    }
   }
 }
 }

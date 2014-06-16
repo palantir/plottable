@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> - jsFiddle demo</title>
+  
+  <style type='text/css'>
+    </style> <link rel="stylesheet" type="text/css" href="../plottable.css"> <style type="text/css">
+/*-- Add custom styles after this line --*/
+ .demo-title {
+    font-size: 24 pt;
+}
+.plottable .y-axis .tick line {
+    opacity: 1
+}
+
+.plottable .x-axis .tick line {
+    opacity: 1
+}
+
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+
+var renderAreaD1, renderAreaD2, renderAreaD3, renderAreaD4;
+var dataseries1, dataseries2, dataseries3, dataseries4;
+var basicTable;
+var title;
+
+window.onload = function () {
+    var svg = d3.select("#chart");
+    svg.attr("width", 500).attr("height", 500);
+
+    //data
+    dataseries1 = new Plottable.DataSource(makeRandomData(50));
+    dataseries1.metadata({name: "series1"});
+    dataseries2 = new Plottable.DataSource(makeRandomData(50));
+    dataseries2.metadata({name: "series2"});
+    dataseries3 = new Plottable.DataSource(makeRandomData(50));
+    dataseries3.metadata({name: "series3"});
+    dataseries4 = new Plottable.DataSource(makeRandomData(50));
+    dataseries4.metadata({name: "series4"});
+    var colorScale1 = new Plottable.Scale.Color("20");
+    colorScale1.domain(["series1", "series2", "series3", "series4"]);
+    
+    //Axis
+    var xScale = new Plottable.Scale.Linear();
+    var yScale = new Plottable.Scale.Linear();
+    var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+    var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+
+        
+    var colorProjector = function(d, i, m) {
+       return colorScale1.scale(m.name);
+    };
+    
+    //rendering
+    renderAreaD1 = new Plottable.Plot.Line(dataseries1, xScale, yScale);   
+    renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
+    renderAreaD3 = new Plottable.Plot.Line(dataseries3, xScale, yScale);
+    renderAreaD4 = new Plottable.Plot.Line(dataseries4, xScale, yScale);
+    renderAreaD1.project("stroke", colorProjector);
+    renderAreaD2.project("stroke", colorProjector);
+    renderAreaD3.project("stroke", colorProjector);
+    renderAreaD4.project("stroke", colorProjector);
+    renderAreas = renderAreaD1.merge(renderAreaD2)
+                        .merge(renderAreaD3).merge(renderAreaD4);
+
+    
+    //title + legend
+    var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
+    var legend1 = new Plottable.Component.Legend(colorScale1);
+    var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
+                                          .addComponent(0,1, legend1);
+    
+    basicTable = new Plottable.Component.Table().addComponent(0,2, titleTable)
+                .addComponent(1, 1, yAxis)
+                .addComponent(1, 2, renderAreas)
+                .addComponent(2, 2, xAxis)
+
+    basicTable.renderTo(svg);
+    flipData();
+    removeOrange();
+};
+
+function flipy(element, index, array) {
+  element.y = -1 * element.y;
+}
+function flipx(element, index, array) {
+  element.x = -1 * element.x;
+}
+
+function flipData(){
+    ds = dataseries4.data();
+    ds.forEach(flipy);
+    dataseries4.data(ds);  
+    
+    ds = dataseries3.data();
+    ds.forEach(flipy);
+    ds.forEach(flipx);
+    dataseries3.data(ds);
+    
+    ds = dataseries2.data();
+    ds.forEach(flipx);
+    dataseries2.data(ds);   
+}
+
+function removeOrange(){
+    // renderAreaD3.dataSource(new Plottable.DataSource([]));
+    // renderAreaD4.dataSource(new Plottable.DataSource([]));
+    renderAreaD3.remove();
+    renderAreaD4.remove();
+}
+//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../plottable_multifile.js"></script>
+<script src="../examples/exampleUtil.js"></script>
+<div class="demo-title">Simple Chart</div>
+<br>
+
+
+<br>
+<svg id="chart"></svg>
+    <button onclick=removeOrange()>remove orange</button>
+<p />
+  
+</body>
+
+
+</html>
+
