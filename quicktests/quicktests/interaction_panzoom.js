@@ -1,6 +1,5 @@
 // Will receive function arguments: (svg, data, Plottable)
 
-console.log(data);
 
 var xScale = new Plottable.Scale.Linear();
 var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
