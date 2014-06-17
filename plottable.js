@@ -2881,11 +2881,7 @@ var Plottable;
         *                 pair.
         */
         Domainer.prototype.computeDomain = function (extents, scale) {
-            if (extents.length === 0) {
-                return [0, 1];
-            } else {
-                return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
-            }
+            return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
         };
 
         /**
@@ -2938,11 +2934,15 @@ var Plottable;
         };
 
         Domainer.defaultCombineExtents = function (extents) {
-            return [d3.min(extents, function (e) {
-                    return e[0];
-                }), d3.max(extents, function (e) {
-                    return e[1];
-                })];
+            if (extents.length === 0) {
+                return [0, 1];
+            } else {
+                return [d3.min(extents, function (e) {
+                        return e[0];
+                    }), d3.max(extents, function (e) {
+                        return e[1];
+                    })];
+            }
         };
 
         Domainer.prototype.padDomain = function (domain) {

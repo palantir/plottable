@@ -36,11 +36,7 @@ module Plottable {
      *                 pair.
      */
     public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[] {
-      if (extents.length === 0) {
-        return [0, 1];
-      } else {
-        return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
-      }
+      return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
     }
 
     /**
@@ -92,7 +88,11 @@ module Plottable {
     }
 
     private static defaultCombineExtents(extents: any[][]): any[] {
-      return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
+      if (extents.length === 0) {
+        return [0, 1];
+      } else {
+        return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
+      }
     }
 
     private padDomain(domain: any[]): any[] {
