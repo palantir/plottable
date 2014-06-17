@@ -916,6 +916,10 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
+    interface IExtent {
+        min: number;
+        max: number;
+    }
 }
 
 
