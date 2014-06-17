@@ -26,4 +26,13 @@ var chart = new Plottable.Component.Table([[yAxis, barPlot],
 
 
 chart.renderTo(svg);
+addRemove = function(x, y){
+    barPlot.remove();
+    chart.addComponent(0, 1, barPlot);
+}
+
+    window.xy = new Plottable.Interaction.Click(barPlot)
+        .callback(addRemove)
+        .registerWithComponent();
+
 

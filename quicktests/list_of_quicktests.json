@@ -2,6 +2,7 @@
   {"name":"animate_addRemove", "categories":["line", "animate", "automate", "gridlines"]},
   {"name":"animate_area", "categories":["area", "animate"]},
   {"name":"animate_horizontalBar", "categories":["horizontalbar", "animate"]},
+  {"name":"animate_line", "categories":["line", "animate"]},
   {"name":"animate_scatter", "categories":["scatter", "animate"]},
   {"name":"animate_verticalBar", "categories":["verticalbar", "animate"]},
   {"name":"interaction_dragzoomx", "categories":["area", "interaction", "gridlines"]},

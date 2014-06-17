@@ -16,3 +16,11 @@ var vBarChart = new Plottable.Component.Table([[yAxis, vBarRenderer],
                                          [null,  xAxis]]);
 vBarChart.renderTo(svg);
 
+addRemove = function(x, y){
+	vBarRenderer.remove();
+	vBarChart.addComponent(0, 1, vBarRenderer);
+}
+
+    window.xy = new Plottable.Interaction.Click(vBarRenderer)
+        .callback(addRemove)
+        .registerWithComponent();

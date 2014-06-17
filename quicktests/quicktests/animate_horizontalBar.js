@@ -16,3 +16,11 @@ var hBarChart = new Plottable.Component.Table([[yAxis, hBarRenderer],
                                          [null,  xAxis]]);
 hBarChart.renderTo(svg);
 
+addRemove = function(x, y){
+	hBarRenderer.remove();
+	hBarChart.addComponent(0, 1, hBarRenderer);
+}
+
+    window.xy = new Plottable.Interaction.Click(hBarRenderer)
+        .callback(addRemove)
+        .registerWithComponent();

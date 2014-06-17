@@ -17,7 +17,14 @@ var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer],
                                          [null,  xAxis]]);
 circleChart.renderTo(svg);
 
+addRemove = function(x, y){
+	circleRenderer.remove();
+	circleChart.addComponent(0, 1, circleRenderer);
+}
 
+    window.xy = new Plottable.Interaction.Click(circleRenderer)
+        .callback(addRemove)
+        .registerWithComponent();
 
 
 

@@ -16,3 +16,13 @@ var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
                                          [null,  xAxis]]);
 lineChart.renderTo(svg);
 
+addRemove = function(x, y){
+	lineRenderer.remove();
+	lineChart.addComponent(0, 1, lineRenderer);
+}
+
+    window.xy = new Plottable.Interaction.Click(lineRenderer)
+        .callback(addRemove)
+        .registerWithComponent();
+
+
