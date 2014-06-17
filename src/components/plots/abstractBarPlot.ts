@@ -43,6 +43,8 @@ export module Abstract {
      */
     public baseline(value: number) {
       this._baselineValue = value;
+      this._setXDomainer();
+      this._setYDomainer();
       if (this.element != null) {
         this._render();
       }

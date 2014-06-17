@@ -5266,6 +5266,8 @@ var Plottable;
             */
             BarPlot.prototype.baseline = function (value) {
                 this._baselineValue = value;
+                this._setXDomainer();
+                this._setYDomainer();
                 if (this.element != null) {
                     this._render();
                 }
@@ -5444,7 +5446,7 @@ var Plottable;
 
             VerticalBar.prototype._setYDomainer = function () {
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.yScale._setDomainerIfDefault(new Plottable.Domainer().pad().addPaddingException(0).nice());
+                    this.yScale._setDomainerIfDefault(new Plottable.Domainer().pad().addPaddingException(this._baseline).nice());
                 }
                 return this;
             };
@@ -5572,7 +5574,7 @@ var Plottable;
 
             HorizontalBar.prototype._setXDomainer = function () {
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.xScale._setDomainerIfDefault(new Plottable.Domainer().pad().addPaddingException(0).nice());
+                    this.xScale._setDomainerIfDefault(new Plottable.Domainer().pad().addPaddingException(this._baseline).nice());
                 }
                 return this;
             };

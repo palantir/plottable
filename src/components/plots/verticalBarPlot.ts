@@ -102,7 +102,7 @@ export module Plot {
     public _setYDomainer() {
       if (this.yScale instanceof Abstract.QuantitiveScale) {
         (<Abstract.QuantitiveScale>this.yScale)._setDomainerIfDefault(
-          new Domainer().pad().addPaddingException(0).nice()
+          new Domainer().pad().addPaddingException(this._baseline).nice()
         );
       }
       return this;
