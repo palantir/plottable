@@ -4593,7 +4593,7 @@ var Plottable;
                 _super.call(this, scale, orientation, formatter);
                 this._intervals = [];
             }
-            Multi.prototype._requetsedSpace = function (offeredWidth, offeredHeight) {
+            Multi.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requestedWidth = this._width;
                 var requestedHeight = this._height;
 
@@ -4611,13 +4611,6 @@ var Plottable;
                 };
             };
 
-            Multi.prototype._measureTextHeight = function () {
-                var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
-                var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
-                fakeTickLabel.remove();
-                return textHeight;
-            };
-
             Multi.prototype.addInterval = function (interval) {
                 this._intervals.push(interval);
                 return this;
@@ -4627,11 +4620,18 @@ var Plottable;
                 var _this = this;
                 var set = d3.set();
                 this._intervals.forEach(function (v) {
-                    set = Plottable.Util.Methods.union(set, d3.set(_this._scale.tickInterval(v)));
+                    return set = Plottable.Util.Methods.union(set, d3.set(_this._scale.tickInterval(v)));
                 });
                 return set.values().map(function (d) {
                     return new Date(d);
                 });
+            };
+
+            Multi.prototype._measureTextHeight = function () {
+                var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
+                var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
+                fakeTickLabel.remove();
+                return textHeight;
             };
 
             Multi.prototype._doRender = function () {
@@ -4649,7 +4649,7 @@ var Plottable;
                     return "translate(" + _this._scale._d3Scale(d) + ",0)";
                 });
                 tickLabels.selectAll("text").text(function (d) {
-                    return _this.formatter(d);
+                    return _this._formatter.format(d);
                 }).style("text-anchor", "middle");
 
                 this._intervals.forEach(function (v) {

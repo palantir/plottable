@@ -17,7 +17,7 @@ export module Axis {
       this._intervals = [];
      }
 
-     public _requetsedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
+     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var requestedWidth = this._width;
       var requestedHeight = this._height;
 
@@ -43,7 +43,7 @@ export module Axis {
     public _getTickValues(): any[] {
       var set = d3.set();
       this._intervals.forEach((v) =>
-        set = Util.Methods.union(set, d3.set(this._scale.tickInterval(v)));
+        set = Util.Methods.union(set, d3.set(this._scale.tickInterval(v)))
       );
       return set.values().map((d) => new Date(d));
     }
@@ -66,7 +66,7 @@ export module Axis {
           (this.availableHeight - this.tickLength() * numIntervals)) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale._d3Scale(d) + ",0)");
-      tickLabels.selectAll("text").text((d: any) => this.formatter.format(d))
+      tickLabels.selectAll("text").text((d: any) => this._formatter.format(d))
                                   .style("text-anchor", "middle");
 
       this._intervals.forEach((v) => {
