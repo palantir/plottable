@@ -916,6 +916,10 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
+    interface IExtent {
+        min: number;
+        max: number;
+    }
 }
 
 
@@ -1762,6 +1766,15 @@ declare module Plottable {
             * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
             */
             public callback(cb: (x: number, y: number) => any): Click;
+        }
+        class DoubleClick extends Click {
+            /**
+            * Creates a DoubleClickInteraction.
+            *
+            * @constructor
+            * @param {Component} componentToListenTo The component to listen for clicks on.
+            */
+            constructor(componentToListenTo: Abstract.Component);
         }
     }
 }
