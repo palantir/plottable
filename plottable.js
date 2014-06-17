@@ -5166,19 +5166,6 @@ var Plottable;
                 }
             };
 
-            /**
-            * Selects the bar under the given pixel position (if [xMax] and
-            * [yMax] are not given), under a given line (if only one of [xMax]
-            * and [yMax] given) or are under a 2D area (if [xMax] and [yMax]
-            * are both given).
-            *
-            * @param {number} xMin The pixel xMin position.
-            * @param {number} yMin The pixel yMin position.
-            * @param {number} xMax If given, bars between the xMin & xMax pixels will be selected.
-            * @param {number} yMax If given, bars between the yMin & yMax pixels will be selected.
-            * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-            * @return {D3.Selection} The selected bar, or null if no bar was selected.
-            */
             BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (typeof select === "undefined") { select = true; }
                 var selectedBars = [];
@@ -5186,10 +5173,16 @@ var Plottable;
                 var xExtent = this.parseExtent(xValOrExtent);
                 var yExtent = this.parseExtent(yValOrExtent);
 
+                // the SVGRects are positioned with sub-pixel accuracy (the default unit
+                // for the x, y, height & width attributes), but user selections (e.g. via
+                // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+                // seems appropriate:
+                var tolerance = 0.5;
+
                 // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
                 this._bars.each(function (d) {
                     var bbox = this.getBBox();
-                    if (bbox.x + bbox.width >= xExtent.min && bbox.x <= xExtent.max && bbox.y + bbox.height >= yExtent.min && bbox.y <= yExtent.max) {
+                    if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
                         selectedBars.push(this);
                     }
                 });

@@ -1550,19 +1550,20 @@ declare module Plottable {
             */
             public barAlignment(alignment: string): BarPlot;
             /**
-            * Selects the bar under the given pixel position (if [xMax] and
-            * [yMax] are not given), under a given line (if only one of [xMax]
-            * and [yMax] given) or are under a 2D area (if [xMax] and [yMax]
-            * are both given).
+            * Selects the bar under the given pixel position (if [xValOrExtent]
+            * and [yValOrExtent] are {number}s), under a given line (if only one
+            * of [xValOrExtent] or [yValOrExtent] are {IExtent}s) or are under a
+            * 2D area (if [xValOrExtent] and [yValOrExtent] are both {IExtent}s).
             *
-            * @param {number} xMin The pixel xMin position.
-            * @param {number} yMin The pixel yMin position.
-            * @param {number} xMax If given, bars between the xMin & xMax pixels will be selected.
-            * @param {number} yMax If given, bars between the yMin & yMax pixels will be selected.
+            * @param {any} xValOrExtent The pixel x position, or range of x values.
+            * @param {any} yValOrExtent The pixel y position, or range of y values.
             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
             * @return {D3.Selection} The selected bar, or null if no bar was selected.
             */
-            public selectBar(xValOrExtent: any, yValOrExtent: any, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
             /**
             * Deselects all bars.
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
