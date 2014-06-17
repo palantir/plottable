@@ -3,6 +3,7 @@
 module Plottable {
 export module Abstract {
   export class Axis extends Abstract.Component {
+    public static TICK_MARK_CLASS = "tick-mark";
     public static TICK_LABEL_CLASS = "tick-label";
     public axisElement: D3.Selection;
     public _ticksContainer: D3.Selection;
@@ -11,12 +12,13 @@ export module Abstract {
     public _scale: Abstract.Scale;
     public _formatter: Abstract.Formatter;
     public _orientation: string;
-    private _tickLength = 5;
-    private _tickLabelPadding = 3;
     public _width: any = "auto";
     public _height: any = "auto";
     public _computedWidth: number;
     public _computedHeight: number;
+    private _showEndTickLabels = true;
+    private _tickLength = 5;
+    private _tickLabelPadding = 3;
 
     /**
      * Creates a BaseAxis.
@@ -70,7 +72,7 @@ export module Abstract {
       var tickValues = this._getTickValues();
       this._ticks = this._ticksContainer.selectAll(".tick").data(tickValues);
       var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
-      tickEnterSelection.append("line").classed("tick-mark", true);
+      tickEnterSelection.append("line").classed(Axis.TICK_MARK_CLASS, true);
       this._ticks.exit().remove();
 
       var tickXTransformFunction = this._isHorizontal() ? (d: any) => this._scale.scale(d) : (d: any) => 0;
@@ -202,7 +204,7 @@ export module Abstract {
     /**
      * Sets a user-specified height.
      *
-     * @param {number|String} w A fixed height for the Axis, or "auto" for automatic mode.
+     * @param {number|String} h A fixed height for the Axis, or "auto" for automatic mode.
      * @returns {Axis} The calling Axis.
      */
     public height(h: any): Axis;
@@ -238,12 +240,17 @@ export module Abstract {
     }
 
     /**
-     * Gets or sets the length of each tick mark.
+     * Gets the current tick mark length.
      *
-     * @param {number} [length] The length of each tick.
-     * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+     * @returns {number} The current tick mark length.
      */
     public tickLength(): number;
+    /**
+     * Sets the tick mark length.
+     *
+     * @param {number} length The length of each tick.
+     * @returns {BaseAxis} The calling BaseAxis.
+     */
     public tickLength(length: number): Axis;
     public tickLength(length?: number): any {
       if (length == null) {
@@ -293,9 +300,32 @@ export module Abstract {
           throw new Error("unsupported orientation");
         }
         this._orientation = newOrientationLC;
-        this._render();
+        this._invalidateLayout();
         return this;
       }
+    }
+
+    /**
+     * Checks whether the Axis is currently set to show the first and last
+     * tick labels.
+     *
+     * @returns {boolean}
+     */
+    public showEndTickLabels(): boolean;
+    /**
+     * Set whether or not to show the first and last tick labels.
+     *
+     * @param {boolean} show Whether or not to show the first and last labels.
+     * @returns {Axis} The calling Axis.
+     */
+    public showEndTickLabels(show: boolean): Axis;
+    public showEndTickLabels(show?: boolean): any {
+      if (show == null) {
+        return this._showEndTickLabels;
+      }
+      this._showEndTickLabels = show;
+      this._render();
+      return this;
     }
   }
 }

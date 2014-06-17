@@ -34,7 +34,7 @@ export module Axis {
         }
 
         requestedWidth = 0;
-        requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
+        requestedHeight = this.height();
       } else { // vertical
         if (this._computedWidth == null) {
           // generate a test value to measure width
@@ -54,7 +54,7 @@ export module Axis {
           this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
           fakeTick.remove();
         }
-        requestedWidth = (this._width === "auto") ? this._computedWidth : this._width;
+        requestedWidth = this.width();
         requestedHeight = 0;
       }
 
@@ -112,11 +112,38 @@ export module Axis {
         }
         textEl.classed("tick-label", true)
               .style("text-anchor", tickLabelTextAnchor)
+              .style("visibility", "visible")
               .attr(tickLabelAttrHash)
               .text(formatFunction(d));
       });
+      if (!this.showEndTickLabels()) {
+        this.hideEndTickLabels();
+      }
 
       return this;
+    }
+
+    private hideEndTickLabels() {
+      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+      var isInsideBBox = (tickBox: ClientRect) => {
+        return (
+          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
+          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+        );
+      };
+
+      var tickLabels = this._ticks.select("text");
+      var firstTickLabel = tickLabels[0][0];
+      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+        d3.select(firstTickLabel).style("visibility", "hidden");
+      }
+      var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
+      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+        d3.select(lastTickLabel).style("visibility", "hidden");
+      }
     }
   }
 }

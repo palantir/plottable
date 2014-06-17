@@ -20,7 +20,7 @@ describe("BaseAxis", () => {
     baseAxis.renderTo(svg);
 
     var ticks = svg.selectAll(".tick");
-    assert.strictEqual(ticks[0].length, tickValues.length, "A line was drawn for each tick");
+    assert.strictEqual(ticks[0].length, tickValues.length, "A tick was created for each value");
     var baseline = svg.select(".baseline");
 
     assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -95,10 +95,36 @@ describe("BaseAxis", () => {
     svg.remove();
   });
 
-  it("tickLabelPadding()", () => {
+  it("tickLabelPadding() rejects negative values", () => {
     var scale = new Plottable.Scale.Linear();
     var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
 
     assert.throws(() => baseAxis.tickLabelPadding(-1), "must be positive");
+  });
+
+  it("width()", () => {
+    var scale = new Plottable.Scale.Linear();
+    var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
+
+    verticalAxis.width(2014);
+    assert.strictEqual(verticalAxis.width(), 2014, "width was set to user-specified value");
+    assert.doesNotThrow(() => verticalAxis.width("auto"), Error, "can be set to auto mode");
+    assert.throws(() => verticalAxis.width(-999), Error, "invalid");
+
+    var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
+    assert.throws(() => horizontalAxis.width(2014), Error, "horizontal");
+  });
+
+  it("height()", () => {
+    var scale = new Plottable.Scale.Linear();
+    var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
+
+    horizontalAxis.height(2014);
+    assert.strictEqual(horizontalAxis.height(), 2014, "height was set to user-specified value");
+    assert.doesNotThrow(() => horizontalAxis.height("auto"), Error, "can be set to auto mode");
+    assert.throws(() => horizontalAxis.height(-999), Error, "invalid");
+
+    var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
+    assert.throws(() => verticalAxis.height(2014), Error, "vertical");
   });
 });

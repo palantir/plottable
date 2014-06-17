@@ -1287,6 +1287,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
+            static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
             /**
             * Creates a BaseAxis.
@@ -1319,7 +1320,7 @@ declare module Plottable {
             /**
             * Sets a user-specified height.
             *
-            * @param {number|String} w A fixed height for the Axis, or "auto" for automatic mode.
+            * @param {number|String} h A fixed height for the Axis, or "auto" for automatic mode.
             * @returns {Axis} The calling Axis.
             */
             public height(h: any): Axis;
@@ -1331,12 +1332,17 @@ declare module Plottable {
             */
             public formatter(formatter: Formatter): Axis;
             /**
-            * Gets or sets the length of each tick mark.
+            * Gets the current tick mark length.
             *
-            * @param {number} [length] The length of each tick.
-            * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+            * @returns {number} The current tick mark length.
             */
             public tickLength(): number;
+            /**
+            * Sets the tick mark length.
+            *
+            * @param {number} length The length of each tick.
+            * @returns {BaseAxis} The calling BaseAxis.
+            */
             public tickLength(length: number): Axis;
             /**
             * Gets or sets the padding between each tick mark and its associated label.
@@ -1348,6 +1354,20 @@ declare module Plottable {
             public tickLabelPadding(padding: number): Axis;
             public orient(): string;
             public orient(newOrientation: string): Axis;
+            /**
+            * Checks whether the Axis is currently set to show the first and last
+            * tick labels.
+            *
+            * @returns {boolean}
+            */
+            public showEndTickLabels(): boolean;
+            /**
+            * Set whether or not to show the first and last tick labels.
+            *
+            * @param {boolean} show Whether or not to show the first and last labels.
+            * @returns {Axis} The calling Axis.
+            */
+            public showEndTickLabels(show: boolean): Axis;
         }
     }
 }

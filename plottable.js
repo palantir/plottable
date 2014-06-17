@@ -4061,10 +4061,11 @@ var Plottable;
             function Axis(scale, orientation, formatter) {
                 var _this = this;
                 _super.call(this);
-                this._tickLength = 5;
-                this._tickLabelPadding = 3;
                 this._width = "auto";
                 this._height = "auto";
+                this._showEndTickLabels = true;
+                this._tickLength = 5;
+                this._tickLabelPadding = 3;
                 this._scale = scale;
                 this.orient(orientation);
 
@@ -4109,7 +4110,7 @@ var Plottable;
                 var tickValues = this._getTickValues();
                 this._ticks = this._ticksContainer.selectAll(".tick").data(tickValues);
                 var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
-                tickEnterSelection.append("line").classed("tick-mark", true);
+                tickEnterSelection.append("line").classed(Axis.TICK_MARK_CLASS, true);
                 this._ticks.exit().remove();
 
                 var tickXTransformFunction = this._isHorizontal() ? function (d) {
@@ -4293,10 +4294,20 @@ var Plottable;
                         throw new Error("unsupported orientation");
                     }
                     this._orientation = newOrientationLC;
-                    this._render();
+                    this._invalidateLayout();
                     return this;
                 }
             };
+
+            Axis.prototype.showEndTickLabels = function (show) {
+                if (show == null) {
+                    return this._showEndTickLabels;
+                }
+                this._showEndTickLabels = show;
+                this._render();
+                return this;
+            };
+            Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
         })(Plottable.Abstract.Component);
@@ -4344,7 +4355,7 @@ var Plottable;
                     }
 
                     requestedWidth = 0;
-                    requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
+                    requestedHeight = this.height();
                 } else {
                     if (this._computedWidth == null) {
                         // generate a test value to measure width
@@ -4364,7 +4375,7 @@ var Plottable;
                         this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
                         fakeTick.remove();
                     }
-                    requestedWidth = (this._width === "auto") ? this._computedWidth : this._width;
+                    requestedWidth = this.width();
                     requestedHeight = 0;
                 }
 
@@ -4423,10 +4434,32 @@ var Plottable;
                     if (textEl.empty()) {
                         textEl = d3El.append("text");
                     }
-                    textEl.classed("tick-label", true).style("text-anchor", tickLabelTextAnchor).attr(tickLabelAttrHash).text(formatFunction(d));
+                    textEl.classed("tick-label", true).style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(formatFunction(d));
                 });
+                if (!this.showEndTickLabels()) {
+                    this.hideEndTickLabels();
+                }
 
                 return this;
+            };
+
+            Number.prototype.hideEndTickLabels = function () {
+                var _this = this;
+                var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+                var isInsideBBox = function (tickBox) {
+                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
+                };
+
+                var tickLabels = this._ticks.select("text");
+                var firstTickLabel = tickLabels[0][0];
+                if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+                    d3.select(firstTickLabel).style("visibility", "hidden");
+                }
+                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
+                if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+                    d3.select(lastTickLabel).style("visibility", "hidden");
+                }
             };
             return Number;
         })(Plottable.Abstract.Axis);
