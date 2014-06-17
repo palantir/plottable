@@ -12,6 +12,7 @@
 /// <reference path="utils/formatters/currencyFormatter.ts" />
 /// <reference path="utils/formatters/percentageFormatter.ts" />
 /// <reference path="utils/formatters/customFormatter.ts" />
+/// <reference path="utils/formatters/timeFormatter.ts" />
 
 
 /// <reference path="core/plottableObject.ts" />
@@ -40,6 +41,8 @@
 
 /// <reference path="components/axis.ts" />
 /// <reference path="components/baseAxis.ts" />
+/// <reference path="components/timeAxis.ts" />
+/// <reference path="components/numberAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
