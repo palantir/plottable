@@ -69,6 +69,10 @@ export module Abstract {
     }
 
     public _setDomain(values: any[]) {
+      if (values[0] === Infinity || values[0] === -Infinity ||
+          values[1] === Infinity || values[1] === -Infinity) {
+        throw new Error("data cannot contain Infinity or -Infinity");
+      }
       this._d3Scale.domain(values);
       this._broadcast();
     }
@@ -110,10 +114,6 @@ export module Abstract {
      * @param {any[]} extent The new extent to be included in the scale.
      */
     public updateExtent(rendererID: number, attr: string, extent: any[]) {
-      if (extent[0] === Infinity || extent[0] === -Infinity ||
-          extent[1] === Infinity || extent[1] === -Infinity) {
-        throw new Error("data cannot contain Infinity or -Infinity");
-      }
       this._rendererAttrID2Extent[rendererID + attr] = extent;
       if (this._autoDomainAutomatically) {
         this.autoDomain();

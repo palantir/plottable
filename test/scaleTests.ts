@@ -98,20 +98,8 @@ describe("Scales", () => {
     });
 
     it("scales don't allow Infinity", () => {
-      var exceptionThrown = false;
-      try {
-        scale.updateExtent(1, "x", [5, Infinity]);
-      } catch (e) {
-        exceptionThrown = true;
-      }
-      assert.isTrue(exceptionThrown, "extent including Infinity throws an error");
-      exceptionThrown = false;
-      try {
-        scale.updateExtent(1, "x", [-Infinity, 6]);
-      } catch (e) {
-        exceptionThrown = true;
-      }
-      assert.isTrue(exceptionThrown, "extent including -Infinity throws an error");
+      assert.throws(() => scale._setDomain([5, Infinity]), Error);
+      assert.throws(() => scale._setDomain([-Infinity, 6]), Error);
     });
   });
 
