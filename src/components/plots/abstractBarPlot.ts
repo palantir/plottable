@@ -73,10 +73,10 @@ export module Abstract {
     }
 
     /**
-     * Selects the bar under the given pixel position (if [xMax] and
-     * [yMax] are not given), under a given line (if only one of [xMax]
-     * and [yMax] given) or are under a 2D area (if [xMax] and [yMax]
-     * are both given).
+     * Selects the bar under the given pixel position (if [xValOrExtent]
+     * and [yValOrExtent] are {number}s), under a given line (if only one
+     * of [xValOrExtent] or [yValOrExtent] are {IExtent}s) or are under a
+     * 2D area (if [xValOrExtent] and [yValOrExtent] are both {IExtent}s).
      *
      * @param {any} xValOrExtent The pixel x position, or range of x values.
      * @param {any} yValOrExtent The pixel y position, or range of y values.
@@ -93,11 +93,17 @@ export module Abstract {
       var xExtent: IExtent = this.parseExtent(xValOrExtent);
       var yExtent: IExtent = this.parseExtent(yValOrExtent);
 
+      // the SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via 
+      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+      // seems appropriate:
+      var tolerance: number = 0.5;
+
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
       this._bars.each(function(d: any) {
         var bbox = this.getBBox();
-        if (bbox.x + bbox.width >= xExtent.min && bbox.x <= xExtent.max &&
-            bbox.y + bbox.height >= yExtent.min && bbox.y <= yExtent.max) {
+        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
+            bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
           selectedBars.push(this);
         }
       });
