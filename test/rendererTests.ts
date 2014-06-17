@@ -474,7 +474,7 @@ describe("Renderers", () => {
       });
 
       it("can select and deselect bars", () => {
-        var selectedBar = renderer.selectBar(145, 150); // in the middle of bar 0
+        var selectedBar: D3.Selection = renderer.selectBar(145, 150); // in the middle of bar 0
 
         assert.isNotNull(selectedBar, "clicked on a bar");
         assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
@@ -512,8 +512,8 @@ describe("Renderers", () => {
 
         // the runtime parameter validation should be strict, so no strings or
         // mangled objects
-        assert.throws(() => renderer.selectBar("blargh", 150), Error);
-        assert.throws(() => renderer.selectBar({min: 150}, 150), Error);
+        assert.throws(() => renderer.selectBar(<any> "blargh", <any> 150), Error);
+        assert.throws(() => renderer.selectBar(<any> {min: 150}, <any> 150), Error);
 
         verifier.end();
       });
