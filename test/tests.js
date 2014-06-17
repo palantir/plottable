@@ -1549,6 +1549,28 @@ describe("Formatters", function () {
         });
     });
 
+    describe("time", function () {
+        it("uses reasonable defaults", function () {
+            var timeFormatter = new Plottable.Formatter.Time();
+
+            // year, month, day, hours, minutes, seconds, milliseconds
+            var result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 0));
+            assert.strictEqual(result, "2000", "only the year was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 0, 0, 0, 0));
+            assert.strictEqual(result, "Mar", "only the month was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 2, 0, 0, 0, 0));
+            assert.strictEqual(result, "Thu 02", "month and date displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 0, 0, 0));
+            assert.strictEqual(result, "08 PM", "only hour was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 0, 0));
+            assert.strictEqual(result, "08:34", "hour and minute was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 53, 0));
+            assert.strictEqual(result, ":53", "seconds was displayed");
+            result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 950));
+            assert.strictEqual(result, ".950", "milliseconds was displayed");
+        });
+    });
+
     describe("custom", function () {
         it("can take a custom formatting function", function () {
             var customFormatter;
