@@ -32,6 +32,8 @@ module Plottable {
      * @param {Abstract.QuantitiveScale} scale
      *        Since nice() must do different things depending on Linear, Log,
      *        or Time scale, the scale must be passed in for nice() to work.
+     * @return {any[]} The domain, as a merging of all exents, as a [min, max]
+     *                 pair.
      */
     public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[] {
       if (extents.length === 0) {
@@ -46,6 +48,7 @@ module Plottable {
      *
      * @param {number} [padProportion] Proportionally how much bigger the 
      *         new domain should be (0.05 = 5% larger).
+     * @return {Domainer} The calling domainer.
      */
     public pad(padProportion = 0.05): Domainer {
       this.padProportion = padProportion;
@@ -58,6 +61,7 @@ module Plottable {
      * [0, 100] to [0, 102.5].
      *
      * @param {any} exception The value that will not be padded.
+     * @return {Domainer} The calling domainer.
      */
     public addPaddingException(exception: any): Domainer {
       this.paddingExceptions.add(exception);
@@ -68,6 +72,7 @@ module Plottable {
      * Reverses the effect of addPaddingException.
      *
      * @param {any} exception The value to be padded again.
+     * @return {Domainer} The calling domainer.
      */
     public removePaddingException(exception: any): Domainer {
       this.paddingExceptions.remove(exception);
@@ -78,6 +83,7 @@ module Plottable {
      * Extends the scale's domain so it starts and ends with "nice" values.
      *
      * @param {number} [count] The number of ticks that should fit inside the new domain.
+     * @return {Domainer} The calling domainer.
      */
     public nice(count?: number): Domainer {
       this.doNice = true;

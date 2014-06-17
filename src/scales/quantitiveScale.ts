@@ -126,6 +126,9 @@ export module Abstract {
     /**
      * Sets a Domainer of a scale. A Domainer is responsible for combining
      * multiple extents into a single domain.
+     *
+     * @param {Domainer} domainer The domainer to be set.
+     * @return {QuantitiveScale} The calling scale.
      */
     public setDomainer(domainer: Domainer): QuantitiveScale {
       this.domainer = domainer;

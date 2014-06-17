@@ -2877,6 +2877,8 @@ var Plottable;
         * @param {Abstract.QuantitiveScale} scale
         *        Since nice() must do different things depending on Linear, Log,
         *        or Time scale, the scale must be passed in for nice() to work.
+        * @return {any[]} The domain, as a merging of all exents, as a [min, max]
+        *                 pair.
         */
         Domainer.prototype.computeDomain = function (extents, scale) {
             if (extents.length === 0) {
@@ -2891,6 +2893,7 @@ var Plottable;
         *
         * @param {number} [padProportion] Proportionally how much bigger the
         *         new domain should be (0.05 = 5% larger).
+        * @return {Domainer} The calling domainer.
         */
         Domainer.prototype.pad = function (padProportion) {
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
@@ -2904,6 +2907,7 @@ var Plottable;
         * [0, 100] to [0, 102.5].
         *
         * @param {any} exception The value that will not be padded.
+        * @return {Domainer} The calling domainer.
         */
         Domainer.prototype.addPaddingException = function (exception) {
             this.paddingExceptions.add(exception);
@@ -2914,6 +2918,7 @@ var Plottable;
         * Reverses the effect of addPaddingException.
         *
         * @param {any} exception The value to be padded again.
+        * @return {Domainer} The calling domainer.
         */
         Domainer.prototype.removePaddingException = function (exception) {
             this.paddingExceptions.remove(exception);
@@ -2924,6 +2929,7 @@ var Plottable;
         * Extends the scale's domain so it starts and ends with "nice" values.
         *
         * @param {number} [count] The number of ticks that should fit inside the new domain.
+        * @return {Domainer} The calling domainer.
         */
         Domainer.prototype.nice = function (count) {
             this.doNice = true;
@@ -3090,6 +3096,9 @@ var Plottable;
             /**
             * Sets a Domainer of a scale. A Domainer is responsible for combining
             * multiple extents into a single domain.
+            *
+            * @param {Domainer} domainer The domainer to be set.
+            * @return {QuantitiveScale} The calling scale.
             */
             QuantitiveScale.prototype.setDomainer = function (domainer) {
                 this.domainer = domainer;

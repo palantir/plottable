@@ -943,6 +943,8 @@ declare module Plottable {
         * @param {Abstract.QuantitiveScale} scale
         *        Since nice() must do different things depending on Linear, Log,
         *        or Time scale, the scale must be passed in for nice() to work.
+        * @return {any[]} The domain, as a merging of all exents, as a [min, max]
+        *                 pair.
         */
         public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[];
         /**
@@ -950,6 +952,7 @@ declare module Plottable {
         *
         * @param {number} [padProportion] Proportionally how much bigger the
         *         new domain should be (0.05 = 5% larger).
+        * @return {Domainer} The calling domainer.
         */
         public pad(padProportion?: number): Domainer;
         /**
@@ -958,18 +961,21 @@ declare module Plottable {
         * [0, 100] to [0, 102.5].
         *
         * @param {any} exception The value that will not be padded.
+        * @return {Domainer} The calling domainer.
         */
         public addPaddingException(exception: any): Domainer;
         /**
         * Reverses the effect of addPaddingException.
         *
         * @param {any} exception The value to be padded again.
+        * @return {Domainer} The calling domainer.
         */
         public removePaddingException(exception: any): Domainer;
         /**
         * Extends the scale's domain so it starts and ends with "nice" values.
         *
         * @param {number} [count] The number of ticks that should fit inside the new domain.
+        * @return {Domainer} The calling domainer.
         */
         public nice(count?: number): Domainer;
     }
@@ -1042,6 +1048,9 @@ declare module Plottable {
             /**
             * Sets a Domainer of a scale. A Domainer is responsible for combining
             * multiple extents into a single domain.
+            *
+            * @param {Domainer} domainer The domainer to be set.
+            * @return {QuantitiveScale} The calling scale.
             */
             public setDomainer(domainer: Domainer): QuantitiveScale;
         }
