@@ -4593,12 +4593,10 @@ var Plottable;
                 _super.call(this, scale, orientation, formatter);
                 this._intervals = [];
             }
-            Multi.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+            Multi.prototype._requetsedSpace = function (offeredWidth, offeredHeight) {
                 var requestedWidth = this._width;
                 var requestedHeight = this._height;
 
-                var fakeTick;
-                var testTextEl;
                 if (this._computedHeight == null) {
                     this._computedHeight = (this.tickLength() + this.tickLabelPadding()) * this._intervals.length + this._measureTextHeight();
                 }
@@ -4613,6 +4611,13 @@ var Plottable;
                 };
             };
 
+            Multi.prototype._measureTextHeight = function () {
+                var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
+                var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
+                fakeTickLabel.remove();
+                return textHeight;
+            };
+
             Multi.prototype.addInterval = function (interval) {
                 this._intervals.push(interval);
                 return this;
@@ -4622,7 +4627,7 @@ var Plottable;
                 var _this = this;
                 var set = d3.set();
                 this._intervals.forEach(function (v) {
-                    return set = Plottable.Util.Methods.union(set, d3.set(_this._scale.tickInterval(v)));
+                    set = Plottable.Util.Methods.union(set, d3.set(_this._scale.tickInterval(v)));
                 });
                 return set.values().map(function (d) {
                     return new Date(d);
@@ -4640,25 +4645,23 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
                 tickLabels.selectAll("text").attr("transform", "translate(0," + (this._orientation === "bottom" ? (this.tickLength() * numIntervals + this._measureTextHeight()) : (this.availableHeight - this.tickLength() * numIntervals)) + ")");
                 tickLabels.exit().remove();
-                tickLabels.attr("transform", function (d, i) {
+                tickLabels.attr("transform", function (d) {
                     return "translate(" + _this._scale._d3Scale(d) + ",0)";
                 });
                 tickLabels.selectAll("text").text(function (d) {
-                    return _this._formatter.format(d);
+                    return _this.formatter(d);
                 }).style("text-anchor", "middle");
 
-                this._intervals.forEach(function (v, i) {
+                this._intervals.forEach(function (v) {
                     var index = _this._intervals.indexOf(v);
                     var tickValues = _this._scale.tickInterval(v);
                     var selection = _this._ticksContainer.selectAll(".tick").filter(function (d) {
-                        // for some reason, the dates didn't compare properly, so I'm comparing them by value
                         return tickValues.map(function (x) {
                             return x.valueOf();
                         }).indexOf(d.valueOf()) >= 0;
                     });
                     selection.select("line").attr("y2", _this.tickLength() * (index + 1));
                 });
-
                 return this;
             };
             return Multi;

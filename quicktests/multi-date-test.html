@@ -1,0 +1,50 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../../plottable.css">
+  <script src="../bower_components/d3/d3.min.js"></script>
+  <script src="../../plottable_multifile.js"></script>
+  <script src="../../examples/exampleUtil.js"></script>
+  <script>
+
+  var data = [
+  {x: "5/2/2014", y: 2},
+  {x: "2/24/2015", y: 150},
+  ]
+
+
+
+  window.onload = function () {
+    xScale = new Plottable.Scale.Time();
+    yScale = new Plottable.Scale.Linear();
+    linePlot = new Plottable.Plot.Line(data, xScale, yScale)
+    .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
+
+    xAxis = new Plottable.Axis.Multi(xScale, "bottom", new Plottable.Formatter.Time());
+    xAxis.addInterval(d3.time.day);
+    xAxis.addInterval(d3.time.month);
+    xAxis.addInterval(d3.time.year);
+    yAxis = new Plottable.Axis.YAxis(yScale);
+
+    gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+    renderGroup = linePlot.merge(gridlines);
+    new Plottable.Template.StandardChart().center(renderGroup).xAxis(xAxis).yAxis(yAxis).renderTo("svg");
+    new Plottable.Interaction.PanZoom(linePlot, xScale, yScale).registerWithComponent();
+  };
+
+
+  </script>
+</head>
+
+<body>
+  <div class="demo-title">Simple Chart</div>
+  <br>
+
+
+  <br>
+  <svg id="chart"></svg>
+
+
+
+  <p />
+</body>
+</html>
