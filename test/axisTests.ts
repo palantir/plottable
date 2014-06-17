@@ -213,7 +213,7 @@ describe("Axes", () => {
     var timeScale = new Plottable.Scale.Linear();
     timeScale.updateExtent(1, "x", [startDate, endDate]);
     timeScale.range([0, 500]);
-    timeScale.setDomainer(new Plottable.Domainer().nice());
+    timeScale.domainer(new Plottable.Domainer().nice());
     var xAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
     var baseDate = d3.min(timeScale.domain());
 

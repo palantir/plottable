@@ -30,11 +30,11 @@ describe("Scales", () => {
     scale._autoDomainAutomatically = true;
     scale.updateExtent(1, "x", [0.08, 9.92]);
     callbackWasCalled = false;
-    scale.setDomainer(new Plottable.Domainer().nice());
+    scale.domainer(new Plottable.Domainer().nice());
     assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
 
     callbackWasCalled = false;
-    scale.setDomainer(new Plottable.Domainer().pad());
+    scale.domainer(new Plottable.Domainer().pad());
     assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
   describe("autoranging behavior", () => {
@@ -49,7 +49,7 @@ describe("Scales", () => {
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
       scale.updateExtent(1, "x", d3.extent(data, (e) => e.foo));
-      scale.setDomainer(new Plottable.Domainer().pad().nice());
+      scale.domainer(new Plottable.Domainer().pad().nice());
       assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
       assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");

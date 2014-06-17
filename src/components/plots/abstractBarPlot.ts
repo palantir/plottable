@@ -27,6 +27,11 @@ export module Abstract {
       this.classed("bar-renderer", true);
       this.project("width", 10);
       this.project("fill", () => "steelblue");
+      // because this._baselineValue was not initialized during the super()
+      // call, we must call this again in order to get this._baselineValue
+      // to be used by the Domainer.
+      this._setXDomainer();
+      this._setYDomainer();
     }
 
     public _setup() {

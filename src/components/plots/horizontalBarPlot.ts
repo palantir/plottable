@@ -100,9 +100,10 @@ export module Plot {
 
     public _setXDomainer() {
       if (this.xScale instanceof Abstract.QuantitiveScale) {
-        (<Abstract.QuantitiveScale>this.xScale)._setDomainerIfDefault(
-          new Domainer().pad().addPaddingException(this._baseline).nice()
-        );
+        var scale = <Abstract.QuantitiveScale>this.xScale;
+        if (!scale._userSetDomainer) {
+          scale.domainer().addPaddingException(this._baselineValue);
+        }
       }
       return this;
     }

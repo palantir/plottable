@@ -3005,10 +3005,11 @@ var Plottable;
                 _super.call(this, scale);
                 this.lastRequestedTickCount = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
+                this._userSetDomainer = false;
+                this._domainer = new Plottable.Domainer();
             }
             QuantitiveScale.prototype.autoDomain = function () {
-                var domainer = this.domainer ? this.domainer : new Plottable.Domainer();
-                this._setDomain(domainer.computeDomain(this._getAllExtents(), this));
+                this._setDomain(this._domainer.computeDomain(this._getAllExtents(), this));
                 return this;
             };
 
@@ -3093,39 +3094,17 @@ var Plottable;
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
             };
 
-            /**
-            * Sets a Domainer of a scale. A Domainer is responsible for combining
-            * multiple extents into a single domain.
-            *
-            * @param {Domainer} domainer The domainer to be set.
-            * @return {QuantitiveScale} The calling scale.
-            */
-            QuantitiveScale.prototype.setDomainer = function (domainer) {
-                this.domainer = domainer;
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
+            QuantitiveScale.prototype.domainer = function (domainer) {
+                if (domainer == null) {
+                    return this._domainer;
+                } else {
+                    this._domainer = domainer;
+                    this._userSetDomainer = true;
+                    if (this._autoDomainAutomatically) {
+                        this.autoDomain();
+                    }
+                    return this;
                 }
-                return this;
-            };
-
-            /**
-            * If the Domainer has been set at all, this function does nothing.
-            * Otherwise, it sets the Domainer to domainer.
-            *
-            * This function exists becaus in the case of an xyPlot, we want to
-            * pad and nice the domain, but only if the user hasn't set a domainer
-            * explicitly. We want to make sure that this code:
-            *
-            *   var scale = new QuantitiveScale().setDomainer(myDomainer);
-            *   var plot = new XYPlot(..., scale, ...);
-            *
-            * doesn't mysteriously ignore myDomainer.
-            */
-            QuantitiveScale.prototype._setDomainerIfDefault = function (domainer) {
-                if (this.domainer == null) {
-                    return this.setDomainer(domainer);
-                }
-                return this;
             };
             return QuantitiveScale;
         })(Plottable.Abstract.Scale);
@@ -5068,14 +5047,20 @@ var Plottable;
 
             XYPlot.prototype._setXDomainer = function () {
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.xScale._setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                    var scale = this.xScale;
+                    if (!scale._userSetDomainer) {
+                        scale.domainer().pad().nice();
+                    }
                 }
                 return this;
             };
 
             XYPlot.prototype._setYDomainer = function () {
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.yScale._setDomainerIfDefault(new Plottable.Domainer().pad().nice());
+                    var scale = this.yScale;
+                    if (!scale._userSetDomainer) {
+                        scale.domainer().pad().nice();
+                    }
                 }
                 return this;
             };
@@ -5260,6 +5245,12 @@ var Plottable;
                 this.project("fill", function () {
                     return "steelblue";
                 });
+
+                // because this._baselineValue was not initialized during the super()
+                // call, we must call this again in order to get this._baselineValue
+                // to be used by the Domainer.
+                this._setXDomainer();
+                this._setYDomainer();
             }
             BarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5455,7 +5446,10 @@ var Plottable;
 
             VerticalBar.prototype._setYDomainer = function () {
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.yScale._setDomainerIfDefault(new Plottable.Domainer().pad().addPaddingException(this._baseline).nice());
+                    var scale = this.yScale;
+                    if (!scale._userSetDomainer) {
+                        scale.domainer().addPaddingException(this._baselineValue);
+                    }
                 }
                 return this;
             };
@@ -5583,7 +5577,10 @@ var Plottable;
 
             HorizontalBar.prototype._setXDomainer = function () {
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    this.xScale._setDomainerIfDefault(new Plottable.Domainer().pad().addPaddingException(this._baseline).nice());
+                    var scale = this.xScale;
+                    if (!scale._userSetDomainer) {
+                        scale.domainer().addPaddingException(this._baselineValue);
+                    }
                 }
                 return this;
             };

@@ -6,7 +6,8 @@ export module Abstract {
     public _d3Scale: D3.Scale.QuantitiveScale;
     private lastRequestedTickCount = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
-    private domainer: Domainer;
+    public _userSetDomainer: boolean = false;
+    private _domainer: Domainer = new Domainer();
 
     /**
      * Creates a new QuantitiveScale.
@@ -19,8 +20,7 @@ export module Abstract {
     }
 
     public autoDomain() {
-      var domainer: Domainer = this.domainer ? this.domainer : new Domainer();
-      this._setDomain(domainer.computeDomain(this._getAllExtents(), this));
+      this._setDomain(this._domainer.computeDomain(this._getAllExtents(), this));
       return this;
     }
 
@@ -130,32 +130,19 @@ export module Abstract {
      * @param {Domainer} domainer The domainer to be set.
      * @return {QuantitiveScale} The calling scale.
      */
-    public setDomainer(domainer: Domainer): QuantitiveScale {
-      this.domainer = domainer;
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
+    public domainer(): Domainer;
+    public domainer(domainer: Domainer): QuantitiveScale;
+    public domainer(domainer?: Domainer): any {
+      if (domainer == null) {
+        return this._domainer;
+      } else {
+        this._domainer = domainer;
+        this._userSetDomainer = true;
+        if (this._autoDomainAutomatically) {
+          this.autoDomain();
+        }
+        return this;
       }
-      return this;
-    }
-
-    /**
-     * If the Domainer has been set at all, this function does nothing.
-     * Otherwise, it sets the Domainer to domainer.
-     *
-     * This function exists becaus in the case of an xyPlot, we want to
-     * pad and nice the domain, but only if the user hasn't set a domainer
-     * explicitly. We want to make sure that this code:
-     *
-     *   var scale = new QuantitiveScale().setDomainer(myDomainer);
-     *   var plot = new XYPlot(..., scale, ...);
-     *
-     * doesn't mysteriously ignore myDomainer.
-     */
-    public _setDomainerIfDefault(domainer: Domainer): QuantitiveScale {
-      if (this.domainer == null) {
-        return this.setDomainer(domainer);
-      }
-      return this;
     }
   }
 }

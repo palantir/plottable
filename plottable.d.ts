@@ -1052,7 +1052,8 @@ declare module Plottable {
             * @param {Domainer} domainer The domainer to be set.
             * @return {QuantitiveScale} The calling scale.
             */
-            public setDomainer(domainer: Domainer): QuantitiveScale;
+            public domainer(): Domainer;
+            public domainer(domainer: Domainer): QuantitiveScale;
         }
     }
 }

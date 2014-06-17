@@ -318,7 +318,7 @@ describe("Axes", function () {
         var timeScale = new Plottable.Scale.Linear();
         timeScale.updateExtent(1, "x", [startDate, endDate]);
         timeScale.range([0, 500]);
-        timeScale.setDomainer(new Plottable.Domainer().nice());
+        timeScale.domainer(new Plottable.Domainer().nice());
         var xAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
         var baseDate = d3.min(timeScale.domain());
 
@@ -3356,11 +3356,11 @@ describe("Scales", function () {
         scale._autoDomainAutomatically = true;
         scale.updateExtent(1, "x", [0.08, 9.92]);
         callbackWasCalled = false;
-        scale.setDomainer(new Plottable.Domainer().nice());
+        scale.domainer(new Plottable.Domainer().nice());
         assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
 
         callbackWasCalled = false;
-        scale.setDomainer(new Plottable.Domainer().pad());
+        scale.domainer(new Plottable.Domainer().pad());
         assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
     });
     describe("autoranging behavior", function () {
@@ -3377,7 +3377,7 @@ describe("Scales", function () {
             scale.updateExtent(1, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
-            scale.setDomainer(new Plottable.Domainer().pad().nice());
+            scale.domainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
             assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
@@ -4283,7 +4283,7 @@ describe("Domainer", function () {
 
     it("pad() works in general case", function () {
         scale.updateExtent(1, "x", [100, 200]);
-        scale.setDomainer(new Plottable.Domainer().pad(0.2));
+        scale.domainer(new Plottable.Domainer().pad(0.2));
         assert.deepEqual(scale.domain(), [90, 210]);
     });
 
@@ -4293,7 +4293,7 @@ describe("Domainer", function () {
         var d1 = f.parse("06/02/2014");
         var d2 = f.parse("06/03/2014");
         timeScale.updateExtent(1, "x", [d1, d2]);
-        timeScale.setDomainer(new Plottable.Domainer().pad());
+        timeScale.domainer(new Plottable.Domainer().pad());
         var dd1 = timeScale.domain()[0];
         var dd2 = timeScale.domain()[1];
         assert.isDefined(dd1.toDateString, "padDomain produced dates");
@@ -4320,7 +4320,7 @@ describe("Domainer", function () {
         // gets fed back into timeScale, it will be adjusted back to a Date.
         // That's why I'm using updateExtent() instead of domainer.computeDomain()
         timeScale.updateExtent(1, "x", [d, d]);
-        timeScale.setDomainer(new Plottable.Domainer().pad());
+        timeScale.domainer(new Plottable.Domainer().pad());
         assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
     });
 
