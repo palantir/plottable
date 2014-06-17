@@ -7,6 +7,11 @@ export module Plot {
     public xScale: Scale.Ordinal;
     public yScale: Scale.Ordinal;
 
+
+    public _animators: Animator.IPlotAnimatorMap = {
+      "cells" : new Animator.Null()
+    };
+
     /**
      * Creates a GridPlot.
      *
@@ -50,7 +55,7 @@ export module Plot {
       attrToProjector["width"]  = () => xStep;
       attrToProjector["height"] = () => yStep;
 
-      cells.attr(attrToProjector);
+      this._applyAnimatedAttributes(cells, "cells", attrToProjector);
       cells.exit().remove();
     }
   }

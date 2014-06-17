@@ -32,6 +32,7 @@ export module Abstract {
 
     public _isSetup = false;
     public _isAnchored = false;
+    public static AUTORESIZE_BY_DEFAULT = true;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -68,6 +69,9 @@ export module Abstract {
      * @returns {Component} The calling Component.
      */
     public _setup() {
+      if (this._isSetup) {
+        return;
+      }
       this.cssClasses.forEach((cssClass: string) => {
         this.element.classed(cssClass, true);
       });
@@ -86,6 +90,9 @@ export module Abstract {
 
       this.interactionsToRegister.forEach((r) => this.registerInteraction(r));
       this.interactionsToRegister = null;
+      if (this.isTopLevelComponent) {
+        this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
+      }
       this._isSetup = true;
       return this;
     }
@@ -165,14 +172,14 @@ export module Abstract {
      */
     public _render() {
       if (this._isAnchored && this._isSetup) {
-        Singleton.RenderController.registerToRender(this);
+        Core.RenderController.registerToRender(this);
       }
       return this;
     }
 
     public _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
-        Singleton.RenderController.registerToComputeLayout(this);
+        Core.RenderController.registerToComputeLayout(this);
       }
       return this;
     }
@@ -226,6 +233,24 @@ export module Abstract {
         this.rootSVG.attr({width: width, height: height});
       }
       this._invalidateLayout();
+      return this;
+    }
+
+    /**
+     * Enables and disables auto-resize.
+     *
+     * If enabled, window resizes will enqueue this component for a re-layout
+     * and re-render. Animations are disabled during window resizes when auto-
+     * resize is enabled.
+     *
+     * @param {boolean} flag - Enables (true) or disables (false) auto-resize.
+     */
+    public autoResize(flag: boolean): Component {
+      if (flag) {
+        Core.ResizeBroadcaster.register(this);
+      } else {
+        Core.ResizeBroadcaster.deregister(this);
+      }
       return this;
     }
 

@@ -70,15 +70,15 @@ describe("Renderers", () => {
     });
 
     it("Updates its projectors when the DataSource is changed", () => {
-      var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
+      var d1 = new Plottable.DataSource([{x: 5, y: 6}], {cssClass: "bar"});
       var r = new Plottable.Abstract.Plot(d1);
 
       var xScaleCalls: number = 0;
       var yScaleCalls: number = 0;
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
-      r.project("x", null, xScale);
-      r.project("y", null, yScale);
+      r.project("x", "x", xScale);
+      r.project("y", "y", yScale);
       xScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
         assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
@@ -95,18 +95,18 @@ describe("Renderers", () => {
       assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
-      var d2 = new Plottable.DataSource(["bar"], {cssClass: "boo"});
+      var d2 = new Plottable.DataSource([{x: 7, y: 8}], {cssClass: "boo"});
       r.dataSource(d2);
-      assert.equal(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
-      assert.equal(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
+      assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
+      assert.equal(2, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
       d1._broadcast();
-      assert.equal(3, xScaleCalls, "X scale was unhooked from old datasource");
-      assert.equal(3, yScaleCalls, "Y scale was unhooked from old datasource");
+      assert.equal(2, xScaleCalls, "X scale was unhooked from old datasource");
+      assert.equal(2, yScaleCalls, "Y scale was unhooked from old datasource");
 
       d2._broadcast();
-      assert.equal(4, xScaleCalls, "X scale was hooked into new datasource");
-      assert.equal(4, yScaleCalls, "Y scale was hooked into new datasource");
+      assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
+      assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
     });
 
     it("Renderer automatically generates a DataSource if only data is provided", () => {
@@ -124,6 +124,21 @@ describe("Renderers", () => {
       var attrToProjector = r._generateAttrToProjector();
       var projector = attrToProjector["attr"];
       assert.equal(projector({"a": 0.5}, 0), 5, "projector works as intended");
+    });
+
+    it("Changing Renderer.dataSource to [] causes scale to contract", () => {
+      var ds1 = new Plottable.DataSource([0, 1, 2]);
+      var ds2 = new Plottable.DataSource([1, 2, 3]);
+      var s = new Plottable.Scale.Linear();
+      var r1 = new Plottable.Abstract.Plot()
+                    .dataSource(ds1)
+                    .project("x", (x: number) => x, s);
+      var r2 = new Plottable.Abstract.Plot()
+                    .dataSource(ds2)
+                    .project("x", (x: number) => x, s);
+      assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
+      ds1.data([]);
+      assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
     });
   });
 
@@ -170,26 +185,36 @@ describe("Renderers", () => {
 
     describe("Basic AreaPlot functionality", () => {
       var svg: D3.Selection;
-      var xScale = new Plottable.Scale.Linear().domain([0, 1]);
-      var yScale = new Plottable.Scale.Linear().domain([0, 1]);
-      var xAccessor = (d: any) => d.foo;
-      var yAccessor = (d: any) => d.bar;
-      var y0Accessor = () => 0;
-      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
-      var fillAccessor = () => "steelblue";
-      var simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
-      var areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale)
-                                  .project("x", xAccessor)
-                                  .project("y", yAccessor)
-                                  .project("y0", y0Accessor)
-                                  .project("fill", fillAccessor)
-                                  .project("stroke", colorAccessor);
+      var xScale: Plottable.Scale.Linear;
+      var yScale: Plottable.Scale.Linear;
+      var xAccessor: any;
+      var yAccessor: any;
+      var y0Accessor: any;
+      var colorAccessor: any;
+      var fillAccessor: any;
+      var simpleDataset: Plottable.DataSource;
+      var areaPlot: Plottable.Plot.Area;
       var renderArea: D3.Selection;
-      var verifier = new MultiTestVerifier();
+      var verifier: MultiTestVerifier;
 
       before(() => {
         svg = generateSVG(500, 500);
-        areaPlot.renderTo(svg);
+        verifier = new MultiTestVerifier();
+        xScale = new Plottable.Scale.Linear().domain([0, 1]);
+        yScale = new Plottable.Scale.Linear().domain([0, 1]);
+        xAccessor = (d: any) => d.foo;
+        yAccessor = (d: any) => d.bar;
+        y0Accessor = () => 0;
+        colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
+        fillAccessor = () => "steelblue";
+        simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
+        areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
+        areaPlot.project("x", xAccessor, xScale)
+                .project("y", yAccessor, yScale)
+                .project("y0", y0Accessor, yScale)
+                .project("fill", fillAccessor)
+                .project("stroke", colorAccessor)
+                .renderTo(svg);
         renderArea = areaPlot.renderArea;
       });
 
@@ -229,7 +254,7 @@ describe("Renderers", () => {
       });
 
       it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-        areaPlot.project("y0", (d: any) => d.bar/2);
+        areaPlot.project("y0", (d: any) => d.bar/2, yScale);
         areaPlot.renderTo(svg);
         renderArea = areaPlot.renderArea;
         var areaPath = renderArea.select(".area");
@@ -625,7 +650,7 @@ describe("Renderers", () => {
         var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale)
-                                                            .project("fill", "magnitude");
+                                                            .project("fill", "magnitude", colorScale);
         renderer.renderTo(svg);
         VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
         svg.remove();
@@ -638,7 +663,7 @@ describe("Renderers", () => {
         var colorScale: Plottable.Scale.InterpolatedColor = new Plottable.Scale.InterpolatedColor(["black", "white"]);
         var svg: D3.Selection = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var renderer: Plottable.Plot.Grid = new Plottable.Plot.Grid(null, xScale, yScale, colorScale)
-                                                            .project("fill", "magnitude");
+                                                            .project("fill", "magnitude", colorScale);
         renderer.renderTo(svg);
         renderer.dataSource().data(DATA);
         VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);

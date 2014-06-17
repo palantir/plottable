@@ -38,6 +38,11 @@ declare module Plottable {
             * @return {any[]}
             */
             function createFilledArray(value: any, count: number): any[];
+            /**
+            * @param {T[][]} a The 2D array that will have its elements joined together.
+            * @return {T[]} Every array in a, concatenated together in the order they appear.
+            */
+            function flatten<T>(a: T[][]): T[];
         }
     }
 }
@@ -226,11 +231,149 @@ declare module Plottable {
             * @returns {SVGRed} The bounding box.
             */
             function getBBox(element: D3.Selection): SVGRect;
+            var POLYFILL_TIMEOUT_MSEC: number;
+            function requestAnimationFramePolyfill(fn: () => any): void;
             function isSelectionRemovedFromSVG(selection: D3.Selection): boolean;
             function getElementWidth(elem: HTMLScriptElement): number;
             function getElementHeight(elem: HTMLScriptElement): number;
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Formatter {
+            constructor(precision: number);
+            /**
+            * Format an input value.
+            *
+            * @param {any} d The value to be formatted.
+            * @returns {string} The formatted value.
+            */
+            public format(d: any): string;
+            /**
+            * Gets the current precision of the Formatter.
+            * The meaning depends on the implementation.
+            *
+            * @returns {number} The current precision.
+            */
+            public precision(): number;
+            /**
+            * Sets the precision of the Formatter.
+            * The meaning depends on the implementation.
+            *
+            * @param {number} [value] The new precision.
+            * @returns {Formatter} The calling Formatter.
+            */
+            public precision(value: number): Formatter;
+            /**
+            * Checks if this formatter will show only unchanged values.
+            *
+            * @returns {boolean}
+            */
+            public showOnlyUnchangedValues(): boolean;
+            /**
+            * Sets whether this formatter will show only unchanged values.
+            * If true, inputs whose value is changed by the formatter will be formatted
+            * to an empty string.
+            *
+            * @param {boolean} showUnchanged Whether or not to show only unchanged values.
+            * @returns {Formatter} The calling Formatter.
+            */
+            public showOnlyUnchangedValues(showUnchanged: boolean): Formatter;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Identity extends Abstract.Formatter {
+            /**
+            * Creates an formatter that simply stringifies the input.
+            *
+            * @constructor
+            */
+            constructor();
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class General extends Abstract.Formatter {
+            /**
+            * Creates a formatter that formats numbers to show no more than
+            * [precision] decimal places. All other values are stringified.
+            *
+            * @constructor
+            * @param {number} [precision] The maximum number of decimal places to display.
+            */
+            constructor(precision?: number);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Fixed extends Abstract.Formatter {
+            /**
+            * Creates a formatter that displays exactly [precision] decimal places.
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            constructor(precision?: number);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Currency extends Fixed {
+            /**
+            * Creates a formatter for currency values.
+            *
+            * @param {number} [precision] The number of decimal places to show.
+            * @param {string} [symbol] The currency symbol to use.
+            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
+            *
+            * @returns {IFormatter} A formatter for currency values.
+            */
+            constructor(precision?: number, symbol?: string, prefix?: boolean);
+            public format(d: any): string;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Percentage extends Fixed {
+            /**
+            * Creates a formatter for percentage values.
+            * Multiplies the supplied value by 100 and appends "%".
+            *
+            * @constructor
+            * @param {number} [precision] The number of decimal places to display.
+            */
+            constructor(precision?: number);
+            public format(d: any): string;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
+        class Custom extends Abstract.Formatter {
+            constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
         }
     }
 }
@@ -304,6 +447,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
+            static AUTORESIZE_BY_DEFAULT: boolean;
             /**
             * Renders the Component into a given DOM element.
             *
@@ -318,6 +462,16 @@ declare module Plottable {
             * @param {number} [availableHeight] - the height of the container element
             */
             public resize(width?: number, height?: number): Component;
+            /**
+            * Enables and disables auto-resize.
+            *
+            * If enabled, window resizes will enqueue this component for a re-layout
+            * and re-render. Animations are disabled during window resizes when auto-
+            * resize is enabled.
+            *
+            * @param {boolean} flag - Enables (true) or disables (false) auto-resize.
+            */
+            public autoResize(flag: boolean): Component;
             /**
             * Sets the x alignment of the Component.
             *
@@ -533,6 +687,18 @@ declare module Plottable {
             * @returns {Scale} A copy of the calling Scale.
             */
             public copy(): Scale;
+            /**
+            * When a renderer determines that the extent of a projector has changed,
+            * it will call this function. This function should ensure that
+            * the scale has a domain at least large enough to include extent.
+            *
+            * @param {number} rendererID A unique indentifier of the renderer sending
+            *                 the new extent.
+            * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+            * @param {any[]} extent The new extent to be included in the scale.
+            */
+            public updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
+            public removeExtent(rendererID: number, attr: string): Scale;
         }
     }
 }
@@ -543,6 +709,9 @@ declare module Plottable {
         interface _IProjector {
             accessor: IAccessor;
             scale?: Scale;
+        }
+        interface IAttributeToProjector {
+            [attrToSet: string]: IAppliedAccessor;
         }
         class Plot extends Component {
             /**
@@ -569,18 +738,140 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
+            /**
+            * Gets or sets the animator associated with the specified animator key.
+            *
+            * @param {string} animatorKey The key for the animator.
+            * @param {Animator.IPlotAnimator} animator If specified, will be stored as the
+            *     animator for the key.
+            * @return {Animator.IPlotAnimator|Plot} If an animator is specified, we return
+            *     this object to enable chaining, otherwise we return the animator
+            *     stored at the specified key.
+            */
+            public animator(animatorKey: string): Animator.IPlotAnimator;
+            public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
         }
     }
 }
 
 
 declare module Plottable {
-    module Singleton {
-        class RenderController {
-            static enabled: boolean;
-            static registerToRender(c: Abstract.Component): void;
-            static registerToComputeLayout(c: Abstract.Component): void;
-            static flush(): void;
+    module Core {
+        module RenderController {
+            module RenderPolicy {
+                interface IRenderPolicy {
+                    render(): any;
+                }
+                class Immediate implements IRenderPolicy {
+                    public render(): void;
+                }
+                class AnimationFrame implements IRenderPolicy {
+                    public render(): void;
+                }
+                class Timeout implements IRenderPolicy {
+                    public render(): void;
+                }
+            }
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Core {
+        /**
+        * The RenderController is responsible for enqueueing and synchronizing
+        * layout and render calls for Plottable components.
+        *
+        * Layouts and renders occur inside an animation callback
+        * (window.requestAnimationFrame if available).
+        *
+        * If you require immediate rendering, call RenderController.flush() to
+        * perform enqueued layout and rendering serially.
+        */
+        module RenderController {
+            var _renderPolicy: RenderPolicy.IRenderPolicy;
+            function setRenderPolicy(policy: RenderPolicy.IRenderPolicy): any;
+            /**
+            * If the RenderController is enabled, we enqueue the component for
+            * render. Otherwise, it is rendered immediately.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            function registerToRender(c: Abstract.Component): void;
+            /**
+            * If the RenderController is enabled, we enqueue the component for
+            * layout and render. Otherwise, it is rendered immediately.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            function registerToComputeLayout(c: Abstract.Component): void;
+            function flush(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Core {
+        /**
+        * The ResizeBroadcaster will broadcast a notification to any registered
+        * components when the window is resized.
+        *
+        * The broadcaster and single event listener are lazily constructed.
+        *
+        * Upon resize, the _resized flag will be set to true until after the next
+        * flush of the RenderController. This is used, for example, to disable
+        * animations during resize.
+        */
+        module ResizeBroadcaster {
+            /**
+            * Returns true if the window has been resized and the RenderController
+            * has not yet been flushed.
+            */
+            function resizing(): boolean;
+            function clearResizing(): any;
+            /**
+            * Registers a component.
+            *
+            * When the window is resized, we invoke ._invalidateLayout() on the
+            * component, which will enqueue the component for layout and rendering
+            * with the RenderController.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            function register(c: Abstract.Component): void;
+            /**
+            * Deregisters the components.
+            *
+            * The component will no longer receive updates on window resize.
+            *
+            * @param {Abstract.Component} component Any Plottable component.
+            */
+            function deregister(c: Abstract.Component): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        interface IPlotAnimator {
+            /**
+            * Applies the supplied attributes to a D3.Selection with some animation.
+            *
+            * @param {D3.Selection} selection The update selection or transition selection that we wish to animate.
+            * @param {Abstract.IAttributeToProjector} attrToProjector The set of
+            *     IAccessors that we will use to set attributes on the selection.
+            * @param {Abstract.Plot} plot The plot being animated.
+            * @return {D3.Selection} Animators should return the selection or
+            *     transition object so that plots may chain the transitions between
+            *     animators.
+            */
+            animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+        }
+        interface IPlotAnimatorMap {
+            [animatorKey: string]: IPlotAnimator;
         }
     }
 }
@@ -909,7 +1200,7 @@ declare module Plottable {
             * @constructor
             * @param {Scale} scale The Scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {any} [formatter] a D3 formatter
+            * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
             */
             constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any);
             public showEndTickLabels(): boolean;
@@ -1356,13 +1647,80 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Singleton {
+    module Animator {
+        /**
+        * An animator implementation with no animation. The attributes are
+        * immediately set on the selection.
+        */
+        class Null implements IPlotAnimator {
+            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        /**
+        * The default animator implementation with easing, duration, and delay.
+        */
+        class Default implements IPlotAnimator {
+            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+            /**
+            * Gets or sets the duration of the animation in milliseconds.
+            *
+            * @param {Number} duration The duration in milliseconds.
+            * @return {Number|Default} Returns this object for chaining or
+            *     the current duration if no argument is supplied.
+            */
+            public duration(): Number;
+            public duration(duration: Number): Default;
+            /**
+            * Gets or sets the delay of the animation in milliseconds.
+            *
+            * @param {Number} delay The delay in milliseconds.
+            * @return {Number|Default} Returns this object for chaining or
+            *     the current delay if no argument is supplied.
+            */
+            public delay(): Number;
+            public delay(delay: Number): Default;
+            /**
+            * Gets or sets the easing string of the animation in milliseconds.
+            *
+            * @param {string} easing The easing string.
+            * @return {string|Default} Returns this object for chaining or
+            *     the current easing string if no argument is supplied.
+            */
+            public easing(): string;
+            public easing(easing: string): Default;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Animator {
+        /**
+        * An animator that delays the animation of the attributes using the index
+        * of the selection data.
+        *
+        * The delay between animations can be configured with the .delay getter/setter.
+        */
+        class IterativeDelay extends Default {
+            public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Core {
         interface IKeyEventListenerCallback {
             (e: D3.Event): any;
         }
-        class KeyEventListener {
-            static initialize(): void;
-            static addCallback(keyCode: number, cb: IKeyEventListenerCallback): void;
+        module KeyEventListener {
+            function initialize(): void;
+            function addCallback(keyCode: number, cb: IKeyEventListenerCallback): void;
         }
     }
 }
