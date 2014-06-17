@@ -27,6 +27,14 @@ declare module Plottable {
             * @return {D3.Set} A set that contains elements that appear in both set1 and set2
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
+            /**
+            * Takes two sets and returns the union
+            *
+            * @param{D3.Set} set1 The first set
+            * @param{D3.Set} set2 The second set
+            * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+            */
+            function union(set1: D3.Set, set2: D3.Set): D3.Set;
             function accessorize(accessor: any): IAccessor;
             function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
@@ -1411,6 +1419,23 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
+        class Multi extends Time {
+            /**
+            * Creates a MultiTimeAxis
+            *
+            * @constructor
+            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            */
+            constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
+            public addInterval(interval: D3.Time.Interval): Multi;
         }
     }
 }

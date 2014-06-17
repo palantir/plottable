@@ -31,7 +31,7 @@ export module Axis {
       var fakeTick: D3.Selection;
       var testTextEl: D3.Selection;
       if (this._computedHeight == null) {
-        this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
+        this._computedHeight = this.tickLength() + this.tickLabelPadding() + this._measureTextHeight();
       }
       requestedWidth = 0;
       requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
@@ -48,7 +48,7 @@ export module Axis {
       return this._scale.ticks(7);
     }
 
-    private measureTextHeight(): number {
+    public _measureTextHeight(): number {
       var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
       var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
       fakeTickLabel.remove();
@@ -58,10 +58,10 @@ export module Axis {
     public _doRender() {
       super._doRender();
       var tickValues = this._getTickValues();
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._getTickValues(), (d) => d);
+      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(tickValues, (d) => d);
       var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
       tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ?
-                     (this.tickLength() + this.measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
+                     (this.tickLength() + this._measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any, i: number) => "translate(" + this._scale._d3Scale(d) + ",0)");
       tickLabels.selectAll("text").text((d: any) => this._formatter.format(d))

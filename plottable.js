@@ -57,6 +57,25 @@ var Plottable;
             }
             Methods.intersection = intersection;
 
+            /**
+            * Takes two sets and returns the union
+            *
+            * @param{D3.Set} set1 The first set
+            * @param{D3.Set} set2 The second set
+            * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+            */
+            function union(set1, set2) {
+                var set = d3.set();
+                set1.forEach(function (v) {
+                    return set.add(v);
+                });
+                set2.forEach(function (v) {
+                    return set.add(v);
+                });
+                return set;
+            }
+            Methods.union = union;
+
             function accessorize(accessor) {
                 if (typeof (accessor) === "function") {
                     return accessor;
@@ -4502,7 +4521,7 @@ var Plottable;
                 var fakeTick;
                 var testTextEl;
                 if (this._computedHeight == null) {
-                    this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
+                    this._computedHeight = this.tickLength() + this.tickLabelPadding() + this._measureTextHeight();
                 }
                 requestedWidth = 0;
                 requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
@@ -4519,7 +4538,7 @@ var Plottable;
                 return this._scale.ticks(7);
             };
 
-            Time.prototype.measureTextHeight = function () {
+            Time.prototype._measureTextHeight = function () {
                 var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
                 var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
                 fakeTickLabel.remove();
@@ -4530,11 +4549,11 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickValues = this._getTickValues();
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._getTickValues(), function (d) {
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(tickValues, function (d) {
                     return d;
                 });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-                tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ? (this.tickLength() + this.measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
+                tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ? (this.tickLength() + this._measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d, i) {
                     return "translate(" + _this._scale._d3Scale(d) + ",0)";
@@ -4547,6 +4566,104 @@ var Plottable;
             return Time;
         })(Plottable.Abstract.Axis);
         Axis.Time = Time;
+    })(Plottable.Axis || (Plottable.Axis = {}));
+    var Axis = Plottable.Axis;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Axis) {
+        var Multi = (function (_super) {
+            __extends(Multi, _super);
+            /**
+            * Creates a MultiTimeAxis
+            *
+            * @constructor
+            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            */
+            function Multi(scale, orientation, formatter) {
+                _super.call(this, scale, orientation, formatter);
+                this._intervals = [];
+            }
+            Multi.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                var requestedWidth = this._width;
+                var requestedHeight = this._height;
+
+                var fakeTick;
+                var testTextEl;
+                if (this._computedHeight == null) {
+                    this._computedHeight = (this.tickLength() + this.tickLabelPadding()) * this._intervals.length + this._measureTextHeight();
+                }
+                requestedWidth = 0;
+                requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
+
+                return {
+                    width: Math.min(offeredWidth, requestedWidth),
+                    height: Math.min(offeredHeight, requestedHeight),
+                    wantsWidth: false,
+                    wantsHeight: offeredHeight < requestedHeight
+                };
+            };
+
+            Multi.prototype.addInterval = function (interval) {
+                this._intervals.push(interval);
+                return this;
+            };
+
+            Multi.prototype._getTickValues = function () {
+                var _this = this;
+                var set = d3.set();
+                this._intervals.forEach(function (v) {
+                    return set = Plottable.Util.Methods.union(set, d3.set(_this._scale.tickInterval(v)));
+                });
+                return set.values().map(function (d) {
+                    return new Date(d);
+                });
+            };
+
+            Multi.prototype._doRender = function () {
+                var _this = this;
+                _super.prototype._doRender.call(this);
+                var numIntervals = this._intervals.length;
+                var topTicks = this._scale.tickInterval(this._intervals[numIntervals - 1]);
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(topTicks, function (d) {
+                    return d;
+                });
+                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+                tickLabels.selectAll("text").attr("transform", "translate(0," + (this._orientation === "bottom" ? (this.tickLength() * numIntervals + this._measureTextHeight()) : (this.availableHeight - this.tickLength() * numIntervals)) + ")");
+                tickLabels.exit().remove();
+                tickLabels.attr("transform", function (d, i) {
+                    return "translate(" + _this._scale._d3Scale(d) + ",0)";
+                });
+                tickLabels.selectAll("text").text(function (d) {
+                    return _this._formatter.format(d);
+                }).style("text-anchor", "middle");
+
+                this._intervals.forEach(function (v, i) {
+                    var index = _this._intervals.indexOf(v);
+                    var tickValues = _this._scale.tickInterval(v);
+                    var selection = _this._ticksContainer.selectAll(".tick").filter(function (d) {
+                        // for some reason, the dates didn't compare properly, so I'm comparing them by value
+                        return tickValues.map(function (x) {
+                            return x.valueOf();
+                        }).indexOf(d.valueOf()) >= 0;
+                    });
+                    selection.select("line").attr("y2", _this.tickLength() * (index + 1));
+                });
+
+                return this;
+            };
+            return Multi;
+        })(Plottable.Axis.Time);
+        Axis.Multi = Multi;
     })(Plottable.Axis || (Plottable.Axis = {}));
     var Axis = Plottable.Axis;
 })(Plottable || (Plottable = {}));
