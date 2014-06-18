@@ -204,11 +204,14 @@ var Plottable;
             /**
             * Set a new key/value pair in the store.
             *
-            * @param {any} Key to set in the store
-            * @param {any} Value to set in the store
+            * @param {any} key Key to set in the store
+            * @param {any} value Value to set in the store
             * @return {boolean} True if key already in store, false otherwise
             */
             StrictEqualityAssociativeArray.prototype.set = function (key, value) {
+                if (key !== key) {
+                    throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
+                }
                 for (var i = 0; i < this.keyValuePairs.length; i++) {
                     if (this.keyValuePairs[i][0] === key) {
                         this.keyValuePairs[i][1] = value;
@@ -219,6 +222,12 @@ var Plottable;
                 return false;
             };
 
+            /**
+            * Get a value from the store, given a key.
+            *
+            * @param {any} key Key associated with value to retrieve
+            * @return {any} Value if found, undefined otherwise
+            */
             StrictEqualityAssociativeArray.prototype.get = function (key) {
                 for (var i = 0; i < this.keyValuePairs.length; i++) {
                     if (this.keyValuePairs[i][0] === key) {
@@ -228,6 +237,15 @@ var Plottable;
                 return undefined;
             };
 
+            /**
+            * Test whether store has a value associated with given key.
+            *
+            * Will return true if there is a key/value entry,
+            * even if the value is explicitly `undefined`.
+            *
+            * @param {any} key Key to test for presence of an entry
+            * @return {boolean} Whether there was a matching entry for that key
+            */
             StrictEqualityAssociativeArray.prototype.has = function (key) {
                 for (var i = 0; i < this.keyValuePairs.length; i++) {
                     if (this.keyValuePairs[i][0] === key) {
@@ -237,12 +255,46 @@ var Plottable;
                 return false;
             };
 
+            /**
+            * Return an array of the values in the key-value store
+            *
+            * @return {any[]} The values in the store
+            */
             StrictEqualityAssociativeArray.prototype.values = function () {
                 return this.keyValuePairs.map(function (x) {
                     return x[1];
                 });
             };
 
+            /**
+            * Return an array of keys in the key-value store
+            *
+            * @return {any[]} The keys in the store
+            */
+            StrictEqualityAssociativeArray.prototype.keys = function () {
+                return this.keyValuePairs.map(function (x) {
+                    return x[0];
+                });
+            };
+
+            /**
+            * Execute a callback for each entry in the array.
+            *
+            * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
+            * @return {any[]} The results of mapping the callback over the entries
+            */
+            StrictEqualityAssociativeArray.prototype.map = function (cb) {
+                return this.keyValuePairs.map(function (kv, index) {
+                    return cb(kv[0], kv[1], index);
+                });
+            };
+
+            /**
+            * Delete a key from the key-value store. Return whether the key was present.
+            *
+            * @param {any} The key to remove
+            * @return {boolean} Whether a matching entry was found and removed
+            */
             StrictEqualityAssociativeArray.prototype.delete = function (key) {
                 for (var i = 0; i < this.keyValuePairs.length; i++) {
                     if (this.keyValuePairs[i][0] === key) {
@@ -1091,12 +1143,13 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Abstract) {
+    (function (Core) {
         var Broadcaster = (function (_super) {
             __extends(Broadcaster, _super);
-            function Broadcaster() {
-                _super.apply(this, arguments);
+            function Broadcaster(listenable) {
+                _super.call(this);
                 this.listener2Callback = new Plottable.Util.StrictEqualityAssociativeArray();
+                this.listenable = listenable;
             }
             /**
             * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -1120,20 +1173,20 @@ var Plottable;
             * @param ...args A variable number of optional arguments
             * @returns {Broadcaster} this object
             */
-            Broadcaster.prototype._broadcast = function () {
+            Broadcaster.prototype.broadcast = function () {
                 var _this = this;
                 var args = [];
                 for (var _i = 0; _i < (arguments.length - 0); _i++) {
                     args[_i] = arguments[_i + 0];
                 }
                 this.listener2Callback.values().forEach(function (callback) {
-                    return callback(_this, args);
+                    return callback(_this.listenable, args);
                 });
                 return this;
             };
 
             /**
-            * Registers deregister the callback associated with a listener.
+            * Deregisters the callback associated with a listener.
             *
             * @param listener The listener to deregister.
             * @returns {Broadcaster} this object
@@ -1142,11 +1195,20 @@ var Plottable;
                 this.listener2Callback.delete(listener);
                 return this;
             };
+
+            /**
+            * Deregisters all listeners and callbacks associated with the broadcaster.
+            *
+            * @returns {Broadcaster} this object
+            */
+            Broadcaster.prototype.deregisterAllListeners = function () {
+                this.listener2Callback = new Plottable.Util.StrictEqualityAssociativeArray();
+            };
             return Broadcaster;
         })(Plottable.Abstract.PlottableObject);
-        Abstract.Broadcaster = Broadcaster;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
+        Core.Broadcaster = Broadcaster;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1171,6 +1233,7 @@ var Plottable;
             if (typeof data === "undefined") { data = []; }
             if (typeof metadata === "undefined") { metadata = {}; }
             _super.call(this);
+            this.broadcaster = new Plottable.Core.Broadcaster(this);
             this._data = data;
             this._metadata = metadata;
             this.accessor2cachedExtent = new Plottable.Util.StrictEqualityAssociativeArray();
@@ -1181,7 +1244,7 @@ var Plottable;
             } else {
                 this._data = data;
                 this.accessor2cachedExtent = new Plottable.Util.StrictEqualityAssociativeArray();
-                this._broadcast();
+                this.broadcaster.broadcast();
                 return this;
             }
         };
@@ -1192,7 +1255,7 @@ var Plottable;
             } else {
                 this._metadata = metadata;
                 this.accessor2cachedExtent = new Plottable.Util.StrictEqualityAssociativeArray();
-                this._broadcast();
+                this.broadcaster.broadcast();
                 return this;
             }
         };
@@ -1218,7 +1281,7 @@ var Plottable;
             }
         };
         return DataSource;
-    })(Plottable.Abstract.Broadcaster);
+    })(Plottable.Abstract.PlottableObject);
     Plottable.DataSource = DataSource;
 })(Plottable || (Plottable = {}));
 
@@ -1239,7 +1302,6 @@ var Plottable;
                 this.interactionsToRegister = [];
                 this.boxes = [];
                 this.clipPathEnabled = false;
-                this.broadcastersCurrentlyListeningTo = {};
                 this.isTopLevelComponent = false;
                 this._xOffset = 0;
                 this._yOffset = 0;
@@ -1586,16 +1648,6 @@ var Plottable;
                     this.interactionsToRegister.push(interaction);
                 }
                 return this;
-            };
-
-            Component.prototype._registerToBroadcaster = function (broadcaster, callback) {
-                broadcaster.registerListener(this, callback);
-                this.broadcastersCurrentlyListeningTo[broadcaster._plottableID] = broadcaster;
-            };
-
-            Component.prototype._deregisterFromBroadcaster = function (broadcaster) {
-                broadcaster.deregisterListener(this);
-                delete this.broadcastersCurrentlyListeningTo[broadcaster._plottableID];
             };
 
             Component.prototype.classed = function (cssClass, addClass) {
@@ -2316,6 +2368,7 @@ var Plottable;
             function Scale(scale) {
                 _super.call(this);
                 this._autoDomainAutomatically = true;
+                this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._autoNice = false;
                 this._autoPad = false;
@@ -2363,7 +2416,7 @@ var Plottable;
 
             Scale.prototype._setDomain = function (values) {
                 this._d3Scale.domain(values);
-                this._broadcast();
+                this.broadcaster.broadcast();
             };
 
             Scale.prototype.range = function (values) {
@@ -2410,7 +2463,7 @@ var Plottable;
                 return this;
             };
             return Scale;
-        })(Plottable.Abstract.Broadcaster);
+        })(Plottable.Abstract.PlottableObject);
         Abstract.Scale = Scale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2470,12 +2523,12 @@ var Plottable;
                 }
                 var oldSource = this._dataSource;
                 if (oldSource != null) {
-                    this._deregisterFromBroadcaster(this._dataSource);
+                    this._dataSource.broadcaster.deregisterListener(this);
                     this._requireRerender = true;
                     this._rerenderUpdateSelection = true;
                 }
                 this._dataSource = source;
-                this._registerToBroadcaster(this._dataSource, function () {
+                this._dataSource.broadcaster.registerListener(this, function () {
                     _this.updateAllProjectors();
                     _this._dataChanged = true;
                     _this._render();
@@ -2494,11 +2547,11 @@ var Plottable;
 
                 if (existingScale != null) {
                     existingScale.removeExtent(this._plottableID, attrToSet);
-                    this._deregisterFromBroadcaster(existingScale);
+                    existingScale.broadcaster.deregisterListener(this);
                 }
 
                 if (scale != null) {
-                    this._registerToBroadcaster(scale, function () {
+                    scale.broadcaster.registerListener(this, function () {
                         return _this._render();
                     });
                 }
@@ -2771,19 +2824,19 @@ var Plottable;
         * animations during resize.
         */
         (function (ResizeBroadcaster) {
-            var _broadcaster;
+            var broadcaster;
             var _resizing = false;
 
             function _lazyInitialize() {
-                if (_broadcaster === undefined) {
-                    _broadcaster = new Plottable.Abstract.Broadcaster();
+                if (broadcaster === undefined) {
+                    broadcaster = new Plottable.Core.Broadcaster(ResizeBroadcaster);
                     window.addEventListener("resize", _onResize);
                 }
             }
 
             function _onResize() {
                 _resizing = true;
-                _broadcaster._broadcast();
+                broadcaster.broadcast();
             }
 
             /**
@@ -2811,7 +2864,7 @@ var Plottable;
             */
             function register(c) {
                 _lazyInitialize();
-                _broadcaster.registerListener(c._plottableID, function () {
+                broadcaster.registerListener(c._plottableID, function () {
                     return c._invalidateLayout();
                 });
             }
@@ -2825,8 +2878,8 @@ var Plottable;
             * @param {Abstract.Component} component Any Plottable component.
             */
             function deregister(c) {
-                if (_broadcaster) {
-                    _broadcaster.deregisterListener(c._plottableID);
+                if (broadcaster) {
+                    broadcaster.deregisterListener(c._plottableID);
                 }
             }
             ResizeBroadcaster.deregister = deregister;
@@ -3163,7 +3216,7 @@ var Plottable;
                     if (innerPadding != null) {
                         this._innerPadding = innerPadding;
                     }
-                    this._broadcast();
+                    this.broadcaster.broadcast();
                     return this;
                 }
             };
@@ -3391,7 +3444,7 @@ var Plottable;
                 if (this._autoDomainAutomatically) {
                     this.autoDomain();
                 }
-                this._broadcast();
+                this.broadcaster.broadcast();
             };
 
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
@@ -3473,7 +3526,7 @@ var Plottable;
                 this.rescaleInProgress = false;
                 this.scales = scales;
                 this.scales.forEach(function (s) {
-                    return s.registerListener(_this, function (sx) {
+                    return s.broadcaster.registerListener(_this, function (sx) {
                         return _this.rescale(sx);
                     });
                 });
@@ -3536,7 +3589,7 @@ var Plottable;
                     };
                 }
                 this.tickFormat(formatFunction);
-                this._registerToBroadcaster(this._axisScale, function () {
+                this._axisScale.broadcaster.registerListener(this, function () {
                     return _this._render();
                 });
             }
@@ -4078,8 +4131,7 @@ var Plottable;
                 this._formatter = (formatter != null) ? formatter : function (n) {
                     return String(n);
                 };
-
-                this._registerToBroadcaster(this._scale, function () {
+                this._scale.broadcaster.registerListener(this, function () {
                     return _this.rescale();
                 });
             }
@@ -4288,7 +4340,7 @@ var Plottable;
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
                 }
-                this._registerToBroadcaster(this._scale, function () {
+                this._scale.broadcaster.registerListener(this, function () {
                     return _this._invalidateLayout();
                 });
             }
@@ -4607,10 +4659,10 @@ var Plottable;
                 var _this = this;
                 if (scale != null) {
                     if (this.colorScale != null) {
-                        this._deregisterFromBroadcaster(this.colorScale);
+                        this.colorScale.broadcaster.deregisterListener(this);
                     }
                     this.colorScale = scale;
-                    this._registerToBroadcaster(this.colorScale, function () {
+                    this.colorScale.broadcaster.registerListener(this, function () {
                         return _this.updateDomain();
                     });
                     this.updateDomain();
@@ -4795,12 +4847,12 @@ var Plottable;
                 this.xScale = xScale;
                 this.yScale = yScale;
                 if (this.xScale != null) {
-                    this._registerToBroadcaster(this.xScale, function () {
+                    this.xScale.broadcaster.registerListener(this, function () {
                         return _this._render();
                     });
                 }
                 if (this.yScale != null) {
-                    this._registerToBroadcaster(this.yScale, function () {
+                    this.yScale.broadcaster.registerListener(this, function () {
                         return _this._render();
                     });
                 }
@@ -5775,12 +5827,16 @@ var Plottable;
             Click.prototype._anchor = function (hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, hitBox);
-                hitBox.on("click", function () {
+                hitBox.on(this._listenTo(), function () {
                     var xy = d3.mouse(hitBox.node());
                     var x = xy[0];
                     var y = xy[1];
                     _this._callback(x, y);
                 });
+            };
+
+            Click.prototype._listenTo = function () {
+                return "click";
             };
 
             /**
@@ -5795,6 +5851,24 @@ var Plottable;
             return Click;
         })(Plottable.Abstract.Interaction);
         Interaction.Click = Click;
+
+        var DoubleClick = (function (_super) {
+            __extends(DoubleClick, _super);
+            /**
+            * Creates a DoubleClickInteraction.
+            *
+            * @constructor
+            * @param {Component} componentToListenTo The component to listen for clicks on.
+            */
+            function DoubleClick(componentToListenTo) {
+                _super.call(this, componentToListenTo);
+            }
+            DoubleClick.prototype._listenTo = function () {
+                return "dblclick";
+            };
+            return DoubleClick;
+        })(Click);
+        Interaction.DoubleClick = DoubleClick;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));

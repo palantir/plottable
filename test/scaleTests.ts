@@ -4,26 +4,26 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale's copy() works correctly", () => {
-    var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
+    var testCallback: Plottable.Core.IBroadcasterCallback = (broadcaster: Plottable.Core.IListenable) => {
       return true; // doesn't do anything
     };
     var scale = new Plottable.Scale.Linear();
-    scale.registerListener(null, testCallback);
+    scale.broadcaster.registerListener(null, testCallback);
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-    assert.notDeepEqual((<any> scale).listener2Callback, (<any> scaleCopy).listener2Callback,
-                              "Registered callbacks are not copied over");
+    assert.notDeepEqual(scale.broadcaster, scaleCopy.broadcaster,
+                              "Broadcasters are not copied over");
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
     var scale = new Plottable.Scale.Linear();
     var callbackWasCalled = false;
-    var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
-      assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+    var testCallback: Plottable.Core.IBroadcasterCallback = (listenable: Plottable.Core.IListenable) => {
+      assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
-    scale.registerListener(null, testCallback);
+    scale.broadcaster.registerListener(null, testCallback);
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
 
@@ -167,11 +167,11 @@ describe("Scales", () => {
     it("rangeType triggers broadcast", () => {
       var scale = new Plottable.Scale.Ordinal();
       var callbackWasCalled = false;
-      var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
-        assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+      var testCallback: Plottable.Core.IBroadcasterCallback = (listenable: Plottable.Core.IListenable) => {
+        assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
         callbackWasCalled = true;
       };
-      scale.registerListener(null, testCallback);
+      scale.broadcaster.registerListener(null, testCallback);
       scale.rangeType("points");
       assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
