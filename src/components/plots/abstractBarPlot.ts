@@ -61,31 +61,60 @@ export module Abstract {
       return this;
     }
 
+
+    private parseExtent(input: any): IExtent {
+      if (typeof(input) === "number") {
+        return {min: input, max: input};
+      } else if (input instanceof Object && "min" in input && "max" in input) {
+        return <IExtent> input;
+      } else {
+        throw new Error("input '" + input + "' can't be parsed as an IExtent");
+      }
+    }
+
     /**
-     * Selects the bar under the given pixel position.
+     * Selects the bar under the given pixel position (if [xValOrExtent]
+     * and [yValOrExtent] are {number}s), under a given line (if only one
+     * of [xValOrExtent] or [yValOrExtent] are {IExtent}s) or are under a
+     * 2D area (if [xValOrExtent] and [yValOrExtent] are both {IExtent}s).
      *
-     * @param {number} x The pixel x position.
-     * @param {number} y The pixel y position.
+     * @param {any} xValOrExtent The pixel x position, or range of x values.
+     * @param {any} yValOrExtent The pixel y position, or range of y values.
      * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
      * @return {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public selectBar(x: number, y: number, select = true): D3.Selection {
-      var selectedBar: D3.Selection = null;
+    public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+    public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+    public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
+    public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
+    public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
+      var selectedBars: any[] = [];
+
+      var xExtent: IExtent = this.parseExtent(xValOrExtent);
+      var yExtent: IExtent = this.parseExtent(yValOrExtent);
+
+      // the SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via 
+      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+      // seems appropriate:
+      var tolerance: number = 0.5;
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
       this._bars.each(function(d: any) {
         var bbox = this.getBBox();
-        if (bbox.x <= x && x <= bbox.x + bbox.width &&
-            bbox.y <= y && y <= bbox.y + bbox.height) {
-          selectedBar = d3.select(this);
+        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
+            bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+          selectedBars.push(this);
         }
       });
 
-      if (selectedBar != null) {
-        selectedBar.classed("selected", select);
+      if (selectedBars.length > 0) {
+        var selection: D3.Selection = d3.selectAll(selectedBars);
+        selection.classed("selected", select);
+        return selection;
+      } else {
+        return null;
       }
-
-      return selectedBar;
     }
 
     /**

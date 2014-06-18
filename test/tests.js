@@ -3101,7 +3101,7 @@ describe("Renderers", function () {
             it("can select and deselect bars", function () {
                 var selectedBar = renderer.selectBar(145, 150);
 
-                assert.isNotNull(selectedBar, "a bar was selected");
+                assert.isNotNull(selectedBar, "clicked on a bar");
                 assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
                 assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
 
@@ -3110,6 +3110,38 @@ describe("Renderers", function () {
 
                 selectedBar = renderer.selectBar(-1, -1); // no bars here
                 assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                selectedBar = renderer.selectBar(200, 50); // between the two bars
+                assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                selectedBar = renderer.selectBar(145, 10); // above bar 0
+                assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
+                // origin is at the top left!
+                selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 150 }, true);
+                assert.isNotNull(selectedBar, "line between middle of two bars");
+                assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
+                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.equal(selectedBar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+                selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 350 }, true);
+                assert.isNotNull(selectedBar, "square between middle of two bars, & over the whole area");
+                assert.lengthOf(selectedBar.data(), 3, "selected all the bars");
+                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.equal(selectedBar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+                assert.equal(selectedBar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
+                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+                // the runtime parameter validation should be strict, so no strings or
+                // mangled objects
+                assert.throws(function () {
+                    return renderer.selectBar("blargh", 150);
+                }, Error);
+                assert.throws(function () {
+                    return renderer.selectBar({ min: 150 }, 150);
+                }, Error);
 
                 verifier.end();
             });

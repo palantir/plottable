@@ -5208,31 +5208,44 @@ var Plottable;
                 return this;
             };
 
-            /**
-            * Selects the bar under the given pixel position.
-            *
-            * @param {number} x The pixel x position.
-            * @param {number} y The pixel y position.
-            * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
-            * @return {D3.Selection} The selected bar, or null if no bar was selected.
-            */
-            BarPlot.prototype.selectBar = function (x, y, select) {
+            BarPlot.prototype.parseExtent = function (input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                } else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                } else {
+                    throw new Error("input '" + input + "' can't be parsed as an IExtent");
+                }
+            };
+
+            BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (typeof select === "undefined") { select = true; }
-                var selectedBar = null;
+                var selectedBars = [];
+
+                var xExtent = this.parseExtent(xValOrExtent);
+                var yExtent = this.parseExtent(yValOrExtent);
+
+                // the SVGRects are positioned with sub-pixel accuracy (the default unit
+                // for the x, y, height & width attributes), but user selections (e.g. via
+                // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+                // seems appropriate:
+                var tolerance = 0.5;
 
                 // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
                 this._bars.each(function (d) {
                     var bbox = this.getBBox();
-                    if (bbox.x <= x && x <= bbox.x + bbox.width && bbox.y <= y && y <= bbox.y + bbox.height) {
-                        selectedBar = d3.select(this);
+                    if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+                        selectedBars.push(this);
                     }
                 });
 
-                if (selectedBar != null) {
-                    selectedBar.classed("selected", select);
+                if (selectedBars.length > 0) {
+                    var selection = d3.selectAll(selectedBars);
+                    selection.classed("selected", select);
+                    return selection;
+                } else {
+                    return null;
                 }
-
-                return selectedBar;
             };
 
             /**
