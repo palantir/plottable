@@ -20,9 +20,9 @@
     .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
 
     xAxis = new Plottable.Axis.Multi(xScale, "bottom", new Plottable.Formatter.Time());
-    xAxis.addInterval(d3.time.day);
-    xAxis.addInterval(d3.time.month);
-    xAxis.addInterval(d3.time.year);
+    // xAxis.addInterval({interval: d3.time.day, step: 16});
+    // xAxis.addInterval({interval: d3.time.month});
+    // xAxis.addInterval({interval: d3.time.year});
     yAxis = new Plottable.Axis.YAxis(yScale);
 
     gridlines = new Plottable.Component.Gridlines(xScale, yScale);

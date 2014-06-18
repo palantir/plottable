@@ -1426,6 +1426,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
+        interface Interval {
+            interval: D3.Time.Interval;
+            step?: number;
+            length?: number;
+        }
         class Multi extends Time {
             /**
             * Creates a MultiTimeAxis
@@ -1435,7 +1440,7 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
-            public addInterval(interval: D3.Time.Interval): Multi;
+            public addInterval(interval: Interval): Multi;
         }
     }
 }

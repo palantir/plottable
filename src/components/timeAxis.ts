@@ -58,7 +58,7 @@ export module Axis {
     public _doRender() {
       super._doRender();
       var tickValues = this._getTickValues();
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(tickValues, (d) => d);
+      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(tickValues, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
       tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ?
                      (this.tickLength() + this._measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
