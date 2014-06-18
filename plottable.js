@@ -4063,7 +4063,7 @@ var Plottable;
                 _super.call(this);
                 this._width = "auto";
                 this._height = "auto";
-                this._showEndTickLabels = true;
+                this._showEndTickLabels = false;
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
                 this._scale = scale;
@@ -4090,9 +4090,48 @@ var Plottable;
                 return this._orientation === "top" || this._orientation === "bottom";
             };
 
+            Axis.prototype._computeWidth = function () {
+                // to be overridden by subclass logic
+                this._computedWidth = this._tickLength;
+                return this._computedWidth;
+            };
+
+            Axis.prototype._computeHeight = function () {
+                // to be overridden by subclass logic
+                this._computedHeight = this._tickLength;
+                return this._computedHeight;
+            };
+
+            Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
+                var requestedWidth = this._width;
+                var requestedHeight = this._height;
+
+                if (this._isHorizontal()) {
+                    if (this._computedHeight == null) {
+                        this._computeHeight();
+                    }
+                    requestedWidth = 0;
+                    requestedHeight = this.height();
+                } else {
+                    if (this._computedWidth == null) {
+                        this._computeWidth();
+                    }
+                    requestedWidth = this.width();
+                    requestedHeight = 0;
+                }
+
+                return {
+                    width: Math.min(offeredWidth, requestedWidth),
+                    height: Math.min(offeredHeight, requestedHeight),
+                    wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
+                    wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
+                };
+            };
+
             Axis.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._ticksContainer = this.content.append("g").classed("ticks-container", true);
+                this._tickMarkContainer = this.content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
+                this._tickLabelContainer = this.content.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true);
                 this._baseline = this.content.append("line").classed("baseline", true);
                 return this;
             };
@@ -4106,31 +4145,13 @@ var Plottable;
             };
 
             Axis.prototype._doRender = function () {
-                var _this = this;
-                var tickValues = this._getTickValues();
-                this._ticks = this._ticksContainer.selectAll(".tick").data(tickValues);
-                var tickEnterSelection = this._ticks.enter().append("g").classed("tick", true);
-                tickEnterSelection.append("line").classed(Axis.TICK_MARK_CLASS, true);
-                this._ticks.exit().remove();
-
-                var tickXTransformFunction = this._isHorizontal() ? function (d) {
-                    return _this._scale.scale(d);
-                } : function (d) {
-                    return 0;
-                };
-                var tickYTransformFunction = this._isHorizontal() ? function (d) {
-                    return 0;
-                } : function (d) {
-                    return _this._scale.scale(d);
-                };
-
-                var tickTransformGenerator = function (d, i) {
-                    return "translate(" + tickXTransformFunction(d) + ", " + tickYTransformFunction(d) + ")";
-                };
+                var tickMarkValues = this._getTickValues();
+                var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+                tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
+                tickMarks.attr(this._generateTickMarkAttrHash());
+                tickMarks.exit().remove();
 
                 this._baseline.attr(this._generateBaselineAttrHash());
-                this._ticks.select("line").attr(this._generateTickMarkAttrHash());
-                this._ticks.attr("transform", tickTransformGenerator);
 
                 return this;
             };
@@ -4169,12 +4190,24 @@ var Plottable;
             };
 
             Axis.prototype._generateTickMarkAttrHash = function () {
+                var _this = this;
                 var tickMarkAttrHash = {
                     x1: 0,
                     y1: 0,
                     x2: 0,
                     y2: 0
                 };
+
+                var scalingFunction = function (d) {
+                    return _this._scale.scale(d);
+                };
+                if (this._isHorizontal()) {
+                    tickMarkAttrHash["x1"] = scalingFunction;
+                    tickMarkAttrHash["x2"] = scalingFunction;
+                } else {
+                    tickMarkAttrHash["y1"] = scalingFunction;
+                    tickMarkAttrHash["y2"] = scalingFunction;
+                }
 
                 switch (this._orientation) {
                     case "bottom":
@@ -4338,53 +4371,45 @@ var Plottable;
             */
             function Number(scale, orientation, formatter) {
                 _super.call(this, scale, orientation, formatter);
+                this.tickLabelPositioning = "center";
             }
-            Number.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requestedWidth = this._width;
-                var requestedHeight = this._height;
+            Number.prototype._computeWidth = function () {
+                // generate a test value to measure width
+                var tickValues = this._getTickValues();
+                var valueLength = function (v) {
+                    var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
+                    return (logLength > 0) ? logLength : 1;
+                };
+                var pow10 = Math.max.apply(null, tickValues.map(valueLength));
+                var precision = this._formatter.precision();
+                var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision));
 
-                var fakeTick;
-                var testTextEl;
-                if (this._isHorizontal()) {
-                    if (this._computedHeight == null) {
-                        fakeTick = this._ticksContainer.append("g").classed("tick", true);
-                        testTextEl = fakeTick.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                        var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
-                        this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
-                        fakeTick.remove();
-                    }
+                var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                var formattedTestValue = this._formatter.format(testValue);
+                var textLength = testTextEl.text(formattedTestValue).node().getComputedTextLength();
+                testTextEl.remove();
 
-                    requestedWidth = 0;
-                    requestedHeight = this.height();
+                if (this.tickLabelPositioning === "center") {
+                    this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
                 } else {
-                    if (this._computedWidth == null) {
-                        // generate a test value to measure width
-                        var tickValues = this._getTickValues();
-                        var valueLength = function (v) {
-                            var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
-                            return (logLength > 0) ? logLength : 1;
-                        };
-                        var pow10 = Math.max.apply(null, tickValues.map(valueLength));
-                        var precision = this._formatter.precision();
-                        var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision));
-
-                        fakeTick = this._ticksContainer.append("g").classed("tick", true);
-                        testTextEl = fakeTick.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                        var formattedTestValue = this._formatter.format(testValue);
-                        var textLength = testTextEl.text(formattedTestValue).node().getComputedTextLength();
-                        this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
-                        fakeTick.remove();
-                    }
-                    requestedWidth = this.width();
-                    requestedHeight = 0;
+                    this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
                 }
 
-                return {
-                    width: Math.min(offeredWidth, requestedWidth),
-                    height: Math.min(offeredHeight, requestedHeight),
-                    wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-                    wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
-                };
+                return this._computedWidth;
+            };
+
+            Number.prototype._computeHeight = function () {
+                var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
+                testTextEl.remove();
+
+                if (this.tickLabelPositioning === "center") {
+                    this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+                } else {
+                    this._computedHeight = Math.max(this.tickLength(), this.tickLabelPadding() + textHeight);
+                }
+
+                return this._computedHeight;
             };
 
             Number.prototype._getTickValues = function () {
@@ -4395,52 +4420,121 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
 
-                var tickLabelTextAnchor = "middle";
                 var tickLabelAttrHash = {
                     x: 0,
                     y: 0,
                     dx: "0em",
                     dy: "0.3em"
                 };
+
+                var tickMarkLength = this.tickLength();
+                var tickLabelPadding = this.tickLabelPadding();
+
+                var tickLabelTextAnchor = "middle";
+
+                var labelGroupTransformX = 0;
+                var labelGroupTransformY = 0;
+                var labelGroupShiftX = 0;
+                var labelGroupShiftY = 0;
+                if (this._isHorizontal()) {
+                    switch (this.tickLabelPositioning) {
+                        case "left":
+                            tickLabelTextAnchor = "end";
+                            labelGroupTransformX = -tickLabelPadding;
+                            labelGroupShiftY = tickLabelPadding;
+                            break;
+                        case "center":
+                            labelGroupShiftY = tickMarkLength + tickLabelPadding;
+                            break;
+                        case "right":
+                            tickLabelTextAnchor = "start";
+                            labelGroupTransformX = tickLabelPadding;
+                            labelGroupShiftY = tickLabelPadding;
+                            break;
+                    }
+                } else {
+                    switch (this.tickLabelPositioning) {
+                        case "top":
+                            tickLabelAttrHash["dy"] = "-0.3em";
+                            labelGroupShiftX = tickLabelPadding;
+                            labelGroupTransformY = -tickLabelPadding;
+                            break;
+                        case "center":
+                            labelGroupShiftX = tickMarkLength + tickLabelPadding;
+                            break;
+                        case "bottom":
+                            tickLabelAttrHash["dy"] = "1em";
+                            labelGroupShiftX = tickLabelPadding;
+                            labelGroupTransformY = tickLabelPadding;
+                            break;
+                    }
+                }
+
                 var tickMarkAttrHash = this._generateTickMarkAttrHash();
                 switch (this._orientation) {
                     case "bottom":
-                        tickLabelAttrHash["y"] = tickMarkAttrHash["y2"] + this.tickLabelPadding();
+                        tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
                         tickLabelAttrHash["dy"] = "0.95em";
+                        labelGroupTransformY = tickMarkAttrHash["y1"] + labelGroupShiftY;
                         break;
 
                     case "top":
-                        tickLabelAttrHash["y"] = tickMarkAttrHash["y2"] - this.tickLabelPadding();
+                        tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
                         tickLabelAttrHash["dy"] = "-.25em";
+                        labelGroupTransformY = tickMarkAttrHash["y1"] - labelGroupShiftY;
                         break;
 
                     case "left":
                         tickLabelTextAnchor = "end";
-                        tickLabelAttrHash["x"] = tickMarkAttrHash["x2"] - this.tickLabelPadding();
+                        labelGroupTransformX = tickMarkAttrHash["x1"] - labelGroupShiftX;
+                        tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
                         break;
 
                     case "right":
                         tickLabelTextAnchor = "start";
-                        tickLabelAttrHash["x"] = tickMarkAttrHash["x2"] + this.tickLabelPadding();
+                        labelGroupTransformX = tickMarkAttrHash["x1"] + labelGroupShiftX;
+                        tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
                         break;
                 }
+
+                var tickLabelValues = this._getTickValues();
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(tickLabelValues);
+                tickLabels.enter().append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                tickLabels.exit().remove();
 
                 var formatFunction = function (d) {
                     return _this._formatter.format(d);
                 };
-                this._ticks.each(function (d, i) {
-                    var d3El = d3.select(this);
-                    var textEl = d3El.select("text");
-                    if (textEl.empty()) {
-                        textEl = d3El.append("text");
-                    }
-                    textEl.classed("tick-label", true).style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(formatFunction(d));
-                });
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(formatFunction);
+
+                var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
+                this._tickLabelContainer.attr("transform", labelGroupTransform);
+
                 if (!this.showEndTickLabels()) {
                     this.hideEndTickLabels();
                 }
 
                 return this;
+            };
+
+            Number.prototype.tickLabelPosition = function (position) {
+                if (position == null) {
+                    return this.tickLabelPositioning;
+                } else {
+                    var positionLC = position.toLowerCase();
+                    if (this._isHorizontal()) {
+                        if (!(positionLC === "left" || positionLC === "center" || positionLC === "right")) {
+                            throw new Error(positionLC + " is not a valid tick label position for a horizontal NumberAxis");
+                        }
+                    } else {
+                        if (!(positionLC === "top" || positionLC === "center" || positionLC === "bottom")) {
+                            throw new Error(positionLC + " is not a valid tick label position for a vertical NumberAxis");
+                        }
+                    }
+                    this.tickLabelPositioning = positionLC;
+                    this._invalidateLayout();
+                    return this;
+                }
             };
 
             Number.prototype.hideEndTickLabels = function () {
@@ -4451,7 +4545,7 @@ var Plottable;
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
                 };
 
-                var tickLabels = this._ticks.select("text");
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
                 var firstTickLabel = tickLabels[0][0];
                 if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
@@ -4608,7 +4702,7 @@ var Plottable;
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
                 Plottable.Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
-                Plottable.Util.DOM.translate(this._ticksContainer, translate[0], translate[1]);
+                Plottable.Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
                 return this;
             };
             return Category;

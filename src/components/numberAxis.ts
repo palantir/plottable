@@ -4,6 +4,7 @@ module Plottable {
 export module Axis {
   export class Number extends Abstract.Axis {
     public _scale: Abstract.QuantitiveScale;
+    private tickLabelPositioning = "center";
 
     /**
      * Creates a NumberAxis.
@@ -17,53 +18,43 @@ export module Axis {
       super(scale, orientation, formatter);
     }
 
+    public _computeWidth() {
+      // generate a test value to measure width
+      var tickValues = this._getTickValues();
+      var valueLength = function(v: any) {
+        var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
+        return (logLength > 0) ? logLength : 1; // even the smallest number takes 1 character
+      };
+      var pow10 = Math.max.apply(null, tickValues.map(valueLength));
+      var precision = this._formatter.precision();
+      var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision)); // leave room for negative sign
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var requestedWidth = this._width;
-      var requestedHeight = this._height;
+      var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      var formattedTestValue = this._formatter.format(testValue);
+      var textLength = (<SVGTextElement> testTextEl.text(formattedTestValue).node()).getComputedTextLength();
+      testTextEl.remove();
 
-      var fakeTick: D3.Selection;
-      var testTextEl: D3.Selection;
-      if (this._isHorizontal()) {
-        if (this._computedHeight == null) {
-          fakeTick = this._ticksContainer.append("g").classed("tick", true);
-          testTextEl = fakeTick.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-          var textHeight = Util.DOM.getBBox(testTextEl.text("test")).height;
-          this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
-          fakeTick.remove();
-        }
-
-        requestedWidth = 0;
-        requestedHeight = this.height();
-      } else { // vertical
-        if (this._computedWidth == null) {
-          // generate a test value to measure width
-          var tickValues = this._getTickValues();
-          var valueLength = function(v: any) {
-            var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
-            return (logLength > 0) ? logLength : 1; // even the smallest number takes 1 character
-          };
-          var pow10 = Math.max.apply(null, tickValues.map(valueLength));
-          var precision = this._formatter.precision();
-          var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision)); // leave room for negative sign
-
-          fakeTick = this._ticksContainer.append("g").classed("tick", true);
-          testTextEl = fakeTick.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-          var formattedTestValue = this._formatter.format(testValue);
-          var textLength = (<SVGTextElement> testTextEl.text(formattedTestValue).node()).getComputedTextLength();
-          this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
-          fakeTick.remove();
-        }
-        requestedWidth = this.width();
-        requestedHeight = 0;
+      if (this.tickLabelPositioning === "center") {
+        this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+      } else {
+        this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
       }
 
-      return {
-        width : Math.min(offeredWidth, requestedWidth),
-        height: Math.min(offeredHeight, requestedHeight),
-        wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-        wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
-      };
+      return this._computedWidth;
+    }
+
+    public _computeHeight() {
+      var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      var textHeight = Util.DOM.getBBox(testTextEl.text("test")).height;
+      testTextEl.remove();
+
+      if (this.tickLabelPositioning === "center") {
+        this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+      } else {
+        this._computedHeight = Math.max(this.tickLength(), this.tickLabelPadding()+ textHeight);
+      }
+
+      return this._computedHeight;
     }
 
     public _getTickValues(): any[] {
@@ -73,54 +64,139 @@ export module Axis {
     public _doRender() {
       super._doRender();
 
-      var tickLabelTextAnchor = "middle";
       var tickLabelAttrHash = {
-        x: 0,
-        y: 0,
+        x: <any> 0,
+        y: <any> 0,
         dx: "0em",
         dy: "0.3em"
       };
+
+      var tickMarkLength = this.tickLength();
+      var tickLabelPadding = this.tickLabelPadding();
+
+      var tickLabelTextAnchor = "middle";
+
+      var labelGroupTransformX = 0;
+      var labelGroupTransformY = 0;
+      var labelGroupShiftX = 0;
+      var labelGroupShiftY = 0;
+      if (this._isHorizontal()) {
+        switch(this.tickLabelPositioning) {
+          case "left":
+            tickLabelTextAnchor = "end";
+            labelGroupTransformX = -tickLabelPadding;
+            labelGroupShiftY = tickLabelPadding;
+            break;
+          case "center":
+            labelGroupShiftY = tickMarkLength + tickLabelPadding;
+            break;
+          case "right":
+            tickLabelTextAnchor = "start";
+            labelGroupTransformX = tickLabelPadding;
+            labelGroupShiftY = tickLabelPadding;
+            break;
+        }
+      } else {
+        switch(this.tickLabelPositioning) {
+          case "top":
+            tickLabelAttrHash["dy"] = "-0.3em";
+            labelGroupShiftX = tickLabelPadding;
+            labelGroupTransformY = -tickLabelPadding;
+            break;
+          case "center":
+            labelGroupShiftX = tickMarkLength + tickLabelPadding;
+            break;
+          case "bottom":
+            tickLabelAttrHash["dy"] = "1em";
+            labelGroupShiftX = tickLabelPadding;
+            labelGroupTransformY = tickLabelPadding;
+            break;
+        }
+      }
+
       var tickMarkAttrHash = this._generateTickMarkAttrHash();
       switch(this._orientation) {
         case "bottom":
-          tickLabelAttrHash["y"] = tickMarkAttrHash["y2"] + this.tickLabelPadding();
+          tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "0.95em";
+          labelGroupTransformY = tickMarkAttrHash["y1"] + labelGroupShiftY;
           break;
 
         case "top":
-          tickLabelAttrHash["y"] = tickMarkAttrHash["y2"] - this.tickLabelPadding();
+          tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "-.25em";
+          labelGroupTransformY = tickMarkAttrHash["y1"] - labelGroupShiftY;
           break;
 
         case "left":
           tickLabelTextAnchor = "end";
-          tickLabelAttrHash["x"] = tickMarkAttrHash["x2"] - this.tickLabelPadding();
+          labelGroupTransformX = tickMarkAttrHash["x1"] - labelGroupShiftX;
+          tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
           break;
 
         case "right":
           tickLabelTextAnchor = "start";
-          tickLabelAttrHash["x"] = tickMarkAttrHash["x2"] + this.tickLabelPadding();
+          labelGroupTransformX = tickMarkAttrHash["x1"] + labelGroupShiftX;
+          tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
           break;
       }
 
+      var tickLabelValues = this._getTickValues();
+      var tickLabels = this._tickLabelContainer
+                           .selectAll("." + Abstract.Axis.TICK_LABEL_CLASS)
+                           .data(tickLabelValues);
+      tickLabels.enter().append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      tickLabels.exit().remove();
+
       var formatFunction = (d: any) => this._formatter.format(d);
-      this._ticks.each(function(d: any, i: number) {
-        var d3El = d3.select(this);
-        var textEl = d3El.select("text");
-        if (textEl.empty()) {
-          textEl = d3El.append("text");
-        }
-        textEl.classed("tick-label", true)
-              .style("text-anchor", tickLabelTextAnchor)
-              .style("visibility", "visible")
-              .attr(tickLabelAttrHash)
-              .text(formatFunction(d));
-      });
+      tickLabels.style("text-anchor", tickLabelTextAnchor)
+                .style("visibility", "visible")
+                .attr(tickLabelAttrHash)
+                .text(formatFunction);
+
+      var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
+      this._tickLabelContainer.attr("transform", labelGroupTransform);
+
       if (!this.showEndTickLabels()) {
         this.hideEndTickLabels();
       }
 
       return this;
+    }
+
+    /**
+     * Gets the tick label position relative to the tick marks.
+     *
+     * @returns {string} The current tick label position.
+     */
+    public tickLabelPosition(): string;
+    /**
+     * Sets the tick label position relative to the tick marks.
+     *
+     * @param {string} position The relative position of the tick label.
+     *                          [top/center/bottom] for a vertical NumberAxis,
+     *                          [left/center/right] for a horizontal NumberAxis.
+     * @returns {NumberAxis} The calling NumberAxis.
+     */
+    public tickLabelPosition(position: string): Axis.Number;
+    public tickLabelPosition(position?: string): any {
+      if (position == null) {
+        return this.tickLabelPositioning;
+      } else {
+        var positionLC = position.toLowerCase();
+        if (this._isHorizontal()) {
+          if (!(positionLC === "left" || positionLC === "center" || positionLC === "right")) {
+            throw new Error(positionLC + " is not a valid tick label position for a horizontal NumberAxis");
+          }
+        } else {
+          if (!(positionLC === "top" || positionLC === "center" || positionLC === "bottom")) {
+            throw new Error(positionLC + " is not a valid tick label position for a vertical NumberAxis");
+          }
+        }
+        this.tickLabelPositioning = positionLC;
+        this._invalidateLayout();
+        return this;
+      }
     }
 
     private hideEndTickLabels() {
@@ -135,7 +211,7 @@ export module Axis {
         );
       };
 
-      var tickLabels = this._ticks.select("text");
+      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
       var firstTickLabel = tickLabels[0][0];
       if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
         d3.select(firstTickLabel).style("visibility", "hidden");

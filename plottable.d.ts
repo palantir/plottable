@@ -1385,6 +1385,21 @@ declare module Plottable {
             * @param {Formatter} [formatter] A function to format tick labels.
             */
             constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: Abstract.Formatter);
+            /**
+            * Gets the tick label position relative to the tick marks.
+            *
+            * @returns {string} The current tick label position.
+            */
+            public tickLabelPosition(): string;
+            /**
+            * Sets the tick label position relative to the tick marks.
+            *
+            * @param {string} position The relative position of the tick label.
+            *                          [top/center/bottom] for a vertical NumberAxis,
+            *                          [left/center/right] for a horizontal NumberAxis.
+            * @returns {NumberAxis} The calling NumberAxis.
+            */
+            public tickLabelPosition(position: string): Number;
         }
     }
 }

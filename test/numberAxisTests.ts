@@ -3,7 +3,18 @@
 var assert = chai.assert;
 
 describe("NumberAxis", () => {
-  it("draws ticks correctly (horizontal)", () => {
+  it("tickLabelPosition() input validation", () => {
+    var scale = new Plottable.Scale.Linear();
+    var horizontalAxis = new Plottable.Axis.Number(scale, "bottom");
+    assert.throws(() => horizontalAxis.tickLabelPosition("top"), "horizontal");
+    assert.throws(() => horizontalAxis.tickLabelPosition("bottom"), "horizontal");
+
+    var verticalAxis = new Plottable.Axis.Number(scale, "left");
+    assert.throws(() => verticalAxis.tickLabelPosition("left"), "vertical");
+    assert.throws(() => verticalAxis.tickLabelPosition("right"), "vertical");
+  });
+
+  it("draws tick labels correctly (horizontal)", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -12,23 +23,43 @@ describe("NumberAxis", () => {
     var numberAxis = new Plottable.Axis.Number(scale, "bottom");
     numberAxis.renderTo(svg);
 
-    var ticks = numberAxis.element.selectAll(".tick");
-    assert.operator(ticks[0].length, ">=", 2, "at least two ticks were drawn");
-    var tickLabels = numberAxis.element.selectAll("text");
-    assert.strictEqual(ticks[0].length, tickLabels[0].length, "there is one label per tick");
-    ticks.each(function(d: any, i: number) {
-      var tick = d3.select(this);
-      var mark = tick.select("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
-      var label = tick.select("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+    var tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+    assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
+    var tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+    assert.strictEqual( tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
 
-      assert.isNotNull(label[0][0], "each tick has a label");
-      var markBB = (<any> mark.node()).getBBox();
+    var i: number;
+    var markBB: SVGRect;
+    var labelBB: SVGRect;
+    for (i = 0; i < tickLabels[0].length; i++) {
+      markBB = tickMarks[0][i].getBBox();
       var markCenter = markBB.x + markBB.width / 2;
-      var labelBB = (<any> mark.node()).getBBox();
+      labelBB = tickLabels[0][i].getBBox();
       var labelCenter = labelBB.x + labelBB.width / 2;
+      assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
+    }
 
-      assert.strictEqual(labelCenter, markCenter, "tick label is centered on mark");
-    });
+    // labels to left
+    numberAxis.tickLabelPosition("left");
+    tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+    tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+    for (i = 0; i < tickLabels[0].length; i++) {
+      markBB = tickMarks[0][i].getBBox();
+      labelBB = tickLabels[0][i].getBBox();
+      var labelRight = labelBB.x + labelBB.width;
+      assert.operator(labelRight, "<=", markBB.x, "tick label is to left of mark");
+    }
+
+    // labels to right
+    numberAxis.tickLabelPosition("right");
+    tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+    tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+    for (i = 0; i < tickLabels[0].length; i++) {
+      markBB = tickMarks[0][i].getBBox();
+      labelBB = tickLabels[0][i].getBBox();
+      var markRight = markBB.x + markBB.width;
+      assert.operator(markRight, "<=", labelBB.x, "tick label is to right of mark");
+    }
 
     svg.remove();
   });
@@ -42,23 +73,43 @@ describe("NumberAxis", () => {
     var numberAxis = new Plottable.Axis.Number(scale, "left");
     numberAxis.renderTo(svg);
 
-    var ticks = numberAxis.element.selectAll(".tick");
-    assert.operator(ticks[0].length, ">=", 2, "at least two ticks were drawn");
-    var tickLabels = numberAxis.element.selectAll("text");
-    assert.strictEqual(ticks[0].length, tickLabels[0].length, "there is one label per tick");
-    ticks.each(function(d: any, i: number) {
-      var tick = d3.select(this);
-      var mark = tick.select("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
-      var label = tick.select("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+    var tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+    assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
+    var tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+    assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
 
-      assert.isNotNull(label[0][0], "each tick has a label");
-      var markBB = (<any> mark.node()).getBBox();
+    var i: number;
+    var markBB: SVGRect;
+    var labelBB: SVGRect;
+    for (i = 0; i < tickLabels[0].length; i++) {
+      markBB = tickMarks[0][i].getBBox();
       var markCenter = markBB.y + markBB.height / 2;
-      var labelBB = (<any> mark.node()).getBBox();
+      labelBB = tickLabels[0][i].getBBox();
       var labelCenter = labelBB.y + labelBB.height / 2;
+      assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
+    }
 
-      assert.strictEqual(labelCenter, markCenter, "tick label is centered on mark");
-    });
+    // labels to top
+    numberAxis.tickLabelPosition("top");
+    tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+    tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+    for (i = 0; i < tickLabels[0].length; i++) {
+      markBB = tickMarks[0][i].getBBox();
+      labelBB = tickLabels[0][i].getBBox();
+      var labelBottom = labelBB.y + labelBB.height;
+      assert.operator(labelBottom, "<=", markBB.y, "tick label is above mark");
+    }
+
+    // labels to bottom
+    numberAxis.tickLabelPosition("bottom");
+    tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+    tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+    for (i = 0; i < tickLabels[0].length; i++) {
+      markBB = tickMarks[0][i].getBBox();
+      labelBB = tickLabels[0][i].getBBox();
+      var markBottom = markBB.y + markBB.height;
+      assert.operator(markBottom, "<=", labelBB.y, "tick label is below mark");
+    }
 
     svg.remove();
   });
@@ -75,7 +126,7 @@ describe("NumberAxis", () => {
     var numberAxis = new Plottable.Axis.Number(scale, "left", formatter);
     numberAxis.renderTo(svg);
 
-    var tickLabels = numberAxis.element.selectAll(".tick").select("text");
+    var tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
     tickLabels.each(function(d: any, i: number) {
       var labelText = d3.select(this).text();
       var formattedValue = formatter.format(d);
@@ -95,7 +146,7 @@ describe("NumberAxis", () => {
     numberAxis.showEndTickLabels(false);
     numberAxis.renderTo(svg);
 
-    var tickLabels = numberAxis.element.selectAll(".tick").select("text");
+    var tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
     var firstLabel = d3.select(tickLabels[0][0]);
     assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
     var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
