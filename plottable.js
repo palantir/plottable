@@ -2899,25 +2899,21 @@ var Plottable;
 
         /**
         * Adds a value that will not be padded if either end of the domain.
-        * For example, after addPaddingException(0), a domainer will pad
+        * For example, after paddingException(0), a domainer will pad
         * [0, 100] to [0, 102.5].
         *
         * @param {any} exception The value that will not be padded.
+        * @param {boolean} add Defaults to true. If true, add the exception,
+        *                  if false, removes the exception.
         * @return {Domainer} The calling domainer.
         */
-        Domainer.prototype.addPaddingException = function (exception) {
-            this.paddingExceptions.add(exception);
-            return this;
-        };
-
-        /**
-        * Reverses the effect of addPaddingException.
-        *
-        * @param {any} exception The value to be padded again.
-        * @return {Domainer} The calling domainer.
-        */
-        Domainer.prototype.removePaddingException = function (exception) {
-            this.paddingExceptions.remove(exception);
+        Domainer.prototype.paddingException = function (exception, add) {
+            if (typeof add === "undefined") { add = true; }
+            if (add) {
+                this.paddingExceptions.add(exception);
+            } else {
+                this.paddingExceptions.remove(exception);
+            }
             return this;
         };
 
@@ -5448,7 +5444,7 @@ var Plottable;
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
                     var scale = this.yScale;
                     if (!scale._userSetDomainer) {
-                        scale.domainer().addPaddingException(this._baselineValue);
+                        scale.domainer().paddingException(this._baselineValue);
                     }
                 }
                 return this;
@@ -5579,7 +5575,7 @@ var Plottable;
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
                     var scale = this.xScale;
                     if (!scale._userSetDomainer) {
-                        scale.domainer().addPaddingException(this._baselineValue);
+                        scale.domainer().paddingException(this._baselineValue);
                     }
                 }
                 return this;

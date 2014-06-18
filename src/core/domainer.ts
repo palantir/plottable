@@ -53,25 +53,20 @@ module Plottable {
 
     /**
      * Adds a value that will not be padded if either end of the domain.
-     * For example, after addPaddingException(0), a domainer will pad
+     * For example, after paddingException(0), a domainer will pad
      * [0, 100] to [0, 102.5].
      *
      * @param {any} exception The value that will not be padded.
+     * @param {boolean} add Defaults to true. If true, add the exception,
+     *                  if false, removes the exception.
      * @return {Domainer} The calling domainer.
      */
-    public addPaddingException(exception: any): Domainer {
-      this.paddingExceptions.add(exception);
-      return this;
-    }
-
-    /**
-     * Reverses the effect of addPaddingException.
-     *
-     * @param {any} exception The value to be padded again.
-     * @return {Domainer} The calling domainer.
-     */
-    public removePaddingException(exception: any): Domainer {
-      this.paddingExceptions.remove(exception);
+    public paddingException(exception: any, add = true): Domainer {
+      if (add) {
+        this.paddingExceptions.add(exception);
+      } else {
+        this.paddingExceptions.remove(exception);
+      }
       return this;
     }
 

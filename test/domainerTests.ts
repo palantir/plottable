@@ -64,13 +64,16 @@ describe("Domainer", () => {
     assert.deepEqual(domain, [-5, 105]);
   });
 
-  it("addPaddingException(n) will not pad beyond n", () => {
-    domainer.pad(0.1).addPaddingException(0).addPaddingException(200);
+  it("paddingException(n) will not pad beyond n", () => {
+    domainer.pad(0.1).paddingException(0).paddingException(200);
     var domain = domainer.computeDomain([[0, 100]], scale);
     assert.deepEqual(domain, [0, 105]);
     domain = domainer.computeDomain([[-100, 0]], scale);
     assert.deepEqual(domain, [-105, 0]);
     domain = domainer.computeDomain([[0, 200]], scale);
     assert.deepEqual(domain, [0, 200]);
+    domainer.paddingException(0, false);
+    domain = domainer.computeDomain([[0, 200]], scale);
+    assert.deepEqual(domain, [-10, 200]);
   });
 });
