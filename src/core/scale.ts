@@ -2,9 +2,10 @@
 
 module Plottable {
 export module Abstract {
-  export class Scale extends Broadcaster {
+  export class Scale extends PlottableObject implements Core.IListenable {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomainAutomatically = true;
+    public broadcaster = new Plottable.Core.Broadcaster(this);
     public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
     /**
      * Creates a new Scale.
@@ -74,7 +75,7 @@ export module Abstract {
         throw new Error("data cannot contain Infinity or -Infinity");
       }
       this._d3Scale.domain(values);
-      this._broadcast();
+      this.broadcaster.broadcast();
     }
 
     /**
@@ -107,7 +108,7 @@ export module Abstract {
      * When a renderer determines that the extent of a projector has changed,
      * it will call this function. This function should ensure that
      * the scale has a domain at least large enough to include extent.
-     * 
+     *
      * @param {number} rendererID A unique indentifier of the renderer sending
      *                 the new extent.
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"

@@ -14,19 +14,19 @@ export module Core {
    * animations during resize.
    */
   export module ResizeBroadcaster {
-    var _broadcaster: Abstract.Broadcaster;
+    var broadcaster: Core.Broadcaster;
     var _resizing: boolean = false;
 
     function _lazyInitialize() {
-      if (_broadcaster === undefined) {
-        _broadcaster = new Abstract.Broadcaster();
+      if (broadcaster === undefined) {
+        broadcaster = new Core.Broadcaster(<any> ResizeBroadcaster);
         window.addEventListener("resize", _onResize);
       }
     }
 
     function _onResize(){
       _resizing = true;
-      _broadcaster._broadcast();
+      broadcaster.broadcast();
     }
 
     /**
@@ -52,7 +52,7 @@ export module Core {
      */
     export function register(c: Abstract.Component) {
       _lazyInitialize();
-      _broadcaster.registerListener(c._plottableID, () => c._invalidateLayout());
+      broadcaster.registerListener(c._plottableID, () => c._invalidateLayout());
     }
 
     /**
@@ -63,8 +63,8 @@ export module Core {
      * @param {Abstract.Component} component Any Plottable component.
      */
     export function deregister(c: Abstract.Component) {
-      if (_broadcaster) {
-        _broadcaster.deregisterListener(c._plottableID);
+      if (broadcaster) {
+        broadcaster.deregisterListener(c._plottableID);
       }
     }
   }

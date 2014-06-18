@@ -18,7 +18,7 @@ export module Util {
      */
     constructor(scales: Abstract.Scale[]) {
       this.scales = scales;
-      this.scales.forEach((s) => s.registerListener(this, (sx: Abstract.Scale) => this.rescale(sx)));
+      this.scales.forEach((s) => s.broadcaster.registerListener(this, (sx: Abstract.Scale) => this.rescale(sx)));
     }
 
     public rescale(scale: Abstract.Scale) {
