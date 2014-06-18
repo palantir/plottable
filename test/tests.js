@@ -575,9 +575,11 @@ describe("Broadcasters", function () {
     var b;
     var called;
     var cb;
+    var listenable = { broadcaster: null };
 
     beforeEach(function () {
-        b = new Plottable.Abstract.Broadcaster();
+        b = new Plottable.Core.Broadcaster(listenable);
+        listenable.broadcaster = b;
         called = false;
         cb = function () {
             called = true;
@@ -585,7 +587,7 @@ describe("Broadcasters", function () {
     });
     it("listeners are called by the broadcast method", function () {
         b.registerListener(null, cb);
-        b._broadcast();
+        b.broadcast();
         assert.isTrue(called, "callback was called");
     });
 
@@ -597,7 +599,7 @@ describe("Broadcasters", function () {
         var listener = {};
         b.registerListener(listener, cb);
         b.registerListener(listener, cb2);
-        b._broadcast();
+        b.broadcast();
         assert.isFalse(called, "first (overwritten) callback not called");
         assert.isTrue(called2, "second callback was called");
     });
@@ -606,21 +608,33 @@ describe("Broadcasters", function () {
         var listener = {};
         b.registerListener(listener, cb);
         b.deregisterListener(listener);
-        b._broadcast();
-        assert.isFalse(called, "callback was never called");
+        b.broadcast();
+        assert.isFalse(called, "callback was not called after deregistering only listener");
+
+        b.registerListener(5, cb);
+        b.registerListener(6, cb);
+        b.deregisterAllListeners();
+        b.broadcast();
+        assert.isFalse(called, "callback was not called after deregistering all listeners");
+
+        b.registerListener(5, cb);
+        b.registerListener(6, cb);
+        b.deregisterListener(5);
+        b.broadcast();
+        assert.isTrue(called, "callback was called even after 1/2 listeners were deregistered");
     });
 
     it("arguments are passed through to callback", function () {
         var g2 = {};
         var g3 = "foo";
         var cb = function (a1, rest) {
-            assert.equal(b, a1, "broadcaster passed through");
+            assert.equal(listenable, a1, "broadcaster passed through");
             assert.equal(g2, rest[0], "arg1 passed through");
             assert.equal(g3, rest[1], "arg2 passed through");
             called = true;
         };
         b.registerListener(null, cb);
-        b._broadcast(g2, g3);
+        b.broadcast(g2, g3);
         assert.isTrue(called, "the cb was called");
     });
 
@@ -1248,19 +1262,19 @@ describe("Component behavior", function () {
         var cb = function (b) {
             return cbCalled++;
         };
-        var b = new Plottable.Abstract.Broadcaster();
+        var b = new Plottable.Core.Broadcaster(null);
 
         var c1 = new Plottable.Abstract.Component();
 
-        c1._registerToBroadcaster(b, cb);
+        b.registerListener(c1, cb);
 
         c1.renderTo(svg);
-        b._broadcast();
+        b.broadcast();
         assert.equal(cbCalled, 1, "the callback was called");
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
         c1.remove();
 
-        b._broadcast();
+        b.broadcast();
         assert.equal(cbCalled, 2, "the callback is still attached to the component");
         assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
@@ -1321,12 +1335,12 @@ describe("DataSource", function () {
         var newData = [1, 2, 3];
 
         var callbackCalled = false;
-        var callback = function (broadcaster) {
-            assert.equal(broadcaster, ds, "Callback received the DataSource as the first argument");
+        var callback = function (listenable) {
+            assert.equal(listenable, ds, "Callback received the DataSource as the first argument");
             assert.deepEqual(ds.data(), newData, "DataSource arrives with correct data");
             callbackCalled = true;
         };
-        ds.registerListener(null, callback);
+        ds.broadcaster.registerListener(null, callback);
 
         ds.data(newData);
         assert.isTrue(callbackCalled, "callback was called when the data was changed");
@@ -1338,12 +1352,12 @@ describe("DataSource", function () {
         var newMetadata = "blargh";
 
         var callbackCalled = false;
-        var callback = function (broadcaster) {
-            assert.equal(broadcaster, ds, "Callback received the DataSource as the first argument");
+        var callback = function (listenable) {
+            assert.equal(listenable, ds, "Callback received the DataSource as the first argument");
             assert.deepEqual(ds.metadata(), newMetadata, "DataSource arrives with correct metadata");
             callbackCalled = true;
         };
-        ds.registerListener(null, callback);
+        ds.broadcaster.registerListener(null, callback);
 
         ds.metadata(newMetadata);
         assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
@@ -2640,7 +2654,7 @@ describe("Renderers", function () {
 
             assert.equal(0, r.renders, "initially hasn't rendered anything");
 
-            d1._broadcast();
+            d1.broadcaster.broadcast();
             assert.equal(1, r.renders, "we re-render when our datasource changes");
 
             r.dataSource();
@@ -2650,10 +2664,10 @@ describe("Renderers", function () {
             r.dataSource(d2);
             assert.equal(2, r.renders, "we should redraw when we change datasource");
 
-            d1._broadcast();
+            d1.broadcaster.broadcast();
             assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
 
-            d2._broadcast();
+            d2.broadcaster.broadcast();
             assert.equal(3, r.renders, "we should listen to the new datasource");
         });
 
@@ -2667,19 +2681,19 @@ describe("Renderers", function () {
             var yScale = new Plottable.Scale.Linear();
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
-            xScale.registerListener(null, function (broadcaster) {
-                assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
+            xScale.broadcaster.registerListener(null, function (listenable) {
+                assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
             });
-            yScale.registerListener(null, function (broadcaster) {
-                assert.equal(broadcaster, yScale, "Callback received the calling scale as the first argument");
+            yScale.broadcaster.registerListener(null, function (listenable) {
+                assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
                 ++yScaleCalls;
             });
 
             assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
             assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
 
-            d1._broadcast();
+            d1.broadcaster.broadcast();
             assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
@@ -2688,11 +2702,11 @@ describe("Renderers", function () {
             assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
             assert.equal(2, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
-            d1._broadcast();
+            d1.broadcaster.broadcast();
             assert.equal(2, xScaleCalls, "X scale was unhooked from old datasource");
             assert.equal(2, yScaleCalls, "Y scale was unhooked from old datasource");
 
-            d2._broadcast();
+            d2.broadcaster.broadcast();
             assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
             assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
         });
@@ -3335,21 +3349,21 @@ describe("Scales", function () {
             return true;
         };
         var scale = new Plottable.Scale.Linear();
-        scale.registerListener(null, testCallback);
+        scale.broadcaster.registerListener(null, testCallback);
         var scaleCopy = scale.copy();
         assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
         assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-        assert.notDeepEqual(scale.listener2Callback, scaleCopy.listener2Callback, "Registered callbacks are not copied over");
+        assert.notDeepEqual(scale.broadcaster, scaleCopy.broadcaster, "Broadcasters are not copied over");
     });
 
     it("Scale alerts listeners when its domain is updated", function () {
         var scale = new Plottable.Scale.Linear();
         var callbackWasCalled = false;
-        var testCallback = function (broadcaster) {
-            assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+        var testCallback = function (listenable) {
+            assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
             callbackWasCalled = true;
         };
-        scale.registerListener(null, testCallback);
+        scale.broadcaster.registerListener(null, testCallback);
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
 
@@ -3496,11 +3510,11 @@ describe("Scales", function () {
         it("rangeType triggers broadcast", function () {
             var scale = new Plottable.Scale.Ordinal();
             var callbackWasCalled = false;
-            var testCallback = function (broadcaster) {
-                assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+            var testCallback = function (listenable) {
+                assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
                 callbackWasCalled = true;
             };
-            scale.registerListener(null, testCallback);
+            scale.broadcaster.registerListener(null, testCallback);
             scale.rangeType("points");
             assert.isTrue(callbackWasCalled, "The registered callback was called");
         });
@@ -3607,6 +3621,18 @@ describe("StrictEqualityAssociativeArray", function () {
         assert.isUndefined(s.get(3));
         assert.equal(s.get(o2), "baz");
         assert.equal(s.get("3"), "ball");
+    });
+
+    it("Array-level operations (retrieve keys, vals, and map)", function () {
+        var s = new Plottable.Util.StrictEqualityAssociativeArray();
+        s.set(2, "foo");
+        s.set(3, "bar");
+        s.set(4, "baz");
+        assert.deepEqual(s.values(), ["foo", "bar", "baz"]);
+        assert.deepEqual(s.keys(), [2, 3, 4]);
+        assert.deepEqual(s.map(function (k, v, i) {
+            return [k, v, i];
+        }), [[2, "foo", 0], [3, "bar", 1], [4, "baz", 2]]);
     });
 });
 

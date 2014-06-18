@@ -33,7 +33,7 @@ export module Axis {
         formatFunction = (d: any) => (<Abstract.Formatter> formatter).format(d);
       }
       this.tickFormat(formatFunction);
-      this._registerToBroadcaster(this._axisScale, () => this._render());
+      this._axisScale.broadcaster.registerListener(this, () => this._render());
     }
 
     public _setup() {

@@ -184,7 +184,7 @@ export module Scale {
       if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
-      this._broadcast();
+      this.broadcaster.broadcast();
     }
 
     private _resolveColorValues(colorRange: any): string[] {
