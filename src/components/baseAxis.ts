@@ -70,16 +70,20 @@ export module Abstract {
       var requestedHeight = this._height;
 
       if (this._isHorizontal()) {
-        if (this._computedHeight == null) {
-          this._computeHeight();
+        if (this._height === "auto") {
+          if (this._computedHeight == null) {
+            this._computeHeight();
+          }
+          requestedHeight = this._computedHeight;
         }
         requestedWidth = 0;
-        requestedHeight = this.height();
       } else { // vertical
-        if (this._computedWidth == null) {
-          this._computeWidth();
+        if (this._width === "auto") {
+          if (this._computedWidth == null) {
+            this._computeWidth();
+          }
+          requestedWidth = this._computedWidth;
         }
-        requestedWidth = this.width();
         requestedHeight = 0;
       }
 
@@ -219,10 +223,7 @@ export module Abstract {
     public width(w: any): Axis;
     public width(w?: any): any {
       if (w == null) {
-        if (this._width === "auto") {
-          return this._computedWidth;
-        }
-        return <number> this._width;
+        return this.availableWidth;
       } else {
         if (this._isHorizontal()) {
           throw new Error("width cannot be set on a horizontal Axis");
@@ -251,10 +252,7 @@ export module Abstract {
     public height(h: any): Axis;
     public height(h?: any): any {
       if (h == null) {
-        if (this._height === "auto") {
-          return this._computedHeight;
-        }
-        return <number> this._height;
+        return this.availableHeight;
       } else {
         if (!this._isHorizontal()) {
           throw new Error("height cannot be set on a vertical Axis");

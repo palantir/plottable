@@ -29,13 +29,13 @@ describe("NumberAxis", () => {
     assert.strictEqual( tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
 
     var i: number;
-    var markBB: SVGRect;
-    var labelBB: SVGRect;
+    var markBB: ClientRect;
+    var labelBB: ClientRect;
     for (i = 0; i < tickLabels[0].length; i++) {
-      markBB = tickMarks[0][i].getBBox();
-      var markCenter = markBB.x + markBB.width / 2;
-      labelBB = tickLabels[0][i].getBBox();
-      var labelCenter = labelBB.x + labelBB.width / 2;
+      markBB = tickMarks[0][i].getBoundingClientRect();
+      var markCenter = (markBB.left + markBB.right) / 2;
+      labelBB = tickLabels[0][i].getBoundingClientRect();
+      var labelCenter = (labelBB.left + labelBB.right) / 2;
       assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
     }
 
@@ -44,10 +44,9 @@ describe("NumberAxis", () => {
     tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
     tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
     for (i = 0; i < tickLabels[0].length; i++) {
-      markBB = tickMarks[0][i].getBBox();
-      labelBB = tickLabels[0][i].getBBox();
-      var labelRight = labelBB.x + labelBB.width;
-      assert.operator(labelRight, "<=", markBB.x, "tick label is to left of mark");
+      markBB = tickMarks[0][i].getBoundingClientRect();
+      labelBB = tickLabels[0][i].getBoundingClientRect();
+      assert.operator(labelBB.left, "<=", markBB.right, "tick label is to left of mark");
     }
 
     // labels to right
@@ -55,10 +54,9 @@ describe("NumberAxis", () => {
     tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
     tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
     for (i = 0; i < tickLabels[0].length; i++) {
-      markBB = tickMarks[0][i].getBBox();
-      labelBB = tickLabels[0][i].getBBox();
-      var markRight = markBB.x + markBB.width;
-      assert.operator(markRight, "<=", labelBB.x, "tick label is to right of mark");
+      markBB = tickMarks[0][i].getBoundingClientRect();
+      labelBB = tickLabels[0][i].getBoundingClientRect();
+      assert.operator(markBB.right, "<=", labelBB.left, "tick label is to right of mark");
     }
 
     svg.remove();
@@ -79,13 +77,13 @@ describe("NumberAxis", () => {
     assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
 
     var i: number;
-    var markBB: SVGRect;
-    var labelBB: SVGRect;
+    var markBB: ClientRect;
+    var labelBB: ClientRect;
     for (i = 0; i < tickLabels[0].length; i++) {
-      markBB = tickMarks[0][i].getBBox();
-      var markCenter = markBB.y + markBB.height / 2;
-      labelBB = tickLabels[0][i].getBBox();
-      var labelCenter = labelBB.y + labelBB.height / 2;
+      markBB = tickMarks[0][i].getBoundingClientRect();
+      var markCenter = (markBB.top + markBB.bottom) / 2;
+      labelBB = tickLabels[0][i].getBoundingClientRect();
+      var labelCenter = (labelBB.top + labelBB.bottom) / 2;
       assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
     }
 
@@ -94,10 +92,9 @@ describe("NumberAxis", () => {
     tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
     tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
     for (i = 0; i < tickLabels[0].length; i++) {
-      markBB = tickMarks[0][i].getBBox();
-      labelBB = tickLabels[0][i].getBBox();
-      var labelBottom = labelBB.y + labelBB.height;
-      assert.operator(labelBottom, "<=", markBB.y, "tick label is above mark");
+      markBB = tickMarks[0][i].getBoundingClientRect();
+      labelBB = tickLabels[0][i].getBoundingClientRect();
+      assert.operator(labelBB.bottom, "<=", markBB.top, "tick label is above mark");
     }
 
     // labels to bottom
@@ -105,10 +102,9 @@ describe("NumberAxis", () => {
     tickLabels = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
     tickMarks = numberAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
     for (i = 0; i < tickLabels[0].length; i++) {
-      markBB = tickMarks[0][i].getBBox();
-      labelBB = tickLabels[0][i].getBBox();
-      var markBottom = markBB.y + markBB.height;
-      assert.operator(markBottom, "<=", labelBB.y, "tick label is below mark");
+      markBB = tickMarks[0][i].getBoundingClientRect();
+      labelBB = tickLabels[0][i].getBoundingClientRect();
+      assert.operator(markBB.bottom, "<=", labelBB.top, "tick label is below mark");
     }
 
     svg.remove();
@@ -151,6 +147,60 @@ describe("NumberAxis", () => {
     assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
     var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
     assert.strictEqual(lastLabel.style("visibility"), "hidden", "last label is hidden");
+
+    svg.remove();
+  });
+
+
+  it("tick labels don't overlap in a constrained space", () => {
+    var SVG_WIDTH = 100;
+    var SVG_HEIGHT = 100;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scale.Linear();
+    scale.range([0, SVG_WIDTH]);
+    var numberAxis = new Plottable.Axis.Number(scale, "bottom");
+    numberAxis.showEndTickLabels(false);
+    numberAxis.renderTo(svg);
+
+    function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
+      if (boxA.right < boxB.left) { return false; }
+      if (boxA.left > boxB.right) { return false; }
+      if (boxA.bottom < boxB.top) { return false; }
+      if (boxA.top > boxB.bottom) { return false; }
+      return true;
+    }
+    var visibleTickLabels = numberAxis.element
+                              .selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS)
+                              .filter(function(d: any, i: number) {
+                                return d3.select(this).style("visibility") === "visible";
+                              });
+    var numLabels = visibleTickLabels[0].length;
+    var box1: ClientRect;
+    var box2: ClientRect;
+    for (var i = 0; i < numLabels; i++) {
+      for (var j = i + 1; j < numLabels; j++) {
+        box1 = visibleTickLabels[0][i].getBoundingClientRect();
+        box2 = visibleTickLabels[0][j].getBoundingClientRect();
+
+        assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+      }
+    }
+
+    numberAxis.orient("bottom");
+    visibleTickLabels = numberAxis.element
+                          .selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS)
+                          .filter(function(d: any, i: number) {
+                            return d3.select(this).style("visibility") === "visible";
+                          });
+    numLabels = visibleTickLabels[0].length;
+    for (i = 0; i < numLabels; i++) {
+      for (j = i + 1; j < numLabels; j++) {
+        box1 = visibleTickLabels[0][i].getBoundingClientRect();
+        box2 = visibleTickLabels[0][j].getBoundingClientRect();
+
+        assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+      }
+    }
 
     svg.remove();
   });

@@ -16,29 +16,55 @@ describe("BaseAxis", () => {
   });
 
   it("width()", () => {
+    var SVG_WIDTH = 100;
+    var SVG_HEIGHT = 500;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
+    verticalAxis.renderTo(svg);
 
-    verticalAxis.width(2014);
-    assert.strictEqual(verticalAxis.width(), 2014, "width was set to user-specified value");
+    var expectedWidth = verticalAxis.tickLength(); // vertical BaseAxis returns tick length as width
+    assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
+
+    verticalAxis.width(20);
+    assert.strictEqual(verticalAxis.width(), 20, "width was set to user-specified value");
+
+    verticalAxis.width(10 * SVG_WIDTH); // way too big
+    assert.strictEqual(verticalAxis.width(), SVG_WIDTH, "returns actual used width if requested width is too large");
+
     assert.doesNotThrow(() => verticalAxis.width("auto"), Error, "can be set to auto mode");
     assert.throws(() => verticalAxis.width(-999), Error, "invalid");
 
     var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
     assert.throws(() => horizontalAxis.width(2014), Error, "horizontal");
+
+    svg.remove();
   });
 
   it("height()", () => {
+    var SVG_WIDTH = 500;
+    var SVG_HEIGHT = 100;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
+    horizontalAxis.renderTo(svg);
 
-    horizontalAxis.height(2014);
-    assert.strictEqual(horizontalAxis.height(), 2014, "height was set to user-specified value");
+    var expectedHeight = horizontalAxis.tickLength(); // horizontal BaseAxis returns tick length as height
+    assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
+
+    horizontalAxis.height(20);
+    assert.strictEqual(horizontalAxis.height(), 20, "height was set to user-specified value");
+
+    horizontalAxis.height(10 * SVG_HEIGHT); // way too big
+    assert.strictEqual(horizontalAxis.height(), SVG_HEIGHT, "returns actual used height if requested height is too large");
+
     assert.doesNotThrow(() => horizontalAxis.height("auto"), Error, "can be set to auto mode");
     assert.throws(() => horizontalAxis.height(-999), Error, "invalid");
 
     var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
     assert.throws(() => verticalAxis.height(2014), Error, "vertical");
+
+    svg.remove();
   });
 
   it("draws ticks and baseline (horizontal)", () => {

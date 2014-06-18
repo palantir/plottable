@@ -4107,16 +4107,20 @@ var Plottable;
                 var requestedHeight = this._height;
 
                 if (this._isHorizontal()) {
-                    if (this._computedHeight == null) {
-                        this._computeHeight();
+                    if (this._height === "auto") {
+                        if (this._computedHeight == null) {
+                            this._computeHeight();
+                        }
+                        requestedHeight = this._computedHeight;
                     }
                     requestedWidth = 0;
-                    requestedHeight = this.height();
                 } else {
-                    if (this._computedWidth == null) {
-                        this._computeWidth();
+                    if (this._width === "auto") {
+                        if (this._computedWidth == null) {
+                            this._computeWidth();
+                        }
+                        requestedWidth = this._computedWidth;
                     }
-                    requestedWidth = this.width();
                     requestedHeight = 0;
                 }
 
@@ -4244,10 +4248,7 @@ var Plottable;
 
             Axis.prototype.width = function (w) {
                 if (w == null) {
-                    if (this._width === "auto") {
-                        return this._computedWidth;
-                    }
-                    return this._width;
+                    return this.availableWidth;
                 } else {
                     if (this._isHorizontal()) {
                         throw new Error("width cannot be set on a horizontal Axis");
@@ -4263,10 +4264,7 @@ var Plottable;
 
             Axis.prototype.height = function (h) {
                 if (h == null) {
-                    if (this._height === "auto") {
-                        return this._computedHeight;
-                    }
-                    return this._height;
+                    return this.availableHeight;
                 } else {
                     if (!this._isHorizontal()) {
                         throw new Error("height cannot be set on a vertical Axis");
@@ -4514,6 +4512,8 @@ var Plottable;
                     this.hideEndTickLabels();
                 }
 
+                this.hideOverlappingTickLabels();
+
                 return this;
             };
 
@@ -4554,6 +4554,40 @@ var Plottable;
                 if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
+            };
+
+            Number.prototype.hideOverlappingTickLabels = function () {
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                var lastLabelClientRect;
+
+                function boxesOverlap(boxA, boxB) {
+                    if (boxA.right < boxB.left) {
+                        return false;
+                    }
+                    if (boxA.left > boxB.right) {
+                        return false;
+                    }
+                    if (boxA.bottom < boxB.top) {
+                        return false;
+                    }
+                    if (boxA.top > boxB.bottom) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                visibleTickLabels.each(function (d) {
+                    var clientRect = this.getBoundingClientRect();
+                    var tickLabel = d3.select(this);
+                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+                        tickLabel.style("visibility", "hidden");
+                    } else {
+                        lastLabelClientRect = clientRect;
+                        tickLabel.style("visibility", "visible");
+                    }
+                });
             };
             return Number;
         })(Plottable.Abstract.Axis);
