@@ -40,11 +40,11 @@ module Plottable {
     }
 
     /**
-     * Pads out the domain of the scale by a specified ratio.
+     * Sets the Domainer to pad by a given ratio.
      *
      * @param {number} [padProportion] Proportionally how much bigger the 
      *         new domain should be (0.05 = 5% larger).
-     * @return {Domainer} The calling domainer.
+     * @return {Domainer} The calling Domainer.
      */
     public pad(padProportion = 0.05): Domainer {
       this.padProportion = padProportion;
@@ -59,7 +59,7 @@ module Plottable {
      * @param {any} exception The value that will not be padded.
      * @param {boolean} add Defaults to true. If true, add the exception,
      *                  if false, removes the exception.
-     * @return {Domainer} The calling domainer.
+     * @return {Domainer} The calling Domainer.
      */
     public paddingException(exception: any, add = true): Domainer {
       if (add) {
@@ -74,7 +74,7 @@ module Plottable {
      * Extends the scale's domain so it starts and ends with "nice" values.
      *
      * @param {number} [count] The number of ticks that should fit inside the new domain.
-     * @return {Domainer} The calling domainer.
+     * @return {Domainer} The calling Domainer.
      */
     public nice(count?: number): Domainer {
       this.doNice = true;

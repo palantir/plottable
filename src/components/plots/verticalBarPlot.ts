@@ -99,7 +99,7 @@ export module Plot {
       return this;
     }
 
-    public _setYDomainer() {
+    public _updateYDomainer() {
       if (this.yScale instanceof Abstract.QuantitiveScale) {
         var scale = <Abstract.QuantitiveScale>this.yScale;
         if (!scale._userSetDomainer) {

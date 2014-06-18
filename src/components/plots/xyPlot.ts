@@ -26,12 +26,12 @@ export module Abstract {
       // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
       if (attrToSet === "x" && scale != null) {
         this.xScale = scale;
-        this._setXDomainer();
+        this._updateXDomainer();
       }
 
       if (attrToSet === "y" && scale != null) {
         this.yScale = scale;
-        this._setYDomainer();
+        this._updateYDomainer();
       }
 
       super.project(attrToSet, accessor, scale);
@@ -52,7 +52,7 @@ export module Abstract {
       }
     }
 
-    public _setXDomainer(): XYPlot {
+    public _updateXDomainer(): XYPlot {
       if (this.xScale instanceof QuantitiveScale) {
         var scale = <QuantitiveScale>this.xScale;
         if (!scale._userSetDomainer) {
@@ -62,7 +62,7 @@ export module Abstract {
       return this;
     }
 
-    public _setYDomainer(): XYPlot {
+    public _updateYDomainer(): XYPlot {
       if (this.yScale instanceof QuantitiveScale) {
         var scale = <QuantitiveScale>this.yScale;
         if (!scale._userSetDomainer) {

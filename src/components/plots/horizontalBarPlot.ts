@@ -98,7 +98,7 @@ export module Plot {
       return this;
     }
 
-    public _setXDomainer() {
+    public _updateXDomainer() {
       if (this.xScale instanceof Abstract.QuantitiveScale) {
         var scale = <Abstract.QuantitiveScale>this.xScale;
         if (!scale._userSetDomainer) {

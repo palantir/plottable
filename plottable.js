@@ -2938,11 +2938,11 @@ var Plottable;
         };
 
         /**
-        * Pads out the domain of the scale by a specified ratio.
+        * Sets the Domainer to pad by a given ratio.
         *
         * @param {number} [padProportion] Proportionally how much bigger the
         *         new domain should be (0.05 = 5% larger).
-        * @return {Domainer} The calling domainer.
+        * @return {Domainer} The calling Domainer.
         */
         Domainer.prototype.pad = function (padProportion) {
             if (typeof padProportion === "undefined") { padProportion = 0.05; }
@@ -2958,7 +2958,7 @@ var Plottable;
         * @param {any} exception The value that will not be padded.
         * @param {boolean} add Defaults to true. If true, add the exception,
         *                  if false, removes the exception.
-        * @return {Domainer} The calling domainer.
+        * @return {Domainer} The calling Domainer.
         */
         Domainer.prototype.paddingException = function (exception, add) {
             if (typeof add === "undefined") { add = true; }
@@ -2974,7 +2974,7 @@ var Plottable;
         * Extends the scale's domain so it starts and ends with "nice" values.
         *
         * @param {number} [count] The number of ticks that should fit inside the new domain.
-        * @return {Domainer} The calling domainer.
+        * @return {Domainer} The calling Domainer.
         */
         Domainer.prototype.nice = function (count) {
             this.doNice = true;
@@ -5067,12 +5067,12 @@ var Plottable;
                 // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
                 if (attrToSet === "x" && scale != null) {
                     this.xScale = scale;
-                    this._setXDomainer();
+                    this._updateXDomainer();
                 }
 
                 if (attrToSet === "y" && scale != null) {
                     this.yScale = scale;
-                    this._setYDomainer();
+                    this._updateYDomainer();
                 }
 
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
@@ -5093,7 +5093,7 @@ var Plottable;
                 }
             };
 
-            XYPlot.prototype._setXDomainer = function () {
+            XYPlot.prototype._updateXDomainer = function () {
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
                     var scale = this.xScale;
                     if (!scale._userSetDomainer) {
@@ -5103,7 +5103,7 @@ var Plottable;
                 return this;
             };
 
-            XYPlot.prototype._setYDomainer = function () {
+            XYPlot.prototype._updateYDomainer = function () {
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
                     var scale = this.yScale;
                     if (!scale._userSetDomainer) {
@@ -5295,10 +5295,9 @@ var Plottable;
                 });
 
                 // because this._baselineValue was not initialized during the super()
-                // call, we must call this again in order to get this._baselineValue
+                // call, we must call this in order to get this._baselineValue
                 // to be used by the Domainer.
-                this._setXDomainer();
-                this._setYDomainer();
+                this.baseline(this._baselineValue);
             }
             BarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5314,8 +5313,8 @@ var Plottable;
             */
             BarPlot.prototype.baseline = function (value) {
                 this._baselineValue = value;
-                this._setXDomainer();
-                this._setYDomainer();
+                this._updateXDomainer();
+                this._updateYDomainer();
                 if (this.element != null) {
                     this._render();
                 }
@@ -5492,7 +5491,7 @@ var Plottable;
                 return this;
             };
 
-            VerticalBar.prototype._setYDomainer = function () {
+            VerticalBar.prototype._updateYDomainer = function () {
                 if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
                     var scale = this.yScale;
                     if (!scale._userSetDomainer) {
@@ -5623,7 +5622,7 @@ var Plottable;
                 return this;
             };
 
-            HorizontalBar.prototype._setXDomainer = function () {
+            HorizontalBar.prototype._updateXDomainer = function () {
                 if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
                     var scale = this.xScale;
                     if (!scale._userSetDomainer) {

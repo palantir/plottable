@@ -28,10 +28,9 @@ export module Abstract {
       this.project("width", 10);
       this.project("fill", () => "steelblue");
       // because this._baselineValue was not initialized during the super()
-      // call, we must call this again in order to get this._baselineValue
+      // call, we must call this in order to get this._baselineValue
       // to be used by the Domainer.
-      this._setXDomainer();
-      this._setYDomainer();
+      this.baseline(this._baselineValue);
     }
 
     public _setup() {
@@ -48,8 +47,8 @@ export module Abstract {
      */
     public baseline(value: number) {
       this._baselineValue = value;
-      this._setXDomainer();
-      this._setYDomainer();
+      this._updateXDomainer();
+      this._updateYDomainer();
       if (this.element != null) {
         this._render();
       }
