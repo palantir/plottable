@@ -11,8 +11,8 @@ export module Axis {
   export class Multi extends Time {
     public _intervals: Interval[];
 
-    // default intervals from d3
-    public allIntervals: Interval[] = [
+    // default intervals
+    public static allIntervals: Interval[] = [
       {interval: d3.time.year, length: 1000*60*60*24*365},
       {interval: d3.time.month, step: 3, length: 1000*60*60*24*365/4},
       {interval: d3.time.month, length: 1000*60*60*24*30},
@@ -33,8 +33,8 @@ export module Axis {
       {interval: d3.time.second, length: 1000}
     ];
 
-    private layers: number = 2;
-    private ticksOnLowestLevel: number = 10;
+    private layers: number = 3;
+    private ticksOnLowestLevel: number = 25;
 
     /**
      * Creates a MultiTimeAxis
@@ -47,7 +47,7 @@ export module Axis {
       super(scale, orientation, formatter);
       this._intervals = [];
       for (var i = this.layers - 1; i >= 0; i--) {
-        this._intervals.push(this.allIntervals[i]);
+        this._intervals.push(Multi.allIntervals[i]);
       }
      }
 
@@ -69,23 +69,18 @@ export module Axis {
       };
     }
 
-    public addInterval(interval: Interval): Multi {
-      this._intervals.push(interval);
-      return this;
-    }
-
     public _getTickValues(): any[] {
       var domain = this._scale.domain();
       var diff = domain[1] - domain[0];
       var i = this.layers - 1;
-      for(; i < this.allIntervals.length - 1; i++) {
-        if (diff / this.allIntervals[i].length > this.ticksOnLowestLevel) {
+      for(; i < Multi.allIntervals.length - 1; i++) {
+        if (diff / Multi.allIntervals[i].length > this.ticksOnLowestLevel) {
           break;
         }
       }
       this._intervals = [];
       for (var k = i; k > i - this.layers; k--) {
-        this._intervals.push(this.allIntervals[k]);
+        this._intervals.push(Multi.allIntervals[k]);
       }
 
       var set = d3.set();

@@ -4593,32 +4593,11 @@ var Plottable;
             */
             function Multi(scale, orientation, formatter) {
                 _super.call(this, scale, orientation, formatter);
-                // default intervals from d3
-                this.allIntervals = [
-                    { interval: d3.time.year, length: 1000 * 60 * 60 * 24 * 365 },
-                    { interval: d3.time.month, step: 3, length: 1000 * 60 * 60 * 24 * 365 / 4 },
-                    { interval: d3.time.month, length: 1000 * 60 * 60 * 24 * 30 },
-                    { interval: d3.time.day, step: 16, length: 1000 * 60 * 60 * 24 * 16 },
-                    { interval: d3.time.day, step: 4, length: 1000 * 60 * 60 * 24 * 4 },
-                    { interval: d3.time.day, length: 1000 * 60 * 60 * 24 },
-                    { interval: d3.time.hour, step: 12, length: 1000 * 60 * 60 * 12 },
-                    { interval: d3.time.hour, step: 6, length: 1000 * 60 * 60 * 6 },
-                    { interval: d3.time.hour, step: 3, length: 1000 * 60 * 60 * 3 },
-                    { interval: d3.time.hour, length: 1000 * 60 * 60 },
-                    { interval: d3.time.minute, step: 30, length: 1000 * 60 * 30 },
-                    { interval: d3.time.minute, step: 15, length: 1000 * 60 * 15 },
-                    { interval: d3.time.minute, step: 5, length: 1000 * 60 * 5 },
-                    { interval: d3.time.minute, length: 1000 * 60 },
-                    { interval: d3.time.second, step: 30, length: 1000 * 30 },
-                    { interval: d3.time.second, step: 15, length: 1000 * 15 },
-                    { interval: d3.time.second, step: 5, length: 1000 * 5 },
-                    { interval: d3.time.second, length: 1000 }
-                ];
-                this.layers = 2;
-                this.ticksOnLowestLevel = 10;
+                this.layers = 3;
+                this.ticksOnLowestLevel = 25;
                 this._intervals = [];
                 for (var i = this.layers - 1; i >= 0; i--) {
-                    this._intervals.push(this.allIntervals[i]);
+                    this._intervals.push(Multi.allIntervals[i]);
                 }
             }
             Multi.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -4639,24 +4618,19 @@ var Plottable;
                 };
             };
 
-            Multi.prototype.addInterval = function (interval) {
-                this._intervals.push(interval);
-                return this;
-            };
-
             Multi.prototype._getTickValues = function () {
                 var _this = this;
                 var domain = this._scale.domain();
                 var diff = domain[1] - domain[0];
                 var i = this.layers - 1;
-                for (; i < this.allIntervals.length - 1; i++) {
-                    if (diff / this.allIntervals[i].length > this.ticksOnLowestLevel) {
+                for (; i < Multi.allIntervals.length - 1; i++) {
+                    if (diff / Multi.allIntervals[i].length > this.ticksOnLowestLevel) {
                         break;
                     }
                 }
                 this._intervals = [];
                 for (var k = i; k > i - this.layers; k--) {
-                    this._intervals.push(this.allIntervals[k]);
+                    this._intervals.push(Multi.allIntervals[k]);
                 }
 
                 var set = d3.set();
@@ -4707,6 +4681,26 @@ var Plottable;
                 });
                 return this;
             };
+            Multi.allIntervals = [
+                { interval: d3.time.year, length: 1000 * 60 * 60 * 24 * 365 },
+                { interval: d3.time.month, step: 3, length: 1000 * 60 * 60 * 24 * 365 / 4 },
+                { interval: d3.time.month, length: 1000 * 60 * 60 * 24 * 30 },
+                { interval: d3.time.day, step: 16, length: 1000 * 60 * 60 * 24 * 16 },
+                { interval: d3.time.day, step: 4, length: 1000 * 60 * 60 * 24 * 4 },
+                { interval: d3.time.day, length: 1000 * 60 * 60 * 24 },
+                { interval: d3.time.hour, step: 12, length: 1000 * 60 * 60 * 12 },
+                { interval: d3.time.hour, step: 6, length: 1000 * 60 * 60 * 6 },
+                { interval: d3.time.hour, step: 3, length: 1000 * 60 * 60 * 3 },
+                { interval: d3.time.hour, length: 1000 * 60 * 60 },
+                { interval: d3.time.minute, step: 30, length: 1000 * 60 * 30 },
+                { interval: d3.time.minute, step: 15, length: 1000 * 60 * 15 },
+                { interval: d3.time.minute, step: 5, length: 1000 * 60 * 5 },
+                { interval: d3.time.minute, length: 1000 * 60 },
+                { interval: d3.time.second, step: 30, length: 1000 * 30 },
+                { interval: d3.time.second, step: 15, length: 1000 * 15 },
+                { interval: d3.time.second, step: 5, length: 1000 * 5 },
+                { interval: d3.time.second, length: 1000 }
+            ];
             return Multi;
         })(Plottable.Axis.Time);
         Axis.Multi = Multi;

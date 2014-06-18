@@ -1432,6 +1432,7 @@ declare module Plottable {
             length?: number;
         }
         class Multi extends Time {
+            static allIntervals: Interval[];
             /**
             * Creates a MultiTimeAxis
             *
@@ -1440,7 +1441,6 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
-            public addInterval(interval: Interval): Multi;
         }
     }
 }
