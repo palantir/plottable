@@ -1397,29 +1397,62 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
+            static TICK_MARK_CLASS: string;
+            static TICK_LABEL_CLASS: string;
             /**
             * Creates a BaseAxis.
             *
             * @constructor
             * @param {Scale} scale The Scale to base the BaseAxis on.
             * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
-            * @param {(n: any) => string} [formatter] A function to format tick labels.
+            * @param {Formatter} [formatter]
             */
-            constructor(scale: Scale, orientation: string, formatter?: (n: any) => string);
+            constructor(scale: Scale, orientation: string, formatter?: Formatter);
+            /**
+            * Gets the current width.
+            *
+            * @returns {number} The current width.
+            */
+            public width(): number;
+            /**
+            * Sets a user-specified width.
+            *
+            * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
+            * @returns {Axis} The calling Axis.
+            */
+            public width(w: any): Axis;
+            /**
+            * Gets the current height.
+            *
+            * @returns {number} The current height.
+            */
+            public height(): number;
+            /**
+            * Sets a user-specified height.
+            *
+            * @param {number|String} h A fixed height for the Axis, or "auto" for automatic mode.
+            * @returns {Axis} The calling Axis.
+            */
+            public height(h: any): Axis;
             /**
             * Sets a new tick formatter.
             *
-            * @param {(n: any) => string} formatter A function to format tick labels.
+            * @param {Abstract.Formatter} formatter
             * @returns {BaseAxis} The calling BaseAxis.
             */
-            public formatter(formatFunction: (n: any) => string): Axis;
+            public formatter(formatter: Formatter): Axis;
             /**
-            * Gets or sets the length of each tick mark.
+            * Gets the current tick mark length.
             *
-            * @param {number} [length] The length of each tick.
-            * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+            * @returns {number} The current tick mark length.
             */
             public tickLength(): number;
+            /**
+            * Sets the tick mark length.
+            *
+            * @param {number} length The length of each tick.
+            * @returns {BaseAxis} The calling BaseAxis.
+            */
             public tickLength(length: number): Axis;
             /**
             * Gets or sets the padding between each tick mark and its associated label.
@@ -1431,6 +1464,52 @@ declare module Plottable {
             public tickLabelPadding(padding: number): Axis;
             public orient(): string;
             public orient(newOrientation: string): Axis;
+            /**
+            * Checks whether the Axis is currently set to show the first and last
+            * tick labels.
+            *
+            * @returns {boolean}
+            */
+            public showEndTickLabels(): boolean;
+            /**
+            * Set whether or not to show the first and last tick labels.
+            *
+            * @param {boolean} show Whether or not to show the first and last labels.
+            * @returns {Axis} The calling Axis.
+            */
+            public showEndTickLabels(show: boolean): Axis;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
+        class Numeric extends Abstract.Axis {
+            /**
+            * Creates a NumericAxis.
+            *
+            * @constructor
+            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumericAxis on.
+            * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
+            * @param {Formatter} [formatter] A function to format tick labels.
+            */
+            constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: Abstract.Formatter);
+            /**
+            * Gets the tick label position relative to the tick marks.
+            *
+            * @returns {string} The current tick label position.
+            */
+            public tickLabelPosition(): string;
+            /**
+            * Sets the tick label position relative to the tick marks.
+            *
+            * @param {string} position The relative position of the tick label.
+            *                          [top/center/bottom] for a vertical NumericAxis,
+            *                          [left/center/right] for a horizontal NumericAxis.
+            * @returns {NumericAxis} The calling NumericAxis.
+            */
+            public tickLabelPosition(position: string): Numeric;
         }
     }
 }
