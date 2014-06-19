@@ -48,10 +48,6 @@ export module Axis {
      */
     constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter) {
       super(scale, orientation, formatter);
-      this._intervals = [];
-      for (var i = this.layers - 1; i >= 0; i--) {
-        this._intervals.push(Multi.allIntervals[i]);
-      }
      }
 
      public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -72,7 +68,7 @@ export module Axis {
       };
     }
 
-    public _getTickValues(): any[] {
+    public getTopLevel(): number {
       var domain = this._scale.domain();
       var diff = domain[1] - domain[0];
       var i = this.layers - 1;
@@ -81,15 +77,16 @@ export module Axis {
           break;
         }
       }
-      this._intervals = [];
-      for (var k = i; k > i - this.layers; k--) {
-        this._intervals.push(Multi.allIntervals[k]);
-      }
 
+      return i;
+    }
+
+    public _getTickValues(): any[] {
+      var top = this.getTopLevel();
       var set = d3.set();
-      this._intervals.forEach((v) =>
-        set = Util.Methods.union(set, d3.set(this._scale.tickInterval(v.interval, v.step)))
-      );
+      for (var k = top; k > top - this.layers; k--) {
+        set = Util.Methods.union(set, d3.set(this._scale.tickInterval(Multi.allIntervals[k].interval, Multi.allIntervals[k].step)));
+      }
       return set.values().map((d) => new Date(d));
     }
 
@@ -102,28 +99,29 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      var numIntervals = this.layers;
-      var topTicks = this._scale.tickInterval(this._intervals[numIntervals - 1].interval, this._intervals[numIntervals - 1].step);
+      var top = this.getTopLevel();
+      var topTicks = this._scale.tickInterval(Multi.allIntervals[top - this.layers + 1].interval,
+                                              Multi.allIntervals[top - this.layers + 1].step);
       this._tickLabelsG.selectAll(".tick-label").remove();
       var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(topTicks, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
       tickLabelsEnter.append("text");
       tickLabels.selectAll("text").attr("transform", "translate(0," + (this._orientation === "bottom" ?
-          (this.tickLength() * numIntervals + this._measureTextHeight()) :
-          (this.availableHeight - this.tickLength() * numIntervals)) + ")");
+          (this.tickLength() * this.layers + this._measureTextHeight()) :
+          (this.availableHeight - this.tickLength() * this.layers)) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale._d3Scale(d) + ",0)");
       tickLabels.selectAll("text").text((d: any) => this._formatter.format(d))
                                   .style("text-anchor", "middle");
-
-      this._intervals.forEach((v) => {
-          var index = this._intervals.indexOf(v);
+      for (var k = top; k > top - this.layers; k--) {
+          var v = Multi.allIntervals[k];
+          var index = top - k;
           var tickValues = this._scale.tickInterval(v.interval, v.step);
           var selection = this._ticksContainer.selectAll(".tick").filter((d) =>
               tickValues.map((x) => x.valueOf()).indexOf(d.valueOf()) >= 0
           );
           selection.select("line").attr("y2", this.tickLength() * (index + 1));
-      });
+        }
       return this;
     }
   }

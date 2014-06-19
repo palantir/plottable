@@ -1441,6 +1441,7 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
+            public getTopLevel(): number;
         }
     }
 }

@@ -4595,10 +4595,6 @@ var Plottable;
                 _super.call(this, scale, orientation, formatter);
                 this.layers = 3;
                 this.ticksOnLowestLevel = 25;
-                this._intervals = [];
-                for (var i = this.layers - 1; i >= 0; i--) {
-                    this._intervals.push(Multi.allIntervals[i]);
-                }
             }
             Multi.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requestedWidth = this._width;
@@ -4618,8 +4614,7 @@ var Plottable;
                 };
             };
 
-            Multi.prototype._getTickValues = function () {
-                var _this = this;
+            Multi.prototype.getTopLevel = function () {
                 var domain = this._scale.domain();
                 var diff = domain[1] - domain[0];
                 var i = this.layers - 1;
@@ -4628,15 +4623,16 @@ var Plottable;
                         break;
                     }
                 }
-                this._intervals = [];
-                for (var k = i; k > i - this.layers; k--) {
-                    this._intervals.push(Multi.allIntervals[k]);
-                }
 
+                return i;
+            };
+
+            Multi.prototype._getTickValues = function () {
+                var top = this.getTopLevel();
                 var set = d3.set();
-                this._intervals.forEach(function (v) {
-                    return set = Plottable.Util.Methods.union(set, d3.set(_this._scale.tickInterval(v.interval, v.step)));
-                });
+                for (var k = top; k > top - this.layers; k--) {
+                    set = Plottable.Util.Methods.union(set, d3.set(this._scale.tickInterval(Multi.allIntervals[k].interval, Multi.allIntervals[k].step)));
+                }
                 return set.values().map(function (d) {
                     return new Date(d);
                 });
@@ -4652,15 +4648,15 @@ var Plottable;
             Multi.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                var numIntervals = this.layers;
-                var topTicks = this._scale.tickInterval(this._intervals[numIntervals - 1].interval, this._intervals[numIntervals - 1].step);
+                var top = this.getTopLevel();
+                var topTicks = this._scale.tickInterval(Multi.allIntervals[top - this.layers + 1].interval, Multi.allIntervals[top - this.layers + 1].step);
                 this._tickLabelsG.selectAll(".tick-label").remove();
                 var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(topTicks, function (d) {
                     return d.valueOf();
                 });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
                 tickLabelsEnter.append("text");
-                tickLabels.selectAll("text").attr("transform", "translate(0," + (this._orientation === "bottom" ? (this.tickLength() * numIntervals + this._measureTextHeight()) : (this.availableHeight - this.tickLength() * numIntervals)) + ")");
+                tickLabels.selectAll("text").attr("transform", "translate(0," + (this._orientation === "bottom" ? (this.tickLength() * this.layers + this._measureTextHeight()) : (this.availableHeight - this.tickLength() * this.layers)) + ")");
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d) {
                     return "translate(" + _this._scale._d3Scale(d) + ",0)";
@@ -4668,17 +4664,17 @@ var Plottable;
                 tickLabels.selectAll("text").text(function (d) {
                     return _this._formatter.format(d);
                 }).style("text-anchor", "middle");
-
-                this._intervals.forEach(function (v) {
-                    var index = _this._intervals.indexOf(v);
-                    var tickValues = _this._scale.tickInterval(v.interval, v.step);
-                    var selection = _this._ticksContainer.selectAll(".tick").filter(function (d) {
+                for (var k = top; k > top - this.layers; k--) {
+                    var v = Multi.allIntervals[k];
+                    var index = top - k;
+                    var tickValues = this._scale.tickInterval(v.interval, v.step);
+                    var selection = this._ticksContainer.selectAll(".tick").filter(function (d) {
                         return tickValues.map(function (x) {
                             return x.valueOf();
                         }).indexOf(d.valueOf()) >= 0;
                     });
-                    selection.select("line").attr("y2", _this.tickLength() * (index + 1));
-                });
+                    selection.select("line").attr("y2", this.tickLength() * (index + 1));
+                }
                 return this;
             };
             Multi.allIntervals = [
