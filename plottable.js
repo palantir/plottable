@@ -4682,8 +4682,11 @@ var Plottable;
                 return this;
             };
             Multi.allIntervals = [
+                { interval: d3.time.year, step: 50, length: 1000 * 60 * 60 * 24 * 365 * 50 },
+                { interval: d3.time.year, step: 10, length: 1000 * 60 * 60 * 24 * 365 * 10 },
+                { interval: d3.time.year, step: 2, length: 1000 * 60 * 60 * 24 * 365 * 2 },
                 { interval: d3.time.year, length: 1000 * 60 * 60 * 24 * 365 },
-                { interval: d3.time.month, step: 3, length: 1000 * 60 * 60 * 24 * 365 / 4 },
+                { interval: d3.time.month, step: 3, length: 1000 * 60 * 60 * 24 * 30 * 3 },
                 { interval: d3.time.month, length: 1000 * 60 * 60 * 24 * 30 },
                 { interval: d3.time.day, step: 16, length: 1000 * 60 * 60 * 24 * 16 },
                 { interval: d3.time.day, step: 4, length: 1000 * 60 * 60 * 24 * 4 },
