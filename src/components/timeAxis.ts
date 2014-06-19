@@ -4,8 +4,6 @@ module Plottable {
 export module Axis {
   export class Time extends Abstract.Axis {
     public _scale: Scale.Time;
-    public _tickLabelsG: D3.Selection;
-
     /**
      * Creates a TimeAxis
      * 
@@ -18,30 +16,13 @@ export module Axis {
       this.classed("time-axis", true);
     }
 
-    public _setup() {
-      super._setup();
-      this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
-      return this;
+    public _computeWidth() {
+      return 0; // always horizontal, so never requires any width
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var requestedWidth = this._width;
-      var requestedHeight = this._height;
-
-      var fakeTick: D3.Selection;
-      var testTextEl: D3.Selection;
-      if (this._computedHeight == null) {
-        this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
-      }
-      requestedWidth = 0;
-      requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
-
-      return {
-        width : Math.min(offeredWidth, requestedWidth),
-        height: Math.min(offeredHeight, requestedHeight),
-        wantsWidth: false,
-        wantsHeight: offeredHeight < requestedHeight
-      };
+    public _computeHeight() {
+      this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
+      return this._computedHeight;
     }
 
     public _getTickValues(): string[] {
@@ -49,7 +30,7 @@ export module Axis {
     }
 
     private measureTextHeight(): number {
-      var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
+      var fakeTickLabel = this._tickLabelContainer.append("g").classed("tick-label", true);
       var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
       fakeTickLabel.remove();
       return textHeight;
@@ -58,7 +39,7 @@ export module Axis {
     public _doRender() {
       super._doRender();
       var tickValues = this._getTickValues();
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._getTickValues(), (d) => d);
+      var tickLabels = this._tickLabelContainer.selectAll(".tick-label").data(this._getTickValues(), (d) => d);
       var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
       tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ?
                      (this.tickLength() + this.measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");

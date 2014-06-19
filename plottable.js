@@ -4597,30 +4597,13 @@ var Plottable;
                 _super.call(this, scale, orientation, formatter);
                 this.classed("time-axis", true);
             }
-            Time.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
-                return this;
+            Time.prototype._computeWidth = function () {
+                return 0;
             };
 
-            Time.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requestedWidth = this._width;
-                var requestedHeight = this._height;
-
-                var fakeTick;
-                var testTextEl;
-                if (this._computedHeight == null) {
-                    this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
-                }
-                requestedWidth = 0;
-                requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
-
-                return {
-                    width: Math.min(offeredWidth, requestedWidth),
-                    height: Math.min(offeredHeight, requestedHeight),
-                    wantsWidth: false,
-                    wantsHeight: offeredHeight < requestedHeight
-                };
+            Time.prototype._computeHeight = function () {
+                this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
+                return this._computedHeight;
             };
 
             Time.prototype._getTickValues = function () {
@@ -4628,7 +4611,7 @@ var Plottable;
             };
 
             Time.prototype.measureTextHeight = function () {
-                var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
+                var fakeTickLabel = this._tickLabelContainer.append("g").classed("tick-label", true);
                 var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
                 fakeTickLabel.remove();
                 return textHeight;
@@ -4638,7 +4621,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickValues = this._getTickValues();
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._getTickValues(), function (d) {
+                var tickLabels = this._tickLabelContainer.selectAll(".tick-label").data(this._getTickValues(), function (d) {
                     return d;
                 });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
