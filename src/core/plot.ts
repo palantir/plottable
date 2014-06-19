@@ -71,12 +71,17 @@ export module Abstract {
     }
 
     /**
-     * Retrieves the current DataSource, or sets a DataSource if the Plot doesn't yet have one.
+     * Gets the Plot's DataSource.
      *
-     * @param {DataSource} [source] The DataSource the Plot should use, if it doesn't yet have one.
-     * @return {DataSource|Plot} The current DataSource or the calling Plot.
+     * @return {DataSource} The current DataSource.
      */
     public dataSource(): DataSource;
+    /**
+     * Sets the Plot's DataSource.
+     *
+     * @param {DataSource} source The DataSource the Plot should use.
+     * @return {Plot} The calling Plot.
+     */
     public dataSource(source: DataSource): Plot;
     public dataSource(source?: DataSource): any {
       if (source == null) {
@@ -208,16 +213,20 @@ export module Abstract {
     }
 
     /**
-     * Gets or sets the animator associated with the specified animator key.
+     * Gets the animator associated with the specified Animator key.
      *
-     * @param {string} animatorKey The key for the animator.
-     * @param {Animator.IPlotAnimator} animator If specified, will be stored as the
-     *     animator for the key.
-     * @return {Animator.IPlotAnimator|Plot} If an animator is specified, we return
-     *     this object to enable chaining, otherwise we return the animator
-     *     stored at the specified key.
+     * @param {string} animatorKey The key for the Animator.
+     * @return {Animator.IPlotAnimator} The Animator for the specified key.
      */
     public animator(animatorKey: string): Animator.IPlotAnimator;
+    /**
+     * Sets the animator associated with the specified Animator key.
+     *
+     * @param {string} animatorKey The key for the Animator.
+     * @param {Animator.IPlotAnimator} animator An Animator to be assigned to
+     *                                          the specified key.
+     * @return {Plot} The calling Plot.
+     */
     public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
     public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
       if (animator === undefined){

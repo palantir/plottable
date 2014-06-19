@@ -76,12 +76,17 @@ export module Abstract {
     }
 
     /**
-     * Gets or sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+     * Gets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
      *
-     * @param {boolean} [clamp] Whether or not to clamp the QuantitiveScale.
-     * @returns {boolean|QuantitiveScale} The current clamp status, or the calling QuantitiveScale.
+     * @returns {boolean} The current clamp status.
      */
     public clamp(): boolean;
+    /**
+     * Sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+     *
+     * @param {boolean} clamp Whether or not to clamp the QuantitiveScale.
+     * @returns {QuantitiveScale} The calling QuantitiveScale.
+     */
     public clamp(clamp: boolean): QuantitiveScale;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {

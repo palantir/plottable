@@ -25,12 +25,17 @@ module Plottable {
     }
 
     /**
-     * Retrieves the current data from the DataSource, or sets the data.
+     * Gets the data.
      *
-     * @param {any[]} [data] The new data.
-     * @returns {any[]|DataSource} The current data, or the calling DataSource.
+     * @returns {any[]} The current data.
      */
     public data(): any[];
+    /**
+     * Sets new data.
+     *
+     * @param {any[]} data The new data.
+     * @returns {DataSource} The calling DataSource.
+     */
     public data(data: any[]): DataSource;
     public data(data?: any[]): any {
       if (data == null) {
@@ -44,12 +49,17 @@ module Plottable {
     }
 
     /**
-     * Retrieves the current metadata from the DataSource, or sets the metadata.
+     * Gets the metadata.
      *
-     * @param {any[]} [metadata] The new metadata.
-     * @returns {any[]|DataSource} The current metadata, or the calling DataSource.
+     * @returns {any} The current metadata.
      */
     public metadata(): any;
+    /**
+     * Sets the metadata.
+     *
+     * @param {any} metadata The new metadata.
+     * @returns {DataSource} The calling DataSource.
+     */
     public metadata(metadata: any): DataSource;
     public metadata(metadata?: any): any {
       if (metadata == null) {

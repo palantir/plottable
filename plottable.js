@@ -4203,14 +4203,6 @@ var Plottable;
     (function (Abstract) {
         var Axis = (function (_super) {
             __extends(Axis, _super);
-            /**
-            * Creates a BaseAxis.
-            *
-            * @constructor
-            * @param {Scale} scale The Scale to base the BaseAxis on.
-            * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
-            * @param {Formatter} [formatter]
-            */
             function Axis(scale, orientation, formatter) {
                 var _this = this;
                 _super.call(this);
