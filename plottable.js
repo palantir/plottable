@@ -3489,82 +3489,14 @@ var Plottable;
             function Time(scale) {
                 _super.call(this, d3.time.scale());
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
-                this.lastRequestedTickCount = 10;
-                this._userSetDomainer = false;
-                this._domainer = new Plottable.Domainer();
             }
             Time.prototype._setDomain = function (values) {
                 _super.prototype._setDomain.call(this, values.map(function (d) {
                     return new Date(d);
                 }));
             };
-
-            Time.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
-                if (extents.length > 0) {
-                    return [d3.min(extents, function (e) {
-                            return e[0];
-                        }), d3.max(extents, function (e) {
-                            return e[1];
-                        })];
-                } else {
-                    return [0, 1];
-                }
-            };
-
-            /**
-            * Sets the range of the Time and sets the interpolator to d3.interpolateRound.
-            *
-            * @param {number[]} values The new range value for the range.
-            */
-            Time.prototype.rangeRound = function (values) {
-                this._d3Scale.rangeRound(values);
-                return this;
-            };
-
-            Time.prototype.clamp = function (clamp) {
-                if (clamp == null) {
-                    return this._d3Scale.clamp();
-                }
-                this._d3Scale.clamp(clamp);
-                return this;
-            };
-
-            /**
-            * Generates tick values.
-            *
-            * @param {number} [count] The number of ticks to generate.
-            * @returns {any[]} The generated ticks.
-            */
-            Time.prototype.ticks = function (count) {
-                if (count != null) {
-                    this.lastRequestedTickCount = count;
-                }
-                return this._d3Scale.ticks(this.lastRequestedTickCount);
-            };
-
-            Time.prototype.tickInterval = function (interval, step) {
-                return this._d3Scale.ticks(interval, step);
-            };
-
-            Time.prototype.domain = function (values) {
-                return _super.prototype.domain.call(this, values);
-            };
-
-            Time.prototype.domainer = function (domainer) {
-                if (domainer == null) {
-                    return this._domainer;
-                } else {
-                    this._domainer = domainer;
-                    this._userSetDomainer = true;
-                    if (this._autoDomainAutomatically) {
-                        this.autoDomain();
-                    }
-                    return this;
-                }
-            };
             return Time;
-        })(Plottable.Abstract.Scale);
+        })(Plottable.Abstract.QuantitiveScale);
         Scale.Time = Time;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
