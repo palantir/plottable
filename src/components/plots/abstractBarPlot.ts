@@ -94,6 +94,10 @@ export module Abstract {
     public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
+      if (!this._isSetup) {
+        return null;
+      }
+
       var selectedBars: any[] = [];
 
       var xExtent: IExtent = this.parseExtent(xValOrExtent);
@@ -128,7 +132,7 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
-      if (this._bars != null) {
+      if (this._isSetup) {
         this._bars.classed("selected", false);
       }
       return this;
