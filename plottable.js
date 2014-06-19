@@ -5345,6 +5345,10 @@ var Plottable;
 
             BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (typeof select === "undefined") { select = true; }
+                if (!this._isSetup) {
+                    return null;
+                }
+
                 var selectedBars = [];
 
                 var xExtent = this.parseExtent(xValOrExtent);
@@ -5378,7 +5382,7 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.deselectAll = function () {
-                if (this._bars != null) {
+                if (this._isSetup) {
                     this._bars.classed("selected", false);
                 }
                 return this;

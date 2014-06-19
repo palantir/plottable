@@ -3145,6 +3145,8 @@ describe("Renderers", function () {
                     return renderer.selectBar({ min: 150 }, 150);
                 }, Error);
 
+                assert.isNull(new Plottable.Plot.VerticalBar(dataset, xScale, yScale).selectBar(0, 0), "shouldn't explode if you select bars before the first render");
+
                 verifier.end();
             });
 
