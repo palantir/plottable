@@ -3482,7 +3482,7 @@ var Plottable;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
-            * Creates a new Time.
+            * Creates a new TimeScale.
             *
             * @constructor
             */
@@ -4590,7 +4590,7 @@ var Plottable;
             * Creates a TimeAxis
             *
             * @constructor
-            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {TimeScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             function Time(scale, orientation, formatter) {

@@ -1242,7 +1242,7 @@ declare module Plottable {
     module Scale {
         class Time extends Abstract.QuantitiveScale {
             /**
-            * Creates a new Time.
+            * Creates a new TimeScale.
             *
             * @constructor
             */
@@ -1505,7 +1505,7 @@ declare module Plottable {
             * Creates a TimeAxis
             *
             * @constructor
-            * @param {OrdinalScale} scale The scale to base the Axis on.
+            * @param {TimeScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
