@@ -425,9 +425,8 @@ declare module Plottable {
             * Creates a formatter that displays dates
             *
             * @constructor
-            * @param {number} [precision] The number of decimal places to display.
             */
-            constructor(precision?: number);
+            constructor();
         }
     }
 }
@@ -1242,7 +1241,7 @@ declare module Plottable {
     module Scale {
         class Time extends Abstract.QuantitiveScale {
             /**
-            * Creates a new TimeScale.
+            * Creates a new Time Scale.
             *
             * @constructor
             */
@@ -1502,7 +1501,7 @@ declare module Plottable {
     module Axis {
         class Time extends Abstract.Axis {
             /**
-            * Creates a TimeAxis
+            * Creates a Time Axis
             *
             * @constructor
             * @param {TimeScale} scale The scale to base the Axis on.

@@ -5,7 +5,7 @@ export module Scale {
   export class Time extends Abstract.QuantitiveScale {
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
     /**
-     * Creates a new TimeScale.
+     * Creates a new Time Scale.
      *
      * @constructor
      */

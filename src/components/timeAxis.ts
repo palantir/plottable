@@ -5,7 +5,7 @@ export module Axis {
   export class Time extends Abstract.Axis {
     public _scale: Scale.Time;
     /**
-     * Creates a TimeAxis
+     * Creates a Time Axis
      * 
      * @constructor
      * @param {TimeScale} scale The scale to base the Axis on.
@@ -13,6 +13,9 @@ export module Axis {
      */
     constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter) {
       super(scale, orientation, formatter);
+      if (orientation !== "top" && orientation !== "bottom") {
+        throw new Error ("Time Axis can only be horizontal for now");
+      }
       this.classed("time-axis", true);
     }
 
@@ -30,23 +33,45 @@ export module Axis {
     }
 
     private measureTextHeight(): number {
-      var fakeTickLabel = this._tickLabelContainer.append("g").classed("tick-label", true);
-      var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
-      fakeTickLabel.remove();
+      var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      var textHeight = Util.DOM.getBBox(testTextEl.text("test")).height;
+      testTextEl.remove();
       return textHeight;
     }
 
     public _doRender() {
       super._doRender();
       var tickValues = this._getTickValues();
-      var tickLabels = this._tickLabelContainer.selectAll(".tick-label").data(this._getTickValues(), (d) => d);
-      var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-      tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ?
-                     (this.tickLength() + this.measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
+      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(tickValues);
       tickLabels.exit().remove();
-      tickLabels.attr("transform", (d: any, i: number) => "translate(" + this._scale._d3Scale(d) + ",0)");
-      tickLabels.selectAll("text").text((d: any) => this._formatter.format(d))
-                                  .style("text-anchor", "middle");
+      tickLabels.enter().append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+
+      var tickLabelAttrHash = {
+        x: <any> 0,
+        y: <any> 0,
+        dx: "0em",
+        dy: "0em"
+      };
+      var labelGroupTransformY = 0;
+      var tickMarkAttrHash = this._generateTickMarkAttrHash();
+      switch(this._orientation) {
+        case "bottom":
+          tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
+          tickLabelAttrHash["dy"] = "0.95em";
+          break;
+        case "top":
+          tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
+          tickLabelAttrHash["dy"] = "-.25em";
+          break;
+      }
+
+      tickLabels.text((d: any) => this._formatter.format(d))
+                                  .style("text-anchor", "middle")
+                                  .style("visibility", "visible")
+                                  .attr(tickLabelAttrHash);
+
+      var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
+      this._tickLabelContainer.attr("transform", labelGroupTransform);
       return this;
     }
   }

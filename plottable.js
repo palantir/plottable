@@ -1134,11 +1134,9 @@ var Plottable;
             * Creates a formatter that displays dates
             *
             * @constructor
-            * @param {number} [precision] The number of decimal places to display.
             */
-            function Time(precision) {
-                if (typeof precision === "undefined") { precision = 0; }
-                _super.call(this, precision);
+            function Time() {
+                _super.call(this, null);
 
                 var numFormats = 8;
                 var formats = {};
@@ -3482,7 +3480,7 @@ var Plottable;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
-            * Creates a new TimeScale.
+            * Creates a new Time Scale.
             *
             * @constructor
             */
@@ -4587,7 +4585,7 @@ var Plottable;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
-            * Creates a TimeAxis
+            * Creates a Time Axis
             *
             * @constructor
             * @param {TimeScale} scale The scale to base the Axis on.
@@ -4595,6 +4593,9 @@ var Plottable;
             */
             function Time(scale, orientation, formatter) {
                 _super.call(this, scale, orientation, formatter);
+                if (orientation !== "top" && orientation !== "bottom") {
+                    throw new Error("Time Axis can only be horizontal for now");
+                }
                 this.classed("time-axis", true);
             }
             Time.prototype._computeWidth = function () {
@@ -4611,9 +4612,9 @@ var Plottable;
             };
 
             Time.prototype.measureTextHeight = function () {
-                var fakeTickLabel = this._tickLabelContainer.append("g").classed("tick-label", true);
-                var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
-                fakeTickLabel.remove();
+                var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
+                testTextEl.remove();
                 return textHeight;
             };
 
@@ -4621,18 +4622,35 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickValues = this._getTickValues();
-                var tickLabels = this._tickLabelContainer.selectAll(".tick-label").data(this._getTickValues(), function (d) {
-                    return d;
-                });
-                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
-                tickLabelsEnter.append("text").attr("transform", "translate(0," + (this._orientation === "bottom" ? (this.tickLength() + this.measureTextHeight()) : this.availableHeight - this.tickLength()) + ")");
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(tickValues);
                 tickLabels.exit().remove();
-                tickLabels.attr("transform", function (d, i) {
-                    return "translate(" + _this._scale._d3Scale(d) + ",0)";
-                });
-                tickLabels.selectAll("text").text(function (d) {
+                tickLabels.enter().append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+
+                var tickLabelAttrHash = {
+                    x: 0,
+                    y: 0,
+                    dx: "0em",
+                    dy: "0em"
+                };
+                var labelGroupTransformY = 0;
+                var tickMarkAttrHash = this._generateTickMarkAttrHash();
+                switch (this._orientation) {
+                    case "bottom":
+                        tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
+                        tickLabelAttrHash["dy"] = "0.95em";
+                        break;
+                    case "top":
+                        tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
+                        tickLabelAttrHash["dy"] = "-.25em";
+                        break;
+                }
+
+                tickLabels.text(function (d) {
                     return _this._formatter.format(d);
-                }).style("text-anchor", "middle");
+                }).style("text-anchor", "middle").style("visibility", "visible").attr(tickLabelAttrHash);
+
+                var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
+                this._tickLabelContainer.attr("transform", labelGroupTransform);
                 return this;
             };
             return Time;

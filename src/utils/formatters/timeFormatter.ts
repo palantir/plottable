@@ -7,10 +7,9 @@ module Plottable {
        * Creates a formatter that displays dates
        * 
        * @constructor
-       * @param {number} [precision] The number of decimal places to display.
        */
-      constructor(precision = 0) {
-        super(precision);
+      constructor() {
+        super(null);
 
         var numFormats = 8;
         var formats: {[index: number]: string} = {};
