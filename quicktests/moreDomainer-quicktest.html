@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> - jsFiddle demo</title>
+  
+  <script type='text/javascript' src='/js/lib/dummy.js'></script>
+  
+  
+  
+  
+  <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
+  <style type='text/css'>
+    </style> <link rel="stylesheet" type="text/css" href="https://rawgithub.com/palantir/plottable/master/plottable.css"> <style type="text/css">
+/*-- Add custom styles after this line --*/
+ .demo-title {
+    font-size: 24 pt;
+}
+.plottable .y-axis .tick line {
+    opacity: 1
+}
+.plottable .x-axis .tick line {
+    opacity: 1
+}
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+
+var boringData = function () {
+    var boring;
+    boring0 = {
+        x: 0,
+        y: 0
+    }
+    boring1 = {
+        x: 0,
+        y: 2
+    }
+    boring2 = {
+        x: 1,
+        y: 2
+    }
+    boring3 = {
+        x: 1,
+        y: 4
+    }
+    boring4 = {
+        x: 2,
+        y: 4
+    }
+    boring5 = {
+        x: 2,
+        y: 6
+    }
+    boring6 = {
+        x: 12,
+        y: 26
+    }
+    boring = [boring0, boring1, boring2, boring3, boring4, boring5, boring6];
+    return boring;
+}
+
+var xScale;
+var yScale;
+var domainer;
+
+window.onload = function () {
+    var svg = d3.select("#chart");
+    svg.attr("width", 500).attr("height", 300);
+
+    //data
+    var dataseries1 = new Plottable.DataSource(boringData());
+    dataseries1.metadata({
+        name: "series1"
+    });
+    var dataseries2 = new Plottable.DataSource(boringData());
+    dataseries2.metadata({
+        name: "series2"
+    });
+    var dataseries3 = new Plottable.DataSource(boringData());
+    dataseries3.metadata({
+        name: "series3"
+    });
+    var colorScale1 = new Plottable.Scale.Color("10");
+    colorScale1.domain(["series1", "series2", "series3"]);
+
+    //Axis
+    xScale = new Plottable.Scale.Linear();
+    yScale = new Plottable.Scale.Linear();
+    xScale.domain([0, 3]);
+    yScale.domain([0, 8]);
+    var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+    var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+    var xAxis2 = new Plottable.Axis.XAxis(xScale, "bottom");
+    var yAxis2 = new Plottable.Axis.YAxis(yScale, "left");
+
+    
+    //test
+    console.log("X (focus): "+ xScale.domain());
+    console.log("Y (focus): "+ yScale.domain());
+
+    
+    var colorProjector = function (d, i, m) {
+        return colorScale1.scale(m.name);
+    };
+
+    //rendering
+    var renderAreaD1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale);
+    var renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale, yScale);
+    var renderAreaD3 = new Plottable.Plot.Scatter(dataseries3, xScale, yScale);
+    renderAreaD1.project("fill", colorProjector).animate(true);
+    renderAreaD2.project("stroke", colorProjector).animate(true);
+    renderAreaD3.project("fill", colorProjector).animate(true);
+    
+
+    var basicTable = new Plottable.Component.Table()
+        .addComponent(2, 0, yAxis2)
+        .addComponent(2, 1, renderAreaD2)
+        .addComponent(2, 2, yAxis)
+        .addComponent(2, 3, renderAreaD3.merge(renderAreaD1))
+        .addComponent(3, 3, xAxis)
+        .addComponent(3, 1, xAxis2);
+
+    var bigTable = new Plottable.Component.Table()
+        .addComponent(1, 0, basicTable);
+
+    basicTable.renderTo(svg);
+    setTimeout(button1callback, 100);
+};
+
+function button1callback(){
+    console.log("X (before): ", xScale.domain());   
+    xScale.autoDomain(); 
+    console.log("X (auto): ", xScale.domain());
+}
+function button2callback(){
+    console.log("Y (before): " + yScale.domain());
+     yScale.autoDomain();  
+    console.log("Y (auto): " + yScale.domain());
+}
+function button3callback(){
+    xScale.domain([0, 3]);
+    console.log("X (focus): "+ xScale.domain());
+}
+function button4callback(){
+    yScale.domain([0, 8]);
+    console.log("Y (focus): " + yScale.domain());    
+}
+function button5callback(){
+    xScale.domain([0, 0]);
+    console.log("X (0): "+ xScale.domain());
+}
+function button6callback(){
+    yScale.domain([0, 0]);
+    console.log("Y (0): " + yScale.domain());    
+}
+
+//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../plottable_multifile.js"></script>
+<script src="http://rawgithub.com/palantir/plottable/master/examples/exampleUtil.js"></script>
+<div class="demo-title">Simple Chart</div>
+<br>
+<br>
+<svg id="chart"></svg>
+ 
+<button onclick="button1callback()">autoDomain x</button>    
+<button onclick="button2callback()">autoDomain y</button> 
+    <br>
+<button onclick="button3callback()">focus x</button>    
+<button onclick="button4callback()">focus y</button>   
+    <br>
+<button onclick="button5callback()">no x</button>    
+<button onclick="button6callback()">no y</button>    
+            <br><br><br>
+<p />
+  
+</body>
+
+
+</html>
+

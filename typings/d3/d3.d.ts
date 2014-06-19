@@ -2740,6 +2740,7 @@ declare module D3 {
             };
             tickFormat(count: number): (n: number) => string;
             copy(): TimeScale;
+            nice(count?: number): TimeScale;
         }
     }
 

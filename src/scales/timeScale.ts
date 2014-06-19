@@ -6,7 +6,8 @@ export module Scale {
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
     private lastRequestedTickCount = 10;
     public _d3Scale: D3.Scale.TimeScale;
-
+    public _userSetDomainer: boolean = false;
+    private _domainer: Domainer = new Domainer();
 
     /**
      * Creates a new Time.
@@ -28,14 +29,6 @@ export module Scale {
       } else {
         return [0, 1];
       }
-    }
-
-    public autoDomain() {
-      super.autoDomain();
-      if (this._autoPad) {
-        this.padDomain();
-      }
-      return this;
     }
 
     /**
@@ -88,24 +81,25 @@ export module Scale {
     }
 
     /**
-     * Pads out the domain of the scale by a specified ratio.
+     * Sets a Domainer of a scale. A Domainer is responsible for combining
+     * multiple extents into a single domain.
      *
-     * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-     * @returns {Time} The calling Time.
+     * @param {Domainer} domainer The domainer to be set.
+     * @return {Time} The calling scale.
      */
-    public padDomain(padProportion = 0.05): Time {
-      var currentDomain = this.domain();
-      if (currentDomain[0] === currentDomain[1]) {
-        var d = currentDomain[0].valueOf(); // valueOf accounts for dates properly
-        this._setDomain([d - this._PADDING_FOR_IDENTICAL_DOMAIN, d + this._PADDING_FOR_IDENTICAL_DOMAIN]);
+    public domainer(): Domainer;
+    public domainer(domainer: Domainer): Time;
+    public domainer(domainer?: Domainer): any {
+      if (domainer == null) {
+        return this._domainer;
+      } else {
+        this._domainer = domainer;
+        this._userSetDomainer = true;
+        if (this._autoDomainAutomatically) {
+          this.autoDomain();
+        }
         return this;
       }
-
-      var extent = currentDomain[1] - currentDomain[0];
-      // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
-      var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1].valueOf() + padProportion/2 * extent];
-      this._setDomain(newDomain);
-      return this;
     }
   }
 }

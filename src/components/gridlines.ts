@@ -21,10 +21,10 @@ export module Component {
       this.xScale = xScale;
       this.yScale = yScale;
       if (this.xScale != null) {
-        this._registerToBroadcaster(this.xScale, () => this._render());
+        this.xScale.broadcaster.registerListener(this, () => this._render());
       }
       if (this.yScale != null) {
-        this._registerToBroadcaster(this.yScale, () => this._render());
+        this.yScale.broadcaster.registerListener(this, () => this._render());
       }
     }
 
