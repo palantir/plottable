@@ -1375,12 +1375,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
-        class Number extends Abstract.Axis {
+        class Numeric extends Abstract.Axis {
             /**
-            * Creates a NumberAxis.
+            * Creates a NumericAxis.
             *
             * @constructor
-            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumberAxis on.
+            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumericAxis on.
             * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
             * @param {Formatter} [formatter] A function to format tick labels.
             */
@@ -1395,11 +1395,11 @@ declare module Plottable {
             * Sets the tick label position relative to the tick marks.
             *
             * @param {string} position The relative position of the tick label.
-            *                          [top/center/bottom] for a vertical NumberAxis,
-            *                          [left/center/right] for a horizontal NumberAxis.
-            * @returns {NumberAxis} The calling NumberAxis.
+            *                          [top/center/bottom] for a vertical NumericAxis,
+            *                          [left/center/right] for a horizontal NumericAxis.
+            * @returns {NumericAxis} The calling NumericAxis.
             */
-            public tickLabelPosition(position: string): Number;
+            public tickLabelPosition(position: string): Numeric;
         }
     }
 }

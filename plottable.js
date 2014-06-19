@@ -4357,21 +4357,21 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Axis) {
-        var Number = (function (_super) {
-            __extends(Number, _super);
+        var Numeric = (function (_super) {
+            __extends(Numeric, _super);
             /**
-            * Creates a NumberAxis.
+            * Creates a NumericAxis.
             *
             * @constructor
-            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumberAxis on.
+            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumericAxis on.
             * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
             * @param {Formatter} [formatter] A function to format tick labels.
             */
-            function Number(scale, orientation, formatter) {
+            function Numeric(scale, orientation, formatter) {
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
             }
-            Number.prototype._computeWidth = function () {
+            Numeric.prototype._computeWidth = function () {
                 // generate a test value to measure width
                 var tickValues = this._getTickValues();
                 var valueLength = function (v) {
@@ -4396,7 +4396,7 @@ var Plottable;
                 return this._computedWidth;
             };
 
-            Number.prototype._computeHeight = function () {
+            Numeric.prototype._computeHeight = function () {
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
                 testTextEl.remove();
@@ -4410,11 +4410,11 @@ var Plottable;
                 return this._computedHeight;
             };
 
-            Number.prototype._getTickValues = function () {
+            Numeric.prototype._getTickValues = function () {
                 return this._scale.ticks(10);
             };
 
-            Number.prototype._doRender = function () {
+            Numeric.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
 
@@ -4517,18 +4517,18 @@ var Plottable;
                 return this;
             };
 
-            Number.prototype.tickLabelPosition = function (position) {
+            Numeric.prototype.tickLabelPosition = function (position) {
                 if (position == null) {
                     return this.tickLabelPositioning;
                 } else {
                     var positionLC = position.toLowerCase();
                     if (this._isHorizontal()) {
                         if (!(positionLC === "left" || positionLC === "center" || positionLC === "right")) {
-                            throw new Error(positionLC + " is not a valid tick label position for a horizontal NumberAxis");
+                            throw new Error(positionLC + " is not a valid tick label position for a horizontal NumericAxis");
                         }
                     } else {
                         if (!(positionLC === "top" || positionLC === "center" || positionLC === "bottom")) {
-                            throw new Error(positionLC + " is not a valid tick label position for a vertical NumberAxis");
+                            throw new Error(positionLC + " is not a valid tick label position for a vertical NumericAxis");
                         }
                     }
                     this.tickLabelPositioning = positionLC;
@@ -4537,7 +4537,7 @@ var Plottable;
                 }
             };
 
-            Number.prototype.hideEndTickLabels = function () {
+            Numeric.prototype.hideEndTickLabels = function () {
                 var _this = this;
                 var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
 
@@ -4556,7 +4556,7 @@ var Plottable;
                 }
             };
 
-            Number.prototype.hideOverlappingTickLabels = function () {
+            Numeric.prototype.hideOverlappingTickLabels = function () {
                 var visibleTickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
@@ -4589,9 +4589,9 @@ var Plottable;
                     }
                 });
             };
-            return Number;
+            return Numeric;
         })(Plottable.Abstract.Axis);
-        Axis.Number = Number;
+        Axis.Numeric = Numeric;
     })(Plottable.Axis || (Plottable.Axis = {}));
     var Axis = Plottable.Axis;
 })(Plottable || (Plottable = {}));

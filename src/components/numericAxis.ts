@@ -2,15 +2,15 @@
 
 module Plottable {
 export module Axis {
-  export class Number extends Abstract.Axis {
+  export class Numeric extends Abstract.Axis {
     public _scale: Abstract.QuantitiveScale;
     private tickLabelPositioning = "center";
 
     /**
-     * Creates a NumberAxis.
+     * Creates a NumericAxis.
      *
      * @constructor
-     * @param {QuantitiveScale} scale The QuantitiveScale to base the NumberAxis on.
+     * @param {QuantitiveScale} scale The QuantitiveScale to base the NumericAxis on.
      * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
      * @param {Formatter} [formatter] A function to format tick labels.
      */
@@ -176,11 +176,11 @@ export module Axis {
      * Sets the tick label position relative to the tick marks.
      *
      * @param {string} position The relative position of the tick label.
-     *                          [top/center/bottom] for a vertical NumberAxis,
-     *                          [left/center/right] for a horizontal NumberAxis.
-     * @returns {NumberAxis} The calling NumberAxis.
+     *                          [top/center/bottom] for a vertical NumericAxis,
+     *                          [left/center/right] for a horizontal NumericAxis.
+     * @returns {NumericAxis} The calling NumericAxis.
      */
-    public tickLabelPosition(position: string): Axis.Number;
+    public tickLabelPosition(position: string): Axis.Numeric;
     public tickLabelPosition(position?: string): any {
       if (position == null) {
         return this.tickLabelPositioning;
@@ -188,11 +188,11 @@ export module Axis {
         var positionLC = position.toLowerCase();
         if (this._isHorizontal()) {
           if (!(positionLC === "left" || positionLC === "center" || positionLC === "right")) {
-            throw new Error(positionLC + " is not a valid tick label position for a horizontal NumberAxis");
+            throw new Error(positionLC + " is not a valid tick label position for a horizontal NumericAxis");
           }
         } else {
           if (!(positionLC === "top" || positionLC === "center" || positionLC === "bottom")) {
-            throw new Error(positionLC + " is not a valid tick label position for a vertical NumberAxis");
+            throw new Error(positionLC + " is not a valid tick label position for a vertical NumericAxis");
           }
         }
         this.tickLabelPositioning = positionLC;
