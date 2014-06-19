@@ -116,14 +116,53 @@ declare module Plottable {
             /**
             * Set a new key/value pair in the store.
             *
-            * @param {any} Key to set in the store
-            * @param {any} Value to set in the store
+            * @param {any} key Key to set in the store
+            * @param {any} value Value to set in the store
             * @return {boolean} True if key already in store, false otherwise
             */
             public set(key: any, value: any): boolean;
+            /**
+            * Get a value from the store, given a key.
+            *
+            * @param {any} key Key associated with value to retrieve
+            * @return {any} Value if found, undefined otherwise
+            */
             public get(key: any): any;
+            /**
+            * Test whether store has a value associated with given key.
+            *
+            * Will return true if there is a key/value entry,
+            * even if the value is explicitly `undefined`.
+            *
+            * @param {any} key Key to test for presence of an entry
+            * @return {boolean} Whether there was a matching entry for that key
+            */
             public has(key: any): boolean;
+            /**
+            * Return an array of the values in the key-value store
+            *
+            * @return {any[]} The values in the store
+            */
             public values(): any[];
+            /**
+            * Return an array of keys in the key-value store
+            *
+            * @return {any[]} The keys in the store
+            */
+            public keys(): any[];
+            /**
+            * Execute a callback for each entry in the array.
+            *
+            * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
+            * @return {any[]} The results of mapping the callback over the entries
+            */
+            public map(cb: (key?: any, val?: any, index?: number) => any): any[];
+            /**
+            * Delete a key from the key-value store. Return whether the key was present.
+            *
+            * @param {any} The key to remove
+            * @return {boolean} Whether a matching entry was found and removed
+            */
             public delete(key: any): boolean;
         }
     }
@@ -388,8 +427,15 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Broadcaster extends PlottableObject {
+    module Core {
+        interface IListenable {
+            broadcaster: Broadcaster;
+        }
+        interface IBroadcasterCallback {
+            (listenable: IListenable, ...args: any[]): any;
+        }
+        class Broadcaster extends Abstract.PlottableObject {
+            constructor(listenable: IListenable);
             /**
             * Registers a callback to be called when the broadcast method is called. Also takes a listener which
             * is used to support deregistering the same callback later, by passing in the same listener.
@@ -403,19 +449,32 @@ declare module Plottable {
             */
             public registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
             /**
-            * Registers deregister the callback associated with a listener.
+            * Call all listening callbacks, optionally with arguments passed through.
+            *
+            * @param ...args A variable number of optional arguments
+            * @returns {Broadcaster} this object
+            */
+            public broadcast(...args: any[]): Broadcaster;
+            /**
+            * Deregisters the callback associated with a listener.
             *
             * @param listener The listener to deregister.
             * @returns {Broadcaster} this object
             */
             public deregisterListener(listener: any): Broadcaster;
+            /**
+            * Deregisters all listeners and callbacks associated with the broadcaster.
+            *
+            * @returns {Broadcaster} this object
+            */
+            public deregisterAllListeners(): void;
         }
     }
 }
 
 
 declare module Plottable {
-    class DataSource extends Abstract.Broadcaster {
+    class DataSource extends Abstract.PlottableObject implements Core.IListenable {
         /**
         * Creates a new DataSource.
         *
@@ -639,7 +698,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Scale extends Broadcaster {
+        class Scale extends PlottableObject implements Core.IListenable {
             /**
             * Creates a new Scale.
             *
@@ -901,9 +960,6 @@ declare module Plottable {
         pixel: SelectionArea;
         data: SelectionArea;
     }
-    interface IBroadcasterCallback {
-        (broadcaster: Abstract.Broadcaster, ...args: any[]): any;
-    }
     interface ISpaceRequest {
         width: number;
         height: number;
@@ -919,6 +975,60 @@ declare module Plottable {
     interface IExtent {
         min: number;
         max: number;
+    }
+}
+
+
+declare module Plottable {
+    class Domainer {
+        /**
+        * @param {(extents: any[][]) => any[]} combineExtents
+        *        If present, this function will be used by the Domainer to merge
+        *        all the extents that are present on a scale.
+        *
+        *        A plot may draw multiple things relative to a scale, e.g.
+        *        different stocks over time. The plot computes their extents,
+        *        which are a [min, max] pair. combineExtents is responsible for
+        *        merging them all into one [min, max] pair. It defaults to taking
+        *        the min of the first elements and the max of the second arguments.
+        */
+        constructor(combineExtents?: (extents: any[][]) => any[]);
+        /**
+        * @param {any[][]} extents The list of extents to be reduced to a single
+        *        extent.
+        * @param {Abstract.QuantitiveScale} scale
+        *        Since nice() must do different things depending on Linear, Log,
+        *        or Time scale, the scale must be passed in for nice() to work.
+        * @return {any[]} The domain, as a merging of all exents, as a [min, max]
+        *                 pair.
+        */
+        public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[];
+        /**
+        * Sets the Domainer to pad by a given ratio.
+        *
+        * @param {number} [padProportion] Proportionally how much bigger the
+        *         new domain should be (0.05 = 5% larger).
+        * @return {Domainer} The calling Domainer.
+        */
+        public pad(padProportion?: number): Domainer;
+        /**
+        * Adds a value that will not be padded if either end of the domain.
+        * For example, after paddingException(0), a domainer will pad
+        * [0, 100] to [0, 102.5].
+        *
+        * @param {any} exception The value that will not be padded.
+        * @param {boolean} add Defaults to true. If true, add the exception,
+        *                  if false, removes the exception.
+        * @return {Domainer} The calling Domainer.
+        */
+        public paddingException(exception: any, add?: boolean): Domainer;
+        /**
+        * Extends the scale's domain so it starts and ends with "nice" values.
+        *
+        * @param {number} [count] The number of ticks that should fit inside the new domain.
+        * @return {Domainer} The calling Domainer.
+        */
+        public nice(count?: number): Domainer;
     }
 }
 
@@ -972,12 +1082,6 @@ declare module Plottable {
             public clamp(): boolean;
             public clamp(clamp: boolean): QuantitiveScale;
             /**
-            * Extends the scale's domain so it starts and ends with "nice" values.
-            *
-            * @param {number} [count] The number of ticks that should fit inside the new domain.
-            */
-            public nice(count?: number): QuantitiveScale;
-            /**
             * Generates tick values.
             *
             * @param {number} [count] The number of ticks to generate.
@@ -993,12 +1097,14 @@ declare module Plottable {
             */
             public tickFormat(count: number, format?: string): (n: number) => string;
             /**
-            * Pads out the domain of the scale by a specified ratio.
+            * Sets a Domainer of a scale. A Domainer is responsible for combining
+            * multiple extents into a single domain.
             *
-            * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-            * @returns {QuantitiveScale} The calling QuantitiveScale.
+            * @param {Domainer} domainer The domainer to be set.
+            * @return {QuantitiveScale} The calling scale.
             */
-            public padDomain(padProportion?: number): QuantitiveScale;
+            public domainer(): Domainer;
+            public domainer(domainer: Domainer): QuantitiveScale;
         }
     }
 }
@@ -1550,14 +1656,20 @@ declare module Plottable {
             */
             public barAlignment(alignment: string): BarPlot;
             /**
-            * Selects the bar under the given pixel position.
+            * Selects the bar under the given pixel position (if [xValOrExtent]
+            * and [yValOrExtent] are {number}s), under a given line (if only one
+            * of [xValOrExtent] or [yValOrExtent] are {IExtent}s) or are under a
+            * 2D area (if [xValOrExtent] and [yValOrExtent] are both {IExtent}s).
             *
-            * @param {number} x The pixel x position.
-            * @param {number} y The pixel y position.
+            * @param {any} xValOrExtent The pixel x position, or range of x values.
+            * @param {any} yValOrExtent The pixel y position, or range of y values.
             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
             * @return {D3.Selection} The selected bar, or null if no bar was selected.
             */
-            public selectBar(x: number, y: number, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
             /**
             * Deselects all bars.
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
@@ -1766,6 +1878,15 @@ declare module Plottable {
             * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
             */
             public callback(cb: (x: number, y: number) => any): Click;
+        }
+        class DoubleClick extends Click {
+            /**
+            * Creates a DoubleClickInteraction.
+            *
+            * @constructor
+            * @param {Component} componentToListenTo The component to listen for clicks on.
+            */
+            constructor(componentToListenTo: Abstract.Component);
         }
     }
 }
