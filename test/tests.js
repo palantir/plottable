@@ -316,9 +316,9 @@ describe("Axes", function () {
         var startDate = new Date(2000, 0, 1);
         var endDate = new Date(2001, 0, 1);
         var timeScale = new Plottable.Scale.Linear();
-        timeScale.domain([startDate, endDate]);
+        timeScale.updateExtent(1, "x", [startDate, endDate]);
         timeScale.range([0, 500]);
-        timeScale.nice();
+        timeScale.domainer(new Plottable.Domainer().nice());
         var xAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
         var baseDate = d3.min(timeScale.domain());
 
@@ -3399,13 +3399,14 @@ describe("Scales", function () {
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-        scale.domain([0.08, 9.92]);
+        scale._autoDomainAutomatically = true;
+        scale.updateExtent(1, "x", [0.08, 9.92]);
         callbackWasCalled = false;
-        scale.nice();
+        scale.domainer(new Plottable.Domainer().nice());
         assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
 
         callbackWasCalled = false;
-        scale.padDomain(0.2);
+        scale.domainer(new Plottable.Domainer().pad());
         assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
     });
     describe("autoranging behavior", function () {
@@ -3422,7 +3423,7 @@ describe("Scales", function () {
             scale.updateExtent(1, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
-            scale.autoDomain().padDomain().nice();
+            scale.domainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
             assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
@@ -3470,47 +3471,24 @@ describe("Scales", function () {
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
+
+        it("scales don't allow Infinity", function () {
+            assert.throws(function () {
+                return scale._setDomain([5, Infinity]);
+            }, Error);
+            assert.throws(function () {
+                return scale._setDomain([-Infinity, 6]);
+            }, Error);
+        });
     });
 
     describe("Quantitive Scales", function () {
         it("autorange defaults to [0, 1] if no perspectives set", function () {
             var scale = new Plottable.Scale.Linear();
-            scale.domain([]);
             scale.autoDomain();
             var d = scale.domain();
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
-        });
-
-        it("autoPad defaults to [v-1, v+1] if there's only one value", function () {
-            var scale = new Plottable.Scale.Linear();
-            scale.domain([5, 5]);
-            scale.padDomain();
-            assert.deepEqual(scale.domain(), [4, 6]);
-        });
-
-        it("autoPad works in general case", function () {
-            var scale = new Plottable.Scale.Linear();
-            scale.domain([100, 200]);
-            scale.padDomain(0.20);
-            assert.deepEqual(scale.domain(), [90, 210]);
-        });
-
-        it("autoPad works for date scales", function () {
-            var scale = new Plottable.Scale.Time();
-            var f = d3.time.format("%x");
-            var d1 = f.parse("06/02/2014");
-            var d2 = f.parse("06/03/2014");
-            scale.domain([d1, d2]);
-            scale.padDomain();
-            var dd1 = scale.domain()[0];
-            var dd2 = scale.domain()[1];
-            assert.isDefined(dd1.toDateString, "padDomain produced dates");
-            assert.isNotNull(dd1.toDateString, "padDomain produced dates");
-            assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
-            assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-            assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-            assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
         });
     });
 
@@ -4347,5 +4325,85 @@ describe("Util.s", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+});
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("Domainer", function () {
+    var scale;
+    var domainer;
+    beforeEach(function () {
+        scale = new Plottable.Scale.Linear();
+        domainer = new Plottable.Domainer();
+    });
+
+    it("pad() works in general case", function () {
+        scale.updateExtent(1, "x", [100, 200]);
+        scale.domainer(new Plottable.Domainer().pad(0.2));
+        assert.deepEqual(scale.domain(), [90, 210]);
+    });
+
+    it("pad() works for date scales", function () {
+        var timeScale = new Plottable.Scale.Time();
+        var f = d3.time.format("%x");
+        var d1 = f.parse("06/02/2014");
+        var d2 = f.parse("06/03/2014");
+        timeScale.updateExtent(1, "x", [d1, d2]);
+        timeScale.domainer(new Plottable.Domainer().pad());
+        var dd1 = timeScale.domain()[0];
+        var dd2 = timeScale.domain()[1];
+        assert.isDefined(dd1.toDateString, "padDomain produced dates");
+        assert.isNotNull(dd1.toDateString, "padDomain produced dates");
+        assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
+        assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
+        assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
+        assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
+    });
+
+    it("pad() defaults to [v-1, v+1] if there's only one numeric value", function () {
+        domainer.pad();
+        var domain = domainer.computeDomain([[5, 5]], scale);
+        assert.deepEqual(domain, [4, 6]);
+    });
+
+    it("pad() defaults to [v-1 day, v+1 day] if there's only one date value", function () {
+        var d = new Date(2000, 5, 5);
+        var dayBefore = new Date(2000, 5, 4);
+        var dayAfter = new Date(2000, 5, 6);
+        var timeScale = new Plottable.Scale.Time();
+
+        // the result of computeDomain() will be number[], but when it
+        // gets fed back into timeScale, it will be adjusted back to a Date.
+        // That's why I'm using updateExtent() instead of domainer.computeDomain()
+        timeScale.updateExtent(1, "x", [d, d]);
+        timeScale.domainer(new Plottable.Domainer().pad());
+        assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
+    });
+
+    it("pad() only takes the last value", function () {
+        domainer.pad(1000).pad(4).pad(0.1);
+        var domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [95, 205]);
+    });
+
+    it("pad() will pad beyond 0 by default", function () {
+        domainer.pad(0.1);
+        var domain = domainer.computeDomain([[0, 100]], scale);
+        assert.deepEqual(domain, [-5, 105]);
+    });
+
+    it("paddingException(n) will not pad beyond n", function () {
+        domainer.pad(0.1).paddingException(0).paddingException(200);
+        var domain = domainer.computeDomain([[0, 100]], scale);
+        assert.deepEqual(domain, [0, 105]);
+        domain = domainer.computeDomain([[-100, 0]], scale);
+        assert.deepEqual(domain, [-105, 0]);
+        domain = domainer.computeDomain([[0, 200]], scale);
+        assert.deepEqual(domain, [0, 200]);
+        domainer.paddingException(0, false);
+        domain = domainer.computeDomain([[0, 200]], scale);
+        assert.deepEqual(domain, [-10, 200]);
     });
 });

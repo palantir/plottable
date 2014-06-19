@@ -7,8 +7,6 @@ export module Abstract {
     public _autoDomainAutomatically = true;
     public broadcaster = new Plottable.Core.Broadcaster(this);
     public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
-    public _autoNice = false;
-    public _autoPad  = false;
     /**
      * Creates a new Scale.
      *
@@ -72,6 +70,10 @@ export module Abstract {
     }
 
     public _setDomain(values: any[]) {
+      if (values[0] === Infinity || values[0] === -Infinity ||
+          values[1] === Infinity || values[1] === -Infinity) {
+        throw new Error("data cannot contain Infinity or -Infinity");
+      }
       this._d3Scale.domain(values);
       this.broadcaster.broadcast();
     }

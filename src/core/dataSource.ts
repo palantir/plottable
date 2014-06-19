@@ -79,7 +79,12 @@ module Plottable {
       } else if (typeof(mappedData[0]) === "string") {
         return Util.Methods.uniq(mappedData);
       } else {
-        return d3.extent(mappedData);
+        var extent = d3.extent(mappedData);
+        if (extent[0] == null || extent[1] == null) {
+          return [];
+        } else {
+          return extent;
+        }
       }
     }
   }

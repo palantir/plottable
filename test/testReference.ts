@@ -29,3 +29,4 @@
 ///<reference path="tableTests.ts" />
 ///<reference path="textUtilsTests.ts" />
 ///<reference path="utilsTests.ts" />
+///<reference path="domainerTests.ts" />

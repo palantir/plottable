@@ -980,6 +980,60 @@ declare module Plottable {
 
 
 declare module Plottable {
+    class Domainer {
+        /**
+        * @param {(extents: any[][]) => any[]} combineExtents
+        *        If present, this function will be used by the Domainer to merge
+        *        all the extents that are present on a scale.
+        *
+        *        A plot may draw multiple things relative to a scale, e.g.
+        *        different stocks over time. The plot computes their extents,
+        *        which are a [min, max] pair. combineExtents is responsible for
+        *        merging them all into one [min, max] pair. It defaults to taking
+        *        the min of the first elements and the max of the second arguments.
+        */
+        constructor(combineExtents?: (extents: any[][]) => any[]);
+        /**
+        * @param {any[][]} extents The list of extents to be reduced to a single
+        *        extent.
+        * @param {Abstract.QuantitiveScale} scale
+        *        Since nice() must do different things depending on Linear, Log,
+        *        or Time scale, the scale must be passed in for nice() to work.
+        * @return {any[]} The domain, as a merging of all exents, as a [min, max]
+        *                 pair.
+        */
+        public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[];
+        /**
+        * Sets the Domainer to pad by a given ratio.
+        *
+        * @param {number} [padProportion] Proportionally how much bigger the
+        *         new domain should be (0.05 = 5% larger).
+        * @return {Domainer} The calling Domainer.
+        */
+        public pad(padProportion?: number): Domainer;
+        /**
+        * Adds a value that will not be padded if either end of the domain.
+        * For example, after paddingException(0), a domainer will pad
+        * [0, 100] to [0, 102.5].
+        *
+        * @param {any} exception The value that will not be padded.
+        * @param {boolean} add Defaults to true. If true, add the exception,
+        *                  if false, removes the exception.
+        * @return {Domainer} The calling Domainer.
+        */
+        public paddingException(exception: any, add?: boolean): Domainer;
+        /**
+        * Extends the scale's domain so it starts and ends with "nice" values.
+        *
+        * @param {number} [count] The number of ticks that should fit inside the new domain.
+        * @return {Domainer} The calling Domainer.
+        */
+        public nice(count?: number): Domainer;
+    }
+}
+
+
+declare module Plottable {
     module Abstract {
         class QuantitiveScale extends Scale {
             /**
@@ -1028,12 +1082,6 @@ declare module Plottable {
             public clamp(): boolean;
             public clamp(clamp: boolean): QuantitiveScale;
             /**
-            * Extends the scale's domain so it starts and ends with "nice" values.
-            *
-            * @param {number} [count] The number of ticks that should fit inside the new domain.
-            */
-            public nice(count?: number): QuantitiveScale;
-            /**
             * Generates tick values.
             *
             * @param {number} [count] The number of ticks to generate.
@@ -1049,12 +1097,14 @@ declare module Plottable {
             */
             public tickFormat(count: number, format?: string): (n: number) => string;
             /**
-            * Pads out the domain of the scale by a specified ratio.
+            * Sets a Domainer of a scale. A Domainer is responsible for combining
+            * multiple extents into a single domain.
             *
-            * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-            * @returns {QuantitiveScale} The calling QuantitiveScale.
+            * @param {Domainer} domainer The domainer to be set.
+            * @return {QuantitiveScale} The calling scale.
             */
-            public padDomain(padProportion?: number): QuantitiveScale;
+            public domainer(): Domainer;
+            public domainer(domainer: Domainer): QuantitiveScale;
         }
     }
 }
