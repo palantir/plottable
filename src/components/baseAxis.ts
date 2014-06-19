@@ -46,7 +46,7 @@ export module Abstract {
       }
       this.formatter(formatter);
 
-      this._registerToBroadcaster(this._scale, () => this.rescale());
+      this._scale.broadcaster.registerListener(this, () => this.rescale());
     }
 
     public _isHorizontal() {

@@ -9,12 +9,12 @@ describe("DataSource", () => {
     var newData = [ 1, 2, 3 ];
 
     var callbackCalled = false;
-    var callback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
-      assert.equal(broadcaster, ds, "Callback received the DataSource as the first argument");
+    var callback: Plottable.Core.IBroadcasterCallback = (listenable: Plottable.Core.IListenable) => {
+      assert.equal(listenable, ds, "Callback received the DataSource as the first argument");
       assert.deepEqual(ds.data(), newData, "DataSource arrives with correct data");
       callbackCalled = true;
     };
-    ds.registerListener(null, callback);
+    ds.broadcaster.registerListener(null, callback);
 
     ds.data(newData);
     assert.isTrue(callbackCalled, "callback was called when the data was changed");
@@ -26,12 +26,12 @@ describe("DataSource", () => {
     var newMetadata = "blargh";
 
     var callbackCalled = false;
-    var callback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
-      assert.equal(broadcaster, ds, "Callback received the DataSource as the first argument");
+    var callback: Plottable.Core.IBroadcasterCallback = (listenable: Plottable.Core.IListenable) => {
+      assert.equal(listenable, ds, "Callback received the DataSource as the first argument");
       assert.deepEqual(ds.metadata(), newMetadata, "DataSource arrives with correct metadata");
       callbackCalled = true;
     };
-    ds.registerListener(null, callback);
+    ds.broadcaster.registerListener(null, callback);
 
     ds.metadata(newMetadata);
     assert.isTrue(callbackCalled, "callback was called when the metadata was changed");

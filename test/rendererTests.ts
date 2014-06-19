@@ -52,7 +52,7 @@ describe("Renderers", () => {
 
       assert.equal(0, r.renders, "initially hasn't rendered anything");
 
-      d1._broadcast();
+      d1.broadcaster.broadcast();
       assert.equal(1, r.renders, "we re-render when our datasource changes");
 
       r.dataSource();
@@ -62,10 +62,10 @@ describe("Renderers", () => {
       r.dataSource(d2);
       assert.equal(2, r.renders, "we should redraw when we change datasource");
 
-      d1._broadcast();
+      d1.broadcaster.broadcast();
       assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
 
-      d2._broadcast();
+      d2.broadcaster.broadcast();
       assert.equal(3, r.renders, "we should listen to the new datasource");
     });
 
@@ -79,19 +79,19 @@ describe("Renderers", () => {
       var yScale = new Plottable.Scale.Linear();
       r.project("x", "x", xScale);
       r.project("y", "y", yScale);
-      xScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
-        assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
+      xScale.broadcaster.registerListener(null, (listenable: Plottable.Core.IListenable) => {
+        assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
       });
-      yScale.registerListener(null, (broadcaster: Plottable.Abstract.Broadcaster) => {
-        assert.equal(broadcaster, yScale, "Callback received the calling scale as the first argument");
+      yScale.broadcaster.registerListener(null, (listenable: Plottable.Core.IListenable) => {
+        assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
         ++yScaleCalls;
       });
 
       assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
       assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
 
-      d1._broadcast();
+      d1.broadcaster.broadcast();
       assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
@@ -100,11 +100,11 @@ describe("Renderers", () => {
       assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
       assert.equal(2, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
-      d1._broadcast();
+      d1.broadcaster.broadcast();
       assert.equal(2, xScaleCalls, "X scale was unhooked from old datasource");
       assert.equal(2, yScaleCalls, "Y scale was unhooked from old datasource");
 
-      d2._broadcast();
+      d2.broadcaster.broadcast();
       assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
       assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
     });
@@ -474,9 +474,9 @@ describe("Renderers", () => {
       });
 
       it("can select and deselect bars", () => {
-        var selectedBar = renderer.selectBar(145, 150); // in the middle of bar 0
+        var selectedBar: D3.Selection = renderer.selectBar(145, 150); // in the middle of bar 0
 
-        assert.isNotNull(selectedBar, "a bar was selected");
+        assert.isNotNull(selectedBar, "clicked on a bar");
         assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
         assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
 
@@ -485,6 +485,35 @@ describe("Renderers", () => {
 
         selectedBar = renderer.selectBar(-1, -1); // no bars here
         assert.isNull(selectedBar, "returns null if no bar was selected");
+
+        selectedBar = renderer.selectBar(200, 50); // between the two bars
+        assert.isNull(selectedBar, "returns null if no bar was selected");
+
+        selectedBar = renderer.selectBar(145, 10); // above bar 0
+        assert.isNull(selectedBar, "returns null if no bar was selected");
+
+        // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
+        // origin is at the top left!
+
+        selectedBar = renderer.selectBar({min: 145, max: 445}, {min: 150, max: 150}, true);
+        assert.isNotNull(selectedBar, "line between middle of two bars");
+        assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
+        assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+        assert.equal(selectedBar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+        assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+        selectedBar = renderer.selectBar({min: 145, max: 445}, {min: 150, max: 350}, true);
+        assert.isNotNull(selectedBar, "square between middle of two bars, & over the whole area");
+        assert.lengthOf(selectedBar.data(), 3, "selected all the bars");
+        assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+        assert.equal(selectedBar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+        assert.equal(selectedBar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
+        assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+        // the runtime parameter validation should be strict, so no strings or
+        // mangled objects
+        assert.throws(() => renderer.selectBar(<any> "blargh", <any> 150), Error);
+        assert.throws(() => renderer.selectBar(<any> {min: 150}, <any> 150), Error);
 
         verifier.end();
       });

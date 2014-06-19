@@ -3,18 +3,20 @@
 var assert = chai.assert;
 
 describe("Broadcasters", () => {
-  var b: Plottable.Abstract.Broadcaster;
+  var b: Plottable.Core.Broadcaster;
   var called: boolean;
   var cb: any;
+  var listenable: Plottable.Core.IListenable = {broadcaster: null};
 
   beforeEach(() => {
-    b = new Plottable.Abstract.Broadcaster();
+    b = new Plottable.Core.Broadcaster(listenable);
+    listenable.broadcaster = b;
     called = false;
     cb = () => {called = true;};
   });
   it("listeners are called by the broadcast method", () => {
     b.registerListener(null, cb);
-    b._broadcast();
+    b.broadcast();
     assert.isTrue(called, "callback was called");
   });
 
@@ -24,7 +26,7 @@ describe("Broadcasters", () => {
     var listener = {};
     b.registerListener(listener, cb);
     b.registerListener(listener, cb2);
-    b._broadcast();
+    b.broadcast();
     assert.isFalse(called, "first (overwritten) callback not called");
     assert.isTrue(called2, "second callback was called");
   });
@@ -33,21 +35,33 @@ describe("Broadcasters", () => {
     var listener = {};
     b.registerListener(listener, cb);
     b.deregisterListener(listener);
-    b._broadcast();
-    assert.isFalse(called, "callback was never called");
+    b.broadcast();
+    assert.isFalse(called, "callback was not called after deregistering only listener");
+
+    b.registerListener(5, cb);
+    b.registerListener(6, cb);
+    b.deregisterAllListeners();
+    b.broadcast();
+    assert.isFalse(called, "callback was not called after deregistering all listeners");
+
+    b.registerListener(5, cb);
+    b.registerListener(6, cb);
+    b.deregisterListener(5);
+    b.broadcast();
+    assert.isTrue(called, "callback was called even after 1/2 listeners were deregistered");
   });
 
   it("arguments are passed through to callback", () => {
     var g2 = {};
     var g3 = "foo";
-    var cb = (a1: Plottable.Abstract.Broadcaster, rest: any[]) => {
-      assert.equal(b, a1, "broadcaster passed through");
+    var cb = (a1: Plottable.Core.IListenable, rest: any[]) => {
+      assert.equal(listenable, a1, "broadcaster passed through");
       assert.equal(g2, rest[0], "arg1 passed through");
       assert.equal(g3, rest[1], "arg2 passed through");
       called = true;
     };
     b.registerListener(null, cb);
-    b._broadcast(g2, g3);
+    b.broadcast(g2, g3);
     assert.isTrue(called, "the cb was called");
   });
 

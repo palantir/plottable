@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Plottable.js Simple Chart Demo - jsFiddle demo</title>
+  
+  <style type='text/css'>
+    </style>
+<link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css">
+<style type="text/css">
+/*-- Add custom styles after this line --*/
+.demo-title { font-size: 24pt; }
+
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+
+var xAxis;
+var yAxis;
+var basicTable;
+
+window.onload = function() {
+    var data = [{x: 0, y: 0},{x: 200000, y: 30000}, {x: 300000, y: 40000}];
+    var svg = d3.select("#chart");
+    svg.attr("width", '100%').attr("height", 500);
+    
+    var xScale = new Plottable.Scale.Linear();
+    
+    xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+    var yScale = new Plottable.Scale.Linear();
+    yAxis = new Plottable.Axis.YAxis(yScale, "left");
+
+    var renderAreaD1 = new Plottable.Plot.Scatter(data, xScale, yScale);
+    xScale.setDomainer(new Plottable.Domainer().pad());
+    yScale.setDomainer(new Plottable.Domainer().pad());
+    basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis)
+                                          .addComponent(0, 1, renderAreaD1)
+                                          .addComponent(1, 1, xAxis);
+
+    basicTable.renderTo(svg);    
+};
+
+//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../plottable_multifile.js"></script>
+<script src="../examples/exampleUtil.js"></script>
+
+<div class="demo-title">Simple Chart</div>
+<br>
+<svg id="chart"></svg>
+<p />
+
+  
+</body>
+
+
+</html>
+

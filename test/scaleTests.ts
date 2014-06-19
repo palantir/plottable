@@ -4,36 +4,37 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale's copy() works correctly", () => {
-    var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
+    var testCallback: Plottable.Core.IBroadcasterCallback = (broadcaster: Plottable.Core.IListenable) => {
       return true; // doesn't do anything
     };
     var scale = new Plottable.Scale.Linear();
-    scale.registerListener(null, testCallback);
+    scale.broadcaster.registerListener(null, testCallback);
     var scaleCopy = scale.copy();
     assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
     assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-    assert.notDeepEqual((<any> scale).listener2Callback, (<any> scaleCopy).listener2Callback,
-                              "Registered callbacks are not copied over");
+    assert.notDeepEqual(scale.broadcaster, scaleCopy.broadcaster,
+                              "Broadcasters are not copied over");
   });
 
   it("Scale alerts listeners when its domain is updated", () => {
     var scale = new Plottable.Scale.Linear();
     var callbackWasCalled = false;
-    var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
-      assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+    var testCallback: Plottable.Core.IBroadcasterCallback = (listenable: Plottable.Core.IListenable) => {
+      assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
       callbackWasCalled = true;
     };
-    scale.registerListener(null, testCallback);
+    scale.broadcaster.registerListener(null, testCallback);
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-    scale.domain([0.08, 9.92]);
+    scale._autoDomainAutomatically = true;
+    scale.updateExtent(1, "x", [0.08, 9.92]);
     callbackWasCalled = false;
-    scale.nice();
+    scale.domainer(new Plottable.Domainer().nice());
     assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
 
     callbackWasCalled = false;
-    scale.padDomain(0.2);
+    scale.domainer(new Plottable.Domainer().pad());
     assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
   });
   describe("autoranging behavior", () => {
@@ -48,7 +49,7 @@ describe("Scales", () => {
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
       scale.updateExtent(1, "x", d3.extent(data, (e) => e.foo));
-      scale.autoDomain().padDomain().nice();
+      scale.domainer(new Plottable.Domainer().pad().nice());
       assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
       assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
@@ -95,47 +96,20 @@ describe("Scales", () => {
       assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
       assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
     });
+
+    it("scales don't allow Infinity", () => {
+      assert.throws(() => scale._setDomain([5, Infinity]), Error);
+      assert.throws(() => scale._setDomain([-Infinity, 6]), Error);
+    });
   });
 
   describe("Quantitive Scales", () => {
     it("autorange defaults to [0, 1] if no perspectives set", () => {
       var scale = new Plottable.Scale.Linear();
-      scale.domain([]);
       scale.autoDomain();
       var d = scale.domain();
       assert.equal(d[0], 0);
       assert.equal(d[1], 1);
-    });
-
-    it("autoPad defaults to [v-1, v+1] if there's only one value", () => {
-      var scale = new Plottable.Scale.Linear();
-      scale.domain([5,5]);
-      scale.padDomain();
-      assert.deepEqual(scale.domain(), [4, 6]);
-    });
-
-    it("autoPad works in general case", () => {
-      var scale = new Plottable.Scale.Linear();
-      scale.domain([100, 200]);
-      scale.padDomain(0.20);
-      assert.deepEqual(scale.domain(), [90, 210]);
-    });
-
-    it("autoPad works for date scales", () => {
-      var scale = new Plottable.Scale.Time();
-      var f = d3.time.format("%x");
-      var d1 = f.parse("06/02/2014");
-      var d2 = f.parse("06/03/2014");
-      scale.domain([d1, d2]);
-      scale.padDomain();
-      var dd1 = scale.domain()[0];
-      var dd2 = scale.domain()[1];
-      assert.isDefined(dd1.toDateString, "padDomain produced dates");
-      assert.isNotNull(dd1.toDateString, "padDomain produced dates");
-      assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
-      assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-      assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-      assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
     });
   });
 
@@ -167,11 +141,11 @@ describe("Scales", () => {
     it("rangeType triggers broadcast", () => {
       var scale = new Plottable.Scale.Ordinal();
       var callbackWasCalled = false;
-      var testCallback: Plottable.IBroadcasterCallback = (broadcaster: Plottable.Abstract.Broadcaster) => {
-        assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+      var testCallback: Plottable.Core.IBroadcasterCallback = (listenable: Plottable.Core.IListenable) => {
+        assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
         callbackWasCalled = true;
       };
-      scale.registerListener(null, testCallback);
+      scale.broadcaster.registerListener(null, testCallback);
       scale.rangeType("points");
       assert.isTrue(callbackWasCalled, "The registered callback was called");
     });

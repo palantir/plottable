@@ -84,12 +84,12 @@ export module Abstract {
       }
       var oldSource = this._dataSource;
       if (oldSource != null) {
-        this._deregisterFromBroadcaster(this._dataSource);
+        this._dataSource.broadcaster.deregisterListener(this);
         this._requireRerender = true;
         this._rerenderUpdateSelection = true;
       }
       this._dataSource = source;
-      this._registerToBroadcaster(this._dataSource, () => {
+      this._dataSource.broadcaster.registerListener(this, () => {
         this.updateAllProjectors();
         this._dataChanged = true;
         this._render();
@@ -107,11 +107,11 @@ export module Abstract {
 
       if (existingScale != null) {
         existingScale.removeExtent(this._plottableID, attrToSet);
-        this._deregisterFromBroadcaster(existingScale);
+        existingScale.broadcaster.deregisterListener(this);
       }
 
       if (scale != null) {
-        this._registerToBroadcaster(scale, () => this._render());
+        scale.broadcaster.registerListener(this, () => this._render());
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
