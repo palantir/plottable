@@ -5657,7 +5657,7 @@ var Plottable;
             */
             function BarPlot(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._baselineValue = BarPlot._defaultBaselineValue;
+                this._baselineValue = 0;
                 this.previousBaselineValue = null;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
@@ -5759,9 +5759,8 @@ var Plottable;
             BarPlot.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Plottable.Abstract.QuantitiveScale) {
                     var qscale = scale;
-                    if (!qscale._userSetDomainer) {
-                        var baselineValue = this._baselineValue === undefined ? Plottable.Abstract.BarPlot._defaultBaselineValue : this._baselineValue;
-                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(baselineValue).include(baselineValue);
+                    if (!qscale._userSetDomainer && this._baselineValue != null) {
+                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
                         if (qscale._autoDomainAutomatically) {
                             qscale.autoDomain();
                         }
@@ -5769,7 +5768,6 @@ var Plottable;
                 }
                 return this;
             };
-            BarPlot._defaultBaselineValue = 0;
             return BarPlot;
         })(Plottable.Abstract.XYPlot);
         Abstract.BarPlot = BarPlot;

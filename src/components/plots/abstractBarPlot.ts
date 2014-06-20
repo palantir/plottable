@@ -3,12 +3,9 @@
 module Plottable {
 export module Abstract {
   export class BarPlot extends XYPlot {
-
-    public static _defaultBaselineValue = 0;
-
     public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
-    public _baselineValue = BarPlot._defaultBaselineValue;
+    public _baselineValue = 0;
     public _barAlignment: string;
     private previousBaselineValue: number = null;
 
@@ -138,15 +135,12 @@ export module Abstract {
     public _updateDomainer(scale: Scale) {
       if (scale instanceof Abstract.QuantitiveScale) {
         var qscale = <Abstract.QuantitiveScale>scale;
-        if (!qscale._userSetDomainer) {
-          var baselineValue = this._baselineValue === undefined ?
-                              Abstract.BarPlot._defaultBaselineValue :
-                              this._baselineValue;
+        if (!qscale._userSetDomainer && this._baselineValue != null) {
           qscale.domainer()
             .paddingException(this.previousBaselineValue, false)
             .include(this.previousBaselineValue, false)
-            .paddingException(baselineValue)
-            .include(baselineValue);
+            .paddingException(this._baselineValue)
+            .include(this._baselineValue);
           if (qscale._autoDomainAutomatically) {
             qscale.autoDomain();
           }

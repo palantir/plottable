@@ -1723,7 +1723,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-            static _defaultBaselineValue: number;
             /**
             * Creates an AbstractBarPlot.
             *
