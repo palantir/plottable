@@ -5669,8 +5669,11 @@ var Plottable;
                 this.project("fill", function () {
                     return "steelblue";
                 });
-                this._updateXDomainer();
-                this._updateYDomainer();
+
+                // because this._baselineValue was not initialized during the super()
+                // call, we must call this in order to get this._baselineValue
+                // to be used by the Domainer.
+                this.baseline(this._baselineValue);
             }
             BarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
