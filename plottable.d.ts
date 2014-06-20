@@ -1497,22 +1497,27 @@ declare module Plottable {
             */
             public tickLabelPosition(position: string): Numeric;
             /**
-            * Control whether or not the tick labels at the end of the graph are
-            * displayed when partially cut off. For example, on an axis with
-            * orientation "bottom", you can turn on or off the "left" and "right"
-            * tick labels.
+            * Return whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
             *
             * @param {string} orientation Where on the scale to change tick labels.
             *                 On a "top" or "bottom" axis, this can be "left" or
             *                 "right". On a "left" or "right" axis, this can be "top"
             *                 or "bottom".
-            * @param {boolean} [show] If present, whether or not the given tick
-            *                 should be displayed. If not present, retrieve whether
-            *                 or not the tick is displayed.
-            * @returns {Numeric|boolean} The current setting, or the calling Numeric
-            *                 (if show is supplied).
+            * @returns {boolean} The current setting.
             */
             public showEndTickLabel(orientation: string): boolean;
+            /**
+            * Control whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @param {boolean} show Whether or not the given tick should be displayed.
+            * @returns {Numeric} The calling Numeric.
+            */
             public showEndTickLabel(orientation: string, show: boolean): Numeric;
         }
     }
