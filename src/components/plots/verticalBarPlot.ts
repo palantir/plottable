@@ -103,7 +103,11 @@ export module Plot {
       if (this.yScale instanceof Abstract.QuantitiveScale) {
         var scale = <Abstract.QuantitiveScale>this.yScale;
         if (!scale._userSetDomainer) {
-          scale.domainer().paddingException(this._baselineValue);
+          var baselineValue = this._baselineValue === undefined ?
+                              Abstract.BarPlot._defaultBaselineValue :
+                              this._baselineValue;
+          scale.domainer().paddingException(baselineValue)
+                          .include(baselineValue);
         }
       }
       return this;

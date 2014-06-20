@@ -4696,4 +4696,20 @@ describe("Domainer", function () {
         domain = domainer.computeDomain([[0, 200]], scale);
         assert.deepEqual(domain, [-10, 200]);
     });
+
+    it("include(n) works an expected", function () {
+        domainer.include(5);
+        var domain = domainer.computeDomain([[0, 10]], scale);
+        assert.deepEqual(domain, [0, 10]);
+        domain = domainer.computeDomain([[0, 3]], scale);
+        assert.deepEqual(domain, [0, 5]);
+        domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [5, 200]);
+
+        domainer.include(-3).include(0).include(10);
+        domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [-3, 200]);
+        domain = domainer.computeDomain([[0, 0]], scale);
+        assert.deepEqual(domain, [-3, 10]);
+    });
 });

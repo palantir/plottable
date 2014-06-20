@@ -3,9 +3,12 @@
 module Plottable {
 export module Abstract {
   export class BarPlot extends XYPlot {
+
+    public static _defaultBaselineValue = 0;
+
     public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
-    public _baselineValue = 0;
+    public _baselineValue = BarPlot._defaultBaselineValue;
     public _barAlignment: string;
 
     public _animators: Animator.IPlotAnimatorMap = {
@@ -27,10 +30,6 @@ export module Abstract {
       this.classed("bar-renderer", true);
       this.project("width", 10);
       this.project("fill", () => "steelblue");
-      // because this._baselineValue was not initialized during the super()
-      // call, we must call this in order to get this._baselineValue
-      // to be used by the Domainer.
-      this.baseline(this._baselineValue);
     }
 
     public _setup() {

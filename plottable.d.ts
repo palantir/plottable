@@ -1029,6 +1029,19 @@ declare module Plottable {
         * @return {Domainer} The calling Domainer.
         */
         public nice(count?: number): Domainer;
+        /**
+        * Ensure that the domain produced includes value.
+        *
+        * For example, after include(0), the domain [3, 5] will become [0, 5],
+        * and the domain [-9, -8] will become [-9, 0].
+        *
+        * @param {any} value The value that will be included.
+        * @param {boolean} include Defaults to true. If true, this value will
+        *                  always be included, if false, this value will not
+        *                  necessarily be included.
+        * @return {Domainer} The calling Domainer.
+        */
+        public include(value: any, include?: boolean): Domainer;
     }
 }
 
@@ -1710,6 +1723,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
+            static _defaultBaselineValue: number;
             /**
             * Creates an AbstractBarPlot.
             *
