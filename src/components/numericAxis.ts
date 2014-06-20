@@ -161,7 +161,7 @@ export module Axis {
         this.hideEndTickLabels();
       }
 
-      this.hideOverlappingTickLabels();
+      this._hideOverlappingTickLabels();
 
       return this;
     }
@@ -222,34 +222,6 @@ export module Axis {
       if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
-    }
-
-    private hideOverlappingTickLabels() {
-      var visibleTickLabels = this._tickLabelContainer
-                                    .selectAll("." + Abstract.Axis.TICK_LABEL_CLASS)
-                                    .filter(function(d: any, i: number) {
-                                      return d3.select(this).style("visibility") === "visible";
-                                    });
-      var lastLabelClientRect: ClientRect;
-
-      function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-        if (boxA.right < boxB.left) { return false; }
-        if (boxA.left > boxB.right) { return false; }
-        if (boxA.bottom < boxB.top) { return false; }
-        if (boxA.top > boxB.bottom) { return false; }
-        return true;
-      }
-
-      visibleTickLabels.each(function (d: any) {
-        var clientRect = this.getBoundingClientRect();
-        var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
-          tickLabel.style("visibility", "hidden");
-        } else {
-          lastLabelClientRect = clientRect;
-          tickLabel.style("visibility", "visible");
-        }
-      });
     }
   }
 }

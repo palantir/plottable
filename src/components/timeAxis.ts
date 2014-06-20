@@ -72,6 +72,7 @@ export module Axis {
 
       var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
+      this._hideOverlappingTickLabels();
       return this;
     }
   }
