@@ -1110,13 +1110,23 @@ declare module Plottable {
             */
             public tickFormat(count: number, format?: string): (n: number) => string;
             /**
+            * Retrieve a Domainer of a scale. A Domainer is responsible for combining
+            * multiple extents into a single domain.
+            *
+            * @return {QuantitiveScale} The scale's current domainer.
+            */
+            public domainer(): Domainer;
+            /**
             * Sets a Domainer of a scale. A Domainer is responsible for combining
             * multiple extents into a single domain.
+            *
+            * When you set domainer, we assume that you know what you want the domain
+            * to look like better that we do. Ensuring that the domain is padded,
+            * includes 0, etc., will be the responsability of the new domainer.
             *
             * @param {Domainer} domainer The domainer to be set.
             * @return {QuantitiveScale} The calling scale.
             */
-            public domainer(): Domainer;
             public domainer(domainer: Domainer): QuantitiveScale;
         }
     }
