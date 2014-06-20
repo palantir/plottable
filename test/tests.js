@@ -1803,6 +1803,17 @@ describe("Formatters", function () {
             result = general.format(null);
             assert.strictEqual(result, "null", "non-number inputs are stringified");
         });
+
+        it("throws an error on strange precision", function () {
+            assert.throws(function () {
+                var general = new Plottable.Formatter.General(-1);
+                var result = general.format(5);
+            });
+            assert.throws(function () {
+                var general = new Plottable.Formatter.General(100);
+                var result = general.format(5);
+            });
+        });
     });
 
     describe("identity", function () {
