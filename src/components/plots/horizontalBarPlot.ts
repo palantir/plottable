@@ -99,16 +99,7 @@ export module Plot {
     }
 
     public _updateXDomainer() {
-      if (this.xScale instanceof Abstract.QuantitiveScale) {
-        var scale = <Abstract.QuantitiveScale>this.xScale;
-        if (!scale._userSetDomainer) {
-          var baselineValue = this._baselineValue === undefined ?
-                              Abstract.BarPlot._defaultBaselineValue :
-                              this._baselineValue;
-          scale.domainer().paddingException(baselineValue)
-                          .include(baselineValue);
-          }
-      }
+      this._updateDomainer(this.yScale);
       return this;
     }
   }

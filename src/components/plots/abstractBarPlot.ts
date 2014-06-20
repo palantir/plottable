@@ -10,6 +10,7 @@ export module Abstract {
     public _baseline: D3.Selection;
     public _baselineValue = BarPlot._defaultBaselineValue;
     public _barAlignment: string;
+    private previousBaselineValue: number = null;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
@@ -30,6 +31,8 @@ export module Abstract {
       this.classed("bar-renderer", true);
       this.project("width", 10);
       this.project("fill", () => "steelblue");
+      this._updateXDomainer();
+      this._updateYDomainer();
     }
 
     public _setup() {
@@ -45,6 +48,7 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
+      this.previousBaselineValue = this._baselineValue;
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
@@ -128,6 +132,26 @@ export module Abstract {
      */
     public deselectAll() {
       this._bars.classed("selected", false);
+      return this;
+    }
+
+    public _updateDomainer(scale: Scale) {
+      if (scale instanceof Abstract.QuantitiveScale) {
+        var qscale = <Abstract.QuantitiveScale>scale;
+        if (!qscale._userSetDomainer) {
+          var baselineValue = this._baselineValue === undefined ?
+                              Abstract.BarPlot._defaultBaselineValue :
+                              this._baselineValue;
+          qscale.domainer()
+            .paddingException(this.previousBaselineValue, false)
+            .include(this.previousBaselineValue, false)
+            .paddingException(baselineValue)
+            .include(baselineValue);
+          if (qscale._autoDomainAutomatically) {
+            qscale.autoDomain();
+          }
+        }
+      }
       return this;
     }
   }

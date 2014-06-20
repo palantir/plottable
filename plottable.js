@@ -5658,6 +5658,7 @@ var Plottable;
             function BarPlot(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = BarPlot._defaultBaselineValue;
+                this.previousBaselineValue = null;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -5668,6 +5669,8 @@ var Plottable;
                 this.project("fill", function () {
                     return "steelblue";
                 });
+                this._updateXDomainer();
+                this._updateYDomainer();
             }
             BarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5682,6 +5685,7 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.baseline = function (value) {
+                this.previousBaselineValue = this._baselineValue;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
@@ -5749,6 +5753,20 @@ var Plottable;
             */
             BarPlot.prototype.deselectAll = function () {
                 this._bars.classed("selected", false);
+                return this;
+            };
+
+            BarPlot.prototype._updateDomainer = function (scale) {
+                if (scale instanceof Plottable.Abstract.QuantitiveScale) {
+                    var qscale = scale;
+                    if (!qscale._userSetDomainer) {
+                        var baselineValue = this._baselineValue === undefined ? Plottable.Abstract.BarPlot._defaultBaselineValue : this._baselineValue;
+                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(baselineValue).include(baselineValue);
+                        if (qscale._autoDomainAutomatically) {
+                            qscale.autoDomain();
+                        }
+                    }
+                }
                 return this;
             };
             BarPlot._defaultBaselineValue = 0;
@@ -5876,13 +5894,7 @@ var Plottable;
             };
 
             VerticalBar.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    var scale = this.yScale;
-                    if (!scale._userSetDomainer) {
-                        var baselineValue = this._baselineValue === undefined ? Plottable.Abstract.BarPlot._defaultBaselineValue : this._baselineValue;
-                        scale.domainer().paddingException(baselineValue).include(baselineValue);
-                    }
-                }
+                this._updateDomainer(this.yScale);
                 return this;
             };
             return VerticalBar;
@@ -6008,13 +6020,7 @@ var Plottable;
             };
 
             HorizontalBar.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    var scale = this.xScale;
-                    if (!scale._userSetDomainer) {
-                        var baselineValue = this._baselineValue === undefined ? Plottable.Abstract.BarPlot._defaultBaselineValue : this._baselineValue;
-                        scale.domainer().paddingException(baselineValue).include(baselineValue);
-                    }
-                }
+                this._updateDomainer(this.yScale);
                 return this;
             };
             return HorizontalBar;

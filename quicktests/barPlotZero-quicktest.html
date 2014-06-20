@@ -18,7 +18,6 @@
       yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
       var barPlot = new Plottable.Plot.VerticalBar(data1, xScale, yScale)
-      debugger;
 
       var chart = new Plottable.Component.Table([
         [yAxis, barPlot],
@@ -29,10 +28,15 @@
         var svg = d3.select("#test");
         chart.renderTo(svg);
       }
+
+      function randomBaseline() {
+        barPlot.baseline(Math.random());
+      }
     </script>
   </head>
   <body>
     <svg id="test" width="480" height="320"></svg>
+    <button onclick="randomBaseline()">random baseline</button>
   </body>
 
 </html>
