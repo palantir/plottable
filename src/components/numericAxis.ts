@@ -5,6 +5,10 @@ export module Axis {
   export class Numeric extends Abstract.Axis {
     public _scale: Abstract.QuantitiveScale;
     private tickLabelPositioning = "center";
+    // Whether or not first/last tick label will still be displayed even if
+    // the label is cut off.
+    private showFirstTickLabel = false;
+    private showLastTickLabel = false;
 
     /**
      * Creates a NumericAxis.
@@ -157,9 +161,7 @@ export module Axis {
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
 
-      if (!this.showEndTickLabels()) {
-        this.hideEndTickLabels();
-      }
+      this.hideEndTickLabels();
 
       this.hideOverlappingTickLabels();
 
@@ -215,11 +217,11 @@ export module Axis {
 
       var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
       var firstTickLabel = tickLabels[0][0];
-      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+      if (!this.showFirstTickLabel && !isInsideBBox(firstTickLabel.getBoundingClientRect())) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
       var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+      if (!this.showLastTickLabel && !isInsideBBox(lastTickLabel.getBoundingClientRect())) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
     }
@@ -251,6 +253,47 @@ export module Axis {
         }
       });
     }
-  }
+
+    /**
+     * Control whether or not the tick labels at the end of the graph are
+     * displayed when partially cut off. For example, on an axis with
+     * orientation "bottom", you can turn on or off the "left" and "right"
+     * tick labels.
+     *
+     * @param {string} orientation Where on the scale to change tick labels.
+     *                 On a "top" or "bottom" axis, this can be "left" or
+     *                 "right". On a "left" or "right" axis, this can be "top"
+     *                 or "bottom".
+     * @param {boolean} [show] If present, whether or not the given tick
+     *                 should be displayed. If not present, retrieve whether
+     *                 or not the tick is displayed.
+     * @returns {Numeric|boolean} The current setting, or the calling Numeric
+     *                 (if show is supplied).
+     */
+    public showEndTickLabel(orientation: string): boolean;
+    public showEndTickLabel(orientation: string, show: boolean): Numeric;
+    public showEndTickLabel(orientation: string, show?: boolean): any {
+      if ((this._isHorizontal() && orientation === "left") ||
+          (!this._isHorizontal() && orientation === "top")) {
+        if (show === undefined) {
+          return this.showFirstTickLabel;
+        } else {
+          this.showFirstTickLabel = show;
+          return this;
+        }
+      } else if ((this._isHorizontal() && orientation === "right") ||
+                 (!this._isHorizontal() && orientation === "bottom")) {
+        if (show === undefined) {
+          return this.showLastTickLabel;
+        } else {
+          this.showLastTickLabel = show;
+          return this;
+        }
+      } else {
+        throw new Error("Attempt to show " + orientation +
+                        " tick labels on a " + this._orientation + " axis");
+      }
+    }
+}
 }
 }

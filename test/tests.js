@@ -788,7 +788,7 @@ describe("NumericAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.range([0, SVG_WIDTH]);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
-        numericAxis.showEndTickLabels(false);
+        numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
         numericAxis.renderTo(svg);
 
         var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
@@ -807,7 +807,7 @@ describe("NumericAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.range([0, SVG_WIDTH]);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
-        numericAxis.showEndTickLabels(false);
+        numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
         numericAxis.renderTo(svg);
 
         function boxesOverlap(boxA, boxB) {

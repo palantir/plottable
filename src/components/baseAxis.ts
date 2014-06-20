@@ -16,7 +16,6 @@ export module Abstract {
     public _height: any = "auto";
     public _computedWidth: number;
     public _computedHeight: number;
-    private _showEndTickLabels = false;
     private _tickLength = 5;
     private _tickLabelPadding = 3;
 
@@ -342,29 +341,6 @@ export module Abstract {
         this._invalidateLayout();
         return this;
       }
-    }
-
-    /**
-     * Checks whether the Axis is currently set to show the first and last
-     * tick labels.
-     *
-     * @returns {boolean}
-     */
-    public showEndTickLabels(): boolean;
-    /**
-     * Set whether or not to show the first and last tick labels.
-     *
-     * @param {boolean} show Whether or not to show the first and last labels.
-     * @returns {Axis} The calling Axis.
-     */
-    public showEndTickLabels(show: boolean): Axis;
-    public showEndTickLabels(show?: boolean): any {
-      if (show == null) {
-        return this._showEndTickLabels;
-      }
-      this._showEndTickLabels = show;
-      this._render();
-      return this;
     }
   }
 }

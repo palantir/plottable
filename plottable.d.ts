@@ -1464,20 +1464,6 @@ declare module Plottable {
             public tickLabelPadding(padding: number): Axis;
             public orient(): string;
             public orient(newOrientation: string): Axis;
-            /**
-            * Checks whether the Axis is currently set to show the first and last
-            * tick labels.
-            *
-            * @returns {boolean}
-            */
-            public showEndTickLabels(): boolean;
-            /**
-            * Set whether or not to show the first and last tick labels.
-            *
-            * @param {boolean} show Whether or not to show the first and last labels.
-            * @returns {Axis} The calling Axis.
-            */
-            public showEndTickLabels(show: boolean): Axis;
         }
     }
 }
@@ -1510,6 +1496,24 @@ declare module Plottable {
             * @returns {NumericAxis} The calling NumericAxis.
             */
             public tickLabelPosition(position: string): Numeric;
+            /**
+            * Control whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off. For example, on an axis with
+            * orientation "bottom", you can turn on or off the "left" and "right"
+            * tick labels.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @param {boolean} [show] If present, whether or not the given tick
+            *                 should be displayed. If not present, retrieve whether
+            *                 or not the tick is displayed.
+            * @returns {Numeric|boolean} The current setting, or the calling Numeric
+            *                 (if show is supplied).
+            */
+            public showEndTickLabel(orientation: string): boolean;
+            public showEndTickLabel(orientation: string, show: boolean): Numeric;
         }
     }
 }

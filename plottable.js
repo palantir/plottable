@@ -4216,7 +4216,6 @@ var Plottable;
                 _super.call(this);
                 this._width = "auto";
                 this._height = "auto";
-                this._showEndTickLabels = false;
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
                 this._scale = scale;
@@ -4482,15 +4481,6 @@ var Plottable;
                     return this;
                 }
             };
-
-            Axis.prototype.showEndTickLabels = function (show) {
-                if (show == null) {
-                    return this._showEndTickLabels;
-                }
-                this._showEndTickLabels = show;
-                this._render();
-                return this;
-            };
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
@@ -4523,6 +4513,10 @@ var Plottable;
             function Numeric(scale, orientation, formatter) {
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
+                // Whether or not first/last tick label will still be displayed even if
+                // the label is cut off.
+                this.showFirstTickLabel = false;
+                this.showLastTickLabel = false;
             }
             Numeric.prototype._computeWidth = function () {
                 // generate a test value to measure width
@@ -4661,9 +4655,7 @@ var Plottable;
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
 
-                if (!this.showEndTickLabels()) {
-                    this.hideEndTickLabels();
-                }
+                this.hideEndTickLabels();
 
                 this.hideOverlappingTickLabels();
 
@@ -4700,11 +4692,11 @@ var Plottable;
 
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
                 var firstTickLabel = tickLabels[0][0];
-                if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+                if (!this.showFirstTickLabel && !isInsideBBox(firstTickLabel.getBoundingClientRect())) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
                 }
                 var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+                if (!this.showLastTickLabel && !isInsideBBox(lastTickLabel.getBoundingClientRect())) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
@@ -4741,6 +4733,26 @@ var Plottable;
                         tickLabel.style("visibility", "visible");
                     }
                 });
+            };
+
+            Numeric.prototype.showEndTickLabel = function (orientation, show) {
+                if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "top")) {
+                    if (show === undefined) {
+                        return this.showFirstTickLabel;
+                    } else {
+                        this.showFirstTickLabel = show;
+                        return this;
+                    }
+                } else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "bottom")) {
+                    if (show === undefined) {
+                        return this.showLastTickLabel;
+                    } else {
+                        this.showLastTickLabel = show;
+                        return this;
+                    }
+                } else {
+                    throw new Error("Attempt to show " + orientation + " tick labels on a " + this._orientation + " axis");
+                }
             };
             return Numeric;
         })(Plottable.Abstract.Axis);
