@@ -4751,7 +4751,7 @@ var Plottable;
                         return this;
                     }
                 } else {
-                    throw new Error("Attempt to show " + orientation + " tick labels on a " + this._orientation + " axis");
+                    throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
                 }
             };
             return Numeric;
