@@ -1,7 +1,7 @@
 var renderGroup, renderGroup2;
+var xScale1, xScale2, yScale1, yScale2;
 
-var renderArea1_top, renderArea2_top, renderArea3_top, renderArea4_top;
-var renderArea1_bottom, renderArea2_bottom, renderArea3_bottom, renderArea4_bottom;
+var renderArea1, renderArea2, renderArea3, renderArea4;
 
     //data
     var dataseries = new Plottable.DataSource(data[0].slice(0, 10));
@@ -17,10 +17,10 @@ var renderArea1_bottom, renderArea2_bottom, renderArea3_bottom, renderArea4_bott
     
     //Axis
 
-    var xScale1 = new Plottable.Scale.Linear();
-    var yScale1 = new Plottable.Scale.Linear(); 
-    var xScale2 = new Plottable.Scale.Linear();
-    var yScale2 = new Plottable.Scale.Linear(); 
+    xScale1 = new Plottable.Scale.Linear();
+    yScale1 = new Plottable.Scale.Linear(); 
+    xScale2 = new Plottable.Scale.Linear();
+    yScale2 = new Plottable.Scale.Linear(); 
     var xAxis = new Plottable.Axis.Numeric(xScale1, "bottom");
     var yAxis = new Plottable.Axis.Numeric(yScale1, "left");
     var xAxis2 = new Plottable.Axis.Numeric(xScale2, "bottom");
@@ -31,26 +31,18 @@ var renderArea1_bottom, renderArea2_bottom, renderArea3_bottom, renderArea4_bott
     };
     
     //rendering
-    renderArea1_top = new Plottable.Plot.Area(dataseries, xScale1, yScale1);
-    renderArea1_top.project("fill", colorProjector);
-    renderArea2_top = new Plottable.Plot.Area(dataseries2, xScale1, yScale1);
-    renderArea2_top.project("fill", colorProjector);    
-    renderArea3_top = new Plottable.Plot.Area(dataseries3, xScale1, yScale1);
-    renderArea3_top.project("fill", colorProjector);
-    renderArea4_top = new Plottable.Plot.Area(dataseries4, xScale1, yScale1);
-    renderArea4_top.project("fill", colorProjector);
-    renderArea1_bottom = new Plottable.Plot.Area(dataseries, xScale2, yScale2);
-    renderArea1_bottom.project("fill", colorProjector);
-    renderArea2_bottom = new Plottable.Plot.Area(dataseries2, xScale2, yScale2);
-    renderArea2_bottom.project("fill", colorProjector);    
-    renderArea3_bottom = new Plottable.Plot.Area(dataseries3, xScale2, yScale2);
-    renderArea3_bottom.project("fill", colorProjector);
-    renderArea4_bottom = new Plottable.Plot.Area(dataseries4, xScale2, yScale2);
-    renderArea4_bottom.project("fill", colorProjector);
+    renderArea1 = new Plottable.Plot.Area(dataseries, xScale1, yScale1);
+    renderArea1.project("fill", colorProjector);
+    renderArea2 = new Plottable.Plot.Area(dataseries2, xScale1, yScale1);
+    renderArea2.project("fill", colorProjector);    
+    renderArea3 = new Plottable.Plot.Area(dataseries3, xScale2, yScale2);
+    renderArea3.project("fill", colorProjector);
+    renderArea4 = new Plottable.Plot.Area(dataseries4, xScale2, yScale2);
+    renderArea4.project("fill", colorProjector);
     
     
-    renderGroup = renderArea1_top.merge(renderArea2_top);
-    renderGroup2 = renderArea3_bottom.merge(renderArea4_bottom);  
+    renderGroup = renderArea1.merge(renderArea2);
+    renderGroup2 = renderArea3.merge(renderArea4);  
     
     var basicTable = new Plottable.Component.Table()
                 .addComponent(0, 0, yAxis)
@@ -68,15 +60,15 @@ var renderArea1_bottom, renderArea2_bottom, renderArea3_bottom, renderArea4_bott
     bigTable.renderTo(svg);
 
 addRemove = function(x, y){
-    console.log("addremove");
-    setTimeout(function(){Area1Group1()}, 500);
-    setTimeout(function(){Area2Group1()}, 1000);
-    setTimeout(function(){Area3Group1()}, 1500);
-    setTimeout(function(){area4Group1()}, 2000);
-    setTimeout(function(){Area1Group2()}, 2500);
-    setTimeout(function(){Area2Group2()}, 3000);
-    setTimeout(function(){Area3Group2()}, 3500);
-    setTimeout(function(){Area4Group2()}, 4000);
+    var gap = 1000;
+    setTimeout(function(){Area1Group1()}, gap*1);
+    setTimeout(function(){Area2Group1()}, gap*2);
+    setTimeout(function(){Area3Group1()}, gap*3);
+    setTimeout(function(){area4Group1()}, gap*4);
+    setTimeout(function(){Area1Group2()}, gap*5);
+    setTimeout(function(){Area2Group2()}, gap*6);
+    setTimeout(function(){Area3Group2()}, gap*7);
+    setTimeout(function(){Area4Group2()}, gap*8);
 }
 
 
@@ -85,49 +77,45 @@ window.xy = new Plottable.Interaction.Click(bigTable)
     .registerWithComponent();
 
 function Area1Group1() {
-    renderArea1_top.remove();
-    renderArea1_bottom.remove();
-    renderGroup.merge(renderArea1_top);    
+    project_newScale(renderArea1, xScale1, yScale1);
+    renderGroup.merge(renderArea1);    
 }
-
 function Area2Group1() {
-    renderArea2_top.remove();
-    renderArea2_bottom.remove();
-    renderGroup.merge(renderArea2_top);    
+    project_newScale(renderArea2, xScale1, yScale1);
+    renderGroup.merge(renderArea2);    
 }
-
 function Area3Group1() {
-    renderArea3_top.remove();
-    renderArea3_bottom.remove();
-    renderGroup.merge(renderArea3_top);  
+    project_newScale(renderArea3, xScale1, yScale1);
+    renderGroup.merge(renderArea3);    
 }
-
 function area4Group1() {
-    renderArea4_top.remove();
-    renderArea4_bottom.remove();
-    renderGroup.merge(renderArea4_top);    
+    project_newScale(renderArea4, xScale1, yScale1);
+    renderGroup.merge(renderArea4);    
 }
-
 function Area1Group2() {
-    renderArea1_top.remove();
-    renderArea1_bottom.remove();
-    renderGroup2.merge(renderArea1_bottom);    
+    project_newScale(renderArea1, xScale2, yScale2);
+    renderGroup2.merge(renderArea1);    
 }
-
 function Area2Group2() {
-    renderArea2_top.remove();
-    renderArea2_bottom.remove();
-    renderGroup2.merge(renderArea2_bottom);     
+    project_newScale(renderArea2, xScale2, yScale2);
+    renderGroup2.merge(renderArea2);    
 }
-
 function Area3Group2() {
-    renderArea3_top.remove();
-    renderArea3_bottom.remove();
-    renderGroup2.merge(renderArea3_bottom);       
+    project_newScale(renderArea3, xScale2, yScale2);
+    renderGroup2.merge(renderArea3);    
 }
-
 function Area4Group2() {
-    renderArea4_top.remove();
-    renderArea4_bottom.remove();
-    renderGroup2.merge(renderArea4_bottom);     
+    project_newScale(renderArea4, xScale2, yScale2);
+    renderGroup2.merge(renderArea4);    
+}
+function xAccessor(d){
+    return d.x;
+}
+function yAccessor(d){
+    return d.y;
+}
+function project_newScale(renderArea, xScale, yScale){
+    renderArea.remove();
+    renderArea.project("x", xAccessor, xScale);
+    renderArea.project("y", yAccessor, yScale);
 }
