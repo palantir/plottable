@@ -5636,6 +5636,7 @@ var Plottable;
             BarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
+                this._bars = this.renderArea.selectAll("rect").data([]);
                 return this;
             };
 
@@ -5679,6 +5680,10 @@ var Plottable;
 
             BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (typeof select === "undefined") { select = true; }
+                if (!this._isSetup) {
+                    return null;
+                }
+
                 var selectedBars = [];
 
                 var xExtent = this.parseExtent(xValOrExtent);
@@ -5712,7 +5717,9 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.deselectAll = function () {
-                this._bars.classed("selected", false);
+                if (this._isSetup) {
+                    this._bars.classed("selected", false);
+                }
                 return this;
             };
             return BarPlot;

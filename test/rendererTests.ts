@@ -518,6 +518,20 @@ describe("Renderers", () => {
         verifier.end();
       });
 
+      it("shouldn't blow up if members called before the first render", () => {
+        var brandNew = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+
+        assert.isNotNull(brandNew.deselectAll(), "deselects return self");
+        assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
+
+        brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
+
+        assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
+        assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
+
+        verifier.end();
+      });
+
       after(() => {
         if (verifier.passed) {svg.remove();};
       });

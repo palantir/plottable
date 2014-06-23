@@ -36,6 +36,7 @@ export module Abstract {
     public _setup() {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._bars = this.renderArea.selectAll("rect").data([]);
       return this;
     }
 
@@ -94,6 +95,10 @@ export module Abstract {
     public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
+      if (!this._isSetup) {
+        return null;
+      }
+
       var selectedBars: any[] = [];
 
       var xExtent: IExtent = this.parseExtent(xValOrExtent);
@@ -128,7 +133,9 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
-      this._bars.classed("selected", false);
+      if (this._isSetup) {
+        this._bars.classed("selected", false);
+      }
       return this;
     }
   }
