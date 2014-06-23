@@ -136,7 +136,7 @@ export module Abstract {
 
     public _updateDomainer(scale: Scale) {
       if (scale instanceof Abstract.QuantitiveScale) {
-        var qscale = <Abstract.QuantitiveScale>scale;
+        var qscale = <Abstract.QuantitiveScale> scale;
         if (!qscale._userSetDomainer && this._baselineValue != null) {
           qscale.domainer()
             .paddingException(this.previousBaselineValue, false)
