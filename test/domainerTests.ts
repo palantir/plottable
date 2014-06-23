@@ -77,6 +77,18 @@ describe("Domainer", () => {
     assert.deepEqual(domain, [-10, 200]);
   });
 
+  it("paddingException(n) works on dates", () => {
+    var a = new Date(2000, 5, 5);
+    var b = new Date(2003, 0, 1);
+    domainer.pad().paddingException(a);
+    var timeScale = new Plottable.Scale.Time();
+    timeScale.updateExtent(1, "x", [a, b]);
+    timeScale.domainer(domainer);
+    var domain = timeScale.domain();
+    assert.deepEqual(domain[0], a);
+    assert.isTrue(b < domain[1]);
+  });
+
   it("include(n) works an expected", () => {
     domainer.include(5);
     var domain = domainer.computeDomain([[0, 10]], scale);
@@ -91,5 +103,27 @@ describe("Domainer", () => {
     assert.deepEqual(domain, [-3, 200]);
     domain = domainer.computeDomain([[0, 0]], scale);
     assert.deepEqual(domain, [-3, 10]);
+
+    domainer.include(10, false);
+    domain = domainer.computeDomain([[100, 200]], scale);
+    assert.deepEqual(domain, [-3, 200]);
+    domain = domainer.computeDomain([[-100, -50]], scale);
+    assert.deepEqual(domain, [-100, 5]);
+
+    domainer.include(10);
+    domain = domainer.computeDomain([[-100, -50]], scale);
+    assert.deepEqual(domain, [-100, 10]);
+  });
+
+  it("include(n) works on dates", () => {
+    var a = new Date(2000, 5, 4);
+    var b = new Date(2000, 5, 5);
+    var c = new Date(2000, 5, 6);
+    var d = new Date(2003, 0, 1);
+    domainer.include(b);
+    var timeScale = new Plottable.Scale.Time();
+    timeScale.updateExtent(1, "x", [c, d]);
+    timeScale.domainer(domainer);
+    assert.deepEqual(timeScale.domain(), [b, d]);
   });
 });
