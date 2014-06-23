@@ -29,12 +29,17 @@ export module Scale {
     }
 
     /**
-     * Retrieves the current domain, or sets the Scale's domain to the specified values.
+     * Gets the domain.
      *
-     * @param {any[]} [values] The new values for the domain. This array may contain more than 2 values.
-     * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+     * @returns {any[]} The current domain.
      */
     public domain(): any[];
+    /**
+     * Sets the domain.
+     *
+     * @param {any[]} values The new values for the domain. This array may contain more than 2 values.
+     * @returns {Ordinal} The calling Ordinal Scale.
+     */
     public domain(values: any[]): Ordinal;
     public domain(values?: any[]): any {
       return super.domain(values);
@@ -46,12 +51,17 @@ export module Scale {
     }
 
     /**
-     * Returns the range of pixels spanned by the scale, or sets the range.
+     * Gets the range of pixels spanned by the Ordinal Scale.
      *
-     * @param {number[]} [values] The pixel range to set on the scale.
-     * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
+     * @returns {number[]} The pixel range.
      */
-    public range(): any[];
+    public range(): number[];
+    /**
+     * Sets the range of pixels spanned by the Ordinal Scale.
+     *
+     * @param {number[]} values The pixel range to to be spanend by the scale.
+     * @returns {Ordinal} The calling Ordinal Scale.
+     */
     public range(values: number[]): Ordinal;
     public range(values?: number[]): any {
       if (values == null) {
@@ -92,19 +102,23 @@ export module Scale {
     }
 
     /**
-     * Returns the range type, or sets the range type.
+     * Gets the range type.
      *
-     * @param {string} [rangeType] Either "points" or "bands" indicating the
+     * @returns {string} The current range type.
+     */
+    public rangeType() : string;
+    /**
+     * Sets the range type.
+     *
+     * @param {string} rangeType Either "points" or "bands" indicating the
      *     d3 method used to generate range bounds.
      * @param {number} [outerPadding] The padding outside the range,
      *     proportional to the range step.
      * @param {number} [innerPadding] The padding between bands in the range,
      *     proportional to the range step. This parameter is only used in
      *     "bands" type ranges.
-     * @returns {string|OrdinalScale} The current range type, or the calling
-     *     OrdinalScale.
+     * @returns {Ordinal} The calling Ordinal Scale.
      */
-    public rangeType() : string;
     public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number) : Ordinal;
     public rangeType(rangeType?: string, outerPadding?: number, innerPadding?: number) : any {
       if (rangeType == null) {

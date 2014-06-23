@@ -49,15 +49,20 @@ export module Abstract {
     }
 
     /**
-     * Retrieves the current domain, or sets the Scale's domain to the specified values.
+     * Gets the domain.
      *
-     * @param {any[]} [values] The new value for the domain. This array may
+     * @returns {any[]} The current domain.
+     */
+    public domain(): any[];
+    /**
+     * Sets the Scale's domain to the specified values.
+     *
+     * @param {any[]} values The new value for the domain. This array may
      *     contain more than 2 values if the scale type allows it (e.g.
      *     ordinal scales). Other scales such as quantitative scales accept
      *     only a 2-value extent array.
-     * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+     * @returns {Scale} The calling Scale.
      */
-    public domain(): any[];
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
@@ -79,12 +84,17 @@ export module Abstract {
     }
 
     /**
-     * Retrieves the current range, or sets the Scale's range to the specified values.
+     * Gets the range.
      *
-     * @param {any[]} [values] The new value for the range.
-     * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
+     * @returns {any[]} The current range.
      */
     public range(): any[];
+    /**
+     * Sets the Scale's range to the specified values.
+     *
+     * @param {any[]} values The new values for the range.
+     * @returns {Scale} The calling Scale.
+     */
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {
