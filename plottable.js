@@ -5633,6 +5633,7 @@ var Plottable;
             BarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
+                this._bars = this.renderArea.selectAll("rect").data([]);
                 return this;
             };
 
