@@ -36,6 +36,7 @@ export module Abstract {
     public _setup() {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._bars = this.renderArea.selectAll("rect").data([]);
       return this;
     }
 

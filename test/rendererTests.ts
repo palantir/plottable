@@ -486,10 +486,6 @@ describe("Renderers", () => {
         selectedBar = renderer.selectBar(-1, -1); // no bars here
         assert.isNull(selectedBar, "returns null if no bar was selected");
 
-        assert.isNotNull(
-          new Plottable.Plot.VerticalBar(dataset, xScale, yScale).deselectAll(),
-          "shouldn't explode if you deselect bars before the first render");
-
         selectedBar = renderer.selectBar(200, 50); // between the two bars
         assert.isNull(selectedBar, "returns null if no bar was selected");
 
@@ -519,9 +515,19 @@ describe("Renderers", () => {
         assert.throws(() => renderer.selectBar(<any> "blargh", <any> 150), Error);
         assert.throws(() => renderer.selectBar(<any> {min: 150}, <any> 150), Error);
 
-        assert.isNull(
-          new Plottable.Plot.VerticalBar(dataset, xScale, yScale).selectBar(0, 0),
-          "shouldn't explode if you select bars before the first render");
+        verifier.end();
+      });
+
+      it("shouldn't blow up if members called before the first render", () => {
+        var brandNew = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+
+        assert.isNotNull(brandNew.deselectAll(), "deselects return self");
+        assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
+
+        brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
+
+        assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
+        assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
 
         verifier.end();
       });
