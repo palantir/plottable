@@ -5,6 +5,7 @@ export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
     public _tickLabelsG: D3.Selection;
+    private chr2Measure: {[chr: string]: number[]} = {};
 
     /**
      * Creates a CategoryAxis.
@@ -56,11 +57,8 @@ export module Axis {
       } else {
         this._scale.range([offeredHeight, 0]);
       }
-      var testG = this._tickLabelsG.append("g");
-      var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
-      fakeTicks.enter().append("g").classed("tick", true);
-      var textResult = this.writeTextToTicks(offeredWidth, offeredHeight, fakeTicks);
-      testG.remove();
+      var textResult = this.measureTicks(offeredWidth, offeredHeight,
+                                                 this._scale.domain());
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
@@ -72,6 +70,35 @@ export module Axis {
 
     public _getTickValues(): string[] {
       return this._scale.domain();
+    }
+
+    /**
+     * Acts similarly to writeTextToTicks, but is entirely non-destructive
+     * and rarely touches the DOM.
+     */
+    private measureTicks(axisWidth: number, axisHeight: number, tickStrs: string[]): Util.Text.IWriteTextResult {
+      var textWriteResults: Util.Text.IWriteTextResult[] = [];
+      tickStrs.forEach((s: string) => {
+        var bandWidth = this._scale.fullBandStartAndWidth(s)[1];
+        var width  = this._isHorizontal() ? bandWidth  : axisWidth - this.tickLength() - this.tickLabelPadding();
+        var height = this._isHorizontal() ? axisHeight - this.tickLength() - this.tickLabelPadding() : bandWidth;
+
+        var tm = (s: string) => {
+          var widthHeights = s.trim().split("").map((c) => this.getTickWH(c));
+          return [d3.sum(widthHeights, (wh) => wh[0]), d3.max(widthHeights, (wh) => wh[1])];
+        };
+
+        var textWriteResult = Util.Text.measureTextInBox(s, width, height, tm, true);
+        textWriteResults.push(textWriteResult);
+      });
+
+      var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
+      var heightFn = this._isHorizontal() ? d3.max : d3.sum;
+      return {
+        textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
+        usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),
+        usedHeight: heightFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedHeight)
+      };
     }
 
     private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Util.Text.IWriteTextResult {
@@ -124,6 +151,48 @@ export module Axis {
       Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
       Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
       return this;
+    }
+
+    /**
+     * If c were on a tick, how much space would it take up?
+     * This will cache the result in this.chr2Measure.
+     *
+     * @return {number[]}: [width, height] pair.
+     */
+    private getTickWH(c: string): number[] {
+      if (!(c in this.chr2Measure)) {
+        // whitespace, when measured alone, will take up no space
+        if (/\s/.test(c)) {
+          var totalWH = this.computTickWH("x" + c + "x");
+          this.chr2Measure[c] = [totalWH[0] - this.getTickWH("x")[0] * 2,
+                                 totalWH[1]];
+        } else {
+          this.chr2Measure[c] = this.computTickWH(c);
+        }
+      }
+      return this.chr2Measure[c];
+    }
+
+    /**
+     * If s were on a tick, how much space would it take up?
+     * This function is non-destructive, but does use the DOM.
+     *
+     * @return {number[]}: [width, height] pair.
+     */
+    private computTickWH(s: string): number[] {
+        var innerG = this._tickLabelsG.append("g").classed("writeText-inner-g", true); // unleash your inner G
+        var t = innerG.append("text").text(s);
+        var bb = Util.DOM.getBBox(t);
+        innerG.remove();
+        return [bb.width, bb.height];
+    }
+
+    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      // When anyone calls _invalidateLayout, _computeLayout will be called
+      // on everyone, including this. Since CSS or something might have
+      // affected the size of the characters, clear the cache.
+      this.chr2Measure = {};
+      return super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
     }
   }
 }

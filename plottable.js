@@ -542,6 +542,29 @@ var Plottable;
                 };
             }
             Text.writeText = writeText;
+
+            /**
+            * Similar to writeText, but rather than measuring by inserting into a
+            * DOM node, it measures using textMeasure.
+            */
+            function measureTextInBox(text, width, height, textMeasure, horizontally) {
+                var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, textMeasure);
+                var widthFn = orientHorizontally ? d3.max : d3.sum;
+                var heightFn = orientHorizontally ? d3.sum : d3.max;
+                return {
+                    textFits: wrappedText.textFits,
+                    usedWidth: widthFn(wrappedText.lines, function (line) {
+                        return textMeasure(line)[0];
+                    }),
+                    usedHeight: heightFn(wrappedText.lines, function (line) {
+                        return textMeasure(line)[1];
+                    })
+                };
+            }
+            Text.measureTextInBox = measureTextInBox;
         })(Util.Text || (Util.Text = {}));
         var Text = Util.Text;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -4812,6 +4835,7 @@ var Plottable;
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 var _this = this;
                 _super.call(this, scale, orientation);
+                this.chr2Measure = {};
                 this.classed("category-axis", true);
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
@@ -4851,11 +4875,7 @@ var Plottable;
                 } else {
                     this._scale.range([offeredHeight, 0]);
                 }
-                var testG = this._tickLabelsG.append("g");
-                var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
-                fakeTicks.enter().append("g").classed("tick", true);
-                var textResult = this.writeTextToTicks(offeredWidth, offeredHeight, fakeTicks);
-                testG.remove();
+                var textResult = this.measureTicks(offeredWidth, offeredHeight, this._scale.domain());
 
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
@@ -4867,6 +4887,48 @@ var Plottable;
 
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
+            };
+
+            /**
+            * Acts similarly to writeTextToTicks, but is entirely non-destructive
+            * and rarely touches the DOM.
+            */
+            Category.prototype.measureTicks = function (axisWidth, axisHeight, tickStrs) {
+                var _this = this;
+                var textWriteResults = [];
+                tickStrs.forEach(function (s) {
+                    var bandWidth = _this._scale.fullBandStartAndWidth(s)[1];
+                    var width = _this._isHorizontal() ? bandWidth : axisWidth - _this.tickLength() - _this.tickLabelPadding();
+                    var height = _this._isHorizontal() ? axisHeight - _this.tickLength() - _this.tickLabelPadding() : bandWidth;
+
+                    var tm = function (s) {
+                        var widthHeights = s.trim().split("").map(function (c) {
+                            return _this.getTickWH(c);
+                        });
+                        return [d3.sum(widthHeights, function (wh) {
+                                return wh[0];
+                            }), d3.max(widthHeights, function (wh) {
+                                return wh[1];
+                            })];
+                    };
+
+                    var textWriteResult = Plottable.Util.Text.measureTextInBox(s, width, height, tm, true);
+                    textWriteResults.push(textWriteResult);
+                });
+
+                var widthFn = this._isHorizontal() ? d3.sum : d3.max;
+                var heightFn = this._isHorizontal() ? d3.max : d3.sum;
+                return {
+                    textFits: textWriteResults.every(function (t) {
+                        return t.textFits;
+                    }),
+                    usedWidth: widthFn(textWriteResults, function (t) {
+                        return t.usedWidth;
+                    }),
+                    usedHeight: heightFn(textWriteResults, function (t) {
+                        return t.usedHeight;
+                    })
+                };
             };
 
             Category.prototype.writeTextToTicks = function (axisWidth, axisHeight, ticks) {
@@ -4928,6 +4990,49 @@ var Plottable;
                 Plottable.Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
                 Plottable.Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
                 return this;
+            };
+
+            /**
+            * If c were on a tick, how much space would it take up?
+            * This will cache the result in this.chr2Measure.
+            *
+            * @return {number[]}: [width, height] pair.
+            */
+            Category.prototype.getTickWH = function (c) {
+                if (!(c in this.chr2Measure)) {
+                    // whitespace, when measured alone, will take up no space
+                    if (/\s/.test(c)) {
+                        var totalWH = this.computTickWH("x" + c + "x");
+                        this.chr2Measure[c] = [
+                            totalWH[0] - this.getTickWH("x")[0] * 2,
+                            totalWH[1]];
+                    } else {
+                        this.chr2Measure[c] = this.computTickWH(c);
+                    }
+                }
+                return this.chr2Measure[c];
+            };
+
+            /**
+            * If s were on a tick, how much space would it take up?
+            * This function is non-destructive, but does use the DOM.
+            *
+            * @return {number[]}: [width, height] pair.
+            */
+            Category.prototype.computTickWH = function (s) {
+                var innerG = this._tickLabelsG.append("g").classed("writeText-inner-g", true);
+                var t = innerG.append("text").text(s);
+                var bb = Plottable.Util.DOM.getBBox(t);
+                innerG.remove();
+                return [bb.width, bb.height];
+            };
+
+            Category.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+                // When anyone calls _invalidateLayout, _computeLayout will be called
+                // on everyone, including this. Since CSS or something might have
+                // affected the size of the characters, clear the cache.
+                this.chr2Measure = {};
+                return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;
         })(Plottable.Abstract.Axis);

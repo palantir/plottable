@@ -225,6 +225,26 @@ export module Util {
         usedHeight: wh[1]
       };
     }
+
+    /**
+     * Similar to writeText, but rather than measuring by inserting into a
+     * DOM node, it measures using textMeasure.
+     */
+    export function measureTextInBox(text: string, width: number, height: number,
+                                     textMeasure: Text.TextMeasurer,
+                                     horizontally?: boolean): IWriteTextResult {
+      var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
+      var primaryDimension = orientHorizontally ? width : height;
+      var secondaryDimension = orientHorizontally ? height : width;
+      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, textMeasure);
+      var widthFn = orientHorizontally ? d3.max : d3.sum;
+      var heightFn = orientHorizontally ? d3.sum : d3.max;
+      return {
+        textFits: wrappedText.textFits,
+        usedWidth: widthFn(wrappedText.lines, (line: string) => textMeasure(line)[0]),
+        usedHeight: heightFn(wrappedText.lines, (line: string) => textMeasure(line)[1])
+      };
+    }
   }
 }
 }

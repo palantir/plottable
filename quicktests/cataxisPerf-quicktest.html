@@ -12,7 +12,9 @@
           { name: "Poptart", age: 1 },
           { name: "Budoka", age: 3 },
           { name: "Sugar", age: 14 },
-          { name: "Tac", age: +5 }
+          { name: "Tac", age: +5 },
+          { name: "Supercalifragilisticexpialidocious", age: 10 },
+          { name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit", age: 4 }
         ];
 
       var ds = new Plottable.DataSource(data);
@@ -21,6 +23,14 @@
 
       var yScale = new Plottable.Scale.Ordinal();
       yAxis = new Plottable.Axis.Category(yScale, "left").xAlign("right");
+
+      var rs = yAxis._requestedSpace;
+      yAxis._requestedSpace = function() {
+        console.time("_requestedSpace");
+        var result = rs.apply(this, arguments);
+        console.timeEnd("_requestedSpace");
+        return result;
+      }
 
       var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
                               .project("x", "age", xScale)
