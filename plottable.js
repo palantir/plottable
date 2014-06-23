@@ -2925,6 +2925,9 @@ var Plottable;
             this.doNice = false;
             this.padProportion = 0.0;
             this.paddingExceptions = d3.set([]);
+            // This must be a map rather than a set so we can get the original values
+            // back out, rather than their stringified versions.
+            this.includedValues = d3.map([]);
             this.combineExtents = combineExtents;
         }
         /**
@@ -2937,7 +2940,12 @@ var Plottable;
         *                 pair.
         */
         Domainer.prototype.computeDomain = function (extents, scale) {
-            return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
+            var domain;
+            domain = this.combineExtents(extents);
+            domain = this.includeDomain(domain);
+            domain = this.padDomain(domain);
+            domain = this.niceDomain(scale, domain);
+            return domain;
         };
 
         /**
@@ -2985,6 +2993,28 @@ var Plottable;
             return this;
         };
 
+        /**
+        * Ensure that the domain produced includes value.
+        *
+        * For example, after include(0), the domain [3, 5] will become [0, 5],
+        * and the domain [-9, -8] will become [-9, 0].
+        *
+        * @param {any} value The value that will be included.
+        * @param {boolean} include Defaults to true. If true, this value will
+        *                  always be included, if false, this value will not
+        *                  necessarily be included.
+        * @return {Domainer} The calling Domainer.
+        */
+        Domainer.prototype.include = function (value, include) {
+            if (typeof include === "undefined") { include = true; }
+            if (include) {
+                this.includedValues.set(value, value);
+            } else {
+                this.includedValues.remove(value);
+            }
+            return this;
+        };
+
         Domainer.defaultCombineExtents = function (extents) {
             if (extents.length === 0) {
                 return [0, 1];
@@ -3027,6 +3057,12 @@ var Plottable;
             } else {
                 return domain;
             }
+        };
+
+        Domainer.prototype.includeDomain = function (domain) {
+            return this.includedValues.values().reduce(function (domain, value) {
+                return [Math.min(domain[0], value), Math.max(domain[1], value)];
+            }, domain);
         };
         Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
         Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
@@ -5617,6 +5653,7 @@ var Plottable;
             function BarPlot(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
+                this.previousBaselineValue = null;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -5647,6 +5684,7 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.baseline = function (value) {
+                this.previousBaselineValue = this._baselineValue;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
@@ -5719,6 +5757,19 @@ var Plottable;
             BarPlot.prototype.deselectAll = function () {
                 if (this._isSetup) {
                     this._bars.classed("selected", false);
+                }
+                return this;
+            };
+
+            BarPlot.prototype._updateDomainer = function (scale) {
+                if (scale instanceof Plottable.Abstract.QuantitiveScale) {
+                    var qscale = scale;
+                    if (!qscale._userSetDomainer && this._baselineValue != null) {
+                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
+                        if (qscale._autoDomainAutomatically) {
+                            qscale.autoDomain();
+                        }
+                    }
                 }
                 return this;
             };
@@ -5846,12 +5897,7 @@ var Plottable;
             };
 
             VerticalBar.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    var scale = this.yScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().paddingException(this._baselineValue);
-                    }
-                }
+                this._updateDomainer(this.yScale);
                 return this;
             };
             return VerticalBar;
@@ -5977,12 +6023,7 @@ var Plottable;
             };
 
             HorizontalBar.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    var scale = this.xScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().paddingException(this._baselineValue);
-                    }
-                }
+                this._updateDomainer(this.yScale);
                 return this;
             };
             return HorizontalBar;

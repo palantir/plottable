@@ -100,12 +100,7 @@ export module Plot {
     }
 
     public _updateYDomainer() {
-      if (this.yScale instanceof Abstract.QuantitiveScale) {
-        var scale = <Abstract.QuantitiveScale>this.yScale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().paddingException(this._baselineValue);
-        }
-      }
+      this._updateDomainer(this.yScale);
       return this;
     }
   }

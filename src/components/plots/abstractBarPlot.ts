@@ -7,6 +7,7 @@ export module Abstract {
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignment: string;
+    private previousBaselineValue: number = null;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
@@ -47,6 +48,7 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
+      this.previousBaselineValue = this._baselineValue;
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
@@ -135,6 +137,23 @@ export module Abstract {
     public deselectAll() {
       if (this._isSetup) {
         this._bars.classed("selected", false);
+      }
+      return this;
+    }
+
+    public _updateDomainer(scale: Scale) {
+      if (scale instanceof Abstract.QuantitiveScale) {
+        var qscale = <Abstract.QuantitiveScale> scale;
+        if (!qscale._userSetDomainer && this._baselineValue != null) {
+          qscale.domainer()
+            .paddingException(this.previousBaselineValue, false)
+            .include(this.previousBaselineValue, false)
+            .paddingException(this._baselineValue)
+            .include(this._baselineValue);
+          if (qscale._autoDomainAutomatically) {
+            qscale.autoDomain();
+          }
+        }
       }
       return this;
     }
