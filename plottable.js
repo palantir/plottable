@@ -854,7 +854,7 @@ var Plottable;
         var Formatter = (function () {
             function Formatter(precision) {
                 this._onlyShowUnchanged = true;
-                if (precision < 0 || 20 < precision) {
+                if (precision < 0 || precision > 20) {
                     throw new RangeError("Formatter precision must be between 0 and 20");
                 }
                 this._precision = precision;
