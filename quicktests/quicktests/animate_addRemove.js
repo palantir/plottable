@@ -45,30 +45,16 @@
 addRemove = function(x, y){
     console.log("addremove");
     setTimeout(function(){renderAreaD1.remove()}, 500);
-
     setTimeout(function(){renderAreaD2.remove()}, 1000);
-
     setTimeout(function(){renderAreaD3.remove()}, 1500);
-
     setTimeout(function(){renderAreaD4.remove()}, 2000);
-
     setTimeout(function(){renderGroup.merge(renderAreaD1)}, 2500);
-
     setTimeout(function(){renderGroup.merge(renderAreaD2)}, 3000);
-
     setTimeout(function(){renderGroup.merge(renderAreaD3)}, 3500);
-
     setTimeout(function(){renderGroup.merge(renderAreaD4)}, 4000);
-    
 }
 
     window.xy = new Plottable.Interaction.Click(renderGroup)
         .callback(addRemove)
         .registerWithComponent();
    
-   
-
-
-
-
-
