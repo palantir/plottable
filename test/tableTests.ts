@@ -285,52 +285,43 @@ describe("Tables", () => {
     var c5 = new Plottable.Abstract.Component();
     var c6 = new Plottable.Abstract.Component();
     var table: Plottable.Component.Table;
-    it("table._removeComponent works in easy case with no splicing", () => {
+    it("table._removeComponent works in basic case", () => {
       table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
       table._removeComponent(c4);
       assert.deepEqual((<any> table).rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
     });
 
-    it("table._removeComponent works for row splicing", () => {
+    it("doesn't mutate the table size when clearing out internal rows", () => {
       table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
       table._removeComponent(c4);
       table._removeComponent(c3);
-      assert.deepEqual((<any> table).rows, [[c1, c2], [c5, c6]], "remove one row");
+      assert.deepEqual((<any> table).rows, [[c1, c2], [null, null], [c5, c6]], "interior rows are not removed");
     });
 
-    it("table._removeComponent works for column splicing", () => {
-      table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
+    it("doesn't mutate the table size when clearing out internal columns", () => {
+      table = new Plottable.Component.Table([[c1, c2, c3], [c4, c5, c6]]);
       table._removeComponent(c2);
-      table._removeComponent(c4);
-      table._removeComponent(c6);
-
-      assert.deepEqual((<any> table).rows, [[c1], [c3], [c5]], "remove one column");
+      table._removeComponent(c5);
+      assert.deepEqual((<any> table).rows, [[c1, null, c3], [c4, null, c6]], "interior columns are not removed");
     });
 
-    it("table._removeComponent only splices when row or column is completely empty", () => {
-      table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
-      table._removeComponent(c2);
-      table._removeComponent(c3);
-      table._removeComponent(c6);
+    it("removes all-null rows/columns beyond the last non-null element", () => {
+      table = new Plottable.Component.Table([[c1, c2], [c3, c4]]);
+      table.addComponent(3, 3, c5);
 
-      assert.deepEqual((<any> table).rows, [[c1, null], [null, c4], [c5, null]], "remove multiple items");
-    });
-
-    it("table._removeComponent works for splicing out row and column simultaneously", () => {
-      table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
-      table._removeComponent(c2);
-      table._removeComponent(c3);
-      table._removeComponent(c6);
-      table._removeComponent(c4); // this should kill the row and column at the same time
-
-      assert.deepEqual((<any> table).rows, [[c1], [c5]], "remove row and column");
-    });
-
-    it ("table._removeComponent works for single row and column", () => {
-      table = new Plottable.Component.Table([[c1]]);
-      table._removeComponent(c1);
-
-      assert.deepEqual((<any> table).rows, [], "remove entire table");
+      var expectedRows = [
+                           [c1,   c2,   null, null],
+                           [c3,   c4,   null, null],
+                           [null, null, null, null],
+                           [null, null, null, c5  ]
+                         ];
+      assert.deepEqual((<any> table).rows, expectedRows, "table was constructed correctly");
+      table._removeComponent(c5);
+      expectedRows = [
+                       [c1, c2],
+                       [c3, c4]
+                     ];
+      assert.deepEqual((<any> table).rows, expectedRows, "all-null rows/columns were removed from the edge of the table");
     });
 
     it("table._removeComponent does nothing when component is not found", () =>  {

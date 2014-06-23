@@ -21,6 +21,14 @@
 
       var yScale = new Plottable.Scale.Ordinal();
       yAxis = new Plottable.Axis.Category(yScale, "left");
+      var rs = yAxis._requestedSpace;
+      yAxis._requestedSpace = function(oW, oH) {
+        var start = new Date();
+        var retval = rs.call(yAxis, oW, oH);
+        var end = new Date();
+        console.log("Category _requestedSpace: " + (end-start) + " ms");
+        return retval;
+      }
 
       var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
                               .project("x", "age", xScale)
