@@ -38,6 +38,11 @@ declare module Plottable {
             * @return {any[]}
             */
             function createFilledArray(value: any, count: number): any[];
+            /**
+            * @param {T[][]} a The 2D array that will have its elements joined together.
+            * @return {T[]} Every array in a, concatenated together in the order they appear.
+            */
+            function flatten<T>(a: T[][]): T[];
         }
     }
 }
@@ -111,14 +116,53 @@ declare module Plottable {
             /**
             * Set a new key/value pair in the store.
             *
-            * @param {any} Key to set in the store
-            * @param {any} Value to set in the store
+            * @param {any} key Key to set in the store
+            * @param {any} value Value to set in the store
             * @return {boolean} True if key already in store, false otherwise
             */
             public set(key: any, value: any): boolean;
+            /**
+            * Get a value from the store, given a key.
+            *
+            * @param {any} key Key associated with value to retrieve
+            * @return {any} Value if found, undefined otherwise
+            */
             public get(key: any): any;
+            /**
+            * Test whether store has a value associated with given key.
+            *
+            * Will return true if there is a key/value entry,
+            * even if the value is explicitly `undefined`.
+            *
+            * @param {any} key Key to test for presence of an entry
+            * @return {boolean} Whether there was a matching entry for that key
+            */
             public has(key: any): boolean;
+            /**
+            * Return an array of the values in the key-value store
+            *
+            * @return {any[]} The values in the store
+            */
             public values(): any[];
+            /**
+            * Return an array of keys in the key-value store
+            *
+            * @return {any[]} The keys in the store
+            */
+            public keys(): any[];
+            /**
+            * Execute a callback for each entry in the array.
+            *
+            * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
+            * @return {any[]} The results of mapping the callback over the entries
+            */
+            public map(cb: (key?: any, val?: any, index?: number) => any): any[];
+            /**
+            * Delete a key from the key-value store. Return whether the key was present.
+            *
+            * @param {any} The key to remove
+            * @return {boolean} Whether a matching entry was found and removed
+            */
             public delete(key: any): boolean;
         }
     }
@@ -383,8 +427,15 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Broadcaster extends PlottableObject {
+    module Core {
+        interface IListenable {
+            broadcaster: Broadcaster;
+        }
+        interface IBroadcasterCallback {
+            (listenable: IListenable, ...args: any[]): any;
+        }
+        class Broadcaster extends Abstract.PlottableObject {
+            constructor(listenable: IListenable);
             /**
             * Registers a callback to be called when the broadcast method is called. Also takes a listener which
             * is used to support deregistering the same callback later, by passing in the same listener.
@@ -398,19 +449,32 @@ declare module Plottable {
             */
             public registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
             /**
-            * Registers deregister the callback associated with a listener.
+            * Call all listening callbacks, optionally with arguments passed through.
+            *
+            * @param ...args A variable number of optional arguments
+            * @returns {Broadcaster} this object
+            */
+            public broadcast(...args: any[]): Broadcaster;
+            /**
+            * Deregisters the callback associated with a listener.
             *
             * @param listener The listener to deregister.
             * @returns {Broadcaster} this object
             */
             public deregisterListener(listener: any): Broadcaster;
+            /**
+            * Deregisters all listeners and callbacks associated with the broadcaster.
+            *
+            * @returns {Broadcaster} this object
+            */
+            public deregisterAllListeners(): void;
         }
     }
 }
 
 
 declare module Plottable {
-    class DataSource extends Abstract.Broadcaster {
+    class DataSource extends Abstract.PlottableObject implements Core.IListenable {
         /**
         * Creates a new DataSource.
         *
@@ -420,20 +484,30 @@ declare module Plottable {
         */
         constructor(data?: any[], metadata?: any);
         /**
-        * Retrieves the current data from the DataSource, or sets the data.
+        * Gets the data.
         *
-        * @param {any[]} [data] The new data.
-        * @returns {any[]|DataSource} The current data, or the calling DataSource.
+        * @returns {any[]} The current data.
         */
         public data(): any[];
+        /**
+        * Sets new data.
+        *
+        * @param {any[]} data The new data.
+        * @returns {DataSource} The calling DataSource.
+        */
         public data(data: any[]): DataSource;
         /**
-        * Retrieves the current metadata from the DataSource, or sets the metadata.
+        * Gets the metadata.
         *
-        * @param {any[]} [metadata] The new metadata.
-        * @returns {any[]|DataSource} The current metadata, or the calling DataSource.
+        * @returns {any} The current metadata.
         */
         public metadata(): any;
+        /**
+        * Sets the metadata.
+        *
+        * @param {any} metadata The new metadata.
+        * @returns {DataSource} The calling DataSource.
+        */
         public metadata(metadata: any): DataSource;
     }
 }
@@ -634,7 +708,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Scale extends Broadcaster {
+        class Scale extends PlottableObject implements Core.IListenable {
             /**
             * Creates a new Scale.
             *
@@ -658,23 +732,33 @@ declare module Plottable {
             */
             public scale(value: any): any;
             /**
-            * Retrieves the current domain, or sets the Scale's domain to the specified values.
+            * Gets the domain.
             *
-            * @param {any[]} [values] The new value for the domain. This array may
+            * @returns {any[]} The current domain.
+            */
+            public domain(): any[];
+            /**
+            * Sets the Scale's domain to the specified values.
+            *
+            * @param {any[]} values The new value for the domain. This array may
             *     contain more than 2 values if the scale type allows it (e.g.
             *     ordinal scales). Other scales such as quantitative scales accept
             *     only a 2-value extent array.
-            * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+            * @returns {Scale} The calling Scale.
             */
-            public domain(): any[];
             public domain(values: any[]): Scale;
             /**
-            * Retrieves the current range, or sets the Scale's range to the specified values.
+            * Gets the range.
             *
-            * @param {any[]} [values] The new value for the range.
-            * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
+            * @returns {any[]} The current range.
             */
             public range(): any[];
+            /**
+            * Sets the Scale's range to the specified values.
+            *
+            * @param {any[]} values The new values for the range.
+            * @returns {Scale} The calling Scale.
+            */
             public range(values: any[]): Scale;
             /**
             * Creates a copy of the Scale with the same domain and range but without any registered listeners.
@@ -682,6 +766,18 @@ declare module Plottable {
             * @returns {Scale} A copy of the calling Scale.
             */
             public copy(): Scale;
+            /**
+            * When a renderer determines that the extent of a projector has changed,
+            * it will call this function. This function should ensure that
+            * the scale has a domain at least large enough to include extent.
+            *
+            * @param {number} rendererID A unique indentifier of the renderer sending
+            *                 the new extent.
+            * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+            * @param {any[]} extent The new extent to be included in the scale.
+            */
+            public updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
+            public removeExtent(rendererID: number, attr: string): Scale;
         }
     }
 }
@@ -707,12 +803,17 @@ declare module Plottable {
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
             /**
-            * Retrieves the current DataSource, or sets a DataSource if the Plot doesn't yet have one.
+            * Gets the Plot's DataSource.
             *
-            * @param {DataSource} [source] The DataSource the Plot should use, if it doesn't yet have one.
-            * @return {DataSource|Plot} The current DataSource or the calling Plot.
+            * @return {DataSource} The current DataSource.
             */
             public dataSource(): DataSource;
+            /**
+            * Sets the Plot's DataSource.
+            *
+            * @param {DataSource} source The DataSource the Plot should use.
+            * @return {Plot} The calling Plot.
+            */
             public dataSource(source: DataSource): Plot;
             public project(attrToSet: string, accessor: any, scale?: Scale): Plot;
             /**
@@ -722,16 +823,20 @@ declare module Plottable {
             */
             public animate(enabled: boolean): Plot;
             /**
-            * Gets or sets the animator associated with the specified animator key.
+            * Gets the animator associated with the specified Animator key.
             *
-            * @param {string} animatorKey The key for the animator.
-            * @param {Animator.IPlotAnimator} animator If specified, will be stored as the
-            *     animator for the key.
-            * @return {Animator.IPlotAnimator|Plot} If an animator is specified, we return
-            *     this object to enable chaining, otherwise we return the animator
-            *     stored at the specified key.
+            * @param {string} animatorKey The key for the Animator.
+            * @return {Animator.IPlotAnimator} The Animator for the specified key.
             */
             public animator(animatorKey: string): Animator.IPlotAnimator;
+            /**
+            * Sets the animator associated with the specified Animator key.
+            *
+            * @param {string} animatorKey The key for the Animator.
+            * @param {Animator.IPlotAnimator} animator An Animator to be assigned to
+            *                                          the specified key.
+            * @return {Plot} The calling Plot.
+            */
             public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
         }
     }
@@ -884,9 +989,6 @@ declare module Plottable {
         pixel: SelectionArea;
         data: SelectionArea;
     }
-    interface IBroadcasterCallback {
-        (broadcaster: Abstract.Broadcaster, ...args: any[]): any;
-    }
     interface ISpaceRequest {
         width: number;
         height: number;
@@ -898,6 +1000,77 @@ declare module Plottable {
         xMax: number;
         yMin: number;
         yMax: number;
+    }
+    interface IExtent {
+        min: number;
+        max: number;
+    }
+}
+
+
+declare module Plottable {
+    class Domainer {
+        /**
+        * @param {(extents: any[][]) => any[]} combineExtents
+        *        If present, this function will be used by the Domainer to merge
+        *        all the extents that are present on a scale.
+        *
+        *        A plot may draw multiple things relative to a scale, e.g.
+        *        different stocks over time. The plot computes their extents,
+        *        which are a [min, max] pair. combineExtents is responsible for
+        *        merging them all into one [min, max] pair. It defaults to taking
+        *        the min of the first elements and the max of the second arguments.
+        */
+        constructor(combineExtents?: (extents: any[][]) => any[]);
+        /**
+        * @param {any[][]} extents The list of extents to be reduced to a single
+        *        extent.
+        * @param {Abstract.QuantitiveScale} scale
+        *        Since nice() must do different things depending on Linear, Log,
+        *        or Time scale, the scale must be passed in for nice() to work.
+        * @return {any[]} The domain, as a merging of all exents, as a [min, max]
+        *                 pair.
+        */
+        public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[];
+        /**
+        * Sets the Domainer to pad by a given ratio.
+        *
+        * @param {number} [padProportion] Proportionally how much bigger the
+        *         new domain should be (0.05 = 5% larger).
+        * @return {Domainer} The calling Domainer.
+        */
+        public pad(padProportion?: number): Domainer;
+        /**
+        * Adds a value that will not be padded if either end of the domain.
+        * For example, after paddingException(0), a domainer will pad
+        * [0, 100] to [0, 102.5].
+        *
+        * @param {any} exception The value that will not be padded.
+        * @param {boolean} add Defaults to true. If true, add the exception,
+        *                  if false, removes the exception.
+        * @return {Domainer} The calling Domainer.
+        */
+        public paddingException(exception: any, add?: boolean): Domainer;
+        /**
+        * Extends the scale's domain so it starts and ends with "nice" values.
+        *
+        * @param {number} [count] The number of ticks that should fit inside the new domain.
+        * @return {Domainer} The calling Domainer.
+        */
+        public nice(count?: number): Domainer;
+        /**
+        * Ensure that the domain produced includes value.
+        *
+        * For example, after include(0), the domain [3, 5] will become [0, 5],
+        * and the domain [-9, -8] will become [-9, 0].
+        *
+        * @param {any} value The value that will be included.
+        * @param {boolean} include Defaults to true. If true, this value will
+        *                  always be included, if false, this value will not
+        *                  necessarily be included.
+        * @return {Domainer} The calling Domainer.
+        */
+        public include(value: any, include?: boolean): Domainer;
     }
 }
 
@@ -943,19 +1116,18 @@ declare module Plottable {
             */
             public rangeRound(values: number[]): QuantitiveScale;
             /**
-            * Gets or sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+            * Gets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
             *
-            * @param {boolean} [clamp] Whether or not to clamp the QuantitiveScale.
-            * @returns {boolean|QuantitiveScale} The current clamp status, or the calling QuantitiveScale.
+            * @returns {boolean} The current clamp status.
             */
             public clamp(): boolean;
-            public clamp(clamp: boolean): QuantitiveScale;
             /**
-            * Extends the scale's domain so it starts and ends with "nice" values.
+            * Sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
             *
-            * @param {number} [count] The number of ticks that should fit inside the new domain.
+            * @param {boolean} clamp Whether or not to clamp the QuantitiveScale.
+            * @returns {QuantitiveScale} The calling QuantitiveScale.
             */
-            public nice(count?: number): QuantitiveScale;
+            public clamp(clamp: boolean): QuantitiveScale;
             /**
             * Generates tick values.
             *
@@ -972,12 +1144,24 @@ declare module Plottable {
             */
             public tickFormat(count: number, format?: string): (n: number) => string;
             /**
-            * Pads out the domain of the scale by a specified ratio.
+            * Retrieve a Domainer of a scale. A Domainer is responsible for combining
+            * multiple extents into a single domain.
             *
-            * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-            * @returns {QuantitiveScale} The calling QuantitiveScale.
+            * @return {QuantitiveScale} The scale's current domainer.
             */
-            public padDomain(padProportion?: number): QuantitiveScale;
+            public domainer(): Domainer;
+            /**
+            * Sets a Domainer of a scale. A Domainer is responsible for combining
+            * multiple extents into a single domain.
+            *
+            * When you set domainer, we assume that you know what you want the domain
+            * to look like better that we do. Ensuring that the domain is padded,
+            * includes 0, etc., will be the responsability of the new domainer.
+            *
+            * @param {Domainer} domainer The domainer to be set.
+            * @return {QuantitiveScale} The calling scale.
+            */
+            public domainer(domainer: Domainer): QuantitiveScale;
         }
     }
 }
@@ -1037,20 +1221,30 @@ declare module Plottable {
             */
             constructor(scale?: D3.Scale.OrdinalScale);
             /**
-            * Retrieves the current domain, or sets the Scale's domain to the specified values.
+            * Gets the domain.
             *
-            * @param {any[]} [values] The new values for the domain. This array may contain more than 2 values.
-            * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+            * @returns {any[]} The current domain.
             */
             public domain(): any[];
+            /**
+            * Sets the domain.
+            *
+            * @param {any[]} values The new values for the domain. This array may contain more than 2 values.
+            * @returns {Ordinal} The calling Ordinal Scale.
+            */
             public domain(values: any[]): Ordinal;
             /**
-            * Returns the range of pixels spanned by the scale, or sets the range.
+            * Gets the range of pixels spanned by the Ordinal Scale.
             *
-            * @param {number[]} [values] The pixel range to set on the scale.
-            * @returns {number[]|OrdinalScale} The pixel range, or the calling OrdinalScale.
+            * @returns {number[]} The pixel range.
             */
-            public range(): any[];
+            public range(): number[];
+            /**
+            * Sets the range of pixels spanned by the Ordinal Scale.
+            *
+            * @param {number[]} values The pixel range to to be spanend by the scale.
+            * @returns {Ordinal} The calling Ordinal Scale.
+            */
             public range(values: number[]): Ordinal;
             /**
             * Returns the width of the range band. Only valid when rangeType is set to "bands".
@@ -1061,19 +1255,23 @@ declare module Plottable {
             public innerPadding(): number;
             public fullBandStartAndWidth(v: any): number[];
             /**
-            * Returns the range type, or sets the range type.
+            * Gets the range type.
             *
-            * @param {string} [rangeType] Either "points" or "bands" indicating the
+            * @returns {string} The current range type.
+            */
+            public rangeType(): string;
+            /**
+            * Sets the range type.
+            *
+            * @param {string} rangeType Either "points" or "bands" indicating the
             *     d3 method used to generate range bounds.
             * @param {number} [outerPadding] The padding outside the range,
             *     proportional to the range step.
             * @param {number} [innerPadding] The padding between bands in the range,
             *     proportional to the range step. This parameter is only used in
             *     "bands" type ranges.
-            * @returns {string|OrdinalScale} The current range type, or the calling
-            *     OrdinalScale.
+            * @returns {Ordinal} The calling Ordinal Scale.
             */
-            public rangeType(): string;
             public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
         }
     }
@@ -1126,31 +1324,35 @@ declare module Plottable {
             */
             constructor(colorRange?: any, scaleType?: string);
             /**
-            * Gets or sets the color range.
+            * Gets the color range.
             *
-            * @param {string|string[]} [colorRange]. If no argument is passed,
-            *     returns the current range of colors. If the param is one of
-            *     (reds/blues/posneg) we lookup the scale from the built-in color
-            *     groups. Finally, if params is an array of strings with at least 2
-            *     values (e.g. ["#FF00FF", "red", "dodgerblue"], the resulting scale
-            *     will interpolate between the color values across the domain.
-            *
-            * @returns the current color values for the range as strings or this
-            *     InterpolatedColorScale object.
+            * @returns {string[]} the current color values for the range as strings.
             */
             public colorRange(): string[];
+            /**
+            * Sets the color range.
+            *
+            * @param {string|string[]} colorRange. If colorRange is one of
+            *     (reds/blues/posneg), uses the built-in color groups. If colorRange
+            *     is an array of strings with at least 2 values
+            *     (e.g. ["#FF00FF", "red", "dodgerblue"], the resulting scale
+            *     will interpolate between the color values across the domain.
+            * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
+            */
             public colorRange(colorRange: any): InterpolatedColor;
             /**
-            * Gets or sets the internal scale type.
+            * Gets the internal scale type.
             *
-            * @param {string} [scaleType]. If no argument is passed, returns the
-            *     current scale type string. Otherwise, we set the internal scale
-            *     using the d3 scale name. These scales must be quantitative scales,
-            *     so the valid values are (linear/log/sqrt/pow).
-            *
-            * @returns the current scale type or this InterpolatedColorScale object.
+            * @returns {string} The current scale type.
             */
             public scaleType(): string;
+            /**
+            * Sets the internal scale type.
+            *
+            * @param {string} scaleType. The type of d3 scale to use internally.
+            *                            (linear/log/sqrt/pow).
+            * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
+            */
             public scaleType(scaleType: string): InterpolatedColor;
         }
     }
@@ -1270,40 +1472,127 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
+            static TICK_MARK_CLASS: string;
+            static TICK_LABEL_CLASS: string;
+            constructor(scale: Scale, orientation: string, formatter?: Formatter);
             /**
-            * Creates a BaseAxis.
+            * Gets the current width.
             *
-            * @constructor
-            * @param {Scale} scale The Scale to base the BaseAxis on.
-            * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
-            * @param {(n: any) => string} [formatter] A function to format tick labels.
+            * @returns {number} The current width.
             */
-            constructor(scale: Scale, orientation: string, formatter?: (n: any) => string);
+            public width(): number;
+            /**
+            * Sets a user-specified width.
+            *
+            * @param {number|String} w A fixed width for the Axis, or "auto" for automatic mode.
+            * @returns {Axis} The calling Axis.
+            */
+            public width(w: any): Axis;
+            /**
+            * Gets the current height.
+            *
+            * @returns {number} The current height.
+            */
+            public height(): number;
+            /**
+            * Sets a user-specified height.
+            *
+            * @param {number|String} h A fixed height for the Axis, or "auto" for automatic mode.
+            * @returns {Axis} The calling Axis.
+            */
+            public height(h: any): Axis;
             /**
             * Sets a new tick formatter.
             *
-            * @param {(n: any) => string} formatter A function to format tick labels.
+            * @param {Abstract.Formatter} formatter
             * @returns {BaseAxis} The calling BaseAxis.
             */
-            public formatter(formatFunction: (n: any) => string): Axis;
+            public formatter(formatter: Formatter): Axis;
             /**
-            * Gets or sets the length of each tick mark.
+            * Gets the current tick mark length.
             *
-            * @param {number} [length] The length of each tick.
-            * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+            * @returns {number} The current tick mark length.
             */
             public tickLength(): number;
+            /**
+            * Sets the tick mark length.
+            *
+            * @param {number} length The length of each tick.
+            * @returns {BaseAxis} The calling Axis.
+            */
             public tickLength(length: number): Axis;
             /**
-            * Gets or sets the padding between each tick mark and its associated label.
+            * Gets the padding between each tick mark and its associated label.
             *
-            * @param {number} [length] The length of each tick.
-            * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+            * @returns {number} The current padding, in pixels.
             */
             public tickLabelPadding(): number;
+            /**
+            * Sets the padding between each tick mark and its associated label.
+            *
+            * @param {number} padding The desired padding, in pixels.
+            * @returns {Axis} The calling Axis.
+            */
             public tickLabelPadding(padding: number): Axis;
+            /**
+            * Gets the orientation of the Axis.
+            *
+            * @returns {string} The current orientation.
+            */
             public orient(): string;
+            /**
+            * Sets the orientation of the Axis.
+            *
+            * @param {string} newOrientation The desired orientation (top/bottom/left/right).
+            * @returns {Axis} The calling Axis.
+            */
             public orient(newOrientation: string): Axis;
+            /**
+            * Checks whether the Axis is currently set to show the first and last
+            * tick labels.
+            *
+            * @returns {boolean}
+            */
+            public showEndTickLabels(): boolean;
+            /**
+            * Set whether or not to show the first and last tick labels.
+            *
+            * @param {boolean} show Whether or not to show the first and last labels.
+            * @returns {Axis} The calling Axis.
+            */
+            public showEndTickLabels(show: boolean): Axis;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
+        class Numeric extends Abstract.Axis {
+            /**
+            * Creates a NumericAxis.
+            *
+            * @constructor
+            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumericAxis on.
+            * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
+            * @param {Formatter} [formatter] A function to format tick labels.
+            */
+            constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: Abstract.Formatter);
+            /**
+            * Gets the tick label position relative to the tick marks.
+            *
+            * @returns {string} The current tick label position.
+            */
+            public tickLabelPosition(): string;
+            /**
+            * Sets the tick label position relative to the tick marks.
+            *
+            * @param {string} position The relative position of the tick label.
+            *                          [top/center/bottom] for a vertical NumericAxis,
+            *                          [left/center/right] for a horizontal NumericAxis.
+            * @returns {NumericAxis} The calling NumericAxis.
+            */
+            public tickLabelPosition(position: string): Numeric;
         }
     }
 }
@@ -1529,14 +1818,20 @@ declare module Plottable {
             */
             public barAlignment(alignment: string): BarPlot;
             /**
-            * Selects the bar under the given pixel position.
+            * Selects the bar under the given pixel position (if [xValOrExtent]
+            * and [yValOrExtent] are {number}s), under a given line (if only one
+            * of [xValOrExtent] or [yValOrExtent] are {IExtent}s) or are under a
+            * 2D area (if [xValOrExtent] and [yValOrExtent] are both {IExtent}s).
             *
-            * @param {number} x The pixel x position.
-            * @param {number} y The pixel y position.
+            * @param {any} xValOrExtent The pixel x position, or range of x values.
+            * @param {any} yValOrExtent The pixel y position, or range of y values.
             * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
             * @return {D3.Selection} The selected bar, or null if no bar was selected.
             */
-            public selectBar(x: number, y: number, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
+            public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
             /**
             * Deselects all bars.
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
@@ -1650,31 +1945,43 @@ declare module Plottable {
         class Default implements IPlotAnimator {
             public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any;
             /**
-            * Gets or sets the duration of the animation in milliseconds.
+            * Gets the duration of the animation in milliseconds.
             *
-            * @param {Number} duration The duration in milliseconds.
-            * @return {Number|Default} Returns this object for chaining or
-            *     the current duration if no argument is supplied.
+            * @returns {Number} The current duration.
             */
             public duration(): Number;
+            /**
+            * Sets the duration of the animation in milliseconds.
+            *
+            * @param {Number} duration The duration in milliseconds.
+            * @returns {Default} The calling Default Animator.
+            */
             public duration(duration: Number): Default;
             /**
-            * Gets or sets the delay of the animation in milliseconds.
+            * Gets the delay of the animation in milliseconds.
             *
-            * @param {Number} delay The delay in milliseconds.
-            * @return {Number|Default} Returns this object for chaining or
-            *     the current delay if no argument is supplied.
+            * @returns {Number} The current delay.
             */
             public delay(): Number;
+            /**
+            * Sets the delay of the animation in milliseconds.
+            *
+            * @param {Number} delay The delay in milliseconds.
+            * @returns {Default} The calling Default Animator.
+            */
             public delay(delay: Number): Default;
             /**
-            * Gets or sets the easing string of the animation in milliseconds.
+            * Gets the current easing of the animation.
             *
-            * @param {string} easing The easing string.
-            * @return {string|Default} Returns this object for chaining or
-            *     the current easing string if no argument is supplied.
+            * @returns {string} the current easing mode.
             */
             public easing(): string;
+            /**
+            * Sets the easing mode of the animation.
+            *
+            * @param {string} easing The desired easing mode.
+            * @returns {Default} The calling Default Animator.
+            */
             public easing(easing: string): Default;
         }
     }
@@ -1745,6 +2052,15 @@ declare module Plottable {
             * @param {(x: number, y: number) => any} cb: Callback to be called. Takes click x and y in pixels.
             */
             public callback(cb: (x: number, y: number) => any): Click;
+        }
+        class DoubleClick extends Click {
+            /**
+            * Creates a DoubleClickInteraction.
+            *
+            * @constructor
+            * @param {Component} componentToListenTo The component to listen for clicks on.
+            */
+            constructor(componentToListenTo: Abstract.Component);
         }
     }
 }

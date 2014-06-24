@@ -2,17 +2,11 @@
 
 module Plottable {
 export module Abstract {
-  interface IPerspective {
-    dataSource: DataSource;
-    accessor: IAccessor;
-  }
-  export class Scale extends Broadcaster {
+  export class Scale extends PlottableObject implements Core.IListenable {
     public _d3Scale: D3.Scale.Scale;
     public _autoDomainAutomatically = true;
-    private rendererID2Perspective: {[rendererID: string]: IPerspective} = {};
-    private dataSourceReferenceCounter = new Util.IDCounter();
-    public _autoNice = false;
-    public _autoPad  = false;
+    public broadcaster = new Plottable.Core.Broadcaster(this);
+    public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
     /**
      * Creates a new Scale.
      *
@@ -25,13 +19,7 @@ export module Abstract {
     }
 
     public _getAllExtents(): any[][] {
-      var perspectives: IPerspective[] = d3.values(this.rendererID2Perspective);
-      var extents = perspectives.map((p) => {
-        var source = p.dataSource;
-        var accessor = p.accessor;
-        return source._getExtent(accessor);
-      }).filter((e) => e != null);
-      return extents;
+      return d3.values(this._rendererAttrID2Extent);
     }
 
     public _getExtent(): any[] {
@@ -50,40 +38,6 @@ export module Abstract {
       return this;
     }
 
-    public _addPerspective(rendererIDAttr: string, dataSource: DataSource, accessor: any) {
-      if (this.rendererID2Perspective[rendererIDAttr] != null) {
-        this._removePerspective(rendererIDAttr);
-      }
-      this.rendererID2Perspective[rendererIDAttr] = {dataSource: dataSource, accessor: accessor};
-
-      var dataSourceID = dataSource._plottableID;
-      if (this.dataSourceReferenceCounter.increment(dataSourceID) === 1 ) {
-        dataSource.registerListener(this, () => {
-          if (this._autoDomainAutomatically) {
-            this.autoDomain();
-          }
-        });
-      }
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
-      return this;
-    }
-
-    public _removePerspective(rendererIDAttr: string) {
-      var dataSource = this.rendererID2Perspective[rendererIDAttr].dataSource;
-      var dataSourceID = dataSource._plottableID;
-      if (this.dataSourceReferenceCounter.decrement(dataSourceID) === 0) {
-        dataSource.deregisterListener(this);
-      }
-
-      delete this.rendererID2Perspective[rendererIDAttr];
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
-      return this;
-    }
-
     /**
      * Returns the range value corresponding to a given domain value.
      *
@@ -95,15 +49,20 @@ export module Abstract {
     }
 
     /**
-     * Retrieves the current domain, or sets the Scale's domain to the specified values.
+     * Gets the domain.
      *
-     * @param {any[]} [values] The new value for the domain. This array may
+     * @returns {any[]} The current domain.
+     */
+    public domain(): any[];
+    /**
+     * Sets the Scale's domain to the specified values.
+     *
+     * @param {any[]} values The new value for the domain. This array may
      *     contain more than 2 values if the scale type allows it (e.g.
      *     ordinal scales). Other scales such as quantitative scales accept
      *     only a 2-value extent array.
-     * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+     * @returns {Scale} The calling Scale.
      */
-    public domain(): any[];
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
@@ -116,17 +75,26 @@ export module Abstract {
     }
 
     public _setDomain(values: any[]) {
+      if (values[0] === Infinity || values[0] === -Infinity ||
+          values[1] === Infinity || values[1] === -Infinity) {
+        throw new Error("data cannot contain Infinity or -Infinity");
+      }
       this._d3Scale.domain(values);
-      this._broadcast();
+      this.broadcaster.broadcast();
     }
 
     /**
-     * Retrieves the current range, or sets the Scale's range to the specified values.
+     * Gets the range.
      *
-     * @param {any[]} [values] The new value for the range.
-     * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
+     * @returns {any[]} The current range.
      */
     public range(): any[];
+    /**
+     * Sets the Scale's range to the specified values.
+     *
+     * @param {any[]} values The new values for the range.
+     * @returns {Scale} The calling Scale.
+     */
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {
@@ -144,6 +112,32 @@ export module Abstract {
      */
     public copy(): Scale {
       return new Scale(this._d3Scale.copy());
+    }
+
+    /**
+     * When a renderer determines that the extent of a projector has changed,
+     * it will call this function. This function should ensure that
+     * the scale has a domain at least large enough to include extent.
+     *
+     * @param {number} rendererID A unique indentifier of the renderer sending
+     *                 the new extent.
+     * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
+     * @param {any[]} extent The new extent to be included in the scale.
+     */
+    public updateExtent(rendererID: number, attr: string, extent: any[]) {
+      this._rendererAttrID2Extent[rendererID + attr] = extent;
+      if (this._autoDomainAutomatically) {
+        this.autoDomain();
+      }
+      return this;
+    }
+
+    public removeExtent(rendererID: number, attr: string) {
+      delete this._rendererAttrID2Extent[rendererID + attr];
+      if (this._autoDomainAutomatically) {
+        this.autoDomain();
+      }
+      return this;
     }
   }
 }

@@ -5,10 +5,11 @@ module Plottable {
     accessor: IAccessor;
     extent: any[];
   }
-  export class DataSource extends Abstract.Broadcaster {
+  export class DataSource extends Abstract.PlottableObject implements Core.IListenable {
     private _data: any[];
     private _metadata: any;
     private accessor2cachedExtent: Util.StrictEqualityAssociativeArray;
+    public broadcaster = new Core.Broadcaster(this);
     /**
      * Creates a new DataSource.
      *
@@ -24,12 +25,17 @@ module Plottable {
     }
 
     /**
-     * Retrieves the current data from the DataSource, or sets the data.
+     * Gets the data.
      *
-     * @param {any[]} [data] The new data.
-     * @returns {any[]|DataSource} The current data, or the calling DataSource.
+     * @returns {any[]} The current data.
      */
     public data(): any[];
+    /**
+     * Sets new data.
+     *
+     * @param {any[]} data The new data.
+     * @returns {DataSource} The calling DataSource.
+     */
     public data(data: any[]): DataSource;
     public data(data?: any[]): any {
       if (data == null) {
@@ -37,18 +43,23 @@ module Plottable {
       } else {
         this._data = data;
         this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
-        this._broadcast();
+        this.broadcaster.broadcast();
         return this;
       }
     }
 
     /**
-     * Retrieves the current metadata from the DataSource, or sets the metadata.
+     * Gets the metadata.
      *
-     * @param {any[]} [metadata] The new metadata.
-     * @returns {any[]|DataSource} The current metadata, or the calling DataSource.
+     * @returns {any} The current metadata.
      */
     public metadata(): any;
+    /**
+     * Sets the metadata.
+     *
+     * @param {any} metadata The new metadata.
+     * @returns {DataSource} The calling DataSource.
+     */
     public metadata(metadata: any): DataSource;
     public metadata(metadata?: any): any {
       if (metadata == null) {
@@ -56,7 +67,7 @@ module Plottable {
       } else {
         this._metadata = metadata;
         this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
-        this._broadcast();
+        this.broadcaster.broadcast();
         return this;
       }
     }
@@ -74,11 +85,16 @@ module Plottable {
       var appliedAccessor = Util.Methods.applyAccessor(accessor, this);
       var mappedData = this._data.map(appliedAccessor);
       if (mappedData.length === 0){
-        return undefined;
+        return [];
       } else if (typeof(mappedData[0]) === "string") {
         return Util.Methods.uniq(mappedData);
       } else {
-        return d3.extent(mappedData);
+        var extent = d3.extent(mappedData);
+        if (extent[0] == null || extent[1] == null) {
+          return [];
+        } else {
+          return extent;
+        }
       }
     }
   }

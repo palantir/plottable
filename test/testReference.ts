@@ -9,6 +9,7 @@
 ///<reference path="globalInitialization.ts" />
 ///<reference path="axisTests.ts" />
 ///<reference path="baseAxisTests.ts" />
+///<reference path="numericAxisTests.ts" />
 ///<reference path="broadcasterTests.ts" />
 ///<reference path="componentContainerTests.ts" />
 ///<reference path="componentGroupTests.ts" />
@@ -29,3 +30,4 @@
 ///<reference path="tableTests.ts" />
 ///<reference path="textUtilsTests.ts" />
 ///<reference path="utilsTests.ts" />
+///<reference path="domainerTests.ts" />

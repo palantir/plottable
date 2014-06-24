@@ -33,7 +33,7 @@ export module Axis {
         formatFunction = (d: any) => (<Abstract.Formatter> formatter).format(d);
       }
       this.tickFormat(formatFunction);
-      this._registerToBroadcaster(this._axisScale, () => this._render());
+      this._axisScale.broadcaster.registerListener(this, () => this._render());
     }
 
     public _setup() {
@@ -43,7 +43,7 @@ export module Axis {
     }
 
     public _doRender() {
-      var domain = this.d3Axis.scale().domain();
+      var domain = this._axisScale.domain();
       var extent = Math.abs(domain[1] - domain[0]);
       var min = +d3.min(domain);
       var max = +d3.max(domain);

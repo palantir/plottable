@@ -4,8 +4,6 @@ module Plottable {
 export module Plot {
   export class HorizontalBar extends Abstract.BarPlot {
     public _barAlignment = "top";
-    public _ANIMATION_DURATION = 300; //milliseconds
-    public _ANIMATION_DELAY = 15; //milliseconds
 
     /**
      * Creates a HorizontalBarPlot.
@@ -50,7 +48,7 @@ export module Plot {
       if (this._animate && this._dataChanged) {
         attrToProjector["x"] = () => scaledBaseline;
         attrToProjector["width"] = () => 0;
-        this._bars.attr(attrToProjector);
+        this._applyAnimatedAttributes(this._bars, "bars-reset", attrToProjector);
       }
 
       attrToProjector["x"] = (d: any, i: number) => {
@@ -67,22 +65,18 @@ export module Plot {
         this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
 
-      var updateSelection: any = this._bars;
-      if (this._animate) {
-        var n = this.dataSource().data().length;
-        updateSelection = updateSelection.transition().ease("exp-out").duration(this._ANIMATION_DURATION)
-                                            .delay((d: any, i: number) => i * this._ANIMATION_DELAY);
-      }
+      // Apply bar updates
+      this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
 
-      updateSelection.attr(attrToProjector);
       this._bars.exit().remove();
 
-      this._baseline.attr({
+      var baselineAttr: Abstract.IAttributeToProjector = {
         "x1": scaledBaseline,
         "y1": 0,
         "x2": scaledBaseline,
         "y2": this.availableHeight
-      });
+      };
+      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
     }
 
     /**
@@ -101,6 +95,11 @@ export module Plot {
       if (this.element != null) {
         this._render();
       }
+      return this;
+    }
+
+    public _updateXDomainer() {
+      this._updateDomainer(this.yScale);
       return this;
     }
   }

@@ -22,7 +22,7 @@ export module Axis {
       if (scale.rangeType() !== "bands") {
         throw new Error("Only rangeBands category axes are implemented");
       }
-      this._registerToBroadcaster(this._scale, () => this._invalidateLayout());
+      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
     }
 
     public _setup() {
@@ -122,7 +122,7 @@ export module Axis {
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
       Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
-      Util.DOM.translate(this._ticksContainer, translate[0], translate[1]);
+      Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
       return this;
     }
   }

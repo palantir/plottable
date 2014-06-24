@@ -4,7 +4,6 @@ module Plottable {
 export module Plot {
   export class Line extends Area {
     private path: D3.Selection;
-    public _ANIMATION_DURATION = 600; //milliseconds
 
     /**
      * Creates a LinePlot.
