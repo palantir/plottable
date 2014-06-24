@@ -77,7 +77,8 @@ export module Component {
     }
 
     private truncateTextAndRemeasure(availableLength: number) {
-      var shortText = Util.Text.getTruncatedText(this.text, availableLength, this.textElement);
+      var measure = Util.Text.getTextMeasure(this.textElement);
+      var shortText = Util.Text.getTruncatedText(this.text, availableLength, measure);
       this.textElement.text(shortText);
       this.measureAndSetTextSize();
     }

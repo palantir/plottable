@@ -190,7 +190,7 @@ declare module Plottable {
             * @param {D3.Selection} element: The text element used to measure the text
             * @returns {string} text - the shortened text
             */
-            function getTruncatedText(text: string, availableWidth: number, element: D3.Selection): string;
+            function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
             /**
             * Gets the height of a text element, as rendered.
             *

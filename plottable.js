@@ -357,8 +357,7 @@ var Plottable;
             * @param {D3.Selection} element: The text element used to measure the text
             * @returns {string} text - the shortened text
             */
-            function getTruncatedText(text, availableWidth, element) {
-                var measurer = getTextMeasure(element);
+            function getTruncatedText(text, availableWidth, measurer) {
                 if (measurer(text)[0] <= availableWidth) {
                     return text;
                 } else {
@@ -4058,7 +4057,7 @@ var Plottable;
                             var measure = Plottable.Util.Text.getTextMeasure(textEl);
                             var wrappedLines = Plottable.Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
                             if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, textEl));
+                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, measure));
                             } else {
                                 textEl.text("");
                                 var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -4196,7 +4195,7 @@ var Plottable;
                             var measure = Plottable.Util.Text.getTextMeasure(textEl);
                             var wrappedLines = Plottable.Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
                             if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, textEl));
+                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, measure));
                             } else {
                                 var baseY = 0;
                                 if (tickLabelPosition === "top") {
@@ -5017,7 +5016,8 @@ var Plottable;
             };
 
             Label.prototype.truncateTextAndRemeasure = function (availableLength) {
-                var shortText = Plottable.Util.Text.getTruncatedText(this.text, availableLength, this.textElement);
+                var measure = Plottable.Util.Text.getTextMeasure(this.textElement);
+                var shortText = Plottable.Util.Text.getTruncatedText(this.text, availableLength, measure);
                 this.textElement.text(shortText);
                 this.measureAndSetTextSize();
             };
@@ -5213,7 +5213,8 @@ var Plottable;
                 });
                 legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
                 legend.selectAll("text").text(function (d) {
-                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, d3.select(this));
+                    var measure = Plottable.Util.Text.getTextMeasure(d3.select(this));
+                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
                 });
                 this.updateClasses();
                 this.updateListeners();

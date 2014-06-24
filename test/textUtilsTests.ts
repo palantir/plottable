@@ -1,18 +1,17 @@
 ///<reference path="testReference.ts" />
 
 var assert = chai.assert;
-var tu = Plottable.Util.Text;
 describe("Util.Text", () => {
   it("getTruncatedText works properly", () => {
     var svg = generateSVG();
     var textEl = svg.append("text").attr("x", 20).attr("y", 50);
     textEl.text("foobar");
-
-    var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, textEl);
+    var measure = Plottable.Util.Text.getTextMeasure(textEl);
+    var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, measure);
     assert.equal(fullText, "hellom world!", "text untruncated");
-    var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, textEl);
+    var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, measure);
     assert.equal(partialText, "hello...", "text truncated");
-    var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, textEl);
+    var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, measure);
     assert.equal(tinyText, "", "empty string for tiny text");
 
     assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
