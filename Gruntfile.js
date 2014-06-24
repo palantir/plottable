@@ -1,9 +1,3 @@
-/*
- * The Web project Gruntfile.
- *
- * Copyright 2013 Palantir Technologies, Inc. All rights reserved.
- */
-
 module.exports = function(grunt) {
   "use strict";
 
@@ -191,7 +185,7 @@ module.exports = function(grunt) {
         "files": ["src/**/*.ts"]
       },
       "tests": {
-        "tasks": ["test-compile", "tslint"],
+        "tasks": ["test-compile"],
         "files": ["test/**.ts"]
       }
     },
@@ -291,7 +285,6 @@ module.exports = function(grunt) {
                                   "sed:private_definitions",
                                   "definitions_prod",
                                   "test-compile",
-                                  "tslint",
                                   "handle-header",
                                   "sed:protected_definitions",
                                   "sed:public_member_vars",
@@ -306,6 +299,7 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", [
                                   "dev-compile",
                                   "blanket_mocha",
+                                  "tslint",
                                   "uglify",
                                   "compress"
                                   ]);
@@ -313,7 +307,7 @@ module.exports = function(grunt) {
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint"]);
   grunt.registerTask("bm", ["blanket_mocha"]);
 
   grunt.registerTask("sublime", [
