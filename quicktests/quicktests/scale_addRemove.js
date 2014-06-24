@@ -13,7 +13,6 @@ var clicks = 0;
         var data_sliced = (i>2)?data[i%2].slice(0, 10):data[i%2].slice(10, 20);
         d_array[i] = new Plottable.DataSource(data_sliced);
         d_array[i].metadata({name: "series" + (i+1).toString()});
-        console.log(d_array[i].metadata);
     }
 
 
