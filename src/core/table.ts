@@ -230,7 +230,7 @@ export module Component {
           };
 
           if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
-            throw new Error("Invariant Violation: Abstract.Component cannot request more space than is offered");
+            console.log("Invariant Violation: Abstract.Component cannot request more space than is offered");
           }
 
           requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], spaceRequest.width );
