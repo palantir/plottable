@@ -2184,7 +2184,13 @@ var Plottable;
                         } else {
                             spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                         }
-                        if (spaceRequest.width > offeredWidths[colIndex] || spaceRequest.height > offeredHeights[rowIndex]) {
+
+                        var epsilon = 0.001;
+                        var epsilonGT = function (a, b) {
+                            return a - b - epsilon > 0;
+                        };
+
+                        if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
                             throw new Error("Invariant Violation: Abstract.Component cannot request more space than is offered");
                         }
 
