@@ -180,11 +180,11 @@ export module Axis {
      * @return {number[]}: [width, height] pair.
      */
     private computTickWH(s: string): number[] {
-        var innerG = this._tickLabelsG.append("g").classed("writeText-inner-g", true); // unleash your inner G
-        var t = innerG.append("text").text(s);
-        var bb = Util.DOM.getBBox(t);
-        innerG.remove();
-        return [bb.width, bb.height];
+      var innerG = this._tickLabelsG.append("g").classed("writeText-inner-g", true); // unleash your inner G
+      var t = innerG.append("text").text(s);
+      var bb = Util.DOM.getBBox(t);
+      innerG.remove();
+      return [bb.width, bb.height];
     }
 
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
