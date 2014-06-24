@@ -1058,6 +1058,19 @@ declare module Plottable {
         * @return {Domainer} The calling Domainer.
         */
         public nice(count?: number): Domainer;
+        /**
+        * Ensure that the domain produced includes value.
+        *
+        * For example, after include(0), the domain [3, 5] will become [0, 5],
+        * and the domain [-9, -8] will become [-9, 0].
+        *
+        * @param {any} value The value that will be included.
+        * @param {boolean} include Defaults to true. If true, this value will
+        *                  always be included, if false, this value will not
+        *                  necessarily be included.
+        * @return {Domainer} The calling Domainer.
+        */
+        public include(value: any, include?: boolean): Domainer;
     }
 }
 
@@ -1131,13 +1144,23 @@ declare module Plottable {
             */
             public tickFormat(count: number, format?: string): (n: number) => string;
             /**
+            * Retrieve a Domainer of a scale. A Domainer is responsible for combining
+            * multiple extents into a single domain.
+            *
+            * @return {QuantitiveScale} The scale's current domainer.
+            */
+            public domainer(): Domainer;
+            /**
             * Sets a Domainer of a scale. A Domainer is responsible for combining
             * multiple extents into a single domain.
+            *
+            * When you set domainer, we assume that you know what you want the domain
+            * to look like better that we do. Ensuring that the domain is padded,
+            * includes 0, etc., will be the responsability of the new domainer.
             *
             * @param {Domainer} domainer The domainer to be set.
             * @return {QuantitiveScale} The calling scale.
             */
-            public domainer(): Domainer;
             public domainer(domainer: Domainer): QuantitiveScale;
         }
     }

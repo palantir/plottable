@@ -10,6 +10,7 @@ export module Abstract {
     public _barAlignmentFactor = 0;
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
+    private previousBaselineValue: number = null;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
@@ -38,6 +39,7 @@ export module Abstract {
     public _setup() {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._bars = this.renderArea.selectAll("rect").data([]);
       return this;
     }
 
@@ -84,6 +86,7 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
+      this.previousBaselineValue = this._baselineValue;
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
@@ -138,6 +141,10 @@ export module Abstract {
     public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
+      if (!this._isSetup) {
+        return null;
+      }
+
       var selectedBars: any[] = [];
 
       var xExtent: IExtent = this.parseExtent(xValOrExtent);
@@ -172,7 +179,26 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
-      this._bars.classed("selected", false);
+      if (this._isSetup) {
+        this._bars.classed("selected", false);
+      }
+      return this;
+    }
+
+    public _updateDomainer(scale: Scale) {
+      if (scale instanceof Abstract.QuantitiveScale) {
+        var qscale = <Abstract.QuantitiveScale> scale;
+        if (!qscale._userSetDomainer && this._baselineValue != null) {
+          qscale.domainer()
+            .paddingException(this.previousBaselineValue, false)
+            .include(this.previousBaselineValue, false)
+            .paddingException(this._baselineValue)
+            .include(this._baselineValue);
+          if (qscale._autoDomainAutomatically) {
+            qscale.autoDomain();
+          }
+        }
+      }
       return this;
     }
 

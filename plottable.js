@@ -854,6 +854,9 @@ var Plottable;
         var Formatter = (function () {
             function Formatter(precision) {
                 this._onlyShowUnchanged = true;
+                if (precision < 0 || precision > 20) {
+                    throw new RangeError("Formatter precision must be between 0 and 20");
+                }
                 this._precision = precision;
             }
             /**
@@ -2923,6 +2926,9 @@ var Plottable;
             this.doNice = false;
             this.padProportion = 0.0;
             this.paddingExceptions = d3.set([]);
+            // This must be a map rather than a set so we can get the original values
+            // back out, rather than their stringified versions.
+            this.includedValues = d3.map([]);
             this.combineExtents = combineExtents;
         }
         /**
@@ -2935,7 +2941,12 @@ var Plottable;
         *                 pair.
         */
         Domainer.prototype.computeDomain = function (extents, scale) {
-            return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
+            var domain;
+            domain = this.combineExtents(extents);
+            domain = this.includeDomain(domain);
+            domain = this.padDomain(domain);
+            domain = this.niceDomain(scale, domain);
+            return domain;
         };
 
         /**
@@ -2983,6 +2994,28 @@ var Plottable;
             return this;
         };
 
+        /**
+        * Ensure that the domain produced includes value.
+        *
+        * For example, after include(0), the domain [3, 5] will become [0, 5],
+        * and the domain [-9, -8] will become [-9, 0].
+        *
+        * @param {any} value The value that will be included.
+        * @param {boolean} include Defaults to true. If true, this value will
+        *                  always be included, if false, this value will not
+        *                  necessarily be included.
+        * @return {Domainer} The calling Domainer.
+        */
+        Domainer.prototype.include = function (value, include) {
+            if (typeof include === "undefined") { include = true; }
+            if (include) {
+                this.includedValues.set(value, value);
+            } else {
+                this.includedValues.remove(value);
+            }
+            return this;
+        };
+
         Domainer.defaultCombineExtents = function (extents) {
             if (extents.length === 0) {
                 return [0, 1];
@@ -3025,6 +3058,12 @@ var Plottable;
             } else {
                 return domain;
             }
+        };
+
+        Domainer.prototype.includeDomain = function (domain) {
+            return this.includedValues.values().reduce(function (domain, value) {
+                return [Math.min(domain[0], value), Math.max(domain[1], value)];
+            }, domain);
         };
         Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
         Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
@@ -5616,6 +5655,7 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
+                this.previousBaselineValue = null;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -5634,6 +5674,7 @@ var Plottable;
             BarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
+                this._bars = this.renderArea.selectAll("rect").data([]);
                 return this;
             };
 
@@ -5683,6 +5724,7 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.baseline = function (value) {
+                this.previousBaselineValue = this._baselineValue;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
@@ -5722,6 +5764,10 @@ var Plottable;
 
             BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (typeof select === "undefined") { select = true; }
+                if (!this._isSetup) {
+                    return null;
+                }
+
                 var selectedBars = [];
 
                 var xExtent = this.parseExtent(xValOrExtent);
@@ -5755,15 +5801,25 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.deselectAll = function () {
-                this._bars.classed("selected", false);
+                if (this._isSetup) {
+                    this._bars.classed("selected", false);
+                }
                 return this;
             };
 
-            /*
-            * generateAttrToProjector is overwritten on Abstract.BarPlot so it can default the width projector appropriately:
-            * to a constant default value if the OrdinalScale rangeType is "points" and to the rangeBand if the rangeType is
-            * "bands". If the width projector was set explicitly, then it will not be overwritten.
-            */
+            BarPlot.prototype._updateDomainer = function (scale) {
+                if (scale instanceof Plottable.Abstract.QuantitiveScale) {
+                    var qscale = scale;
+                    if (!qscale._userSetDomainer && this._baselineValue != null) {
+                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
+                        if (qscale._autoDomainAutomatically) {
+                            qscale.autoDomain();
+                        }
+                    }
+                }
+                return this;
+            };
+
             BarPlot.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 // Primary scale/direction: the "length" of the bars
@@ -5841,12 +5897,7 @@ var Plottable;
                 this._isVertical = true;
             }
             VerticalBar.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    var scale = this.yScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().paddingException(this._baselineValue);
-                    }
-                }
+                this._updateDomainer(this.yScale);
                 return this;
             };
             VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
@@ -5880,15 +5931,9 @@ var Plottable;
             function HorizontalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this.isVertical = false;
-                this.isVertical = false;
             }
             HorizontalBar.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    var scale = this.xScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().paddingException(this._baselineValue);
-                    }
-                }
+                this._updateDomainer(this.xScale);
                 return this;
             };
 

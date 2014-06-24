@@ -1803,6 +1803,17 @@ describe("Formatters", function () {
             result = general.format(null);
             assert.strictEqual(result, "null", "non-number inputs are stringified");
         });
+
+        it("throws an error on strange precision", function () {
+            assert.throws(function () {
+                var general = new Plottable.Formatter.General(-1);
+                var result = general.format(5);
+            });
+            assert.throws(function () {
+                var general = new Plottable.Formatter.General(100);
+                var result = general.format(5);
+            });
+        });
     });
 
     describe("identity", function () {
@@ -3436,6 +3447,20 @@ describe("Renderers", function () {
                     verifier.end();
                 });
 
+                it("shouldn't blow up if members called before the first render", function () {
+                    var brandNew = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+
+                    assert.isNotNull(brandNew.deselectAll(), "deselects return self");
+                    assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
+
+                    brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
+
+                    assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
+                    assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
+
+                    verifier.end();
+                });
+
                 after(function () {
                     if (verifier.passed) {
                         svg.remove();
@@ -3453,7 +3478,6 @@ describe("Renderers", function () {
                 var renderer;
                 var SVG_WIDTH = 600;
                 var SVG_HEIGHT = 400;
-
                 before(function () {
                     svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
                     yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
@@ -4756,5 +4780,55 @@ describe("Domainer", function () {
         domainer.paddingException(0, false);
         domain = domainer.computeDomain([[0, 200]], scale);
         assert.deepEqual(domain, [-10, 200]);
+    });
+
+    it("paddingException(n) works on dates", function () {
+        var a = new Date(2000, 5, 5);
+        var b = new Date(2003, 0, 1);
+        domainer.pad().paddingException(a);
+        var timeScale = new Plottable.Scale.Time();
+        timeScale.updateExtent(1, "x", [a, b]);
+        timeScale.domainer(domainer);
+        var domain = timeScale.domain();
+        assert.deepEqual(domain[0], a);
+        assert.isTrue(b < domain[1]);
+    });
+
+    it("include(n) works an expected", function () {
+        domainer.include(5);
+        var domain = domainer.computeDomain([[0, 10]], scale);
+        assert.deepEqual(domain, [0, 10]);
+        domain = domainer.computeDomain([[0, 3]], scale);
+        assert.deepEqual(domain, [0, 5]);
+        domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [5, 200]);
+
+        domainer.include(-3).include(0).include(10);
+        domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [-3, 200]);
+        domain = domainer.computeDomain([[0, 0]], scale);
+        assert.deepEqual(domain, [-3, 10]);
+
+        domainer.include(10, false);
+        domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [-3, 200]);
+        domain = domainer.computeDomain([[-100, -50]], scale);
+        assert.deepEqual(domain, [-100, 5]);
+
+        domainer.include(10);
+        domain = domainer.computeDomain([[-100, -50]], scale);
+        assert.deepEqual(domain, [-100, 10]);
+    });
+
+    it("include(n) works on dates", function () {
+        var a = new Date(2000, 5, 4);
+        var b = new Date(2000, 5, 5);
+        var c = new Date(2000, 5, 6);
+        var d = new Date(2003, 0, 1);
+        domainer.include(b);
+        var timeScale = new Plottable.Scale.Time();
+        timeScale.updateExtent(1, "x", [c, d]);
+        timeScale.domainer(domainer);
+        assert.deepEqual(timeScale.domain(), [b, d]);
     });
 });
