@@ -2224,8 +2224,7 @@ describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel("A CHART TITLE");
-        label._anchor(svg);
-        label._computeLayout();
+        label.renderTo(svg);
 
         var content = label.content;
         assert.isTrue(label.element.classed("label"), "title element has label css class");
@@ -2243,30 +2242,24 @@ describe("Labels", function () {
     it("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
         assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
-        assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
         svg.remove();
     });
 
     it("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
         assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
-        assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
         svg.remove();
     });
 
@@ -2274,12 +2267,11 @@ describe("Labels", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel();
         label.renderTo(svg);
-        var textEl = label.content.select("text");
-        assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
+        assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
         assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
         label.setText("hello world");
         label.renderTo(svg);
-        assert.equal(textEl.text(), "hello world", "the label text updated properly");
+        assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
         assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
@@ -2288,11 +2280,9 @@ describe("Labels", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
         var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var bbox = Plottable.Util.DOM.getBBox(text);
         assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
@@ -2310,13 +2300,13 @@ describe("Labels", function () {
 
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
-        var label = new Plottable.Component.TitleLabel(".");
+        var label = new Plottable.Component.TitleLabel("X");
         var t = new Plottable.Component.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Abstract.Component());
         t.renderTo(svg);
-        var textElement = svg.select("text");
-        var textX = parseFloat(textElement.attr("x"));
+        var textTranslate = d3.transform(label.content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label.element.attr("transform")).translate;
-        assert.closeTo(eleTranslate[0] + textX, 200, 10, "label is centered");
+        var textWidth = Plottable.Util.DOM.getBBox(label.content.select("text")).width;
+        assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
         svg.remove();
     });
 

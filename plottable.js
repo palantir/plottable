@@ -4961,23 +4961,38 @@ var Plottable;
                 this.classed("label", true);
                 this.setText(text);
                 orientation = orientation.toLowerCase();
-                if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
+                if (orientation === "vertical-left") {
+                    orientation = "left";
+                }
+                if (orientation === "vertical-right") {
+                    orientation = "right";
+                }
+                if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
                     this.orientation = orientation;
                 } else {
                     throw new Error(orientation + " is not a valid orientation for LabelComponent");
                 }
-                this.xAlign("CENTER").yAlign("CENTER"); // the defaults
+                this.xAlign("center");
+                this.yAlign("center");
             }
+            Label.prototype.xAlign = function (alignment) {
+                var alignmentLC = alignment.toLowerCase();
+                _super.prototype.xAlign.call(this, alignmentLC);
+                this.xAlignment = alignmentLC;
+                return this;
+            };
+            Label.prototype.yAlign = function (alignment) {
+                var alignmentLC = alignment.toLowerCase();
+                _super.prototype.yAlign.call(this, alignmentLC);
+                this.yAlignment = alignmentLC;
+                return this;
+            };
+
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var desiredWidth;
-                var desiredHeight;
-                if (this.orientation === "horizontal") {
-                    desiredWidth = this.textLength;
-                    desiredHeight = this.textHeight;
-                } else {
-                    desiredWidth = this.textHeight;
-                    desiredHeight = this.textLength;
-                }
+                var desiredWH = this.measurer(this.text);
+                var desiredWidth = this.orientation === "horizontal" ? desiredWH[0] : desiredWH[1];
+                var desiredHeight = this.orientation === "horizontal" ? desiredWH[1] : desiredWH[0];
+
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
                     height: Math.min(desiredHeight, offeredHeight),
@@ -4988,7 +5003,8 @@ var Plottable;
 
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.textElement = this.content.append("text");
+                this.textContainer = this.content.append("g");
+                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
                 this.setText(this.text);
                 return this;
             };
@@ -5001,54 +5017,26 @@ var Plottable;
             */
             Label.prototype.setText = function (text) {
                 this.text = text;
-                if (this.element != null) {
-                    this.textElement.text(text);
-                    this.measureAndSetTextSize();
-                }
                 this._invalidateLayout();
                 return this;
             };
 
-            Label.prototype.measureAndSetTextSize = function () {
-                var bbox = Plottable.Util.DOM.getBBox(this.textElement);
-                this.textHeight = bbox.height;
-                this.textLength = this.text === "" ? 0 : bbox.width;
-            };
-
-            Label.prototype.truncateTextAndRemeasure = function (availableLength) {
-                var measure = Plottable.Util.Text.getTextMeasure(this.textElement);
-                var shortText = Plottable.Util.Text.getTruncatedText(this.text, availableLength, measure);
-                this.textElement.text(shortText);
-                this.measureAndSetTextSize();
+            Label.prototype._doRender = function () {
+                _super.prototype._doRender.call(this);
+                this.textContainer.selectAll("text").remove();
+                var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
+                var truncatedText = Plottable.Util.Text.getTruncatedText(this.text, dimension, this.measurer);
+                if (this.orientation === "horizontal") {
+                    Plottable.Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight, this.xAlignment, this.yAlignment);
+                } else {
+                    Plottable.Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight, this.xAlignment, this.yAlignment, this.orientation);
+                }
+                return this;
             };
 
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-                var bbox = Plottable.Util.DOM.getBBox(this.textElement);
-                this.textElement.attr("dy", -bbox.y);
-
-                var xShift = 0;
-                var yShift = 0;
-
-                if (this.orientation === "horizontal") {
-                    this.truncateTextAndRemeasure(this.availableWidth);
-                    xShift = (this.availableWidth - this.textLength) * this._xAlignProportion;
-                } else {
-                    this.truncateTextAndRemeasure(this.availableHeight);
-                    xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
-
-                    if (this.orientation === "vertical-right") {
-                        this.textElement.attr("transform", "rotate(90)");
-                        yShift = -this.textHeight;
-                    } else {
-                        this.textElement.attr("transform", "rotate(-90)");
-                        xShift = -xShift - this.textLength; // flip xShift
-                    }
-                }
-
-                this.textElement.attr("x", xShift);
-                this.textElement.attr("y", yShift);
+                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
                 return this;
             };
             return Label;

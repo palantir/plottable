@@ -1628,6 +1628,8 @@ declare module Plottable {
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
             constructor(text?: string, orientation?: string);
+            public xAlign(alignment: string): Label;
+            public yAlign(alignment: string): Label;
             /**
             * Sets the text on the Label.
             *

@@ -3,11 +3,12 @@
 module Plottable {
 export module Component {
   export class Label extends Abstract.Component {
-    private textElement: D3.Selection;
+    private textContainer: D3.Selection;
     private text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private orientation: string;
-    private textLength: number;
-    private textHeight: number;
+    private measurer: Util.Text.TextMeasurer;
+    private xAlignment: string;
+    private yAlignment: string;
 
     /**
      * Creates a Label.
@@ -21,24 +22,39 @@ export module Component {
       this.classed("label", true);
       this.setText(text);
       orientation = orientation.toLowerCase();
-      if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
+      if (orientation === "vertical-left") {
+        orientation = "left";
+      }
+      if (orientation === "vertical-right") {
+        orientation = "right";
+      }
+      if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
         this.orientation = orientation;
       } else {
         throw new Error(orientation + " is not a valid orientation for LabelComponent");
       }
-      this.xAlign("CENTER").yAlign("CENTER"); // the defaults
+      this.xAlign("center");
+      this.yAlign("center");
+    }
+
+    public xAlign(alignment: string): Label {
+      var alignmentLC = alignment.toLowerCase();
+      super.xAlign(alignmentLC);
+      this.xAlignment = alignmentLC;
+      return this;
+    }
+    public yAlign(alignment: string): Label {
+      var alignmentLC = alignment.toLowerCase();
+      super.yAlign(alignmentLC);
+      this.yAlignment = alignmentLC;
+      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var desiredWidth : number;
-      var desiredHeight: number;
-      if (this.orientation === "horizontal") {
-        desiredWidth  = this.textLength;
-        desiredHeight = this.textHeight;
-      } else {
-        desiredWidth  = this.textHeight;
-        desiredHeight = this.textLength;
-      }
+      var desiredWH = this.measurer(this.text);
+      var desiredWidth  = this.orientation === "horizontal" ? desiredWH[0] : desiredWH [1];
+      var desiredHeight = this.orientation === "horizontal" ? desiredWH[1] : desiredWH [0];
+
       return {
         width : Math.min(desiredWidth , offeredWidth),
         height: Math.min(desiredHeight, offeredHeight),
@@ -49,7 +65,8 @@ export module Component {
 
     public _setup() {
       super._setup();
-      this.textElement = this.content.append("text");
+      this.textContainer = this.content.append("g");
+      this.measurer = Util.Text.getTextMeasure(this.textContainer);
       this.setText(this.text);
       return this;
     }
@@ -62,54 +79,28 @@ export module Component {
      */
     public setText(text: string) {
       this.text = text;
-      if (this.element != null) {
-        this.textElement.text(text);
-        this.measureAndSetTextSize();
-      }
       this._invalidateLayout();
       return this;
     }
 
-    private measureAndSetTextSize() {
-      var bbox = Util.DOM.getBBox(this.textElement);
-      this.textHeight = bbox.height;
-      this.textLength = this.text === "" ? 0 : bbox.width;
-    }
-
-    private truncateTextAndRemeasure(availableLength: number) {
-      var measure = Util.Text.getTextMeasure(this.textElement);
-      var shortText = Util.Text.getTruncatedText(this.text, availableLength, measure);
-      this.textElement.text(shortText);
-      this.measureAndSetTextSize();
+    public _doRender() {
+      super._doRender();
+      this.textContainer.selectAll("text").remove();
+      var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
+      var truncatedText = Util.Text.getTruncatedText(this.text, dimension, this.measurer);
+      if (this.orientation === "horizontal") {
+        Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+                                        this.xAlignment, this.yAlignment);
+      } else {
+        Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
+                                        this.xAlignment, this.yAlignment, this.orientation);
+      }
+      return this;
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-      var bbox = Util.DOM.getBBox(this.textElement);
-      this.textElement.attr("dy", -bbox.y);
-
-      var xShift = 0;
-      var yShift = 0;
-
-      if (this.orientation === "horizontal") {
-        this.truncateTextAndRemeasure(this.availableWidth );
-        xShift = (this.availableWidth   - this.textLength) * this._xAlignProportion;
-      } else {
-        this.truncateTextAndRemeasure(this.availableHeight);
-        xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
-
-        if (this.orientation === "vertical-right") {
-          this.textElement.attr("transform", "rotate(90)");
-          yShift = -this.textHeight;
-        } else { // vertical-left
-          this.textElement.attr("transform", "rotate(-90)");
-          xShift = -xShift - this.textLength; // flip xShift
-        }
-      }
-
-      this.textElement.attr("x", xShift);
-      this.textElement.attr("y", yShift);
+      this.measurer = Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
       return this;
     }
   }
