@@ -10,7 +10,7 @@ var axis_array = [];
 var clicks = 0;
 
     for(var i = 0; i < 4; i++){
-        var data_sliced = (i>2)?data[i%2].slice(0, 10):data[i%2].slice(10, 20);
+        var data_sliced = (i<2)?data[i%2].slice(0, 10):data[i%2].slice(10, 20);
         d_array[i] = new Plottable.DataSource(data_sliced);
         d_array[i].metadata({name: "series" + (i+1).toString()});
     }
@@ -50,8 +50,20 @@ var clicks = 0;
                 .addComponent(2, 0, yAxis2)
                 .addComponent(2, 1, renderGroup2)
                 .addComponent(3, 1, xAxis2);
+
     basicTable.renderTo(svg);
 
+
+function project_newScale(renderArea, xScale, yScale){
+    renderArea.remove();
+    renderArea.project("x", "x", xScale);
+    renderArea.project("y", "y", yScale);
+}
+
+function movePlot(renderGroup, renderArea, xScale, yScale){
+    project_newScale(renderArea, xScale, yScale);
+    renderGroup.merge(renderArea);
+}
 
 addRemove = function(x, y){
 
@@ -64,17 +76,6 @@ addRemove = function(x, y){
     if(clicks == 8){ clicks = 0;}
 }
 
-
 window.xy = new Plottable.Interaction.Click(basicTable)
     .callback(addRemove)
     .registerWithComponent();
-
-function movePlot(renderGroup, renderArea, xScale, yScale){
-    project_newScale(renderArea, xScale, yScale);
-    renderGroup.merge(renderArea);
-}
-function project_newScale(renderArea, xScale, yScale){
-    renderArea.remove();
-    renderArea.project("x", "x", xScale);
-    renderArea.project("y", "y", yScale);
-}
