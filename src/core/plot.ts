@@ -123,6 +123,7 @@ export module Abstract {
       this._requireRerender = true;
       this._rerenderUpdateSelection = true;
       this.updateProjector(attrToSet);
+      this._render(); // queue a re-render upon changing projector
       return this;
     }
 
