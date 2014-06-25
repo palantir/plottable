@@ -236,6 +236,24 @@ declare module Plottable {
             * DOM node, it measures using textMeasure.
             */
             function measureTextInBox(text: string, width: number, height: number, textMeasure: TextMeasurer, horizontally?: boolean): IWriteTextResult;
+            class CachingMeasurer {
+                /**
+                * @param {D3.Selection} parentG The DOM element you want to measure
+                *        text inside.
+                */
+                constructor(parentG: D3.Selection);
+                /**
+                * If c were on a tick, how much space would it take up?
+                *
+                * @return {number[]}: [width, height] pair.
+                */
+                public measure(s: string): number[];
+                /**
+                * Call this when the sizes of letters may have changed.
+                * If the font has indeed changed sizes, clear the cache.
+                */
+                public clearCacheIfOutdated(): CachingMeasurer;
+            }
         }
     }
 }

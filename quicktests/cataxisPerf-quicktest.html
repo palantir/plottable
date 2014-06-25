@@ -1,66 +1,125 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Horizontal Category Renderer Quicktest</title>
-    <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../bower_components/d3/d3.min.js"></script>
-    <script src="../../plottable_multifile.js"></script>
-    <script src="../../examples/exampleUtil.js"></script>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> - jsFiddle demo</title>
+  
+  
+  
+  
+  
+  
+  <style type='text/css'>
+    </style> <link rel="stylesheet" type="text/css" href="../plottable.css"> <style type="text/css">
+/*-- Add custom styles after this line --*/
+ .demo-title {
+    font-size: 24 pt;
+}
+.plottable .y-axis .tick line {
+    opacity: 1
+}
 
-    <script>
-      var data = [
-          { name: "Spot", age: 8 },
-          { name: "Poptart", age: 1 },
-          { name: "Budoka", age: 3 },
-          { name: "Sugar", age: 14 },
-          { name: "Tac", age: +5 },
-          { name: "Supercalifragilisticexpialidocious", age: 10 },
-          { name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit", age: 4 }
-        ];
+.plottable .x-axis .tick line {
+    opacity: 1
+}
 
-      var ds = new Plottable.DataSource(data);
-      var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+  </style>
+  
 
-      var yScale = new Plottable.Scale.Ordinal();
-      yAxis = new Plottable.Axis.Category(yScale, "left").xAlign("right");
 
-      var rs = yAxis._requestedSpace;
-      yAxis._requestedSpace = function() {
-        console.time("_requestedSpace");
-        var result = rs.apply(this, arguments);
-        console.timeEnd("_requestedSpace");
+<script type='text/javascript'>//<![CDATA[ 
+
+     var ds;
+        var data = [];
+        var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
+                       "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
+                       "t", "u", "v", "w", "x", "y", "z"];
+    window.onload = function() {
+
+      ds = new Plottable.DataSource(data);
+      var xScale = new Plottable.Scale.Ordinal();
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+
+      var requestedSpace = xAxis._requestedSpace;
+      xAxis._requestedSpace = function(offeredWidth, offeredHeight) {
+        if (offeredWidth !== -1 && offeredHeight !== -1) {
+          console.time("_requestedSpace");
+        }
+        var result = requestedSpace.bind(xAxis)(offeredWidth, offeredHeight);
+        if (offeredWidth !== -1 && offeredHeight !== -1) {
+          console.timeEnd("_requestedSpace");
+        }
         return result;
       }
 
-      var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
-                              .project("x", "age", xScale)
-                              .project("y", "name", yScale)
-                              .animate(true);
+      var yScale = new Plottable.Scale.Linear();
+      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+      yAxis.showEndTickLabels(true);
+        
+      var gridlines = new Plottable.Component.Gridlines(null, yScale);
 
+      var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
+                              .project("x", "name", xScale)
+                              .project("y", "age", yScale)
+                              .project("fill", function() {return "steelblue"; })
       var chart = new Plottable.Component.Table([
-        [yAxis, barPlot],
-        [null, xAxis]
-      ]);
+                                  [yAxis, gridlines.merge(barRenderer)],
+                                  [null,  xAxis]
+                                ]);
 
-      window.onload = function() {
-        chart.renderTo("#meow");
-      }
 
-      function younger() {
-        var data = ds.data();
-        data.forEach(function(d) { d.age--; });
-        ds.data(data);
+
+
+
+        chart.renderTo("#cataxis");
+}
+
+function addBar() {
+  var data = ds.data();
+      var newName = "";
+      var numChars = Math.floor(Math.random()*50);
+      for(var i = 0; i < numChars; i++){
+          newName = newName + alphabet[Math.floor(Math.random()*26)];
+          if (Math.random() < .2){ newName = newName + " ";}
       }
-      function older() {
-        var data = ds.data();
-        data.forEach(function(d) { d.age++; });
-        ds.data(data);
-      }
-    </script>
-  </head>
-  <body>
-    <svg id="meow" width="480" height="320"></svg>
+      var newBar = { name: newName, age: Math.random() * 30 };
+      data.push(newBar);
+  ds.data(data);
+}
+function removeBar() {
+  var data = ds.data();
+    if(data.length > 0){  data.pop();   }
+  ds.data(data);
+}
+
+    
+    
+
+//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../plottable_multifile.js"></script>
+<script src="../examples/exampleUtil.js"></script>
+<div class="demo-title">Simple Chart</div>
+<br>
+
+
+<br>
+<svg id="cataxis" width="100%" height="500"></svg>
     <p />
-    <button name="minus-age" onclick="younger()">-1 year</button><button name="plus-age" onclick="older()">+1 year</button>
-  </body>
+    <button name="add-bar" onclick="addBar()">addBar</button>
+    <button name="remove-bar" onclick="removeBar()">remove Bar</button>
+
+    <p />
+<p />
+  
+</body>
+
+
 </html>
+

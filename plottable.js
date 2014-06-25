@@ -345,19 +345,19 @@ var Plottable;
                     if (s.trim() === "") {
                         return [0, 0];
                     }
-                    if (Plottable.Util.DOM.isSelectionRemovedFromSVG(selection)) {
+                    if (Util.DOM.isSelectionRemovedFromSVG(selection)) {
                         throw new Error("Cannot measure text in a removed node");
                     }
                     var bb;
                     if (selection.node().nodeName === "text") {
                         var originalText = selection.text();
                         selection.text(s);
-                        bb = Plottable.Util.DOM.getBBox(selection);
+                        bb = Util.DOM.getBBox(selection);
                         selection.text(originalText);
                         return [bb.width, bb.height];
                     } else {
                         var t = selection.append("text").text(s);
-                        bb = Plottable.Util.DOM.getBBox(t);
+                        bb = Util.DOM.getBBox(t);
                         t.remove();
                         return [bb.width, bb.height];
                     }
@@ -443,7 +443,7 @@ var Plottable;
                 var innerG = g.append("g");
                 var textEl = innerG.append("text");
                 textEl.text(line);
-                var bb = Plottable.Util.DOM.getBBox(textEl);
+                var bb = Util.DOM.getBBox(textEl);
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
@@ -456,7 +456,7 @@ var Plottable;
                 var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
                 var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
-                Plottable.Util.DOM.translate(innerG, xOff, yOff);
+                Util.DOM.translate(innerG, xOff, yOff);
                 return [w, h];
             }
             Text.writeLineHorizontally = writeLineHorizontally;
@@ -491,7 +491,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Plottable.Util.DOM.translate(innerG, 0, i * h);
+                    Util.DOM.translate(innerG, 0, i * h);
                     var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
                     if (wh[0] > maxWidth) {
                         maxWidth = wh[0];
@@ -500,7 +500,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = height - usedSpace;
                 var translator = { center: 0.5, top: 0, bottom: 1 };
-                Plottable.Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
+                Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
                 return [maxWidth, usedSpace];
             }
             Text.writeTextHorizontally = writeTextHorizontally;
@@ -514,7 +514,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Plottable.Util.DOM.translate(innerG, i * h, 0);
+                    Util.DOM.translate(innerG, i * h, 0);
                     var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
                     if (wh[1] > maxHeight) {
                         maxHeight = wh[1];
@@ -523,7 +523,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = width - usedSpace;
                 var translator = { center: 0.5, left: 0, right: 1 };
-                Plottable.Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
+                Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
 
                 return [usedSpace, maxHeight];
             }
@@ -547,7 +547,7 @@ var Plottable;
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
                 var measureText = getTextMeasure(innerG);
-                var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
 
                 var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
                 var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
@@ -567,7 +567,7 @@ var Plottable;
                 var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
-                var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, textMeasure);
+                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, textMeasure);
                 var widthFn = orientHorizontally ? d3.max : d3.sum;
                 var heightFn = orientHorizontally ? d3.sum : d3.max;
                 return {
@@ -581,6 +581,74 @@ var Plottable;
                 };
             }
             Text.measureTextInBox = measureTextInBox;
+
+            var CachingMeasurer = (function () {
+                /**
+                * @param {D3.Selection} parentG The DOM element you want to measure
+                *        text inside.
+                */
+                function CachingMeasurer(parentG) {
+                    this.chr2Measure = {};
+                    this.computeTickWH = getTextMeasure(parentG);
+
+                    // store this one in the cache
+                    this.getTickWH(CachingMeasurer.CANONICAL_CHR);
+                }
+                /**
+                * If c were on a tick, how much space would it take up?
+                *
+                * @return {number[]}: [width, height] pair.
+                */
+                CachingMeasurer.prototype.measure = function (s) {
+                    var _this = this;
+                    var widthHeights = s.trim().split("").map(function (c) {
+                        return _this.getTickWH(c);
+                    });
+                    return [d3.sum(widthHeights, function (wh) {
+                            return wh[0];
+                        }), d3.max(widthHeights, function (wh) {
+                            return wh[1];
+                        })];
+                };
+
+                /**
+                * Call this when the sizes of letters may have changed.
+                * If the font has indeed changed sizes, clear the cache.
+                */
+                CachingMeasurer.prototype.clearCacheIfOutdated = function () {
+                    // speed hack: measure one letter. Only clear the cache if its size has
+                    // changed, which it usually hasn't.
+                    if (!Util.Methods.arrayEq(this.computeTickWH(CachingMeasurer.CANONICAL_CHR), this.getTickWH(CachingMeasurer.CANONICAL_CHR))) {
+                        this.chr2Measure = {};
+                    }
+                    return this;
+                };
+
+                /**
+                * If c were on a tick, how much space would it take up?
+                * This will cache the result in this.chr2Measure.
+                *
+                * @param {string} c A single character.
+                * @return {number[]} [width, height] pair.
+                */
+                CachingMeasurer.prototype.getTickWH = function (c) {
+                    if (!(c in this.chr2Measure)) {
+                        // whitespace, when measured alone, will take up no space
+                        if (/\s/.test(c)) {
+                            var totalWH = this.computeTickWH("x" + c + "x");
+                            this.chr2Measure[c] = [
+                                totalWH[0] - this.getTickWH("x")[0] * 2,
+                                totalWH[1]];
+                        } else {
+                            this.chr2Measure[c] = this.computeTickWH(c);
+                        }
+                    }
+                    return this.chr2Measure[c];
+                };
+                CachingMeasurer.CANONICAL_CHR = "a";
+                return CachingMeasurer;
+            })();
+            Text.CachingMeasurer = CachingMeasurer;
         })(Util.Text || (Util.Text = {}));
         var Text = Util.Text;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -614,7 +682,7 @@ var Plottable;
                     lines = lines.splice(0, nLinesThatFit);
                     if (nLinesThatFit > 0) {
                         // Overwrite the last line to one that has had a ... appended to the end
-                        lines[nLinesThatFit - 1] = Plottable.Util.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
+                        lines[nLinesThatFit - 1] = Util.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
                     }
                 }
                 return { originalText: text, lines: lines, textFits: textFit };
@@ -1091,7 +1159,7 @@ var Plottable;
                 return formattedValue;
             };
             return Currency;
-        })(Plottable.Formatter.Fixed);
+        })(Formatter.Fixed);
         Formatter.Currency = Currency;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
@@ -1128,7 +1196,7 @@ var Plottable;
                 return formattedValue;
             };
             return Percentage;
-        })(Plottable.Formatter.Fixed);
+        })(Formatter.Fixed);
         Formatter.Percentage = Percentage;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
@@ -1790,7 +1858,7 @@ var Plottable;
             };
             Component.AUTORESIZE_BY_DEFAULT = true;
             return Component;
-        })(Plottable.Abstract.PlottableObject);
+        })(Abstract.PlottableObject);
         Abstract.Component = Component;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -1892,7 +1960,7 @@ var Plottable;
                 return this;
             };
             return ComponentContainer;
-        })(Plottable.Abstract.Component);
+        })(Abstract.Component);
         Abstract.ComponentContainer = ComponentContainer;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2517,7 +2585,7 @@ var Plottable;
                 return this;
             };
             return Scale;
-        })(Plottable.Abstract.PlottableObject);
+        })(Abstract.PlottableObject);
         Abstract.Scale = Scale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2718,7 +2786,7 @@ var Plottable;
                 }
             };
             return Plot;
-        })(Plottable.Abstract.Component);
+        })(Abstract.Component);
         Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2734,7 +2802,7 @@ var Plottable;
                     function Immediate() {
                     }
                     Immediate.prototype.render = function () {
-                        Plottable.Core.RenderController.flush();
+                        RenderController.flush();
                     };
                     return Immediate;
                 })();
@@ -2744,7 +2812,7 @@ var Plottable;
                     function AnimationFrame() {
                     }
                     AnimationFrame.prototype.render = function () {
-                        Plottable.Util.DOM.requestAnimationFramePolyfill(Plottable.Core.RenderController.flush);
+                        Plottable.Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
                     };
                     return AnimationFrame;
                 })();
@@ -2755,7 +2823,7 @@ var Plottable;
                         this._timeoutMsec = Plottable.Util.DOM.POLYFILL_TIMEOUT_MSEC;
                     }
                     Timeout.prototype.render = function () {
-                        setTimeout(Plottable.Core.RenderController.flush, this._timeoutMsec);
+                        setTimeout(RenderController.flush, this._timeoutMsec);
                     };
                     return Timeout;
                 })();
@@ -2786,7 +2854,7 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
-            RenderController._renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
+            RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
 
             function setRenderPolicy(policy) {
                 RenderController._renderPolicy = policy;
@@ -2854,7 +2922,7 @@ var Plottable;
                 }
 
                 // Reset resize flag regardless of queue'd components
-                Plottable.Core.ResizeBroadcaster.clearResizing();
+                Core.ResizeBroadcaster.clearResizing();
             }
             RenderController.flush = flush;
         })(Core.RenderController || (Core.RenderController = {}));
@@ -2883,7 +2951,7 @@ var Plottable;
 
             function _lazyInitialize() {
                 if (broadcaster === undefined) {
-                    broadcaster = new Plottable.Core.Broadcaster(ResizeBroadcaster);
+                    broadcaster = new Core.Broadcaster(ResizeBroadcaster);
                     window.addEventListener("resize", _onResize);
                 }
             }
@@ -3240,7 +3308,7 @@ var Plottable;
                 }
             };
             return QuantitiveScale;
-        })(Plottable.Abstract.Scale);
+        })(Abstract.Scale);
         Abstract.QuantitiveScale = QuantitiveScale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -4570,7 +4638,7 @@ var Plottable;
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
-        })(Plottable.Abstract.Component);
+        })(Abstract.Component);
         Abstract.Axis = Axis;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -4851,7 +4919,6 @@ var Plottable;
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 var _this = this;
                 _super.call(this, scale, orientation);
-                this.chr2Measure = {};
                 this.classed("category-axis", true);
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
@@ -4862,7 +4929,10 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
+
+                // ASK: what is the difference between constructor and _setup?
                 this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
+                this.measurer = new Plottable.Util.Text.CachingMeasurer(this._tickLabelsG);
                 return this;
             };
 
@@ -4918,16 +4988,8 @@ var Plottable;
                     var height = _this._isHorizontal() ? axisHeight - _this.tickLength() - _this.tickLabelPadding() : bandWidth;
 
                     var tm = function (s) {
-                        var widthHeights = s.trim().split("").map(function (c) {
-                            return _this.getTickWH(c);
-                        });
-                        return [d3.sum(widthHeights, function (wh) {
-                                return wh[0];
-                            }), d3.max(widthHeights, function (wh) {
-                                return wh[1];
-                            })];
+                        return _this.measurer.measure(s);
                     };
-
                     var textWriteResult = Plottable.Util.Text.measureTextInBox(s, width, height, tm, true);
                     textWriteResults.push(textWriteResult);
                 });
@@ -5008,51 +5070,13 @@ var Plottable;
                 return this;
             };
 
-            /**
-            * If c were on a tick, how much space would it take up?
-            * This will cache the result in this.chr2Measure.
-            *
-            * @return {number[]}: [width, height] pair.
-            */
-            Category.prototype.getTickWH = function (c) {
-                if (!(c in this.chr2Measure)) {
-                    // whitespace, when measured alone, will take up no space
-                    if (/\s/.test(c)) {
-                        var totalWH = this.computeTickWH("x" + c + "x");
-                        this.chr2Measure[c] = [
-                            totalWH[0] - this.getTickWH("x")[0] * 2,
-                            totalWH[1]];
-                    } else {
-                        this.chr2Measure[c] = this.computeTickWH(c);
-                    }
-                }
-                return this.chr2Measure[c];
-            };
-
-            /**
-            * If s were on a tick, how much space would it take up?
-            * This function is non-destructive, but does use the DOM.
-            *
-            * @return {number[]}: [width, height] pair.
-            */
-            Category.prototype.computeTickWH = function (s) {
-                var innerG = this._tickLabelsG.append("g").classed("writeText-inner-g", true);
-                var t = innerG.append("text").text(s);
-                var bb = Plottable.Util.DOM.getBBox(t);
-                innerG.remove();
-                return [bb.width, bb.height];
-            };
-
             Category.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
                 // speed hack: pick an arbitrary letter. If its size hasn't changed, assume
                 // that all sizes haven't changed
-                var c = d3.keys(this.chr2Measure)[0];
-                if (c == null || !Plottable.Util.Methods.arrayEq(this.computeTickWH(c), this.chr2Measure[c])) {
-                    this.chr2Measure = {};
-                }
+                this.measurer.clearCacheIfOutdated();
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;
@@ -5596,7 +5620,7 @@ var Plottable;
             };
 
             XYPlot.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
+                if (this.xScale instanceof Abstract.QuantitiveScale) {
                     var scale = this.xScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
@@ -5606,7 +5630,7 @@ var Plottable;
             };
 
             XYPlot.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
+                if (this.yScale instanceof Abstract.QuantitiveScale) {
                     var scale = this.yScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
@@ -5615,7 +5639,7 @@ var Plottable;
                 return this;
             };
             return XYPlot;
-        })(Plottable.Abstract.Plot);
+        })(Abstract.Plot);
         Abstract.XYPlot = XYPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -5894,7 +5918,7 @@ var Plottable;
             };
 
             BarPlot.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Plottable.Abstract.QuantitiveScale) {
+                if (scale instanceof Abstract.QuantitiveScale) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer && this._baselineValue != null) {
                         qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
@@ -5906,7 +5930,7 @@ var Plottable;
                 return this;
             };
             return BarPlot;
-        })(Plottable.Abstract.XYPlot);
+        })(Abstract.XYPlot);
         Abstract.BarPlot = BarPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -6272,7 +6296,7 @@ var Plottable;
                 });
             }
             return Line;
-        })(Plottable.Plot.Area);
+        })(Plot.Area);
         Plot.Line = Line;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -6378,7 +6402,7 @@ var Plottable;
                 }).attr(attrToProjector);
             };
             return IterativeDelay;
-        })(Plottable.Animator.Default);
+        })(Animator.Default);
         Animator.IterativeDelay = IterativeDelay;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
@@ -6870,7 +6894,7 @@ var Plottable;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
             return DragBox;
-        })(Plottable.Interaction.Drag);
+        })(Interaction.Drag);
         Interaction.DragBox = DragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6911,7 +6935,7 @@ var Plottable;
                 return this;
             };
             return XDragBox;
-        })(Plottable.Interaction.DragBox);
+        })(Interaction.DragBox);
         Interaction.XDragBox = XDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6949,7 +6973,7 @@ var Plottable;
                 this.callbackToCall(pixelArea);
             };
             return XYDragBox;
-        })(Plottable.Interaction.DragBox);
+        })(Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6990,7 +7014,7 @@ var Plottable;
                 return this;
             };
             return YDragBox;
-        })(Plottable.Interaction.DragBox);
+        })(Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;

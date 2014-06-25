@@ -5,7 +5,7 @@ export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
     public _tickLabelsG: D3.Selection;
-    private chr2Measure: {[chr: string]: number[]} = {};
+    private measurer: Util.Text.CachingMeasurer;
 
     /**
      * Creates a CategoryAxis.
@@ -28,7 +28,9 @@ export module Axis {
 
     public _setup() {
       super._setup();
+      // ASK: what is the difference between constructor and _setup?
       this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
+      this.measurer = new Util.Text.CachingMeasurer(this._tickLabelsG);
       return this;
     }
 
@@ -57,8 +59,7 @@ export module Axis {
       } else {
         this._scale.range([offeredHeight, 0]);
       }
-      var textResult = this.measureTicks(offeredWidth, offeredHeight,
-                                                 this._scale.domain());
+      var textResult = this.measureTicks(offeredWidth, offeredHeight, this._scale.domain());
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
@@ -83,11 +84,7 @@ export module Axis {
         var width  = this._isHorizontal() ? bandWidth  : axisWidth - this.tickLength() - this.tickLabelPadding();
         var height = this._isHorizontal() ? axisHeight - this.tickLength() - this.tickLabelPadding() : bandWidth;
 
-        var tm = (s: string) => {
-          var widthHeights = s.trim().split("").map((c) => this.getTickWH(c));
-          return [d3.sum(widthHeights, (wh) => wh[0]), d3.max(widthHeights, (wh) => wh[1])];
-        };
-
+        var tm = (s: string) => this.measurer.measure(s);
         var textWriteResult = Util.Text.measureTextInBox(s, width, height, tm, true);
         textWriteResults.push(textWriteResult);
       });
@@ -153,39 +150,6 @@ export module Axis {
       return this;
     }
 
-    /**
-     * If c were on a tick, how much space would it take up?
-     * This will cache the result in this.chr2Measure.
-     *
-     * @return {number[]}: [width, height] pair.
-     */
-    private getTickWH(c: string): number[] {
-      if (!(c in this.chr2Measure)) {
-        // whitespace, when measured alone, will take up no space
-        if (/\s/.test(c)) {
-          var totalWH = this.computeTickWH("x" + c + "x");
-          this.chr2Measure[c] = [totalWH[0] - this.getTickWH("x")[0] * 2,
-                                 totalWH[1]];
-        } else {
-          this.chr2Measure[c] = this.computeTickWH(c);
-        }
-      }
-      return this.chr2Measure[c];
-    }
-
-    /**
-     * If s were on a tick, how much space would it take up?
-     * This function is non-destructive, but does use the DOM.
-     *
-     * @return {number[]}: [width, height] pair.
-     */
-    private computeTickWH(s: string): number[] {
-      var innerG = this._tickLabelsG.append("g").classed("writeText-inner-g", true); // unleash your inner G
-      var t = innerG.append("text").text(s);
-      var bb = Util.DOM.getBBox(t);
-      innerG.remove();
-      return [bb.width, bb.height];
-    }
 
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       // When anyone calls _invalidateLayout, _computeLayout will be called
@@ -194,10 +158,7 @@ export module Axis {
 
       // speed hack: pick an arbitrary letter. If its size hasn't changed, assume
       // that all sizes haven't changed
-      var c = d3.keys(this.chr2Measure)[0];
-      if (c == null || !Util.Methods.arrayEq(this.computeTickWH(c), this.chr2Measure[c])) {
-        this.chr2Measure = {};
-      }
+      this.measurer.clearCacheIfOutdated();
       return super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
     }
   }
