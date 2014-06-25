@@ -2007,14 +2007,14 @@ var Plottable;
                 return this;
             };
 
-            Table.prototype._removeComponent = function (c) {
-                _super.prototype._removeComponent.call(this, c);
+            Table.prototype._removeComponent = function (component) {
+                _super.prototype._removeComponent.call(this, component);
                 var rowpos;
                 var colpos;
                 outer:
                 for (var i = 0; i < this.nRows; i++) {
                     for (var j = 0; j < this.nCols; j++) {
-                        if (this.rows[i][j] === c) {
+                        if (this.rows[i][j] === component) {
                             rowpos = i;
                             colpos = j;
                             break outer;
@@ -2027,26 +2027,6 @@ var Plottable;
                 }
 
                 this.rows[rowpos][colpos] = null;
-
-                // check if can splice out row
-                if (this.rows[rowpos].every(function (v) {
-                    return v === null;
-                })) {
-                    this.rows.splice(rowpos, 1);
-                    this.rowWeights.splice(rowpos, 1);
-                    this.nRows--;
-                }
-
-                // check if can splice out column
-                if (this.rows.every(function (v) {
-                    return v[colpos] === null;
-                })) {
-                    this.rows.forEach(function (r) {
-                        return r.splice(colpos, 1);
-                    });
-                    this.colWeights.splice(colpos, 1);
-                    this.nCols--;
-                }
 
                 return this;
             };
