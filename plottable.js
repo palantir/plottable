@@ -6627,16 +6627,18 @@ var Plottable;
             * @returns {AreaInteraction} The calling AreaInteraction.
             */
             DragBox.prototype.clearBox = function () {
-                if (this.dragBox == null)
+                if (this.dragBox == null) {
                     return;
+                }
                 this.dragBox.attr("height", 0).attr("width", 0);
                 this.boxIsDrawn = false;
                 return this;
             };
 
             DragBox.prototype.setBox = function (x0, x1, y0, y1) {
-                if (this.dragBox == null)
+                if (this.dragBox == null) {
                     return;
+                }
                 var w = Math.abs(x0 - x1);
                 var h = Math.abs(y0 - y1);
                 var xo = Math.min(x0, x1);
