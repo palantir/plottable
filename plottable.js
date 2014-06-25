@@ -4736,14 +4736,14 @@ var Plottable;
             };
 
             Numeric.prototype.showEndTickLabel = function (orientation, show) {
-                if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "top")) {
+                if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "bottom")) {
                     if (show === undefined) {
                         return this.showFirstTickLabel;
                     } else {
                         this.showFirstTickLabel = show;
                         return this;
                     }
-                } else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "bottom")) {
+                } else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
                     if (show === undefined) {
                         return this.showLastTickLabel;
                     } else {

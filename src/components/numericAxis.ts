@@ -279,7 +279,7 @@ export module Axis {
     public showEndTickLabel(orientation: string, show: boolean): Numeric;
     public showEndTickLabel(orientation: string, show?: boolean): any {
       if ((this._isHorizontal() && orientation === "left") ||
-          (!this._isHorizontal() && orientation === "top")) {
+          (!this._isHorizontal() && orientation === "bottom")) {
         if (show === undefined) {
           return this.showFirstTickLabel;
         } else {
@@ -287,7 +287,7 @@ export module Axis {
           return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
-                 (!this._isHorizontal() && orientation === "bottom")) {
+                 (!this._isHorizontal() && orientation === "top")) {
         if (show === undefined) {
           return this.showLastTickLabel;
         } else {
