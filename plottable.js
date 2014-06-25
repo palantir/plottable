@@ -5018,12 +5018,12 @@ var Plottable;
                 if (!(c in this.chr2Measure)) {
                     // whitespace, when measured alone, will take up no space
                     if (/\s/.test(c)) {
-                        var totalWH = this.computTickWH("x" + c + "x");
+                        var totalWH = this.computeTickWH("x" + c + "x");
                         this.chr2Measure[c] = [
                             totalWH[0] - this.getTickWH("x")[0] * 2,
                             totalWH[1]];
                     } else {
-                        this.chr2Measure[c] = this.computTickWH(c);
+                        this.chr2Measure[c] = this.computeTickWH(c);
                     }
                 }
                 return this.chr2Measure[c];
@@ -5035,7 +5035,7 @@ var Plottable;
             *
             * @return {number[]}: [width, height] pair.
             */
-            Category.prototype.computTickWH = function (s) {
+            Category.prototype.computeTickWH = function (s) {
                 var innerG = this._tickLabelsG.append("g").classed("writeText-inner-g", true);
                 var t = innerG.append("text").text(s);
                 var bb = Plottable.Util.DOM.getBBox(t);
@@ -5050,7 +5050,7 @@ var Plottable;
                 // speed hack: pick an arbitrary letter. If its size hasn't changed, assume
                 // that all sizes haven't changed
                 var c = d3.keys(this.chr2Measure)[0];
-                if (c == null || !Plottable.Util.Methods.arrayEq(this.computTickWH(c), this.chr2Measure[c])) {
+                if (c == null || !Plottable.Util.Methods.arrayEq(this.computeTickWH(c), this.chr2Measure[c])) {
                     this.chr2Measure = {};
                 }
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
