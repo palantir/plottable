@@ -257,7 +257,8 @@ export module Util {
        */
       constructor(parentG: D3.Selection) {
         this.computeTickWH = getTextMeasure(parentG);
-        // store this one in the cache
+        // We must measure this char ahead of time so we can tell if it's
+        // changed. See clearCacheIfOutdate()
         this.getTickWH(CachingMeasurer.CANONICAL_CHR);
       }
 
@@ -296,9 +297,12 @@ export module Util {
         if (!(c in this.chr2Measure)) {
           // whitespace, when measured alone, will take up no space
           if (/\s/.test(c)) {
-            var totalWH = this.computeTickWH("x" + c + "x");
-            this.chr2Measure[c] = [totalWH[0] - this.getTickWH("x")[0] * 2,
-                                   totalWH[1]];
+            var totalWH = this.computeTickWH(
+              CachingMeasurer.CANONICAL_CHR + c + CachingMeasurer.CANONICAL_CHR
+            );
+            this.chr2Measure[c] =
+              [totalWH[0] - this.getTickWH(CachingMeasurer.CANONICAL_CHR)[0]*2,
+               totalWH[1]];
           } else {
             this.chr2Measure[c] = this.computeTickWH(c);
           }

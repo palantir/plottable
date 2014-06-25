@@ -28,7 +28,6 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      // ASK: what is the difference between constructor and _setup?
       this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
       this.measurer = new Util.Text.CachingMeasurer(this._tickLabelsG);
       return this;
@@ -155,9 +154,6 @@ export module Axis {
       // When anyone calls _invalidateLayout, _computeLayout will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
-
-      // speed hack: pick an arbitrary letter. If its size hasn't changed, assume
-      // that all sizes haven't changed
       this.measurer.clearCacheIfOutdated();
       return super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
     }

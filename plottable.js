@@ -591,7 +591,8 @@ var Plottable;
                     this.chr2Measure = {};
                     this.computeTickWH = getTextMeasure(parentG);
 
-                    // store this one in the cache
+                    // We must measure this char ahead of time so we can tell if it's
+                    // changed. See clearCacheIfOutdate()
                     this.getTickWH(CachingMeasurer.CANONICAL_CHR);
                 }
                 /**
@@ -635,9 +636,9 @@ var Plottable;
                     if (!(c in this.chr2Measure)) {
                         // whitespace, when measured alone, will take up no space
                         if (/\s/.test(c)) {
-                            var totalWH = this.computeTickWH("x" + c + "x");
+                            var totalWH = this.computeTickWH(CachingMeasurer.CANONICAL_CHR + c + CachingMeasurer.CANONICAL_CHR);
                             this.chr2Measure[c] = [
-                                totalWH[0] - this.getTickWH("x")[0] * 2,
+                                totalWH[0] - this.getTickWH(CachingMeasurer.CANONICAL_CHR)[0] * 2,
                                 totalWH[1]];
                         } else {
                             this.chr2Measure[c] = this.computeTickWH(c);
@@ -4929,8 +4930,6 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-
-                // ASK: what is the difference between constructor and _setup?
                 this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
                 this.measurer = new Plottable.Util.Text.CachingMeasurer(this._tickLabelsG);
                 return this;
@@ -5074,8 +5073,6 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                // speed hack: pick an arbitrary letter. If its size hasn't changed, assume
-                // that all sizes haven't changed
                 this.measurer.clearCacheIfOutdated();
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
