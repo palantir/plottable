@@ -2025,32 +2025,6 @@ var Plottable;
 
                 this.rows[rowpos][colpos] = null;
 
-                for (var r = this.nRows - 1; r >= 0; r--) {
-                    if (this.rows[r].every(function (v) {
-                        return v === null;
-                    })) {
-                        this.rows.splice(r, 1);
-                        this.rowWeights.splice(r, 1);
-                        this.nRows--;
-                    } else {
-                        break;
-                    }
-                }
-
-                for (var c = this.nCols - 1; c >= 0; c--) {
-                    if (this.rows.every(function (row) {
-                        return row[c] === null;
-                    })) {
-                        this.rows.forEach(function (row) {
-                            return row.splice(c, 1);
-                        });
-                        this.colWeights.splice(c, 1);
-                        this.nCols--;
-                    } else {
-                        break;
-                    }
-                }
-
                 return this;
             };
 

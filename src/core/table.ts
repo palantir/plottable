@@ -92,28 +92,6 @@ export module Component {
 
       this.rows[rowpos][colpos] = null;
 
-      // starting from the outermost row, splice out any all-null rows
-      for (var r = this.nRows - 1; r >= 0; r--) {
-        if (this.rows[r].every((v) => v === null)) {
-          this.rows.splice(r, 1);
-          this.rowWeights.splice(r, 1);
-          this.nRows--;
-        } else {
-          break;
-        }
-      }
-
-      // starting from the outermost column, splice out any all-null columns
-      for (var c = this.nCols - 1; c >= 0; c--) {
-        if (this.rows.every((row) => row[c] === null)) {
-          this.rows.forEach((row) => row.splice(c, 1));
-          this.colWeights.splice(c, 1);
-          this.nCols--;
-        } else {
-          break;
-        }
-      }
-
       return this;
     }
 
