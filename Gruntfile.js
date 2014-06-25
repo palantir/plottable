@@ -27,6 +27,9 @@ module.exports = function(grunt) {
         declaration: false,
         removeComments: false
       }
+    },
+    verify_d_ts: {
+      src: ["typings/d3/d3.d.ts", "plottable.d.ts"]
     }
   };
 
@@ -75,11 +78,6 @@ module.exports = function(grunt) {
       pattern: "VERSION",
       replacement: "<%= pkg.version %>",
       path: "license_header.tmp",
-    },
-    public_member_vars: {
-      pattern: jsdoc + prefixMatch + "public " + "[^(;{]*(\{[^}]*\})?;",
-      replacement: "",
-      path: "plottable.d.ts",
     },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
@@ -287,7 +285,6 @@ module.exports = function(grunt) {
                                   "test-compile",
                                   "handle-header",
                                   "sed:protected_definitions",
-                                  "sed:public_member_vars",
                                   "concat:plottable_multifile",
                                   "sed:plottable_multifile",
                                   "clean:tscommand"]);
@@ -300,6 +297,7 @@ module.exports = function(grunt) {
                                   "dev-compile",
                                   "blanket_mocha",
                                   "tslint",
+                                  "ts:verify_d_ts",
                                   "uglify",
                                   "compress"
                                   ]);
@@ -307,7 +305,7 @@ module.exports = function(grunt) {
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
   grunt.registerTask("bm", ["blanket_mocha"]);
 
   grunt.registerTask("sublime", [

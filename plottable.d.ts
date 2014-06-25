@@ -435,6 +435,7 @@ declare module Plottable {
             (listenable: IListenable, ...args: any[]): any;
         }
         class Broadcaster extends Abstract.PlottableObject {
+            public listenable: IListenable;
             constructor(listenable: IListenable);
             /**
             * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -475,6 +476,7 @@ declare module Plottable {
 
 declare module Plottable {
     class DataSource extends Abstract.PlottableObject implements Core.IListenable {
+        public broadcaster: Core.Broadcaster;
         /**
         * Creates a new DataSource.
         *
@@ -516,6 +518,15 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
+            public element: D3.Selection;
+            public content: D3.Selection;
+            public backgroundContainer: D3.Selection;
+            public foregroundContainer: D3.Selection;
+            public clipPathEnabled: boolean;
+            public availableWidth: number;
+            public availableHeight: number;
+            public xOrigin: number;
+            public yOrigin: number;
             static AUTORESIZE_BY_DEFAULT: boolean;
             /**
             * Renders the Component into a given DOM element.
@@ -709,6 +720,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Scale extends PlottableObject implements Core.IListenable {
+            public broadcaster: Core.Broadcaster;
             /**
             * Creates a new Scale.
             *
@@ -793,6 +805,8 @@ declare module Plottable {
             [attrToSet: string]: IAppliedAccessor;
         }
         class Plot extends Component {
+            public renderArea: D3.Selection;
+            public element: D3.Selection;
             /**
             * Creates a Plot.
             *
@@ -1378,6 +1392,10 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Axis extends Abstract.Component {
+            public axisElement: D3.Selection;
+            public orientToAlign: {
+                [s: string]: string;
+            };
             static _DEFAULT_TICK_SIZE: number;
             /**
             * Creates an Axis.
@@ -1474,6 +1492,7 @@ declare module Plottable {
         class Axis extends Component {
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
+            public axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: Formatter);
             /**
             * Gets the current width.
@@ -1737,6 +1756,8 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
+            public xScale: Scale;
+            public yScale: Scale;
             /**
             * Creates an XYPlot.
             *
@@ -1773,6 +1794,9 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Grid extends Abstract.XYPlot {
+            public colorScale: Abstract.Scale;
+            public xScale: Scale.Ordinal;
+            public yScale: Scale.Ordinal;
             /**
             * Creates a GridPlot.
             *
@@ -1873,6 +1897,7 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
+            public isVertical: boolean;
             /**
             * Creates a HorizontalBarPlot.
             *
@@ -2016,6 +2041,8 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Interaction {
+            public hitBox: D3.Selection;
+            public componentToListenTo: Component;
             /**
             * Creates an Interaction.
             *
@@ -2098,6 +2125,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Abstract.Interaction {
+            public xScale: Abstract.QuantitiveScale;
+            public yScale: Abstract.QuantitiveScale;
             /**
             * Creates a PanZoomInteraction.
             *
@@ -2116,6 +2145,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends Abstract.Interaction {
+            public origin: number[];
+            public location: number[];
             public callbackToCall: (dragInfo: any) => any;
             /**
             * Creates a Drag.
@@ -2139,6 +2170,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class DragBox extends Drag {
+            public dragBox: D3.Selection;
+            public boxIsDrawn: boolean;
             /**
             * Clears the highlighted drag-selection box drawn by the AreaInteraction.
             *
