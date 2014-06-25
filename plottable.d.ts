@@ -175,6 +175,37 @@ declare module Plottable {
 
 declare module Plottable {
     module Util {
+        class Cache<Value> {
+            /**
+            * @constructor
+            *
+            * @param {string} compute The function whose results will be cached.
+            * @param {string} [canonicalKey] If present, when clear() is called,
+            *        this key will be re-computed. If its result hasn't been changed,
+            *        the cache will not be cleared. If canonicalKey is given, valueEq
+            *        must be given as well.
+            * @param {(v: Value, w: Value) => boolean} [valueEq]
+            *        Used to determine if the value of canonicalKey has changed.
+            */
+            constructor(compute: (k: string) => Value, canonicalKey?: string, valueEq?: (v: Value, w: Value) => boolean);
+            /**
+            * Attempt to look up k in the cache, computing the result if it isn't
+            * found.
+            */
+            public get(k: string): Value;
+            /**
+            * Reset the cache empty. However, if the canonicalKey passed into the
+            * constructor has not changed, the cache will not empty. See the
+            * constructor for more.
+            */
+            public clear(): Cache<Value>;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Util {
         module Text {
             interface TextMeasurer {
                 (s: string): number[];
@@ -186,6 +217,20 @@ declare module Plottable {
             * @returns {number[]} width and height of the text
             */
             function getTextMeasure(selection: D3.Selection): TextMeasurer;
+            /**
+            * Returns a text measure that measures each individual character of the
+            * string with tm, then combines all the individual measurements.
+            */
+            function measureByCharacter(tm: TextMeasurer): TextMeasurer;
+            /**
+            * Some TextMeasurers get confused when measuring something that's only
+            * whitespace: only whitespace in a dom node takes up [0, 0] space.
+            *
+            * @return {TextMeasurer} A function that if its argument is all
+            *         whitespace, it will wrap its argument in wrapping before
+            *         measuring in order to get a non-zero size of the whitespace.
+            */
+            function wrapWhitespace(wrapping: string, tm: TextMeasurer): TextMeasurer;
             /**
             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
             *
@@ -236,24 +281,6 @@ declare module Plottable {
             * DOM node, it measures using textMeasure.
             */
             function measureTextInBox(text: string, width: number, height: number, textMeasure: TextMeasurer, horizontally?: boolean): IWriteTextResult;
-            class CachingMeasurer {
-                /**
-                * @param {D3.Selection} parentG The DOM element you want to measure
-                *        text inside.
-                */
-                constructor(parentG: D3.Selection);
-                /**
-                * If c were on a tick, how much space would it take up?
-                *
-                * @return {number[]}: [width, height] pair.
-                */
-                public measure(s: string): number[];
-                /**
-                * Call this when the sizes of letters may have changed.
-                * If the font has indeed changed sizes, clear the cache.
-                */
-                public clearCacheIfOutdated(): CachingMeasurer;
-            }
         }
     }
 }

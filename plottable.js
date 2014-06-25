@@ -331,6 +331,61 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (Util) {
+        var Cache = (function () {
+            /**
+            * @constructor
+            *
+            * @param {string} compute The function whose results will be cached.
+            * @param {string} [canonicalKey] If present, when clear() is called,
+            *        this key will be re-computed. If its result hasn't been changed,
+            *        the cache will not be cleared. If canonicalKey is given, valueEq
+            *        must be given as well.
+            * @param {(v: Value, w: Value) => boolean} [valueEq]
+            *        Used to determine if the value of canonicalKey has changed.
+            */
+            function Cache(compute, canonicalKey, valueEq) {
+                this.cache = {};
+                this.canonicalKey = null;
+                this.compute = compute;
+                if (canonicalKey != null && valueEq != null) {
+                    this.canonicalKey = canonicalKey;
+                    this.valueEq = valueEq;
+                    this.cache[this.canonicalKey] = this.compute(this.canonicalKey);
+                }
+            }
+            /**
+            * Attempt to look up k in the cache, computing the result if it isn't
+            * found.
+            */
+            Cache.prototype.get = function (k) {
+                if (!(k in this.cache)) {
+                    this.cache[k] = this.compute(k);
+                }
+                return this.cache[k];
+            };
+
+            /**
+            * Reset the cache empty. However, if the canonicalKey passed into the
+            * constructor has not changed, the cache will not empty. See the
+            * constructor for more.
+            */
+            Cache.prototype.clear = function () {
+                if (this.canonicalKey == null || !this.valueEq(this.cache[this.canonicalKey], this.compute(this.canonicalKey))) {
+                    this.cache = {};
+                }
+                return this;
+            };
+            return Cache;
+        })();
+        Util.Cache = Cache;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Util) {
         (function (Text) {
             ;
 
@@ -364,6 +419,43 @@ var Plottable;
                 };
             }
             Text.getTextMeasure = getTextMeasure;
+
+            /**
+            * Returns a text measure that measures each individual character of the
+            * string with tm, then combines all the individual measurements.
+            */
+            function measureByCharacter(tm) {
+                return function (s) {
+                    var whs = s.trim().split("").map(tm);
+                    return [d3.sum(whs, function (wh) {
+                            return wh[0];
+                        }), d3.max(whs, function (wh) {
+                            return wh[1];
+                        })];
+                };
+            }
+            Text.measureByCharacter = measureByCharacter;
+
+            /**
+            * Some TextMeasurers get confused when measuring something that's only
+            * whitespace: only whitespace in a dom node takes up [0, 0] space.
+            *
+            * @return {TextMeasurer} A function that if its argument is all
+            *         whitespace, it will wrap its argument in wrapping before
+            *         measuring in order to get a non-zero size of the whitespace.
+            */
+            function wrapWhitespace(wrapping, tm) {
+                return function (s) {
+                    if (/\s/.test(s)) {
+                        var wh = tm(wrapping + s + wrapping);
+                        var whWrapping = tm(wrapping);
+                        return [wh[0] - 2 * whWrapping[0], wh[1]];
+                    } else {
+                        return tm(s);
+                    }
+                };
+            }
+            Text.wrapWhitespace = wrapWhitespace;
 
             /**
             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
@@ -581,75 +673,6 @@ var Plottable;
                 };
             }
             Text.measureTextInBox = measureTextInBox;
-
-            var CachingMeasurer = (function () {
-                /**
-                * @param {D3.Selection} parentG The DOM element you want to measure
-                *        text inside.
-                */
-                function CachingMeasurer(parentG) {
-                    this.chr2Measure = {};
-                    this.computeTickWH = getTextMeasure(parentG);
-
-                    // We must measure this char ahead of time so we can tell if it's
-                    // changed. See clearCacheIfOutdate()
-                    this.getTickWH(CachingMeasurer.CANONICAL_CHR);
-                }
-                /**
-                * If c were on a tick, how much space would it take up?
-                *
-                * @return {number[]}: [width, height] pair.
-                */
-                CachingMeasurer.prototype.measure = function (s) {
-                    var _this = this;
-                    var widthHeights = s.trim().split("").map(function (c) {
-                        return _this.getTickWH(c);
-                    });
-                    return [d3.sum(widthHeights, function (wh) {
-                            return wh[0];
-                        }), d3.max(widthHeights, function (wh) {
-                            return wh[1];
-                        })];
-                };
-
-                /**
-                * Call this when the sizes of letters may have changed.
-                * If the font has indeed changed sizes, clear the cache.
-                */
-                CachingMeasurer.prototype.clearCacheIfOutdated = function () {
-                    // speed hack: measure one letter. Only clear the cache if its size has
-                    // changed, which it usually hasn't.
-                    if (!Util.Methods.arrayEq(this.computeTickWH(CachingMeasurer.CANONICAL_CHR), this.getTickWH(CachingMeasurer.CANONICAL_CHR))) {
-                        this.chr2Measure = {};
-                    }
-                    return this;
-                };
-
-                /**
-                * If c were on a tick, how much space would it take up?
-                * This will cache the result in this.chr2Measure.
-                *
-                * @param {string} c A single character.
-                * @return {number[]} [width, height] pair.
-                */
-                CachingMeasurer.prototype.getTickWH = function (c) {
-                    if (!(c in this.chr2Measure)) {
-                        // whitespace, when measured alone, will take up no space
-                        if (/\s/.test(c)) {
-                            var totalWH = this.computeTickWH(CachingMeasurer.CANONICAL_CHR + c + CachingMeasurer.CANONICAL_CHR);
-                            this.chr2Measure[c] = [
-                                totalWH[0] - this.getTickWH(CachingMeasurer.CANONICAL_CHR)[0] * 2,
-                                totalWH[1]];
-                        } else {
-                            this.chr2Measure[c] = this.computeTickWH(c);
-                        }
-                    }
-                    return this.chr2Measure[c];
-                };
-                CachingMeasurer.CANONICAL_CHR = "a";
-                return CachingMeasurer;
-            })();
-            Text.CachingMeasurer = CachingMeasurer;
         })(Util.Text || (Util.Text = {}));
         var Text = Util.Text;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -4931,7 +4954,7 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
-                this.measurer = new Plottable.Util.Text.CachingMeasurer(this._tickLabelsG);
+                this.measureCache = new Plottable.Util.Cache(Plottable.Util.Text.getTextMeasure(this._tickLabelsG), Category.CANONICAL_CHR, Plottable.Util.Methods.arrayEq);
                 return this;
             };
 
@@ -4986,9 +5009,9 @@ var Plottable;
                     var width = _this._isHorizontal() ? bandWidth : axisWidth - _this.tickLength() - _this.tickLabelPadding();
                     var height = _this._isHorizontal() ? axisHeight - _this.tickLength() - _this.tickLabelPadding() : bandWidth;
 
-                    var tm = function (s) {
-                        return _this.measurer.measure(s);
-                    };
+                    var tm = Plottable.Util.Text.measureByCharacter(Plottable.Util.Text.wrapWhitespace(Category.CANONICAL_CHR, function (s) {
+                        return _this.measureCache.get(s);
+                    }));
                     var textWriteResult = Plottable.Util.Text.measureTextInBox(s, width, height, tm, true);
                     textWriteResults.push(textWriteResult);
                 });
@@ -5073,9 +5096,10 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                this.measurer.clearCacheIfOutdated();
+                this.measureCache.clear();
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
+            Category.CANONICAL_CHR = "a";
             return Category;
         })(Plottable.Abstract.Axis);
         Axis.Category = Category;

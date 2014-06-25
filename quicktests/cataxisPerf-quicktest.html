@@ -34,11 +34,12 @@
         var alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
                        "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
                        "t", "u", "v", "w", "x", "y", "z"];
+    var xAxis;
     window.onload = function() {
 
       ds = new Plottable.DataSource(data);
       var xScale = new Plottable.Scale.Ordinal();
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      xAxis = new Plottable.Axis.Category(xScale, "bottom");
 
       var requestedSpace = xAxis._requestedSpace;
       xAxis._requestedSpace = function(offeredWidth, offeredHeight) {

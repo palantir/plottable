@@ -39,6 +39,37 @@ export module Util {
     }
 
     /**
+     * Returns a text measure that measures each individual character of the
+     * string with tm, then combines all the individual measurements.
+     */
+    export function measureByCharacter(tm: TextMeasurer): TextMeasurer {
+      return (s: string) => {
+        var whs = s.trim().split("").map(tm);
+        return [d3.sum(whs, (wh) => wh[0]), d3.max(whs, (wh) => wh[1])];
+      };
+    }
+
+    /**
+     * Some TextMeasurers get confused when measuring something that's only
+     * whitespace: only whitespace in a dom node takes up [0, 0] space.
+     *
+     * @return {TextMeasurer} A function that if its argument is all
+     *         whitespace, it will wrap its argument in wrapping before
+     *         measuring in order to get a non-zero size of the whitespace.
+     */
+    export function wrapWhitespace(wrapping: string, tm: TextMeasurer): TextMeasurer {
+      return (s: string) => {
+        if (/\s/.test(s)) {
+          var wh = tm(wrapping + s + wrapping);
+          var whWrapping = tm(wrapping);
+          return [wh[0] - 2*whWrapping[0], wh[1]];
+        } else {
+          return tm(s);
+        }
+      };
+    }
+
+    /**
      * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
      *
      * @param {string} text: The string to be truncated
@@ -244,71 +275,6 @@ export module Util {
         usedWidth: widthFn(wrappedText.lines, (line: string) => textMeasure(line)[0]),
         usedHeight: heightFn(wrappedText.lines, (line: string) => textMeasure(line)[1])
       };
-    }
-
-    export class CachingMeasurer {
-      private chr2Measure: {[chr: string]: number[]} = {};
-      private computeTickWH: TextMeasurer;
-      private static CANONICAL_CHR = "a";
-
-      /**
-       * @param {D3.Selection} parentG The DOM element you want to measure
-       *        text inside.
-       */
-      constructor(parentG: D3.Selection) {
-        this.computeTickWH = getTextMeasure(parentG);
-        // We must measure this char ahead of time so we can tell if it's
-        // changed. See clearCacheIfOutdate()
-        this.getTickWH(CachingMeasurer.CANONICAL_CHR);
-      }
-
-      /**
-       * If c were on a tick, how much space would it take up?
-       *
-       * @return {number[]}: [width, height] pair.
-       */
-      public measure(s: string): number[] {
-        var widthHeights = s.trim().split("").map((c) => this.getTickWH(c));
-        return [d3.sum(widthHeights, (wh) => wh[0]), d3.max(widthHeights, (wh) => wh[1])];
-      }
-
-      /**
-       * Call this when the sizes of letters may have changed.
-       * If the font has indeed changed sizes, clear the cache.
-       */
-      public clearCacheIfOutdated() {
-        // speed hack: measure one letter. Only clear the cache if its size has
-        // changed, which it usually hasn't.
-        if (!Util.Methods.arrayEq(this.computeTickWH(CachingMeasurer.CANONICAL_CHR),
-                                  this.getTickWH(CachingMeasurer.CANONICAL_CHR))) {
-          this.chr2Measure = {};
-        }
-        return this;
-      }
-
-      /**
-       * If c were on a tick, how much space would it take up?
-       * This will cache the result in this.chr2Measure.
-       *
-       * @param {string} c A single character.
-       * @return {number[]} [width, height] pair.
-       */
-      private getTickWH(c: string): number[] {
-        if (!(c in this.chr2Measure)) {
-          // whitespace, when measured alone, will take up no space
-          if (/\s/.test(c)) {
-            var totalWH = this.computeTickWH(
-              CachingMeasurer.CANONICAL_CHR + c + CachingMeasurer.CANONICAL_CHR
-            );
-            this.chr2Measure[c] =
-              [totalWH[0] - this.getTickWH(CachingMeasurer.CANONICAL_CHR)[0]*2,
-               totalWH[1]];
-          } else {
-            this.chr2Measure[c] = this.computeTickWH(c);
-          }
-        }
-        return this.chr2Measure[c];
-      }
     }
   }
 }

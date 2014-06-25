@@ -5,7 +5,8 @@ export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
     public _tickLabelsG: D3.Selection;
-    private measurer: Util.Text.CachingMeasurer;
+    private measureCache: Util.Cache<number[]>;
+    private static CANONICAL_CHR = "a";
 
     /**
      * Creates a CategoryAxis.
@@ -29,7 +30,8 @@ export module Axis {
     public _setup() {
       super._setup();
       this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
-      this.measurer = new Util.Text.CachingMeasurer(this._tickLabelsG);
+      this.measureCache = new Util.Cache(
+        Util.Text.getTextMeasure(this._tickLabelsG), Category.CANONICAL_CHR, Util.Methods.arrayEq);
       return this;
     }
 
@@ -83,7 +85,9 @@ export module Axis {
         var width  = this._isHorizontal() ? bandWidth  : axisWidth - this.tickLength() - this.tickLabelPadding();
         var height = this._isHorizontal() ? axisHeight - this.tickLength() - this.tickLabelPadding() : bandWidth;
 
-        var tm = (s: string) => this.measurer.measure(s);
+        var tm = Util.Text.measureByCharacter(
+                  Util.Text.wrapWhitespace(Category.CANONICAL_CHR,
+                    (s) => this.measureCache.get(s)));
         var textWriteResult = Util.Text.measureTextInBox(s, width, height, tm, true);
         textWriteResults.push(textWriteResult);
       });
@@ -154,7 +158,7 @@ export module Axis {
       // When anyone calls _invalidateLayout, _computeLayout will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
-      this.measurer.clearCacheIfOutdated();
+      this.measureCache.clear();
       return super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
     }
   }
