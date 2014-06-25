@@ -114,6 +114,22 @@ var Plottable;
                 return Array.prototype.concat.apply([], a);
             }
             Methods.flatten = flatten;
+
+            /**
+            * Check if two arrays are equal by strict equality.
+            */
+            function arrayEq(a, b) {
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -5031,7 +5047,12 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                this.chr2Measure = {};
+                // speed hack: pick an arbitrary letter. If its size hasn't changed, assume
+                // that all sizes haven't changed
+                var c = d3.keys(this.chr2Measure)[0];
+                if (c == null || !Plottable.Util.Methods.arrayEq(this.computTickWH(c), this.chr2Measure[c])) {
+                    this.chr2Measure = {};
+                }
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;

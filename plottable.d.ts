@@ -43,6 +43,10 @@ declare module Plottable {
             * @return {T[]} Every array in a, concatenated together in the order they appear.
             */
             function flatten<T>(a: T[][]): T[];
+            /**
+            * Check if two arrays are equal by strict equality.
+            */
+            function arrayEq<T>(a: T[], b: T[]): boolean;
         }
     }
 }

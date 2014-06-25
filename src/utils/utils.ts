@@ -90,6 +90,21 @@ export module Util {
     export function flatten<T>(a: T[][]): T[] {
       return Array.prototype.concat.apply([], a);
     }
+
+    /**
+     * Check if two arrays are equal by strict equality.
+     */
+    export function arrayEq<T>(a: T[], b: T[]): boolean {
+      if (a.length !== b.length) {
+        return false;
+      }
+      for (var i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
   }
 }
 }

@@ -191,7 +191,13 @@ export module Axis {
       // When anyone calls _invalidateLayout, _computeLayout will be called
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
-      this.chr2Measure = {};
+
+      // speed hack: pick an arbitrary letter. If its size hasn't changed, assume
+      // that all sizes haven't changed
+      var c = d3.keys(this.chr2Measure)[0];
+      if (c == null || !Util.Methods.arrayEq(this.computTickWH(c), this.chr2Measure[c])) {
+        this.chr2Measure = {};
+      }
       return super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
     }
   }
