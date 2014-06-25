@@ -284,7 +284,7 @@ export module Axis {
           return this.showFirstTickLabel;
         } else {
           this.showFirstTickLabel = show;
-          return this;
+          return this._render();
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
                  (!this._isHorizontal() && orientation === "top")) {
@@ -292,7 +292,7 @@ export module Axis {
           return this.showLastTickLabel;
         } else {
           this.showLastTickLabel = show;
-          return this;
+          return this._render();
         }
       } else {
         throw new Error("Attempt to show " + orientation + " tick label on a " +

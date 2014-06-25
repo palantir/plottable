@@ -4741,14 +4741,14 @@ var Plottable;
                         return this.showFirstTickLabel;
                     } else {
                         this.showFirstTickLabel = show;
-                        return this;
+                        return this._render();
                     }
                 } else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
                     if (show === undefined) {
                         return this.showLastTickLabel;
                     } else {
                         this.showLastTickLabel = show;
-                        return this;
+                        return this._render();
                     }
                 } else {
                     throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
