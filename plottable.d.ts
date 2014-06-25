@@ -1793,6 +1793,10 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
+            static DEFAULT_WIDTH: number;
+            static _BarAlignmentToFactor: {
+                [alignment: string]: number;
+            };
             /**
             * Creates an AbstractBarPlot.
             *
@@ -1811,7 +1815,8 @@ declare module Plottable {
             public baseline(value: number): BarPlot;
             /**
             * Sets the bar alignment relative to the independent axis.
-            * Behavior depends on subclass implementation.
+            * VerticalBarPlot supports "left", "center", "right"
+            * HorizontalBarPlot supports "top", "center", "bottom"
             *
             * @param {string} alignment The desired alignment.
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
@@ -1845,6 +1850,9 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class VerticalBar extends Abstract.BarPlot {
+            static _BarAlignmentToFactor: {
+                [alignment: string]: number;
+            };
             /**
             * Creates a VerticalBarPlot.
             *
@@ -1854,13 +1862,6 @@ declare module Plottable {
             * @param {QuantitiveScale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitiveScale);
-            /**
-            * Sets the horizontal alignment of the bars.
-            *
-            * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
-            * @return {BarPlot} The calling BarPlot.
-            */
-            public barAlignment(alignment: string): VerticalBar;
         }
     }
 }
@@ -1869,6 +1870,9 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class HorizontalBar extends Abstract.BarPlot {
+            static _BarAlignmentToFactor: {
+                [alignment: string]: number;
+            };
             /**
             * Creates a HorizontalBarPlot.
             *
@@ -1878,13 +1882,6 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.QuantitiveScale, yScale: Abstract.Scale);
-            /**
-            * Sets the vertical alignment of the bars.
-            *
-            * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
-            * @return {HorizontalBarPlot} The calling HorizontalBarPlot.
-            */
-            public barAlignment(alignment: string): HorizontalBar;
         }
     }
 }
