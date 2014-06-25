@@ -21,6 +21,18 @@ export module Component {
       this.classed("label", true);
       this.setText(text);
       orientation = orientation.toLowerCase();
+      switch (orientation) {
+        case "bottom":
+        case "top":
+          orientation = "horizontal";
+          break;
+        case "left":
+          orientation = "vertical-left";
+          break;
+        case "right":
+          orientation = "vertical-right";
+          break;
+      }
       if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
         this.orientation = orientation;
       } else {
