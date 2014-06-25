@@ -411,6 +411,34 @@ declare module Plottable {
 
 declare module Plottable {
     module Formatter {
+        class LargeNumber extends Abstract.Formatter {
+            /**
+            * Creates a formatter for large values that displays [precision] significant figures.
+            *
+            * @constructor
+            * @param {number} [precision] The number of significant figures to display.
+            */
+            constructor(precision?: number);
+            /**
+            * Gets the current number of significant figures shown by the Formatter.
+            *
+            * @returns {number} The current precision.
+            */
+            public precision(): number;
+            /**
+            * Sets the number of significant figures to be shown by the Formatter.
+            *
+            * @param {number} [value] The new precision.
+            * @returns {Formatter} The calling LargeNumber Formatter.
+            */
+            public precision(value: number): LargeNumber;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
         class Custom extends Abstract.Formatter {
             constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
         }

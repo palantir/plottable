@@ -854,10 +854,7 @@ var Plottable;
         var Formatter = (function () {
             function Formatter(precision) {
                 this._onlyShowUnchanged = true;
-                if (precision < 0 || precision > 20) {
-                    throw new RangeError("Formatter precision must be between 0 and 20");
-                }
-                this._precision = precision;
+                this.precision(precision);
             }
             /**
             * Format an input value.
@@ -880,6 +877,9 @@ var Plottable;
             Formatter.prototype.precision = function (value) {
                 if (value === undefined) {
                     return this._precision;
+                }
+                if (value < 0 || value > 20) {
+                    throw new RangeError("Formatter precision must be between 0 and 20");
                 }
                 this._precision = value;
                 return this;
@@ -1091,6 +1091,41 @@ var Plottable;
             return Percentage;
         })(Plottable.Formatter.Fixed);
         Formatter.Percentage = Percentage;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var LargeNumber = (function (_super) {
+            __extends(LargeNumber, _super);
+            /**
+            * Creates a formatter for large values that displays [precision] significant figures.
+            *
+            * @constructor
+            * @param {number} [precision] The number of significant figures to display.
+            */
+            function LargeNumber(precision) {
+                if (typeof precision === "undefined") { precision = 3; }
+                _super.call(this, precision);
+                this.showOnlyUnchangedValues(false);
+            }
+            LargeNumber.prototype.precision = function (value) {
+                var returnValue = _super.prototype.precision.call(this, value);
+                this._formatFunction = d3.format("." + this._precision + "s");
+                return returnValue;
+            };
+            return LargeNumber;
+        })(Plottable.Abstract.Formatter);
+        Formatter.LargeNumber = LargeNumber;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
 })(Plottable || (Plottable = {}));
