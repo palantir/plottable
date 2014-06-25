@@ -5838,11 +5838,16 @@ var Plottable;
                     };
                 }
 
+                var positionF = attrToProjector[secondaryAttr];
+                var widthF = attrToProjector["width"];
                 if (!bandsMode) {
-                    var positionF = attrToProjector[secondaryAttr];
-                    var widthF = attrToProjector["width"];
                     attrToProjector[secondaryAttr] = function (d, i) {
                         return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor;
+                    };
+                } else {
+                    var bandWidth = secondaryScale.rangeBand();
+                    attrToProjector[secondaryAttr] = function (d, i) {
+                        return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
                     };
                 }
 

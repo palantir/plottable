@@ -3589,6 +3589,12 @@ describe("Renderers", function () {
                 var renderer;
                 var SVG_WIDTH = 600;
                 var SVG_HEIGHT = 400;
+                var axisWidth = 0;
+                var bandWidth = 0;
+
+                var numAttr = function (s, a) {
+                    return parseFloat(s.attr(a));
+                };
 
                 before(function () {
                     svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -3596,7 +3602,7 @@ describe("Renderers", function () {
                     xScale = new Plottable.Scale.Linear();
 
                     var data = [
-                        { y: "A", x: 0 },
+                        { y: "A", x: 1 },
                         { y: "B", x: 2 }
                     ];
                     dataset = new Plottable.DataSource(data);
@@ -3604,7 +3610,10 @@ describe("Renderers", function () {
                     renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
                     renderer.baseline(0);
                     renderer._animate = false;
-                    renderer.renderTo(svg);
+                    var yAxis = new Plottable.Axis.Category(yScale, "left");
+                    var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+                    axisWidth = yAxis.availableWidth;
+                    bandWidth = yScale.rangeBand();
                 });
                 beforeEach(function () {
                     verifier.start();
@@ -3620,10 +3629,16 @@ describe("Renderers", function () {
                     var bars = renderer.renderArea.selectAll("rect");
                     var bar0 = d3.select(bars[0][0]);
                     var bar1 = d3.select(bars[0][1]);
-                    assert.closeTo(parseFloat(bar0.attr("height")), 104, 2);
-                    assert.closeTo(parseFloat(bar1.attr("height")), 104, 2);
-                    assert.equal(bar0.attr("width"), 0);
-                    assert.equal(bar1.attr("width"), 600);
+                    var bar0y = bar0.data()[0].y;
+                    var bar1y = bar1.data()[0].y;
+                    assert.closeTo(numAttr(bar0, "height"), 104, 2);
+                    assert.closeTo(numAttr(bar1, "height"), 104, 2);
+                    assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "width is correct for bar0");
+                    assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "width is correct for bar1");
+
+                    // check that bar is aligned on the center of the scale
+                    assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "y pos correct for bar0");
+                    assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "y pos correct for bar1");
                     verifier.end();
                 });
 
@@ -3631,11 +3646,15 @@ describe("Renderers", function () {
                     var bars = renderer.renderArea.selectAll("rect");
                     var bar0 = d3.select(bars[0][0]);
                     var bar1 = d3.select(bars[0][1]);
+                    var bar0y = bar0.data()[0].y;
+                    var bar1y = bar1.data()[0].y;
                     renderer.project("width", 10);
-                    assert.equal(bar0.attr("height"), 10);
-                    assert.equal(bar1.attr("height"), 10);
-                    assert.equal(bar0.attr("width"), 0);
-                    assert.equal(bar1.attr("width"), 600);
+                    assert.equal(numAttr(bar0, "height"), 10, "bar0 height");
+                    assert.equal(numAttr(bar1, "height"), 10, "bar1 height");
+                    assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "bar0 width");
+                    assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "bar1 width");
+                    assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "bar0 ypos");
+                    assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "bar1 ypos");
                     verifier.end();
                 });
             });
