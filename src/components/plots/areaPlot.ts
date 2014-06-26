@@ -37,6 +37,14 @@ export module Plot {
       return this;
     }
 
+    public _updateYDomainer(): Area {
+      var scale = <Abstract.QuantitiveScale> this.yScale;
+      if (!scale._userSetDomainer) {
+        scale.domainer().paddingException(0);
+      }
+      return this;
+    }
+
     public _paint() {
       super._paint();
       var attrToProjector = this._generateAttrToProjector();
