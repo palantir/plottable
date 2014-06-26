@@ -22,19 +22,14 @@ export module Component {
       this.classed("label", true);
       this.setText(text);
       orientation = orientation.toLowerCase();
-      if (orientation === "vertical-left") {
-        orientation = "left";
-      }
-      if (orientation === "vertical-right") {
-        orientation = "right";
-      }
+      if (orientation === "vertical-left")  { orientation = "left" ; }
+      if (orientation === "vertical-right") { orientation = "right"; }
       if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
         this.orientation = orientation;
       } else {
         throw new Error(orientation + " is not a valid orientation for LabelComponent");
       }
-      this.xAlign("center");
-      this.yAlign("center");
+      this.xAlign("center").yAlign("center");
     }
 
     public xAlign(alignment: string): Label {
