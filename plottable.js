@@ -329,19 +329,19 @@ var Plottable;
                     if (s.trim() === "") {
                         return [0, 0];
                     }
-                    if (Plottable.Util.DOM.isSelectionRemovedFromSVG(selection)) {
+                    if (Util.DOM.isSelectionRemovedFromSVG(selection)) {
                         throw new Error("Cannot measure text in a removed node");
                     }
                     var bb;
                     if (selection.node().nodeName === "text") {
                         var originalText = selection.text();
                         selection.text(s);
-                        bb = Plottable.Util.DOM.getBBox(selection);
+                        bb = Util.DOM.getBBox(selection);
                         selection.text(originalText);
                         return [bb.width, bb.height];
                     } else {
                         var t = selection.append("text").text(s);
-                        bb = Plottable.Util.DOM.getBBox(t);
+                        bb = Util.DOM.getBBox(t);
                         t.remove();
                         return [bb.width, bb.height];
                     }
@@ -426,7 +426,7 @@ var Plottable;
                 var innerG = g.append("g");
                 var textEl = innerG.append("text");
                 textEl.text(line);
-                var bb = Plottable.Util.DOM.getBBox(textEl);
+                var bb = Util.DOM.getBBox(textEl);
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
@@ -439,7 +439,7 @@ var Plottable;
                 var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
                 var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
-                Plottable.Util.DOM.translate(innerG, xOff, yOff);
+                Util.DOM.translate(innerG, xOff, yOff);
                 return [w, h];
             }
             Text.writeLineHorizontally = writeLineHorizontally;
@@ -474,7 +474,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Plottable.Util.DOM.translate(innerG, 0, i * h);
+                    Util.DOM.translate(innerG, 0, i * h);
                     var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
                     if (wh[0] > maxWidth) {
                         maxWidth = wh[0];
@@ -483,7 +483,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = height - usedSpace;
                 var translator = { center: 0.5, top: 0, bottom: 1 };
-                Plottable.Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
+                Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
                 return [maxWidth, usedSpace];
             }
             Text.writeTextHorizontally = writeTextHorizontally;
@@ -497,7 +497,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Plottable.Util.DOM.translate(innerG, i * h, 0);
+                    Util.DOM.translate(innerG, i * h, 0);
                     var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
                     if (wh[1] > maxHeight) {
                         maxHeight = wh[1];
@@ -506,7 +506,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = width - usedSpace;
                 var translator = { center: 0.5, left: 0, right: 1 };
-                Plottable.Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
+                Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
 
                 return [usedSpace, maxHeight];
             }
@@ -530,7 +530,7 @@ var Plottable;
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
                 var measureText = getTextMeasure(innerG);
-                var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
 
                 var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
                 var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
@@ -574,7 +574,7 @@ var Plottable;
                     lines = lines.splice(0, nLinesThatFit);
                     if (nLinesThatFit > 0) {
                         // Overwrite the last line to one that has had a ... appended to the end
-                        lines[nLinesThatFit - 1] = Plottable.Util.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
+                        lines[nLinesThatFit - 1] = Util.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
                     }
                 }
                 return { originalText: text, lines: lines, textFits: textFit };
@@ -1051,7 +1051,7 @@ var Plottable;
                 return formattedValue;
             };
             return Currency;
-        })(Plottable.Formatter.Fixed);
+        })(Formatter.Fixed);
         Formatter.Currency = Currency;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
@@ -1088,7 +1088,7 @@ var Plottable;
                 return formattedValue;
             };
             return Percentage;
-        })(Plottable.Formatter.Fixed);
+        })(Formatter.Fixed);
         Formatter.Percentage = Percentage;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
@@ -1750,7 +1750,7 @@ var Plottable;
             };
             Component.AUTORESIZE_BY_DEFAULT = true;
             return Component;
-        })(Plottable.Abstract.PlottableObject);
+        })(Abstract.PlottableObject);
         Abstract.Component = Component;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -1852,7 +1852,7 @@ var Plottable;
                 return this;
             };
             return ComponentContainer;
-        })(Plottable.Abstract.Component);
+        })(Abstract.Component);
         Abstract.ComponentContainer = ComponentContainer;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2457,7 +2457,7 @@ var Plottable;
                 return this;
             };
             return Scale;
-        })(Plottable.Abstract.PlottableObject);
+        })(Abstract.PlottableObject);
         Abstract.Scale = Scale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2505,8 +2505,12 @@ var Plottable;
                 this.dataSource(dataSource);
             }
             Plot.prototype._anchor = function (element) {
+                var _this = this;
                 _super.prototype._anchor.call(this, element);
                 this._dataChanged = true;
+                d3.keys(this._projectors).forEach(function (attr) {
+                    return _this.updateProjector(attr);
+                });
                 return this;
             };
 
@@ -2603,6 +2607,17 @@ var Plottable;
                 return this;
             };
 
+            Plot.prototype.remove = function () {
+                var _this = this;
+                _super.prototype.remove.call(this);
+
+                // make the domain resize
+                d3.keys(this._projectors).forEach(function (attr) {
+                    return _this.removeProjector(attr);
+                });
+                return this;
+            };
+
             /**
             * This function makes sure that all of the scales in this._projectors
             * have an extent that includes all the data that is projected onto them.
@@ -2626,6 +2641,14 @@ var Plottable;
                     }
                 }
                 return this;
+            };
+
+            Plot.prototype.removeProjector = function (attr) {
+                var projector = this._projectors[attr];
+                if (projector.scale != null) {
+                    var extent = this.dataSource()._getExtent(projector.accessor);
+                    projector.scale.removeExtent(this._plottableID, attr);
+                }
             };
 
             /**
@@ -2659,7 +2682,7 @@ var Plottable;
                 }
             };
             return Plot;
-        })(Plottable.Abstract.Component);
+        })(Abstract.Component);
         Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2675,7 +2698,7 @@ var Plottable;
                     function Immediate() {
                     }
                     Immediate.prototype.render = function () {
-                        Plottable.Core.RenderController.flush();
+                        RenderController.flush();
                     };
                     return Immediate;
                 })();
@@ -2685,7 +2708,7 @@ var Plottable;
                     function AnimationFrame() {
                     }
                     AnimationFrame.prototype.render = function () {
-                        Plottable.Util.DOM.requestAnimationFramePolyfill(Plottable.Core.RenderController.flush);
+                        Plottable.Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
                     };
                     return AnimationFrame;
                 })();
@@ -2696,7 +2719,7 @@ var Plottable;
                         this._timeoutMsec = Plottable.Util.DOM.POLYFILL_TIMEOUT_MSEC;
                     }
                     Timeout.prototype.render = function () {
-                        setTimeout(Plottable.Core.RenderController.flush, this._timeoutMsec);
+                        setTimeout(RenderController.flush, this._timeoutMsec);
                     };
                     return Timeout;
                 })();
@@ -2727,7 +2750,7 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
-            RenderController._renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
+            RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
 
             function setRenderPolicy(policy) {
                 RenderController._renderPolicy = policy;
@@ -2795,7 +2818,7 @@ var Plottable;
                 }
 
                 // Reset resize flag regardless of queue'd components
-                Plottable.Core.ResizeBroadcaster.clearResizing();
+                Core.ResizeBroadcaster.clearResizing();
             }
             RenderController.flush = flush;
         })(Core.RenderController || (Core.RenderController = {}));
@@ -2824,7 +2847,7 @@ var Plottable;
 
             function _lazyInitialize() {
                 if (broadcaster === undefined) {
-                    broadcaster = new Plottable.Core.Broadcaster(ResizeBroadcaster);
+                    broadcaster = new Core.Broadcaster(ResizeBroadcaster);
                     window.addEventListener("resize", _onResize);
                 }
             }
@@ -3181,7 +3204,7 @@ var Plottable;
                 }
             };
             return QuantitiveScale;
-        })(Plottable.Abstract.Scale);
+        })(Abstract.Scale);
         Abstract.QuantitiveScale = QuantitiveScale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -4511,7 +4534,7 @@ var Plottable;
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
-        })(Plottable.Abstract.Component);
+        })(Abstract.Component);
         Abstract.Axis = Axis;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -5440,7 +5463,7 @@ var Plottable;
             };
 
             XYPlot.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
+                if (this.xScale instanceof Abstract.QuantitiveScale) {
                     var scale = this.xScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
@@ -5450,7 +5473,7 @@ var Plottable;
             };
 
             XYPlot.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
+                if (this.yScale instanceof Abstract.QuantitiveScale) {
                     var scale = this.yScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
@@ -5459,7 +5482,7 @@ var Plottable;
                 return this;
             };
             return XYPlot;
-        })(Plottable.Abstract.Plot);
+        })(Abstract.Plot);
         Abstract.XYPlot = XYPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -5783,7 +5806,7 @@ var Plottable;
             };
 
             BarPlot.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Plottable.Abstract.QuantitiveScale) {
+                if (scale instanceof Abstract.QuantitiveScale) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer && this._baselineValue != null) {
                         qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
@@ -5846,7 +5869,7 @@ var Plottable;
 
             BarPlot._BarAlignmentToFactor = {};
             return BarPlot;
-        })(Plottable.Abstract.XYPlot);
+        })(Abstract.XYPlot);
         Abstract.BarPlot = BarPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -6042,7 +6065,7 @@ var Plottable;
                 });
             }
             return Line;
-        })(Plottable.Plot.Area);
+        })(Plot.Area);
         Plot.Line = Line;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -6148,7 +6171,7 @@ var Plottable;
                 }).attr(attrToProjector);
             };
             return IterativeDelay;
-        })(Plottable.Animator.Default);
+        })(Animator.Default);
         Animator.IterativeDelay = IterativeDelay;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
@@ -6646,7 +6669,7 @@ var Plottable;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
             return DragBox;
-        })(Plottable.Interaction.Drag);
+        })(Interaction.Drag);
         Interaction.DragBox = DragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6687,7 +6710,7 @@ var Plottable;
                 return this;
             };
             return XDragBox;
-        })(Plottable.Interaction.DragBox);
+        })(Interaction.DragBox);
         Interaction.XDragBox = XDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6725,7 +6748,7 @@ var Plottable;
                 this.callbackToCall(pixelArea);
             };
             return XYDragBox;
-        })(Plottable.Interaction.DragBox);
+        })(Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6766,7 +6789,7 @@ var Plottable;
                 return this;
             };
             return YDragBox;
-        })(Plottable.Interaction.DragBox);
+        })(Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;

@@ -836,6 +836,7 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
+            public remove(): Plot;
             /**
             * Gets the animator associated with the specified Animator key.
             *
