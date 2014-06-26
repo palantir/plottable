@@ -6,7 +6,7 @@ module Plottable {
     extent: any[];
   }
 
-  interface DataSet {
+  export interface DataSet {
     data: any[];
     metadata?: any;
   }
@@ -25,7 +25,7 @@ module Plottable {
      */
     constructor();
     constructor(data: DataSet);
-    constructor(data: any[], metadata: any);
+    constructor(data: any[], metadata?: any);
     constructor(data?: any, metadata?: any) {
       super();
       if (data && data.data) {
