@@ -4976,8 +4976,7 @@ var Plottable;
                 } else {
                     throw new Error(orientation + " is not a valid orientation for LabelComponent");
                 }
-                this.xAlign("center");
-                this.yAlign("center");
+                this.xAlign("center").yAlign("center");
             }
             Label.prototype.xAlign = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
