@@ -54,10 +54,10 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
 function assertBBoxInclusion(outerEl, innerEl) {
     var outerBox = outerEl.node().getBoundingClientRect();
     var innerBox = innerEl.node().getBoundingClientRect();
-    assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left), "bounding rect left included");
-    assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top), "bounding rect top included");
-    assert.operator(Math.ceil(outerBox.right), ">=", Math.floor(innerBox.right), "bounding rect right included");
-    assert.operator(Math.ceil(outerBox.bottom), ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
+    assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left) + window.Pixel_CloseTo_Requirement, "bounding rect left included");
+    assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top) + window.Pixel_CloseTo_Requirement, "bounding rect top included");
+    assert.operator(Math.ceil(outerBox.right) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.right), "bounding rect right included");
+    assert.operator(Math.ceil(outerBox.bottom) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
 }
 
 function assertXY(el, xExpected, yExpected, message) {
@@ -104,9 +104,11 @@ var MultiTestVerifier = (function () {
 })();
 
 ///<reference path="testReference.ts" />
+
 before(function () {
     // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
     Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
+    window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
 
 ///<reference path="testReference.ts" />
@@ -2247,7 +2249,7 @@ describe("Labels", function () {
         var text = content.select("text");
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.closeTo(textBBox.height, label.availableWidth, 1.5, "text height === label.minimumWidth() (it's rotated)");
+        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
 
@@ -2259,7 +2261,7 @@ describe("Labels", function () {
         var text = content.select("text");
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.closeTo(textBBox.height, label.availableWidth, 1.5, "text height === label.minimumWidth() (it's rotated)");
+        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
 

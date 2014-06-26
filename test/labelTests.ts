@@ -31,7 +31,7 @@ describe("Labels", () => {
     var text = content.select("text");
     var textBBox = Plottable.Util.DOM.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
-    assert.closeTo(textBBox.height, label.availableWidth, 1.5, "text height === label.minimumWidth() (it's rotated)");
+    assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
   });
 
@@ -43,7 +43,7 @@ describe("Labels", () => {
     var text = content.select("text");
     var textBBox = Plottable.Util.DOM.getBBox(text);
     assertBBoxInclusion(label.element.select(".bounding-box"), text);
-    assert.closeTo(textBBox.height, label.availableWidth, 1.5, "text height === label.minimumWidth() (it's rotated)");
+    assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
     svg.remove();
   });
 
