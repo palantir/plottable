@@ -23,9 +23,9 @@ module Plottable {
      * @param {any[]} data
      * @param {any} metadata An object containing additional information.
      */
-    constructor()
+    constructor();
     constructor(data: DataSet);
-    constructor(data: any[], metadata: any)
+    constructor(data: any[], metadata: any);
     constructor(data?: any, metadata?: any) {
       super();
       if (data && data.data) {
