@@ -5,6 +5,12 @@ module Plottable {
     accessor: IAccessor;
     extent: any[];
   }
+
+  export interface DataSet {
+    data: any[];
+    metadata?: any;
+  }
+
   export class DataSource extends Abstract.PlottableObject implements Core.IListenable {
     private _data: any[];
     private _metadata: any;
@@ -17,10 +23,18 @@ module Plottable {
      * @param {any[]} data
      * @param {any} metadata An object containing additional information.
      */
-    constructor(data: any[] = [], metadata: any = {}) {
+    constructor();
+    constructor(data: DataSet);
+    constructor(data: any[], metadata?: any);
+    constructor(data?: any, metadata?: any) {
       super();
-      this._data = data;
-      this._metadata = metadata;
+      if (data && data.data) {
+        this._data = data.data;
+        this._metadata = data.metadata || {};
+      } else {
+        this._data = data || [];
+        this._metadata = metadata || {};
+      }
       this.accessor2cachedExtent = new Util.StrictEqualityAssociativeArray();
     }
 

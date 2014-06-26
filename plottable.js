@@ -1225,20 +1225,16 @@ var Plottable;
 (function (Plottable) {
     var DataSource = (function (_super) {
         __extends(DataSource, _super);
-        /**
-        * Creates a new DataSource.
-        *
-        * @constructor
-        * @param {any[]} data
-        * @param {any} metadata An object containing additional information.
-        */
         function DataSource(data, metadata) {
-            if (typeof data === "undefined") { data = []; }
-            if (typeof metadata === "undefined") { metadata = {}; }
             _super.call(this);
             this.broadcaster = new Plottable.Core.Broadcaster(this);
-            this._data = data;
-            this._metadata = metadata;
+            if (data && data.data) {
+                this._data = data.data;
+                this._metadata = data.metadata || {};
+            } else {
+                this._data = data || [];
+                this._metadata = metadata || {};
+            }
             this.accessor2cachedExtent = new Plottable.Util.StrictEqualityAssociativeArray();
         }
         DataSource.prototype.data = function (data) {
