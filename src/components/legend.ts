@@ -178,7 +178,10 @@ export module Component {
       legend.attr("transform", (d: string) => "translate(0," + domain.indexOf(d) * textHeight + ")");
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: string) {return Util.Text.getTruncatedText(d, availableWidth , d3.select(this));});
+            .text(function(d: string) {
+              var measure = Util.Text.getTextMeasure(d3.select(this));
+              return Util.Text.getTruncatedText(d, availableWidth , measure);
+              });
       this.updateClasses();
       this.updateListeners();
       return this;
