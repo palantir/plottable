@@ -95,6 +95,10 @@ export module Util {
      * Check if two arrays are equal by strict equality.
      */
     export function arrayEq<T>(a: T[], b: T[]): boolean {
+      // Technically, null and undefined are arrays too
+      if (a == null || b == null) {
+        return a === b;
+      }
       if (a.length !== b.length) {
         return false;
       }

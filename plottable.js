@@ -119,6 +119,10 @@ var Plottable;
             * Check if two arrays are equal by strict equality.
             */
             function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
                 if (a.length !== b.length) {
                     return false;
                 }
