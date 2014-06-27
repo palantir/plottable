@@ -33,10 +33,7 @@ export module Axis {
     }
 
     private measureTextHeight(): number {
-      var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var textHeight = Util.DOM.getBBox(testTextEl.text("test")).height;
-      testTextEl.remove();
-      return textHeight;
+      return Util.Text.getTextHeight(this._tickLabelContainer.append("text"));
     }
 
     public _doRender() {
@@ -72,7 +69,7 @@ export module Axis {
 
       var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
-      this._hideOverlappingTickLabels();
+      Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
       return this;
     }
   }
