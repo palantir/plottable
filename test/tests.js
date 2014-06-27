@@ -4879,7 +4879,7 @@ describe("CachingCharacterMeasurer", function () {
         svg.remove();
     });
 
-    it("should repopulate cache if it changes size", function () {
+    it("should repopulate cache if it changes size and clear() is called", function () {
         var a = measurer.measure("x")[0];
         g.style("font-size", "40px");
         var b = measurer.measure("x")[0];
