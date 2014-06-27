@@ -46,15 +46,9 @@ export module Abstract {
       return this;
     }
 
-    private rescale() {
-      if (this.element != null) {
-        this._render();
-      }
-    }
-
     public _updateXDomainer(): XYPlot {
       if (this.xScale instanceof QuantitiveScale) {
-        var scale = <QuantitiveScale>this.xScale;
+        var scale = <QuantitiveScale> this.xScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -64,7 +58,7 @@ export module Abstract {
 
     public _updateYDomainer(): XYPlot {
       if (this.yScale instanceof QuantitiveScale) {
-        var scale = <QuantitiveScale>this.yScale;
+        var scale = <QuantitiveScale> this.yScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }

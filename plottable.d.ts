@@ -1632,7 +1632,7 @@ declare module Plottable {
             /**
             * Creates a CategoryAxis.
             *
-            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
             * display the scale as efficiently as possible.
             *
             * @constructor
