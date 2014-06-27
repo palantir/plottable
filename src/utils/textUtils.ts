@@ -273,7 +273,8 @@ export module Util {
      * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
     export function writeText(text: string, g: D3.Selection, width: number, height: number,
-                              xAlign: string, yAlign: string, horizontally?: boolean): IWriteTextResult {
+                              xAlign: string, yAlign: string, 
+                              tm: TextMeasurer, horizontally?: boolean): IWriteTextResult {
       var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
       var innerG = g.append("g").classed("writeText-inner-g", true); // unleash your inner G
       // the outerG contains general transforms for positining the whole block, the inner g
@@ -281,8 +282,8 @@ export module Util {
 
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
-      var measureText = getTextMeasure(innerG);
-      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+      // var measureText = getTextMeasure(innerG);
+      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
       var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
       var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);

@@ -666,7 +666,7 @@ var Plottable;
             * Will align the text vertically if it seems like that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text, g, width, height, xAlign, yAlign, horizontally) {
+            function writeText(text, g, width, height, xAlign, yAlign, tm, horizontally) {
                 var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
                 var innerG = g.append("g").classed("writeText-inner-g", true);
 
@@ -674,8 +674,9 @@ var Plottable;
                 // will contain transforms specific to orienting the text properly within the block.
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
-                var measureText = getTextMeasure(innerG);
-                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+
+                // var measureText = getTextMeasure(innerG);
+                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
                 var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
                 var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
@@ -5079,7 +5080,10 @@ var Plottable;
                     var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                     var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
 
-                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
+                    var tm = function (s) {
+                        return self.measurer.measure(s);
+                    };
+                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], tm, true);
                     textWriteResults.push(textWriteResult);
                 });
 

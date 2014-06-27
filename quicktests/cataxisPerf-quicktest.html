@@ -35,23 +35,60 @@
                        "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
                        "t", "u", "v", "w", "x", "y", "z"];
     var xAxis;
+
+
+    function time(obj, methodName, label) {
+      if (label == null) {
+        label = methodName;
+      }
+      var f = obj[methodName];
+      obj[methodName] = function() {
+        if (arguments.length > 0) {
+          console.time(label);
+        }
+        var result = f.apply(obj, arguments);
+        if (arguments.length > 0) {
+          console.timeEnd(label);
+        }
+        return result;
+      };
+    }
+
+    function profile(obj, methodName, label) {
+      if (label == null) {
+        label = methodName;
+      }
+      var f = obj[methodName];
+      obj[methodName] = function() {
+        console.profile(label);
+        var result = f.apply(obj, arguments);
+        console.profileEnd(label);
+        return result;
+      };
+    }
+
     window.onload = function() {
+      Plottable.Core.RenderController._renderPolicy = new Plottable.Core.RenderController.RenderPolicy.Immediate();
 
       ds = new Plottable.DataSource(data);
       var xScale = new Plottable.Scale.Ordinal();
       xAxis = new Plottable.Axis.Category(xScale, "bottom");
 
-      var requestedSpace = xAxis._requestedSpace;
-      xAxis._requestedSpace = function(offeredWidth, offeredHeight) {
-        if (offeredWidth !== -1 && offeredHeight !== -1) {
-          console.time("_requestedSpace");
-        }
-        var result = requestedSpace.bind(xAxis)(offeredWidth, offeredHeight);
-        if (offeredWidth !== -1 && offeredHeight !== -1) {
-          console.timeEnd("_requestedSpace");
-        }
-        return result;
-      }
+      // var requestedSpace = xAxis._requestedSpace;
+      // xAxis._requestedSpace = function(offeredWidth, offeredHeight) {
+      //   if (offeredWidth !== -1 && offeredHeight !== -1) {
+      //     console.time("_requestedSpace");
+      //   }
+      //   var result = requestedSpace.bind(xAxis)(offeredWidth, offeredHeight);
+      //   if (offeredWidth !== -1 && offeredHeight !== -1) {
+      //     console.timeEnd("_requestedSpace");
+      //   }
+      //   return result;
+      // }
+
+      // time(xAxis, "writeTextToTicks");
+
+      // time(xAxis, "_doRender", "xAxis._doRender");
 
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
@@ -68,12 +105,12 @@
                                   [null,  xAxis]
                                 ]);
 
-
-
-
+      time(ds, "data", "ds.data");
 
         chart.renderTo("#cataxis");
 }
+
+var n = 0;
 
 function addBar() {
   var data = ds.data();
@@ -83,11 +120,15 @@ function addBar() {
           newName = newName + alphabet[Math.floor(Math.random()*26)];
           if (Math.random() < .2){ newName = newName + " ";}
       }
+      n++;
+      newName = n + " " + newName;
       var newBar = { name: newName, age: Math.random() * 30 };
       data.push(newBar);
   ds.data(data);
 }
+
 function removeBar() {
+  n--;
   var data = ds.data();
     if(data.length > 0){  data.pop();   }
   ds.data(data);

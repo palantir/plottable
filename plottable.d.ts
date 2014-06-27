@@ -278,7 +278,7 @@ declare module Plottable {
             * Will align the text vertically if it seems like that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string, horizontally?: boolean): IWriteTextResult;
+            function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string, tm: TextMeasurer, horizontally?: boolean): IWriteTextResult;
             /**
             * Similar to writeText, but rather than measuring by inserting into a
             * DOM node, it measures using textMeasure.
