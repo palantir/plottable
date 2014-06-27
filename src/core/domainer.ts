@@ -8,6 +8,9 @@ module Plottable {
     private padProportion = 0.0;
     private paddingExceptions: D3.Set = d3.set([]);
     private combineExtents: (extents: any[][]) => any[];
+    // This must be a map rather than a set so we can get the original values
+    // back out, rather than their stringified versions.
+    private includedValues: D3.Map = d3.map([]);
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -36,7 +39,12 @@ module Plottable {
      *                 pair.
      */
     public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[] {
-      return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
+      var domain: any[];
+      domain = this.combineExtents(extents);
+      domain = this.includeDomain(domain);
+      domain = this.padDomain(domain);
+      domain = this.niceDomain(scale, domain);
+      return domain;
     }
 
     /**
@@ -82,6 +90,27 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Ensure that the domain produced includes value.
+     *
+     * For example, after include(0), the domain [3, 5] will become [0, 5],
+     * and the domain [-9, -8] will become [-9, 0].
+     *
+     * @param {any} value The value that will be included.
+     * @param {boolean} include Defaults to true. If true, this value will
+     *                  always be included, if false, this value will not
+     *                  necessarily be included.
+     * @return {Domainer} The calling Domainer.
+     */
+    public include(value: any, include = true): Domainer {
+      if (include) {
+        this.includedValues.set(value, value);
+      } else {
+        this.includedValues.remove(value);
+      }
+      return this;
+    }
+
     private static defaultCombineExtents(extents: any[][]): any[] {
       if (extents.length === 0) {
         return [0, 1];
@@ -118,6 +147,13 @@ module Plottable {
       } else {
         return domain;
       }
+    }
+
+    private includeDomain(domain: any[]): any[] {
+      return this.includedValues.values().reduce(
+        (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],
+        domain
+      );
     }
   }
 }

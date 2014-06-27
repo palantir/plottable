@@ -3,10 +3,14 @@
 module Plottable {
 export module Abstract {
   export class BarPlot extends XYPlot {
+    public static DEFAULT_WIDTH = 10;
     public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
-    public _barAlignment: string;
+    public _barAlignmentFactor = 0;
+    public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
+    public _isVertical: boolean;
+    private previousBaselineValue: number = null;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
@@ -25,7 +29,6 @@ export module Abstract {
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("bar-renderer", true);
-      this.project("width", 10);
       this.project("fill", () => "steelblue");
       // because this._baselineValue was not initialized during the super()
       // call, we must call this in order to get this._baselineValue
@@ -36,7 +39,44 @@ export module Abstract {
     public _setup() {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
+      this._bars = this.renderArea.selectAll("rect").data([]);
       return this;
+    }
+
+    public _paint() {
+      super._paint();
+      this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      this._bars.enter().append("rect");
+
+      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var positionAttr = this._isVertical ? "y" : "x";
+      var dimensionAttr = this._isVertical ? "height" : "width";
+
+      if (this._dataChanged && this._animate) {
+        var resetAttrToProjector = this._generateAttrToProjector();
+        resetAttrToProjector[positionAttr] = () => scaledBaseline;
+        resetAttrToProjector[dimensionAttr] = () => 0;
+        this._applyAnimatedAttributes(this._bars, "bars-reset", resetAttrToProjector);
+      }
+
+      var attrToProjector = this._generateAttrToProjector();
+      if (attrToProjector["fill"] != null) {
+        this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
+      }
+      this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
+
+      this._bars.exit().remove();
+
+      var baselineAttr: Abstract.IAttributeToProjector = {
+        "x1": this._isVertical ? 0 : scaledBaseline,
+        "y1": this._isVertical ? scaledBaseline : 0,
+        "x2": this._isVertical ? this.availableWidth : scaledBaseline,
+        "y2": this._isVertical ? scaledBaseline : this.availableHeight
+      };
+
+      this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+
     }
 
     /**
@@ -46,26 +86,33 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
+      this.previousBaselineValue = this._baselineValue;
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
-      if (this.element != null) {
-        this._render();
-      }
+      this._render();
       return this;
     }
 
     /**
      * Sets the bar alignment relative to the independent axis.
-     * Behavior depends on subclass implementation.
+     * VerticalBarPlot supports "left", "center", "right"
+     * HorizontalBarPlot supports "top", "center", "bottom"
      *
      * @param {string} alignment The desired alignment.
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
-    public barAlignment(alignment: string) {
-      // implementation in child classes
-      return this;
-    }
+     public barAlignment(alignment: string) {
+       var alignmentLC = alignment.toLowerCase();
+       var align2factor = (<typeof BarPlot> this.constructor)._BarAlignmentToFactor;
+       if (align2factor[alignmentLC] === undefined) {
+         throw new Error("unsupported bar alignment");
+       }
+       this._barAlignmentFactor = align2factor[alignmentLC];
+
+       this._render();
+       return this;
+     }
 
 
     private parseExtent(input: any): IExtent {
@@ -94,13 +141,17 @@ export module Abstract {
     public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
     public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
+      if (!this._isSetup) {
+        return null;
+      }
+
       var selectedBars: any[] = [];
 
       var xExtent: IExtent = this.parseExtent(xValOrExtent);
       var yExtent: IExtent = this.parseExtent(yValOrExtent);
 
       // the SVGRects are positioned with sub-pixel accuracy (the default unit
-      // for the x, y, height & width attributes), but user selections (e.g. via 
+      // for the x, y, height & width attributes), but user selections (e.g. via
       // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
       // seems appropriate:
       var tolerance: number = 0.5;
@@ -128,8 +179,68 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public deselectAll() {
-      this._bars.classed("selected", false);
+      if (this._isSetup) {
+        this._bars.classed("selected", false);
+      }
       return this;
+    }
+
+    public _updateDomainer(scale: Scale) {
+      if (scale instanceof Abstract.QuantitiveScale) {
+        var qscale = <Abstract.QuantitiveScale> scale;
+        if (!qscale._userSetDomainer && this._baselineValue != null) {
+          qscale.domainer()
+            .paddingException(this.previousBaselineValue, false)
+            .include(this.previousBaselineValue, false)
+            .paddingException(this._baselineValue)
+            .include(this._baselineValue);
+          if (qscale._autoDomainAutomatically) {
+            qscale.autoDomain();
+          }
+        }
+      }
+      return this;
+    }
+
+    public _generateAttrToProjector() {
+      // Primary scale/direction: the "length" of the bars
+      // Secondary scale/direction: the "width" of the bars
+      var attrToProjector = super._generateAttrToProjector();
+      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
+      var secondaryScale  = this._isVertical ? this.xScale : this.yScale;
+      var primaryAttr     = this._isVertical ? "y" : "x";
+      var secondaryAttr   = this._isVertical ? "x" : "y";
+      var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
+                      && (<Plottable.Scale.Ordinal> secondaryScale).rangeType() === "bands";
+      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      if (attrToProjector["width"] == null) {
+        var constantWidth = bandsMode ? (<Scale.Ordinal> secondaryScale).rangeBand() : BarPlot.DEFAULT_WIDTH;
+        attrToProjector["width"] = (d: any, i: number) => constantWidth;
+      }
+
+      var positionF = attrToProjector[secondaryAttr];
+      var widthF = attrToProjector["width"];
+      if (!bandsMode) {
+        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
+      } else {
+        var bandWidth = (<Plottable.Scale.Ordinal> secondaryScale).rangeBand();
+        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
+      }
+
+      var originalPositionFn = attrToProjector[primaryAttr];
+      attrToProjector[primaryAttr] = (d: any, i: number) => {
+        var originalPos = originalPositionFn(d, i);
+        // If it is past the baseline, it should start at the baselin then width/height
+        // carries it over. If it's not past the baseline, leave it at original position and
+        // then width/height carries it to baseline
+        return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
+      };
+
+      attrToProjector["height"] = (d: any, i: number) => {
+        return Math.abs(scaledBaseline - originalPositionFn(d, i));
+      };
+
+      return attrToProjector;
     }
   }
 }

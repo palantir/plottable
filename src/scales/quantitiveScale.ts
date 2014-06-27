@@ -76,12 +76,17 @@ export module Abstract {
     }
 
     /**
-     * Gets or sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+     * Gets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
      *
-     * @param {boolean} [clamp] Whether or not to clamp the QuantitiveScale.
-     * @returns {boolean|QuantitiveScale} The current clamp status, or the calling QuantitiveScale.
+     * @returns {boolean} The current clamp status.
      */
     public clamp(): boolean;
+    /**
+     * Sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+     *
+     * @param {boolean} clamp Whether or not to clamp the QuantitiveScale.
+     * @returns {QuantitiveScale} The calling QuantitiveScale.
+     */
     public clamp(clamp: boolean): QuantitiveScale;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
@@ -124,13 +129,23 @@ export module Abstract {
     }
 
     /**
+     * Retrieve a Domainer of a scale. A Domainer is responsible for combining
+     * multiple extents into a single domain.
+     *
+     * @return {QuantitiveScale} The scale's current domainer.
+     */
+    public domainer(): Domainer;
+    /**
      * Sets a Domainer of a scale. A Domainer is responsible for combining
      * multiple extents into a single domain.
+     *
+     * When you set domainer, we assume that you know what you want the domain
+     * to look like better that we do. Ensuring that the domain is padded,
+     * includes 0, etc., will be the responsability of the new domainer.
      *
      * @param {Domainer} domainer The domainer to be set.
      * @return {QuantitiveScale} The calling scale.
      */
-    public domainer(): Domainer;
     public domainer(domainer: Domainer): QuantitiveScale;
     public domainer(domainer?: Domainer): any {
       if (domainer == null) {

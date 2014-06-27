@@ -1,5 +1,5 @@
 /*!
-Plottable 0.17.0 (https://github.com/palantir/plottable)
+Plottable 0.18.2 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -357,8 +357,7 @@ var Plottable;
             * @param {D3.Selection} element: The text element used to measure the text
             * @returns {string} text - the shortened text
             */
-            function getTruncatedText(text, availableWidth, element) {
-                var measurer = getTextMeasure(element);
+            function getTruncatedText(text, availableWidth, measurer) {
                 if (measurer(text)[0] <= availableWidth) {
                     return text;
                 } else {
@@ -854,6 +853,9 @@ var Plottable;
         var Formatter = (function () {
             function Formatter(precision) {
                 this._onlyShowUnchanged = true;
+                if (precision < 0 || precision > 20) {
+                    throw new RangeError("Formatter precision must be between 0 and 20");
+                }
                 this._precision = precision;
             }
             /**
@@ -2077,14 +2079,14 @@ var Plottable;
                 return this;
             };
 
-            Table.prototype._removeComponent = function (c) {
-                _super.prototype._removeComponent.call(this, c);
+            Table.prototype._removeComponent = function (component) {
+                _super.prototype._removeComponent.call(this, component);
                 var rowpos;
                 var colpos;
                 outer:
                 for (var i = 0; i < this.nRows; i++) {
                     for (var j = 0; j < this.nCols; j++) {
-                        if (this.rows[i][j] === c) {
+                        if (this.rows[i][j] === component) {
                             rowpos = i;
                             colpos = j;
                             break outer;
@@ -2097,26 +2099,6 @@ var Plottable;
                 }
 
                 this.rows[rowpos][colpos] = null;
-
-                // check if can splice out row
-                if (this.rows[rowpos].every(function (v) {
-                    return v === null;
-                })) {
-                    this.rows.splice(rowpos, 1);
-                    this.rowWeights.splice(rowpos, 1);
-                    this.nRows--;
-                }
-
-                // check if can splice out column
-                if (this.rows.every(function (v) {
-                    return v[colpos] === null;
-                })) {
-                    this.rows.forEach(function (r) {
-                        return r.splice(colpos, 1);
-                    });
-                    this.colWeights.splice(colpos, 1);
-                    this.nCols--;
-                }
 
                 return this;
             };
@@ -2254,8 +2236,14 @@ var Plottable;
                         } else {
                             spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                         }
-                        if (spaceRequest.width > offeredWidths[colIndex] || spaceRequest.height > offeredHeights[rowIndex]) {
-                            throw new Error("Invariant Violation: Abstract.Component cannot request more space than is offered");
+
+                        var epsilon = 0.001;
+                        var epsilonGT = function (a, b) {
+                            return a - b - epsilon > 0;
+                        };
+
+                        if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
+                            console.log("Invariant Violation: Abstract.Component cannot request more space than is offered");
                         }
 
                         requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], spaceRequest.width);
@@ -2639,6 +2627,7 @@ var Plottable;
                 this._requireRerender = true;
                 this._rerenderUpdateSelection = true;
                 this.updateProjector(attrToSet);
+                this._render(); // queue a re-render upon changing projector
                 return this;
             };
 
@@ -2995,6 +2984,9 @@ var Plottable;
             this.doNice = false;
             this.padProportion = 0.0;
             this.paddingExceptions = d3.set([]);
+            // This must be a map rather than a set so we can get the original values
+            // back out, rather than their stringified versions.
+            this.includedValues = d3.map([]);
             this.combineExtents = combineExtents;
         }
         /**
@@ -3007,7 +2999,12 @@ var Plottable;
         *                 pair.
         */
         Domainer.prototype.computeDomain = function (extents, scale) {
-            return this.niceDomain(scale, this.padDomain(this.combineExtents(extents)));
+            var domain;
+            domain = this.combineExtents(extents);
+            domain = this.includeDomain(domain);
+            domain = this.padDomain(domain);
+            domain = this.niceDomain(scale, domain);
+            return domain;
         };
 
         /**
@@ -3055,6 +3052,28 @@ var Plottable;
             return this;
         };
 
+        /**
+        * Ensure that the domain produced includes value.
+        *
+        * For example, after include(0), the domain [3, 5] will become [0, 5],
+        * and the domain [-9, -8] will become [-9, 0].
+        *
+        * @param {any} value The value that will be included.
+        * @param {boolean} include Defaults to true. If true, this value will
+        *                  always be included, if false, this value will not
+        *                  necessarily be included.
+        * @return {Domainer} The calling Domainer.
+        */
+        Domainer.prototype.include = function (value, include) {
+            if (typeof include === "undefined") { include = true; }
+            if (include) {
+                this.includedValues.set(value, value);
+            } else {
+                this.includedValues.remove(value);
+            }
+            return this;
+        };
+
         Domainer.defaultCombineExtents = function (extents) {
             if (extents.length === 0) {
                 return [0, 1];
@@ -3097,6 +3116,12 @@ var Plottable;
             } else {
                 return domain;
             }
+        };
+
+        Domainer.prototype.includeDomain = function (domain) {
+            return this.includedValues.values().reduce(function (domain, value) {
+                return [Math.min(domain[0], value), Math.max(domain[1], value)];
+            }, domain);
         };
         Domainer.PADDING_FOR_IDENTICAL_DOMAIN = 1;
         Domainer.ONE_DAY = 1000 * 60 * 60 * 24;
@@ -4086,7 +4111,7 @@ var Plottable;
                             var measure = Plottable.Util.Text.getTextMeasure(textEl);
                             var wrappedLines = Plottable.Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
                             if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, textEl));
+                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, measure));
                             } else {
                                 textEl.text("");
                                 var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -4224,7 +4249,7 @@ var Plottable;
                             var measure = Plottable.Util.Text.getTextMeasure(textEl);
                             var wrappedLines = Plottable.Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
                             if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, textEl));
+                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, measure));
                             } else {
                                 var baseY = 0;
                                 if (tickLabelPosition === "top") {
@@ -4276,14 +4301,6 @@ var Plottable;
     (function (Abstract) {
         var Axis = (function (_super) {
             __extends(Axis, _super);
-            /**
-            * Creates a BaseAxis.
-            *
-            * @constructor
-            * @param {Scale} scale The Scale to base the BaseAxis on.
-            * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
-            * @param {Formatter} [formatter]
-            */
             function Axis(scale, orientation, formatter) {
                 var _this = this;
                 _super.call(this);
@@ -5086,23 +5103,38 @@ var Plottable;
                 this.classed("label", true);
                 this.setText(text);
                 orientation = orientation.toLowerCase();
-                if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
+                if (orientation === "vertical-left") {
+                    orientation = "left";
+                }
+                if (orientation === "vertical-right") {
+                    orientation = "right";
+                }
+                if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
                     this.orientation = orientation;
                 } else {
                     throw new Error(orientation + " is not a valid orientation for LabelComponent");
                 }
-                this.xAlign("CENTER").yAlign("CENTER"); // the defaults
+                this.xAlign("center");
+                this.yAlign("center");
             }
+            Label.prototype.xAlign = function (alignment) {
+                var alignmentLC = alignment.toLowerCase();
+                _super.prototype.xAlign.call(this, alignmentLC);
+                this.xAlignment = alignmentLC;
+                return this;
+            };
+            Label.prototype.yAlign = function (alignment) {
+                var alignmentLC = alignment.toLowerCase();
+                _super.prototype.yAlign.call(this, alignmentLC);
+                this.yAlignment = alignmentLC;
+                return this;
+            };
+
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var desiredWidth;
-                var desiredHeight;
-                if (this.orientation === "horizontal") {
-                    desiredWidth = this.textLength;
-                    desiredHeight = this.textHeight;
-                } else {
-                    desiredWidth = this.textHeight;
-                    desiredHeight = this.textLength;
-                }
+                var desiredWH = this.measurer(this.text);
+                var desiredWidth = this.orientation === "horizontal" ? desiredWH[0] : desiredWH[1];
+                var desiredHeight = this.orientation === "horizontal" ? desiredWH[1] : desiredWH[0];
+
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
                     height: Math.min(desiredHeight, offeredHeight),
@@ -5113,7 +5145,8 @@ var Plottable;
 
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.textElement = this.content.append("text");
+                this.textContainer = this.content.append("g");
+                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
                 this.setText(this.text);
                 return this;
             };
@@ -5126,53 +5159,26 @@ var Plottable;
             */
             Label.prototype.setText = function (text) {
                 this.text = text;
-                if (this.element != null) {
-                    this.textElement.text(text);
-                    this.measureAndSetTextSize();
-                }
                 this._invalidateLayout();
                 return this;
             };
 
-            Label.prototype.measureAndSetTextSize = function () {
-                var bbox = Plottable.Util.DOM.getBBox(this.textElement);
-                this.textHeight = bbox.height;
-                this.textLength = this.text === "" ? 0 : bbox.width;
-            };
-
-            Label.prototype.truncateTextAndRemeasure = function (availableLength) {
-                var shortText = Plottable.Util.Text.getTruncatedText(this.text, availableLength, this.textElement);
-                this.textElement.text(shortText);
-                this.measureAndSetTextSize();
+            Label.prototype._doRender = function () {
+                _super.prototype._doRender.call(this);
+                this.textContainer.selectAll("text").remove();
+                var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
+                var truncatedText = Plottable.Util.Text.getTruncatedText(this.text, dimension, this.measurer);
+                if (this.orientation === "horizontal") {
+                    Plottable.Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight, this.xAlignment, this.yAlignment);
+                } else {
+                    Plottable.Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight, this.xAlignment, this.yAlignment, this.orientation);
+                }
+                return this;
             };
 
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-                var bbox = Plottable.Util.DOM.getBBox(this.textElement);
-                this.textElement.attr("dy", -bbox.y);
-
-                var xShift = 0;
-                var yShift = 0;
-
-                if (this.orientation === "horizontal") {
-                    this.truncateTextAndRemeasure(this.availableWidth);
-                    xShift = (this.availableWidth - this.textLength) * this._xAlignProportion;
-                } else {
-                    this.truncateTextAndRemeasure(this.availableHeight);
-                    xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
-
-                    if (this.orientation === "vertical-right") {
-                        this.textElement.attr("transform", "rotate(90)");
-                        yShift = -this.textHeight;
-                    } else {
-                        this.textElement.attr("transform", "rotate(-90)");
-                        xShift = -xShift - this.textLength; // flip xShift
-                    }
-                }
-
-                this.textElement.attr("x", xShift);
-                this.textElement.attr("y", yShift);
+                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
                 return this;
             };
             return Label;
@@ -5337,7 +5343,8 @@ var Plottable;
                 });
                 legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
                 legend.selectAll("text").text(function (d) {
-                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, d3.select(this));
+                    var measure = Plottable.Util.Text.getTextMeasure(d3.select(this));
+                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
                 });
                 this.updateClasses();
                 this.updateListeners();
@@ -5783,13 +5790,14 @@ var Plottable;
             function BarPlot(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
+                this._barAlignmentFactor = 0;
+                this.previousBaselineValue = null;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
                     "baseline": new Plottable.Animator.Null()
                 };
                 this.classed("bar-renderer", true);
-                this.project("width", 10);
                 this.project("fill", function () {
                     return "steelblue";
                 });
@@ -5802,7 +5810,47 @@ var Plottable;
             BarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
+                this._bars = this.renderArea.selectAll("rect").data([]);
                 return this;
+            };
+
+            BarPlot.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+                this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+                this._bars.enter().append("rect");
+
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var positionAttr = this._isVertical ? "y" : "x";
+                var dimensionAttr = this._isVertical ? "height" : "width";
+
+                if (this._dataChanged && this._animate) {
+                    var resetAttrToProjector = this._generateAttrToProjector();
+                    resetAttrToProjector[positionAttr] = function () {
+                        return scaledBaseline;
+                    };
+                    resetAttrToProjector[dimensionAttr] = function () {
+                        return 0;
+                    };
+                    this._applyAnimatedAttributes(this._bars, "bars-reset", resetAttrToProjector);
+                }
+
+                var attrToProjector = this._generateAttrToProjector();
+                if (attrToProjector["fill"] != null) {
+                    this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
+                }
+                this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
+
+                this._bars.exit().remove();
+
+                var baselineAttr = {
+                    "x1": this._isVertical ? 0 : scaledBaseline,
+                    "y1": this._isVertical ? scaledBaseline : 0,
+                    "x2": this._isVertical ? this.availableWidth : scaledBaseline,
+                    "y2": this._isVertical ? scaledBaseline : this.availableHeight
+                };
+
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
 
             /**
@@ -5812,24 +5860,31 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.baseline = function (value) {
+                this.previousBaselineValue = this._baselineValue;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
-                if (this.element != null) {
-                    this._render();
-                }
+                this._render();
                 return this;
             };
 
             /**
             * Sets the bar alignment relative to the independent axis.
-            * Behavior depends on subclass implementation.
+            * VerticalBarPlot supports "left", "center", "right"
+            * HorizontalBarPlot supports "top", "center", "bottom"
             *
             * @param {string} alignment The desired alignment.
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.barAlignment = function (alignment) {
-                // implementation in child classes
+                var alignmentLC = alignment.toLowerCase();
+                var align2factor = this.constructor._BarAlignmentToFactor;
+                if (align2factor[alignmentLC] === undefined) {
+                    throw new Error("unsupported bar alignment");
+                }
+                this._barAlignmentFactor = align2factor[alignmentLC];
+
+                this._render();
                 return this;
             };
 
@@ -5845,6 +5900,10 @@ var Plottable;
 
             BarPlot.prototype.selectBar = function (xValOrExtent, yValOrExtent, select) {
                 if (typeof select === "undefined") { select = true; }
+                if (!this._isSetup) {
+                    return null;
+                }
+
                 var selectedBars = [];
 
                 var xExtent = this.parseExtent(xValOrExtent);
@@ -5878,9 +5937,75 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.deselectAll = function () {
-                this._bars.classed("selected", false);
+                if (this._isSetup) {
+                    this._bars.classed("selected", false);
+                }
                 return this;
             };
+
+            BarPlot.prototype._updateDomainer = function (scale) {
+                if (scale instanceof Plottable.Abstract.QuantitiveScale) {
+                    var qscale = scale;
+                    if (!qscale._userSetDomainer && this._baselineValue != null) {
+                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
+                        if (qscale._autoDomainAutomatically) {
+                            qscale.autoDomain();
+                        }
+                    }
+                }
+                return this;
+            };
+
+            BarPlot.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                // Primary scale/direction: the "length" of the bars
+                // Secondary scale/direction: the "width" of the bars
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var secondaryScale = this._isVertical ? this.xScale : this.yScale;
+                var primaryAttr = this._isVertical ? "y" : "x";
+                var secondaryAttr = this._isVertical ? "x" : "y";
+                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                if (attrToProjector["width"] == null) {
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : BarPlot.DEFAULT_WIDTH;
+                    attrToProjector["width"] = function (d, i) {
+                        return constantWidth;
+                    };
+                }
+
+                var positionF = attrToProjector[secondaryAttr];
+                var widthF = attrToProjector["width"];
+                if (!bandsMode) {
+                    attrToProjector[secondaryAttr] = function (d, i) {
+                        return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor;
+                    };
+                } else {
+                    var bandWidth = secondaryScale.rangeBand();
+                    attrToProjector[secondaryAttr] = function (d, i) {
+                        return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
+                    };
+                }
+
+                var originalPositionFn = attrToProjector[primaryAttr];
+                attrToProjector[primaryAttr] = function (d, i) {
+                    var originalPos = originalPositionFn(d, i);
+
+                    // If it is past the baseline, it should start at the baselin then width/height
+                    // carries it over. If it's not past the baseline, leave it at original position and
+                    // then width/height carries it to baseline
+                    return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
+                };
+
+                attrToProjector["height"] = function (d, i) {
+                    return Math.abs(scaledBaseline - originalPositionFn(d, i));
+                };
+
+                return attrToProjector;
+            };
+            BarPlot.DEFAULT_WIDTH = 10;
+
+            BarPlot._BarAlignmentToFactor = {};
             return BarPlot;
         })(Plottable.Abstract.XYPlot);
         Abstract.BarPlot = BarPlot;
@@ -5910,109 +6035,13 @@ var Plottable;
             */
             function VerticalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._barAlignment = "left";
+                this._isVertical = true;
             }
-            VerticalBar.prototype._paint = function () {
-                _super.prototype._paint.call(this);
-                var scaledBaseline = this.yScale.scale(this._baselineValue);
-
-                this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
-                this._bars.enter().append("rect");
-
-                var attrToProjector = this._generateAttrToProjector();
-
-                var xF = attrToProjector["x"];
-                var widthF = attrToProjector["width"];
-                var castXScale = this.xScale;
-                var rangeType = (castXScale.rangeType == null) ? "points" : castXScale.rangeType();
-
-                if (rangeType === "points") {
-                    if (this._barAlignment === "center") {
-                        attrToProjector["x"] = function (d, i) {
-                            return xF(d, i) - widthF(d, i) / 2;
-                        };
-                    } else if (this._barAlignment === "right") {
-                        attrToProjector["x"] = function (d, i) {
-                            return xF(d, i) - widthF(d, i);
-                        };
-                    }
-                } else {
-                    attrToProjector["width"] = function (d, i) {
-                        return castXScale.rangeBand();
-                    };
-                }
-
-                var yFunction = attrToProjector["y"];
-
-                // Apply reset if data changed
-                if (this._dataChanged) {
-                    attrToProjector["y"] = function () {
-                        return scaledBaseline;
-                    };
-                    attrToProjector["height"] = function () {
-                        return 0;
-                    };
-                    this._applyAnimatedAttributes(this._bars, "bars-reset", attrToProjector);
-                }
-
-                // Prepare attributes for bars
-                attrToProjector["y"] = function (d, i) {
-                    var originalY = yFunction(d, i);
-                    return (originalY > scaledBaseline) ? scaledBaseline : originalY;
-                };
-
-                var heightFunction = function (d, i) {
-                    return Math.abs(scaledBaseline - yFunction(d, i));
-                };
-                attrToProjector["height"] = heightFunction;
-
-                if (attrToProjector["fill"] != null) {
-                    this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
-
-                // Apply bar updates
-                this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
-
-                this._bars.exit().remove();
-
-                // Apply baseline updates
-                var baselineAttr = {
-                    "x1": 0,
-                    "y1": scaledBaseline,
-                    "x2": this.availableWidth,
-                    "y2": scaledBaseline
-                };
-                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-            };
-
-            /**
-            * Sets the horizontal alignment of the bars.
-            *
-            * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
-            * @return {BarPlot} The calling BarPlot.
-            */
-            VerticalBar.prototype.barAlignment = function (alignment) {
-                var alignmentLC = alignment.toLowerCase();
-                if (alignmentLC !== "left" && alignmentLC !== "center" && alignmentLC !== "right") {
-                    throw new Error("unsupported bar alignment");
-                }
-
-                this._barAlignment = alignmentLC;
-                if (this.element != null) {
-                    this._render();
-                }
-                return this;
-            };
-
             VerticalBar.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    var scale = this.yScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().paddingException(this._baselineValue);
-                    }
-                }
+                this._updateDomainer(this.yScale);
                 return this;
             };
+            VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             return VerticalBar;
         })(Plottable.Abstract.BarPlot);
         Plot.VerticalBar = VerticalBar;
@@ -6042,108 +6071,24 @@ var Plottable;
             */
             function HorizontalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this._barAlignment = "top";
+                this.isVertical = false;
             }
-            HorizontalBar.prototype._paint = function () {
-                _super.prototype._paint.call(this);
-                this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
-                this._bars.enter().append("rect");
-
-                var attrToProjector = this._generateAttrToProjector();
-
-                var yFunction = attrToProjector["y"];
-
-                attrToProjector["height"] = attrToProjector["width"]; // remapping due to naming conventions
-                var heightFunction = attrToProjector["height"];
-
-                var castYScale = this.yScale;
-                var rangeType = (castYScale.rangeType == null) ? "points" : castYScale.rangeType();
-                if (rangeType === "points") {
-                    if (this._barAlignment === "middle") {
-                        attrToProjector["y"] = function (d, i) {
-                            return yFunction(d, i) - heightFunction(d, i) / 2;
-                        };
-                    } else if (this._barAlignment === "bottom") {
-                        attrToProjector["y"] = function (d, i) {
-                            return yFunction(d, i) - heightFunction(d, i);
-                        };
-                    }
-                } else {
-                    attrToProjector["height"] = function (d, i) {
-                        return castYScale.rangeBand();
-                    };
-                }
-
-                var scaledBaseline = this.xScale.scale(this._baselineValue);
-
-                var xFunction = attrToProjector["x"];
-
-                if (this._animate && this._dataChanged) {
-                    attrToProjector["x"] = function () {
-                        return scaledBaseline;
-                    };
-                    attrToProjector["width"] = function () {
-                        return 0;
-                    };
-                    this._applyAnimatedAttributes(this._bars, "bars-reset", attrToProjector);
-                }
-
-                attrToProjector["x"] = function (d, i) {
-                    var originalX = xFunction(d, i);
-                    return (originalX > scaledBaseline) ? scaledBaseline : originalX;
-                };
-
-                var widthFunction = function (d, i) {
-                    return Math.abs(scaledBaseline - xFunction(d, i));
-                };
-                attrToProjector["width"] = widthFunction; // actual SVG rect width
-
-                if (attrToProjector["fill"] != null) {
-                    this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
-
-                // Apply bar updates
-                this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
-
-                this._bars.exit().remove();
-
-                var baselineAttr = {
-                    "x1": scaledBaseline,
-                    "y1": 0,
-                    "x2": scaledBaseline,
-                    "y2": this.availableHeight
-                };
-                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
-            };
-
-            /**
-            * Sets the vertical alignment of the bars.
-            *
-            * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
-            * @return {HorizontalBarPlot} The calling HorizontalBarPlot.
-            */
-            HorizontalBar.prototype.barAlignment = function (alignment) {
-                var alignmentLC = alignment.toLowerCase();
-                if (alignmentLC !== "top" && alignmentLC !== "middle" && alignmentLC !== "bottom") {
-                    throw new Error("unsupported bar alignment");
-                }
-
-                this._barAlignment = alignmentLC;
-                if (this.element != null) {
-                    this._render();
-                }
-                return this;
-            };
-
             HorizontalBar.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
-                    var scale = this.xScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().paddingException(this._baselineValue);
-                    }
-                }
+                this._updateDomainer(this.xScale);
                 return this;
             };
+
+            HorizontalBar.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+
+                // by convention, for API users the 2ndary dimension of a bar is always called its "width", so
+                // the "width" of a horziontal bar plot is actually its "height" from the perspective of a svg rect
+                var widthF = attrToProjector["width"];
+                attrToProjector["width"] = attrToProjector["height"];
+                attrToProjector["height"] = widthF;
+                return attrToProjector;
+            };
+            HorizontalBar._BarAlignmentToFactor = { "top": 0, "center": 0.5, "bottom": 1 };
             return HorizontalBar;
         })(Plottable.Abstract.BarPlot);
         Plot.HorizontalBar = HorizontalBar;
@@ -6832,12 +6777,18 @@ var Plottable;
             * @returns {AreaInteraction} The calling AreaInteraction.
             */
             DragBox.prototype.clearBox = function () {
+                if (this.dragBox == null) {
+                    return;
+                }
                 this.dragBox.attr("height", 0).attr("width", 0);
                 this.boxIsDrawn = false;
                 return this;
             };
 
             DragBox.prototype.setBox = function (x0, x1, y0, y1) {
+                if (this.dragBox == null) {
+                    return;
+                }
                 var w = Math.abs(x0 - x1);
                 var h = Math.abs(y0 - y1);
                 var xo = Math.min(x0, x1);

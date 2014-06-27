@@ -72,13 +72,13 @@ export module Component {
       return this;
     }
 
-    public _removeComponent(c: Abstract.Component): Table {
-      super._removeComponent(c);
+    public _removeComponent(component: Abstract.Component): Table {
+      super._removeComponent(component);
       var rowpos: number;
       var colpos: number;
       outer : for (var i = 0; i < this.nRows; i++) {
         for (var j = 0; j < this.nCols; j++) {
-          if (this.rows[i][j] === c) {
+          if (this.rows[i][j] === component) {
             rowpos = i;
             colpos = j;
             break outer;
@@ -91,18 +91,6 @@ export module Component {
       }
 
       this.rows[rowpos][colpos] = null;
-      // check if can splice out row
-      if (this.rows[rowpos].every((v) => v === null)) {
-        this.rows.splice(rowpos, 1);
-        this.rowWeights.splice(rowpos, 1);
-        this.nRows--;
-      }
-      // check if can splice out column
-      if (this.rows.every((v) => v[colpos] === null)) {
-        this.rows.forEach((r) => r.splice(colpos, 1));
-        this.colWeights.splice(colpos, 1);
-        this.nCols--;
-      }
 
       return this;
     }
@@ -223,8 +211,14 @@ export module Component {
           } else {
             spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
           }
-          if (spaceRequest.width > offeredWidths[colIndex] || spaceRequest.height > offeredHeights[rowIndex]) {
-            throw new Error("Invariant Violation: Abstract.Component cannot request more space than is offered");
+
+          var epsilon = 0.001;
+          var epsilonGT = (a: number, b: number) => {
+            return a - b - epsilon > 0;
+          };
+
+          if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
+            console.log("Invariant Violation: Abstract.Component cannot request more space than is offered");
           }
 
           requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], spaceRequest.width );

@@ -20,13 +20,17 @@ export module Animator {
     }
 
     /**
-     * Gets or sets the duration of the animation in milliseconds.
+     * Gets the duration of the animation in milliseconds.
      *
-     * @param {Number} duration The duration in milliseconds.
-     * @return {Number|Default} Returns this object for chaining or
-     *     the current duration if no argument is supplied.
+     * @returns {Number} The current duration.
      */
     public duration(): Number;
+    /**
+     * Sets the duration of the animation in milliseconds.
+     *
+     * @param {Number} duration The duration in milliseconds.
+     * @returns {Default} The calling Default Animator.
+     */
     public duration(duration: Number): Default;
     public duration(duration?: Number): any{
       if (duration === undefined) {
@@ -38,13 +42,17 @@ export module Animator {
     }
 
     /**
-     * Gets or sets the delay of the animation in milliseconds.
+     * Gets the delay of the animation in milliseconds.
      *
-     * @param {Number} delay The delay in milliseconds.
-     * @return {Number|Default} Returns this object for chaining or
-     *     the current delay if no argument is supplied.
+     * @returns {Number} The current delay.
      */
     public delay(): Number;
+    /**
+     * Sets the delay of the animation in milliseconds.
+     *
+     * @param {Number} delay The delay in milliseconds.
+     * @returns {Default} The calling Default Animator.
+     */
     public delay(delay: Number): Default;
     public delay(delay?: Number): any{
       if (delay === undefined) {
@@ -56,13 +64,17 @@ export module Animator {
     }
 
     /**
-     * Gets or sets the easing string of the animation in milliseconds.
+     * Gets the current easing of the animation.
      *
-     * @param {string} easing The easing string.
-     * @return {string|Default} Returns this object for chaining or
-     *     the current easing string if no argument is supplied.
+     * @returns {string} the current easing mode.
      */
     public easing(): string;
+    /**
+     * Sets the easing mode of the animation.
+     *
+     * @param {string} easing The desired easing mode.
+     * @returns {Default} The calling Default Animator.
+     */
     public easing(easing: string): Default;
     public easing(easing?: string): any{
       if (easing === undefined) {

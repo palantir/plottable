@@ -20,14 +20,6 @@ export module Abstract {
     private _tickLength = 5;
     private _tickLabelPadding = 3;
 
-    /**
-     * Creates a BaseAxis.
-     *
-     * @constructor
-     * @param {Scale} scale The Scale to base the BaseAxis on.
-     * @param {string} orientation The orientation of the BaseAxis (top/bottom/left/right)
-     * @param {Formatter} [formatter]
-     */
     constructor(scale: Abstract.Scale, orientation: string, formatter?: Abstract.Formatter) {
       super();
       this._scale = scale;
@@ -287,7 +279,7 @@ export module Abstract {
      * Sets the tick mark length.
      *
      * @param {number} length The length of each tick.
-     * @returns {BaseAxis} The calling BaseAxis.
+     * @returns {BaseAxis} The calling Axis.
      */
     public tickLength(length: number): Axis;
     public tickLength(length?: number): any {
@@ -304,12 +296,17 @@ export module Abstract {
     }
 
     /**
-     * Gets or sets the padding between each tick mark and its associated label.
+     * Gets the padding between each tick mark and its associated label.
      *
-     * @param {number} [length] The length of each tick.
-     * @returns {number|BaseAxis} The current tick mark length, or the calling BaseAxis.
+     * @returns {number} The current padding, in pixels.
      */
     public tickLabelPadding(): number;
+    /**
+     * Sets the padding between each tick mark and its associated label.
+     *
+     * @param {number} padding The desired padding, in pixels.
+     * @returns {Axis} The calling Axis.
+     */
     public tickLabelPadding(padding: number): Axis;
     public tickLabelPadding(padding?: number): any {
       if (padding == null) {
@@ -324,7 +321,18 @@ export module Abstract {
       }
     }
 
+    /**
+     * Gets the orientation of the Axis.
+     *
+     * @returns {string} The current orientation.
+     */
     public orient(): string;
+    /**
+     * Sets the orientation of the Axis.
+     *
+     * @param {string} newOrientation The desired orientation (top/bottom/left/right).
+     * @returns {Axis} The calling Axis.
+     */
     public orient(newOrientation: string): Axis;
     public orient(newOrientation?: string): any {
       if (newOrientation == null) {
