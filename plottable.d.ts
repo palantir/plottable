@@ -1566,20 +1566,6 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public orient(newOrientation: string): Axis;
-            /**
-            * Checks whether the Axis is currently set to show the first and last
-            * tick labels.
-            *
-            * @returns {boolean}
-            */
-            public showEndTickLabels(): boolean;
-            /**
-            * Set whether or not to show the first and last tick labels.
-            *
-            * @param {boolean} show Whether or not to show the first and last labels.
-            * @returns {Axis} The calling Axis.
-            */
-            public showEndTickLabels(show: boolean): Axis;
         }
     }
 }
@@ -1612,6 +1598,29 @@ declare module Plottable {
             * @returns {NumericAxis} The calling NumericAxis.
             */
             public tickLabelPosition(position: string): Numeric;
+            /**
+            * Return whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @returns {boolean} The current setting.
+            */
+            public showEndTickLabel(orientation: string): boolean;
+            /**
+            * Control whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @param {boolean} show Whether or not the given tick should be displayed.
+            * @returns {Numeric} The calling Numeric.
+            */
+            public showEndTickLabel(orientation: string, show: boolean): Numeric;
         }
     }
 }
