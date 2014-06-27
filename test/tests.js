@@ -4799,13 +4799,19 @@ describe("Cache", function () {
     });
 
     it("Clears its cache when .clear() is called", function () {
-        assert.equal(cache.get("hello"), "hellohello");
+        var prefix = "hello";
+        cache = new Plottable.Util.Cache(function (s) {
+            callbackCalled = true;
+            return prefix + s;
+        });
+        assert.equal(cache.get("world"), "helloworld");
         assert.isTrue(callbackCalled);
         callbackCalled = false;
-        assert.equal(cache.get("hello"), "hellohello");
+        assert.equal(cache.get("world"), "helloworld");
         assert.isFalse(callbackCalled);
+        prefix = "hola";
         cache.clear();
-        assert.equal(cache.get("hello"), "hellohello");
+        assert.equal(cache.get("world"), "holaworld");
         assert.isTrue(callbackCalled);
     });
 
