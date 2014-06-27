@@ -1,0 +1,20 @@
+/* Welcome to Compass. Use this file to write IE specific override styles.
+ * Import this file using the following HTML or equivalent:
+ * <!--[if IE]>
+ *   <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+ * <![endif]--> */
+noscript {
+
+}
+
+blockquote {
+  zoom: 1;
+}
+
+ul li.separator {
+  margin-top: -28px !important;
+}
+
+section#palantir-at-gsk {
+  background-color: #1a1917;
+}

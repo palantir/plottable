@@ -1,0 +1,141 @@
+---
+---
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="shortcut icon" href="/favicon.ico" sizes="16x16 32x32" type="image/x-icon">
+  <title>Plottable.js | Palantir</title>
+  <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="Flexible, interactive, performant charts for the web made easy">
+  <link rel="stylesheet" href="/build/css/style.css" media="screen">
+  <!-- Modernizr -->
+  <script src="/build/js/modernizr-custom-2.8.2.min.js"></script>
+
+  <!--[if lt IE 9]>
+  <script src="/build/js/respond-1.4.2.min.js"></script>
+  <link rel="stylesheet" href="/build/css/ie.css" media="screen, projection" type="text/css">
+  <![endif]-->
+
+  <!-- OpenGraph -->
+  <meta property="og:title" content="Home">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://palantir.com/index.html">
+  <meta property="og:site_name" content="Plottable.js">
+  <meta property="og:description" content="Flexible, interactive, performant charts for the web made easy.">
+</head>
+<body>
+  <header>
+    <!-- Nav: Main -->
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="container-fluid">
+
+        <div>
+          <!-- Logo -->
+          <h1 id="site-name" class="logo">
+            <a id="logo-svg" href="https://palantir.com/" title="Palantir Technologies">Palantir</a>
+          </h1>
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+
+        <div class="collapse navbar-collapse" id="main-navbar">
+          <ul class="nav navbar-nav">
+            <li><a href="#">Overview</a></li>
+            <li class="separator">•</li>
+            <li><a href="#">API</a></li>
+            <li class="separator">•</li>
+            <li><a href="#">Documentation</a></li>
+            <li class="separator">•</li>
+            <li><a href="#">Tutorials</a></li>
+            <li class="separator">•</li>
+            <li><a href="#">Examples</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+
+      </div><!-- /.container-fluid -->
+    </nav>
+
+    <h1>
+      Plottable.js
+      <small>Flexible, interactive, performant charts for the web made easy</small>
+    </h1>
+    <div id="global-download">
+      <a href="#" class="button icon-download no-arrow">Download (0.15.2)</a>
+    </div>
+
+    <p>
+      Follow our development on <a href="https://github.com/palantir/plottable" title="Plottable on Github.">Github</a>
+    </p>
+
+    <div id="chart-separator">
+      <img class="no-svg" src="/build/images/plot-background.png">
+      <img class="svg" src="/build/images/plot-background.svg">
+    </div>
+  </header><!-- /header -->
+
+
+  <section id="section-built-on-d3">
+    <div class="content">
+      <h2>Built On Top Of D3</h2>
+      <p><strong>Plottable.js</strong> consists of pluggable set of Components which encapsulate rendering logic, and a layout engine that is responsible for positioning them.</p>
+    </div>
+  </section>
+
+  <section id="section-easier-more-usable">
+    <div class="content">
+      <h2>Easier, More Usable</h2>
+      <p>Because Plottable handles layout, sizing, and positioning, Plottable charts are easier to create and more reusable than charts built only with D3. And, since Plottable Components are powered by D3, the full flexibility of D3 is still available.</p>
+      <div id="plot-separator">
+        <img class="no-svg" src="/build/images/plots.png">
+        <img class="svg" src="/build/images/plots.svg">
+      </div>
+      <p>Plottable currently includes components like <strong>LinePlots</strong>, <strong>AreaPlots</strong>, <strong>BarPlots</strong>, <strong>CategoryAxes</strong> (with automatic word-wrapping), <strong>interactive Legends</strong>, and <strong>Labels</strong>. Plottable is open-sourced under the MIT license, and is under active development by <strong>Palantir Technologies</strong>.</p>
+    </div>
+  </section>
+
+<!-- hide examples for now
+  <section id="section-example-1">
+    <div class="content">
+      <h2>Example: Plottable Issues Over Time</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+  </section>
+
+  <section id="section-example-2">
+    <div class="content">
+      <h2>Example: Another Example</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+  </section>
+-->
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    © 2014 <a href="https://palantir.com/" title="Palantir Technologies">Palantir Technologies</a>. <a href="https://github.com/palantir/plottable" title="Plottable on Github.">Plottable.js</a> is released under the <a href="https://github.com/palantir/plottable/blob/master/LICENSE">MIT license</a>.
+  </footer><!-- /footer -->
+
+  {% if site.google_analytics != '' %}
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', '{{ site.google_analytics }}', 'none');
+    ga('send', 'pageview');
+  </script>
+  {% endif %}
+
+  <script src="/build/js/compiled.min.js"></script>
+</body>
+</html>

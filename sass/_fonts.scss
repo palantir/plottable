@@ -1,0 +1,93 @@
+// ---------------------------------------
+// Fonts: Define all @font-face fonts here
+// ---------------------------------------
+
+$font-weight-lighter: 300;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+$font-weight-bolder: 800;
+
+@font-face {
+  font-family: "palantir";
+  src: url('../../fonts/palantir.eot');
+  src: url('../../fonts/palantir.eot') format('embedded-opentype'),
+       url('../../fonts/palantir.woff') format('woff'),
+       url('../../fonts/palantir.ttf') format('truetype'),
+       url('../../fonts/palantir.svg#palantir') format('svg');
+  font-weight: $font-weight-normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN";
+  src: url('../../fonts/DIN/DINNextLTW04-Regular.eot');
+  src: url('../../fonts/DIN/DINNextLTW04-Regular.eot#iefix') format('embedded-opentype'),
+       url('../../fonts/DIN/DINNextLTW04-Regular.woff') format('woff');
+  font-weight: $font-weight-normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN";
+  src: url('../../fonts/DIN/DINNextLTW04-Italic.eot');
+  src: url('../../fonts/DIN/DINNextLTW04-Italic.eot#iefix') format('embedded-opentype'),
+       url('../../fonts/DIN/DINNextLTW04-Italic.woff') format('woff'),
+       url('../../fonts/DIN/DINNextLTW04-Italic.ttf') format('truetype');
+  font-weight: $font-weight-normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "DIN";
+  src: url('../../fonts/DIN/DINNextLTW04-Bold.eot');
+  src: url('../../fonts/DIN/DINNextLTW04-Bold.eot#iefix') format('embedded-opentype'),
+       url('../../fonts/DIN/DINNextLTW04-Bold.woff') format('woff'),
+       url('../../fonts/DIN/DINNextLTW04-Bold.ttf') format('truetype');
+  font-weight: $font-weight-bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN";
+  src: url('../../fonts/DIN/DINNextLTW04-Light.eot');
+  src: url('../../fonts/DIN/DINNextLTW04-Light.eot#iefix') format('embedded-opentype'),
+       url('../../fonts/DIN/DINNextLTW04-Light.woff') format('woff'),
+       url('../../fonts/DIN/DINNextLTW04-Light.ttf') format('truetype');
+  font-weight: $font-weight-lighter;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Blender";
+  src: url('../../fonts/blenderpro/blenderpro-medium-webfont.eot');
+  src: url('../../fonts/blenderpro/blenderpro-medium-webfont.eot#iefix') format('embedded-opentype'),
+       url('../../fonts/blenderpro/blenderpro-medium-webfont.woff') format('woff'),
+       url('../../fonts/blenderpro/blenderpro-medium-webfont.ttf') format('truetype');
+  font-weight: $font-weight-normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Blender";
+  src: url('../../fonts/blenderpro/blenderpro-bold-webfont.eot');
+  src: url('../../fonts/blenderpro/blenderpro-bold-webfont.eot#iefix') format('embedded-opentype'),
+       url('../../fonts/blenderpro/blenderpro-bold-webfont.woff') format('woff'),
+       url('../../fonts/blenderpro/blenderpro-bold-webfont.ttf') format('truetype');
+  font-weight: $font-weight-bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Blender";
+  src: url('../../fonts/blenderpro/blenderpro-heavy-webfont.eot');
+  src: url('../../fonts/blenderpro/blenderpro-heavy-webfont.eot#iefix') format('embedded-opentype'),
+       url('../../fonts/blenderpro/blenderpro-heavy-webfont.woff') format('woff'),
+       url('../../fonts/blenderpro/blenderpro-heavy-webfont.ttf') format('truetype');
+  font-weight: $font-weight-bolder;
+  font-style: normal;
+}
+
+/** Type Variables
+ -------------------------------------------------- */
+$font-headers: "Blender", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-body: "DIN", "Helvetica Neue", Helvetica, Arial, sans-serif;

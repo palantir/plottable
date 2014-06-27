@@ -1,0 +1,257 @@
+// -------------------------------------------
+// Content: Page styles should be defined here
+// -------------------------------------------
+
+/*
+ * Header
+ */
+header {
+  .no-retina & { background: $COLOR_BLUE2 repeat url(/build/images/background-pattern.png) center top; }
+  .retina & { background: $COLOR_BLUE2 repeat url(/build/images/background-pattern@2x.png) center top; }
+  padding-top: 1em;
+  color: $COLOR_BLUE1;
+
+  h1.logo {
+    text-align: center;
+    margin: 0 auto;
+    width: 119px;
+    height: 31px;
+
+    a {
+      @include transition-property(opacity);
+      @include transition-duration($transition-duration);
+      @include opacity(1);
+
+      display: block;
+      text-indent: 9999px;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      .no-svg & { background-image: url(/build/images/palantir-logo.png); }
+      .svg & { background-image: url(/build/images/palantir-logo.svg); }
+
+      .no-touch &:hover {
+        @include opacity(0.4);
+      }
+    }
+  }
+
+  .navbar {
+    background: transparent;
+    border: none;
+
+    button.navbar-toggle {
+      margin-top: -2em;
+      border: none;
+      @include transition-property(opacity);
+      @include transition-duration($transition-duration);
+      @include opacity(1);
+
+      .no-touch &:hover {
+        background: transparent;
+        @include opacity(0.4);
+      }
+
+      span.icon-bar {
+        background-color: $COLOR_WHITE1;
+      }
+
+    }
+  }
+
+  .navbar .nav,
+  .navbar .nav > li {
+    @include rem(font-size, 16px);
+    color: $COLOR_WHITE1;
+
+    a {
+      padding: 4px;
+      @include transition-property(opacity);
+      @include transition-duration($transition-duration);
+      @include opacity(1);
+      color: $COLOR_WHITE1;
+
+      .no-touch &:hover {
+        color: $COLOR_WHITE1;
+        @include opacity(0.4);
+      }
+    }
+
+    &.separator {
+      display: none;
+      color: $COLOR_WHITE1;
+    }
+  }
+
+  @media (min-width: $screen-md-min) {
+    .navbar .nav,
+    .navbar .nav > li {
+      float: none;
+      display: inline-block;
+      *display: inline; /* ie7 fix */
+      *zoom: 1; /* hasLayout ie7 trigger */
+      &.separator {
+        display: inline-block;
+      }
+    }
+
+    .container-fluid {
+      text-align: center;
+    }
+  }
+
+  h1 {
+    text-align: center;
+    font-weight: $font-weight-bold;
+    @include rem(font-size, 36px);
+
+
+
+    small {
+      margin-top: 1em;
+      @include rem(font-size, 10px);
+      color: $COLOR_BLUE1;
+      text-transform: none;
+      font-family: $font-body;
+      display: block;
+      text-align: center;
+    }
+
+    @media (min-width: $screen-md-min) {
+      @include rem(font-size, 72px);
+
+      small {
+        @include rem(font-size, 20px);
+      }
+    }
+  }
+
+  div#global-download, p {
+    position: relative;
+    z-index: 100;
+    text-align: center;
+  }
+
+  div#global-download {
+    margin-top: 4em;
+    > a:hover {
+      color: $COLOR_BLUE1;
+      border-color: $COLOR_BLUE1;
+      @include opacity(0.4);
+    }
+  }
+
+  p {
+    color: $COLOR_BLUE1;
+    margin-top: 2em;
+
+    > a {
+      font-weight: $font-weight-bold;
+      color: $COLOR_BLUE1;
+      @include transition-property(opacity);
+      @include transition-duration($transition-duration);
+      @include opacity(1);
+
+      .no-touch &:hover {
+        @include opacity(0.4);
+        color: $COLOR_BLUE1;
+      }
+    }
+  }
+
+}
+
+
+div#chart-separator {
+  position: relative;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+  background-color: transparent;
+  width: 100%;
+  margin-top: -10%;
+  .no-svg & { background-image: url(/build/images/plot-background.png); }
+  .svg & { background-image: url(/build/images/plot-background.svg); }
+
+  img {
+    width: 100%;
+
+    .no-svg &.svg { display: none; }
+    .svg &.no-svg { display: none; }
+  }
+}
+
+
+/*
+ * Section
+ */
+section {
+  text-align: center;
+  width: 100%;
+  margin: 4em 0;
+
+  div.content {
+    max-width: 586px;
+    margin: 0 auto 4em auto;
+    h2 {
+      @include rem(font-size, 32px);
+      font-weight: $font-weight-normal;
+    }
+
+    p {
+      margin: 2em 0;
+    }
+  }
+
+  &#section-built-on-d3 {
+    background-color: $COLOR_BLUE3;
+    color: $COLOR_WHITE1;
+    padding-bottom: 1em;
+    margin: 0;
+
+    h2 {
+      margin-top: 0;
+      background-repeat: no-repeat;
+      padding-top: 64px;
+      background-position: center top;
+      background-size: 46px 44px;
+
+      .no-retina & { background-image: url(/build/images/d3-logo.png); }
+      .retina & { background-image: url(/build/images/d3-logo@2x.png); }
+    }
+
+    p {
+      color: $COLOR_WHITE1;
+      @include rem(font-size, 24px);
+    }
+  }
+
+  &#section-easier-more-usable {
+    div#plot-separator {
+      margin: 1em 0;
+      img {
+        max-width: 100%;
+        .no-svg &.svg { display: none; }
+        .svg &.no-svg { display: none; }
+      }
+    }
+  }
+}
+
+
+/*
+ * Footer
+ */
+footer {
+  margin: 1em 0;
+  text-align: center;
+  @include rem(font-size, 12px);
+
+  a {
+    color: $COLOR_BLUE1;
+
+    .no-touch &:hover {
+
+    }
+  }
+}

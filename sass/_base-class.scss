@@ -1,0 +1,197 @@
+// ----------------------------------------------
+// Base Class: Base tags and classes defined here
+// ----------------------------------------------
+
+/** Tags
+ -------------------------------------------------- */
+
+html { font-size: 62.5%; } // base font is 10px
+
+body {
+  @include rem(font-size, $font-size-base);
+  @include relative-line-height($line-height-base-px, $font-size-base);
+
+  font-family: $font-body;
+  //-webkit-font-smoothing: antialiased;
+
+  @media (min-width: $screen-md-min) {
+    @include rem(font-size, 18px);
+  }
+}
+
+h1, h2, h3, h4 {
+  text-transform: uppercase;
+  font-family: $font-headers;
+
+  &.subtitle {
+    @include rem(font-size, 20px);
+    margin-bottom: 0;
+  }
+}
+
+h1 {
+  @include rem(font-size, 32px);
+  @include relative-line-height(30px, 32px);
+}
+
+h2 {
+  @include rem(font-size, 20px);
+  @include relative-line-height(20px, 20px);
+}
+
+h3 {
+  @include rem(font-size, 18px);
+  @include relative-line-height(18px, 18px);
+}
+
+p {
+  font-weight: $font-weight-lighter;
+  color: $COLOR_GRAY1;
+}
+
+
+/** Media sizes
+ -------------------------------------------------- */
+@media (min-width: $screen-sm-min) {
+
+  h1 {
+    @include rem(font-size, 75px);
+  }
+
+  h2 {
+    @include rem(font-size, 55px);
+  }
+
+  h3 {
+    @include rem(font-size, 28px);
+  }
+
+  h1, h2, h3 {
+    &.subtitle {
+      @include rem(font-size, 35px);
+    }
+  }
+}
+
+
+/** Classes
+ -------------------------------------------------- */
+a, button, input[type="submit"] {
+  &:focus,
+  &:hover {
+    text-decoration: none;
+  }
+
+  &.button {
+    .no-touch & {
+      @include transition-property(color, border-color, background-color, opacity);
+      @include transition-duration($transition-duration, $transition-duration, $transition-duration, $transition-duration);
+    }
+
+    @include border-radius(2px);
+
+    font-family: $font-headers;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 2px solid $COLOR_BLUE1;
+    color: $COLOR_BLUE1;
+    padding: 5px 10px;
+    display: inline-block;
+    background-color: transparent;
+
+    &:after {
+      content: '›';
+      font-size: 2em;
+      line-height: 0;
+      vertical-align: -.1em;
+      padding-left: .25em;
+    }
+
+    .no-touch &:hover,
+    .touch &:active {
+      border-color: $COLOR_BLACK1;
+      color: $COLOR_BLACK1;
+      text-decoration: none;
+    }
+
+    // define colors
+    &.button-white {
+      border-color: $COLOR_WHITE1;
+      color: $COLOR_WHITE1;
+
+      .no-touch &:hover,
+      .touch &:active {
+        border-color: $COLOR_BLACK1;
+        color: $COLOR_BLACK1;
+      }
+    }
+
+    .no-touch &.button-hover-white:hover {
+      border-color: $COLOR_WHITE1;
+      color: $COLOR_WHITE1;
+    }
+
+    &.no-arrow {
+      &:after {
+        content: '';
+      }
+    }
+
+    &.icon-download {
+      &:before {
+        content: '';
+        width: 15px;
+        height: 12px;
+        margin-right: 10px;
+        background-repeat: no-repeat;
+        display: inline-block;
+        .no-svg & { background-image: url(/build/images/icon-download.png); }
+        .svg & { background-image: url(/build/images/icon-download.svg); }
+      }
+    }
+
+    // define sizes
+    &.button-large {
+      @include rem(font-size, 14px);
+      padding: 5px 30px;
+    }
+
+    &.button-small {
+      @include rem(font-size, 10px);
+      padding: 4px 8px;
+      border-width: 1px;
+    }
+
+    @media (min-width: $screen-sm-min) {
+      & {
+        @include rem(font-size, $font-size-base);
+        padding: 10px 20px;
+
+        // define sizes
+        &.button-large {
+          @include rem(font-size, 25px);
+          padding: 10px 60px;
+        }
+
+        &.button-small {
+          @include rem(font-size, 12px);
+          padding: 8px 16px;
+        }
+      }
+    }
+
+  }
+}
+
+.type-centered {
+  text-align: center;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.nopadding {
+  margin: 0 !important;
+  padding: 0 !important;
+}

@@ -1,0 +1,40 @@
+// -----------------------------------------------------------
+// Main file: SASS variables, mixins, fonts, and @imports
+// -----------------------------------------------------------
+
+/** Imports
+ -------------------------------------------------- */
+@import "colors";
+@import "fonts";
+@import "utility";
+
+
+/** Variables: override bootstrap before include
+ -------------------------------------------------- */
+$font-size-base: 15px;
+$line-height-base: 1.666667;
+$line-height-base-px: 23px;
+$brand-primary: $COLOR_BLACK1;
+$screen-md-min: 1024px;
+$transition-duration: 200ms;
+
+//** Point at which the navbar becomes uncollapsed.
+$grid-float-breakpoint:     $screen-md-min;
+//** Point at which the navbar begins collapsing.
+//$grid-float-breakpoint-max: ($grid-float-breakpoint - 1) !default;
+
+
+/** Bootstrap/Compass
+ -------------------------------------------------- */
+@import "bootstrap";
+@import "bootstrap-compass";
+@import "compass";
+
+
+/** All includes
+ -------------------------------------------------- */
+@import "base-class";
+@import "content";
+
+// Include style for syntax highlighting
+@import "syntax";

@@ -2,9 +2,6 @@
   "name": "plottable-website",
   "version": "0.1.0",
   "homepage": "palantir.github.io/plottable",
-  "authors": [
-    "Daniel Mane <danmane@gmail.com>"
-  ],
   "description": "Plottable's github pages website",
   "main": "index.html",
   "license": "MIT",

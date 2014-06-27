@@ -1,0 +1,118 @@
+// ----------------------------------------
+// Utility/Helper Classes
+// ----------------------------------------
+
+// Create REM values with PX fall back
+//
+// Generate a REM with PX fallback from
+// $baseFontSize. Enter the desired size based
+// on pixels in numerical form. Supports shorthand.
+//
+// Forked from: http://codepen.io/thejameskyle/pen/JmBjc
+//
+// @author Greg Rickaby
+// @since 1.0
+//
+// Usage: @include rem($property, $values);
+// Example Usage:
+//    @include rem(font-size, 16px);
+//    @include rem(margin, 0 24px 0 12px);
+//
+// Outputs:
+//    font-size: 16px;
+//    font-size: 1.6rem;
+//    margin: 0 24px 0 12px;
+//    margin: 0 2.4rem 0 1.2rem;
+// ----------------------------------
+$baseFontSize: 10; // Based on HTML reset html { font-size: 62.5%; }
+
+@function parseInt($n) {
+  @return $n / ($n * 0 + 1);
+}
+
+@mixin rem($property, $values) {
+  $px : ();
+  $rem: ();
+
+  $root: $baseFontSize;
+
+  @each $value in $values {
+    @if $value == 0 or $value == auto {
+      $px : append($px , $value);
+      $rem: append($rem, $value);
+    }
+
+    @else if type-of($value) == number {
+      $unit: unit($value);
+      $val: parseInt($value);
+
+      @if $unit == "px" {
+        $px : append($px,  $value);
+        $rem: append($rem, ($val / $root + rem));
+      }
+
+      @if $unit == "rem" {
+        $px : append($px,  ($val * $root + px));
+        $rem: append($rem, $value);
+      }
+    }
+
+    @else {
+      $px : append($px,  $value);
+      $rem: append($rem, $value);
+    }
+  }
+
+  @if $px == $rem {
+    #{$property}: $px;
+  } @else {
+    #{$property}: $px;
+    #{$property}: $rem;
+  }
+}
+
+@function rem($value) {
+  $root: $baseFontSize;
+  $val: parseInt($value);
+  $return: ();
+
+  @if unit($value) == "px" {
+    $return: append($return, ($val / $root + rem));
+  } @else {
+    $return: append($return, ($val * $root + px));
+  }
+
+  @return $return;
+}
+
+@mixin relative-line-height($line-height-px, $font-size-in-px) {
+  line-height: $line-height-px/$font-size-in-px;
+}
+
+@mixin footer-push() {
+  margin-top: -$footer-height-xs;
+  background-color: transparent;
+
+  @media (min-width: $screen-sm-min) {
+    & {
+      margin-top: -$footer-height-sm;
+    }
+  }
+
+  @media (min-width: $screen-md-min) {
+    & {
+      margin-top: -$footer-height-md;
+    }
+  }
+
+  @media (min-width: $screen-lg-min) {
+    & {
+      margin-top: -$footer-height-lg;
+    }
+  }
+}
+
+@mixin fade-background() {
+  @include filter-gradient(#030000, #18191b, vertical);
+  @include background-image(linear-gradient(top, rgba(0,0,0,0.01) 0%, rgba(2,2,2,1) 8%, rgba(24,25,27,1) 100%));
+}
