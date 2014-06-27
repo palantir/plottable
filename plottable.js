@@ -660,56 +660,45 @@ var Plottable;
             ;
 
             /**
-            * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
-            * Contains the text within a rectangle with dimensions width, height. Tries to
-            * orient the text using xOrient and yOrient parameters.
-            * Will align the text vertically if it seems like that is appropriate.
+            * @param {write} [IWriteOptions] If supplied, the text will be written
+            *        To the given g. Will align the text vertically if it seems like
+            *        that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text, g, width, height, xAlign, yAlign, tm, horizontally) {
+            function writeText(text, width, height, tm, horizontally, write) {
                 var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
-                var innerG = g.append("g").classed("writeText-inner-g", true);
-
-                // the outerG contains general transforms for positining the whole block, the inner g
-                // will contain transforms specific to orienting the text properly within the block.
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
-
-                // var measureText = getTextMeasure(innerG);
                 var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
-                var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-                var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
+                var usedWidth, usedHeight;
+                if (write == null) {
+                    var widthFn = orientHorizontally ? d3.max : d3.sum;
+                    var heightFn = orientHorizontally ? d3.sum : d3.max;
+                    usedWidth = widthFn(wrappedText.lines, function (line) {
+                        return tm(line)[0];
+                    });
+                    usedHeight = heightFn(wrappedText.lines, function (line) {
+                        return tm(line)[1];
+                    });
+                } else {
+                    var innerG = write.g.append("g").classed("writeText-inner-g", true);
+
+                    // the outerG contains general transforms for positining the whole block, the inner g
+                    // will contain transforms specific to orienting the text properly within the block.
+                    var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+                    var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+                    usedWidth = wh[0];
+                    usedHeight = wh[1];
+                }
+
                 return {
                     textFits: wrappedText.textFits,
-                    usedWidth: wh[0],
-                    usedHeight: wh[1]
+                    usedWidth: usedWidth,
+                    usedHeight: usedHeight
                 };
             }
             Text.writeText = writeText;
-
-            /**
-            * Similar to writeText, but rather than measuring by inserting into a
-            * DOM node, it measures using textMeasure.
-            */
-            function measureTextInBox(text, width, height, textMeasure, horizontally) {
-                var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
-                var primaryDimension = orientHorizontally ? width : height;
-                var secondaryDimension = orientHorizontally ? height : width;
-                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, textMeasure);
-                var widthFn = orientHorizontally ? d3.max : d3.sum;
-                var heightFn = orientHorizontally ? d3.sum : d3.max;
-                return {
-                    textFits: wrappedText.textFits,
-                    usedWidth: widthFn(wrappedText.lines, function (line) {
-                        return textMeasure(line)[0];
-                    }),
-                    usedHeight: heightFn(wrappedText.lines, function (line) {
-                        return textMeasure(line)[1];
-                    })
-                };
-            }
-            Text.measureTextInBox = measureTextInBox;
         })(Util.Text || (Util.Text = {}));
         var Text = Util.Text;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -5034,56 +5023,37 @@ var Plottable;
                 return this._scale.domain();
             };
 
-            /**
-            * Acts similarly to writeTextToTicks, but is entirely non-destructive
-            * and rarely touches the DOM.
-            */
-            Category.prototype.measureTicks = function (axisWidth, axisHeight, tickStrs) {
-                var _this = this;
-                var textWriteResults = [];
-                tickStrs.forEach(function (s) {
-                    var bandWidth = _this._scale.fullBandStartAndWidth(s)[1];
-                    var width = _this._isHorizontal() ? bandWidth : axisWidth - _this.tickLength() - _this.tickLabelPadding();
-                    var height = _this._isHorizontal() ? axisHeight - _this.tickLength() - _this.tickLabelPadding() : bandWidth;
-
-                    var tm = function (s) {
-                        return _this.measurer.measure(s);
-                    };
-                    var textWriteResult = Plottable.Util.Text.measureTextInBox(s, width, height, tm, true);
-                    textWriteResults.push(textWriteResult);
-                });
-
-                var widthFn = this._isHorizontal() ? d3.sum : d3.max;
-                var heightFn = this._isHorizontal() ? d3.max : d3.sum;
-                return {
-                    textFits: textWriteResults.every(function (t) {
-                        return t.textFits;
-                    }),
-                    usedWidth: widthFn(textWriteResults, function (t) {
-                        return t.usedWidth;
-                    }),
-                    usedHeight: heightFn(textWriteResults, function (t) {
-                        return t.usedHeight;
-                    })
-                };
-            };
-
-            Category.prototype.writeTextToTicks = function (axisWidth, axisHeight, ticks) {
+            Category.prototype.measureTicks = function (axisWidth, axisHeight, dataOrTicks) {
+                var draw = dataOrTicks instanceof d3.selection;
                 var self = this;
                 var textWriteResults = [];
-                ticks.each(function (d, i) {
-                    var d3this = d3.select(this);
+                var tm = function (s) {
+                    return self.measurer.measure(s);
+                };
+                var iterator = draw ? function (f) {
+                    return dataOrTicks.each(f);
+                } : function (f) {
+                    return dataOrTicks.forEach(f);
+                };
+
+                iterator(function (d) {
                     var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self.tickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-                    var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                    var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                    if (draw) {
+                        var d3this = d3.select(this);
+                        var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                        var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                        var textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true, {
+                            g: d3this,
+                            xAlign: xAlign[self._orientation],
+                            yAlign: yAlign[self._orientation]
+                        });
+                    } else {
+                        var textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true);
+                    }
 
-                    var tm = function (s) {
-                        return self.measurer.measure(s);
-                    };
-                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], tm, true);
                     textWriteResults.push(textWriteResult);
                 });
 
@@ -5122,7 +5092,7 @@ var Plottable;
 
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
+                this.measureTicks(this.availableWidth, this.availableHeight, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;

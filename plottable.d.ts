@@ -271,19 +271,18 @@ declare module Plottable {
                 usedWidth: number;
                 usedHeight: number;
             }
+            interface IWriteOptions {
+                g: D3.Selection;
+                xAlign: string;
+                yAlign: string;
+            }
             /**
-            * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
-            * Contains the text within a rectangle with dimensions width, height. Tries to
-            * orient the text using xOrient and yOrient parameters.
-            * Will align the text vertically if it seems like that is appropriate.
+            * @param {write} [IWriteOptions] If supplied, the text will be written
+            *        To the given g. Will align the text vertically if it seems like
+            *        that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string, tm: TextMeasurer, horizontally?: boolean): IWriteTextResult;
-            /**
-            * Similar to writeText, but rather than measuring by inserting into a
-            * DOM node, it measures using textMeasure.
-            */
-            function measureTextInBox(text: string, width: number, height: number, textMeasure: TextMeasurer, horizontally?: boolean): IWriteTextResult;
+            function writeText(text: string, width: number, height: number, tm: TextMeasurer, horizontally?: boolean, write?: IWriteOptions): IWriteTextResult;
         }
     }
 }

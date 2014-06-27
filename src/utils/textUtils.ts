@@ -265,52 +265,47 @@ export module Util {
       usedHeight: number;
     };
 
-    /**
-     * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
-     * Contains the text within a rectangle with dimensions width, height. Tries to
-     * orient the text using xOrient and yOrient parameters.
-     * Will align the text vertically if it seems like that is appropriate.
-     * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
-     */
-    export function writeText(text: string, g: D3.Selection, width: number, height: number,
-                              xAlign: string, yAlign: string, 
-                              tm: TextMeasurer, horizontally?: boolean): IWriteTextResult {
-      var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
-      var innerG = g.append("g").classed("writeText-inner-g", true); // unleash your inner G
-      // the outerG contains general transforms for positining the whole block, the inner g
-      // will contain transforms specific to orienting the text properly within the block.
-
-      var primaryDimension = orientHorizontally ? width : height;
-      var secondaryDimension = orientHorizontally ? height : width;
-      // var measureText = getTextMeasure(innerG);
-      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
-
-      var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-      var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
-      return {
-        textFits: wrappedText.textFits,
-        usedWidth: wh[0],
-        usedHeight: wh[1]
-      };
+    export interface IWriteOptions {
+      g: D3.Selection;
+      xAlign: string;
+      yAlign: string;
     }
 
     /**
-     * Similar to writeText, but rather than measuring by inserting into a
-     * DOM node, it measures using textMeasure.
+     * @param {write} [IWriteOptions] If supplied, the text will be written
+     *        To the given g. Will align the text vertically if it seems like
+     *        that is appropriate.
+     * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
-    export function measureTextInBox(text: string, width: number, height: number,
-                                     textMeasure: Text.TextMeasurer,
-                                     horizontally?: boolean): IWriteTextResult {
+    export function writeText(text: string, width: number, height: number, tm: TextMeasurer,
+                              horizontally?: boolean,
+                              write?: IWriteOptions): IWriteTextResult {
+
       var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
-      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, textMeasure);
-      var widthFn = orientHorizontally ? d3.max : d3.sum;
-      var heightFn = orientHorizontally ? d3.sum : d3.max;
+      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
+
+      var usedWidth: number, usedHeight: number;
+      if (write == null) {
+        var widthFn = orientHorizontally ? d3.max : d3.sum;
+        var heightFn = orientHorizontally ? d3.sum : d3.max;
+        usedWidth = widthFn(wrappedText.lines, (line: string) => tm(line)[0]);
+        usedHeight = heightFn(wrappedText.lines, (line: string) => tm(line)[1]);
+      } else {
+        var innerG = write.g.append("g").classed("writeText-inner-g", true); // unleash your inner G
+        // the outerG contains general transforms for positining the whole block, the inner g
+        // will contain transforms specific to orienting the text properly within the block.
+        var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+        var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+        usedWidth = wh[0];
+        usedHeight = wh[1];
+      }
+
       return {
         textFits: wrappedText.textFits,
-        usedWidth: widthFn(wrappedText.lines, (line: string) => textMeasure(line)[0]),
-        usedHeight: heightFn(wrappedText.lines, (line: string) => textMeasure(line)[1])
+        usedWidth: usedWidth,
+        usedHeight: usedHeight
       };
     }
   }

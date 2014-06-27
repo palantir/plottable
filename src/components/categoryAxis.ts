@@ -60,6 +60,7 @@ export module Axis {
       }
       var textResult = this.measureTicks(offeredWidth, offeredHeight, this._scale.domain());
 
+
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
         height: textResult.usedHeight + heightRequiredByTicks,
@@ -73,46 +74,42 @@ export module Axis {
     }
 
     /**
-     * Acts similarly to writeTextToTicks, but is entirely non-destructive
-     * and rarely touches the DOM.
+     * Measures the size of the ticks without making any (permanent) DOM
+     * changes.
+     *
+     * @param {string[]} data The strings that will be printed on the ticks.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, tickStrs: string[]): Util.Text.IWriteTextResult {
-      var textWriteResults: Util.Text.IWriteTextResult[] = [];
-      tickStrs.forEach((s: string) => {
-        var bandWidth = this._scale.fullBandStartAndWidth(s)[1];
-        var width  = this._isHorizontal() ? bandWidth  : axisWidth - this.tickLength() - this.tickLabelPadding();
-        var height = this._isHorizontal() ? axisHeight - this.tickLength() - this.tickLabelPadding() : bandWidth;
-
-        var tm = (s: string) => this.measurer.measure(s);
-        var textWriteResult = Util.Text.measureTextInBox(s, width, height, tm, true);
-        textWriteResults.push(textWriteResult);
-      });
-
-      var widthFn  = this._isHorizontal() ? d3.sum : d3.max;
-      var heightFn = this._isHorizontal() ? d3.max : d3.sum;
-      return {
-        textFits: textWriteResults.every((t: Util.Text.IWriteTextResult) => t.textFits),
-        usedWidth : widthFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedWidth),
-        usedHeight: heightFn(textWriteResults, (t: Util.Text.IWriteTextResult) => t.usedHeight)
-      };
-    }
-
-    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Util.Text.IWriteTextResult {
+    private measureTicks(axisWidth: number, axisHeight: number, data: string[]): Util.Text.IWriteTextResult;
+    /**
+     * Measures the size of the ticks while also writing them to the DOM.
+     * @param {D3.Selection} ticks The tick elements to be written to.
+     */
+    private measureTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Util.Text.IWriteTextResult;
+    private measureTicks(axisWidth: number, axisHeight: number, dataOrTicks: any): Util.Text.IWriteTextResult {
+      var draw = dataOrTicks instanceof d3.selection;
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
-      ticks.each(function (d: string, i: number) {
-        var d3this = d3.select(this);
+      var tm = (s: string) => self.measurer.measure(s);
+      var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
+
+      iterator(function (d: string) {
         var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-        var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
-        var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
+        if (draw) {
+          var d3this = d3.select(this);
+          var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
+          var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
+          var textWriteResult = Util.Text.writeText(d, width, height, tm, true, {
+                                                    g: d3this,
+                                                    xAlign: xAlign[self._orientation],
+                                                    yAlign: yAlign[self._orientation]
+          });
+        } else {
+          var textWriteResult = Util.Text.writeText(d, width, height, tm, true);
+        }
 
-        var tm = (s: string) => self.measurer.measure(s);
-        var textWriteResult = Util.Text.writeText(d, d3this, width, height,
-                                                  xAlign[self._orientation], yAlign[self._orientation], 
-                                                  tm, true);
         textWriteResults.push(textWriteResult);
       });
 
@@ -141,7 +138,7 @@ export module Axis {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
+      this.measureTicks(this.availableWidth, this.availableHeight, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
