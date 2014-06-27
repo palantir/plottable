@@ -227,7 +227,7 @@ describe("NumericAxis", () => {
         return "This is zero";
       }
       return String(d);
-    }
+    };
     var formatter = new Plottable.Formatter.Custom(0, customFormatFunction);
 
     var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
@@ -256,7 +256,7 @@ describe("NumericAxis", () => {
     scale.domain([5, -5]);
     scale.range([0, SVG_WIDTH]);
 
-    var formatter = new Plottable.Formatter.Fixed(2)
+    var formatter = new Plottable.Formatter.Fixed(2);
 
     var numericAxis = new Plottable.Axis.Numeric(scale, "bottom", formatter);
     numericAxis.renderTo(svg);
