@@ -24,19 +24,6 @@ export module Abstract {
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
 
-
-    public _rerenderUpdateSelection = false;
-    // A perf-efficient manner of rendering would be to calculate attributes only
-    // on new nodes, and assume that old nodes (ie the update selection) can
-    // maintain their current attributes. If we change the metadata or an
-    // accessor function, then this property will not be true, and we will need
-    // to recompute attributes on the entire update selection.
-
-    public _requireRerender = false;
-    // A perf-efficient approach to rendering scale changes would be to transform
-    // the container rather than re-render. In the event that the data is changed,
-    // it will be necessary to do a regular rerender.
-
     /**
      * Creates a Plot.
      *
@@ -90,8 +77,6 @@ export module Abstract {
       var oldSource = this._dataSource;
       if (oldSource != null) {
         this._dataSource.broadcaster.deregisterListener(this);
-        this._requireRerender = true;
-        this._rerenderUpdateSelection = true;
       }
       this._dataSource = source;
       this._dataSource.broadcaster.registerListener(this, () => {
@@ -120,8 +105,6 @@ export module Abstract {
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
       this.updateProjector(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
@@ -143,8 +126,6 @@ export module Abstract {
       if (this.element != null) {
         this._paint();
         this._dataChanged = false;
-        this._requireRerender = false;
-        this._rerenderUpdateSelection = false;
       }
       return this;
     }
