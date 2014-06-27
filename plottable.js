@@ -2482,13 +2482,6 @@ var Plottable;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250;
                 this._projectors = {};
-                this._rerenderUpdateSelection = false;
-                // A perf-efficient manner of rendering would be to calculate attributes only
-                // on new nodes, and assume that old nodes (ie the update selection) can
-                // maintain their current attributes. If we change the metadata or an
-                // accessor function, then this property will not be true, and we will need
-                // to recompute attributes on the entire update selection.
-                this._requireRerender = false;
                 this.clipPathEnabled = true;
                 this.classed("renderer", true);
 
@@ -2519,8 +2512,6 @@ var Plottable;
                 var oldSource = this._dataSource;
                 if (oldSource != null) {
                     this._dataSource.broadcaster.deregisterListener(this);
-                    this._requireRerender = true;
-                    this._rerenderUpdateSelection = true;
                 }
                 this._dataSource = source;
                 this._dataSource.broadcaster.registerListener(this, function () {
@@ -2552,8 +2543,6 @@ var Plottable;
                 }
 
                 this._projectors[attrToSet] = { accessor: accessor, scale: scale };
-                this._requireRerender = true;
-                this._rerenderUpdateSelection = true;
                 this.updateProjector(attrToSet);
                 this._render(); // queue a re-render upon changing projector
                 return this;
@@ -2578,8 +2567,6 @@ var Plottable;
                 if (this.element != null) {
                     this._paint();
                     this._dataChanged = false;
-                    this._requireRerender = false;
-                    this._rerenderUpdateSelection = false;
                 }
                 return this;
             };
@@ -4242,7 +4229,6 @@ var Plottable;
                 _super.call(this);
                 this._width = "auto";
                 this._height = "auto";
-                this._showEndTickLabels = false;
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
                 this._scale = scale;
@@ -4508,15 +4494,6 @@ var Plottable;
                     return this;
                 }
             };
-
-            Axis.prototype.showEndTickLabels = function (show) {
-                if (show == null) {
-                    return this._showEndTickLabels;
-                }
-                this._showEndTickLabels = show;
-                this._render();
-                return this;
-            };
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
@@ -4549,6 +4526,10 @@ var Plottable;
             function Numeric(scale, orientation, formatter) {
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
+                // Whether or not first/last tick label will still be displayed even if
+                // the label is cut off.
+                this.showFirstTickLabel = false;
+                this.showLastTickLabel = false;
             }
             Numeric.prototype._computeWidth = function () {
                 // generate a test value to measure width
@@ -4687,9 +4668,7 @@ var Plottable;
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
 
-                if (!this.showEndTickLabels()) {
-                    this.hideEndTickLabels();
-                }
+                this.hideEndTickLabels();
 
                 this.hideOverlappingTickLabels();
 
@@ -4726,11 +4705,11 @@ var Plottable;
 
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
                 var firstTickLabel = tickLabels[0][0];
-                if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+                if (!this.showFirstTickLabel && !isInsideBBox(firstTickLabel.getBoundingClientRect())) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
                 }
                 var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+                if (!this.showLastTickLabel && !isInsideBBox(lastTickLabel.getBoundingClientRect())) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
@@ -4768,6 +4747,26 @@ var Plottable;
                     }
                 });
             };
+
+            Numeric.prototype.showEndTickLabel = function (orientation, show) {
+                if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "bottom")) {
+                    if (show === undefined) {
+                        return this.showFirstTickLabel;
+                    } else {
+                        this.showFirstTickLabel = show;
+                        return this._render();
+                    }
+                } else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
+                    if (show === undefined) {
+                        return this.showLastTickLabel;
+                    } else {
+                        this.showLastTickLabel = show;
+                        return this._render();
+                    }
+                } else {
+                    throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
+                }
+            };
             return Numeric;
         })(Plottable.Abstract.Axis);
         Axis.Numeric = Numeric;
@@ -4790,7 +4789,7 @@ var Plottable;
             /**
             * Creates a CategoryAxis.
             *
-            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
             * display the scale as efficiently as possible.
             *
             * @constructor
@@ -5439,12 +5438,6 @@ var Plottable;
                 this.xScale.range([0, this.availableWidth]);
                 this.yScale.range([this.availableHeight, 0]);
                 return this;
-            };
-
-            XYPlot.prototype.rescale = function () {
-                if (this.element != null) {
-                    this._render();
-                }
             };
 
             XYPlot.prototype._updateXDomainer = function () {

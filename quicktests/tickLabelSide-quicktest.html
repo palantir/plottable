@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> - jsFiddle demo</title>
+  
+  
+  
+  
+  
+  
+  <style type='text/css'>
+    </style> <link rel="stylesheet" type="text/css" href="../plottable.css"> <style type="text/css">
+/*-- Add custom styles after this line --*/
+ .demo-title {
+    font-size: 24 pt;
+}
+.plottable .y-axis .tick line {
+    opacity: 1
+}
+
+.plottable .x-axis .tick line {
+    opacity: 1
+}
+
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+
+var svg;
+var dataseries1;
+var dataseries2;
+
+var xScale;
+var yScale;
+var xAxis;
+var yAxis;
+
+var renderArea1;
+var renderArea1a;
+var renderArea1b;
+var renderArea2;
+
+var renderGroup;
+
+var basicTable;
+
+
+
+window.onload = function () {
+    svg = d3.select("#chart");
+    svg.attr("width", 500).attr("height", 300);
+
+    //make 2 dataseries
+    dataseries1 = new Plottable.DataSource(makeRandomData(5));
+    dataseries2 = new Plottable.DataSource(makeRandomData(10));
+    var colorScale1 = new Plottable.Scale.Color("10");
+    colorScale1.domain(["series1", "series2"]);
+    
+    //Axis
+    xScale = new Plottable.Scale.Linear();
+    yScale = new Plottable.Scale.Linear();
+    xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+    yAxis = new Plottable.Axis.Numeric(yScale, "left");
+        
+    var domainerx = new Plottable.Domainer()
+    .pad()
+    .paddingException(0);
+    var domainery = new Plottable.Domainer()
+    .pad()
+    .paddingException(0);    
+    xScale.domainer(domainerx);
+    yScale.domainer(domainery);
+    
+    var colorProjector = function(d, i, m) {
+       return colorScale1.scale(m.name);
+    };
+    
+    renderArea1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale);
+    renderArea1
+        .project("fill", colorScale1.scale("series1"))
+        .animate(true)
+        .baseline(0); 
+    
+    
+    
+    basicTable = new Plottable.Component.Table()
+                .addComponent(2, 0, yAxis)
+                .addComponent(2, 1, renderArea1)
+                .addComponent(3, 1, xAxis);
+
+    basicTable.renderTo(svg);
+    
+};
+
+function button1Callback() {
+    dataseries1.data(makeRandomData(5));
+}
+
+function button2Callback() {
+    dataseries1.data(makeRandomData(10));
+}
+function toggleRight() {
+    xAxis.showEndTickLabel("right", 
+                 (xAxis.showEndTickLabel("right")?false:true));   
+    console.log(xAxis.showEndTickLabel("right"));
+}
+function toggleLeft() {
+    xAxis.showEndTickLabel("left", 
+                 (xAxis.showEndTickLabel("left")?false:true));
+    console.log(xAxis.showEndTickLabel("left"));
+}
+function toggleTop() {
+    yAxis.showEndTickLabel("top", 
+                 (yAxis.showEndTickLabel("top")?false:true));
+    console.log(yAxis.showEndTickLabel("top"));
+}
+
+function toggleBottom() {
+    yAxis.showEndTickLabel("bottom", 
+                 (yAxis.showEndTickLabel("bottom")?false:true));
+    console.log(yAxis.showEndTickLabel("bottom"));
+}
+
+
+
+
+//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../plottable_multifile.js"></script>
+<script src="../examples/exampleUtil.js"></script>
+<div class="demo-title">Simple Chart</div>
+<br>
+
+
+<br>
+<svg id="chart"></svg>
+    <button onclick="button1Callback()">5 points</button>
+    <button onclick="button2Callback()">10 points</button>
+    <button onclick="toggleRight()">right</button>
+    <button onclick="toggleLeft()">left</button>
+    <button onclick="toggleTop()">top</button>
+    <button onclick="toggleBottom()">bottom</button>
+<p />
+  
+</body>
+
+
+</html>
+
