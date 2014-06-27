@@ -2605,13 +2605,10 @@ var Plottable;
             };
 
             Plot.prototype.remove = function () {
-                var _this = this;
                 _super.prototype.remove.call(this);
 
                 // make the domain resize
-                d3.keys(this._projectors).forEach(function (attr) {
-                    return _this.removeProjector(attr);
-                });
+                this.updateAllProjectors();
                 return this;
             };
 
@@ -2631,20 +2628,13 @@ var Plottable;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     var extent = this.dataSource()._getExtent(projector.accessor);
-                    if (extent.length === 0) {
+                    if (extent.length === 0 || !this._isAnchored) {
                         projector.scale.removeExtent(this._plottableID, attr);
                     } else {
                         projector.scale.updateExtent(this._plottableID, attr, extent);
                     }
                 }
                 return this;
-            };
-
-            Plot.prototype.removeProjector = function (attr) {
-                var projector = this._projectors[attr];
-                if (projector.scale != null) {
-                    projector.scale.removeExtent(this._plottableID, attr);
-                }
             };
 
             /**

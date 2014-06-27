@@ -173,7 +173,7 @@ export module Abstract {
     public remove() {
       super.remove();
       // make the domain resize
-      d3.keys(this._projectors).forEach((attr: string) => this.removeProjector(attr));
+      this.updateAllProjectors();
       return this;
     }
 
@@ -190,20 +190,13 @@ export module Abstract {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
-        if (extent.length === 0) {
+        if (extent.length === 0 || !this._isAnchored) {
           projector.scale.removeExtent(this._plottableID, attr);
         } else {
           projector.scale.updateExtent(this._plottableID, attr, extent);
         }
       }
       return this;
-    }
-
-    private removeProjector(attr: string) {
-      var projector = this._projectors[attr];
-      if (projector.scale != null) {
-        projector.scale.removeExtent(this._plottableID, attr);
-      }
     }
 
     /**
