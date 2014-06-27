@@ -16,7 +16,6 @@ export module Abstract {
     public _height: any = "auto";
     public _computedWidth: number;
     public _computedHeight: number;
-    private _showEndTickLabels = false;
     private _tickLength = 5;
     private _tickLabelPadding = 3;
 
