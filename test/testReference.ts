@@ -31,3 +31,4 @@
 ///<reference path="textUtilsTests.ts" />
 ///<reference path="utilsTests.ts" />
 ///<reference path="domainerTests.ts" />
+///<reference path="cacheTests.ts" />

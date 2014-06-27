@@ -4773,3 +4773,81 @@ describe("Domainer", function () {
         assert.deepEqual(timeScale.domain(), [b, d]);
     });
 });
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("Cache", function () {
+    var callbackCalled = false;
+    var f = function (s) {
+        callbackCalled = true;
+        return s + s;
+    };
+    var cache;
+
+    beforeEach(function () {
+        callbackCalled = false;
+        cache = new Plottable.Util.Cache(f);
+    });
+
+    it("Doesn't call its function if it already called", function () {
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isTrue(callbackCalled);
+        callbackCalled = false;
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isFalse(callbackCalled);
+    });
+
+    it("Clears its cache when .clear() is called", function () {
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isTrue(callbackCalled);
+        callbackCalled = false;
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isFalse(callbackCalled);
+        cache.clear();
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isTrue(callbackCalled);
+    });
+
+    it("Doesn't clear the cache when canonicalKey doesn't change", function () {
+        cache = new Plottable.Util.Cache(f, "x");
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isTrue(callbackCalled);
+        cache.clear();
+        callbackCalled = false;
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isFalse(callbackCalled);
+    });
+
+    it("Clears the cache when canonicalKey changes", function () {
+        var prefix = "hello";
+        cache = new Plottable.Util.Cache(function (s) {
+            callbackCalled = true;
+            return prefix + s;
+        });
+        cache.get("world");
+        assert.isTrue(callbackCalled);
+        prefix = "hola";
+        cache.clear();
+        callbackCalled = false;
+        cache.get("world");
+        assert.isTrue(callbackCalled);
+    });
+
+    it("uses valueEq to check if it should clear", function () {
+        var decider = true;
+        cache = new Plottable.Util.Cache(f, "x", function (a, b) {
+            return decider;
+        });
+        cache.get("hello");
+        assert.isTrue(callbackCalled);
+        cache.clear();
+        callbackCalled = false;
+        cache.get("hello");
+        assert.isFalse(callbackCalled);
+        decider = false;
+        cache.clear();
+        cache.get("hello");
+        assert.isTrue(callbackCalled);
+    });
+});
