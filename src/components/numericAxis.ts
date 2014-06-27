@@ -19,25 +19,20 @@ export module Axis {
     }
 
     public _computeWidth() {
-      // generate a test value to measure width
       var tickValues = this._getTickValues();
-      var valueLength = function(v: any) {
-        var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
-        return (logLength > 0) ? logLength : 1; // even the smallest number takes 1 character
-      };
-      var pow10 = Math.max.apply(null, tickValues.map(valueLength));
-      var precision = this._formatter.precision();
-      var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision)); // leave room for negative sign
-
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var formattedTestValue = this._formatter.format(testValue);
-      var textLength = (<SVGTextElement> testTextEl.text(formattedTestValue).node()).getComputedTextLength();
+      var textLengths = tickValues.map((v: any) => {
+        var formattedTestValue = this._formatter.format(v);
+        return (<SVGTextElement> testTextEl.text(formattedTestValue).node()).getComputedTextLength();
+      });
       testTextEl.remove();
 
+      var maxTextLength = Math.max.apply(null, textLengths);
+
       if (this.tickLabelPositioning === "center") {
-        this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+        this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;
       } else {
-        this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
+        this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + maxTextLength);
       }
 
       return this._computedWidth;
