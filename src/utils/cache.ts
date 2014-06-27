@@ -3,7 +3,7 @@
 module Plottable {
 export module Util {
   export class Cache<Value> {
-    private cache: {[k: string]: Value} = {};
+    private cache: D3.Map = d3.map();
     private compute: (k: string) => Value;
     private canonicalKey: string = null;
     private valueEq: (v: Value, w: Value) => boolean;
@@ -26,7 +26,7 @@ export module Util {
       if (canonicalKey != null && valueEq != null) {
         this.canonicalKey = canonicalKey;
         this.valueEq = valueEq;
-        this.cache[this.canonicalKey] = this.compute(this.canonicalKey);
+        this.cache.set(this.canonicalKey, this.compute(this.canonicalKey));
       }
     }
 
@@ -35,10 +35,10 @@ export module Util {
      * found.
      */
     public get(k: string): Value {
-      if (!(k in this.cache)) {
-        this.cache[k] = this.compute(k);
+      if (!this.cache.has(k)) {
+        this.cache.set(k, this.compute(k));
       }
-      return this.cache[k];
+      return this.cache.get(k);
     }
 
     /**
@@ -48,9 +48,9 @@ export module Util {
      */
     public clear(): Cache<Value> {
       if (this.canonicalKey == null ||
-          !this.valueEq(this.cache[this.canonicalKey],
+          !this.valueEq(this.cache.get(this.canonicalKey),
                         this.compute(this.canonicalKey))) {
-        this.cache = {};
+        this.cache = d3.map();
       }
       return this;
     }
