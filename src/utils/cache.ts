@@ -14,18 +14,19 @@ export module Util {
      * @param {string} compute The function whose results will be cached.
      * @param {string} [canonicalKey] If present, when clear() is called,
      *        this key will be re-computed. If its result hasn't been changed,
-     *        the cache will not be cleared. If canonicalKey is given, valueEq
-     *        must be given as well.
+     *        the cache will not be cleared.
      * @param {(v: Value, w: Value) => boolean} [valueEq]
      *        Used to determine if the value of canonicalKey has changed.
+     *        If omitted, defaults to === comparision.
      */
     constructor(compute: (k: string) => Value,
                 canonicalKey?: string,
-                valueEq?: (v: Value, w: Value) => boolean) {
+                valueEq: (v: Value, w: Value) => boolean =
+                         (v: Value, w: Value) => v === w) {
       this.compute = compute;
-      if (canonicalKey != null && valueEq != null) {
-        this.canonicalKey = canonicalKey;
-        this.valueEq = valueEq;
+      this.canonicalKey = canonicalKey;
+      this.valueEq = valueEq;
+      if (canonicalKey !== undefined) {
         this.cache.set(this.canonicalKey, this.compute(this.canonicalKey));
       }
     }
@@ -47,7 +48,7 @@ export module Util {
      * constructor for more.
      */
     public clear(): Cache<Value> {
-      if (this.canonicalKey == null ||
+      if (this.canonicalKey === undefined ||
           !this.valueEq(this.cache.get(this.canonicalKey),
                         this.compute(this.canonicalKey))) {
         this.cache = d3.map();

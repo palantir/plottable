@@ -182,10 +182,10 @@ declare module Plottable {
             * @param {string} compute The function whose results will be cached.
             * @param {string} [canonicalKey] If present, when clear() is called,
             *        this key will be re-computed. If its result hasn't been changed,
-            *        the cache will not be cleared. If canonicalKey is given, valueEq
-            *        must be given as well.
+            *        the cache will not be cleared.
             * @param {(v: Value, w: Value) => boolean} [valueEq]
             *        Used to determine if the value of canonicalKey has changed.
+            *        If omitted, defaults to === comparision.
             */
             constructor(compute: (k: string) => Value, canonicalKey?: string, valueEq?: (v: Value, w: Value) => boolean);
             /**

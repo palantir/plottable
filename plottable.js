@@ -342,18 +342,21 @@ var Plottable;
             * @param {string} compute The function whose results will be cached.
             * @param {string} [canonicalKey] If present, when clear() is called,
             *        this key will be re-computed. If its result hasn't been changed,
-            *        the cache will not be cleared. If canonicalKey is given, valueEq
-            *        must be given as well.
+            *        the cache will not be cleared.
             * @param {(v: Value, w: Value) => boolean} [valueEq]
             *        Used to determine if the value of canonicalKey has changed.
+            *        If omitted, defaults to === comparision.
             */
             function Cache(compute, canonicalKey, valueEq) {
+                if (typeof valueEq === "undefined") { valueEq = function (v, w) {
+                    return v === w;
+                }; }
                 this.cache = d3.map();
                 this.canonicalKey = null;
                 this.compute = compute;
-                if (canonicalKey != null && valueEq != null) {
-                    this.canonicalKey = canonicalKey;
-                    this.valueEq = valueEq;
+                this.canonicalKey = canonicalKey;
+                this.valueEq = valueEq;
+                if (canonicalKey !== undefined) {
                     this.cache.set(this.canonicalKey, this.compute(this.canonicalKey));
                 }
             }
@@ -374,7 +377,7 @@ var Plottable;
             * constructor for more.
             */
             Cache.prototype.clear = function () {
-                if (this.canonicalKey == null || !this.valueEq(this.cache.get(this.canonicalKey), this.compute(this.canonicalKey))) {
+                if (this.canonicalKey === undefined || !this.valueEq(this.cache.get(this.canonicalKey), this.compute(this.canonicalKey))) {
                     this.cache = d3.map();
                 }
                 return this;
