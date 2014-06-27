@@ -67,7 +67,7 @@ export module Abstract {
     public _anchor(element: D3.Selection) {
       super._anchor(element);
       this._dataChanged = true;
-      d3.keys(this._projectors).forEach((attr: string) => this.updateProjector(attr));
+      this.updateAllProjectors();
       return this;
     }
 
@@ -202,7 +202,6 @@ export module Abstract {
     private removeProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
-        var extent = this.dataSource()._getExtent(projector.accessor);
         projector.scale.removeExtent(this._plottableID, attr);
       }
     }

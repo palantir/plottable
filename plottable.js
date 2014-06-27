@@ -2505,12 +2505,9 @@ var Plottable;
                 this.dataSource(dataSource);
             }
             Plot.prototype._anchor = function (element) {
-                var _this = this;
                 _super.prototype._anchor.call(this, element);
                 this._dataChanged = true;
-                d3.keys(this._projectors).forEach(function (attr) {
-                    return _this.updateProjector(attr);
-                });
+                this.updateAllProjectors();
                 return this;
             };
 
@@ -2646,7 +2643,6 @@ var Plottable;
             Plot.prototype.removeProjector = function (attr) {
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
-                    var extent = this.dataSource()._getExtent(projector.accessor);
                     projector.scale.removeExtent(this._plottableID, attr);
                 }
             };
