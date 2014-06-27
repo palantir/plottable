@@ -101,6 +101,27 @@ describe("Scales", () => {
       assert.throws(() => scale._setDomain([5, Infinity]), Error);
       assert.throws(() => scale._setDomain([-Infinity, 6]), Error);
     });
+
+    it("should resize when a plot is removed", () => {
+      var svg = generateSVG(400, 400);
+      var ds1 = [{x: 0, y:0}, {x: 1, y: 1}];
+      var ds2 = [{x: 1, y:1}, {x: 2, y: 2}];
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      xScale.domainer(new Plottable.Domainer());
+      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+      var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
+      var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
+      var renderAreas = renderAreaD1.merge(renderAreaD2);
+      renderAreas.renderTo(svg);
+      assert.deepEqual(xScale.domain(), [0, 2]);
+      renderAreaD1.remove();
+      assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+      renderAreas.merge(renderAreaD1);
+      assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
+      svg.remove();
+    });
   });
 
   describe("Quantitive Scales", () => {
