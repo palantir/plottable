@@ -343,7 +343,7 @@ var Plottable;
             * @param {string} [canonicalKey] If present, when clear() is called,
             *        this key will be re-computed. If its result hasn't been changed,
             *        the cache will not be cleared.
-            * @param {(v: Value, w: Value) => boolean} [valueEq]
+            * @param {(v: T, w: T) => boolean} [valueEq]
             *        Used to determine if the value of canonicalKey has changed.
             *        If omitted, defaults to === comparision.
             */

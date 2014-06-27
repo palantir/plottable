@@ -2,11 +2,11 @@
 
 module Plottable {
 export module Util {
-  export class Cache<Value> {
+  export class Cache<T> {
     private cache: D3.Map = d3.map();
-    private compute: (k: string) => Value;
+    private compute: (k: string) => T;
     private canonicalKey: string = null;
-    private valueEq: (v: Value, w: Value) => boolean;
+    private valueEq: (v: T, w: T) => boolean;
 
     /**
      * @constructor
@@ -15,14 +15,14 @@ export module Util {
      * @param {string} [canonicalKey] If present, when clear() is called,
      *        this key will be re-computed. If its result hasn't been changed,
      *        the cache will not be cleared.
-     * @param {(v: Value, w: Value) => boolean} [valueEq]
+     * @param {(v: T, w: T) => boolean} [valueEq]
      *        Used to determine if the value of canonicalKey has changed.
      *        If omitted, defaults to === comparision.
      */
-    constructor(compute: (k: string) => Value,
+    constructor(compute: (k: string) => T,
                 canonicalKey?: string,
-                valueEq: (v: Value, w: Value) => boolean =
-                         (v: Value, w: Value) => v === w) {
+                valueEq: (v: T, w: T) => boolean =
+                         (v: T, w: T) => v === w) {
       this.compute = compute;
       this.canonicalKey = canonicalKey;
       this.valueEq = valueEq;
@@ -35,7 +35,7 @@ export module Util {
      * Attempt to look up k in the cache, computing the result if it isn't
      * found.
      */
-    public get(k: string): Value {
+    public get(k: string): T {
       if (!this.cache.has(k)) {
         this.cache.set(k, this.compute(k));
       }
@@ -47,7 +47,7 @@ export module Util {
      * constructor has not changed, the cache will not empty. See the
      * constructor for more.
      */
-    public clear(): Cache<Value> {
+    public clear(): Cache<T> {
       if (this.canonicalKey === undefined ||
           !this.valueEq(this.cache.get(this.canonicalKey),
                         this.compute(this.canonicalKey))) {

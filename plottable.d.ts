@@ -175,7 +175,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Util {
-        class Cache<Value> {
+        class Cache<T> {
             /**
             * @constructor
             *
@@ -183,22 +183,22 @@ declare module Plottable {
             * @param {string} [canonicalKey] If present, when clear() is called,
             *        this key will be re-computed. If its result hasn't been changed,
             *        the cache will not be cleared.
-            * @param {(v: Value, w: Value) => boolean} [valueEq]
+            * @param {(v: T, w: T) => boolean} [valueEq]
             *        Used to determine if the value of canonicalKey has changed.
             *        If omitted, defaults to === comparision.
             */
-            constructor(compute: (k: string) => Value, canonicalKey?: string, valueEq?: (v: Value, w: Value) => boolean);
+            constructor(compute: (k: string) => T, canonicalKey?: string, valueEq?: (v: T, w: T) => boolean);
             /**
             * Attempt to look up k in the cache, computing the result if it isn't
             * found.
             */
-            public get(k: string): Value;
+            public get(k: string): T;
             /**
             * Reset the cache empty. However, if the canonicalKey passed into the
             * constructor has not changed, the cache will not empty. See the
             * constructor for more.
             */
-            public clear(): Cache<Value>;
+            public clear(): Cache<T>;
         }
     }
 }
