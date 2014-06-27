@@ -442,19 +442,21 @@ var Plottable;
                 };
             }
 
+            var CANONICAL_CHR = "a";
+
             /**
             * Some TextMeasurers get confused when measuring something that's only
             * whitespace: only whitespace in a dom node takes up [0, 0] space.
             *
             * @return {TextMeasurer} A function that if its argument is all
-            *         whitespace, it will wrap its argument in wrapping before
+            *         whitespace, it will wrap its argument in CANONICAL_CHR before
             *         measuring in order to get a non-zero size of the whitespace.
             */
-            function wrapWhitespace(wrapping, tm) {
+            function wrapWhitespace(tm) {
                 return function (s) {
                     if (/\s/.test(s)) {
-                        var wh = tm(wrapping + s + wrapping);
-                        var whWrapping = tm(wrapping);
+                        var wh = tm(CANONICAL_CHR + s + CANONICAL_CHR);
+                        var whWrapping = tm(CANONICAL_CHR);
                         return [wh[0] - 2 * whWrapping[0], wh[1]];
                     } else {
                         return tm(s);
@@ -475,8 +477,8 @@ var Plottable;
                 */
                 function CachingCharacterMeasurer(g) {
                     var _this = this;
-                    this.cache = new Util.Cache(getTextMeasure(g), CachingCharacterMeasurer.CANONICAL_CHR, Util.Methods.arrayEq);
-                    this.measure = measureByCharacter(wrapWhitespace(CachingCharacterMeasurer.CANONICAL_CHR, function (s) {
+                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.arrayEq);
+                    this.measure = measureByCharacter(wrapWhitespace(function (s) {
                         return _this.cache.get(s);
                     }));
                 }
@@ -487,7 +489,6 @@ var Plottable;
                     this.cache.clear();
                     return this;
                 };
-                CachingCharacterMeasurer.CANONICAL_CHR = "a";
                 return CachingCharacterMeasurer;
             })();
             Text.CachingCharacterMeasurer = CachingCharacterMeasurer;

@@ -49,19 +49,21 @@ export module Util {
       };
     }
 
+    var CANONICAL_CHR = "a";
+
     /**
      * Some TextMeasurers get confused when measuring something that's only
      * whitespace: only whitespace in a dom node takes up [0, 0] space.
      *
      * @return {TextMeasurer} A function that if its argument is all
-     *         whitespace, it will wrap its argument in wrapping before
+     *         whitespace, it will wrap its argument in CANONICAL_CHR before
      *         measuring in order to get a non-zero size of the whitespace.
      */
-    function wrapWhitespace(wrapping: string, tm: TextMeasurer): TextMeasurer {
+    function wrapWhitespace(tm: TextMeasurer): TextMeasurer {
       return (s: string) => {
         if (/\s/.test(s)) {
-          var wh = tm(wrapping + s + wrapping);
-          var whWrapping = tm(wrapping);
+          var wh = tm(CANONICAL_CHR + s + CANONICAL_CHR);
+          var whWrapping = tm(CANONICAL_CHR);
           return [wh[0] - 2*whWrapping[0], wh[1]];
         } else {
           return tm(s);
@@ -75,7 +77,6 @@ export module Util {
      * letter.
      */
     export class CachingCharacterMeasurer {
-      private static CANONICAL_CHR = "a";
       private cache: Cache<number[]>;
       /**
        * @param {string} s The string to be measured.
@@ -89,11 +90,9 @@ export module Util {
        *        this element will to the text being measured.
        */
       constructor(g: D3.Selection) {
-        this.cache = new Cache(getTextMeasure(g),
-                               CachingCharacterMeasurer.CANONICAL_CHR,
-                               Methods.arrayEq);
+        this.cache = new Cache(getTextMeasure(g), CANONICAL_CHR, Methods.arrayEq);
         this.measure = measureByCharacter(
-                          wrapWhitespace(CachingCharacterMeasurer.CANONICAL_CHR,
+                          wrapWhitespace(
                             (s: string) => this.cache.get(s)));
       }
 
