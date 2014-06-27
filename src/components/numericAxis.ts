@@ -158,7 +158,7 @@ export module Axis {
       this._tickLabelContainer.attr("transform", labelGroupTransform);
 
       if (!this.showEndTickLabels()) {
-        this.hideEndTickLabels();
+        this._hideEndTickLabels();
       }
 
       Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
@@ -198,29 +198,6 @@ export module Axis {
         this.tickLabelPositioning = positionLC;
         this._invalidateLayout();
         return this;
-      }
-    }
-
-    private hideEndTickLabels() {
-      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-      var isInsideBBox = (tickBox: ClientRect) => {
-        return (
-          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
-          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
-        );
-      };
-
-      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
-      var firstTickLabel = tickLabels[0][0];
-      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
-        d3.select(firstTickLabel).style("visibility", "hidden");
-      }
-      var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
-        d3.select(lastTickLabel).style("visibility", "hidden");
       }
     }
   }

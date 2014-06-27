@@ -4615,6 +4615,25 @@ var Plottable;
                 this._render();
                 return this;
             };
+
+            Axis.prototype._hideEndTickLabels = function () {
+                var _this = this;
+                var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+                var isInsideBBox = function (tickBox) {
+                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
+                };
+
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+                var firstTickLabel = tickLabels[0][0];
+                if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+                    d3.select(firstTickLabel).style("visibility", "hidden");
+                }
+                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
+                if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+                    d3.select(lastTickLabel).style("visibility", "hidden");
+                }
+            };
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
@@ -4700,7 +4719,12 @@ var Plottable;
 
                 var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
+
+                if (!this.showEndTickLabels()) {
+                    this._hideEndTickLabels();
+                }
                 Plottable.Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
+
                 return this;
             };
             return Time;
@@ -4872,7 +4896,7 @@ var Plottable;
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
 
                 if (!this.showEndTickLabels()) {
-                    this.hideEndTickLabels();
+                    this._hideEndTickLabels();
                 }
 
                 Plottable.Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
@@ -4897,25 +4921,6 @@ var Plottable;
                     this.tickLabelPositioning = positionLC;
                     this._invalidateLayout();
                     return this;
-                }
-            };
-
-            Numeric.prototype.hideEndTickLabels = function () {
-                var _this = this;
-                var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-                var isInsideBBox = function (tickBox) {
-                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
-                };
-
-                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-                var firstTickLabel = tickLabels[0][0];
-                if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
-                    d3.select(firstTickLabel).style("visibility", "hidden");
-                }
-                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
-                    d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
             return Numeric;

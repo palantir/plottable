@@ -69,7 +69,12 @@ export module Axis {
 
       var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
+
+      if (!this.showEndTickLabels()) {
+        this._hideEndTickLabels();
+      }
       Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
+      
       return this;
     }
   }
