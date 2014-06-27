@@ -1,0 +1,22 @@
+{
+  "name": "plottable-website",
+  "version": "0.1.0",
+  "homepage": "palantir.github.io/plottable",
+  "authors": [
+    "Daniel Mane <danmane@gmail.com>"
+  ],
+  "description": "Plottable's github pages website",
+  "main": "index.html",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "plottable": "~0.18.2"
+  }
+}
