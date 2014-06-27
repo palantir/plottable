@@ -4683,7 +4683,7 @@ var Plottable;
             };
 
             Time.prototype.measureTextHeight = function () {
-                return Plottable.Util.Text.getTextHeight(this._tickLabelContainer.append("text"));
+                return Plottable.Util.Text.getTextHeight(this._tickLabelContainer);
             };
 
             Time.prototype._doRender = function () {

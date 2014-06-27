@@ -33,7 +33,7 @@ export module Axis {
     }
 
     private measureTextHeight(): number {
-      return Util.Text.getTextHeight(this._tickLabelContainer.append("text"));
+      return Util.Text.getTextHeight(this._tickLabelContainer);
     }
 
     public _doRender() {
