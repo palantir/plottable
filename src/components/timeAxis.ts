@@ -74,7 +74,6 @@ export module Axis {
         this._hideEndTickLabels();
       }
       Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
-      
       return this;
     }
   }

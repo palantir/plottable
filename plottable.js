@@ -4711,7 +4711,6 @@ var Plottable;
                     this._hideEndTickLabels();
                 }
                 Plottable.Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
-
                 return this;
             };
             return Time;
