@@ -42,6 +42,15 @@ export module Plot {
     public _updateYDomainer(): Area {
       super._updateYDomainer();
       var scale = <Abstract.QuantitiveScale> this.yScale;
+
+      var y0Accessor = this._projectors["y0"];
+      var extent = y0Accessor != null ? this.dataSource()._getExtent(accessor) : [];
+      if (extent.length === 2 && extent[0] === extent[1]) {
+        this.constantBaseline = extent[0];
+      } else {
+        this.constantBaseline = null;
+      }
+
       if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
         if (this.previousBaseline != null) {
           scale.domainer().paddingException(this.previousBaseline, false);
@@ -58,12 +67,6 @@ export module Plot {
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
       super.project(attrToSet, accessor, scale);
       if (attrToSet === "y0") {
-        var extent = this.dataSource()._getExtent(accessor);
-        if (extent[0] === extent[1]) {
-          this.constantBaseline = extent[0];
-        } else {
-          this.constantBaseline = null;
-        }
         this._updateYDomainer();
       }
       return this;
@@ -105,7 +108,6 @@ export module Plot {
         .x(xFunction)
         .y(yFunction);
       this._applyAnimatedAttributes(this.linePath, "area", attrToProjector);
-
     }
   }
 }
