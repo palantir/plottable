@@ -3793,7 +3793,7 @@ describe("Scales", function () {
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-        scale._autoDomainAutomatically = true;
+        scale.autoDomainAutomatically = true;
         scale.updateExtent(1, "x", [0.08, 9.92]);
         callbackWasCalled = false;
         scale.domainer(new Plottable.Domainer().nice());
@@ -3818,9 +3818,9 @@ describe("Scales", function () {
                 return e.foo;
             }));
             scale.domainer(new Plottable.Domainer().pad().nice());
-            assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+            assert.isTrue(scale.autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
-            assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
+            assert.isFalse(scale.autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
         });
 
         it("scale autorange works as expected with single dataSource", function () {
@@ -3846,23 +3846,23 @@ describe("Scales", function () {
         });
 
         it("scale perspectives can be removed appropriately", function () {
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled1");
             scale.updateExtent(1, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
             scale.updateExtent(2, "x", d3.extent(data, function (e) {
                 return e.bar;
             }));
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled3");
             scale.removeExtent(1, "x");
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
             scale.updateExtent(2, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
 
@@ -4829,5 +4829,9 @@ describe("Domainer", function () {
             return 5;
         }, yScale);
         assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
+        r.project("y0", "x", yScale);
+        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+        r.dataSource().data([{ x: 0 }, { x: 0 }]);
+        assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
     });
 });

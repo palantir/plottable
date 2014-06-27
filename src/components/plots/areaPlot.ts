@@ -39,12 +39,20 @@ export module Plot {
       return this;
     }
 
+    public _onDataSourceUpdate() {
+      super._onDataSourceUpdate();
+      if (this.yScale != null) {
+        this._updateYDomainer();
+      }
+    }
+
     public _updateYDomainer(): Area {
       super._updateYDomainer();
       var scale = <Abstract.QuantitiveScale> this.yScale;
 
-      var y0Accessor = this._projectors["y0"];
-      var extent = y0Accessor != null ? this.dataSource()._getExtent(accessor) : [];
+      var y0Projector = this._projectors["y0"];
+      var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
+      var extent:  number[] = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
       if (extent.length === 2 && extent[0] === extent[1]) {
         this.constantBaseline = extent[0];
       } else {
@@ -60,6 +68,7 @@ export module Plot {
           scale.domainer().paddingException(this.constantBaseline, true);
           this.previousBaseline = this.constantBaseline;
         }
+        scale._autoDomainIfAutomaticMode();
       }
       return this;
     }
