@@ -73,12 +73,12 @@ describe("Scales", () => {
       var svg2 = generateSVG(100, 100);
       var renderer1 = new Plottable.Abstract.Plot()
                           .dataSource(dataSource)
-                          .project("x", "foo", scale)
-                          .renderTo(svg1);
+                          .project("x", "foo", scale);
+      renderer1.renderTo(svg1);
       var renderer2 = new Plottable.Abstract.Plot()
                           .dataSource(dataSource)
-                          .project("x", "foo", scale)
-                          .renderTo(svg2);
+                          .project("x", "foo", scale);
+      renderer2.renderTo(svg2);
       var otherScale = new Plottable.Scale.Linear();
       renderer1.project("x", "foo", otherScale);
       dataSource.data([{foo: 10}, {foo: 11}]);
