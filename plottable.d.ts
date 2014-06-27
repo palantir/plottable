@@ -218,19 +218,22 @@ declare module Plottable {
             */
             function getTextMeasure(selection: D3.Selection): TextMeasurer;
             /**
-            * Returns a text measure that measures each individual character of the
-            * string with tm, then combines all the individual measurements.
+            * This class will measure text by measuring each character individually,
+            * then adding up the dimensions. It will also cache the dimensions of each
+            * letter.
             */
-            function measureByCharacter(tm: TextMeasurer): TextMeasurer;
-            /**
-            * Some TextMeasurers get confused when measuring something that's only
-            * whitespace: only whitespace in a dom node takes up [0, 0] space.
-            *
-            * @return {TextMeasurer} A function that if its argument is all
-            *         whitespace, it will wrap its argument in wrapping before
-            *         measuring in order to get a non-zero size of the whitespace.
-            */
-            function wrapWhitespace(wrapping: string, tm: TextMeasurer): TextMeasurer;
+            class CachingCharacterMeasurer {
+                /**
+                * @param {D3.Selection} g The element that will have text inserted into
+                *        it in order to measure text. The styles present for text in
+                *        this element will to the text being measured.
+                */
+                constructor(g: D3.Selection);
+                /**
+                * Clear the cache, if it seems that the text has changed size.
+                */
+                public clear(): CachingCharacterMeasurer;
+            }
             /**
             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
             *

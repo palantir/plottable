@@ -42,7 +42,7 @@ export module Util {
      * Returns a text measure that measures each individual character of the
      * string with tm, then combines all the individual measurements.
      */
-    export function measureByCharacter(tm: TextMeasurer): TextMeasurer {
+    function measureByCharacter(tm: TextMeasurer): TextMeasurer {
       return (s: string) => {
         var whs = s.trim().split("").map(tm);
         return [d3.sum(whs, (wh) => wh[0]), d3.max(whs, (wh) => wh[1])];
@@ -57,7 +57,7 @@ export module Util {
      *         whitespace, it will wrap its argument in wrapping before
      *         measuring in order to get a non-zero size of the whitespace.
      */
-    export function wrapWhitespace(wrapping: string, tm: TextMeasurer): TextMeasurer {
+    function wrapWhitespace(wrapping: string, tm: TextMeasurer): TextMeasurer {
       return (s: string) => {
         if (/\s/.test(s)) {
           var wh = tm(wrapping + s + wrapping);
@@ -67,6 +67,43 @@ export module Util {
           return tm(s);
         }
       };
+    }
+
+    /**
+     * This class will measure text by measuring each character individually,
+     * then adding up the dimensions. It will also cache the dimensions of each
+     * letter.
+     */
+    export class CachingCharacterMeasurer {
+      private static CANONICAL_CHR = "a";
+      private cache: Cache<number[]>;
+      /**
+       * @param {string} s The string to be measured.
+       * @return {number[]} [width, height] pair.
+       */
+      public measure: TextMeasurer;
+
+      /**
+       * @param {D3.Selection} g The element that will have text inserted into
+       *        it in order to measure text. The styles present for text in
+       *        this element will to the text being measured.
+       */
+      constructor(g: D3.Selection) {
+        this.cache = new Cache(getTextMeasure(g),
+                               CachingCharacterMeasurer.CANONICAL_CHR,
+                               Methods.arrayEq);
+        this.measure = measureByCharacter(
+                          wrapWhitespace(CachingCharacterMeasurer.CANONICAL_CHR,
+                            (s: string) => this.cache.get(s)));
+      }
+
+      /**
+       * Clear the cache, if it seems that the text has changed size.
+       */
+      clear() {
+        this.cache.clear();
+        return this;
+      }
     }
 
     /**

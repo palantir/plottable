@@ -441,7 +441,6 @@ var Plottable;
                         })];
                 };
             }
-            Text.measureByCharacter = measureByCharacter;
 
             /**
             * Some TextMeasurers get confused when measuring something that's only
@@ -462,7 +461,36 @@ var Plottable;
                     }
                 };
             }
-            Text.wrapWhitespace = wrapWhitespace;
+
+            /**
+            * This class will measure text by measuring each character individually,
+            * then adding up the dimensions. It will also cache the dimensions of each
+            * letter.
+            */
+            var CachingCharacterMeasurer = (function () {
+                /**
+                * @param {D3.Selection} g The element that will have text inserted into
+                *        it in order to measure text. The styles present for text in
+                *        this element will to the text being measured.
+                */
+                function CachingCharacterMeasurer(g) {
+                    var _this = this;
+                    this.cache = new Util.Cache(getTextMeasure(g), CachingCharacterMeasurer.CANONICAL_CHR, Util.Methods.arrayEq);
+                    this.measure = measureByCharacter(wrapWhitespace(CachingCharacterMeasurer.CANONICAL_CHR, function (s) {
+                        return _this.cache.get(s);
+                    }));
+                }
+                /**
+                * Clear the cache, if it seems that the text has changed size.
+                */
+                CachingCharacterMeasurer.prototype.clear = function () {
+                    this.cache.clear();
+                    return this;
+                };
+                CachingCharacterMeasurer.CANONICAL_CHR = "a";
+                return CachingCharacterMeasurer;
+            })();
+            Text.CachingCharacterMeasurer = CachingCharacterMeasurer;
 
             /**
             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
@@ -4961,7 +4989,7 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
-                this.measureCache = new Plottable.Util.Cache(Plottable.Util.Text.getTextMeasure(this._tickLabelsG), Category.CANONICAL_CHR, Plottable.Util.Methods.arrayEq);
+                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelsG);
                 return this;
             };
 
@@ -5016,9 +5044,9 @@ var Plottable;
                     var width = _this._isHorizontal() ? bandWidth : axisWidth - _this.tickLength() - _this.tickLabelPadding();
                     var height = _this._isHorizontal() ? axisHeight - _this.tickLength() - _this.tickLabelPadding() : bandWidth;
 
-                    var tm = Plottable.Util.Text.measureByCharacter(Plottable.Util.Text.wrapWhitespace(Category.CANONICAL_CHR, function (s) {
-                        return _this.measureCache.get(s);
-                    }));
+                    var tm = function (s) {
+                        return _this.measurer.measure(s);
+                    };
                     var textWriteResult = Plottable.Util.Text.measureTextInBox(s, width, height, tm, true);
                     textWriteResults.push(textWriteResult);
                 });
@@ -5103,10 +5131,9 @@ var Plottable;
                 // When anyone calls _invalidateLayout, _computeLayout will be called
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
-                this.measureCache.clear();
+                this.measurer.clear();
                 return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
-            Category.CANONICAL_CHR = "a";
             return Category;
         })(Plottable.Abstract.Axis);
         Axis.Category = Category;
