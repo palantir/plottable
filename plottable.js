@@ -4330,6 +4330,7 @@ var Plottable;
                 this._height = "auto";
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
+                this._showEndTickLabels = false;
                 this._scale = scale;
                 this.orient(orientation);
 
@@ -4592,7 +4593,6 @@ var Plottable;
                     return this;
                 }
             };
-<<<<<<< HEAD
 
             Axis.prototype.showEndTickLabels = function (show) {
                 if (show == null) {
@@ -4621,8 +4621,6 @@ var Plottable;
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
-=======
->>>>>>> master
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
@@ -4888,13 +4886,9 @@ var Plottable;
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
 
-<<<<<<< HEAD
                 if (!this.showEndTickLabels()) {
                     this._hideEndTickLabels();
                 }
-=======
-                this.hideEndTickLabels();
->>>>>>> master
 
                 Plottable.Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
 
@@ -4920,61 +4914,6 @@ var Plottable;
                     return this;
                 }
             };
-<<<<<<< HEAD
-=======
-
-            Numeric.prototype.hideEndTickLabels = function () {
-                var _this = this;
-                var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-                var isInsideBBox = function (tickBox) {
-                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
-                };
-
-                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-                var firstTickLabel = tickLabels[0][0];
-                if (!this.showFirstTickLabel && !isInsideBBox(firstTickLabel.getBoundingClientRect())) {
-                    d3.select(firstTickLabel).style("visibility", "hidden");
-                }
-                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!this.showLastTickLabel && !isInsideBBox(lastTickLabel.getBoundingClientRect())) {
-                    d3.select(lastTickLabel).style("visibility", "hidden");
-                }
-            };
-
-            Numeric.prototype.hideOverlappingTickLabels = function () {
-                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
-                });
-                var lastLabelClientRect;
-
-                function boxesOverlap(boxA, boxB) {
-                    if (boxA.right < boxB.left) {
-                        return false;
-                    }
-                    if (boxA.left > boxB.right) {
-                        return false;
-                    }
-                    if (boxA.bottom < boxB.top) {
-                        return false;
-                    }
-                    if (boxA.top > boxB.bottom) {
-                        return false;
-                    }
-                    return true;
-                }
-
-                visibleTickLabels.each(function (d) {
-                    var clientRect = this.getBoundingClientRect();
-                    var tickLabel = d3.select(this);
-                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
-                        tickLabel.style("visibility", "hidden");
-                    } else {
-                        lastLabelClientRect = clientRect;
-                        tickLabel.style("visibility", "visible");
-                    }
-                });
-            };
 
             Numeric.prototype.showEndTickLabel = function (orientation, show) {
                 if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "bottom")) {
@@ -4995,7 +4934,6 @@ var Plottable;
                     throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
                 }
             };
->>>>>>> master
             return Numeric;
         })(Plottable.Abstract.Axis);
         Axis.Numeric = Numeric;

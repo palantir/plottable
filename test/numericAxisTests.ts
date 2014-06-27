@@ -153,7 +153,7 @@ describe("NumericAxis", () => {
     var firstLabel = d3.select(tickLabels[0][0]);
     assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
     var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
-    assert.strictEqual(lastLabel.style("visibility"), "visible", "last label is hidden");
+    assert.strictEqual(lastLabel.style("visibility"), "hidden", "last label is hidden");
 
     svg.remove();
   });
