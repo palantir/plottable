@@ -56,22 +56,29 @@ describe("Scales", () => {
     });
 
     it("scale autorange works as expected with single dataSource", () => {
+      var svg = generateSVG(100, 100);
       var renderer = new Plottable.Abstract.Plot()
                         .dataSource(dataSource)
-                        .project("x", "foo", scale);
+                        .project("x", "foo", scale)
+                        .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
       dataSource.data(data);
       assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
+      svg.remove();
     });
 
     it("scale reference counting works as expected", () => {
+      var svg1 = generateSVG(100, 100);
+      var svg2 = generateSVG(100, 100);
       var renderer1 = new Plottable.Abstract.Plot()
                           .dataSource(dataSource)
-                          .project("x", "foo", scale);
+                          .project("x", "foo", scale)
+                          .renderTo(svg1);
       var renderer2 = new Plottable.Abstract.Plot()
                           .dataSource(dataSource)
-                          .project("x", "foo", scale);
+                          .project("x", "foo", scale)
+                          .renderTo(svg2);
       var otherScale = new Plottable.Scale.Linear();
       renderer1.project("x", "foo", otherScale);
       dataSource.data([{foo: 10}, {foo: 11}]);
@@ -80,6 +87,8 @@ describe("Scales", () => {
       // "scale not listening to the dataSource after all perspectives removed"
       dataSource.data([{foo: 99}, {foo: 100}]);
       assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
+      svg1.remove();
+      svg2.remove();
     });
 
     it("scale perspectives can be removed appropriately", () => {
