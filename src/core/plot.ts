@@ -94,15 +94,15 @@ export module Abstract {
         this._rerenderUpdateSelection = true;
       }
       this._dataSource = source;
-      this._dataSource.broadcaster.registerListener(this, () => {
-        this.updateAllProjectors();
-        this._dataChanged = true;
-        this._render();
-      });
+      this._dataSource.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
+      this._onDataSourceUpdate();
+      return this;
+    }
+
+    public _onDataSourceUpdate() {
       this.updateAllProjectors();
       this._dataChanged = true;
       this._render();
-      return this;
     }
 
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
