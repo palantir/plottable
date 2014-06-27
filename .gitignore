@@ -1,9 +1,6 @@
 .DS_Store
 *.tmp.txt
 node_modules
-build
-plottable_multifile.js
-test/tests_multifile.js
 
 # Emacs
 .#*
