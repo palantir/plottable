@@ -5,6 +5,8 @@ export module Plot {
   export class Area extends Abstract.XYPlot {
     private areaPath: D3.Selection;
     private linePath: D3.Selection;
+    private constantBaseline: number = null;
+    private previousBaseline: number = null;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "area-reset" : new Animator.Null(),
@@ -38,9 +40,31 @@ export module Plot {
     }
 
     public _updateYDomainer(): Area {
+      super._updateYDomainer();
       var scale = <Abstract.QuantitiveScale> this.yScale;
-      if (!scale._userSetDomainer) {
-        scale.domainer().paddingException(0);
+      if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
+        if (this.previousBaseline != null) {
+          scale.domainer().paddingException(this.previousBaseline, false);
+          this.previousBaseline = null;
+        }
+        if (this.constantBaseline != null) {
+          scale.domainer().paddingException(this.constantBaseline, true);
+          this.previousBaseline = this.constantBaseline;
+        }
+      }
+      return this;
+    }
+
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+      super.project(attrToSet, accessor, scale);
+      if (attrToSet === "y0") {
+        var extent = this.dataSource()._getExtent(accessor);
+        if (extent[0] === extent[1]) {
+          this.constantBaseline = extent[0];
+        } else {
+          this.constantBaseline = null;
+        }
+        this._updateYDomainer();
       }
       return this;
     }

@@ -4808,4 +4808,26 @@ describe("Domainer", function () {
         timeScale.domainer(domainer);
         assert.deepEqual(timeScale.domain(), [b, d]);
     });
+
+    it("exceptions are setup properly on an area plot", function () {
+        var xScale = new Plottable.Scale.Linear();
+        var yScale = new Plottable.Scale.Linear();
+        var domainer = yScale.domainer();
+        var getExceptions = function () {
+            return yScale.domainer().paddingExceptions.values().map(parseFloat);
+        };
+        assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
+        var r = new Plottable.Plot.Area([{ x: 0 }, { x: 1 }, { x: 2 }, { x: 3 }, { x: 4 }, { x: 5 }, { x: 6 }], xScale, yScale);
+        r.project("x", "x", xScale);
+        r.project("y", "x", yScale);
+        assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
+        r.project("y0", "x", yScale);
+        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+        r.project("y0", 0, yScale);
+        assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
+        r.project("y0", function () {
+            return 5;
+        }, yScale);
+        assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
+    });
 });

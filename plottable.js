@@ -5968,6 +5968,8 @@ var Plottable;
             */
             function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
+                this.constantBaseline = null;
+                this.previousBaseline = null;
                 this._animators = {
                     "area-reset": new Plottable.Animator.Null(),
                     "area": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
@@ -5985,6 +5987,36 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this.areaPath = this.renderArea.append("path").classed("area", true);
                 this.linePath = this.renderArea.append("path").classed("line", true);
+                return this;
+            };
+
+            Area.prototype._updateYDomainer = function () {
+                _super.prototype._updateYDomainer.call(this);
+                var scale = this.yScale;
+                if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
+                    if (this.previousBaseline != null) {
+                        scale.domainer().paddingException(this.previousBaseline, false);
+                        this.previousBaseline = null;
+                    }
+                    if (this.constantBaseline != null) {
+                        scale.domainer().paddingException(this.constantBaseline, true);
+                        this.previousBaseline = this.constantBaseline;
+                    }
+                }
+                return this;
+            };
+
+            Area.prototype.project = function (attrToSet, accessor, scale) {
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if (attrToSet === "y0") {
+                    var extent = this.dataSource()._getExtent(accessor);
+                    if (extent[0] === extent[1]) {
+                        this.constantBaseline = extent[0];
+                    } else {
+                        this.constantBaseline = null;
+                    }
+                    this._updateYDomainer();
+                }
                 return this;
             };
 

@@ -1924,6 +1924,7 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
+            public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Area;
         }
     }
 }
