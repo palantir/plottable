@@ -153,9 +153,7 @@ export module Abstract {
       } else {
         this._domainer = domainer;
         this._userSetDomainer = true;
-        if (this._autoDomainAutomatically) {
-          this.autoDomain();
-        }
+        this._autoDomainIfAutomaticMode();
         return this;
       }
     }
