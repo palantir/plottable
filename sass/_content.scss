@@ -6,8 +6,8 @@
  * Header
  */
 header {
-  .no-retina & { background: $COLOR_BLUE2 repeat url(/build/images/background-pattern.png) center top; }
-  .retina & { background: $COLOR_BLUE2 repeat url(/build/images/background-pattern@2x.png) center top; }
+  .no-retina & { background: $COLOR_BLUE2 repeat url(build/images/background-pattern.png) center top; }
+  .retina & { background: $COLOR_BLUE2 repeat url(build/images/background-pattern@2x.png) center top; }
   padding-top: 1em;
   color: $COLOR_BLUE1;
 
@@ -26,8 +26,8 @@ header {
       text-indent: 9999px;
       overflow: hidden;
       background-repeat: no-repeat;
-      .no-svg & { background-image: url(/build/images/palantir-logo.png); }
-      .svg & { background-image: url(/build/images/palantir-logo.svg); }
+      .no-svg & { background-image: url(build/images/palantir-logo.png); }
+      .svg & { background-image: url(build/images/palantir-logo.svg); }
 
       .no-touch &:hover {
         @include opacity(0.4);
@@ -170,8 +170,8 @@ div#chart-separator {
   background-color: transparent;
   width: 100%;
   margin-top: -10%;
-  .no-svg & { background-image: url(/build/images/plot-background.png); }
-  .svg & { background-image: url(/build/images/plot-background.svg); }
+  .no-svg & { background-image: url(build/images/plot-background.png); }
+  .svg & { background-image: url(build/images/plot-background.svg); }
 
   img {
     width: 100%;
@@ -216,8 +216,8 @@ section {
       background-position: center top;
       background-size: 46px 44px;
 
-      .no-retina & { background-image: url(/build/images/d3-logo.png); }
-      .retina & { background-image: url(/build/images/d3-logo@2x.png); }
+      .no-retina & { background-image: url(build/images/d3-logo.png); }
+      .retina & { background-image: url(build/images/d3-logo@2x.png); }
     }
 
     p {
