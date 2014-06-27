@@ -840,41 +840,6 @@ var Plottable;
                 }
             }
             DOM.translate = translate;
-
-            function hideOverlappingTickLabels(tickLabelContainer) {
-                var visibleTickLabels = tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
-                });
-                var lastLabelClientRect;
-
-                function boxesOverlap(boxA, boxB) {
-                    if (boxA.right < boxB.left) {
-                        return false;
-                    }
-                    if (boxA.left > boxB.right) {
-                        return false;
-                    }
-                    if (boxA.bottom < boxB.top) {
-                        return false;
-                    }
-                    if (boxA.top > boxB.bottom) {
-                        return false;
-                    }
-                    return true;
-                }
-
-                visibleTickLabels.each(function (d) {
-                    var clientRect = this.getBoundingClientRect();
-                    var tickLabel = d3.select(this);
-                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
-                        tickLabel.style("visibility", "hidden");
-                    } else {
-                        lastLabelClientRect = clientRect;
-                        tickLabel.style("visibility", "visible");
-                    }
-                });
-            }
-            DOM.hideOverlappingTickLabels = hideOverlappingTickLabels;
         })(Util.DOM || (Util.DOM = {}));
         var DOM = Util.DOM;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -1176,46 +1141,62 @@ var Plottable;
                 _super.call(this, null);
 
                 var numFormats = 8;
-                var formats = {};
-                var filters = {};
 
-                formats[0] = ".%L";
-                filters[0] = function (d) {
-                    return d.getMilliseconds();
+                var timeFormat = {};
+
+                timeFormat[0] = {
+                    format: ".%L",
+                    filter: function (d) {
+                        return d.getMilliseconds() !== 0;
+                    }
                 };
-                formats[1] = ":%S";
-                filters[1] = function (d) {
-                    return d.getSeconds();
+                timeFormat[1] = {
+                    format: ":%S",
+                    filter: function (d) {
+                        return d.getMinutes() !== 0;
+                    }
                 };
-                formats[2] = "%I:%M";
-                filters[2] = function (d) {
-                    return d.getMinutes();
+                timeFormat[2] = {
+                    format: "%I:%M",
+                    filter: function (d) {
+                        return d.getMinutes() !== 0;
+                    }
                 };
-                formats[3] = "%I %p";
-                filters[3] = function (d) {
-                    return d.getHours();
+                timeFormat[3] = {
+                    format: "%I %p",
+                    filter: function (d) {
+                        return d.getHours() !== 0;
+                    }
                 };
-                formats[4] = "%a %d";
-                filters[4] = function (d) {
-                    return d.getDay() && d.getDate() !== 1;
+                timeFormat[4] = {
+                    format: "%a %d",
+                    filter: function (d) {
+                        return d.getDay() !== 0 && d.getDate() !== 1;
+                    }
                 };
-                formats[5] = "%b %d";
-                filters[5] = function (d) {
-                    return d.getDate() !== 1;
+                timeFormat[5] = {
+                    format: "%b %d",
+                    filter: function (d) {
+                        return d.getDate() !== 1;
+                    }
                 };
-                formats[6] = "%b";
-                filters[6] = function (d) {
-                    return d.getMonth();
+                timeFormat[6] = {
+                    format: "%b",
+                    filter: function (d) {
+                        return d.getMonth() !== 0;
+                    }
                 };
-                formats[7] = "%Y";
-                filters[7] = function () {
-                    return true;
+                timeFormat[7] = {
+                    format: "%Y",
+                    filter: function () {
+                        return true;
+                    }
                 };
 
                 this._formatFunction = function (d) {
                     for (var i = 0; i < numFormats; i++) {
-                        if (filters[i](d)) {
-                            return d3.time.format(formats[i])(d);
+                        if (timeFormat[i].filter(d)) {
+                            return d3.time.format(timeFormat[i].format)(d);
                         }
                     }
                 };
@@ -3532,7 +3513,7 @@ var Plottable;
             * @constructor
             */
             function Time(scale) {
-                _super.call(this, d3.time.scale());
+                _super.call(this, scale);
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }
             Time.prototype._setDomain = function (values) {
@@ -4621,6 +4602,40 @@ var Plottable;
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
+
+            Axis.prototype._hideOverlappingTickLabels = function () {
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                var lastLabelClientRect;
+
+                function boxesOverlap(boxA, boxB) {
+                    if (boxA.right < boxB.left) {
+                        return false;
+                    }
+                    if (boxA.left > boxB.right) {
+                        return false;
+                    }
+                    if (boxA.bottom < boxB.top) {
+                        return false;
+                    }
+                    if (boxA.top > boxB.bottom) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                visibleTickLabels.each(function (d) {
+                    var clientRect = this.getBoundingClientRect();
+                    var tickLabel = d3.select(this);
+                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+                        tickLabel.style("visibility", "hidden");
+                    } else {
+                        lastLabelClientRect = clientRect;
+                        tickLabel.style("visibility", "visible");
+                    }
+                });
+            };
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
@@ -4674,7 +4689,6 @@ var Plottable;
             };
 
             Time.prototype._doRender = function () {
-                var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickValues = this._getTickValues();
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(tickValues);
@@ -4700,9 +4714,7 @@ var Plottable;
                         break;
                 }
 
-                tickLabels.text(function (d) {
-                    return _this._formatter.format(d);
-                }).style("text-anchor", "middle").style("visibility", "visible").attr(tickLabelAttrHash);
+                tickLabels.text(this._formatter.format).style("text-anchor", "middle").style("visibility", "visible").attr(tickLabelAttrHash);
 
                 var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
@@ -4710,7 +4722,7 @@ var Plottable;
                 if (!this.showEndTickLabels()) {
                     this._hideEndTickLabels();
                 }
-                Plottable.Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
+                this._hideOverlappingTickLabels();
                 return this;
             };
             return Time;
@@ -4889,8 +4901,7 @@ var Plottable;
                     this._hideEndTickLabels();
                 }
 
-                Plottable.Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
-
+                this._hideOverlappingTickLabels();
                 return this;
             };
 

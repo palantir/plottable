@@ -9,8 +9,8 @@ export module Scale {
      *
      * @constructor
      */
-    constructor(scale?: D3.Scale.TimeScale) {
-      super(<any> d3.time.scale());
+    constructor(scale = d3.scale.time()) {
+      super(<any>scale);
     }
 
     public _setDomain(values: any[]) {

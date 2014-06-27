@@ -277,7 +277,6 @@ declare module Plottable {
             function getElementHeight(elem: HTMLScriptElement): number;
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
-            function hideOverlappingTickLabels(tickLabelContainer: D3.Selection): void;
         }
     }
 }
@@ -420,6 +419,10 @@ declare module Plottable {
 
 
 declare module Plottable {
+    interface FilterFormat {
+        format: string;
+        filter: (d: any) => any;
+    }
     module Formatter {
         class Time extends Abstract.Formatter {
             /**

@@ -62,10 +62,10 @@ export module Axis {
           break;
       }
 
-      tickLabels.text((d: any) => this._formatter.format(d))
-                                  .style("text-anchor", "middle")
-                                  .style("visibility", "visible")
-                                  .attr(tickLabelAttrHash);
+      tickLabels.text(this._formatter.format)
+                          .style("text-anchor", "middle")
+                          .style("visibility", "visible")
+                          .attr(tickLabelAttrHash);
 
       var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
@@ -73,7 +73,7 @@ export module Axis {
       if (!this.showEndTickLabels()) {
         this._hideEndTickLabels();
       }
-      Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
+      this._hideOverlappingTickLabels();
       return this;
     }
   }

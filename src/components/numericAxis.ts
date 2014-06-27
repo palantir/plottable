@@ -164,9 +164,8 @@ export module Axis {
       if (!this.showEndTickLabels()) {
         this._hideEndTickLabels();
       }
-
-      Util.DOM.hideOverlappingTickLabels(this._tickLabelContainer);
-
+      
+      this._hideOverlappingTickLabels();
       return this;
     }
 
@@ -251,6 +250,6 @@ export module Axis {
                         " axis");
       }
     }
-  }
+}
 }
 }
