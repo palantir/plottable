@@ -3513,6 +3513,7 @@ var Plottable;
             * @constructor
             */
             function Time(scale) {
+                if (typeof scale === "undefined") { scale = d3.time.scale(); }
                 _super.call(this, scale);
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }

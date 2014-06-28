@@ -9,7 +9,7 @@ export module Scale {
      *
      * @constructor
      */
-    constructor(scale = d3.scale.time()) {
+    constructor(scale = d3.time.scale()) {
       super(<any>scale);
     }
 
