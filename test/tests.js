@@ -54,10 +54,10 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
 function assertBBoxInclusion(outerEl, innerEl) {
     var outerBox = outerEl.node().getBoundingClientRect();
     var innerBox = innerEl.node().getBoundingClientRect();
-    assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left), "bounding rect left included");
-    assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top), "bounding rect top included");
-    assert.operator(Math.ceil(outerBox.right), ">=", Math.floor(innerBox.right), "bounding rect right included");
-    assert.operator(Math.ceil(outerBox.bottom), ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
+    assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left) + window.Pixel_CloseTo_Requirement, "bounding rect left included");
+    assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top) + window.Pixel_CloseTo_Requirement, "bounding rect top included");
+    assert.operator(Math.ceil(outerBox.right) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.right), "bounding rect right included");
+    assert.operator(Math.ceil(outerBox.bottom) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
 }
 
 function assertXY(el, xExpected, yExpected, message) {
@@ -104,9 +104,11 @@ var MultiTestVerifier = (function () {
 })();
 
 ///<reference path="testReference.ts" />
+
 before(function () {
     // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
     Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
+    window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
 
 ///<reference path="testReference.ts" />
@@ -788,14 +790,25 @@ describe("NumericAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.range([0, SVG_WIDTH]);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
-        numericAxis.showEndTickLabels(false);
+
+        numericAxis.showEndTickLabel("left", false);
+        assert.isFalse(numericAxis.showEndTickLabel("left"), "retrieve showEndTickLabel setting");
+        numericAxis.showEndTickLabel("right", true);
+        assert.isTrue(numericAxis.showEndTickLabel("right"), "retrieve showEndTickLabel setting");
+        assert.throws(function () {
+            return numericAxis.showEndTickLabel("top", true);
+        }, Error);
+        assert.throws(function () {
+            return numericAxis.showEndTickLabel("bottom", true);
+        }, Error);
+
         numericAxis.renderTo(svg);
 
         var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
         var firstLabel = d3.select(tickLabels[0][0]);
         assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
         var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
-        assert.strictEqual(lastLabel.style("visibility"), "hidden", "last label is hidden");
+        assert.strictEqual(lastLabel.style("visibility"), "visible", "last label is hidden");
 
         svg.remove();
     });
@@ -807,7 +820,7 @@ describe("NumericAxis", function () {
         var scale = new Plottable.Scale.Linear();
         scale.range([0, SVG_WIDTH]);
         var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
-        numericAxis.showEndTickLabels(false);
+        numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
         numericAxis.renderTo(svg);
 
         function boxesOverlap(boxA, boxB) {
@@ -2224,8 +2237,7 @@ describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel("A CHART TITLE");
-        label._anchor(svg);
-        label._computeLayout();
+        label.renderTo(svg);
 
         var content = label.content;
         assert.isTrue(label.element.classed("label"), "title element has label css class");
@@ -2243,30 +2255,24 @@ describe("Labels", function () {
     it("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
-        assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
+        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
 
     it("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
-        assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
+        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
 
@@ -2274,12 +2280,11 @@ describe("Labels", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel();
         label.renderTo(svg);
-        var textEl = label.content.select("text");
-        assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
+        assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
         assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
         label.setText("hello world");
         label.renderTo(svg);
-        assert.equal(textEl.text(), "hello world", "the label text updated properly");
+        assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
         assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
@@ -2288,11 +2293,9 @@ describe("Labels", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
         var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var bbox = Plottable.Util.DOM.getBBox(text);
         assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
@@ -2310,13 +2313,13 @@ describe("Labels", function () {
 
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
-        var label = new Plottable.Component.TitleLabel(".");
+        var label = new Plottable.Component.TitleLabel("X");
         var t = new Plottable.Component.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Abstract.Component());
         t.renderTo(svg);
-        var textElement = svg.select("text");
-        var textX = parseFloat(textElement.attr("x"));
+        var textTranslate = d3.transform(label.content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label.element.attr("transform")).translate;
-        assert.closeTo(eleTranslate[0] + textX, 200, 10, "label is centered");
+        var textWidth = Plottable.Util.DOM.getBBox(label.content.select("text")).width;
+        assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
         svg.remove();
     });
 
@@ -3033,15 +3036,19 @@ describe("Renderers", function () {
             var ds1 = new Plottable.DataSource([0, 1, 2]);
             var ds2 = new Plottable.DataSource([1, 2, 3]);
             var s = new Plottable.Scale.Linear();
+            var svg1 = generateSVG(100, 100);
+            var svg2 = generateSVG(100, 100);
             var r1 = new Plottable.Abstract.Plot().dataSource(ds1).project("x", function (x) {
                 return x;
-            }, s);
+            }, s).renderTo(svg1);
             var r2 = new Plottable.Abstract.Plot().dataSource(ds2).project("x", function (x) {
                 return x;
-            }, s);
+            }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
+            svg1.remove();
+            svg2.remove();
         });
     });
 
@@ -3809,16 +3816,22 @@ describe("Scales", function () {
         });
 
         it("scale autorange works as expected with single dataSource", function () {
-            var renderer = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            var svg = generateSVG(100, 100);
+            var renderer = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataSource.data(data);
             assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
+            svg.remove();
         });
 
         it("scale reference counting works as expected", function () {
+            var svg1 = generateSVG(100, 100);
+            var svg2 = generateSVG(100, 100);
             var renderer1 = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            renderer1.renderTo(svg1);
             var renderer2 = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            renderer2.renderTo(svg2);
             var otherScale = new Plottable.Scale.Linear();
             renderer1.project("x", "foo", otherScale);
             dataSource.data([{ foo: 10 }, { foo: 11 }]);
@@ -3828,6 +3841,8 @@ describe("Scales", function () {
             // "scale not listening to the dataSource after all perspectives removed"
             dataSource.data([{ foo: 99 }, { foo: 100 }]);
             assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
+            svg1.remove();
+            svg2.remove();
         });
 
         it("scale perspectives can be removed appropriately", function () {
@@ -3858,6 +3873,27 @@ describe("Scales", function () {
             assert.throws(function () {
                 return scale._setDomain([-Infinity, 6]);
             }, Error);
+        });
+
+        it("should resize when a plot is removed", function () {
+            var svg = generateSVG(400, 400);
+            var ds1 = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+            var ds2 = [{ x: 1, y: 1 }, { x: 2, y: 2 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            xScale.domainer(new Plottable.Domainer());
+            var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+            var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+            var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
+            var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
+            var renderAreas = renderAreaD1.merge(renderAreaD2);
+            renderAreas.renderTo(svg);
+            assert.deepEqual(xScale.domain(), [0, 2]);
+            renderAreaD1.remove();
+            assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+            renderAreas.merge(renderAreaD1);
+            assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
+            svg.remove();
         });
     });
 
@@ -4372,18 +4408,17 @@ describe("Tables", function () {
 
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
-var tu = Plottable.Util.Text;
 describe("Util.Text", function () {
     it("getTruncatedText works properly", function () {
         var svg = generateSVG();
         var textEl = svg.append("text").attr("x", 20).attr("y", 50);
         textEl.text("foobar");
-
-        var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, textEl);
+        var measure = Plottable.Util.Text.getTextMeasure(textEl);
+        var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, measure);
         assert.equal(fullText, "hellom world!", "text untruncated");
-        var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, textEl);
+        var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, measure);
         assert.equal(partialText, "hello...", "text truncated");
-        var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, textEl);
+        var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, measure);
         assert.equal(tinyText, "", "empty string for tiny text");
 
         assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");

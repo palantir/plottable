@@ -190,7 +190,7 @@ declare module Plottable {
             * @param {D3.Selection} element: The text element used to measure the text
             * @returns {string} text - the shortened text
             */
-            function getTruncatedText(text: string, availableWidth: number, element: D3.Selection): string;
+            function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
             /**
             * Gets the height of a text element, as rendered.
             *
@@ -836,6 +836,7 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
+            public remove(): Plot;
             /**
             * Gets the animator associated with the specified Animator key.
             *
@@ -1566,20 +1567,6 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public orient(newOrientation: string): Axis;
-            /**
-            * Checks whether the Axis is currently set to show the first and last
-            * tick labels.
-            *
-            * @returns {boolean}
-            */
-            public showEndTickLabels(): boolean;
-            /**
-            * Set whether or not to show the first and last tick labels.
-            *
-            * @param {boolean} show Whether or not to show the first and last labels.
-            * @returns {Axis} The calling Axis.
-            */
-            public showEndTickLabels(show: boolean): Axis;
         }
     }
 }
@@ -1612,6 +1599,29 @@ declare module Plottable {
             * @returns {NumericAxis} The calling NumericAxis.
             */
             public tickLabelPosition(position: string): Numeric;
+            /**
+            * Return whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @returns {boolean} The current setting.
+            */
+            public showEndTickLabel(orientation: string): boolean;
+            /**
+            * Control whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @param {boolean} show Whether or not the given tick should be displayed.
+            * @returns {Numeric} The calling Numeric.
+            */
+            public showEndTickLabel(orientation: string, show: boolean): Numeric;
         }
     }
 }
@@ -1623,7 +1633,7 @@ declare module Plottable {
             /**
             * Creates a CategoryAxis.
             *
-            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
             * display the scale as efficiently as possible.
             *
             * @constructor
@@ -1647,6 +1657,8 @@ declare module Plottable {
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
             constructor(text?: string, orientation?: string);
+            public xAlign(alignment: string): Label;
+            public yAlign(alignment: string): Label;
             /**
             * Sets the text on the Label.
             *

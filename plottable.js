@@ -357,8 +357,7 @@ var Plottable;
             * @param {D3.Selection} element: The text element used to measure the text
             * @returns {string} text - the shortened text
             */
-            function getTruncatedText(text, availableWidth, element) {
-                var measurer = getTextMeasure(element);
+            function getTruncatedText(text, availableWidth, measurer) {
                 if (measurer(text)[0] <= availableWidth) {
                     return text;
                 } else {
@@ -2486,13 +2485,6 @@ var Plottable;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250;
                 this._projectors = {};
-                this._rerenderUpdateSelection = false;
-                // A perf-efficient manner of rendering would be to calculate attributes only
-                // on new nodes, and assume that old nodes (ie the update selection) can
-                // maintain their current attributes. If we change the metadata or an
-                // accessor function, then this property will not be true, and we will need
-                // to recompute attributes on the entire update selection.
-                this._requireRerender = false;
                 this.clipPathEnabled = true;
                 this.classed("renderer", true);
 
@@ -2511,6 +2503,7 @@ var Plottable;
             Plot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
                 this._dataChanged = true;
+                this.updateAllProjectors();
                 return this;
             };
 
@@ -2522,8 +2515,6 @@ var Plottable;
                 var oldSource = this._dataSource;
                 if (oldSource != null) {
                     this._dataSource.broadcaster.deregisterListener(this);
-                    this._requireRerender = true;
-                    this._rerenderUpdateSelection = true;
                 }
                 this._dataSource = source;
                 this._dataSource.broadcaster.registerListener(this, function () {
@@ -2557,8 +2548,6 @@ var Plottable;
                 }
 
                 this._projectors[attrToSet] = { accessor: accessor, scale: scale };
-                this._requireRerender = true;
-                this._rerenderUpdateSelection = true;
                 this.updateProjector(attrToSet);
                 this._render(); // queue a re-render upon changing projector
                 return this;
@@ -2583,8 +2572,6 @@ var Plottable;
                 if (this.element != null) {
                     this._paint();
                     this._dataChanged = false;
-                    this._requireRerender = false;
-                    this._rerenderUpdateSelection = false;
                 }
                 return this;
             };
@@ -2609,6 +2596,14 @@ var Plottable;
                 return this;
             };
 
+            Plot.prototype.remove = function () {
+                _super.prototype.remove.call(this);
+
+                // make the domain resize
+                this.updateAllProjectors();
+                return this;
+            };
+
             /**
             * This function makes sure that all of the scales in this._projectors
             * have an extent that includes all the data that is projected onto them.
@@ -2625,7 +2620,7 @@ var Plottable;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     var extent = this.dataSource()._getExtent(projector.accessor);
-                    if (extent.length === 0) {
+                    if (extent.length === 0 || !this._isAnchored) {
                         projector.scale.removeExtent(this._plottableID, attr);
                     } else {
                         projector.scale.updateExtent(this._plottableID, attr, extent);
@@ -4040,7 +4035,7 @@ var Plottable;
                             var measure = Plottable.Util.Text.getTextMeasure(textEl);
                             var wrappedLines = Plottable.Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
                             if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, textEl));
+                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, measure));
                             } else {
                                 textEl.text("");
                                 var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -4178,7 +4173,7 @@ var Plottable;
                             var measure = Plottable.Util.Text.getTextMeasure(textEl);
                             var wrappedLines = Plottable.Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
                             if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, textEl));
+                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, measure));
                             } else {
                                 var baseY = 0;
                                 if (tickLabelPosition === "top") {
@@ -4235,7 +4230,6 @@ var Plottable;
                 _super.call(this);
                 this._width = "auto";
                 this._height = "auto";
-                this._showEndTickLabels = false;
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
                 this._scale = scale;
@@ -4501,15 +4495,6 @@ var Plottable;
                     return this;
                 }
             };
-
-            Axis.prototype.showEndTickLabels = function (show) {
-                if (show == null) {
-                    return this._showEndTickLabels;
-                }
-                this._showEndTickLabels = show;
-                this._render();
-                return this;
-            };
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
@@ -4542,6 +4527,10 @@ var Plottable;
             function Numeric(scale, orientation, formatter) {
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
+                // Whether or not first/last tick label will still be displayed even if
+                // the label is cut off.
+                this.showFirstTickLabel = false;
+                this.showLastTickLabel = false;
             }
             Numeric.prototype._computeWidth = function () {
                 // generate a test value to measure width
@@ -4680,9 +4669,7 @@ var Plottable;
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
 
-                if (!this.showEndTickLabels()) {
-                    this.hideEndTickLabels();
-                }
+                this.hideEndTickLabels();
 
                 this.hideOverlappingTickLabels();
 
@@ -4719,11 +4706,11 @@ var Plottable;
 
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
                 var firstTickLabel = tickLabels[0][0];
-                if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+                if (!this.showFirstTickLabel && !isInsideBBox(firstTickLabel.getBoundingClientRect())) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
                 }
                 var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+                if (!this.showLastTickLabel && !isInsideBBox(lastTickLabel.getBoundingClientRect())) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
@@ -4761,6 +4748,26 @@ var Plottable;
                     }
                 });
             };
+
+            Numeric.prototype.showEndTickLabel = function (orientation, show) {
+                if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "bottom")) {
+                    if (show === undefined) {
+                        return this.showFirstTickLabel;
+                    } else {
+                        this.showFirstTickLabel = show;
+                        return this._render();
+                    }
+                } else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
+                    if (show === undefined) {
+                        return this.showLastTickLabel;
+                    } else {
+                        this.showLastTickLabel = show;
+                        return this._render();
+                    }
+                } else {
+                    throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
+                }
+            };
             return Numeric;
         })(Plottable.Abstract.Axis);
         Axis.Numeric = Numeric;
@@ -4783,7 +4790,7 @@ var Plottable;
             /**
             * Creates a CategoryAxis.
             *
-            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
             * display the scale as efficiently as possible.
             *
             * @constructor
@@ -4944,23 +4951,37 @@ var Plottable;
                 this.classed("label", true);
                 this.setText(text);
                 orientation = orientation.toLowerCase();
-                if (orientation === "horizontal" || orientation === "vertical-left" || orientation === "vertical-right") {
+                if (orientation === "vertical-left") {
+                    orientation = "left";
+                }
+                if (orientation === "vertical-right") {
+                    orientation = "right";
+                }
+                if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
                     this.orientation = orientation;
                 } else {
                     throw new Error(orientation + " is not a valid orientation for LabelComponent");
                 }
-                this.xAlign("CENTER").yAlign("CENTER"); // the defaults
+                this.xAlign("center").yAlign("center");
             }
+            Label.prototype.xAlign = function (alignment) {
+                var alignmentLC = alignment.toLowerCase();
+                _super.prototype.xAlign.call(this, alignmentLC);
+                this.xAlignment = alignmentLC;
+                return this;
+            };
+            Label.prototype.yAlign = function (alignment) {
+                var alignmentLC = alignment.toLowerCase();
+                _super.prototype.yAlign.call(this, alignmentLC);
+                this.yAlignment = alignmentLC;
+                return this;
+            };
+
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var desiredWidth;
-                var desiredHeight;
-                if (this.orientation === "horizontal") {
-                    desiredWidth = this.textLength;
-                    desiredHeight = this.textHeight;
-                } else {
-                    desiredWidth = this.textHeight;
-                    desiredHeight = this.textLength;
-                }
+                var desiredWH = this.measurer(this.text);
+                var desiredWidth = this.orientation === "horizontal" ? desiredWH[0] : desiredWH[1];
+                var desiredHeight = this.orientation === "horizontal" ? desiredWH[1] : desiredWH[0];
+
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
                     height: Math.min(desiredHeight, offeredHeight),
@@ -4971,7 +4992,8 @@ var Plottable;
 
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.textElement = this.content.append("text");
+                this.textContainer = this.content.append("g");
+                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
                 this.setText(this.text);
                 return this;
             };
@@ -4984,53 +5006,26 @@ var Plottable;
             */
             Label.prototype.setText = function (text) {
                 this.text = text;
-                if (this.element != null) {
-                    this.textElement.text(text);
-                    this.measureAndSetTextSize();
-                }
                 this._invalidateLayout();
                 return this;
             };
 
-            Label.prototype.measureAndSetTextSize = function () {
-                var bbox = Plottable.Util.DOM.getBBox(this.textElement);
-                this.textHeight = bbox.height;
-                this.textLength = this.text === "" ? 0 : bbox.width;
-            };
-
-            Label.prototype.truncateTextAndRemeasure = function (availableLength) {
-                var shortText = Plottable.Util.Text.getTruncatedText(this.text, availableLength, this.textElement);
-                this.textElement.text(shortText);
-                this.measureAndSetTextSize();
+            Label.prototype._doRender = function () {
+                _super.prototype._doRender.call(this);
+                this.textContainer.selectAll("text").remove();
+                var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
+                var truncatedText = Plottable.Util.Text.getTruncatedText(this.text, dimension, this.measurer);
+                if (this.orientation === "horizontal") {
+                    Plottable.Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight, this.xAlignment, this.yAlignment);
+                } else {
+                    Plottable.Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight, this.xAlignment, this.yAlignment, this.orientation);
+                }
+                return this;
             };
 
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.textElement.attr("dy", 0); // Reset this so we maintain idempotence
-                var bbox = Plottable.Util.DOM.getBBox(this.textElement);
-                this.textElement.attr("dy", -bbox.y);
-
-                var xShift = 0;
-                var yShift = 0;
-
-                if (this.orientation === "horizontal") {
-                    this.truncateTextAndRemeasure(this.availableWidth);
-                    xShift = (this.availableWidth - this.textLength) * this._xAlignProportion;
-                } else {
-                    this.truncateTextAndRemeasure(this.availableHeight);
-                    xShift = (this.availableHeight - this.textLength) * this._yAlignProportion;
-
-                    if (this.orientation === "vertical-right") {
-                        this.textElement.attr("transform", "rotate(90)");
-                        yShift = -this.textHeight;
-                    } else {
-                        this.textElement.attr("transform", "rotate(-90)");
-                        xShift = -xShift - this.textLength; // flip xShift
-                    }
-                }
-
-                this.textElement.attr("x", xShift);
-                this.textElement.attr("y", yShift);
+                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
                 return this;
             };
             return Label;
@@ -5195,7 +5190,8 @@ var Plottable;
                 });
                 legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
                 legend.selectAll("text").text(function (d) {
-                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, d3.select(this));
+                    var measure = Plottable.Util.Text.getTextMeasure(d3.select(this));
+                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
                 });
                 this.updateClasses();
                 this.updateListeners();
@@ -5443,12 +5439,6 @@ var Plottable;
                 this.xScale.range([0, this.availableWidth]);
                 this.yScale.range([this.availableHeight, 0]);
                 return this;
-            };
-
-            XYPlot.prototype.rescale = function () {
-                if (this.element != null) {
-                    this._render();
-                }
             };
 
             XYPlot.prototype._updateXDomainer = function () {

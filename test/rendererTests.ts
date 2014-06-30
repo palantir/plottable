@@ -130,15 +130,21 @@ describe("Renderers", () => {
       var ds1 = new Plottable.DataSource([0, 1, 2]);
       var ds2 = new Plottable.DataSource([1, 2, 3]);
       var s = new Plottable.Scale.Linear();
+      var svg1 = generateSVG(100, 100);
+      var svg2 = generateSVG(100, 100);
       var r1 = new Plottable.Abstract.Plot()
                     .dataSource(ds1)
-                    .project("x", (x: number) => x, s);
+                    .project("x", (x: number) => x, s)
+                    .renderTo(svg1);
       var r2 = new Plottable.Abstract.Plot()
                     .dataSource(ds2)
-                    .project("x", (x: number) => x, s);
+                    .project("x", (x: number) => x, s)
+                    .renderTo(svg2);
       assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
       ds1.data([]);
       assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
+      svg1.remove();
+      svg2.remove();
     });
   });
 
