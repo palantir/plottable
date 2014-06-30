@@ -224,6 +224,11 @@ declare module Plottable {
             */
             class CachingCharacterMeasurer {
                 /**
+                * @param {string} s The string to be measured.
+                * @return {number[]} [width, height] pair.
+                */
+                public measure: TextMeasurer;
+                /**
                 * @param {D3.Selection} g The element that will have text inserted into
                 *        it in order to measure text. The styles present for text in
                 *        this element will to the text being measured.
@@ -242,7 +247,7 @@ declare module Plottable {
             * @param {D3.Selection} element: The text element used to measure the text
             * @returns {string} text - the shortened text
             */
-            function getTruncatedText(text: string, availableWidth: number, element: D3.Selection): string;
+            function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
             /**
             * Gets the height of a text element, as rendered.
             *
@@ -491,6 +496,7 @@ declare module Plottable {
             (listenable: IListenable, ...args: any[]): any;
         }
         class Broadcaster extends Abstract.PlottableObject {
+            public listenable: IListenable;
             constructor(listenable: IListenable);
             /**
             * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -531,6 +537,7 @@ declare module Plottable {
 
 declare module Plottable {
     class DataSource extends Abstract.PlottableObject implements Core.IListenable {
+        public broadcaster: Core.Broadcaster;
         /**
         * Creates a new DataSource.
         *
@@ -572,6 +579,15 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Component extends PlottableObject {
+            public element: D3.Selection;
+            public content: D3.Selection;
+            public backgroundContainer: D3.Selection;
+            public foregroundContainer: D3.Selection;
+            public clipPathEnabled: boolean;
+            public availableWidth: number;
+            public availableHeight: number;
+            public xOrigin: number;
+            public yOrigin: number;
             static AUTORESIZE_BY_DEFAULT: boolean;
             /**
             * Renders the Component into a given DOM element.
@@ -765,6 +781,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Scale extends PlottableObject implements Core.IListenable {
+            public broadcaster: Core.Broadcaster;
             /**
             * Creates a new Scale.
             *
@@ -849,6 +866,8 @@ declare module Plottable {
             [attrToSet: string]: IAppliedAccessor;
         }
         class Plot extends Component {
+            public renderArea: D3.Selection;
+            public element: D3.Selection;
             /**
             * Creates a Plot.
             *
@@ -878,6 +897,7 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
+            public remove(): Plot;
             /**
             * Gets the animator associated with the specified Animator key.
             *
@@ -1434,6 +1454,10 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Axis extends Abstract.Component {
+            public axisElement: D3.Selection;
+            public orientToAlign: {
+                [s: string]: string;
+            };
             static _DEFAULT_TICK_SIZE: number;
             /**
             * Creates an Axis.
@@ -1530,6 +1554,7 @@ declare module Plottable {
         class Axis extends Component {
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
+            public axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: Formatter);
             /**
             * Gets the current width.
@@ -1603,20 +1628,6 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public orient(newOrientation: string): Axis;
-            /**
-            * Checks whether the Axis is currently set to show the first and last
-            * tick labels.
-            *
-            * @returns {boolean}
-            */
-            public showEndTickLabels(): boolean;
-            /**
-            * Set whether or not to show the first and last tick labels.
-            *
-            * @param {boolean} show Whether or not to show the first and last labels.
-            * @returns {Axis} The calling Axis.
-            */
-            public showEndTickLabels(show: boolean): Axis;
         }
     }
 }
@@ -1649,6 +1660,29 @@ declare module Plottable {
             * @returns {NumericAxis} The calling NumericAxis.
             */
             public tickLabelPosition(position: string): Numeric;
+            /**
+            * Return whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @returns {boolean} The current setting.
+            */
+            public showEndTickLabel(orientation: string): boolean;
+            /**
+            * Control whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @param {boolean} show Whether or not the given tick should be displayed.
+            * @returns {Numeric} The calling Numeric.
+            */
+            public showEndTickLabel(orientation: string, show: boolean): Numeric;
         }
     }
 }
@@ -1660,7 +1694,7 @@ declare module Plottable {
             /**
             * Creates a CategoryAxis.
             *
-            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
             * display the scale as efficiently as possible.
             *
             * @constructor
@@ -1684,6 +1718,8 @@ declare module Plottable {
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
             constructor(text?: string, orientation?: string);
+            public xAlign(alignment: string): Label;
+            public yAlign(alignment: string): Label;
             /**
             * Sets the text on the Label.
             *
@@ -1793,6 +1829,8 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class XYPlot extends Plot {
+            public xScale: Scale;
+            public yScale: Scale;
             /**
             * Creates an XYPlot.
             *
@@ -1829,6 +1867,9 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class Grid extends Abstract.XYPlot {
+            public colorScale: Abstract.Scale;
+            public xScale: Scale.Ordinal;
+            public yScale: Scale.Ordinal;
             /**
             * Creates a GridPlot.
             *
@@ -1849,6 +1890,10 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
+            static DEFAULT_WIDTH: number;
+            static _BarAlignmentToFactor: {
+                [alignment: string]: number;
+            };
             /**
             * Creates an AbstractBarPlot.
             *
@@ -1867,7 +1912,8 @@ declare module Plottable {
             public baseline(value: number): BarPlot;
             /**
             * Sets the bar alignment relative to the independent axis.
-            * Behavior depends on subclass implementation.
+            * VerticalBarPlot supports "left", "center", "right"
+            * HorizontalBarPlot supports "top", "center", "bottom"
             *
             * @param {string} alignment The desired alignment.
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
@@ -1901,6 +1947,9 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class VerticalBar extends Abstract.BarPlot {
+            static _BarAlignmentToFactor: {
+                [alignment: string]: number;
+            };
             /**
             * Creates a VerticalBarPlot.
             *
@@ -1910,13 +1959,6 @@ declare module Plottable {
             * @param {QuantitiveScale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitiveScale);
-            /**
-            * Sets the horizontal alignment of the bars.
-            *
-            * @param {string} alignment Which part of the bar should align with the bar's x-value (left/center/right).
-            * @return {BarPlot} The calling BarPlot.
-            */
-            public barAlignment(alignment: string): VerticalBar;
         }
     }
 }
@@ -1925,6 +1967,10 @@ declare module Plottable {
 declare module Plottable {
     module Plot {
         class HorizontalBar extends Abstract.BarPlot {
+            static _BarAlignmentToFactor: {
+                [alignment: string]: number;
+            };
+            public isVertical: boolean;
             /**
             * Creates a HorizontalBarPlot.
             *
@@ -1934,13 +1980,6 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.QuantitiveScale, yScale: Abstract.Scale);
-            /**
-            * Sets the vertical alignment of the bars.
-            *
-            * @param {string} alignment Which part of the bar should align with the bar's x-value (top/middle/bottom).
-            * @return {HorizontalBarPlot} The calling HorizontalBarPlot.
-            */
-            public barAlignment(alignment: string): HorizontalBar;
         }
     }
 }
@@ -2075,6 +2114,8 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Interaction {
+            public hitBox: D3.Selection;
+            public componentToListenTo: Component;
             /**
             * Creates an Interaction.
             *
@@ -2157,6 +2198,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Abstract.Interaction {
+            public xScale: Abstract.QuantitiveScale;
+            public yScale: Abstract.QuantitiveScale;
             /**
             * Creates a PanZoomInteraction.
             *
@@ -2175,6 +2218,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class Drag extends Abstract.Interaction {
+            public origin: number[];
+            public location: number[];
             public callbackToCall: (dragInfo: any) => any;
             /**
             * Creates a Drag.
@@ -2198,6 +2243,8 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class DragBox extends Drag {
+            public dragBox: D3.Selection;
+            public boxIsDrawn: boolean;
             /**
             * Clears the highlighted drag-selection box drawn by the AreaInteraction.
             *

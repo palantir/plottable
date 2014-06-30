@@ -5,6 +5,8 @@ function commitChart(svg, dataset) {
   var yScale = new Plottable.Scale.Linear()
               .domain([8, 26]);
 
+  yScale.domainer().paddingException(0, true);
+
   var rScale = new Plottable.Scale.Log()
               .range([2, 12])
               .widenDomainOnData(dataset.data, linesAddedAccessor);

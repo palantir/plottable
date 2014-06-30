@@ -24,19 +24,6 @@ export module Abstract {
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
 
-
-    public _rerenderUpdateSelection = false;
-    // A perf-efficient manner of rendering would be to calculate attributes only
-    // on new nodes, and assume that old nodes (ie the update selection) can
-    // maintain their current attributes. If we change the metadata or an
-    // accessor function, then this property will not be true, and we will need
-    // to recompute attributes on the entire update selection.
-
-    public _requireRerender = false;
-    // A perf-efficient approach to rendering scale changes would be to transform
-    // the container rather than re-render. In the event that the data is changed,
-    // it will be necessary to do a regular rerender.
-
     /**
      * Creates a Plot.
      *
@@ -67,6 +54,7 @@ export module Abstract {
     public _anchor(element: D3.Selection) {
       super._anchor(element);
       this._dataChanged = true;
+      this.updateAllProjectors();
       return this;
     }
 
@@ -90,8 +78,6 @@ export module Abstract {
       var oldSource = this._dataSource;
       if (oldSource != null) {
         this._dataSource.broadcaster.deregisterListener(this);
-        this._requireRerender = true;
-        this._rerenderUpdateSelection = true;
       }
       this._dataSource = source;
       this._dataSource.broadcaster.registerListener(this, () => {
@@ -120,9 +106,8 @@ export module Abstract {
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
       this.updateProjector(attrToSet);
+      this._render(); // queue a re-render upon changing projector
       return this;
     }
 
@@ -142,8 +127,6 @@ export module Abstract {
       if (this.element != null) {
         this._paint();
         this._dataChanged = false;
-        this._requireRerender = false;
-        this._rerenderUpdateSelection = false;
       }
       return this;
     }
@@ -168,6 +151,13 @@ export module Abstract {
       return this;
     }
 
+    public remove() {
+      super.remove();
+      // make the domain resize
+      this.updateAllProjectors();
+      return this;
+    }
+
     /**
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
@@ -181,7 +171,7 @@ export module Abstract {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
-        if (extent.length === 0) {
+        if (extent.length === 0 || !this._isAnchored) {
           projector.scale.removeExtent(this._plottableID, attr);
         } else {
           projector.scale.updateExtent(this._plottableID, attr, extent);

@@ -113,8 +113,7 @@ export module Util {
      * @param {D3.Selection} element: The text element used to measure the text
      * @returns {string} text - the shortened text
      */
-    export function getTruncatedText(text: string, availableWidth: number, element: D3.Selection) {
-      var measurer = getTextMeasure(element);
+    export function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer) {
       if (measurer(text)[0] <= availableWidth) {
         return text;
       } else {

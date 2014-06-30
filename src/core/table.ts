@@ -72,13 +72,13 @@ export module Component {
       return this;
     }
 
-    public _removeComponent(c: Abstract.Component): Table {
-      super._removeComponent(c);
+    public _removeComponent(component: Abstract.Component): Table {
+      super._removeComponent(component);
       var rowpos: number;
       var colpos: number;
       outer : for (var i = 0; i < this.nRows; i++) {
         for (var j = 0; j < this.nCols; j++) {
-          if (this.rows[i][j] === c) {
+          if (this.rows[i][j] === component) {
             rowpos = i;
             colpos = j;
             break outer;
@@ -91,18 +91,6 @@ export module Component {
       }
 
       this.rows[rowpos][colpos] = null;
-      // check if can splice out row
-      if (this.rows[rowpos].every((v) => v === null)) {
-        this.rows.splice(rowpos, 1);
-        this.rowWeights.splice(rowpos, 1);
-        this.nRows--;
-      }
-      // check if can splice out column
-      if (this.rows.every((v) => v[colpos] === null)) {
-        this.rows.forEach((r) => r.splice(colpos, 1));
-        this.colWeights.splice(colpos, 1);
-        this.nCols--;
-      }
 
       return this;
     }

@@ -26,6 +26,7 @@
 
 var renderAreaD1, renderAreaD2, renderAreaD3, renderAreaD4;
 var dataseries1, dataseries2, dataseries3, dataseries4;
+var xScale, yScale;
 var basicTable;
 var title;
 
@@ -46,8 +47,8 @@ window.onload = function () {
     colorScale1.domain(["series1", "series2", "series3", "series4"]);
     
     //Axis
-    var xScale = new Plottable.Scale.Linear();
-    var yScale = new Plottable.Scale.Linear();
+    xScale = new Plottable.Scale.Linear();
+    yScale = new Plottable.Scale.Linear();
     var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
     var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
