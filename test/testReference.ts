@@ -29,5 +29,6 @@
 ///<reference path="strictEqualityAssociativeArrayTests.ts" />
 ///<reference path="tableTests.ts" />
 ///<reference path="textUtilsTests.ts" />
+///<reference path="timeAxisTests.ts" />
 ///<reference path="utilsTests.ts" />
 ///<reference path="domainerTests.ts" />

@@ -4666,6 +4666,7 @@ var Plottable;
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             function Time(scale, orientation, formatter) {
+                if (typeof formatter === "undefined") { formatter = new Plottable.Formatter.Time(); }
                 _super.call(this, scale, orientation, formatter);
                 if (orientation !== "top" && orientation !== "bottom") {
                     throw new Error("Time Axis can only be horizontal for now");

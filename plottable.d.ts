@@ -1613,7 +1613,7 @@ declare module Plottable {
             * @param {TimeScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
-            constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
+            constructor(scale: Scale.Time, orientation: string, formatter?: Formatter.Time);
         }
     }
 }
