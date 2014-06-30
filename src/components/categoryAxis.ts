@@ -51,15 +51,16 @@ export module Axis {
           wantsHeight: false
         };
       }
-      if (this._isHorizontal()) {
-        this._scale.range([0, offeredWidth]);
-      } else {
-        this._scale.range([offeredHeight, 0]);
-      }
       var testG = this._tickLabelsG.append("g");
       var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
       fakeTicks.enter().append("g").classed("tick", true);
-      var textResult = this.writeTextToTicks(offeredWidth, offeredHeight, fakeTicks);
+      var fakeScale = <Scale.Ordinal>this._scale.copy();
+      if (this._isHorizontal()) {
+        fakeScale.range([0, offeredWidth]);
+      } else {
+        fakeScale.range([offeredHeight, 0]);
+      }
+      var textResult = this.writeTextToTicks(offeredWidth, offeredHeight, fakeTicks, fakeScale);
       testG.remove();
 
       return {
@@ -74,12 +75,12 @@ export module Axis {
       return this._scale.domain();
     }
 
-    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Util.Text.IWriteTextResult {
+    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection, scale: Scale.Ordinal): Util.Text.IWriteTextResult {
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
       ticks.each(function (d: string, i: number) {
         var d3this = d3.select(this);
-        var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
+        var bandWidth = scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
@@ -116,7 +117,7 @@ export module Axis {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
+      this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels, this._scale);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
