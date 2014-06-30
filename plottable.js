@@ -1105,27 +1105,27 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Formatter) {
-        var LargeNumber = (function (_super) {
-            __extends(LargeNumber, _super);
+        var SISuffix = (function (_super) {
+            __extends(SISuffix, _super);
             /**
-            * Creates a formatter for large values that displays [precision] significant figures.
+            * Creates a formatter for values that displays [precision] significant figures.
             *
             * @constructor
             * @param {number} [precision] The number of significant figures to display.
             */
-            function LargeNumber(precision) {
+            function SISuffix(precision) {
                 if (typeof precision === "undefined") { precision = 3; }
                 _super.call(this, precision);
                 this.showOnlyUnchangedValues(false);
             }
-            LargeNumber.prototype.precision = function (value) {
+            SISuffix.prototype.precision = function (value) {
                 var returnValue = _super.prototype.precision.call(this, value);
                 this._formatFunction = d3.format("." + this._precision + "s");
                 return returnValue;
             };
-            return LargeNumber;
+            return SISuffix;
         })(Plottable.Abstract.Formatter);
-        Formatter.LargeNumber = LargeNumber;
+        Formatter.SISuffix = SISuffix;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
 })(Plottable || (Plottable = {}));

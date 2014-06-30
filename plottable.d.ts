@@ -411,9 +411,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Formatter {
-        class LargeNumber extends Abstract.Formatter {
+        class SISuffix extends Abstract.Formatter {
             /**
-            * Creates a formatter for large values that displays [precision] significant figures.
+            * Creates a formatter for values that displays [precision] significant figures.
             *
             * @constructor
             * @param {number} [precision] The number of significant figures to display.
@@ -429,9 +429,9 @@ declare module Plottable {
             * Sets the number of significant figures to be shown by the Formatter.
             *
             * @param {number} [value] The new precision.
-            * @returns {Formatter} The calling LargeNumber Formatter.
+            * @returns {Formatter} The calling SISuffix Formatter.
             */
-            public precision(value: number): LargeNumber;
+            public precision(value: number): SISuffix;
         }
     }
 }

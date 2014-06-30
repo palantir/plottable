@@ -1871,13 +1871,15 @@ describe("Formatters", function () {
         });
     });
 
-    describe("large number", function () {
-        it("shortens large numbers", function () {
-            var lnFormatter = new Plottable.Formatter.LargeNumber();
+    describe("SISuffix", function () {
+        it("shortens long numbers", function () {
+            var lnFormatter = new Plottable.Formatter.SISuffix();
             var result = lnFormatter.format(1);
             assert.strictEqual(result, "1.00", "shows 3 signifigicant figures by default");
             result = lnFormatter.format(Math.pow(10, 12));
             assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
+            result = lnFormatter.format(Math.pow(10, -12));
+            assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
         });
     });
 });

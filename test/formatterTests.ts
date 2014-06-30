@@ -116,13 +116,15 @@ describe("Formatters", () => {
     });
   });
 
-  describe("large number", () => {
-    it("shortens large numbers", () => {
-      var lnFormatter = new Plottable.Formatter.LargeNumber();
+  describe("SISuffix", () => {
+    it("shortens long numbers", () => {
+      var lnFormatter = new Plottable.Formatter.SISuffix();
       var result = lnFormatter.format(1);
       assert.strictEqual(result, "1.00", "shows 3 signifigicant figures by default");
       result = lnFormatter.format(Math.pow(10, 12));
       assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
+      result = lnFormatter.format(Math.pow(10, -12));
+      assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
     });
   });
 });
