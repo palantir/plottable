@@ -1,13 +1,24 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Abstract {
-  interface IListenerCallbackPair {
-    l: any;
-    c: IBroadcasterCallback;
+export module Core {
+  export interface IListenable {
+    broadcaster: Broadcaster;
   }
-  export class Broadcaster extends PlottableObject {
+
+  export interface IBroadcasterCallback {
+    (listenable: IListenable, ...args: any[]): any;
+  }
+
+
+  export class Broadcaster extends Abstract.PlottableObject {
     private listener2Callback = new Util.StrictEqualityAssociativeArray();
+    public listenable: IListenable;
+
+    constructor(listenable: IListenable) {
+      super();
+      this.listenable = listenable;
+    }
 
     /**
      * Registers a callback to be called when the broadcast method is called. Also takes a listener which
@@ -31,13 +42,13 @@ export module Abstract {
      * @param ...args A variable number of optional arguments
      * @returns {Broadcaster} this object
      */
-    public _broadcast(...args: any[]) {
-      this.listener2Callback.values().forEach((callback) => callback(this, args));
+    public broadcast(...args: any[]) {
+      this.listener2Callback.values().forEach((callback) => callback(this.listenable, args));
       return this;
     }
 
     /**
-     * Registers deregister the callback associated with a listener.
+     * Deregisters the callback associated with a listener.
      *
      * @param listener The listener to deregister.
      * @returns {Broadcaster} this object
@@ -45,6 +56,15 @@ export module Abstract {
     public deregisterListener(listener: any) {
       this.listener2Callback.delete(listener);
       return this;
+    }
+
+    /**
+     * Deregisters all listeners and callbacks associated with the broadcaster.
+     *
+     * @returns {Broadcaster} this object
+     */
+    public deregisterAllListeners() {
+      this.listener2Callback = new Util.StrictEqualityAssociativeArray();
     }
   }
 }

@@ -54,10 +54,10 @@ function assertBBoxEquivalence(bbox, widthAndHeightPair, message) {
 function assertBBoxInclusion(outerEl, innerEl) {
     var outerBox = outerEl.node().getBoundingClientRect();
     var innerBox = innerEl.node().getBoundingClientRect();
-    assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left), "bounding rect left included");
-    assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top), "bounding rect top included");
-    assert.operator(Math.ceil(outerBox.right), ">=", Math.floor(innerBox.right), "bounding rect right included");
-    assert.operator(Math.ceil(outerBox.bottom), ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
+    assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left) + window.Pixel_CloseTo_Requirement, "bounding rect left included");
+    assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top) + window.Pixel_CloseTo_Requirement, "bounding rect top included");
+    assert.operator(Math.ceil(outerBox.right) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.right), "bounding rect right included");
+    assert.operator(Math.ceil(outerBox.bottom) + window.Pixel_CloseTo_Requirement, ">=", Math.floor(innerBox.bottom), "bounding rect bottom included");
 }
 
 function assertXY(el, xExpected, yExpected, message) {
@@ -104,9 +104,11 @@ var MultiTestVerifier = (function () {
 })();
 
 ///<reference path="testReference.ts" />
+
 before(function () {
     // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
     Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
+    window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
 
 ///<reference path="testReference.ts" />
@@ -316,9 +318,9 @@ describe("Axes", function () {
         var startDate = new Date(2000, 0, 1);
         var endDate = new Date(2001, 0, 1);
         var timeScale = new Plottable.Scale.Linear();
-        timeScale.domain([startDate, endDate]);
+        timeScale.updateExtent(1, "x", [startDate, endDate]);
         timeScale.range([0, 500]);
-        timeScale.nice();
+        timeScale.domainer(new Plottable.Domainer().nice());
         var xAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
         var baseDate = d3.min(timeScale.domain());
 
@@ -466,20 +468,96 @@ describe("BaseAxis", function () {
         }, "unsupported");
     });
 
+    it("tickLabelPadding() rejects negative values", function () {
+        var scale = new Plottable.Scale.Linear();
+        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+
+        assert.throws(function () {
+            return baseAxis.tickLabelPadding(-1);
+        }, "must be positive");
+    });
+
+    it("width()", function () {
+        var SVG_WIDTH = 100;
+        var SVG_HEIGHT = 500;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
+        verticalAxis.renderTo(svg);
+
+        var expectedWidth = verticalAxis.tickLength();
+        assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
+
+        verticalAxis.width(20);
+        assert.strictEqual(verticalAxis.width(), 20, "width was set to user-specified value");
+
+        verticalAxis.width(10 * SVG_WIDTH); // way too big
+        assert.strictEqual(verticalAxis.width(), SVG_WIDTH, "returns actual used width if requested width is too large");
+
+        assert.doesNotThrow(function () {
+            return verticalAxis.width("auto");
+        }, Error, "can be set to auto mode");
+        assert.throws(function () {
+            return verticalAxis.width(-999);
+        }, Error, "invalid");
+
+        var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        assert.throws(function () {
+            return horizontalAxis.width(2014);
+        }, Error, "horizontal");
+
+        svg.remove();
+    });
+
+    it("height()", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        horizontalAxis.renderTo(svg);
+
+        var expectedHeight = horizontalAxis.tickLength();
+        assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
+
+        horizontalAxis.height(20);
+        assert.strictEqual(horizontalAxis.height(), 20, "height was set to user-specified value");
+
+        horizontalAxis.height(10 * SVG_HEIGHT); // way too big
+        assert.strictEqual(horizontalAxis.height(), SVG_HEIGHT, "returns actual used height if requested height is too large");
+
+        assert.doesNotThrow(function () {
+            return horizontalAxis.height("auto");
+        }, Error, "can be set to auto mode");
+        assert.throws(function () {
+            return horizontalAxis.height(-999);
+        }, Error, "invalid");
+
+        var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
+        assert.throws(function () {
+            return verticalAxis.height(2014);
+        }, Error, "vertical");
+
+        svg.remove();
+    });
+
     it("draws ticks and baseline (horizontal)", function () {
         var SVG_WIDTH = 500;
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
+        scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        baseAxis.height(SVG_HEIGHT);
+        var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
-            return scale.ticks(10);
+            return tickValues;
         };
         baseAxis.renderTo(svg);
 
-        var ticks = svg.selectAll(".tick");
-        assert.strictEqual(ticks[0].length, scale.ticks(10).length, "A line was drawn for each tick");
+        var tickMarks = svg.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
         var baseline = svg.select(".baseline");
 
         assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -503,15 +581,18 @@ describe("BaseAxis", function () {
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
-        scale.range([0, SVG_WIDTH]);
+        scale.domain([0, 10]);
+        scale.range([0, SVG_HEIGHT]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "left");
+        baseAxis.width(SVG_WIDTH);
+        var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
-            return scale.ticks(10);
+            return tickValues;
         };
         baseAxis.renderTo(svg);
 
-        var ticks = svg.selectAll(".tick");
-        assert.strictEqual(ticks[0].length, scale.ticks(10).length, "A line was drawn for each tick");
+        var tickMarks = svg.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
         var baseline = svg.select(".baseline");
 
         assert.isNotNull(baseline.node(), "baseline was drawn");
@@ -535,21 +616,23 @@ describe("BaseAxis", function () {
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
+        scale.domain([0, 10]);
         scale.range([0, SVG_WIDTH]);
         var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         baseAxis._getTickValues = function () {
-            return scale.ticks(10);
+            return tickValues;
         };
         baseAxis.renderTo(svg);
 
-        var firstTick = svg.select(".tick").select("line");
-        assert.strictEqual(firstTick.attr("x1"), "0");
-        assert.strictEqual(firstTick.attr("x2"), "0");
-        assert.strictEqual(firstTick.attr("y1"), "0");
-        assert.strictEqual(firstTick.attr("y2"), String(baseAxis.tickLength()));
+        var firstTickMark = svg.select("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        assert.strictEqual(firstTickMark.attr("x1"), "0");
+        assert.strictEqual(firstTickMark.attr("x2"), "0");
+        assert.strictEqual(firstTickMark.attr("y1"), "0");
+        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.tickLength()));
 
         baseAxis.tickLength(10);
-        assert.strictEqual(firstTick.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
+        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
 
         assert.throws(function () {
             return baseAxis.tickLength(-1);
@@ -557,14 +640,234 @@ describe("BaseAxis", function () {
 
         svg.remove();
     });
+});
 
-    it("tickLabelPadding()", function () {
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("NumericAxis", function () {
+    it("tickLabelPosition() input validation", function () {
         var scale = new Plottable.Scale.Linear();
-        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
-
+        var horizontalAxis = new Plottable.Axis.Numeric(scale, "bottom");
         assert.throws(function () {
-            return baseAxis.tickLabelPadding(-1);
-        }, "must be positive");
+            return horizontalAxis.tickLabelPosition("top");
+        }, "horizontal");
+        assert.throws(function () {
+            return horizontalAxis.tickLabelPosition("bottom");
+        }, "horizontal");
+
+        var verticalAxis = new Plottable.Axis.Numeric(scale, "left");
+        assert.throws(function () {
+            return verticalAxis.tickLabelPosition("left");
+        }, "vertical");
+        assert.throws(function () {
+            return verticalAxis.tickLabelPosition("right");
+        }, "vertical");
+    });
+
+    it("draws tick labels correctly (horizontal)", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.range([0, SVG_WIDTH]);
+        var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        numericAxis.renderTo(svg);
+
+        var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
+        var tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
+
+        var i;
+        var markBB;
+        var labelBB;
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markBB = tickMarks[0][i].getBoundingClientRect();
+            var markCenter = (markBB.left + markBB.right) / 2;
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            var labelCenter = (labelBB.left + labelBB.right) / 2;
+            assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
+        }
+
+        // labels to left
+        numericAxis.tickLabelPosition("left");
+        tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markBB = tickMarks[0][i].getBoundingClientRect();
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            assert.operator(labelBB.left, "<=", markBB.right, "tick label is to left of mark");
+        }
+
+        // labels to right
+        numericAxis.tickLabelPosition("right");
+        tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markBB = tickMarks[0][i].getBoundingClientRect();
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            assert.operator(markBB.right, "<=", labelBB.left, "tick label is to right of mark");
+        }
+
+        svg.remove();
+    });
+
+    it("draws ticks correctly (vertical)", function () {
+        var SVG_WIDTH = 100;
+        var SVG_HEIGHT = 500;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.range([0, SVG_HEIGHT]);
+        var numericAxis = new Plottable.Axis.Numeric(scale, "left");
+        numericAxis.renderTo(svg);
+
+        var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        assert.operator(tickLabels[0].length, ">=", 2, "at least two tick labels were drawn");
+        var tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        assert.strictEqual(tickLabels[0].length, tickMarks[0].length, "there is one label per mark");
+
+        var i;
+        var markBB;
+        var labelBB;
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markBB = tickMarks[0][i].getBoundingClientRect();
+            var markCenter = (markBB.top + markBB.bottom) / 2;
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            var labelCenter = (labelBB.top + labelBB.bottom) / 2;
+            assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
+        }
+
+        // labels to top
+        numericAxis.tickLabelPosition("top");
+        tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markBB = tickMarks[0][i].getBoundingClientRect();
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            assert.operator(labelBB.bottom, "<=", markBB.top, "tick label is above mark");
+        }
+
+        // labels to bottom
+        numericAxis.tickLabelPosition("bottom");
+        tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickMarks = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+        for (i = 0; i < tickLabels[0].length; i++) {
+            markBB = tickMarks[0][i].getBoundingClientRect();
+            labelBB = tickLabels[0][i].getBoundingClientRect();
+            assert.operator(markBB.bottom, "<=", labelBB.top, "tick label is below mark");
+        }
+
+        svg.remove();
+    });
+
+    it("uses the supplied Formatter", function () {
+        var SVG_WIDTH = 100;
+        var SVG_HEIGHT = 500;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.range([0, SVG_HEIGHT]);
+
+        var formatter = new Plottable.Formatter.Fixed(2);
+
+        var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
+        numericAxis.renderTo(svg);
+
+        var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        tickLabels.each(function (d, i) {
+            var labelText = d3.select(this).text();
+            var formattedValue = formatter.format(d);
+            assert.strictEqual(labelText, formattedValue, "The supplied Formatter was used to format the tick label");
+        });
+
+        svg.remove();
+    });
+
+    it("can hide tick labels that don't fit", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.range([0, SVG_WIDTH]);
+        var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
+
+        numericAxis.showEndTickLabel("left", false);
+        assert.isFalse(numericAxis.showEndTickLabel("left"), "retrieve showEndTickLabel setting");
+        numericAxis.showEndTickLabel("right", true);
+        assert.isTrue(numericAxis.showEndTickLabel("right"), "retrieve showEndTickLabel setting");
+        assert.throws(function () {
+            return numericAxis.showEndTickLabel("top", true);
+        }, Error);
+        assert.throws(function () {
+            return numericAxis.showEndTickLabel("bottom", true);
+        }, Error);
+
+        numericAxis.renderTo(svg);
+
+        var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
+        var firstLabel = d3.select(tickLabels[0][0]);
+        assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
+        var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
+        assert.strictEqual(lastLabel.style("visibility"), "visible", "last label is hidden");
+
+        svg.remove();
+    });
+
+    it("tick labels don't overlap in a constrained space", function () {
+        var SVG_WIDTH = 100;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.range([0, SVG_WIDTH]);
+        var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
+        numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
+        numericAxis.renderTo(svg);
+
+        function boxesOverlap(boxA, boxB) {
+            if (boxA.right < boxB.left) {
+                return false;
+            }
+            if (boxA.left > boxB.right) {
+                return false;
+            }
+            if (boxA.bottom < boxB.top) {
+                return false;
+            }
+            if (boxA.top > boxB.bottom) {
+                return false;
+            }
+            return true;
+        }
+        var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        });
+        var numLabels = visibleTickLabels[0].length;
+        var box1;
+        var box2;
+        for (var i = 0; i < numLabels; i++) {
+            for (var j = i + 1; j < numLabels; j++) {
+                box1 = visibleTickLabels[0][i].getBoundingClientRect();
+                box2 = visibleTickLabels[0][j].getBoundingClientRect();
+
+                assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+            }
+        }
+
+        numericAxis.orient("bottom");
+        visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        });
+        numLabels = visibleTickLabels[0].length;
+        for (i = 0; i < numLabels; i++) {
+            for (j = i + 1; j < numLabels; j++) {
+                box1 = visibleTickLabels[0][i].getBoundingClientRect();
+                box2 = visibleTickLabels[0][j].getBoundingClientRect();
+
+                assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+            }
+        }
+
+        svg.remove();
     });
 });
 
@@ -575,9 +878,11 @@ describe("Broadcasters", function () {
     var b;
     var called;
     var cb;
+    var listenable = { broadcaster: null };
 
     beforeEach(function () {
-        b = new Plottable.Abstract.Broadcaster();
+        b = new Plottable.Core.Broadcaster(listenable);
+        listenable.broadcaster = b;
         called = false;
         cb = function () {
             called = true;
@@ -585,7 +890,7 @@ describe("Broadcasters", function () {
     });
     it("listeners are called by the broadcast method", function () {
         b.registerListener(null, cb);
-        b._broadcast();
+        b.broadcast();
         assert.isTrue(called, "callback was called");
     });
 
@@ -597,7 +902,7 @@ describe("Broadcasters", function () {
         var listener = {};
         b.registerListener(listener, cb);
         b.registerListener(listener, cb2);
-        b._broadcast();
+        b.broadcast();
         assert.isFalse(called, "first (overwritten) callback not called");
         assert.isTrue(called2, "second callback was called");
     });
@@ -606,21 +911,33 @@ describe("Broadcasters", function () {
         var listener = {};
         b.registerListener(listener, cb);
         b.deregisterListener(listener);
-        b._broadcast();
-        assert.isFalse(called, "callback was never called");
+        b.broadcast();
+        assert.isFalse(called, "callback was not called after deregistering only listener");
+
+        b.registerListener(5, cb);
+        b.registerListener(6, cb);
+        b.deregisterAllListeners();
+        b.broadcast();
+        assert.isFalse(called, "callback was not called after deregistering all listeners");
+
+        b.registerListener(5, cb);
+        b.registerListener(6, cb);
+        b.deregisterListener(5);
+        b.broadcast();
+        assert.isTrue(called, "callback was called even after 1/2 listeners were deregistered");
     });
 
     it("arguments are passed through to callback", function () {
         var g2 = {};
         var g3 = "foo";
         var cb = function (a1, rest) {
-            assert.equal(b, a1, "broadcaster passed through");
+            assert.equal(listenable, a1, "broadcaster passed through");
             assert.equal(g2, rest[0], "arg1 passed through");
             assert.equal(g3, rest[1], "arg2 passed through");
             called = true;
         };
         b.registerListener(null, cb);
-        b._broadcast(g2, g3);
+        b.broadcast(g2, g3);
         assert.isTrue(called, "the cb was called");
     });
 
@@ -1248,19 +1565,19 @@ describe("Component behavior", function () {
         var cb = function (b) {
             return cbCalled++;
         };
-        var b = new Plottable.Abstract.Broadcaster();
+        var b = new Plottable.Core.Broadcaster(null);
 
         var c1 = new Plottable.Abstract.Component();
 
-        c1._registerToBroadcaster(b, cb);
+        b.registerListener(c1, cb);
 
         c1.renderTo(svg);
-        b._broadcast();
+        b.broadcast();
         assert.equal(cbCalled, 1, "the callback was called");
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
         c1.remove();
 
-        b._broadcast();
+        b.broadcast();
         assert.equal(cbCalled, 2, "the callback is still attached to the component");
         assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
@@ -1321,12 +1638,12 @@ describe("DataSource", function () {
         var newData = [1, 2, 3];
 
         var callbackCalled = false;
-        var callback = function (broadcaster) {
-            assert.equal(broadcaster, ds, "Callback received the DataSource as the first argument");
+        var callback = function (listenable) {
+            assert.equal(listenable, ds, "Callback received the DataSource as the first argument");
             assert.deepEqual(ds.data(), newData, "DataSource arrives with correct data");
             callbackCalled = true;
         };
-        ds.registerListener(null, callback);
+        ds.broadcaster.registerListener(null, callback);
 
         ds.data(newData);
         assert.isTrue(callbackCalled, "callback was called when the data was changed");
@@ -1338,12 +1655,12 @@ describe("DataSource", function () {
         var newMetadata = "blargh";
 
         var callbackCalled = false;
-        var callback = function (broadcaster) {
-            assert.equal(broadcaster, ds, "Callback received the DataSource as the first argument");
+        var callback = function (listenable) {
+            assert.equal(listenable, ds, "Callback received the DataSource as the first argument");
             assert.deepEqual(ds.metadata(), newMetadata, "DataSource arrives with correct metadata");
             callbackCalled = true;
         };
-        ds.registerListener(null, callback);
+        ds.broadcaster.registerListener(null, callback);
 
         ds.metadata(newMetadata);
         assert.isTrue(callbackCalled, "callback was called when the metadata was changed");
@@ -1498,6 +1815,17 @@ describe("Formatters", function () {
             assert.strictEqual(result, "blargh", "string values are passed through unchanged");
             result = general.format(null);
             assert.strictEqual(result, "null", "non-number inputs are stringified");
+        });
+
+        it("throws an error on strange precision", function () {
+            assert.throws(function () {
+                var general = new Plottable.Formatter.General(-1);
+                var result = general.format(5);
+            });
+            assert.throws(function () {
+                var general = new Plottable.Formatter.General(100);
+                var result = general.format(5);
+            });
         });
     });
 
@@ -1909,8 +2237,7 @@ describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel("A CHART TITLE");
-        label._anchor(svg);
-        label._computeLayout();
+        label.renderTo(svg);
 
         var content = label.content;
         assert.isTrue(label.element.classed("label"), "title element has label css class");
@@ -1928,30 +2255,24 @@ describe("Labels", function () {
     it("Left-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("LEFT-ROTATED LABEL", "vertical-left");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
-        assert.equal(text.attr("transform"), "rotate(-90)", "the text element is rotated -90 degrees");
+        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
 
     it("Right-rotated text is handled properly", function () {
         var svg = generateSVG(100, 400);
         var label = new Plottable.Component.AxisLabel("RIGHT-ROTATED LABEL", "vertical-right");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var textBBox = Plottable.Util.DOM.getBBox(text);
         assertBBoxInclusion(label.element.select(".bounding-box"), text);
-        assert.equal(textBBox.height, label.availableWidth, "text height === label.minimumWidth() (it's rotated)");
-        assert.equal(text.attr("transform"), "rotate(90)", "the text element is rotated 90 degrees");
+        assert.closeTo(textBBox.height, label.availableWidth, window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
 
@@ -1959,12 +2280,11 @@ describe("Labels", function () {
         var svg = generateSVG(400, 80);
         var label = new Plottable.Component.TitleLabel();
         label.renderTo(svg);
-        var textEl = label.content.select("text");
-        assert.equal(textEl.text(), "", "the text defaulted to empty string when constructor was called w/o arguments");
+        assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
         assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
         label.setText("hello world");
         label.renderTo(svg);
-        assert.equal(textEl.text(), "hello world", "the label text updated properly");
+        assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
         assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
@@ -1973,11 +2293,9 @@ describe("Labels", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
         var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label._anchor(svg);
+        label.renderTo(svg);
         var content = label.content;
         var text = content.select("text");
-        label._computeLayout();
-        label._render();
         var bbox = Plottable.Util.DOM.getBBox(text);
         assert.equal(bbox.height, label.availableHeight, "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
@@ -1995,13 +2313,13 @@ describe("Labels", function () {
 
     it("centered text in a table is positioned properly", function () {
         var svg = generateSVG(400, 400);
-        var label = new Plottable.Component.TitleLabel(".");
+        var label = new Plottable.Component.TitleLabel("X");
         var t = new Plottable.Component.Table().addComponent(0, 0, label).addComponent(1, 0, new Plottable.Abstract.Component());
         t.renderTo(svg);
-        var textElement = svg.select("text");
-        var textX = parseFloat(textElement.attr("x"));
+        var textTranslate = d3.transform(label.content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label.element.attr("transform")).translate;
-        assert.closeTo(eleTranslate[0] + textX, 200, 10, "label is centered");
+        var textWidth = Plottable.Util.DOM.getBBox(label.content.select("text")).width;
+        assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
         svg.remove();
     });
 
@@ -2640,7 +2958,7 @@ describe("Renderers", function () {
 
             assert.equal(0, r.renders, "initially hasn't rendered anything");
 
-            d1._broadcast();
+            d1.broadcaster.broadcast();
             assert.equal(1, r.renders, "we re-render when our datasource changes");
 
             r.dataSource();
@@ -2650,10 +2968,10 @@ describe("Renderers", function () {
             r.dataSource(d2);
             assert.equal(2, r.renders, "we should redraw when we change datasource");
 
-            d1._broadcast();
+            d1.broadcaster.broadcast();
             assert.equal(2, r.renders, "we shouldn't listen to the old datasource");
 
-            d2._broadcast();
+            d2.broadcaster.broadcast();
             assert.equal(3, r.renders, "we should listen to the new datasource");
         });
 
@@ -2667,19 +2985,19 @@ describe("Renderers", function () {
             var yScale = new Plottable.Scale.Linear();
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
-            xScale.registerListener(null, function (broadcaster) {
-                assert.equal(broadcaster, xScale, "Callback received the calling scale as the first argument");
+            xScale.broadcaster.registerListener(null, function (listenable) {
+                assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
             });
-            yScale.registerListener(null, function (broadcaster) {
-                assert.equal(broadcaster, yScale, "Callback received the calling scale as the first argument");
+            yScale.broadcaster.registerListener(null, function (listenable) {
+                assert.equal(listenable, yScale, "Callback received the calling scale as the first argument");
                 ++yScaleCalls;
             });
 
             assert.equal(0, xScaleCalls, "initially hasn't made any X callbacks");
             assert.equal(0, yScaleCalls, "initially hasn't made any Y callbacks");
 
-            d1._broadcast();
+            d1.broadcaster.broadcast();
             assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
@@ -2688,11 +3006,11 @@ describe("Renderers", function () {
             assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
             assert.equal(2, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
 
-            d1._broadcast();
+            d1.broadcaster.broadcast();
             assert.equal(2, xScaleCalls, "X scale was unhooked from old datasource");
             assert.equal(2, yScaleCalls, "Y scale was unhooked from old datasource");
 
-            d2._broadcast();
+            d2.broadcaster.broadcast();
             assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
             assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
         });
@@ -2980,243 +3298,368 @@ describe("Renderers", function () {
                 ;
             });
         });
+        describe("Bar Plot", function () {
+            describe("Vertical Bar Plot in points mode", function () {
+                var verifier = new MultiTestVerifier();
+                var svg;
+                var dataset;
+                var xScale;
+                var yScale;
+                var renderer;
+                var SVG_WIDTH = 600;
+                var SVG_HEIGHT = 400;
 
-        describe("Bar Renderer", function () {
-            var verifier = new MultiTestVerifier();
-            var svg;
-            var dataset;
-            var xScale;
-            var yScale;
-            var renderer;
-            var SVG_WIDTH = 600;
-            var SVG_HEIGHT = 400;
+                before(function () {
+                    svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                    xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+                    yScale = new Plottable.Scale.Linear();
+                    var data = [
+                        { x: "A", y: 1 },
+                        { x: "B", y: -1.5 },
+                        { x: "B", y: 1 }
+                    ];
+                    dataset = new Plottable.DataSource(data);
 
-            before(function () {
-                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
-                yScale = new Plottable.Scale.Linear();
-                var data = [
-                    { x: "A", y: 1 },
-                    { x: "B", y: -1.5 },
-                    { x: "B", y: 1 }
-                ];
-                dataset = new Plottable.DataSource(data);
+                    renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+                    renderer.animate(false);
+                    renderer.renderTo(svg);
+                });
 
-                renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
-                renderer.animate(false);
-                renderer.renderTo(svg);
+                beforeEach(function () {
+                    yScale.domain([-2, 2]);
+                    renderer.baseline(0);
+                    verifier.start();
+                });
+
+                it("renders correctly", function () {
+                    var renderArea = renderer.renderArea;
+                    var bars = renderArea.selectAll("rect");
+                    assert.lengthOf(bars[0], 3, "One bar was created per data point");
+                    var bar0 = d3.select(bars[0][0]);
+                    var bar1 = d3.select(bars[0][1]);
+                    assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+                    assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+                    assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
+                    assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
+                    assert.equal(bar0.attr("x"), "150", "bar0 x is correct");
+                    assert.equal(bar1.attr("x"), "450", "bar1 x is correct");
+                    assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
+                    assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
+
+                    var baseline = renderArea.select(".baseline");
+                    assert.equal(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
+                    assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
+                    assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+                    assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+                    verifier.end();
+                });
+
+                it("baseline value can be changed; renderer updates appropriately", function () {
+                    renderer.baseline(-1);
+
+                    var renderArea = renderer.renderArea;
+                    var bars = renderArea.selectAll("rect");
+                    var bar0 = d3.select(bars[0][0]);
+                    var bar1 = d3.select(bars[0][1]);
+                    assert.equal(bar0.attr("height"), "200", "bar0 height is correct");
+                    assert.equal(bar1.attr("height"), "50", "bar1 height is correct");
+                    assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
+                    assert.equal(bar1.attr("y"), "300", "bar1 y is correct");
+
+                    var baseline = renderArea.select(".baseline");
+                    assert.equal(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
+                    assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
+                    assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+                    assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+                    verifier.end();
+                });
+
+                it("bar alignment can be changed; renderer updates appropriately", function () {
+                    renderer.barAlignment("center");
+                    var renderArea = renderer.renderArea;
+                    var bars = renderArea.selectAll("rect");
+                    var bar0 = d3.select(bars[0][0]);
+                    var bar1 = d3.select(bars[0][1]);
+                    assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+                    assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+                    assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
+                    assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+
+                    renderer.barAlignment("right");
+                    renderArea = renderer.renderArea;
+                    bars = renderArea.selectAll("rect");
+                    bar0 = d3.select(bars[0][0]);
+                    bar1 = d3.select(bars[0][1]);
+                    assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+                    assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+                    assert.equal(bar0.attr("x"), "140", "bar0 x is correct");
+                    assert.equal(bar1.attr("x"), "440", "bar1 x is correct");
+
+                    assert.throws(function () {
+                        return renderer.barAlignment("blargh");
+                    }, Error);
+                    assert.equal(renderer._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
+                    verifier.end();
+                });
+
+                it("can select and deselect bars", function () {
+                    var selectedBar = renderer.selectBar(145, 150);
+
+                    assert.isNotNull(selectedBar, "clicked on a bar");
+                    assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
+                    assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+                    renderer.deselectAll();
+                    assert.isFalse(selectedBar.classed("selected"), "the bar is no longer selected");
+
+                    selectedBar = renderer.selectBar(-1, -1); // no bars here
+                    assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                    selectedBar = renderer.selectBar(200, 50); // between the two bars
+                    assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                    selectedBar = renderer.selectBar(145, 10); // above bar 0
+                    assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                    // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
+                    // origin is at the top left!
+                    selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 150 }, true);
+                    assert.isNotNull(selectedBar, "line between middle of two bars");
+                    assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
+                    assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                    assert.equal(selectedBar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+                    assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+                    selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 350 }, true);
+                    assert.isNotNull(selectedBar, "square between middle of two bars, & over the whole area");
+                    assert.lengthOf(selectedBar.data(), 3, "selected all the bars");
+                    assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                    assert.equal(selectedBar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+                    assert.equal(selectedBar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
+                    assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+                    // the runtime parameter validation should be strict, so no strings or
+                    // mangled objects
+                    assert.throws(function () {
+                        return renderer.selectBar("blargh", 150);
+                    }, Error);
+                    assert.throws(function () {
+                        return renderer.selectBar({ min: 150 }, 150);
+                    }, Error);
+
+                    verifier.end();
+                });
+
+                it("shouldn't blow up if members called before the first render", function () {
+                    var brandNew = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+
+                    assert.isNotNull(brandNew.deselectAll(), "deselects return self");
+                    assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
+
+                    brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
+
+                    assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
+                    assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
+
+                    verifier.end();
+                });
+
+                after(function () {
+                    if (verifier.passed) {
+                        svg.remove();
+                    }
+                    ;
+                });
             });
 
-            beforeEach(function () {
-                yScale.domain([-2, 2]);
-                renderer.baseline(0);
-                verifier.start();
+            describe("Horizontal Bar Plot in Points Mode", function () {
+                var verifier = new MultiTestVerifier();
+                var svg;
+                var dataset;
+                var yScale;
+                var xScale;
+                var renderer;
+                var SVG_WIDTH = 600;
+                var SVG_HEIGHT = 400;
+                before(function () {
+                    svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                    yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+                    xScale = new Plottable.Scale.Linear();
+
+                    var data = [
+                        { y: "A", x: 1 },
+                        { y: "B", x: -1.5 },
+                        { y: "B", x: 1 }
+                    ];
+                    dataset = new Plottable.DataSource(data);
+
+                    renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
+                    renderer._animate = false;
+                    renderer.renderTo(svg);
+                });
+
+                beforeEach(function () {
+                    xScale.domain([-3, 3]);
+                    renderer.baseline(0);
+                    verifier.start();
+                });
+
+                it("renders correctly", function () {
+                    var renderArea = renderer.renderArea;
+                    var bars = renderArea.selectAll("rect");
+                    assert.lengthOf(bars[0], 3, "One bar was created per data point");
+                    var bar0 = d3.select(bars[0][0]);
+                    var bar1 = d3.select(bars[0][1]);
+                    assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+                    assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+                    assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
+                    assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
+                    assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
+                    assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
+                    assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
+                    assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+
+                    var baseline = renderArea.select(".baseline");
+                    assert.equal(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
+                    assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
+                    assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+                    assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+                    verifier.end();
+                });
+
+                it("baseline value can be changed; renderer updates appropriately", function () {
+                    renderer.baseline(-1);
+
+                    var renderArea = renderer.renderArea;
+                    var bars = renderArea.selectAll("rect");
+                    var bar0 = d3.select(bars[0][0]);
+                    var bar1 = d3.select(bars[0][1]);
+                    assert.equal(bar0.attr("width"), "200", "bar0 width is correct");
+                    assert.equal(bar1.attr("width"), "50", "bar1 width is correct");
+                    assert.equal(bar0.attr("x"), "200", "bar0 x is correct");
+                    assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+
+                    var baseline = renderArea.select(".baseline");
+                    assert.equal(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
+                    assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
+                    assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+                    assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+                    verifier.end();
+                });
+
+                it("bar alignment can be changed; renderer updates appropriately", function () {
+                    renderer.barAlignment("center");
+                    var renderArea = renderer.renderArea;
+                    var bars = renderArea.selectAll("rect");
+                    var bar0 = d3.select(bars[0][0]);
+                    var bar1 = d3.select(bars[0][1]);
+                    assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+                    assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+                    assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
+                    assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
+
+                    renderer.barAlignment("bottom");
+                    renderArea = renderer.renderArea;
+                    bars = renderArea.selectAll("rect");
+                    bar0 = d3.select(bars[0][0]);
+                    bar1 = d3.select(bars[0][1]);
+                    assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+                    assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+                    assert.equal(bar0.attr("y"), "290", "bar0 y is correct");
+                    assert.equal(bar1.attr("y"), "90", "bar1 y is correct");
+
+                    assert.throws(function () {
+                        return renderer.barAlignment("blargh");
+                    }, Error);
+
+                    verifier.end();
+                });
+
+                after(function () {
+                    if (verifier.passed) {
+                        svg.remove();
+                    }
+                    ;
+                });
             });
 
-            it("renders correctly", function () {
-                var renderArea = renderer.renderArea;
-                var bars = renderArea.selectAll("rect");
-                assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-                assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-                assert.equal(bar0.attr("x"), "150", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "450", "bar1 x is correct");
-                assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
+            describe("Horizontal Bar Plot in Bands mode", function () {
+                var verifier = new MultiTestVerifier();
+                var svg;
+                var dataset;
+                var yScale;
+                var xScale;
+                var renderer;
+                var SVG_WIDTH = 600;
+                var SVG_HEIGHT = 400;
+                var axisWidth = 0;
+                var bandWidth = 0;
 
-                var baseline = renderArea.select(".baseline");
-                assert.equal(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
-                assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
-                assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-                assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-                verifier.end();
-            });
+                var numAttr = function (s, a) {
+                    return parseFloat(s.attr(a));
+                };
 
-            it("baseline value can be changed; renderer updates appropriately", function () {
-                renderer.baseline(-1);
+                before(function () {
+                    svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                    yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
+                    xScale = new Plottable.Scale.Linear();
 
-                var renderArea = renderer.renderArea;
-                var bars = renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("height"), "200", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "50", "bar1 height is correct");
-                assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "300", "bar1 y is correct");
+                    var data = [
+                        { y: "A", x: 1 },
+                        { y: "B", x: 2 }
+                    ];
+                    dataset = new Plottable.DataSource(data);
 
-                var baseline = renderArea.select(".baseline");
-                assert.equal(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
-                assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
-                assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-                assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-                verifier.end();
-            });
+                    renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
+                    renderer.baseline(0);
+                    renderer._animate = false;
+                    var yAxis = new Plottable.Axis.Category(yScale, "left");
+                    var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+                    axisWidth = yAxis.availableWidth;
+                    bandWidth = yScale.rangeBand();
+                });
+                beforeEach(function () {
+                    verifier.start();
+                });
+                after(function () {
+                    if (verifier.passed) {
+                        svg.remove();
+                    }
+                    ;
+                });
 
-            it("bar alignment can be changed; renderer updates appropriately", function () {
-                renderer.barAlignment("center");
-                var renderArea = renderer.renderArea;
-                var bars = renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-                assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+                it("renders correctly", function () {
+                    var bars = renderer.renderArea.selectAll("rect");
+                    var bar0 = d3.select(bars[0][0]);
+                    var bar1 = d3.select(bars[0][1]);
+                    var bar0y = bar0.data()[0].y;
+                    var bar1y = bar1.data()[0].y;
+                    assert.closeTo(numAttr(bar0, "height"), 104, 2);
+                    assert.closeTo(numAttr(bar1, "height"), 104, 2);
+                    assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "width is correct for bar0");
+                    assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "width is correct for bar1");
 
-                renderer.barAlignment("right");
-                renderArea = renderer.renderArea;
-                bars = renderArea.selectAll("rect");
-                bar0 = d3.select(bars[0][0]);
-                bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-                assert.equal(bar0.attr("x"), "140", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "440", "bar1 x is correct");
+                    // check that bar is aligned on the center of the scale
+                    assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "y pos correct for bar0");
+                    assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "y pos correct for bar1");
+                    verifier.end();
+                });
 
-                assert.throws(function () {
-                    return renderer.barAlignment("blargh");
-                }, Error);
-
-                verifier.end();
-            });
-
-            it("can select and deselect bars", function () {
-                var selectedBar = renderer.selectBar(145, 150);
-
-                assert.isNotNull(selectedBar, "a bar was selected");
-                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
-                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
-
-                renderer.deselectAll();
-                assert.isFalse(selectedBar.classed("selected"), "the bar is no longer selected");
-
-                selectedBar = renderer.selectBar(-1, -1); // no bars here
-                assert.isNull(selectedBar, "returns null if no bar was selected");
-
-                verifier.end();
-            });
-
-            after(function () {
-                if (verifier.passed) {
-                    svg.remove();
-                }
-                ;
-            });
-        });
-
-        describe("Horizontal Bar Renderer", function () {
-            var verifier = new MultiTestVerifier();
-            var svg;
-            var dataset;
-            var yScale;
-            var xScale;
-            var renderer;
-            var SVG_WIDTH = 600;
-            var SVG_HEIGHT = 400;
-
-            before(function () {
-                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
-                xScale = new Plottable.Scale.Linear();
-
-                var data = [
-                    { y: "A", x: 1 },
-                    { y: "B", x: -1.5 },
-                    { y: "B", x: 1 }
-                ];
-                dataset = new Plottable.DataSource(data);
-
-                renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
-                renderer._animate = false;
-                renderer.renderTo(svg);
-            });
-
-            beforeEach(function () {
-                xScale.domain([-3, 3]);
-                renderer.baseline(0);
-                verifier.start();
-            });
-
-            it("renders correctly", function () {
-                var renderArea = renderer.renderArea;
-                var bars = renderArea.selectAll("rect");
-                assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-                assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
-                assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
-
-                var baseline = renderArea.select(".baseline");
-                assert.equal(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
-                assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
-                assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-                assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-                verifier.end();
-            });
-
-            it("baseline value can be changed; renderer updates appropriately", function () {
-                renderer.baseline(-1);
-
-                var renderArea = renderer.renderArea;
-                var bars = renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("width"), "200", "bar0 width is correct");
-                assert.equal(bar1.attr("width"), "50", "bar1 width is correct");
-                assert.equal(bar0.attr("x"), "200", "bar0 x is correct");
-                assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
-
-                var baseline = renderArea.select(".baseline");
-                assert.equal(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
-                assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
-                assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-                assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-                verifier.end();
-            });
-
-            it("bar alignment can be changed; renderer updates appropriately", function () {
-                renderer.barAlignment("middle");
-                var renderArea = renderer.renderArea;
-                var bars = renderArea.selectAll("rect");
-                var bar0 = d3.select(bars[0][0]);
-                var bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-                assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
-
-                renderer.barAlignment("bottom");
-                renderArea = renderer.renderArea;
-                bars = renderArea.selectAll("rect");
-                bar0 = d3.select(bars[0][0]);
-                bar1 = d3.select(bars[0][1]);
-                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-                assert.equal(bar0.attr("y"), "290", "bar0 y is correct");
-                assert.equal(bar1.attr("y"), "90", "bar1 y is correct");
-
-                assert.throws(function () {
-                    return renderer.barAlignment("blargh");
-                }, Error);
-
-                verifier.end();
-            });
-
-            after(function () {
-                if (verifier.passed) {
-                    svg.remove();
-                }
-                ;
+                it("width projector may be overwritten, and calling project queues rerender", function () {
+                    var bars = renderer.renderArea.selectAll("rect");
+                    var bar0 = d3.select(bars[0][0]);
+                    var bar1 = d3.select(bars[0][1]);
+                    var bar0y = bar0.data()[0].y;
+                    var bar1y = bar1.data()[0].y;
+                    renderer.project("width", 10);
+                    assert.equal(numAttr(bar0, "height"), 10, "bar0 height");
+                    assert.equal(numAttr(bar1, "height"), 10, "bar1 height");
+                    assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "bar0 width");
+                    assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "bar1 width");
+                    assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "bar0 ypos");
+                    assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "bar1 ypos");
+                    verifier.end();
+                });
             });
         });
 
@@ -3335,31 +3778,32 @@ describe("Scales", function () {
             return true;
         };
         var scale = new Plottable.Scale.Linear();
-        scale.registerListener(null, testCallback);
+        scale.broadcaster.registerListener(null, testCallback);
         var scaleCopy = scale.copy();
         assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
         assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-        assert.notDeepEqual(scale.listener2Callback, scaleCopy.listener2Callback, "Registered callbacks are not copied over");
+        assert.notDeepEqual(scale.broadcaster, scaleCopy.broadcaster, "Broadcasters are not copied over");
     });
 
     it("Scale alerts listeners when its domain is updated", function () {
         var scale = new Plottable.Scale.Linear();
         var callbackWasCalled = false;
-        var testCallback = function (broadcaster) {
-            assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+        var testCallback = function (listenable) {
+            assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
             callbackWasCalled = true;
         };
-        scale.registerListener(null, testCallback);
+        scale.broadcaster.registerListener(null, testCallback);
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-        scale.domain([0.08, 9.92]);
+        scale._autoDomainAutomatically = true;
+        scale.updateExtent(1, "x", [0.08, 9.92]);
         callbackWasCalled = false;
-        scale.nice();
+        scale.domainer(new Plottable.Domainer().nice());
         assert.isTrue(callbackWasCalled, "The registered callback was called when nice() is used to set the domain");
 
         callbackWasCalled = false;
-        scale.padDomain(0.2);
+        scale.domainer(new Plottable.Domainer().pad());
         assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
     });
     describe("autoranging behavior", function () {
@@ -3376,7 +3820,7 @@ describe("Scales", function () {
             scale.updateExtent(1, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
-            scale.autoDomain().padDomain().nice();
+            scale.domainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
             assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
@@ -3424,47 +3868,24 @@ describe("Scales", function () {
             assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
+
+        it("scales don't allow Infinity", function () {
+            assert.throws(function () {
+                return scale._setDomain([5, Infinity]);
+            }, Error);
+            assert.throws(function () {
+                return scale._setDomain([-Infinity, 6]);
+            }, Error);
+        });
     });
 
     describe("Quantitive Scales", function () {
         it("autorange defaults to [0, 1] if no perspectives set", function () {
             var scale = new Plottable.Scale.Linear();
-            scale.domain([]);
             scale.autoDomain();
             var d = scale.domain();
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
-        });
-
-        it("autoPad defaults to [v-1, v+1] if there's only one value", function () {
-            var scale = new Plottable.Scale.Linear();
-            scale.domain([5, 5]);
-            scale.padDomain();
-            assert.deepEqual(scale.domain(), [4, 6]);
-        });
-
-        it("autoPad works in general case", function () {
-            var scale = new Plottable.Scale.Linear();
-            scale.domain([100, 200]);
-            scale.padDomain(0.20);
-            assert.deepEqual(scale.domain(), [90, 210]);
-        });
-
-        it("autoPad works for date scales", function () {
-            var scale = new Plottable.Scale.Time();
-            var f = d3.time.format("%x");
-            var d1 = f.parse("06/02/2014");
-            var d2 = f.parse("06/03/2014");
-            scale.domain([d1, d2]);
-            scale.padDomain();
-            var dd1 = scale.domain()[0];
-            var dd2 = scale.domain()[1];
-            assert.isDefined(dd1.toDateString, "padDomain produced dates");
-            assert.isNotNull(dd1.toDateString, "padDomain produced dates");
-            assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
-            assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-            assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-            assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
         });
     });
 
@@ -3496,11 +3917,11 @@ describe("Scales", function () {
         it("rangeType triggers broadcast", function () {
             var scale = new Plottable.Scale.Ordinal();
             var callbackWasCalled = false;
-            var testCallback = function (broadcaster) {
-                assert.equal(broadcaster, scale, "Callback received the calling scale as the first argument");
+            var testCallback = function (listenable) {
+                assert.equal(listenable, scale, "Callback received the calling scale as the first argument");
                 callbackWasCalled = true;
             };
-            scale.registerListener(null, testCallback);
+            scale.broadcaster.registerListener(null, testCallback);
             scale.rangeType("points");
             assert.isTrue(callbackWasCalled, "The registered callback was called");
         });
@@ -3607,6 +4028,18 @@ describe("StrictEqualityAssociativeArray", function () {
         assert.isUndefined(s.get(3));
         assert.equal(s.get(o2), "baz");
         assert.equal(s.get("3"), "ball");
+    });
+
+    it("Array-level operations (retrieve keys, vals, and map)", function () {
+        var s = new Plottable.Util.StrictEqualityAssociativeArray();
+        s.set(2, "foo");
+        s.set(3, "bar");
+        s.set(4, "baz");
+        assert.deepEqual(s.values(), ["foo", "bar", "baz"]);
+        assert.deepEqual(s.keys(), [2, 3, 4]);
+        assert.deepEqual(s.map(function (k, v, i) {
+            return [k, v, i];
+        }), [[2, "foo", 0], [3, "bar", 1], [4, "baz", 2]]);
     });
 });
 
@@ -3923,52 +4356,10 @@ describe("Tables", function () {
         var c5 = new Plottable.Abstract.Component();
         var c6 = new Plottable.Abstract.Component();
         var table;
-        it("table._removeComponent works in easy case with no splicing", function () {
+        it("table._removeComponent works in basic case", function () {
             table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
             table._removeComponent(c4);
             assert.deepEqual(table.rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
-        });
-
-        it("table._removeComponent works for row splicing", function () {
-            table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
-            table._removeComponent(c4);
-            table._removeComponent(c3);
-            assert.deepEqual(table.rows, [[c1, c2], [c5, c6]], "remove one row");
-        });
-
-        it("table._removeComponent works for column splicing", function () {
-            table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
-            table._removeComponent(c2);
-            table._removeComponent(c4);
-            table._removeComponent(c6);
-
-            assert.deepEqual(table.rows, [[c1], [c3], [c5]], "remove one column");
-        });
-
-        it("table._removeComponent only splices when row or column is completely empty", function () {
-            table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
-            table._removeComponent(c2);
-            table._removeComponent(c3);
-            table._removeComponent(c6);
-
-            assert.deepEqual(table.rows, [[c1, null], [null, c4], [c5, null]], "remove multiple items");
-        });
-
-        it("table._removeComponent works for splicing out row and column simultaneously", function () {
-            table = new Plottable.Component.Table([[c1, c2], [c3, c4], [c5, c6]]);
-            table._removeComponent(c2);
-            table._removeComponent(c3);
-            table._removeComponent(c6);
-            table._removeComponent(c4); // this should kill the row and column at the same time
-
-            assert.deepEqual(table.rows, [[c1], [c5]], "remove row and column");
-        });
-
-        it("table._removeComponent works for single row and column", function () {
-            table = new Plottable.Component.Table([[c1]]);
-            table._removeComponent(c1);
-
-            assert.deepEqual(table.rows, [], "remove entire table");
         });
 
         it("table._removeComponent does nothing when component is not found", function () {
@@ -3999,18 +4390,17 @@ describe("Tables", function () {
 
 ///<reference path="testReference.ts" />
 var assert = chai.assert;
-var tu = Plottable.Util.Text;
 describe("Util.Text", function () {
     it("getTruncatedText works properly", function () {
         var svg = generateSVG();
         var textEl = svg.append("text").attr("x", 20).attr("y", 50);
         textEl.text("foobar");
-
-        var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, textEl);
+        var measure = Plottable.Util.Text.getTextMeasure(textEl);
+        var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, measure);
         assert.equal(fullText, "hellom world!", "text untruncated");
-        var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, textEl);
+        var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, measure);
         assert.equal(partialText, "hello...", "text truncated");
-        var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, textEl);
+        var tinyText = Plottable.Util.Text.getTruncatedText("hellom world!", 5, measure);
         assert.equal(tinyText, "", "empty string for tiny text");
 
         assert.equal(textEl.text(), "foobar", "truncate had no side effect on textEl");
@@ -4289,5 +4679,135 @@ describe("Util.s", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+});
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("Domainer", function () {
+    var scale;
+    var domainer;
+    beforeEach(function () {
+        scale = new Plottable.Scale.Linear();
+        domainer = new Plottable.Domainer();
+    });
+
+    it("pad() works in general case", function () {
+        scale.updateExtent(1, "x", [100, 200]);
+        scale.domainer(new Plottable.Domainer().pad(0.2));
+        assert.deepEqual(scale.domain(), [90, 210]);
+    });
+
+    it("pad() works for date scales", function () {
+        var timeScale = new Plottable.Scale.Time();
+        var f = d3.time.format("%x");
+        var d1 = f.parse("06/02/2014");
+        var d2 = f.parse("06/03/2014");
+        timeScale.updateExtent(1, "x", [d1, d2]);
+        timeScale.domainer(new Plottable.Domainer().pad());
+        var dd1 = timeScale.domain()[0];
+        var dd2 = timeScale.domain()[1];
+        assert.isDefined(dd1.toDateString, "padDomain produced dates");
+        assert.isNotNull(dd1.toDateString, "padDomain produced dates");
+        assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
+        assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
+        assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
+        assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
+    });
+
+    it("pad() defaults to [v-1, v+1] if there's only one numeric value", function () {
+        domainer.pad();
+        var domain = domainer.computeDomain([[5, 5]], scale);
+        assert.deepEqual(domain, [4, 6]);
+    });
+
+    it("pad() defaults to [v-1 day, v+1 day] if there's only one date value", function () {
+        var d = new Date(2000, 5, 5);
+        var dayBefore = new Date(2000, 5, 4);
+        var dayAfter = new Date(2000, 5, 6);
+        var timeScale = new Plottable.Scale.Time();
+
+        // the result of computeDomain() will be number[], but when it
+        // gets fed back into timeScale, it will be adjusted back to a Date.
+        // That's why I'm using updateExtent() instead of domainer.computeDomain()
+        timeScale.updateExtent(1, "x", [d, d]);
+        timeScale.domainer(new Plottable.Domainer().pad());
+        assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
+    });
+
+    it("pad() only takes the last value", function () {
+        domainer.pad(1000).pad(4).pad(0.1);
+        var domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [95, 205]);
+    });
+
+    it("pad() will pad beyond 0 by default", function () {
+        domainer.pad(0.1);
+        var domain = domainer.computeDomain([[0, 100]], scale);
+        assert.deepEqual(domain, [-5, 105]);
+    });
+
+    it("paddingException(n) will not pad beyond n", function () {
+        domainer.pad(0.1).paddingException(0).paddingException(200);
+        var domain = domainer.computeDomain([[0, 100]], scale);
+        assert.deepEqual(domain, [0, 105]);
+        domain = domainer.computeDomain([[-100, 0]], scale);
+        assert.deepEqual(domain, [-105, 0]);
+        domain = domainer.computeDomain([[0, 200]], scale);
+        assert.deepEqual(domain, [0, 200]);
+        domainer.paddingException(0, false);
+        domain = domainer.computeDomain([[0, 200]], scale);
+        assert.deepEqual(domain, [-10, 200]);
+    });
+
+    it("paddingException(n) works on dates", function () {
+        var a = new Date(2000, 5, 5);
+        var b = new Date(2003, 0, 1);
+        domainer.pad().paddingException(a);
+        var timeScale = new Plottable.Scale.Time();
+        timeScale.updateExtent(1, "x", [a, b]);
+        timeScale.domainer(domainer);
+        var domain = timeScale.domain();
+        assert.deepEqual(domain[0], a);
+        assert.isTrue(b < domain[1]);
+    });
+
+    it("include(n) works an expected", function () {
+        domainer.include(5);
+        var domain = domainer.computeDomain([[0, 10]], scale);
+        assert.deepEqual(domain, [0, 10]);
+        domain = domainer.computeDomain([[0, 3]], scale);
+        assert.deepEqual(domain, [0, 5]);
+        domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [5, 200]);
+
+        domainer.include(-3).include(0).include(10);
+        domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [-3, 200]);
+        domain = domainer.computeDomain([[0, 0]], scale);
+        assert.deepEqual(domain, [-3, 10]);
+
+        domainer.include(10, false);
+        domain = domainer.computeDomain([[100, 200]], scale);
+        assert.deepEqual(domain, [-3, 200]);
+        domain = domainer.computeDomain([[-100, -50]], scale);
+        assert.deepEqual(domain, [-100, 5]);
+
+        domainer.include(10);
+        domain = domainer.computeDomain([[-100, -50]], scale);
+        assert.deepEqual(domain, [-100, 10]);
+    });
+
+    it("include(n) works on dates", function () {
+        var a = new Date(2000, 5, 4);
+        var b = new Date(2000, 5, 5);
+        var c = new Date(2000, 5, 6);
+        var d = new Date(2003, 0, 1);
+        domainer.include(b);
+        var timeScale = new Plottable.Scale.Time();
+        timeScale.updateExtent(1, "x", [c, d]);
+        timeScale.domainer(domainer);
+        assert.deepEqual(timeScale.domain(), [b, d]);
     });
 });

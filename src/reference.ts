@@ -27,6 +27,7 @@
 /// <reference path="core/resizeBroadcaster.ts" />
 /// <reference path="core/animator.ts" />
 /// <reference path="core/interfaces.ts" />
+/// <reference path="core/domainer.ts" />
 
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />
@@ -40,6 +41,7 @@
 
 /// <reference path="components/axis.ts" />
 /// <reference path="components/baseAxis.ts" />
+/// <reference path="components/numericAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />

@@ -33,7 +33,7 @@ export module Axis {
         formatFunction = (d: any) => (<Abstract.Formatter> formatter).format(d);
       }
       this.tickFormat(formatFunction);
-      this._registerToBroadcaster(this._axisScale, () => this._render());
+      this._axisScale.broadcaster.registerListener(this, () => this._render());
     }
 
     public _setup() {
@@ -360,7 +360,7 @@ export module Axis {
             var measure = Util.Text.getTextMeasure(textEl);
             var wrappedLines = Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
-              textEl.text(Util.Text.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(Util.Text.getTruncatedText(currentText, availableWidth, measure));
             } else {
               textEl.text("");
               var tspans = textEl.selectAll("tspan").data(wrappedLines);
@@ -499,7 +499,7 @@ export module Axis {
             var measure = Util.Text.getTextMeasure(textEl);
             var wrappedLines = Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
             if (wrappedLines.length === 1) {
-              textEl.text(Util.Text.getTruncatedText(currentText, availableWidth, textEl));
+              textEl.text(Util.Text.getTruncatedText(currentText, availableWidth, measure));
             } else {
               var baseY = 0; // measured in ems
               if (tickLabelPosition === "top") {

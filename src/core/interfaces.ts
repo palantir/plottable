@@ -29,10 +29,6 @@ module Plottable {
     data: SelectionArea;
   }
 
-  export interface IBroadcasterCallback {
-    (broadcaster: Abstract.Broadcaster, ...args: any[]): any;
-  }
-
   export interface ISpaceRequest {
     width: number;
     height: number;
@@ -45,5 +41,10 @@ module Plottable {
     xMax: number;
     yMin: number;
     yMax: number;
+  }
+
+  export interface IExtent {
+    min: number;
+    max: number;
   }
 }

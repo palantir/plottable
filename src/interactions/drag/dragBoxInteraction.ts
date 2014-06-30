@@ -21,12 +21,14 @@ export module Interaction {
      * @returns {AreaInteraction} The calling AreaInteraction.
      */
     public clearBox() {
+      if (this.dragBox == null) {return;} // HACKHACK #593
       this.dragBox.attr("height", 0).attr("width", 0);
       this.boxIsDrawn = false;
       return this;
     }
 
     public setBox(x0: number, x1: number, y0: number, y1: number) {
+      if (this.dragBox == null) {return;} // HACKHACK #593
       var w = Math.abs(x0 - x1);
       var h = Math.abs(y0 - y1);
       var xo = Math.min(x0, x1);
