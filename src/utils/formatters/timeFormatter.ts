@@ -18,6 +18,8 @@ module Plottable {
 
         var numFormats = 8;
 
+        // these defaults were taken from d3
+        // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
         var timeFormat: {[index: number]: FilterFormat} = {};
 
         timeFormat[0] = {
