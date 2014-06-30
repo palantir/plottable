@@ -1153,7 +1153,7 @@ var Plottable;
                 timeFormat[1] = {
                     format: ":%S",
                     filter: function (d) {
-                        return d.getMinutes() !== 0;
+                        return d.getSeconds() !== 0;
                     }
                 };
                 timeFormat[2] = {
@@ -4690,6 +4690,7 @@ var Plottable;
             };
 
             Time.prototype._doRender = function () {
+                var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickValues = this._getTickValues();
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(tickValues);
@@ -4715,7 +4716,9 @@ var Plottable;
                         break;
                 }
 
-                tickLabels.text(this._formatter.format).style("text-anchor", "middle").style("visibility", "visible").attr(tickLabelAttrHash);
+                tickLabels.text(function (d) {
+                    return _this._formatter.format(d);
+                }).style("text-anchor", "middle").style("visibility", "visible").attr(tickLabelAttrHash);
 
                 var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);

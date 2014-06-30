@@ -62,7 +62,7 @@ export module Axis {
           break;
       }
 
-      tickLabels.text(this._formatter.format)
+      tickLabels.text((d: any) => this._formatter.format(d))
                           .style("text-anchor", "middle")
                           .style("visibility", "visible")
                           .attr(tickLabelAttrHash);

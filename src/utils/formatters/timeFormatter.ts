@@ -26,7 +26,7 @@ module Plottable {
         };
         timeFormat[1] = {
           format: ":%S",
-          filter: (d: any) => d.getMinutes() !== 0
+          filter: (d: any) => d.getSeconds() !== 0
         };
         timeFormat[2] = {
           format: "%I:%M",
@@ -53,7 +53,7 @@ module Plottable {
           filter: () => true
         };
 
-        this._formatFunction = function(d: any) {
+        this._formatFunction = (d: any) => {
           for (var i = 0; i < numFormats; i++) {
             if (timeFormat[i].filter(d)) {
               return d3.time.format(timeFormat[i].format)(d);

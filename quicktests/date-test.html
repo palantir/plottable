@@ -15,10 +15,7 @@
 
 
 
-  window.onload = function () {
-    var format = new Plottable.Formatter.Time();
-    var date = d3.time.format("%x").parse("3/14/2015");
-    
+  window.onload = function () {    
     xScale = new Plottable.Scale.Time();
     yScale = new Plottable.Scale.Linear();
     linePlot = new Plottable.Plot.Line(data, xScale, yScale)
