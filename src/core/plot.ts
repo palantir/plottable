@@ -54,6 +54,7 @@ export module Abstract {
     public _anchor(element: D3.Selection) {
       super._anchor(element);
       this._dataChanged = true;
+      this.updateAllProjectors();
       return this;
     }
 
@@ -150,6 +151,13 @@ export module Abstract {
       return this;
     }
 
+    public remove() {
+      super.remove();
+      // make the domain resize
+      this.updateAllProjectors();
+      return this;
+    }
+
     /**
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
@@ -163,7 +171,7 @@ export module Abstract {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
-        if (extent.length === 0) {
+        if (extent.length === 0 || !this._isAnchored) {
           projector.scale.removeExtent(this._plottableID, attr);
         } else {
           projector.scale.updateExtent(this._plottableID, attr, extent);

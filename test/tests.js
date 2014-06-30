@@ -3036,15 +3036,19 @@ describe("Renderers", function () {
             var ds1 = new Plottable.DataSource([0, 1, 2]);
             var ds2 = new Plottable.DataSource([1, 2, 3]);
             var s = new Plottable.Scale.Linear();
+            var svg1 = generateSVG(100, 100);
+            var svg2 = generateSVG(100, 100);
             var r1 = new Plottable.Abstract.Plot().dataSource(ds1).project("x", function (x) {
                 return x;
-            }, s);
+            }, s).renderTo(svg1);
             var r2 = new Plottable.Abstract.Plot().dataSource(ds2).project("x", function (x) {
                 return x;
-            }, s);
+            }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
+            svg1.remove();
+            svg2.remove();
         });
     });
 
@@ -3827,16 +3831,22 @@ describe("Scales", function () {
         });
 
         it("scale autorange works as expected with single dataSource", function () {
-            var renderer = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            var svg = generateSVG(100, 100);
+            var renderer = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataSource.data(data);
             assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
+            svg.remove();
         });
 
         it("scale reference counting works as expected", function () {
+            var svg1 = generateSVG(100, 100);
+            var svg2 = generateSVG(100, 100);
             var renderer1 = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            renderer1.renderTo(svg1);
             var renderer2 = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            renderer2.renderTo(svg2);
             var otherScale = new Plottable.Scale.Linear();
             renderer1.project("x", "foo", otherScale);
             dataSource.data([{ foo: 10 }, { foo: 11 }]);
@@ -3846,6 +3856,8 @@ describe("Scales", function () {
             // "scale not listening to the dataSource after all perspectives removed"
             dataSource.data([{ foo: 99 }, { foo: 100 }]);
             assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
+            svg1.remove();
+            svg2.remove();
         });
 
         it("scale perspectives can be removed appropriately", function () {
@@ -3876,6 +3888,27 @@ describe("Scales", function () {
             assert.throws(function () {
                 return scale._setDomain([-Infinity, 6]);
             }, Error);
+        });
+
+        it("should resize when a plot is removed", function () {
+            var svg = generateSVG(400, 400);
+            var ds1 = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+            var ds2 = [{ x: 1, y: 1 }, { x: 2, y: 2 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            xScale.domainer(new Plottable.Domainer());
+            var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+            var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+            var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
+            var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
+            var renderAreas = renderAreaD1.merge(renderAreaD2);
+            renderAreas.renderTo(svg);
+            assert.deepEqual(xScale.domain(), [0, 2]);
+            renderAreaD1.remove();
+            assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+            renderAreas.merge(renderAreaD1);
+            assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
+            svg.remove();
         });
     });
 
