@@ -363,6 +363,9 @@ var Plottable;
             /**
             * Attempt to look up k in the cache, computing the result if it isn't
             * found.
+            *
+            * @param {string} k The key to look up in the cache.
+            * @return {T} The value associated with k; the result of compute(k).
             */
             Cache.prototype.get = function (k) {
                 if (!this.cache.has(k)) {
@@ -372,9 +375,13 @@ var Plottable;
             };
 
             /**
-            * Reset the cache empty. However, if the canonicalKey passed into the
-            * constructor has not changed, the cache will not empty. See the
-            * constructor for more.
+            * Reset the cache empty.
+            *
+            * If canonicalKey was provided at construction, compute(canonicalKey)
+            * will be re-run. If the result matches what is already in the cache,
+            * it will not clear the cache.
+            *
+            * @return {Cache<T>} The calling Cache.
             */
             Cache.prototype.clear = function () {
                 if (this.canonicalKey === undefined || !this.valueEq(this.cache.get(this.canonicalKey), this.compute(this.canonicalKey))) {
