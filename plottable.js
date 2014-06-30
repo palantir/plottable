@@ -4288,6 +4288,16 @@ var Plottable;
                 };
             };
 
+            Axis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                if (this._isHorizontal()) {
+                    this._scale.range([0, this.availableWidth]);
+                } else {
+                    this._scale.range([this.availableHeight, 0]);
+                }
+                return this;
+            };
+
             Axis.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tickMarkContainer = this.content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
@@ -5421,13 +5431,6 @@ var Plottable;
 
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
 
-                return this;
-            };
-
-            XYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.xScale.range([0, this.availableWidth]);
-                this.yScale.range([this.availableHeight, 0]);
                 return this;
             };
 
