@@ -164,7 +164,7 @@ export module Axis {
       if (!this.showEndTickLabels()) {
         this._hideEndTickLabels();
       }
-      
+
       this._hideOverlappingTickLabels();
       return this;
     }
