@@ -2,19 +2,10 @@
 
 module Plottable {
 export module Plot {
-  export class Area extends Abstract.XYPlot {
+  export class Area extends Line {
     private areaPath: D3.Selection;
-    private linePath: D3.Selection;
     private constantBaseline: number = null;
     private previousBaseline: number = null;
-
-    public _animators: Animator.IPlotAnimatorMap = {
-      "area-reset" : new Animator.Null(),
-      "area"       : new Animator.Default()
-        .duration(600)
-        .easing("exp-in-out")
-    };
-
 
     /**
      * Creates an AreaPlot.
@@ -30,12 +21,15 @@ export module Plot {
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
       this.project("stroke", () => "none"); // default
+      this._animators["area-reset"] = new Animator.Null();
+      this._animators["area"]       = new Animator.Default()
+                                        .duration(600)
+                                        .easing("exp-in-out");
     }
 
     public _setup() {
       super._setup();
       this.areaPath = this.renderArea.append("path").classed("area", true);
-      this.linePath = this.renderArea.append("path").classed("line", true);
       return this;
     }
 
@@ -92,7 +86,6 @@ export module Plot {
       delete attrToProjector["y"];
 
       this.areaPath.datum(this._dataSource.data());
-      this.linePath.datum(this._dataSource.data());
 
       if (this._dataChanged) {
         attrToProjector["d"] = d3.svg.area()
@@ -100,11 +93,6 @@ export module Plot {
           .y0(y0Function)
           .y1(y0Function);
         this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
-
-        attrToProjector["d"] = d3.svg.line()
-          .x(xFunction)
-          .y(y0Function);
-        this._applyAnimatedAttributes(this.linePath, "area-reset", attrToProjector);
       }
 
       attrToProjector["d"] = d3.svg.area()
@@ -112,11 +100,6 @@ export module Plot {
         .y0(y0Function)
         .y1(yFunction);
       this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
-
-      attrToProjector["d"] = d3.svg.line()
-        .x(xFunction)
-        .y(yFunction);
-      this._applyAnimatedAttributes(this.linePath, "area", attrToProjector);
     }
   }
 }

@@ -2361,7 +2361,7 @@ var Plottable;
             */
             function Scale(scale) {
                 _super.call(this);
-                this._autoDomainAutomatically = true;
+                this.autoDomainAutomatically = true;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._d3Scale = scale;
@@ -2382,8 +2382,15 @@ var Plottable;
             * represents a view in to the data.
             */
             Scale.prototype.autoDomain = function () {
+                this.autoDomainAutomatically = true;
                 this._setDomain(this._getExtent());
                 return this;
+            };
+
+            Scale.prototype._autoDomainIfAutomaticMode = function () {
+                if (this.autoDomainAutomatically) {
+                    this.autoDomain();
+                }
             };
 
             /**
@@ -2400,7 +2407,7 @@ var Plottable;
                 if (values == null) {
                     return this._d3Scale.domain();
                 } else {
-                    this._autoDomainAutomatically = false;
+                    this.autoDomainAutomatically = false;
                     this._setDomain(values);
                     return this;
                 }
@@ -2444,17 +2451,13 @@ var Plottable;
             */
             Scale.prototype.updateExtent = function (rendererID, attr, extent) {
                 this._rendererAttrID2Extent[rendererID + attr] = extent;
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
+                this._autoDomainIfAutomaticMode();
                 return this;
             };
 
             Scale.prototype.removeExtent = function (rendererID, attr) {
                 delete this._rendererAttrID2Extent[rendererID + attr];
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
+                this._autoDomainIfAutomaticMode();
                 return this;
             };
             return Scale;
@@ -2524,14 +2527,16 @@ var Plottable;
                 }
                 this._dataSource = source;
                 this._dataSource.broadcaster.registerListener(this, function () {
-                    _this.updateAllProjectors();
-                    _this._dataChanged = true;
-                    _this._render();
+                    return _this._onDataSourceUpdate();
                 });
+                this._onDataSourceUpdate();
+                return this;
+            };
+
+            Plot.prototype._onDataSourceUpdate = function () {
                 this.updateAllProjectors();
                 this._dataChanged = true;
                 this._render();
-                return this;
             };
 
             Plot.prototype.project = function (attrToSet, accessor, scale) {
@@ -3175,9 +3180,7 @@ var Plottable;
                 } else {
                     this._domainer = domainer;
                     this._userSetDomainer = true;
-                    if (this._autoDomainAutomatically) {
-                        this.autoDomain();
-                    }
+                    this._autoDomainIfAutomaticMode();
                     return this;
                 }
             };
@@ -3567,9 +3570,7 @@ var Plottable;
 
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
+                this._autoDomainIfAutomaticMode();
                 this.broadcaster.broadcast();
             };
 
@@ -5798,9 +5799,7 @@ var Plottable;
                     var qscale = scale;
                     if (!qscale._userSetDomainer && this._baselineValue != null) {
                         qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
-                        if (qscale._autoDomainAutomatically) {
-                            qscale.autoDomain();
-                        }
+                        qscale._autoDomainIfAutomaticMode();
                     }
                 }
                 return this;
@@ -5956,6 +5955,73 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
+        var Line = (function (_super) {
+            __extends(Line, _super);
+            /**
+            * Creates a LinePlot.
+            *
+            * @constructor
+            * @param {IDataset} dataset The dataset to render.
+            * @param {Scale} xScale The x scale to use.
+            * @param {Scale} yScale The y scale to use.
+            */
+            function Line(dataset, xScale, yScale) {
+                _super.call(this, dataset, xScale, yScale);
+                this._animators = {
+                    "line-reset": new Plottable.Animator.Null(),
+                    "line": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
+                };
+                this.classed("line-renderer", true);
+                this.project("stroke", function () {
+                    return "steelblue";
+                });
+                this.project("fill", function () {
+                    return "none";
+                });
+            }
+            Line.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this.linePath = this.renderArea.append("path").classed("line", true);
+                return this;
+            };
+
+            Line.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+                var attrToProjector = this._generateAttrToProjector();
+                var xFunction = attrToProjector["x"];
+                var yFunction = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y"];
+
+                this.linePath.datum(this._dataSource.data());
+
+                if (this._dataChanged) {
+                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(function () {
+                        return 0;
+                    });
+                    this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
+                }
+
+                attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
+                this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
+            };
+            return Line;
+        })(Plottable.Abstract.XYPlot);
+        Plot.Line = Line;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
         var Area = (function (_super) {
             __extends(Area, _super);
             /**
@@ -5970,10 +6036,6 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this.constantBaseline = null;
                 this.previousBaseline = null;
-                this._animators = {
-                    "area-reset": new Plottable.Animator.Null(),
-                    "area": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
-                };
                 this.classed("area-renderer", true);
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
@@ -5982,17 +6044,35 @@ var Plottable;
                 this.project("stroke", function () {
                     return "none";
                 }); // default
+                this._animators["area-reset"] = new Plottable.Animator.Null();
+                this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
             Area.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.areaPath = this.renderArea.append("path").classed("area", true);
-                this.linePath = this.renderArea.append("path").classed("line", true);
                 return this;
+            };
+
+            Area.prototype._onDataSourceUpdate = function () {
+                _super.prototype._onDataSourceUpdate.call(this);
+                if (this.yScale != null) {
+                    this._updateYDomainer();
+                }
             };
 
             Area.prototype._updateYDomainer = function () {
                 _super.prototype._updateYDomainer.call(this);
                 var scale = this.yScale;
+
+                var y0Projector = this._projectors["y0"];
+                var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
+                var extent = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
+                if (extent.length === 2 && extent[0] === extent[1]) {
+                    this.constantBaseline = extent[0];
+                } else {
+                    this.constantBaseline = null;
+                }
+
                 if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
                     if (this.previousBaseline != null) {
                         scale.domainer().paddingException(this.previousBaseline, false);
@@ -6002,6 +6082,7 @@ var Plottable;
                         scale.domainer().paddingException(this.constantBaseline, true);
                         this.previousBaseline = this.constantBaseline;
                     }
+                    scale._autoDomainIfAutomaticMode();
                 }
                 return this;
             };
@@ -6009,12 +6090,6 @@ var Plottable;
             Area.prototype.project = function (attrToSet, accessor, scale) {
                 _super.prototype.project.call(this, attrToSet, accessor, scale);
                 if (attrToSet === "y0") {
-                    var extent = this.dataSource()._getExtent(accessor);
-                    if (extent[0] === extent[1]) {
-                        this.constantBaseline = extent[0];
-                    } else {
-                        this.constantBaseline = null;
-                    }
                     this._updateYDomainer();
                 }
                 return this;
@@ -6031,62 +6106,18 @@ var Plottable;
                 delete attrToProjector["y"];
 
                 this.areaPath.datum(this._dataSource.data());
-                this.linePath.datum(this._dataSource.data());
 
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
                     this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
-
-                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(y0Function);
-                    this._applyAnimatedAttributes(this.linePath, "area-reset", attrToProjector);
                 }
 
                 attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
-
-                attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
-                this._applyAnimatedAttributes(this.linePath, "area", attrToProjector);
             };
             return Area;
-        })(Plottable.Abstract.XYPlot);
+        })(Plottable.Plot.Line);
         Plot.Area = Area;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Plot) {
-        var Line = (function (_super) {
-            __extends(Line, _super);
-            /**
-            * Creates a LinePlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            function Line(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
-                this.classed("line-renderer", true);
-                this.project("stroke", function () {
-                    return "steelblue";
-                });
-                this.project("fill", function () {
-                    return "none";
-                });
-            }
-            return Line;
-        })(Plottable.Plot.Area);
-        Plot.Line = Line;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));

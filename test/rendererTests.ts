@@ -267,21 +267,6 @@ describe("Renderers", () => {
       });
     });
 
-    describe("LinePlot", () => {
-      it("defaults to no fill", () => {
-        var svg = generateSVG(500, 500);
-        var data = [{x: 0, y: 0}, {x: 2, y: 2}];
-        var xScale = new Plottable.Scale.Linear();
-        var yScale = new Plottable.Scale.Linear();
-        var linePlot = new Plottable.Plot.Line(data, xScale, yScale);
-        linePlot.renderTo(svg);
-
-        var areaPath = linePlot.renderArea.select(".area");
-        assert.strictEqual(areaPath.attr("fill"), "none");
-        svg.remove();
-      });
-    });
-
     describe("Example CirclePlot with quadratic series", () => {
       var svg: D3.Selection;
       var xScale: Plottable.Scale.Linear;

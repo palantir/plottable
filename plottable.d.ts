@@ -1914,7 +1914,24 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Area extends Abstract.XYPlot {
+        class Line extends Abstract.XYPlot {
+            /**
+            * Creates a LinePlot.
+            *
+            * @constructor
+            * @param {IDataset} dataset The dataset to render.
+            * @param {Scale} xScale The x scale to use.
+            * @param {Scale} yScale The y scale to use.
+            */
+            constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class Area extends Line {
             /**
             * Creates an AreaPlot.
             *
@@ -1925,23 +1942,6 @@ declare module Plottable {
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
             public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Area;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Plot {
-        class Line extends Area {
-            /**
-            * Creates a LinePlot.
-            *
-            * @constructor
-            * @param {IDataset} dataset The dataset to render.
-            * @param {Scale} xScale The x scale to use.
-            * @param {Scale} yScale The y scale to use.
-            */
-            constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
         }
     }
 }
