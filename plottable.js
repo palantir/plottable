@@ -5029,17 +5029,18 @@ var Plottable;
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self.tickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
+                    var textWriteResult;
                     if (draw) {
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        var textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true, {
+                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true, {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     } else {
-                        var textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true);
+                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true);
                     }
 
                     textWriteResults.push(textWriteResult);

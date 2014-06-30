@@ -97,7 +97,7 @@ export module Axis {
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-        var textWriteResult;
+        var textWriteResult: Util.Text.IWriteTextResult;
         if (draw) {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
