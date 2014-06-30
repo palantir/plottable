@@ -4297,6 +4297,16 @@ var Plottable;
                 };
             };
 
+            Axis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                if (this._isHorizontal()) {
+                    this._scale.range([0, this.availableWidth]);
+                } else {
+                    this._scale.range([this.availableHeight, 0]);
+                }
+                return this;
+            };
+
             Axis.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tickMarkContainer = this.content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
@@ -4834,11 +4844,13 @@ var Plottable;
                         wantsHeight: false
                     };
                 }
+
                 if (this._isHorizontal()) {
                     this._scale.range([0, offeredWidth]);
                 } else {
                     this._scale.range([offeredHeight, 0]);
                 }
+
                 var testG = this._tickLabelsG.append("g");
                 var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
                 fakeTicks.enter().append("g").classed("tick", true);
