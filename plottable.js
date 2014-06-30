@@ -2445,7 +2445,7 @@ var Plottable;
                     throw new Error("data cannot contain Infinity or -Infinity");
                 }
                 this._d3Scale.domain(values);
-                this.broadcaster.broadcast();
+                this.broadcaster.broadcast("domain");
             };
 
             Scale.prototype.range = function (values) {
@@ -2517,6 +2517,7 @@ var Plottable;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250;
                 this._projectors = {};
+                this.animateOnNextRender = true;
                 this.clipPathEnabled = true;
                 this.classed("renderer", true);
 
@@ -2534,6 +2535,7 @@ var Plottable;
             }
             Plot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
+                this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this.updateAllProjectors();
                 return this;
@@ -2550,10 +2552,12 @@ var Plottable;
                 }
                 this._dataSource = source;
                 this._dataSource.broadcaster.registerListener(this, function () {
+                    _this.animateOnNextRender = true;
                     _this.updateAllProjectors();
                     _this._dataChanged = true;
                     _this._render();
                 });
+                this.animateOnNextRender = true;
                 this.updateAllProjectors();
                 this._dataChanged = true;
                 this._render();
@@ -2572,8 +2576,11 @@ var Plottable;
                 }
 
                 if (scale != null) {
-                    scale.broadcaster.registerListener(this, function () {
-                        return _this._render();
+                    scale.broadcaster.registerListener(this, function (_, reason) {
+                        if (reason != null && reason === "domain") {
+                            _this.animateOnNextRender = true;
+                        }
+                        _this._render();
                     });
                 }
 
@@ -2602,6 +2609,7 @@ var Plottable;
                 if (this.element != null) {
                     this._paint();
                     this._dataChanged = false;
+                    this.animateOnNextRender = false;
                 }
                 return this;
             };
@@ -2628,6 +2636,7 @@ var Plottable;
 
             Plot.prototype.remove = function () {
                 _super.prototype.remove.call(this);
+                this.animateOnNextRender = true;
 
                 // make the domain resize
                 this.updateAllProjectors();
@@ -2674,7 +2683,7 @@ var Plottable;
             * @return {D3.Selection} The resulting selection (potentially after the transition)
             */
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this._animators[animatorKey] != null && !Plottable.Core.ResizeBroadcaster.resizing()) {
+                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null && !Plottable.Core.ResizeBroadcaster.resizing()) {
                     return this._animators[animatorKey].animate(selection, attrToProjector, this);
                 } else {
                     return selection.attr(attrToProjector);

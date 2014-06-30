@@ -23,6 +23,7 @@ export module Abstract {
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
+    private animateOnNextRender = true;
 
     /**
      * Creates a Plot.
@@ -53,6 +54,7 @@ export module Abstract {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
+      this.animateOnNextRender = true;
       this._dataChanged = true;
       this.updateAllProjectors();
       return this;
@@ -81,10 +83,12 @@ export module Abstract {
       }
       this._dataSource = source;
       this._dataSource.broadcaster.registerListener(this, () => {
+        this.animateOnNextRender = true;
         this.updateAllProjectors();
         this._dataChanged = true;
         this._render();
       });
+      this.animateOnNextRender = true;
       this.updateAllProjectors();
       this._dataChanged = true;
       this._render();
@@ -102,7 +106,12 @@ export module Abstract {
       }
 
       if (scale != null) {
-        scale.broadcaster.registerListener(this, () => this._render());
+        scale.broadcaster.registerListener(this, (_: Core.IListenable, reason?: string) => {
+          if (reason != null && reason === "domain") {
+            this.animateOnNextRender = true;
+          }
+          this._render();
+        });
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
@@ -127,6 +136,7 @@ export module Abstract {
       if (this.element != null) {
         this._paint();
         this._dataChanged = false;
+        this.animateOnNextRender = false;
       }
       return this;
     }
@@ -153,6 +163,7 @@ export module Abstract {
 
     public remove() {
       super.remove();
+      this.animateOnNextRender = true;
       // make the domain resize
       this.updateAllProjectors();
       return this;
@@ -195,7 +206,8 @@ export module Abstract {
      * @return {D3.Selection} The resulting selection (potentially after the transition)
      */
     public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: Abstract.IAttributeToProjector): any {
-      if (this._animate && this._animators[animatorKey] != null && !Core.ResizeBroadcaster.resizing()) {
+      if (this._animate && this.animateOnNextRender &&
+          this._animators[animatorKey] != null && !Core.ResizeBroadcaster.resizing()) {
         return this._animators[animatorKey].animate(selection, attrToProjector, this);
       } else {
         return selection.attr(attrToProjector);

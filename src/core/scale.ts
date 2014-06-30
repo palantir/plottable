@@ -80,7 +80,7 @@ export module Abstract {
         throw new Error("data cannot contain Infinity or -Infinity");
       }
       this._d3Scale.domain(values);
-      this.broadcaster.broadcast();
+      this.broadcaster.broadcast("domain");
     }
 
     /**

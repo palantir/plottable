@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> - jsFiddle demo by cmorford</title>
+  
+  
+  
+  
+  
+  
+  <style type='text/css'>
+    </style> <link rel="stylesheet" type="text/css" href="../plottable.css"> <style type="text/css">
+/*-- Add custom styles after this line --*/
+ .demo-title {
+    font-size: 24 pt;
+}
+.plottable .y-axis .tick line {
+    opacity: 1
+}
+
+.plottable .x-axis .tick line {
+    opacity: 1
+}
+
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+
+var renderGroup;
+var renderArea1;
+var renderArea2;
+var dataseries;
+var svg;
+var bigTable;
+
+window.onload = function () {
+    svg = d3.select("#chart");
+    svg.attr("width", 500).attr("height", 300);
+
+    //data
+    dataseries = new Plottable.DataSource(makeRandomData(5));
+    dataseries.metadata({name: "series1"});
+    var colorScale1 = new Plottable.Scale.Color("10");
+    colorScale1.domain(["series1", "series2"]);
+    
+    //Axis
+    var xScale = new Plottable.Scale.Linear();
+    var yScale = new Plottable.Scale.Linear();
+    var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+    var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+        
+    var colorProjector = function(d, i, m) {
+       return colorScale1.scale(m.name);
+    };
+    
+    //rendering
+    renderArea1 = new Plottable.Plot.VerticalBar(dataseries, xScale, yScale);
+    renderArea1
+    .project("fill", colorScale1.scale("series1"))
+    .animate(true); ;
+    renderArea2 = new Plottable.Plot.Area(renderArea1.dataSource(), xScale, yScale);
+    renderArea2
+    .project("fill", colorScale1.scale("series2"))
+    .animate(true);
+    
+    //title + legend
+    var title1 = new Plottable.Component.TitleLabel( "Data", "horizontal");
+    var legend1 = new Plottable.Component.Legend(colorScale1);
+    var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
+                                          .addComponent(0,1, legend1);
+    
+    renderGroup = renderArea2.merge(renderArea1);
+    
+    var basicTable = new Plottable.Component.Table()
+                .addComponent(2, 0, yAxis)
+                .addComponent(2, 1, renderGroup)
+                .addComponent(3, 1, xAxis);
+
+    bigTable = new Plottable.Component.Table()
+               .addComponent(0, 0, titleTable)
+               .addComponent(1,0, basicTable);
+    
+    bigTable.renderTo(svg);
+    
+};
+
+function button1Callback() {
+    renderArea1.barAlignment("left");
+}
+
+function button2Callback() {
+    renderArea1.barAlignment("center");
+}
+
+function button3Callback() {
+    renderArea1.barAlignment("right");
+}
+
+
+function changeWidth() {
+  svg.attr("width", 300 + Math.random()*200);
+  bigTable.renderTo(svg);
+}
+
+function removeAndRenderTo() {
+  bigTable.remove();
+  bigTable.renderTo(svg);
+}
+
+
+//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../plottable_multifile.js"></script>
+<script src="../examples/exampleUtil.js"></script>
+<div class="demo-title">Simple Chart</div>
+<br>
+
+
+<br>
+<svg id="chart"></svg>
+    <button onclick="dataseries.data(makeRandomData(10))">dataSource.data()</button>
+    <button onclick="changeWidth()">change width</button>
+    <button onclick="bigTable.remove().renderTo(svg)">remove + renderTo</button>
+
+<p />
+  
+</body>
+
+
+</html>
+
