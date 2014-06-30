@@ -113,8 +113,8 @@ describe("Scales", () => {
 
     it("should resize when a plot is removed", () => {
       var svg = generateSVG(400, 400);
-      var ds1 = [{x: 0, y:0}, {x: 1, y: 1}];
-      var ds2 = [{x: 1, y:1}, {x: 2, y: 2}];
+      var ds1 = [{x: 0, y: 0}, {x: 1, y: 1}];
+      var ds2 = [{x: 1, y: 1}, {x: 2, y: 2}];
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       xScale.domainer(new Plottable.Domainer());
