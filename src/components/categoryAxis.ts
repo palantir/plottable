@@ -51,6 +51,13 @@ export module Axis {
           wantsHeight: false
         };
       }
+
+      if (this._isHorizontal()) {
+        this._scale.range([0, offeredWidth]);
+      } else {
+        this._scale.range([offeredHeight, 0]);
+      }
+
       var testG = this._tickLabelsG.append("g");
       var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
       fakeTicks.enter().append("g").classed("tick", true);
