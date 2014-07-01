@@ -22,7 +22,7 @@
                                 .showEndTickLabel("right", false);
 
       var yScale = new Plottable.Scale.Ordinal();
-      yAxis = new Plottable.Axis.Category(yScale, "left");
+      yAxis = new Plottable.Axis.Category(yScale, "left").xAlign("right");
 
       var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
                               .project("x", "age", xScale)
