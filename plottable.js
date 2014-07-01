@@ -3171,19 +3171,25 @@ var Plottable;
         * [0, 100] to [0, 102.5].
         *
         * @param {any} exception The value that will not be padded.
-        * @param {string} [key] The key to associate the exception with, which enables replacement and deregistration of
-        *                         exceptions. If no key is provided, the exception is unconditionally added to an exception
-        *                         set. Normally, the key should be the _plottableID of the Plot responsible for the exception.
+        * @param {any} [keyOrAddRemove] If a string: The key to associate the value with, which enables
+        *                                replacement and deregistration of exceptions.
+        *                                If a boolean: Whether to add or remove the value from the unregisteredExceptions set.
+        *                                Defaults to true, ie adding the exception to the unregisteredExceptions set.
         * @return {Domainer} The calling Domainer.
         */
-        Domainer.prototype.paddingException = function (exception, key) {
-            if (exception == null && key != null) {
-                this.paddingExceptions.remove(key);
-            } else {
-                if (key == null) {
+        Domainer.prototype.paddingException = function (exception, keyOrAddRemove) {
+            if (typeof keyOrAddRemove === "undefined") { keyOrAddRemove = true; }
+            if (typeof (keyOrAddRemove) === "boolean") {
+                if (keyOrAddRemove) {
                     this.unregisteredPaddingExceptions.add(exception);
                 } else {
-                    this.paddingExceptions.set(key, exception);
+                    this.unregisteredPaddingExceptions.remove(exception);
+                }
+            } else {
+                if (keyOrAddRemove != null) {
+                    this.paddingExceptions.set(keyOrAddRemove, exception);
+                } else {
+                    this.paddingExceptions.remove(keyOrAddRemove);
                 }
             }
             return this;
@@ -3208,19 +3214,26 @@ var Plottable;
         * and the domain [-9, -8] will become [-9, 0].
         *
         * @param {any} value The value that will be included.
-        * @param {string} [key] The key to associate the value with, which enables replacement and deregistration of
-        *                         values. If no key is provided, the value is unconditionally added to an value
-        *                         set. Normally, the key should be the _plottableID of the Plot responsible for the value.
+        * @param {any} [keyOrAddRemove] If a string: The key to associate the value with, which enables
+        *                                replacement and deregistration of values.
+        *                                If a boolean: Whether to add or remove the value from the unregisteredValues set.
+        *                                Defaults to true, ie adding the value to the unregisteredValues set.
         * @return {Domainer} The calling Domainer.
         */
-        Domainer.prototype.include = function (value, key) {
-            if (value == null && key != null) {
-                this.includedValues.remove(key);
-            } else {
-                if (key == null) {
+        Domainer.prototype.include = function (value, keyOrAddRemove) {
+            if (typeof keyOrAddRemove === "undefined") { keyOrAddRemove = true; }
+            if (typeof (keyOrAddRemove) === "boolean") {
+                if (keyOrAddRemove) {
                     this.unregisteredIncludedValues.set(value, value);
                 } else {
-                    this.includedValues.set(key, value);
+                    this.unregisteredIncludedValues.remove(value);
+                }
+            }
+            if (typeof (keyOrAddRemove) === "string") {
+                if (value != null) {
+                    this.includedValues.set(keyOrAddRemove, value);
+                } else {
+                    this.includedValues.remove(keyOrAddRemove);
                 }
             }
             return this;
@@ -6050,6 +6063,8 @@ var Plottable;
                     var qscale = scale;
                     if (!qscale._userSetDomainer && this._baselineValue != null) {
                         qscale.domainer().paddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).include(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+
+                        // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                         qscale._autoDomainIfAutomaticMode();
                     }
                 }
@@ -6320,6 +6335,8 @@ var Plottable;
 
                 if (!scale._userSetDomainer) {
                     scale.domainer().paddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+
+                    // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }
                 return this;

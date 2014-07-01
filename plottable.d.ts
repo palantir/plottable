@@ -1157,12 +1157,13 @@ declare module Plottable {
         * [0, 100] to [0, 102.5].
         *
         * @param {any} exception The value that will not be padded.
-        * @param {string} [key] The key to associate the exception with, which enables replacement and deregistration of
-        *                         exceptions. If no key is provided, the exception is unconditionally added to an exception
-        *                         set. Normally, the key should be the _plottableID of the Plot responsible for the exception.
+        * @param {any} [keyOrAddRemove] If a string: The key to associate the value with, which enables
+        *                                replacement and deregistration of exceptions.
+        *                                If a boolean: Whether to add or remove the value from the unregisteredExceptions set.
+        *                                Defaults to true, ie adding the exception to the unregisteredExceptions set.
         * @return {Domainer} The calling Domainer.
         */
-        public paddingException(exception: any, key?: string): Domainer;
+        public paddingException(exception: any, keyOrAddRemove?: any): Domainer;
         /**
         * Extends the scale's domain so it starts and ends with "nice" values.
         *
@@ -1177,12 +1178,13 @@ declare module Plottable {
         * and the domain [-9, -8] will become [-9, 0].
         *
         * @param {any} value The value that will be included.
-        * @param {string} [key] The key to associate the value with, which enables replacement and deregistration of
-        *                         values. If no key is provided, the value is unconditionally added to an value
-        *                         set. Normally, the key should be the _plottableID of the Plot responsible for the value.
+        * @param {any} [keyOrAddRemove] If a string: The key to associate the value with, which enables
+        *                                replacement and deregistration of values.
+        *                                If a boolean: Whether to add or remove the value from the unregisteredValues set.
+        *                                Defaults to true, ie adding the value to the unregisteredValues set.
         * @return {Domainer} The calling Domainer.
         */
-        public include(value: any, key?: string): Domainer;
+        public include(value: any, keyOrAddRemove?: any): Domainer;
     }
 }
 

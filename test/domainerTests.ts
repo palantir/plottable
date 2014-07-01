@@ -67,14 +67,17 @@ describe("Domainer", () => {
   it("paddingException(n) will not pad beyond n", () => {
     domainer.pad(0.1).paddingException(0, "key").paddingException(200);
     var domain = domainer.computeDomain([[0, 100]], scale);
-    assert.deepEqual(domain, [0, 105]);
+    assert.deepEqual(domain, [0, 105], "padding exceptions can be added by key");
     domain = domainer.computeDomain([[-100, 0]], scale);
     assert.deepEqual(domain, [-105, 0]);
     domain = domainer.computeDomain([[0, 200]], scale);
     assert.deepEqual(domain, [0, 200]);
     domainer.paddingException(null, "key");
     domain = domainer.computeDomain([[0, 200]], scale);
-    assert.deepEqual(domain, [-10, 200]);
+    assert.deepEqual(domain, [-10, 200], "paddingExceptions can be removed by key");
+    domainer.paddingException(200, false);
+    domain = domainer.computeDomain([[0, 200]], scale);
+    assert.notEqual(domain[1], 200, "unregistered paddingExceptions can be removed using boolean argument");
   });
 
   it("paddingException(n) works on dates", () => {
@@ -110,9 +113,12 @@ describe("Domainer", () => {
     domain = domainer.computeDomain([[-100, -50]], scale);
     assert.deepEqual(domain, [-100, 5]);
 
-    domainer.include(10);
+    domainer.include(10, true);
     domain = domainer.computeDomain([[-100, -50]], scale);
-    assert.deepEqual(domain, [-100, 10]);
+    assert.deepEqual(domain, [-100, 10], "unregistered includedValues can be added");
+    domainer.include(10, false);
+    domain = domainer.computeDomain([[-100, -50]], scale);
+    assert.deepEqual(domain, [-100, 5], "unregistered includedValues can be removed with addOrRemove argument");
   });
 
   it("include(n) works on dates", () => {

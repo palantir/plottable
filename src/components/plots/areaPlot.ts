@@ -49,6 +49,7 @@ export module Plot {
 
       if (!scale._userSetDomainer) {
         scale.domainer().paddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+        // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         scale._autoDomainIfAutomaticMode();
       }
       return this;

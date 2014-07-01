@@ -190,6 +190,7 @@ export module Abstract {
           qscale.domainer()
             .paddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
             .include(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
           qscale._autoDomainIfAutomaticMode();
         }
       }
