@@ -188,8 +188,8 @@ export module Abstract {
         var qscale = <Abstract.QuantitiveScale> scale;
         if (!qscale._userSetDomainer && this._baselineValue != null) {
           qscale.domainer()
-            .paddingException(this._baselineValue, this._plottableID.toString())
-            .include(this._baselineValue, this._plottableID.toString());
+            .paddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
+            .include(this._baselineValue, "BAR_PLOT+" + this._plottableID);
           if (qscale._autoDomainAutomatically) {
             qscale.autoDomain();
           }
