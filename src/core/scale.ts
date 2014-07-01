@@ -4,7 +4,7 @@ module Plottable {
 export module Abstract {
   export class Scale extends PlottableObject implements Core.IListenable {
     public _d3Scale: D3.Scale.Scale;
-    public _autoDomainAutomatically = true;
+    private autoDomainAutomatically = true;
     public broadcaster = new Plottable.Core.Broadcaster(this);
     public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
     /**
@@ -34,8 +34,15 @@ export module Abstract {
      * represents a view in to the data.
      */
     public autoDomain() {
+      this.autoDomainAutomatically = true;
       this._setDomain(this._getExtent());
       return this;
+    }
+
+    public _autoDomainIfAutomaticMode() {
+      if (this.autoDomainAutomatically) {
+        this.autoDomain();
+      }
     }
 
     /**
@@ -68,7 +75,7 @@ export module Abstract {
       if (values == null) {
         return this._d3Scale.domain();
       } else {
-        this._autoDomainAutomatically = false;
+        this.autoDomainAutomatically = false;
         this._setDomain(values);
         return this;
       }
@@ -126,17 +133,13 @@ export module Abstract {
      */
     public updateExtent(rendererID: number, attr: string, extent: any[]) {
       this._rendererAttrID2Extent[rendererID + attr] = extent;
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
+      this._autoDomainIfAutomaticMode();
       return this;
     }
 
     public removeExtent(rendererID: number, attr: string) {
       delete this._rendererAttrID2Extent[rendererID + attr];
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
+      this._autoDomainIfAutomaticMode();
       return this;
     }
   }

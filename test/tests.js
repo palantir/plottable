@@ -3204,21 +3204,6 @@ describe("Renderers", function () {
             });
         });
 
-        describe("LinePlot", function () {
-            it("defaults to no fill", function () {
-                var svg = generateSVG(500, 500);
-                var data = [{ x: 0, y: 0 }, { x: 2, y: 2 }];
-                var xScale = new Plottable.Scale.Linear();
-                var yScale = new Plottable.Scale.Linear();
-                var linePlot = new Plottable.Plot.Line(data, xScale, yScale);
-                linePlot.renderTo(svg);
-
-                var areaPath = linePlot.renderArea.select(".area");
-                assert.strictEqual(areaPath.attr("fill"), "none");
-                svg.remove();
-            });
-        });
-
         describe("Example CirclePlot with quadratic series", function () {
             var svg;
             var xScale;
@@ -3813,7 +3798,7 @@ describe("Scales", function () {
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-        scale._autoDomainAutomatically = true;
+        scale.autoDomainAutomatically = true;
         scale.updateExtent(1, "x", [0.08, 9.92]);
         callbackWasCalled = false;
         scale.domainer(new Plottable.Domainer().nice());
@@ -3838,9 +3823,9 @@ describe("Scales", function () {
                 return e.foo;
             }));
             scale.domainer(new Plottable.Domainer().pad().nice());
-            assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+            assert.isTrue(scale.autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
-            assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
+            assert.isFalse(scale.autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
         });
 
         it("scale autorange works as expected with single dataSource", function () {
@@ -3874,23 +3859,23 @@ describe("Scales", function () {
         });
 
         it("scale perspectives can be removed appropriately", function () {
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled1");
             scale.updateExtent(1, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
             scale.updateExtent(2, "x", d3.extent(data, function (e) {
                 return e.bar;
             }));
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled3");
             scale.removeExtent(1, "x");
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
             scale.updateExtent(2, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
 
@@ -4855,6 +4840,32 @@ describe("Domainer", function () {
         timeScale.updateExtent(1, "x", [c, d]);
         timeScale.domainer(domainer);
         assert.deepEqual(timeScale.domain(), [b, d]);
+    });
+
+    it("exceptions are setup properly on an area plot", function () {
+        var xScale = new Plottable.Scale.Linear();
+        var yScale = new Plottable.Scale.Linear();
+        var domainer = yScale.domainer();
+        var getExceptions = function () {
+            return yScale.domainer().paddingExceptions.values().map(parseFloat);
+        };
+        assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
+        var r = new Plottable.Plot.Area([{ x: 0 }, { x: 1 }, { x: 2 }, { x: 3 }, { x: 4 }, { x: 5 }, { x: 6 }], xScale, yScale);
+        r.project("x", "x", xScale);
+        r.project("y", "x", yScale);
+        assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
+        r.project("y0", "x", yScale);
+        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+        r.project("y0", 0, yScale);
+        assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
+        r.project("y0", function () {
+            return 5;
+        }, yScale);
+        assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
+        r.project("y0", "x", yScale);
+        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+        r.dataSource().data([{ x: 0 }, { x: 0 }]);
+        assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
     });
 });
 
