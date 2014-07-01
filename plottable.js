@@ -114,6 +114,26 @@ var Plottable;
                 return Array.prototype.concat.apply([], a);
             }
             Methods.flatten = flatten;
+
+            /**
+            * Check if two arrays are equal by strict equality.
+            */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -315,6 +335,71 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (Util) {
+        var Cache = (function () {
+            /**
+            * @constructor
+            *
+            * @param {string} compute The function whose results will be cached.
+            * @param {string} [canonicalKey] If present, when clear() is called,
+            *        this key will be re-computed. If its result hasn't been changed,
+            *        the cache will not be cleared.
+            * @param {(v: T, w: T) => boolean} [valueEq]
+            *        Used to determine if the value of canonicalKey has changed.
+            *        If omitted, defaults to === comparision.
+            */
+            function Cache(compute, canonicalKey, valueEq) {
+                if (typeof valueEq === "undefined") { valueEq = function (v, w) {
+                    return v === w;
+                }; }
+                this.cache = d3.map();
+                this.canonicalKey = null;
+                this.compute = compute;
+                this.canonicalKey = canonicalKey;
+                this.valueEq = valueEq;
+                if (canonicalKey !== undefined) {
+                    this.cache.set(this.canonicalKey, this.compute(this.canonicalKey));
+                }
+            }
+            /**
+            * Attempt to look up k in the cache, computing the result if it isn't
+            * found.
+            *
+            * @param {string} k The key to look up in the cache.
+            * @return {T} The value associated with k; the result of compute(k).
+            */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+
+            /**
+            * Reset the cache empty.
+            *
+            * If canonicalKey was provided at construction, compute(canonicalKey)
+            * will be re-run. If the result matches what is already in the cache,
+            * it will not clear the cache.
+            *
+            * @return {Cache<T>} The calling Cache.
+            */
+            Cache.prototype.clear = function () {
+                if (this.canonicalKey === undefined || !this.valueEq(this.cache.get(this.canonicalKey), this.compute(this.canonicalKey))) {
+                    this.cache = d3.map();
+                }
+                return this;
+            };
+            return Cache;
+        })();
+        Util.Cache = Cache;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Util) {
         (function (Text) {
             ;
 
@@ -348,6 +433,89 @@ var Plottable;
                 };
             }
             Text.getTextMeasure = getTextMeasure;
+
+            /**
+            * @return {TextMeasurer} A test measurer that will treat all sequences
+            *         of consecutive whitespace as a single " ".
+            */
+            function combineWhitespace(tm) {
+                return function (s) {
+                    return tm(s.replace(/\s+/g, " "));
+                };
+            }
+
+            /**
+            * Returns a text measure that measures each individual character of the
+            * string with tm, then combines all the individual measurements.
+            */
+            function measureByCharacter(tm) {
+                return function (s) {
+                    var whs = s.trim().split("").map(tm);
+                    return [d3.sum(whs, function (wh) {
+                            return wh[0];
+                        }), d3.max(whs, function (wh) {
+                            return wh[1];
+                        })];
+                };
+            }
+
+            var CANONICAL_CHR = "a";
+
+            /**
+            * Some TextMeasurers get confused when measuring something that's only
+            * whitespace: only whitespace in a dom node takes up [0, 0] space.
+            *
+            * @return {TextMeasurer} A function that if its argument is all
+            *         whitespace, it will wrap its argument in CANONICAL_CHR before
+            *         measuring in order to get a non-zero size of the whitespace.
+            */
+            function wrapWhitespace(tm) {
+                return function (s) {
+                    if (/^\s*$/.test(s)) {
+                        var whs = s.split("").map(function (c) {
+                            var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
+                            var whWrapping = tm(CANONICAL_CHR);
+                            return [wh[0] - 2 * whWrapping[0], wh[1]];
+                        });
+                        return [d3.sum(whs, function (x) {
+                                return x[0];
+                            }), d3.max(whs, function (x) {
+                                return x[1];
+                            })];
+                    } else {
+                        return tm(s);
+                    }
+                };
+            }
+
+            /**
+            * This class will measure text by measuring each character individually,
+            * then adding up the dimensions. It will also cache the dimensions of each
+            * letter.
+            */
+            var CachingCharacterMeasurer = (function () {
+                /**
+                * @param {D3.Selection} g The element that will have text inserted into
+                *        it in order to measure text. The styles present for text in
+                *        this element will to the text being measured.
+                */
+                function CachingCharacterMeasurer(g) {
+                    var _this = this;
+                    this.cache = new Plottable.Util.Cache(getTextMeasure(g), CANONICAL_CHR, Plottable.Util.Methods.arrayEq);
+                    this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) {
+                        return _this.cache.get(s);
+                    })));
+                }
+                /**
+                * Clear the cache, if it seems that the text has changed size.
+                */
+                CachingCharacterMeasurer.prototype.clear = function () {
+                    this.cache.clear();
+                    return this;
+                };
+                return CachingCharacterMeasurer;
+            })();
+            Text.CachingCharacterMeasurer = CachingCharacterMeasurer;
 
             /**
             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
@@ -515,29 +683,42 @@ var Plottable;
             ;
 
             /**
-            * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
-            * Contains the text within a rectangle with dimensions width, height. Tries to
-            * orient the text using xOrient and yOrient parameters.
-            * Will align the text vertically if it seems like that is appropriate.
+            * @param {write} [IWriteOptions] If supplied, the text will be written
+            *        To the given g. Will align the text vertically if it seems like
+            *        that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text, g, width, height, xAlign, yAlign, horizontally) {
+            function writeText(text, width, height, tm, horizontally, write) {
                 var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
-                var innerG = g.append("g").classed("writeText-inner-g", true);
-
-                // the outerG contains general transforms for positining the whole block, the inner g
-                // will contain transforms specific to orienting the text properly within the block.
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
-                var measureText = getTextMeasure(innerG);
-                var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+                var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
-                var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-                var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
+                var usedWidth, usedHeight;
+                if (write == null) {
+                    var widthFn = orientHorizontally ? d3.max : d3.sum;
+                    var heightFn = orientHorizontally ? d3.sum : d3.max;
+                    usedWidth = widthFn(wrappedText.lines, function (line) {
+                        return tm(line)[0];
+                    });
+                    usedHeight = heightFn(wrappedText.lines, function (line) {
+                        return tm(line)[1];
+                    });
+                } else {
+                    var innerG = write.g.append("g").classed("writeText-inner-g", true);
+
+                    // the outerG contains general transforms for positining the whole block, the inner g
+                    // will contain transforms specific to orienting the text properly within the block.
+                    var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+                    var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+                    usedWidth = wh[0];
+                    usedHeight = wh[1];
+                }
+
                 return {
                     textFits: wrappedText.textFits,
-                    usedWidth: wh[0],
-                    usedHeight: wh[1]
+                    usedWidth: usedWidth,
+                    usedHeight: usedHeight
                 };
             }
             Text.writeText = writeText;
@@ -853,10 +1034,7 @@ var Plottable;
         var Formatter = (function () {
             function Formatter(precision) {
                 this._onlyShowUnchanged = true;
-                if (precision < 0 || precision > 20) {
-                    throw new RangeError("Formatter precision must be between 0 and 20");
-                }
-                this._precision = precision;
+                this.precision(precision);
             }
             /**
             * Format an input value.
@@ -879,6 +1057,9 @@ var Plottable;
             Formatter.prototype.precision = function (value) {
                 if (value === undefined) {
                     return this._precision;
+                }
+                if (value < 0 || value > 20) {
+                    throw new RangeError("Formatter precision must be between 0 and 20");
                 }
                 this._precision = value;
                 return this;
@@ -1090,6 +1271,41 @@ var Plottable;
             return Percentage;
         })(Plottable.Formatter.Fixed);
         Formatter.Percentage = Percentage;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var SISuffix = (function (_super) {
+            __extends(SISuffix, _super);
+            /**
+            * Creates a formatter for values that displays [precision] significant figures.
+            *
+            * @constructor
+            * @param {number} [precision] The number of significant figures to display.
+            */
+            function SISuffix(precision) {
+                if (typeof precision === "undefined") { precision = 3; }
+                _super.call(this, precision);
+                this.showOnlyUnchangedValues(false);
+            }
+            SISuffix.prototype.precision = function (value) {
+                var returnValue = _super.prototype.precision.call(this, value);
+                this._formatFunction = d3.format("." + this._precision + "s");
+                return returnValue;
+            };
+            return SISuffix;
+        })(Plottable.Abstract.Formatter);
+        Formatter.SISuffix = SISuffix;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
 })(Plottable || (Plottable = {}));
@@ -4306,6 +4522,16 @@ var Plottable;
                 };
             };
 
+            Axis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                if (this._isHorizontal()) {
+                    this._scale.range([0, this.availableWidth]);
+                } else {
+                    this._scale.range([this.availableHeight, 0]);
+                }
+                return this;
+            };
+
             Axis.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tickMarkContainer = this.content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
@@ -4820,6 +5046,7 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
+                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelsG);
                 return this;
             };
 
@@ -4843,17 +5070,14 @@ var Plottable;
                         wantsHeight: false
                     };
                 }
-                var testG = this._tickLabelsG.append("g");
-                var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
-                fakeTicks.enter().append("g").classed("tick", true);
+
                 var fakeScale = this._scale.copy();
                 if (this._isHorizontal()) {
                     fakeScale.range([0, offeredWidth]);
                 } else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this.writeTextToTicks(offeredWidth, offeredHeight, fakeTicks, fakeScale);
-                testG.remove();
+                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
 
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
@@ -4867,19 +5091,38 @@ var Plottable;
                 return this._scale.domain();
             };
 
-            Category.prototype.writeTextToTicks = function (axisWidth, axisHeight, ticks, scale) {
+            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
+                var draw = dataOrTicks instanceof d3.selection;
                 var self = this;
                 var textWriteResults = [];
-                ticks.each(function (d, i) {
-                    var d3this = d3.select(this);
+                var tm = function (s) {
+                    return self.measurer.measure(s);
+                };
+                var iterator = draw ? function (f) {
+                    return dataOrTicks.each(f);
+                } : function (f) {
+                    return dataOrTicks.forEach(f);
+                };
+
+                iterator(function (d) {
                     var bandWidth = scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self.tickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-                    var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                    var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                    var textWriteResult;
+                    if (draw) {
+                        var d3this = d3.select(this);
+                        var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                        var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true, {
+                            g: d3this,
+                            xAlign: xAlign[self._orientation],
+                            yAlign: yAlign[self._orientation]
+                        });
+                    } else {
+                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true);
+                    }
 
-                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
                     textWriteResults.push(textWriteResult);
                 });
 
@@ -4918,7 +5161,7 @@ var Plottable;
 
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels, this._scale);
+                this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
@@ -4926,6 +5169,14 @@ var Plottable;
                 Plottable.Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
                 Plottable.Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
                 return this;
+            };
+
+            Category.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+                // When anyone calls _invalidateLayout, _computeLayout will be called
+                // on everyone, including this. Since CSS or something might have
+                // affected the size of the characters, clear the cache.
+                this.measurer.clear();
+                return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;
         })(Plottable.Abstract.Axis);
