@@ -10,7 +10,6 @@ export module Abstract {
     public _barAlignmentFactor = 0;
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
-    private previousBaselineValue: number = null;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
@@ -86,7 +85,6 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
-      this.previousBaselineValue = this._baselineValue;
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
@@ -190,10 +188,8 @@ export module Abstract {
         var qscale = <Abstract.QuantitiveScale> scale;
         if (!qscale._userSetDomainer && this._baselineValue != null) {
           qscale.domainer()
-            .paddingException(this.previousBaselineValue, false)
-            .include(this.previousBaselineValue, false)
-            .paddingException(this._baselineValue)
-            .include(this._baselineValue);
+            .paddingException(this._baselineValue, this._plottableID.toString())
+            .include(this._baselineValue, this._plottableID.toString());
           if (qscale._autoDomainAutomatically) {
             qscale.autoDomain();
           }

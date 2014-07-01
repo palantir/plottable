@@ -1061,11 +1061,12 @@ declare module Plottable {
         * [0, 100] to [0, 102.5].
         *
         * @param {any} exception The value that will not be padded.
-        * @param {boolean} add Defaults to true. If true, add the exception,
-        *                  if false, removes the exception.
+        * @param {string} [key] The key to associate the exception with, which enables replacement and deregistration of
+        *                         exceptions. If no key is provided, the exception is unconditionally added to an exception
+        *                         set. Normally, the key should be the _plottableID of the Plot responsible for the exception.
         * @return {Domainer} The calling Domainer.
         */
-        public paddingException(exception: any, add?: boolean): Domainer;
+        public paddingException(exception: any, key?: string): Domainer;
         /**
         * Extends the scale's domain so it starts and ends with "nice" values.
         *
@@ -1080,12 +1081,12 @@ declare module Plottable {
         * and the domain [-9, -8] will become [-9, 0].
         *
         * @param {any} value The value that will be included.
-        * @param {boolean} include Defaults to true. If true, this value will
-        *                  always be included, if false, this value will not
-        *                  necessarily be included.
+        * @param {string} [key] The key to associate the value with, which enables replacement and deregistration of
+        *                         values. If no key is provided, the value is unconditionally added to an value
+        *                         set. Normally, the key should be the _plottableID of the Plot responsible for the value.
         * @return {Domainer} The calling Domainer.
         */
-        public include(value: any, include?: boolean): Domainer;
+        public include(value: any, key?: string): Domainer;
     }
 }
 

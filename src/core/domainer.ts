@@ -6,11 +6,12 @@ module Plottable {
     private doNice = false;
     private niceCount: number;
     private padProportion = 0.0;
-    private paddingExceptions: D3.Set = d3.set([]);
+    private paddingExceptions: D3.Map = d3.map();
+    private unregisteredPaddingExceptions: D3.Set = d3.set();
+    private includedValues: D3.Map = d3.map();
+    // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+    private unregisteredIncludedValues: D3.Map = d3.map();
     private combineExtents: (extents: any[][]) => any[];
-    // This must be a map rather than a set so we can get the original values
-    // back out, rather than their stringified versions.
-    private includedValues: D3.Map = d3.map([]);
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -50,7 +51,7 @@ module Plottable {
     /**
      * Sets the Domainer to pad by a given ratio.
      *
-     * @param {number} [padProportion] Proportionally how much bigger the 
+     * @param {number} [padProportion] Proportionally how much bigger the
      *         new domain should be (0.05 = 5% larger).
      * @return {Domainer} The calling Domainer.
      */
@@ -65,15 +66,20 @@ module Plottable {
      * [0, 100] to [0, 102.5].
      *
      * @param {any} exception The value that will not be padded.
-     * @param {boolean} add Defaults to true. If true, add the exception,
-     *                  if false, removes the exception.
+     * @param {string} [key] The key to associate the exception with, which enables replacement and deregistration of
+     *                         exceptions. If no key is provided, the exception is unconditionally added to an exception
+     *                         set. Normally, the key should be the _plottableID of the Plot responsible for the exception.
      * @return {Domainer} The calling Domainer.
      */
-    public paddingException(exception: any, add = true): Domainer {
-      if (add) {
-        this.paddingExceptions.add(exception);
+    public paddingException(exception: any, key?: string): Domainer {
+      if (exception == null && key != null) {
+        this.paddingExceptions.remove(key);
       } else {
-        this.paddingExceptions.remove(exception);
+        if (key == null) {
+          this.unregisteredPaddingExceptions.add(exception);
+        } else {
+          this.paddingExceptions.set(key, exception);
+        }
       }
       return this;
     }
@@ -97,16 +103,20 @@ module Plottable {
      * and the domain [-9, -8] will become [-9, 0].
      *
      * @param {any} value The value that will be included.
-     * @param {boolean} include Defaults to true. If true, this value will
-     *                  always be included, if false, this value will not
-     *                  necessarily be included.
+     * @param {string} [key] The key to associate the value with, which enables replacement and deregistration of
+     *                         values. If no key is provided, the value is unconditionally added to an value
+     *                         set. Normally, the key should be the _plottableID of the Plot responsible for the value.
      * @return {Domainer} The calling Domainer.
      */
-    public include(value: any, include = true): Domainer {
-      if (include) {
-        this.includedValues.set(value, value);
+    public include(value: any, key?: string): Domainer {
+      if (value == null && key != null) {
+        this.includedValues.remove(key);
       } else {
-        this.includedValues.remove(value);
+        if (key == null) {
+          this.unregisteredIncludedValues.set(value, value);
+        } else {
+          this.includedValues.set(key, value);
+        }
       }
       return this;
     }
@@ -132,10 +142,13 @@ module Plottable {
       var extent = domain[1] - domain[0];
       var newDomain = [domain[0].valueOf() - this.padProportion/2 * extent,
                        domain[1].valueOf() + this.padProportion/2 * extent];
-      if (this.paddingExceptions.has(domain[0])) {
+
+      var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+      var exceptionSet = d3.set(exceptionValues);
+      if (exceptionSet.has(domain[0])) {
         newDomain[0] = domain[0];
       }
-      if (this.paddingExceptions.has(domain[1])) {
+      if (exceptionSet.has(domain[1])) {
         newDomain[1] = domain[1];
       }
       return newDomain;
@@ -150,7 +163,8 @@ module Plottable {
     }
 
     private includeDomain(domain: any[]): any[] {
-      return this.includedValues.values().reduce(
+      var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
+      return includedValues.reduce(
         (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],
         domain
       );

@@ -329,19 +329,19 @@ var Plottable;
                     if (s.trim() === "") {
                         return [0, 0];
                     }
-                    if (Util.DOM.isSelectionRemovedFromSVG(selection)) {
+                    if (Plottable.Util.DOM.isSelectionRemovedFromSVG(selection)) {
                         throw new Error("Cannot measure text in a removed node");
                     }
                     var bb;
                     if (selection.node().nodeName === "text") {
                         var originalText = selection.text();
                         selection.text(s);
-                        bb = Util.DOM.getBBox(selection);
+                        bb = Plottable.Util.DOM.getBBox(selection);
                         selection.text(originalText);
                         return [bb.width, bb.height];
                     } else {
                         var t = selection.append("text").text(s);
-                        bb = Util.DOM.getBBox(t);
+                        bb = Plottable.Util.DOM.getBBox(t);
                         t.remove();
                         return [bb.width, bb.height];
                     }
@@ -426,7 +426,7 @@ var Plottable;
                 var innerG = g.append("g");
                 var textEl = innerG.append("text");
                 textEl.text(line);
-                var bb = Util.DOM.getBBox(textEl);
+                var bb = Plottable.Util.DOM.getBBox(textEl);
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
@@ -439,7 +439,7 @@ var Plottable;
                 var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
                 var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
-                Util.DOM.translate(innerG, xOff, yOff);
+                Plottable.Util.DOM.translate(innerG, xOff, yOff);
                 return [w, h];
             }
             Text.writeLineHorizontally = writeLineHorizontally;
@@ -474,7 +474,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Util.DOM.translate(innerG, 0, i * h);
+                    Plottable.Util.DOM.translate(innerG, 0, i * h);
                     var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
                     if (wh[0] > maxWidth) {
                         maxWidth = wh[0];
@@ -483,7 +483,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = height - usedSpace;
                 var translator = { center: 0.5, top: 0, bottom: 1 };
-                Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
+                Plottable.Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
                 return [maxWidth, usedSpace];
             }
             Text.writeTextHorizontally = writeTextHorizontally;
@@ -497,7 +497,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Util.DOM.translate(innerG, i * h, 0);
+                    Plottable.Util.DOM.translate(innerG, i * h, 0);
                     var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
                     if (wh[1] > maxHeight) {
                         maxHeight = wh[1];
@@ -506,7 +506,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = width - usedSpace;
                 var translator = { center: 0.5, left: 0, right: 1 };
-                Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
+                Plottable.Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
 
                 return [usedSpace, maxHeight];
             }
@@ -530,7 +530,7 @@ var Plottable;
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
                 var measureText = getTextMeasure(innerG);
-                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+                var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
 
                 var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
                 var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
@@ -574,7 +574,7 @@ var Plottable;
                     lines = lines.splice(0, nLinesThatFit);
                     if (nLinesThatFit > 0) {
                         // Overwrite the last line to one that has had a ... appended to the end
-                        lines[nLinesThatFit - 1] = Util.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
+                        lines[nLinesThatFit - 1] = Plottable.Util.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
                     }
                 }
                 return { originalText: text, lines: lines, textFits: textFit };
@@ -1051,7 +1051,7 @@ var Plottable;
                 return formattedValue;
             };
             return Currency;
-        })(Formatter.Fixed);
+        })(Plottable.Formatter.Fixed);
         Formatter.Currency = Currency;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
@@ -1088,7 +1088,7 @@ var Plottable;
                 return formattedValue;
             };
             return Percentage;
-        })(Formatter.Fixed);
+        })(Plottable.Formatter.Fixed);
         Formatter.Percentage = Percentage;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
@@ -1750,7 +1750,7 @@ var Plottable;
             };
             Component.AUTORESIZE_BY_DEFAULT = true;
             return Component;
-        })(Abstract.PlottableObject);
+        })(Plottable.Abstract.PlottableObject);
         Abstract.Component = Component;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -1852,7 +1852,7 @@ var Plottable;
                 return this;
             };
             return ComponentContainer;
-        })(Abstract.Component);
+        })(Plottable.Abstract.Component);
         Abstract.ComponentContainer = ComponentContainer;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2457,7 +2457,7 @@ var Plottable;
                 return this;
             };
             return Scale;
-        })(Abstract.PlottableObject);
+        })(Plottable.Abstract.PlottableObject);
         Abstract.Scale = Scale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2655,7 +2655,7 @@ var Plottable;
                 }
             };
             return Plot;
-        })(Abstract.Component);
+        })(Plottable.Abstract.Component);
         Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2671,7 +2671,7 @@ var Plottable;
                     function Immediate() {
                     }
                     Immediate.prototype.render = function () {
-                        RenderController.flush();
+                        Plottable.Core.RenderController.flush();
                     };
                     return Immediate;
                 })();
@@ -2681,7 +2681,7 @@ var Plottable;
                     function AnimationFrame() {
                     }
                     AnimationFrame.prototype.render = function () {
-                        Plottable.Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
+                        Plottable.Util.DOM.requestAnimationFramePolyfill(Plottable.Core.RenderController.flush);
                     };
                     return AnimationFrame;
                 })();
@@ -2692,7 +2692,7 @@ var Plottable;
                         this._timeoutMsec = Plottable.Util.DOM.POLYFILL_TIMEOUT_MSEC;
                     }
                     Timeout.prototype.render = function () {
-                        setTimeout(RenderController.flush, this._timeoutMsec);
+                        setTimeout(Plottable.Core.RenderController.flush, this._timeoutMsec);
                     };
                     return Timeout;
                 })();
@@ -2723,7 +2723,7 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
-            RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
+            RenderController._renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
 
             function setRenderPolicy(policy) {
                 RenderController._renderPolicy = policy;
@@ -2791,7 +2791,7 @@ var Plottable;
                 }
 
                 // Reset resize flag regardless of queue'd components
-                Core.ResizeBroadcaster.clearResizing();
+                Plottable.Core.ResizeBroadcaster.clearResizing();
             }
             RenderController.flush = flush;
         })(Core.RenderController || (Core.RenderController = {}));
@@ -2820,7 +2820,7 @@ var Plottable;
 
             function _lazyInitialize() {
                 if (broadcaster === undefined) {
-                    broadcaster = new Core.Broadcaster(ResizeBroadcaster);
+                    broadcaster = new Plottable.Core.Broadcaster(ResizeBroadcaster);
                     window.addEventListener("resize", _onResize);
                 }
             }
@@ -2906,10 +2906,11 @@ var Plottable;
             if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
             this.doNice = false;
             this.padProportion = 0.0;
-            this.paddingExceptions = d3.set([]);
-            // This must be a map rather than a set so we can get the original values
-            // back out, rather than their stringified versions.
-            this.includedValues = d3.map([]);
+            this.paddingExceptions = d3.map();
+            this.unregisteredPaddingExceptions = d3.set();
+            this.includedValues = d3.map();
+            // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+            this.unregisteredIncludedValues = d3.map();
             this.combineExtents = combineExtents;
         }
         /**
@@ -2949,16 +2950,20 @@ var Plottable;
         * [0, 100] to [0, 102.5].
         *
         * @param {any} exception The value that will not be padded.
-        * @param {boolean} add Defaults to true. If true, add the exception,
-        *                  if false, removes the exception.
+        * @param {string} [key] The key to associate the exception with, which enables replacement and deregistration of
+        *                         exceptions. If no key is provided, the exception is unconditionally added to an exception
+        *                         set. Normally, the key should be the _plottableID of the Plot responsible for the exception.
         * @return {Domainer} The calling Domainer.
         */
-        Domainer.prototype.paddingException = function (exception, add) {
-            if (typeof add === "undefined") { add = true; }
-            if (add) {
-                this.paddingExceptions.add(exception);
+        Domainer.prototype.paddingException = function (exception, key) {
+            if (exception == null && key != null) {
+                this.paddingExceptions.remove(key);
             } else {
-                this.paddingExceptions.remove(exception);
+                if (key == null) {
+                    this.unregisteredPaddingExceptions.add(exception);
+                } else {
+                    this.paddingExceptions.set(key, exception);
+                }
             }
             return this;
         };
@@ -2982,17 +2987,20 @@ var Plottable;
         * and the domain [-9, -8] will become [-9, 0].
         *
         * @param {any} value The value that will be included.
-        * @param {boolean} include Defaults to true. If true, this value will
-        *                  always be included, if false, this value will not
-        *                  necessarily be included.
+        * @param {string} [key] The key to associate the value with, which enables replacement and deregistration of
+        *                         values. If no key is provided, the value is unconditionally added to an value
+        *                         set. Normally, the key should be the _plottableID of the Plot responsible for the value.
         * @return {Domainer} The calling Domainer.
         */
-        Domainer.prototype.include = function (value, include) {
-            if (typeof include === "undefined") { include = true; }
-            if (include) {
-                this.includedValues.set(value, value);
+        Domainer.prototype.include = function (value, key) {
+            if (value == null && key != null) {
+                this.includedValues.remove(key);
             } else {
-                this.includedValues.remove(value);
+                if (key == null) {
+                    this.unregisteredIncludedValues.set(value, value);
+                } else {
+                    this.includedValues.set(key, value);
+                }
             }
             return this;
         };
@@ -3024,10 +3032,13 @@ var Plottable;
             var newDomain = [
                 domain[0].valueOf() - this.padProportion / 2 * extent,
                 domain[1].valueOf() + this.padProportion / 2 * extent];
-            if (this.paddingExceptions.has(domain[0])) {
+
+            var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+            var exceptionSet = d3.set(exceptionValues);
+            if (exceptionSet.has(domain[0])) {
                 newDomain[0] = domain[0];
             }
-            if (this.paddingExceptions.has(domain[1])) {
+            if (exceptionSet.has(domain[1])) {
                 newDomain[1] = domain[1];
             }
             return newDomain;
@@ -3042,7 +3053,8 @@ var Plottable;
         };
 
         Domainer.prototype.includeDomain = function (domain) {
-            return this.includedValues.values().reduce(function (domain, value) {
+            var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
+            return includedValues.reduce(function (domain, value) {
                 return [Math.min(domain[0], value), Math.max(domain[1], value)];
             }, domain);
         };
@@ -3177,7 +3189,7 @@ var Plottable;
                 }
             };
             return QuantitiveScale;
-        })(Abstract.Scale);
+        })(Plottable.Abstract.Scale);
         Abstract.QuantitiveScale = QuantitiveScale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -4497,7 +4509,7 @@ var Plottable;
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
-        })(Abstract.Component);
+        })(Plottable.Abstract.Component);
         Abstract.Axis = Axis;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -5441,7 +5453,7 @@ var Plottable;
             };
 
             XYPlot.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Abstract.QuantitiveScale) {
+                if (this.xScale instanceof Plottable.Abstract.QuantitiveScale) {
                     var scale = this.xScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
@@ -5451,7 +5463,7 @@ var Plottable;
             };
 
             XYPlot.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Abstract.QuantitiveScale) {
+                if (this.yScale instanceof Plottable.Abstract.QuantitiveScale) {
                     var scale = this.yScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
@@ -5460,7 +5472,7 @@ var Plottable;
                 return this;
             };
             return XYPlot;
-        })(Abstract.Plot);
+        })(Plottable.Abstract.Plot);
         Abstract.XYPlot = XYPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -5631,7 +5643,6 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
-                this.previousBaselineValue = null;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -5700,7 +5711,6 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.baseline = function (value) {
-                this.previousBaselineValue = this._baselineValue;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
@@ -5784,10 +5794,10 @@ var Plottable;
             };
 
             BarPlot.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Abstract.QuantitiveScale) {
+                if (scale instanceof Plottable.Abstract.QuantitiveScale) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer && this._baselineValue != null) {
-                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
+                        qscale.domainer().paddingException(this._baselineValue, this._plottableID.toString()).include(this._baselineValue, this._plottableID.toString());
                         if (qscale._autoDomainAutomatically) {
                             qscale.autoDomain();
                         }
@@ -5847,7 +5857,7 @@ var Plottable;
 
             BarPlot._BarAlignmentToFactor = {};
             return BarPlot;
-        })(Abstract.XYPlot);
+        })(Plottable.Abstract.XYPlot);
         Abstract.BarPlot = BarPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -6043,7 +6053,7 @@ var Plottable;
                 });
             }
             return Line;
-        })(Plot.Area);
+        })(Plottable.Plot.Area);
         Plot.Line = Line;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -6149,7 +6159,7 @@ var Plottable;
                 }).attr(attrToProjector);
             };
             return IterativeDelay;
-        })(Animator.Default);
+        })(Plottable.Animator.Default);
         Animator.IterativeDelay = IterativeDelay;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
@@ -6647,7 +6657,7 @@ var Plottable;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
             return DragBox;
-        })(Interaction.Drag);
+        })(Plottable.Interaction.Drag);
         Interaction.DragBox = DragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6688,7 +6698,7 @@ var Plottable;
                 return this;
             };
             return XDragBox;
-        })(Interaction.DragBox);
+        })(Plottable.Interaction.DragBox);
         Interaction.XDragBox = XDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6726,7 +6736,7 @@ var Plottable;
                 this.callbackToCall(pixelArea);
             };
             return XYDragBox;
-        })(Interaction.DragBox);
+        })(Plottable.Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -6767,7 +6777,7 @@ var Plottable;
                 return this;
             };
             return YDragBox;
-        })(Interaction.DragBox);
+        })(Plottable.Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;

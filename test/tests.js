@@ -3303,6 +3303,31 @@ describe("Renderers", function () {
             });
         });
         describe("Bar Plot", function () {
+            it("multiple bar plots with baselines don't interfere", function () {
+                var svg = generateSVG();
+                var xScale = new Plottable.Scale.Linear();
+                var yScale = new Plottable.Scale.Linear();
+                var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+                var bp1 = new Plottable.Plot.VerticalBar(data, xScale, yScale);
+                var bp2 = new Plottable.Plot.VerticalBar(data, xScale, yScale);
+                bp1.baseline(0);
+                bp2.baseline(0);
+                yScale.domainer().pad();
+                var cg = bp1.merge(bp2);
+                cg.renderTo(svg);
+                var yDomain = yScale.domain();
+                assert.equal(yDomain[0], 0, "baseline stopped padding at y=0");
+                assert.operator(yDomain[1], ">", 1, "padding exceeded y=1");
+                bp1.baseline(1);
+                yDomain = yScale.domain();
+                assert.equal(yDomain[0], 0, "baseline stopped padding at y=0 even after one plot switched");
+                assert.equal(yDomain[1], 1, "baseline stopped padding at y=1");
+                bp2.baseline(2);
+                yDomain = yScale.domain();
+                assert.operator(yDomain[0], "<", 0, "no baselien at y=0");
+                assert.equal(yDomain[1], 2, "baseline caused y=2 to get included");
+                svg.remove();
+            });
             describe("Vertical Bar Plot in points mode", function () {
                 var verifier = new MultiTestVerifier();
                 var svg;
@@ -4782,14 +4807,14 @@ describe("Domainer", function () {
     });
 
     it("paddingException(n) will not pad beyond n", function () {
-        domainer.pad(0.1).paddingException(0).paddingException(200);
+        domainer.pad(0.1).paddingException(0, "key").paddingException(200);
         var domain = domainer.computeDomain([[0, 100]], scale);
         assert.deepEqual(domain, [0, 105]);
         domain = domainer.computeDomain([[-100, 0]], scale);
         assert.deepEqual(domain, [-105, 0]);
         domain = domainer.computeDomain([[0, 200]], scale);
         assert.deepEqual(domain, [0, 200]);
-        domainer.paddingException(0, false);
+        domainer.paddingException(null, "key");
         domain = domainer.computeDomain([[0, 200]], scale);
         assert.deepEqual(domain, [-10, 200]);
     });
@@ -4815,13 +4840,13 @@ describe("Domainer", function () {
         domain = domainer.computeDomain([[100, 200]], scale);
         assert.deepEqual(domain, [5, 200]);
 
-        domainer.include(-3).include(0).include(10);
+        domainer.include(-3).include(0).include(10, "key");
         domain = domainer.computeDomain([[100, 200]], scale);
         assert.deepEqual(domain, [-3, 200]);
         domain = domainer.computeDomain([[0, 0]], scale);
         assert.deepEqual(domain, [-3, 10]);
 
-        domainer.include(10, false);
+        domainer.include(null, "key");
         domain = domainer.computeDomain([[100, 200]], scale);
         assert.deepEqual(domain, [-3, 200]);
         domain = domainer.computeDomain([[-100, -50]], scale);
