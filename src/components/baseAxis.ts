@@ -87,6 +87,16 @@ export module Abstract {
       };
     }
 
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
+      if (this._isHorizontal()) {
+        this._scale.range([0, this.availableWidth]);
+      } else {
+        this._scale.range([this.availableHeight, 0]);
+      }
+      return this;
+    }
+
     public _setup() {
       super._setup();
       this._tickMarkContainer = this.content.append("g")

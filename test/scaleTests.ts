@@ -27,7 +27,7 @@ describe("Scales", () => {
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-    scale._autoDomainAutomatically = true;
+    (<any> scale).autoDomainAutomatically = true;
     scale.updateExtent(1, "x", [0.08, 9.92]);
     callbackWasCalled = false;
     scale.domainer(new Plottable.Domainer().nice());
@@ -50,28 +50,36 @@ describe("Scales", () => {
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
       scale.updateExtent(1, "x", d3.extent(data, (e) => e.foo));
       scale.domainer(new Plottable.Domainer().pad().nice());
-      assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+      assert.isTrue((<any> scale).autoDomainAutomatically,
+                          "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
-      assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
+      assert.isFalse((<any> scale).autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
     });
 
     it("scale autorange works as expected with single dataSource", () => {
+      var svg = generateSVG(100, 100);
       var renderer = new Plottable.Abstract.Plot()
                         .dataSource(dataSource)
-                        .project("x", "foo", scale);
+                        .project("x", "foo", scale)
+                        .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
       dataSource.data(data);
       assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
+      svg.remove();
     });
 
     it("scale reference counting works as expected", () => {
+      var svg1 = generateSVG(100, 100);
+      var svg2 = generateSVG(100, 100);
       var renderer1 = new Plottable.Abstract.Plot()
                           .dataSource(dataSource)
                           .project("x", "foo", scale);
+      renderer1.renderTo(svg1);
       var renderer2 = new Plottable.Abstract.Plot()
                           .dataSource(dataSource)
                           .project("x", "foo", scale);
+      renderer2.renderTo(svg2);
       var otherScale = new Plottable.Scale.Linear();
       renderer1.project("x", "foo", otherScale);
       dataSource.data([{foo: 10}, {foo: 11}]);
@@ -80,26 +88,49 @@ describe("Scales", () => {
       // "scale not listening to the dataSource after all perspectives removed"
       dataSource.data([{foo: 99}, {foo: 100}]);
       assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
+      svg1.remove();
+      svg2.remove();
     });
 
     it("scale perspectives can be removed appropriately", () => {
-      assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
+      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled1");
       scale.updateExtent(1, "x", d3.extent(data, (e) => e.foo));
       scale.updateExtent(2, "x", d3.extent(data, (e) => e.bar));
-      assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
+      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled2");
       assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-      assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
+      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled3");
       scale.removeExtent(1, "x");
-      assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
+      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled4");
       assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
       scale.updateExtent(2, "x", d3.extent(data, (e) => e.foo));
-      assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
+      assert.isTrue((<any> scale).autoDomainAutomatically, "autoDomain enabled5");
       assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
     });
 
     it("scales don't allow Infinity", () => {
       assert.throws(() => scale._setDomain([5, Infinity]), Error);
       assert.throws(() => scale._setDomain([-Infinity, 6]), Error);
+    });
+
+    it("should resize when a plot is removed", () => {
+      var svg = generateSVG(400, 400);
+      var ds1 = [{x: 0, y: 0}, {x: 1, y: 1}];
+      var ds2 = [{x: 1, y: 1}, {x: 2, y: 2}];
+      var xScale = new Plottable.Scale.Linear();
+      var yScale = new Plottable.Scale.Linear();
+      xScale.domainer(new Plottable.Domainer());
+      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+      var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
+      var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
+      var renderAreas = renderAreaD1.merge(renderAreaD2);
+      renderAreas.renderTo(svg);
+      assert.deepEqual(xScale.domain(), [0, 2]);
+      renderAreaD1.remove();
+      assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+      renderAreas.merge(renderAreaD1);
+      assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
+      svg.remove();
     });
   });
 

@@ -130,15 +130,21 @@ describe("Renderers", () => {
       var ds1 = new Plottable.DataSource([0, 1, 2]);
       var ds2 = new Plottable.DataSource([1, 2, 3]);
       var s = new Plottable.Scale.Linear();
+      var svg1 = generateSVG(100, 100);
+      var svg2 = generateSVG(100, 100);
       var r1 = new Plottable.Abstract.Plot()
                     .dataSource(ds1)
-                    .project("x", (x: number) => x, s);
+                    .project("x", (x: number) => x, s)
+                    .renderTo(svg1);
       var r2 = new Plottable.Abstract.Plot()
                     .dataSource(ds2)
-                    .project("x", (x: number) => x, s);
+                    .project("x", (x: number) => x, s)
+                    .renderTo(svg2);
       assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
       ds1.data([]);
       assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
+      svg1.remove();
+      svg2.remove();
     });
   });
 
@@ -264,21 +270,6 @@ describe("Renderers", () => {
 
       after(() => {
         if (verifier.passed) {svg.remove();};
-      });
-    });
-
-    describe("LinePlot", () => {
-      it("defaults to no fill", () => {
-        var svg = generateSVG(500, 500);
-        var data = [{x: 0, y: 0}, {x: 2, y: 2}];
-        var xScale = new Plottable.Scale.Linear();
-        var yScale = new Plottable.Scale.Linear();
-        var linePlot = new Plottable.Plot.Line(data, xScale, yScale);
-        linePlot.renderTo(svg);
-
-        var areaPath = linePlot.renderArea.select(".area");
-        assert.strictEqual(areaPath.attr("fill"), "none");
-        svg.remove();
       });
     });
 
