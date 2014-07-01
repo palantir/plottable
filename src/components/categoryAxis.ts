@@ -54,12 +54,13 @@ export module Axis {
         };
       }
 
+      var fakeScale = this._scale.copy();
       if (this._isHorizontal()) {
-        this._scale.range([0, offeredWidth]);
+        fakeScale.range([0, offeredWidth]);
       } else {
-        this._scale.range([offeredHeight, 0]);
+        fakeScale.range([offeredHeight, 0]);
       }
-      var textResult = this.measureTicks(offeredWidth, offeredHeight, this._scale.domain());
+      var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
@@ -79,13 +80,13 @@ export module Axis {
      *
      * @param {string[]} data The strings that will be printed on the ticks.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, data: string[]): Util.Text.IWriteTextResult;
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, data: string[]): Util.Text.IWriteTextResult;
     /**
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {D3.Selection} ticks The tick elements to be written to.
      */
-    private measureTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Util.Text.IWriteTextResult;
-    private measureTicks(axisWidth: number, axisHeight: number, dataOrTicks: any): Util.Text.IWriteTextResult {
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection): Util.Text.IWriteTextResult;
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, dataOrTicks: any): Util.Text.IWriteTextResult {
       var draw = dataOrTicks instanceof d3.selection;
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
@@ -93,7 +94,7 @@ export module Axis {
       var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
 
       iterator(function (d: string) {
-        var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
+        var bandWidth = scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
@@ -139,7 +140,7 @@ export module Axis {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this.measureTicks(this.availableWidth, this.availableHeight, tickLabels);
+      this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;

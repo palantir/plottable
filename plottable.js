@@ -3560,6 +3560,15 @@ var Plottable;
                     return this;
                 }
             };
+
+            /**
+            * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+            *
+            * @returns {Ordinal} A copy of the calling Scale.
+            */
+            Ordinal.prototype.copy = function () {
+                return new Ordinal(this._d3Scale.copy());
+            };
             return Ordinal;
         })(Plottable.Abstract.Scale);
         Scale.Ordinal = Ordinal;
@@ -5063,12 +5072,13 @@ var Plottable;
                     };
                 }
 
+                var fakeScale = this._scale.copy();
                 if (this._isHorizontal()) {
-                    this._scale.range([0, offeredWidth]);
+                    fakeScale.range([0, offeredWidth]);
                 } else {
-                    this._scale.range([offeredHeight, 0]);
+                    fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this.measureTicks(offeredWidth, offeredHeight, this._scale.domain());
+                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
 
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
@@ -5082,7 +5092,7 @@ var Plottable;
                 return this._scale.domain();
             };
 
-            Category.prototype.measureTicks = function (axisWidth, axisHeight, dataOrTicks) {
+            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
                 var draw = dataOrTicks instanceof d3.selection;
                 var self = this;
                 var textWriteResults = [];
@@ -5096,7 +5106,7 @@ var Plottable;
                 };
 
                 iterator(function (d) {
-                    var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
+                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self.tickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
@@ -5152,7 +5162,7 @@ var Plottable;
 
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.measureTicks(this.availableWidth, this.availableHeight, tickLabels);
+                this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
@@ -6288,6 +6298,11 @@ var Plottable;
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
+<<<<<<< HEAD
+            return Line;
+        })(Plottable.Plot.Area);
+        Plot.Line = Line;
+=======
             Area.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.areaPath = this.renderArea.append("path").classed("area", true);
@@ -6359,6 +6374,7 @@ var Plottable;
             return Area;
         })(Plottable.Plot.Line);
         Plot.Area = Area;
+>>>>>>> master
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
