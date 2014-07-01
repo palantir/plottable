@@ -62,9 +62,12 @@ export module Util {
     function wrapWhitespace(tm: TextMeasurer): TextMeasurer {
       return (s: string) => {
         if (/\s/.test(s)) {
-          var wh = tm(CANONICAL_CHR + s + CANONICAL_CHR);
-          var whWrapping = tm(CANONICAL_CHR);
-          return [wh[0] - 2*whWrapping[0], wh[1]];
+          var whs = s.split("").map((c: string) => {
+            var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
+            var whWrapping = tm(CANONICAL_CHR);
+            return [wh[0] - 2*whWrapping[0], wh[1]];
+          });
+          return [d3.sum(whs, (x) => x[0]), d3.max(whs, (x) => x[1])];
         } else {
           return tm(s);
         }
