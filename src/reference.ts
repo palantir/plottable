@@ -2,6 +2,7 @@
 /// <reference path="utils/osUtils.ts" />
 /// <reference path="utils/idCounter.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
+/// <reference path="utils/cache.ts" />
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
@@ -11,6 +12,7 @@
 /// <reference path="utils/formatters/fixedFormatter.ts" />
 /// <reference path="utils/formatters/currencyFormatter.ts" />
 /// <reference path="utils/formatters/percentageFormatter.ts" />
+/// <reference path="utils/formatters/SISuffixFormatter.ts" />
 /// <reference path="utils/formatters/customFormatter.ts" />
 
 
