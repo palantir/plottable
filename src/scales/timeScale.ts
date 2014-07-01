@@ -8,9 +8,13 @@ export module Scale {
      * Creates a new Time Scale.
      *
      * @constructor
+     * @param {D3.Scale.Time} [scale] The D3 TimeScale backing the TimeScale. If not supplied, uses a default scale.
      */
-    constructor(scale = d3.time.scale()) {
-      super(<any>scale);
+    constructor();
+    constructor(scale: D3.Scale.TimeScale);
+    constructor(scale?: any) {
+      // need to cast since d3 time scales do not descend from quantitive scales
+      super(<any>(scale == null ? d3.time.scale() : scale));
     }
 
     public _setDomain(values: any[]) {

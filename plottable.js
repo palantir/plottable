@@ -1,3 +1,9 @@
+/*!
+Plottable 0.18.2 (https://github.com/palantir/plottable)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -3503,14 +3509,9 @@ var Plottable;
     (function (Scale) {
         var Time = (function (_super) {
             __extends(Time, _super);
-            /**
-            * Creates a new Time Scale.
-            *
-            * @constructor
-            */
             function Time(scale) {
-                if (typeof scale === "undefined") { scale = d3.time.scale(); }
-                _super.call(this, scale);
+                // need to cast since d3 time scales do not descend from quantitive scales
+                _super.call(this, (scale == null ? d3.time.scale() : scale));
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }
             Time.prototype._setDomain = function (values) {
