@@ -161,10 +161,11 @@ export module Axis {
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
 
-      this.hideEndTickLabels();
+      if (!this.showEndTickLabels()) {
+        this._hideEndTickLabels();
+      }
 
-      this.hideOverlappingTickLabels();
-
+      this._hideOverlappingTickLabels();
       return this;
     }
 
@@ -201,57 +202,6 @@ export module Axis {
         this._invalidateLayout();
         return this;
       }
-    }
-
-    private hideEndTickLabels() {
-      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-      var isInsideBBox = (tickBox: ClientRect) => {
-        return (
-          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
-          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
-        );
-      };
-
-      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
-      var firstTickLabel = tickLabels[0][0];
-      if (!this.showFirstTickLabel && !isInsideBBox(firstTickLabel.getBoundingClientRect())) {
-        d3.select(firstTickLabel).style("visibility", "hidden");
-      }
-      var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!this.showLastTickLabel && !isInsideBBox(lastTickLabel.getBoundingClientRect())) {
-        d3.select(lastTickLabel).style("visibility", "hidden");
-      }
-    }
-
-    private hideOverlappingTickLabels() {
-      var visibleTickLabels = this._tickLabelContainer
-                                    .selectAll("." + Abstract.Axis.TICK_LABEL_CLASS)
-                                    .filter(function(d: any, i: number) {
-                                      return d3.select(this).style("visibility") === "visible";
-                                    });
-      var lastLabelClientRect: ClientRect;
-
-      function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-        if (boxA.right < boxB.left) { return false; }
-        if (boxA.left > boxB.right) { return false; }
-        if (boxA.bottom < boxB.top) { return false; }
-        if (boxA.top > boxB.bottom) { return false; }
-        return true;
-      }
-
-      visibleTickLabels.each(function (d: any) {
-        var clientRect = this.getBoundingClientRect();
-        var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
-          tickLabel.style("visibility", "hidden");
-        } else {
-          lastLabelClientRect = clientRect;
-          tickLabel.style("visibility", "visible");
-        }
-      });
     }
 
     /**
