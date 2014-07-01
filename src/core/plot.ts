@@ -82,17 +82,16 @@ export module Abstract {
         this._dataSource.broadcaster.deregisterListener(this);
       }
       this._dataSource = source;
-      this._dataSource.broadcaster.registerListener(this, () => {
-        this.animateOnNextRender = true;
-        this.updateAllProjectors();
-        this._dataChanged = true;
-        this._render();
-      });
-      this.animateOnNextRender = true;
+      this._dataSource.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
+      this._onDataSourceUpdate();
+      return this;
+    }
+
+    public _onDataSourceUpdate() {
       this.updateAllProjectors();
+      this.animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
-      return this;
     }
 
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {

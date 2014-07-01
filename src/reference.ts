@@ -2,6 +2,7 @@
 /// <reference path="utils/osUtils.ts" />
 /// <reference path="utils/idCounter.ts" />
 /// <reference path="utils/strictEqualityAssociativeArray.ts" />
+/// <reference path="utils/cache.ts" />
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
@@ -55,8 +56,8 @@
 /// <reference path="components/plots/abstractBarPlot.ts" />
 /// <reference path="components/plots/verticalBarPlot.ts" />
 /// <reference path="components/plots/horizontalBarPlot.ts" />
-/// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />
+/// <reference path="components/plots/areaPlot.ts" />
 
 /// <reference path="animators/nullAnimator.ts" />
 /// <reference path="animators/defaultAnimator.ts" />

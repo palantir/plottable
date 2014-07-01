@@ -43,6 +43,10 @@ declare module Plottable {
             * @return {T[]} Every array in a, concatenated together in the order they appear.
             */
             function flatten<T>(a: T[][]): T[];
+            /**
+            * Check if two arrays are equal by strict equality.
+            */
+            function arrayEq<T>(a: T[], b: T[]): boolean;
         }
     }
 }
@@ -171,6 +175,44 @@ declare module Plottable {
 
 declare module Plottable {
     module Util {
+        class Cache<T> {
+            /**
+            * @constructor
+            *
+            * @param {string} compute The function whose results will be cached.
+            * @param {string} [canonicalKey] If present, when clear() is called,
+            *        this key will be re-computed. If its result hasn't been changed,
+            *        the cache will not be cleared.
+            * @param {(v: T, w: T) => boolean} [valueEq]
+            *        Used to determine if the value of canonicalKey has changed.
+            *        If omitted, defaults to === comparision.
+            */
+            constructor(compute: (k: string) => T, canonicalKey?: string, valueEq?: (v: T, w: T) => boolean);
+            /**
+            * Attempt to look up k in the cache, computing the result if it isn't
+            * found.
+            *
+            * @param {string} k The key to look up in the cache.
+            * @return {T} The value associated with k; the result of compute(k).
+            */
+            public get(k: string): T;
+            /**
+            * Reset the cache empty.
+            *
+            * If canonicalKey was provided at construction, compute(canonicalKey)
+            * will be re-run. If the result matches what is already in the cache,
+            * it will not clear the cache.
+            *
+            * @return {Cache<T>} The calling Cache.
+            */
+            public clear(): Cache<T>;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Util {
         module Text {
             interface TextMeasurer {
                 (s: string): number[];
@@ -182,6 +224,28 @@ declare module Plottable {
             * @returns {number[]} width and height of the text
             */
             function getTextMeasure(selection: D3.Selection): TextMeasurer;
+            /**
+            * This class will measure text by measuring each character individually,
+            * then adding up the dimensions. It will also cache the dimensions of each
+            * letter.
+            */
+            class CachingCharacterMeasurer {
+                /**
+                * @param {string} s The string to be measured.
+                * @return {number[]} [width, height] pair.
+                */
+                public measure: TextMeasurer;
+                /**
+                * @param {D3.Selection} g The element that will have text inserted into
+                *        it in order to measure text. The styles present for text in
+                *        this element will to the text being measured.
+                */
+                constructor(g: D3.Selection);
+                /**
+                * Clear the cache, if it seems that the text has changed size.
+                */
+                public clear(): CachingCharacterMeasurer;
+            }
             /**
             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
             *
@@ -219,14 +283,18 @@ declare module Plottable {
                 usedWidth: number;
                 usedHeight: number;
             }
+            interface IWriteOptions {
+                g: D3.Selection;
+                xAlign: string;
+                yAlign: string;
+            }
             /**
-            * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
-            * Contains the text within a rectangle with dimensions width, height. Tries to
-            * orient the text using xOrient and yOrient parameters.
-            * Will align the text vertically if it seems like that is appropriate.
+            * @param {write} [IWriteOptions] If supplied, the text will be written
+            *        To the given g. Will align the text vertically if it seems like
+            *        that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string, horizontally?: boolean): IWriteTextResult;
+            function writeText(text: string, width: number, height: number, tm: TextMeasurer, horizontally?: boolean, write?: IWriteOptions): IWriteTextResult;
         }
     }
 }
@@ -1954,9 +2022,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Area extends Abstract.XYPlot {
+        class Line extends Abstract.XYPlot {
             /**
-            * Creates an AreaPlot.
+            * Creates a LinePlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1971,9 +2039,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line extends Area {
+        class Area extends Line {
             /**
-            * Creates a LinePlot.
+            * Creates an AreaPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1981,6 +2049,7 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
+            public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Area;
         }
     }
 }
