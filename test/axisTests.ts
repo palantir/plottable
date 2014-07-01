@@ -126,9 +126,10 @@ describe("Axes", () => {
     var axisBBoxAfter = (<any> xAxis.element.node()).getBBox();
     var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
     assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
-    assert.equal( (baselineClientRectAfter.bottom - baselineClientRectBefore.bottom),
-                  (newHeight - oldHeight),
-                  "baseline has shifted down as a consequence" );
+    assert.closeTo( (baselineClientRectAfter.bottom - baselineClientRectBefore.bottom),
+                    (newHeight - oldHeight),
+                    0.01,
+                    "baseline has shifted down as a consequence" );
     svg.remove();
   });
 
@@ -190,9 +191,10 @@ describe("Axes", () => {
     var axisBBoxAfter = (<any> yAxis.element.node()).getBBox();
     var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
     assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
-    assert.equal( (baselineClientRectAfter.right - baselineClientRectBefore.right),
-                  (newWidth - oldWidth),
-                  "baseline has shifted over as a consequence" );
+    assert.closeTo( (baselineClientRectAfter.right - baselineClientRectBefore.right),
+                    (newWidth - oldWidth),
+                    0.01,
+                    "baseline has shifted over as a consequence" );
     svg.remove();
   });
 
