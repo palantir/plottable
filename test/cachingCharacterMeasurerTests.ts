@@ -30,4 +30,10 @@ describe("CachingCharacterMeasurer", () => {
     assert.operator(a, "<", c, "cache reset after font size changed");
     svg.remove();
   });
+
+  it("multiple spaces take up same area as one space", () => {
+    var a = measurer.measure("x x")[0];
+    var b = measurer.measure("x  \t \n x")[0];
+    assert.equal(a, b);
+  });
 });

@@ -39,6 +39,14 @@ export module Util {
     }
 
     /**
+     * @return {TextMeasurer} A test measurer that will treat all sequences
+     *         of consecutive whitespace as a single " ".
+     */
+    function combineWhitespace(tm: TextMeasurer): TextMeasurer {
+      return (s: string) => tm(s.replace(/\s+/g, " "));
+    }
+
+    /**
      * Returns a text measure that measures each individual character of the
      * string with tm, then combines all the individual measurements.
      */
@@ -61,7 +69,7 @@ export module Util {
      */
     function wrapWhitespace(tm: TextMeasurer): TextMeasurer {
       return (s: string) => {
-        if (/\s/.test(s)) {
+        if (/^\s*$/.test(s)) {
           var whs = s.split("").map((c: string) => {
             var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
             var whWrapping = tm(CANONICAL_CHR);
@@ -94,9 +102,10 @@ export module Util {
        */
       constructor(g: D3.Selection) {
         this.cache = new Cache(getTextMeasure(g), CANONICAL_CHR, Methods.arrayEq);
-        this.measure = measureByCharacter(
-                          wrapWhitespace(
-                            (s: string) => this.cache.get(s)));
+        this.measure = combineWhitespace(
+                          measureByCharacter(
+                            wrapWhitespace(
+                              (s: string) => this.cache.get(s))));
       }
 
       /**

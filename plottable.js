@@ -435,6 +435,16 @@ var Plottable;
             Text.getTextMeasure = getTextMeasure;
 
             /**
+            * @return {TextMeasurer} A test measurer that will treat all sequences
+            *         of consecutive whitespace as a single " ".
+            */
+            function combineWhitespace(tm) {
+                return function (s) {
+                    return tm(s.replace(/\s+/g, " "));
+                };
+            }
+
+            /**
             * Returns a text measure that measures each individual character of the
             * string with tm, then combines all the individual measurements.
             */
@@ -461,7 +471,7 @@ var Plottable;
             */
             function wrapWhitespace(tm) {
                 return function (s) {
-                    if (/\s/.test(s)) {
+                    if (/^\s*$/.test(s)) {
                         var whs = s.split("").map(function (c) {
                             var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
                             var whWrapping = tm(CANONICAL_CHR);
@@ -492,9 +502,9 @@ var Plottable;
                 function CachingCharacterMeasurer(g) {
                     var _this = this;
                     this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.arrayEq);
-                    this.measure = measureByCharacter(wrapWhitespace(function (s) {
+                    this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) {
                         return _this.cache.get(s);
-                    }));
+                    })));
                 }
                 /**
                 * Clear the cache, if it seems that the text has changed size.
