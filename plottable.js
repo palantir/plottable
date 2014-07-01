@@ -6395,11 +6395,6 @@ var Plottable;
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
-<<<<<<< HEAD
-            return Line;
-        })(Plottable.Plot.Area);
-        Plot.Line = Line;
-=======
             Area.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.areaPath = this.renderArea.append("path").classed("area", true);
@@ -6471,7 +6466,6 @@ var Plottable;
             return Area;
         })(Plottable.Plot.Line);
         Plot.Area = Area;
->>>>>>> master
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
