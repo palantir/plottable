@@ -186,13 +186,19 @@ export module Abstract {
     public _updateDomainer(scale: Scale) {
       if (scale instanceof Abstract.QuantitiveScale) {
         var qscale = <Abstract.QuantitiveScale> scale;
-        if (!qscale._userSetDomainer && this._baselineValue != null) {
-          qscale.domainer()
-            .paddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
-            .include(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-          qscale._autoDomainIfAutomaticMode();
+        if (!qscale._userSetDomainer) {
+          if (this._baselineValue != null) {
+            qscale.domainer()
+              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
+              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+          } else {
+            qscale.domainer()
+              .removePaddingException("BAR_PLOT+" + this._plottableID)
+              .removeIncludedValue("BAR_PLOT+" + this._plottableID);
+          }
         }
+            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
+        qscale._autoDomainIfAutomaticMode();
       }
       return this;
     }

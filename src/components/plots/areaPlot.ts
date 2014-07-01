@@ -48,7 +48,11 @@ export module Plot {
       var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
       if (!scale._userSetDomainer) {
-        scale.domainer().paddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+        if (constantBaseline != null) {
+          scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+        } else {
+          scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+        }
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         scale._autoDomainIfAutomaticMode();
       }
