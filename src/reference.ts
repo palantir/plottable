@@ -12,6 +12,7 @@
 /// <reference path="utils/formatters/fixedFormatter.ts" />
 /// <reference path="utils/formatters/currencyFormatter.ts" />
 /// <reference path="utils/formatters/percentageFormatter.ts" />
+/// <reference path="utils/formatters/SISuffixFormatter.ts" />
 /// <reference path="utils/formatters/customFormatter.ts" />
 
 

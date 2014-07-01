@@ -53,13 +53,13 @@ export module Axis {
           wantsHeight: false
         };
       }
+
       if (this._isHorizontal()) {
         this._scale.range([0, offeredWidth]);
       } else {
         this._scale.range([offeredHeight, 0]);
       }
       var textResult = this.measureTicks(offeredWidth, offeredHeight, this._scale.domain());
-
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
