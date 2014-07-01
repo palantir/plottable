@@ -131,21 +131,38 @@ describe("Domainer", () => {
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();
     var domainer = yScale.domainer();
-    var getExceptions = () => (<any> yScale.domainer()).paddingExceptions.values().map(parseFloat);
-    assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
-    var r = new Plottable.Plot.Area([{x: 0}, {x: 1}, {x: 2}, {x: 3}, {x: 4}, {x: 5}, {x: 6}], xScale, yScale);
+    var data = [{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 5}];
+    var r = new Plottable.Plot.Area(data, xScale, yScale);
+    var svg = generateSVG();
     r.project("x", "x", xScale);
-    r.project("y", "x", yScale);
+    r.project("y", "y", yScale);
+    r.renderTo(svg);
+
+    function getExceptions() {
+      yScale.autoDomain();
+      var yDomain = yScale.domain();
+      var exceptions: number[] = [];
+      if (yDomain[0] === 0) {
+          exceptions.push(0);
+      }
+      if (yDomain[1] === 5) {
+          exceptions.push(5);
+      }
+      return exceptions;
+    }
+
     assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
-    r.project("y0", "x", yScale);
+    // assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
+    r.project("y0", "y0", yScale);
     assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
     r.project("y0", 0, yScale);
     assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
     r.project("y0", () => 5, yScale);
     assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
-    r.project("y0", "x", yScale);
+    r.project("y0", "y0", yScale);
     assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
-    r.dataSource().data([{x: 0}, {x: 0}]);
+    r.dataSource().data([{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 0}]);
     assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
+    svg.remove();
   });
 });
