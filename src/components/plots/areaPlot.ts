@@ -4,8 +4,6 @@ module Plottable {
 export module Plot {
   export class Area extends Line {
     private areaPath: D3.Selection;
-    private constantBaseline: number = null;
-    private previousBaseline: number = null;
 
     /**
      * Creates an AreaPlot.
@@ -47,21 +45,10 @@ export module Plot {
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
       var extent:  number[] = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
-      if (extent.length === 2 && extent[0] === extent[1]) {
-        this.constantBaseline = extent[0];
-      } else {
-        this.constantBaseline = null;
-      }
+      var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
-      if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
-        if (this.previousBaseline != null) {
-          scale.domainer().paddingException(this.previousBaseline, false);
-          this.previousBaseline = null;
-        }
-        if (this.constantBaseline != null) {
-          scale.domainer().paddingException(this.constantBaseline, true);
-          this.previousBaseline = this.constantBaseline;
-        }
+      if (!scale._userSetDomainer) {
+        scale.domainer().paddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
         scale._autoDomainIfAutomaticMode();
       }
       return this;

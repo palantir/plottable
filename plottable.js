@@ -6049,20 +6049,8 @@ var Plottable;
                 if (scale instanceof Plottable.Abstract.QuantitiveScale) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer && this._baselineValue != null) {
-<<<<<<< HEAD
                         qscale.domainer().paddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).include(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-                        if (qscale._autoDomainAutomatically) {
-                            qscale.autoDomain();
-                        }
-||||||| merged common ancestors
-                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
-                        if (qscale._autoDomainAutomatically) {
-                            qscale.autoDomain();
-                        }
-=======
-                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
                         qscale._autoDomainIfAutomaticMode();
->>>>>>> master
                     }
                 }
                 return this;
@@ -6297,8 +6285,6 @@ var Plottable;
             */
             function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this.constantBaseline = null;
-                this.previousBaseline = null;
                 this.classed("area-renderer", true);
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
@@ -6310,15 +6296,6 @@ var Plottable;
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
-<<<<<<< HEAD
-            return Line;
-        })(Plottable.Plot.Area);
-        Plot.Line = Line;
-||||||| merged common ancestors
-            return Line;
-        })(Plot.Area);
-        Plot.Line = Line;
-=======
             Area.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.areaPath = this.renderArea.append("path").classed("area", true);
@@ -6339,21 +6316,10 @@ var Plottable;
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
                 var extent = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
-                if (extent.length === 2 && extent[0] === extent[1]) {
-                    this.constantBaseline = extent[0];
-                } else {
-                    this.constantBaseline = null;
-                }
+                var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
-                if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
-                    if (this.previousBaseline != null) {
-                        scale.domainer().paddingException(this.previousBaseline, false);
-                        this.previousBaseline = null;
-                    }
-                    if (this.constantBaseline != null) {
-                        scale.domainer().paddingException(this.constantBaseline, true);
-                        this.previousBaseline = this.constantBaseline;
-                    }
+                if (!scale._userSetDomainer) {
+                    scale.domainer().paddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
                     scale._autoDomainIfAutomaticMode();
                 }
                 return this;
@@ -6390,7 +6356,6 @@ var Plottable;
             return Area;
         })(Plottable.Plot.Line);
         Plot.Area = Area;
->>>>>>> master
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
