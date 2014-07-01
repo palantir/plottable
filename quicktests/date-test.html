@@ -21,7 +21,7 @@
     linePlot = new Plottable.Plot.Line(data, xScale, yScale)
     .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
 
-    xAxis = new Plottable.Axis.Time(xScale, "bottom");
+    xAxis = new Plottable.Axis.Numeric(xScale, "bottom", new Plottable.Formatter.Time());
     yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
     gridlines = new Plottable.Component.Gridlines(xScale, yScale);

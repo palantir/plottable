@@ -1,9 +1,3 @@
-/*!
-Plottable 0.18.2 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -4646,97 +4640,6 @@ var Plottable;
         Abstract.Axis = Axis;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Axis) {
-        var Time = (function (_super) {
-            __extends(Time, _super);
-            /**
-            * Creates a Time Axis
-            *
-            * @constructor
-            * @param {TimeScale} scale The scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            */
-            function Time(scale, orientation, formatter) {
-                if (typeof formatter === "undefined") { formatter = new Plottable.Formatter.Time(); }
-                _super.call(this, scale, orientation, formatter);
-                if (orientation !== "top" && orientation !== "bottom") {
-                    throw new Error("Time Axis can only be horizontal for now");
-                }
-                this.classed("time-axis", true);
-            }
-            Time.prototype._computeWidth = function () {
-                return 0;
-            };
-
-            Time.prototype._computeHeight = function () {
-                this._computedHeight = this.tickLength() + this.tickLabelPadding() + this.measureTextHeight();
-                return this._computedHeight;
-            };
-
-            Time.prototype._getTickValues = function () {
-                return this._scale.ticks(7);
-            };
-
-            Time.prototype.measureTextHeight = function () {
-                return Plottable.Util.Text.getTextHeight(this._tickLabelContainer);
-            };
-
-            Time.prototype._doRender = function () {
-                var _this = this;
-                _super.prototype._doRender.call(this);
-                var tickValues = this._getTickValues();
-                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(tickValues);
-                tickLabels.exit().remove();
-                tickLabels.enter().append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-
-                var tickLabelAttrHash = {
-                    x: 0,
-                    y: 0,
-                    dx: "0em",
-                    dy: "0em"
-                };
-                var labelGroupTransformY = 0;
-                var tickMarkAttrHash = this._generateTickMarkAttrHash();
-                switch (this._orientation) {
-                    case "bottom":
-                        tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
-                        tickLabelAttrHash["dy"] = "0.95em";
-                        break;
-                    case "top":
-                        tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
-                        tickLabelAttrHash["dy"] = "-.25em";
-                        break;
-                }
-
-                tickLabels.text(function (d) {
-                    return _this._formatter.format(d);
-                }).style("text-anchor", "middle").style("visibility", "visible").attr(tickLabelAttrHash);
-
-                var labelGroupTransform = "translate(0," + tickMarkAttrHash["y2"] + ")";
-                this._tickLabelContainer.attr("transform", labelGroupTransform);
-
-                if (!this.showEndTickLabels()) {
-                    this._hideEndTickLabels();
-                }
-                this._hideOverlappingTickLabels();
-                return this;
-            };
-            return Time;
-        })(Plottable.Abstract.Axis);
-        Axis.Time = Time;
-    })(Plottable.Axis || (Plottable.Axis = {}));
-    var Axis = Plottable.Axis;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
