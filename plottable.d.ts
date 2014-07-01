@@ -2023,9 +2023,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Area extends Abstract.XYPlot {
+        class Line extends Abstract.XYPlot {
             /**
-            * Creates an AreaPlot.
+            * Creates a LinePlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -2040,9 +2040,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line extends Area {
+        class Area extends Line {
             /**
-            * Creates a LinePlot.
+            * Creates an AreaPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -2050,6 +2050,7 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
+            public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Area;
         }
     }
 }

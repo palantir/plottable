@@ -190,9 +190,7 @@ export module Abstract {
           qscale.domainer()
             .paddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
             .include(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-          if (qscale._autoDomainAutomatically) {
-            qscale.autoDomain();
-          }
+          qscale._autoDomainIfAutomaticMode();
         }
       }
       return this;
