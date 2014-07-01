@@ -3978,6 +3978,27 @@ describe("Scales", function () {
             scale.rangeType("points");
             assert.isTrue(callbackWasCalled, "The registered callback was called");
         });
+
+        it("extentModifier works as expected", function () {
+            var scale = new Plottable.Scale.Ordinal();
+            scale.updateExtent(1, "x", ["d", "e", "f"]);
+
+            scale.extentModifier(function () {
+                return ["a", "b", "c"];
+            });
+            assert.deepEqual(scale.domain(), ["a", "b", "c"]);
+
+            scale.extentModifier(function (extent) {
+                return extent.concat(["g"]);
+            });
+            assert.deepEqual(scale.domain(), ["d", "e", "f", "g"]);
+
+            scale.domain(["h", "i", "j"]);
+            scale.extentModifier(function () {
+                return ["nope"];
+            });
+            assert.deepEqual(scale.domain(), ["h", "i", "j"], "after scale.domain(d), extentModifier is ignored");
+        });
     });
 
     describe("Color Scales", function () {
