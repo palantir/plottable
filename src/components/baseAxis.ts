@@ -40,6 +40,12 @@ export module Abstract {
       this._scale.broadcaster.registerListener(this, () => this.rescale());
     }
 
+    public remove() {
+      super.remove();
+      this._scale.broadcaster.deregisterListener(this);
+      return this;
+    }
+
     public _isHorizontal() {
       return this._orientation === "top" || this._orientation === "bottom";
     }

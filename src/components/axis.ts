@@ -42,6 +42,12 @@ export module Axis {
       return this;
     }
 
+    public remove() {
+      super.remove();
+      this._axisScale.broadcaster.deregisterListener(this);
+      return this;
+    }
+
     public _doRender() {
       var domain = this._axisScale.domain();
       var extent = Math.abs(domain[1] - domain[0]);

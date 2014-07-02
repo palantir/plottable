@@ -639,6 +639,11 @@ declare module Plottable {
             /**
             * Removes a Component from the DOM.
             */
+            public detach(): Component;
+            /**
+            * Removes a Component from the DOM and disconnects it from everything it's
+            * listening to (effectively destroying it).
+            */
             public remove(): Component;
         }
     }
@@ -661,11 +666,13 @@ declare module Plottable {
             */
             public empty(): boolean;
             /**
-            * Remove all components contained in the  ComponentContainer
+            * Detaches all components contained in the ComponentContainer, and
+            * empties the ComponentContainer.
             *
             * @returns {ComponentContainer} The calling ComponentContainer
             */
-            public removeAll(): ComponentContainer;
+            public detachAll(): ComponentContainer;
+            public remove(): ComponentContainer;
         }
     }
 }
@@ -844,6 +851,7 @@ declare module Plottable {
             constructor();
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
+            public remove(): Plot;
             /**
             * Gets the Plot's DataSource.
             *
@@ -864,7 +872,7 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
-            public remove(): Plot;
+            public detach(): Plot;
             /**
             * Gets the animator associated with the specified Animator key.
             *
@@ -1435,6 +1443,7 @@ declare module Plottable {
             * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
             */
             constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any);
+            public remove(): Axis;
             public showEndTickLabels(): boolean;
             public showEndTickLabels(show: boolean): Axis;
             public scale(): Abstract.Scale;
@@ -1523,6 +1532,7 @@ declare module Plottable {
             static TICK_LABEL_CLASS: string;
             public axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: Formatter);
+            public remove(): Axis;
             /**
             * Gets the current width.
             *
@@ -1771,6 +1781,7 @@ declare module Plottable {
             * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
             */
             constructor(xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale);
+            public remove(): Gridlines;
         }
     }
 }

@@ -28,6 +28,17 @@ export module Component {
       }
     }
 
+    public remove() {
+      super.remove();
+      if (this.xScale != null) {
+        this.xScale.broadcaster.deregisterListener(this);
+      }
+      if (this.yScale != null) {
+        this.yScale.broadcaster.deregisterListener(this);
+      }
+      return this;
+    }
+
     public _setup() {
       super._setup();
       this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);

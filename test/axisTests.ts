@@ -52,7 +52,7 @@ describe("Axes", () => {
       return d3.select(this).style("visibility") === "visible";
     });
     assert.operator(visibleTickTexts[0].length, ">=", 2, "Two tick labels remain visible");
-    yAxis.remove();
+    yAxis.detach();
 
     var xScale = new Plottable.Scale.Linear()
                                 .domain([0, 10])
@@ -223,7 +223,7 @@ describe("Axes", () => {
     var tickLabels = $(".tick").children("text");
     assert.equal(parseInt(tickLabels.first().text(), 10), 0);
     assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 365);
-    xAxis.remove();
+    xAxis.detach();
     svg.remove();
 
     svg = generateSVG(100, 500);

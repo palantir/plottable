@@ -58,6 +58,20 @@ export module Abstract {
       return this;
     }
 
+    public remove() {
+      super.remove();
+      this._dataSource.broadcaster.deregisterListener(this);
+      // deregister from all scales
+      var properties = Object.keys(this._projectors);
+      properties.forEach((property) => {
+        var projector = this._projectors[property];
+        if (projector.scale != null) {
+          projector.scale.broadcaster.deregisterListener(this);
+        }
+      });
+      return this;
+    }
+
     /**
      * Gets the Plot's DataSource.
      *
@@ -151,8 +165,8 @@ export module Abstract {
       return this;
     }
 
-    public remove() {
-      super.remove();
+    public detach() {
+      super.detach();
       // make the domain resize
       this.updateAllProjectors();
       return this;

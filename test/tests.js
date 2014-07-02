@@ -170,7 +170,7 @@ describe("Axes", function () {
             return d3.select(this).style("visibility") === "visible";
         });
         assert.operator(visibleTickTexts[0].length, ">=", 2, "Two tick labels remain visible");
-        yAxis.remove();
+        yAxis.detach();
 
         var xScale = new Plottable.Scale.Linear().domain([0, 10]).range([0, 100]);
         var xAxis = new Plottable.Axis.XAxis(yScale, "bottom");
@@ -330,7 +330,7 @@ describe("Axes", function () {
         var tickLabels = $(".tick").children("text");
         assert.equal(parseInt(tickLabels.first().text(), 10), 0);
         assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 365);
-        xAxis.remove();
+        xAxis.detach();
         svg.remove();
 
         svg = generateSVG(100, 500);
@@ -996,15 +996,15 @@ describe("ComponentContainer", function () {
         assert.isFalse(container.empty());
     });
 
-    it("removeAll()", function () {
+    it("detachAll()", function () {
         var container = new Plottable.Abstract.ComponentContainer();
         var c1 = new Plottable.Abstract.Component();
         var c2 = new Plottable.Abstract.Component();
         container._addComponent(c1);
         container._addComponent(c2);
-        container.removeAll();
+        container.detachAll();
 
-        assert.deepEqual(container.components(), [], "all components were removed");
+        assert.deepEqual(container.components(), [], "container was cleared of components");
     });
 
     it("components() returns a shallow copy", function () {
@@ -1108,7 +1108,7 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
 
-    it("remove() and removeComponent work correctly for componentGroup", function () {
+    it("detach() and _removeComponent work correctly for componentGroup", function () {
         var c1 = new Plottable.Abstract.Component().classed("component-1", true);
         var c2 = new Plottable.Abstract.Component().classed("component-2", true);
         var cg = new Plottable.Component.Group([c1, c2]);
@@ -1122,7 +1122,7 @@ describe("ComponentGroups", function () {
         assert.isNotNull(c1Node, "component 1 was added to the DOM");
         assert.isNotNull(c2Node, "component 2 was added to the DOM");
 
-        c2.remove();
+        c2.detach();
 
         c1Node = svg.select(".component-1").node();
         c2Node = svg.select(".comopnent-2").node();
@@ -1130,7 +1130,7 @@ describe("ComponentGroups", function () {
         assert.isNotNull(c1Node, "component 1 is still in the DOM");
         assert.isNull(c2Node, "component 2 was removed from the DOM");
 
-        cg.remove();
+        cg.detach();
         var cgNode = svg.select(".component-group").node();
         c1Node = svg.select(".component-1").node();
 
@@ -1147,7 +1147,7 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
 
-    it("removeAll() works as expected", function () {
+    it("detachAll() works as expected", function () {
         var cg = new Plottable.Component.Group();
         var c1 = new Plottable.Abstract.Component();
         var c2 = new Plottable.Abstract.Component();
@@ -1155,11 +1155,11 @@ describe("ComponentGroups", function () {
         assert.isTrue(cg.empty(), "cg initially empty");
         cg.merge(c1).merge(c2).merge(c3);
         assert.isFalse(cg.empty(), "cg not empty after merging components");
-        cg.removeAll();
-        assert.isTrue(cg.empty(), "cg empty after removing components");
-        assert.isFalse(c1._isAnchored, "c1 was removed");
-        assert.isFalse(c2._isAnchored, "c2 was removed");
-        assert.isFalse(c3._isAnchored, "c3 was removed");
+        cg.detachAll();
+        assert.isTrue(cg.empty(), "cg empty after detachAll()");
+        assert.isFalse(c1._isAnchored, "c1 was detached");
+        assert.isFalse(c2._isAnchored, "c2 was detached");
+        assert.isFalse(c3._isAnchored, "c3 was detached");
         assert.lengthOf(cg.components(), 0, "cg has no components");
     });
 
@@ -1560,7 +1560,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
 
-    it("remove works as expected", function () {
+    it("detach() works as expected", function () {
         var cbCalled = 0;
         var cb = function (b) {
             return cbCalled++;
@@ -1575,12 +1575,23 @@ describe("Component behavior", function () {
         b.broadcast();
         assert.equal(cbCalled, 1, "the callback was called");
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
-        c1.remove();
+        c1.detach();
 
         b.broadcast();
         assert.equal(cbCalled, 2, "the callback is still attached to the component");
         assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
+        svg.remove();
+    });
+
+    it("can't reuse component if it's been remove()-ed", function () {
+        var c1 = new Plottable.Abstract.Component();
+        c1.renderTo(svg);
+        c1.remove();
+
+        assert.throws(function () {
+            return c1.renderTo(svg);
+        }, "reuse");
         svg.remove();
     });
 
@@ -1598,9 +1609,9 @@ describe("Component behavior", function () {
         svg.remove();
     });
 
-    it("components can be removed even if not anchored", function () {
+    it("components can be detached even if not anchored", function () {
         var c = new Plottable.Abstract.Component();
-        c.remove(); // no error thrown
+        c.detach(); // no error thrown
         svg.remove();
     });
 });
@@ -3916,8 +3927,8 @@ describe("Scales", function () {
             var renderAreas = renderAreaD1.merge(renderAreaD2);
             renderAreas.renderTo(svg);
             assert.deepEqual(xScale.domain(), [0, 2]);
-            renderAreaD1.remove();
-            assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+            renderAreaD1.detach();
+            assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
             renderAreas.merge(renderAreaD1);
             assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
             svg.remove();
