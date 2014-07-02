@@ -515,6 +515,24 @@ declare module Plottable {
 
 
 declare module Plottable {
+    interface FilterFormat {
+        format: string;
+        filter: (d: any) => any;
+    }
+    module Formatter {
+        class Time extends Abstract.Formatter {
+            /**
+            * Creates a formatter that displays dates
+            *
+            * @constructor
+            */
+            constructor();
+        }
+    }
+}
+
+
+declare module Plottable {
     module Abstract {
         class PlottableObject {
         }
@@ -1384,6 +1402,12 @@ declare module Plottable {
             * @returns {Ordinal} The calling Ordinal Scale.
             */
             public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
+            /**
+            * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+            *
+            * @returns {Ordinal} A copy of the calling Scale.
+            */
+            public copy(): Ordinal;
         }
     }
 }
@@ -1409,11 +1433,13 @@ declare module Plottable {
     module Scale {
         class Time extends Abstract.QuantitiveScale {
             /**
-            * Creates a new TimeScale.
+            * Creates a new Time Scale.
             *
             * @constructor
+            * @param {D3.Scale.Time} [scale] The D3 TimeScale backing the TimeScale. If not supplied, uses a default scale.
             */
             constructor();
+            constructor(scale: D3.Scale.TimeScale);
         }
     }
 }
@@ -1663,6 +1689,20 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public orient(newOrientation: string): Axis;
+            /**
+            * Checks whether the Axis is currently set to show the first and last
+            * tick labels.
+            *
+            * @returns {boolean}
+            */
+            public showEndTickLabels(): boolean;
+            /**
+            * Set whether or not to show the first and last tick labels.
+            *
+            * @param {boolean} show Whether or not to show the first and last labels.
+            * @returns {Axis} The calling Axis.
+            */
+            public showEndTickLabels(show: boolean): Axis;
         }
     }
 }
