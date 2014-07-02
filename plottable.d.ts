@@ -1349,6 +1349,29 @@ declare module Plottable {
             * @constructor
             */
             constructor(scale?: D3.Scale.OrdinalScale);
+            public autoDomain(): Ordinal;
+            /**
+            * Return the extentModifier function.
+            *
+            * @returns {(extent: string[]) => string[]} The extentModifier function.
+            */
+            public extentModifier(): (extent: string[]) => string[];
+            /**
+            * Sets the extentModifier function.
+            *
+            * @param {(extent: string[]) => string[]} f
+            *        The extentModifier function is used to change the extent before
+            *        it is displayed. For example, it could sort the extent, or remove
+            *        certain undesired values.
+            *
+            *        It defaults to the identity function.
+            *
+            *        It serves a similar role to Plottable.Domainer, but operates on
+            *        Ordinal scales.
+            *
+            * @returns {Ordinal} The calling Ordinal Scale.
+            */
+            public extentModifier(f: (extent: string[]) => string[]): Ordinal;
             /**
             * Gets the domain.
             *

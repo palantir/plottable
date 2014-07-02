@@ -180,6 +180,22 @@ describe("Scales", () => {
       scale.rangeType("points");
       assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
+
+    it("extentModifier works as expected", () => {
+      var scale = new Plottable.Scale.Ordinal();
+      scale.updateExtent(1, "x", ["d", "e", "f"]);
+
+      scale.extentModifier(() => ["a", "b", "c"]);
+      assert.deepEqual(scale.domain(), ["a", "b", "c"]);
+
+      scale.extentModifier((extent) => extent.concat(["g"]));
+      assert.deepEqual(scale.domain(), ["d", "e", "f", "g"]);
+
+      scale.domain(["h", "i", "j"]);
+      scale.extentModifier(() => ["nope"]);
+      assert.deepEqual(scale.domain(), ["h", "i", "j"],
+                       "after scale.domain(d), extentModifier is ignored");
+    });
   });
 
   describe("Color Scales", () => {

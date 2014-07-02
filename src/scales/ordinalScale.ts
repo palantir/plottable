@@ -11,6 +11,8 @@ export module Scale {
     private _innerPadding: number = 0.3;
     private _outerPadding: number = 0.5;
 
+    private _extentModifier = (extent: string[]) => extent;
+
     /**
      * Creates a new OrdinalScale. Domain and Range are set later.
      *
@@ -26,6 +28,43 @@ export module Scale {
     public _getExtent(): any[] {
       var extents: string[][] = this._getAllExtents();
       return Util.Methods.uniq(Util.Methods.flatten(extents));
+    }
+
+    public autoDomain() {
+      this._setDomain(this._extentModifier(this._getExtent()));
+      return this;
+    }
+
+    /**
+     * Return the extentModifier function.
+     *
+     * @returns {(extent: string[]) => string[]} The extentModifier function.
+     */
+    public extentModifier(): (extent: string[]) => string[];
+    /**
+     * Sets the extentModifier function.
+     *
+     * @param {(extent: string[]) => string[]} f
+     *        The extentModifier function is used to change the extent before
+     *        it is displayed. For example, it could sort the extent, or remove
+     *        certain undesired values.
+     *
+     *        It defaults to the identity function.
+     *
+     *        It serves a similar role to Plottable.Domainer, but operates on
+     *        Ordinal scales.
+     *
+     * @returns {Ordinal} The calling Ordinal Scale.
+     */
+    public extentModifier(f: (extent: string[]) => string[]): Ordinal;
+    public extentModifier(f?: (extent: string[]) => string[]): any {
+      if (f == null) {
+        return this._extentModifier;
+      } else {
+        this._extentModifier = f;
+        this._autoDomainIfAutomaticMode();
+        return this;
+      }
     }
 
     /**
