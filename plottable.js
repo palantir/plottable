@@ -5187,7 +5187,7 @@ var Plottable;
             };
 
             Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
-                var draw = dataOrTicks instanceof d3.selection;
+                var draw = typeof dataOrTicks[0] !== "string";
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) {
