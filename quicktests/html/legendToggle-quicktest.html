@@ -45,7 +45,7 @@
 
         var legendLabel = new Plottable.Component.TitleLabel("fat");
         var legend = new Plottable.Component.Legend(colorScale);
-        legend.callbackClick(
+        legend.toggleCallback(
             function (d, b) {
                 var index = names.indexOf(d);
                 renderers[index].classed("toggled-on", b);
@@ -57,7 +57,7 @@
         var outerTable = new Plottable.Component.Table([[chart, legendTable]]);
 
       window.onload = function() {
-        outerTable.renderTo(svg);
+        outerTable.renderTo("#legend-toggle-test");
       }
 
       function shuffle() {

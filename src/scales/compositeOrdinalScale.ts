@@ -53,7 +53,7 @@ export module Scale {
 
     // Here we composite the scaling from our _subscales using variable arguments
     // So, usage is like .project('x', (d) -> xScale.scale(d.primary, d.secondary, d.tertiary))
-    public scale(...args: any[]) {
+    public scale(args: any[]) {
       var result = super.scale(args[0]);
       this._subScales.forEach((subScale, i) => {
         if (!(args[i + 1] === undefined)){
@@ -63,29 +63,53 @@ export module Scale {
       return result;
     }
 
+    public product(d1: any[][], d2: any[]): any[][] {
+      var ret: any[][] = [];
+      for (var i = 0; i < d1.length; i++) {
+        for (var j = 0; j < d2.length; j++) {
+          var add: any[] = d1[i].slice();
+          add.push(d2[j]);
+          ret.push(add);
+        }
+      }
+      return ret;
+    }
+
     // (bdwyer) - to be updated once we have custom domainers? This makes
     // assumptions about the layout of data and how it is mapped to the sub
     // scales. Deserves some more thought depending on how the domainers are
     // going to work.
-    public updateDomains(data: any[], ...keys: any[]): CompositeOrdinal {
+    public updateDomains(data: any[], keys: any[]): CompositeOrdinal {
+      var init: any[][] = [];
+      var dom: any[] = [];
+      for (var j = 0; j < data.length; j++) {
+        if (dom.indexOf(data[j][keys[0]]) == -1) {
+          dom.push(data[j][keys[0]]);
+          init.push([data[j][keys[0]]]);
+        }
+      }
+      this.domain(init);
       this._subScales.forEach((subScale, i) => {
         if (keys[i + 1] === undefined) {
           return;
         }
         // (bdwyer) - THIS USES LODASH. Re-implmementing this functionality may be anoying.
         // var subDomain = _(data).map(keys[i + 1]).sortBy().uniq().value();
-        var subDomain = [0, 1];
-        subScale.domain(subDomain);
+        var dom: any[] = [];
+        for (var j = 0; j < data.length; j++) {
+          if (dom.indexOf(data[j][keys[i + 1]]) == -1) {
+            dom.push(data[j][keys[i + 1]]);
+          }
+        }
+        init = this.product(init, dom);
+        subScale.domain(dom);
       });
 
       // MORE LODASH.
       //var mainDomain = _(data).map(keys[0]).sortBy().uniq().value()
-      var mainDomain = [0, 1];
-      this.domain(mainDomain);
-
+      
       return this;
     }
   }
-
 }
 }

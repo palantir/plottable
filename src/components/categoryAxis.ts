@@ -84,9 +84,9 @@ export module Axis {
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
         var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
-        var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
+        var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"}
 
-        var textWriteResult = Util.Text.writeText(d, d3this, width, height,
+        var textWriteResult = Util.Text.writeText("" + d, d3this, width, height,
                                                   xAlign[self._orientation], yAlign[self._orientation], true);
         textWriteResults.push(textWriteResult);
       });

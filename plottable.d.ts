@@ -1303,8 +1303,9 @@ declare module Plottable {
             public smallestRangeBand(): number;
             public range(): any[];
             public range(values: number[]): CompositeOrdinal;
-            public scale(...args: any[]): any;
-            public updateDomains(data: any[], ...keys: any[]): CompositeOrdinal;
+            public scale(args: any[]): any;
+            public product(d1: any[][], d2: any[]): any[][];
+            public updateDomains(data: any[], keys: any[]): CompositeOrdinal;
         }
     }
 }
