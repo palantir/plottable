@@ -157,7 +157,6 @@ export module Abstract {
 
     public remove() {
       super.remove();
-      this.animateOnNextRender = true;
       // make the domain resize
       this.updateAllProjectors();
       return this;

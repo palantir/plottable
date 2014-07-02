@@ -2818,7 +2818,6 @@ var Plottable;
 
             Plot.prototype.remove = function () {
                 _super.prototype.remove.call(this);
-                this.animateOnNextRender = true;
 
                 // make the domain resize
                 this.updateAllProjectors();
