@@ -102,7 +102,7 @@ function button3Callback() {
 
 function changeWidth() {
   svg.attr("width", 300 + Math.random()*200);
-  bigTable.renderTo(svg);
+  bigTable.resize();
 }
 
 function removeAndRenderTo() {
@@ -128,8 +128,8 @@ function removeAndRenderTo() {
 <br>
 <svg id="chart"></svg>
     <button onclick="dataseries.data(makeRandomData(10))">dataSource.data()</button>
-    <button onclick="changeWidth()">change width</button>
-    <button onclick="bigTable.remove().renderTo(svg)">remove + renderTo</button>
+    <button onclick="changeWidth()">change width + resize</button>
+    <button onclick="removeAndRenderTo()">remove + renderTo</button>
     <button onclick="bigTable._render()">_render()</button>
 
 <p />
