@@ -2633,7 +2633,7 @@ var Plottable;
                     throw new Error("data cannot contain Infinity or -Infinity");
                 }
                 this._d3Scale.domain(values);
-                this.broadcaster.broadcast("domain");
+                this.broadcaster.broadcast();
             };
 
             Scale.prototype.range = function (values) {
@@ -2761,11 +2761,8 @@ var Plottable;
                 }
 
                 if (scale != null) {
-                    scale.broadcaster.registerListener(this, function (_, reason) {
-                        if (reason != null && reason === "domain") {
-                            _this.animateOnNextRender = true;
-                        }
-                        _this._render();
+                    scale.broadcaster.registerListener(this, function () {
+                        return _this._render();
                     });
                 }
 

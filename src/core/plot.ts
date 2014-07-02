@@ -105,12 +105,7 @@ export module Abstract {
       }
 
       if (scale != null) {
-        scale.broadcaster.registerListener(this, (_: Core.IListenable, reason?: string) => {
-          if (reason != null && reason === "domain") {
-            this.animateOnNextRender = true;
-          }
-          this._render();
-        });
+        scale.broadcaster.registerListener(this, () => this._render());
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
