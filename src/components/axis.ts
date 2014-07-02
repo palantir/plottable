@@ -45,7 +45,6 @@ export module Axis {
     public remove() {
       super.remove();
       this._axisScale.broadcaster.deregisterListener(this);
-      return this;
     }
 
     public _doRender() {

@@ -456,7 +456,9 @@ export module Abstract {
     }
 
     /**
-     * Removes a Component from the DOM.
+     * Detaches a Component from the DOM. The component can be reused.
+     *
+     * @returns The calling Component.
      */
     public detach() {
       if (this._isAnchored) {
@@ -478,7 +480,6 @@ export module Abstract {
       this.removed = true;
       this.detach();
       Core.ResizeBroadcaster.deregister(this);
-      return this;
     }
   }
 }

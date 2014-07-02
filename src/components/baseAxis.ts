@@ -43,7 +43,6 @@ export module Abstract {
     public remove() {
       super.remove();
       this._scale.broadcaster.deregisterListener(this);
-      return this;
     }
 
     public _isHorizontal() {

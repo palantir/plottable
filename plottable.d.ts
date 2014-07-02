@@ -637,14 +637,16 @@ declare module Plottable {
             */
             public merge(c: Component): Component.Group;
             /**
-            * Removes a Component from the DOM.
+            * Detaches a Component from the DOM. The component can be reused.
+            *
+            * @returns The calling Component.
             */
             public detach(): Component;
             /**
             * Removes a Component from the DOM and disconnects it from everything it's
             * listening to (effectively destroying it).
             */
-            public remove(): Component;
+            public remove(): void;
         }
     }
 }
@@ -672,7 +674,7 @@ declare module Plottable {
             * @returns {ComponentContainer} The calling ComponentContainer
             */
             public detachAll(): ComponentContainer;
-            public remove(): ComponentContainer;
+            public remove(): void;
         }
     }
 }
@@ -851,7 +853,7 @@ declare module Plottable {
             constructor();
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
-            public remove(): Plot;
+            public remove(): void;
             /**
             * Gets the Plot's DataSource.
             *
@@ -1443,7 +1445,7 @@ declare module Plottable {
             * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
             */
             constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any);
-            public remove(): Axis;
+            public remove(): void;
             public showEndTickLabels(): boolean;
             public showEndTickLabels(show: boolean): Axis;
             public scale(): Abstract.Scale;
@@ -1532,7 +1534,7 @@ declare module Plottable {
             static TICK_LABEL_CLASS: string;
             public axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: Formatter);
-            public remove(): Axis;
+            public remove(): void;
             /**
             * Gets the current width.
             *

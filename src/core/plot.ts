@@ -69,7 +69,6 @@ export module Abstract {
           projector.scale.broadcaster.deregisterListener(this);
         }
       });
-      return this;
     }
 
     /**

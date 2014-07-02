@@ -81,7 +81,6 @@ export module Abstract {
     public remove() {
       super.remove();
       this._components.slice().forEach((c: Abstract.Component) => c.remove());
-      return this;
     }
   }
 }
