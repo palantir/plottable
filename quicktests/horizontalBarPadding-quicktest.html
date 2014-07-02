@@ -17,10 +17,12 @@
 
       var ds = new Plottable.DataSource(data);
       var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+      xAxis = new Plottable.Axis.Numeric(xScale, "bottom")
+                                .showEndTickLabel("left", true)
+                                .showEndTickLabel("right", false);
 
       var yScale = new Plottable.Scale.Ordinal();
-      yAxis = new Plottable.Axis.Category(yScale, "left");
+      yAxis = new Plottable.Axis.Category(yScale, "left").xAlign("right");
 
       var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
                               .project("x", "age", xScale)

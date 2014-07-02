@@ -155,7 +155,14 @@ describe("NumericAxis", () => {
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
-    numericAxis.showEndTickLabels(false);
+
+    numericAxis.showEndTickLabel("left", false);
+    assert.isFalse(numericAxis.showEndTickLabel("left"), "retrieve showEndTickLabel setting");
+    numericAxis.showEndTickLabel("right", true);
+    assert.isTrue(numericAxis.showEndTickLabel("right"), "retrieve showEndTickLabel setting");
+    assert.throws(() => numericAxis.showEndTickLabel("top", true), Error);
+    assert.throws(() => numericAxis.showEndTickLabel("bottom", true), Error);
+
     numericAxis.renderTo(svg);
 
     var tickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
@@ -175,7 +182,7 @@ describe("NumericAxis", () => {
     var scale = new Plottable.Scale.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axis.Numeric(scale, "bottom");
-    numericAxis.showEndTickLabels(false);
+    numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
     numericAxis.renderTo(svg);
 
     var visibleTickLabels = numericAxis.element

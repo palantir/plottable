@@ -39,6 +39,85 @@ export module Util {
     }
 
     /**
+     * @return {TextMeasurer} A test measurer that will treat all sequences
+     *         of consecutive whitespace as a single " ".
+     */
+    function combineWhitespace(tm: TextMeasurer): TextMeasurer {
+      return (s: string) => tm(s.replace(/\s+/g, " "));
+    }
+
+    /**
+     * Returns a text measure that measures each individual character of the
+     * string with tm, then combines all the individual measurements.
+     */
+    function measureByCharacter(tm: TextMeasurer): TextMeasurer {
+      return (s: string) => {
+        var whs = s.trim().split("").map(tm);
+        return [d3.sum(whs, (wh) => wh[0]), d3.max(whs, (wh) => wh[1])];
+      };
+    }
+
+    var CANONICAL_CHR = "a";
+
+    /**
+     * Some TextMeasurers get confused when measuring something that's only
+     * whitespace: only whitespace in a dom node takes up [0, 0] space.
+     *
+     * @return {TextMeasurer} A function that if its argument is all
+     *         whitespace, it will wrap its argument in CANONICAL_CHR before
+     *         measuring in order to get a non-zero size of the whitespace.
+     */
+    function wrapWhitespace(tm: TextMeasurer): TextMeasurer {
+      return (s: string) => {
+        if (/^\s*$/.test(s)) {
+          var whs = s.split("").map((c: string) => {
+            var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
+            var whWrapping = tm(CANONICAL_CHR);
+            return [wh[0] - 2*whWrapping[0], wh[1]];
+          });
+          return [d3.sum(whs, (x) => x[0]), d3.max(whs, (x) => x[1])];
+        } else {
+          return tm(s);
+        }
+      };
+    }
+
+    /**
+     * This class will measure text by measuring each character individually,
+     * then adding up the dimensions. It will also cache the dimensions of each
+     * letter.
+     */
+    export class CachingCharacterMeasurer {
+      private cache: Cache<number[]>;
+      /**
+       * @param {string} s The string to be measured.
+       * @return {number[]} [width, height] pair.
+       */
+      public measure: TextMeasurer;
+
+      /**
+       * @param {D3.Selection} g The element that will have text inserted into
+       *        it in order to measure text. The styles present for text in
+       *        this element will to the text being measured.
+       */
+      constructor(g: D3.Selection) {
+        this.cache = new Cache(getTextMeasure(g), CANONICAL_CHR, Methods.arrayEq);
+        this.measure = combineWhitespace(
+                          measureByCharacter(
+                            wrapWhitespace(
+                              (s: string) => this.cache.get(s))));
+      }
+
+      /**
+       * Clear the cache, if it seems that the text has changed size.
+       */
+      clear() {
+        this.cache.clear();
+        return this;
+      }
+    }
+
+    /**
      * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
      *
      * @param {string} text: The string to be truncated
@@ -46,8 +125,7 @@ export module Util {
      * @param {D3.Selection} element: The text element used to measure the text
      * @returns {string} text - the shortened text
      */
-    export function getTruncatedText(text: string, availableWidth: number, element: D3.Selection) {
-      var measurer = getTextMeasure(element);
+    export function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer) {
       if (measurer(text)[0] <= availableWidth) {
         return text;
       } else {
@@ -198,31 +276,47 @@ export module Util {
       usedHeight: number;
     };
 
+    export interface IWriteOptions {
+      g: D3.Selection;
+      xAlign: string;
+      yAlign: string;
+    }
+
     /**
-     * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
-     * Contains the text within a rectangle with dimensions width, height. Tries to
-     * orient the text using xOrient and yOrient parameters.
-     * Will align the text vertically if it seems like that is appropriate.
+     * @param {write} [IWriteOptions] If supplied, the text will be written
+     *        To the given g. Will align the text vertically if it seems like
+     *        that is appropriate.
      * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
      */
-    export function writeText(text: string, g: D3.Selection, width: number, height: number,
-                              xAlign: string, yAlign: string, horizontally?: boolean): IWriteTextResult {
-      var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
-      var innerG = g.append("g").classed("writeText-inner-g", true); // unleash your inner G
-      // the outerG contains general transforms for positining the whole block, the inner g
-      // will contain transforms specific to orienting the text properly within the block.
+    export function writeText(text: string, width: number, height: number, tm: TextMeasurer,
+                              horizontally?: boolean,
+                              write?: IWriteOptions): IWriteTextResult {
 
+      var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
       var primaryDimension = orientHorizontally ? width : height;
       var secondaryDimension = orientHorizontally ? height : width;
-      var measureText = getTextMeasure(innerG);
-      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+      var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
-      var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-      var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
+      var usedWidth: number, usedHeight: number;
+      if (write == null) {
+        var widthFn = orientHorizontally ? d3.max : d3.sum;
+        var heightFn = orientHorizontally ? d3.sum : d3.max;
+        usedWidth = widthFn(wrappedText.lines, (line: string) => tm(line)[0]);
+        usedHeight = heightFn(wrappedText.lines, (line: string) => tm(line)[1]);
+      } else {
+        var innerG = write.g.append("g").classed("writeText-inner-g", true); // unleash your inner G
+        // the outerG contains general transforms for positining the whole block, the inner g
+        // will contain transforms specific to orienting the text properly within the block.
+        var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+        var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+        usedWidth = wh[0];
+        usedHeight = wh[1];
+      }
+
       return {
         textFits: wrappedText.textFits,
-        usedWidth: wh[0],
-        usedHeight: wh[1]
+        usedWidth: usedWidth,
+        usedHeight: usedHeight
       };
     }
   }

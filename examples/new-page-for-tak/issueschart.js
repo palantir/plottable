@@ -1,6 +1,7 @@
 function makeIssuesChart(svg, data) {
   var xScale = new Plottable.Scale.Time();
   var yScale = new Plottable.Scale.Linear();
+  yScale.domainer().paddingException(0, true);
 
   var format = d3.time.format("%Y/%m/%d");
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", format);

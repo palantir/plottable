@@ -94,6 +94,27 @@ describe("Formatters", () => {
     });
   });
 
+  describe("time", () => {
+    it("uses reasonable defaults", () => {
+      var timeFormatter = new Plottable.Formatter.Time();
+      // year, month, day, hours, minutes, seconds, milliseconds
+      var result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 0));
+      assert.strictEqual(result, "2000", "only the year was displayed");
+      result = timeFormatter.format(new Date(2000, 2, 1, 0, 0, 0, 0));
+      assert.strictEqual(result, "Mar", "only the month was displayed");
+      result = timeFormatter.format(new Date(2000, 2, 2, 0, 0, 0, 0));
+      assert.strictEqual(result, "Thu 02", "month and date displayed");
+      result = timeFormatter.format(new Date(2000, 2, 1, 20, 0, 0, 0));
+      assert.strictEqual(result, "08 PM", "only hour was displayed");
+      result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 0, 0));
+      assert.strictEqual(result, "08:34", "hour and minute was displayed");
+      result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 53, 0));
+      assert.strictEqual(result, ":53", "seconds was displayed");
+      result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 950));
+      assert.strictEqual(result, ".950", "milliseconds was displayed");
+    });
+  });
+
   describe("percentage", () => {
     it("uses reasonable defaults", ()=> {
       var percentFormatter = new Plottable.Formatter.Percentage();
@@ -113,6 +134,18 @@ describe("Formatters", () => {
       customFormatter = new Plottable.Formatter.Custom(0, blargify);
       var result = customFormatter.format(1);
       assert.strictEqual(result, "1-blargh", "it uses the custom formatting function");
+    });
+  });
+
+  describe("SISuffix", () => {
+    it("shortens long numbers", () => {
+      var lnFormatter = new Plottable.Formatter.SISuffix();
+      var result = lnFormatter.format(1);
+      assert.strictEqual(result, "1.00", "shows 3 signifigicant figures by default");
+      result = lnFormatter.format(Math.pow(10, 12));
+      assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
+      result = lnFormatter.format(Math.pow(10, -12));
+      assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
     });
   });
 });

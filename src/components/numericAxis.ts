@@ -5,6 +5,10 @@ export module Axis {
   export class Numeric extends Abstract.Axis {
     public _scale: Abstract.QuantitiveScale;
     private tickLabelPositioning = "center";
+    // Whether or not first/last tick label will still be displayed even if
+    // the label is cut off.
+    private showFirstTickLabel = false;
+    private showLastTickLabel = false;
 
     /**
      * Creates a NumericAxis.
@@ -153,11 +157,10 @@ export module Axis {
       this._tickLabelContainer.attr("transform", labelGroupTransform);
 
       if (!this.showEndTickLabels()) {
-        this.hideEndTickLabels();
+        this._hideEndTickLabels();
       }
 
-      this.hideOverlappingTickLabels();
-
+      this._hideOverlappingTickLabels();
       return this;
     }
 
@@ -196,56 +199,52 @@ export module Axis {
       }
     }
 
-    private hideEndTickLabels() {
-      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-      var isInsideBBox = (tickBox: ClientRect) => {
-        return (
-          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
-          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
-        );
-      };
-
-      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
-      var firstTickLabel = tickLabels[0][0];
-      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
-        d3.select(firstTickLabel).style("visibility", "hidden");
-      }
-      var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
-      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
-        d3.select(lastTickLabel).style("visibility", "hidden");
-      }
-    }
-
-    private hideOverlappingTickLabels() {
-      var visibleTickLabels = this._tickLabelContainer
-                                    .selectAll("." + Abstract.Axis.TICK_LABEL_CLASS)
-                                    .filter(function(d: any, i: number) {
-                                      return d3.select(this).style("visibility") === "visible";
-                                    });
-      var lastLabelClientRect: ClientRect;
-
-      function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-        if (boxA.right < boxB.left) { return false; }
-        if (boxA.left > boxB.right) { return false; }
-        if (boxA.bottom < boxB.top) { return false; }
-        if (boxA.top > boxB.bottom) { return false; }
-        return true;
-      }
-
-      visibleTickLabels.each(function (d: any) {
-        var clientRect = this.getBoundingClientRect();
-        var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
-          tickLabel.style("visibility", "hidden");
+    /**
+     * Return whether or not the tick labels at the end of the graph are
+     * displayed when partially cut off.
+     *
+     * @param {string} orientation Where on the scale to change tick labels.
+     *                 On a "top" or "bottom" axis, this can be "left" or
+     *                 "right". On a "left" or "right" axis, this can be "top"
+     *                 or "bottom".
+     * @returns {boolean} The current setting.
+     */
+    public showEndTickLabel(orientation: string): boolean;
+    /**
+     * Control whether or not the tick labels at the end of the graph are
+     * displayed when partially cut off.
+     *
+     * @param {string} orientation Where on the scale to change tick labels.
+     *                 On a "top" or "bottom" axis, this can be "left" or
+     *                 "right". On a "left" or "right" axis, this can be "top"
+     *                 or "bottom".
+     * @param {boolean} show Whether or not the given tick should be displayed.
+     * @returns {Numeric} The calling Numeric.
+     */
+    public showEndTickLabel(orientation: string, show: boolean): Numeric;
+    public showEndTickLabel(orientation: string, show?: boolean): any {
+      if ((this._isHorizontal() && orientation === "left") ||
+          (!this._isHorizontal() && orientation === "bottom")) {
+        if (show === undefined) {
+          return this.showFirstTickLabel;
         } else {
-          lastLabelClientRect = clientRect;
-          tickLabel.style("visibility", "visible");
+          this.showFirstTickLabel = show;
+          return this._render();
         }
-      });
+      } else if ((this._isHorizontal() && orientation === "right") ||
+                 (!this._isHorizontal() && orientation === "top")) {
+        if (show === undefined) {
+          return this.showLastTickLabel;
+        } else {
+          this.showLastTickLabel = show;
+          return this._render();
+        }
+      } else {
+        throw new Error("Attempt to show " + orientation + " tick label on a " +
+                        (this._isHorizontal() ? "horizontal" : "vertical") +
+                        " axis");
+      }
     }
-  }
+}
 }
 }
