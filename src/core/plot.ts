@@ -199,8 +199,7 @@ export module Abstract {
      * @return {D3.Selection} The resulting selection (potentially after the transition)
      */
     public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: Abstract.IAttributeToProjector): any {
-      if (this._animate && this.animateOnNextRender &&
-          this._animators[animatorKey] != null && !Core.ResizeBroadcaster.resizing()) {
+      if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
         return this._animators[animatorKey].animate(selection, attrToProjector, this);
       } else {
         return selection.attr(attrToProjector);

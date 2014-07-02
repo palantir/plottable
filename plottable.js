@@ -1,9 +1,3 @@
-/*!
-Plottable 0.18.2 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -2864,7 +2858,7 @@ var Plottable;
             * @return {D3.Selection} The resulting selection (potentially after the transition)
             */
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null && !Plottable.Core.ResizeBroadcaster.resizing()) {
+                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
                     return this._animators[animatorKey].animate(selection, attrToProjector, this);
                 } else {
                     return selection.attr(attrToProjector);
