@@ -1,5 +1,5 @@
 /*!
-Plottable 0.18.2 (https://github.com/palantir/plottable)
+Plottable 0.19.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -413,9 +413,6 @@ var Plottable;
                 return function (s) {
                     if (s.trim() === "") {
                         return [0, 0];
-                    }
-                    if (Plottable.Util.DOM.isSelectionRemovedFromSVG(selection)) {
-                        throw new Error("Cannot measure text in a removed node");
                     }
                     var bb;
                     if (selection.node().nodeName === "text") {

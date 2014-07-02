@@ -1756,16 +1756,6 @@ describe("Util.DOM", function () {
             child.remove();
         });
     });
-
-    it("isSelectionRemovedFromSVG works", function () {
-        var svg = generateSVG();
-        var g = svg.append("g");
-        assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is in svg");
-        g.remove();
-        assert.isTrue(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is no longer in svg");
-        assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(svg), "svg is not considered removed");
-        svg.remove();
-    });
 });
 
 ///<reference path="testReference.ts" />
