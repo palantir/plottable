@@ -109,6 +109,18 @@ export module Util {
       }
       return true;
     }
+
+    // TODO: docstring
+    export function objEq(a: any, b: any): boolean {
+      if (a == null || b == null) {
+        return a === b;
+      }
+      return objSubset(a, b) && objSubset(b, a);
+    }
+
+    function objSubset(a: any, b: any): boolean {
+      return Object.keys(a).map((k) => a[k] === b[k]).reduce((x, y) => x && y);
+    }
   }
 }
 }
