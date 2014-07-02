@@ -19,6 +19,7 @@ export module Abstract {
      * @param {Component} componentToListenTo The component to listen for interactions on.
      */
     constructor(componentToListenTo: Abstract.Component) {
+      if (componentToListenTo == null) {throw new Error("Interactions require a component to listen to");}
       this.componentToListenTo = componentToListenTo;
     }
 
