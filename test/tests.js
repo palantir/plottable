@@ -3139,6 +3139,9 @@ describe("Renderers", function () {
             var renderArea;
             var verifier;
 
+            // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
+            var normalizePath;
+
             before(function () {
                 svg = generateSVG(500, 500);
                 verifier = new MultiTestVerifier();
@@ -3163,6 +3166,9 @@ describe("Renderers", function () {
                 areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
                 areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
                 renderArea = areaPlot.renderArea;
+                normalizePath = function (s) {
+                    return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+                };
             });
 
             beforeEach(function () {
@@ -3171,13 +3177,13 @@ describe("Renderers", function () {
 
             it("draws area and line correctly", function () {
                 var areaPath = renderArea.select(".area");
-                assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+                assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
                 assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
                 var areaComputedStyle = window.getComputedStyle(areaPath.node());
                 assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
 
                 var linePath = renderArea.select(".line");
-                assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+                assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
                 assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
                 var lineComputedStyle = window.getComputedStyle(linePath.node());
                 assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
@@ -3209,7 +3215,7 @@ describe("Renderers", function () {
                 areaPlot.renderTo(svg);
                 renderArea = areaPlot.renderArea;
                 var areaPath = renderArea.select(".area");
-                assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
+                assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
                 verifier.end();
             });
 

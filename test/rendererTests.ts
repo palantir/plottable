@@ -202,6 +202,8 @@ describe("Renderers", () => {
       var areaPlot: Plottable.Plot.Area;
       var renderArea: D3.Selection;
       var verifier: MultiTestVerifier;
+      // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
+      var normalizePath: (s: string) => string;
 
       before(() => {
         svg = generateSVG(500, 500);
@@ -222,6 +224,7 @@ describe("Renderers", () => {
                 .project("stroke", colorAccessor)
                 .renderTo(svg);
         renderArea = areaPlot.renderArea;
+        normalizePath = (s: string) => s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
       });
 
       beforeEach(() => {
@@ -230,13 +233,15 @@ describe("Renderers", () => {
 
       it("draws area and line correctly", () => {
         var areaPath = renderArea.select(".area");
-        assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+        assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z",
+                          "area d was set correctly");
         assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
         var areaComputedStyle = window.getComputedStyle(areaPath.node());
         assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
 
         var linePath = renderArea.select(".line");
-        assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+        assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0",
+                           "line d was set correctly");
         assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
         var lineComputedStyle = window.getComputedStyle(linePath.node());
         assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
@@ -264,7 +269,7 @@ describe("Renderers", () => {
         areaPlot.renderTo(svg);
         renderArea = areaPlot.renderArea;
         var areaPath = renderArea.select(".area");
-        assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
+        assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
         verifier.end();
       });
 
