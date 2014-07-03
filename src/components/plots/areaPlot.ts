@@ -20,6 +20,7 @@ export module Plot {
       this.classed("area-renderer", true);
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
+      this.project("fill-opacity", () => 0.5); // default
       this.project("stroke", () => "none"); // default
       this._animators["area-reset"] = new Animator.Null();
       this._animators["area"]       = new Animator.Default()

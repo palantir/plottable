@@ -15,6 +15,7 @@ export module Abstract {
      */
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset);
+      if (xScale == null || yScale == null) {throw new Error("XYPlots require an xScale and yScale");}
       this.classed("xy-renderer", true);
 
       this.project("x", "x", xScale); // default accessor

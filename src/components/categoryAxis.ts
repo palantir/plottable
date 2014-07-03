@@ -85,7 +85,7 @@ export module Axis {
      */
     private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection): Util.Text.IWriteTextResult;
     private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, dataOrTicks: any): Util.Text.IWriteTextResult {
-      var draw = dataOrTicks instanceof d3.selection;
+      var draw = typeof dataOrTicks[0] !== "string";
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
       var tm = (s: string) => self.measurer.measure(s);

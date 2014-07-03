@@ -47,6 +47,15 @@ declare module Plottable {
             * Check if two arrays are equal by strict equality.
             */
             function arrayEq<T>(a: T[], b: T[]): boolean;
+            /**
+            * @param {any} a Object to check against b for equality.
+            * @param {any} b Object to check against a for equality.
+            *
+            * @returns {boolean} whether or not two objects share the same keys, and
+            *          values associated with those keys. Values will be compared
+            *          with ===.
+            */
+            function objEq(a: any, b: any): boolean;
         }
     }
 }
@@ -214,14 +223,18 @@ declare module Plottable {
 declare module Plottable {
     module Util {
         module Text {
+            interface Dimensions {
+                width: number;
+                height: number;
+            }
             interface TextMeasurer {
-                (s: string): number[];
+                (s: string): Dimensions;
             }
             /**
-            * Returns a quasi-pure function of typesignature (t: string) => number[] which measures height and width of text
+            * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
             *
             * @param {D3.Selection} selection: The selection in which text will be drawn and measured
-            * @returns {number[]} width and height of the text
+            * @returns {Dimensions} width and height of the text
             */
             function getTextMeasure(selection: D3.Selection): TextMeasurer;
             /**
@@ -232,7 +245,7 @@ declare module Plottable {
             class CachingCharacterMeasurer {
                 /**
                 * @param {string} s The string to be measured.
-                * @return {number[]} [width, height] pair.
+                * @return {Dimensions} The width and height of the measured text.
                 */
                 public measure: TextMeasurer;
                 /**
@@ -274,10 +287,22 @@ declare module Plottable {
             * shortening the line as required to ensure that it fits within width.
             */
             function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
-            function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
-            function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
-            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
-            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
+            function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
+                width: number;
+                height: number;
+            };
+            function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
+                width: number;
+                height: number;
+            };
+            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
+                width: number;
+                height: number;
+            };
+            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
+                width: number;
+                height: number;
+            };
             interface IWriteTextResult {
                 textFits: boolean;
                 usedWidth: number;
