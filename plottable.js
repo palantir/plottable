@@ -5002,7 +5002,7 @@ var Plottable;
                     var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                     var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
 
-                    var textWriteResult = Plottable.Util.Text.writeText(d[0], d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
+                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
                     textWriteResults.push(textWriteResult);
                 });
 
@@ -5082,7 +5082,7 @@ var Plottable;
             function Composite(scale, orientation) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 _super.call(this, scale, orientation);
-                this.tickLength(15);
+                this.tickLength(60);
             }
             Composite.prototype._generateTickMarkAttrHash = function () {
                 var _this = this;
@@ -5135,8 +5135,9 @@ var Plottable;
 
                 // make tick length variable depending on level
                 var tickMarks = this._tickMarkContainer.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS).data(this._getTickValues());
+                var k = this._scale.getLevels();
                 tickMarks.attr("y2", function (d) {
-                    return _this.tickLength() / d.length;
+                    return (k - d.length + 1) * _this.tickLength() / k;
                 });
                 return this;
             };

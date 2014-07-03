@@ -17,7 +17,7 @@ export module Axis {
      */
     constructor(scale: Scale.CompositeOrdinal, orientation = "bottom") {
       super(scale, orientation);
-      this.tickLength(15);
+      this.tickLength(60);
     }
 
     public _generateTickMarkAttrHash() {
@@ -60,15 +60,13 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-
-
-
       // remove all the translation from tickMarks
       Util.DOM.translate(this._tickMarkContainer, 0, 0);
 
       // make tick length variable depending on level
       var tickMarks = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).data(this._getTickValues());
-      tickMarks.attr("y2", (d: any[]) => this.tickLength() / d.length);
+      var k = this._scale.getLevels();
+      tickMarks.attr("y2", (d: any[]) => (k - d.length + 1) * this.tickLength() / k);
       return this;
     }
   }
