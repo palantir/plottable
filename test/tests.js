@@ -434,11 +434,11 @@ describe("Axes", function () {
             var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
             var ca = new Plottable.Axis.Category(xScale, "left");
             ca.renderTo(svg);
-            assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+            assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
             assert.doesNotThrow(function () {
                 return xScale.domain(["bar", "baz", "bam"]);
             });
-            assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+            assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
             svg.remove();
         });
 

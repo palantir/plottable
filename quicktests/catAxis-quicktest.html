@@ -47,7 +47,7 @@
       var xAxis = new Plottable.Axis.Category(xScale, "bottom", cuteFormatter);
 
       var yScale = new Plottable.Scale.Linear();
-      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
       yAxis.showEndTickLabels(true);
 
       var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
@@ -60,7 +60,7 @@
                                 ]);
 
       var xScale2 = new Plottable.Scale.Linear();
-      var xAxis2 = new Plottable.Axis.XAxis(xScale2, "bottom");
+      var xAxis2 = new Plottable.Axis.Numeric(xScale2, "bottom");
 
       var yScale2 = new Plottable.Scale.Ordinal();
       var yAxis2 = new Plottable.Axis.Category(yScale2, "left");//, cuteFormatter);
