@@ -194,9 +194,7 @@ export module Abstract {
             .include(this.previousBaselineValue, false)
             .paddingException(this._baselineValue)
             .include(this._baselineValue);
-          if (qscale._autoDomainAutomatically) {
-            qscale.autoDomain();
-          }
+          qscale._autoDomainIfAutomaticMode();
         }
       }
       return this;

@@ -138,6 +138,15 @@ export module Scale {
         return this;
       }
     }
+
+    /**
+     * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+     *
+     * @returns {Ordinal} A copy of the calling Scale.
+     */
+    public copy(): Ordinal {
+      return new Ordinal(this._d3Scale.copy());
+    }
   }
 }
 }
