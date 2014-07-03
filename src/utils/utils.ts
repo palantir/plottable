@@ -110,16 +110,23 @@ export module Util {
       return true;
     }
 
-    // TODO: docstring
+    /**
+     * @param {any} a Object to check against b for equality.
+     * @param {any} b Object to check against a for equality.
+     *
+     * @returns {boolean} whether or not two objects share the same keys, and 
+     *          values associated with those keys. Values will be compared
+     *          with ===.
+     */
     export function objEq(a: any, b: any): boolean {
       if (a == null || b == null) {
         return a === b;
       }
-      return objSubset(a, b) && objSubset(b, a);
-    }
-
-    function objSubset(a: any, b: any): boolean {
-      return Object.keys(a).map((k) => a[k] === b[k]).reduce((x, y) => x && y);
+      var keysA = Object.keys(a).sort();
+      var keysB = Object.keys(b).sort();
+      var valuesA = keysA.map((k) => a[k]);
+      var valuesB = keysB.map((k) => b[k]);
+      return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
     }
   }
 }

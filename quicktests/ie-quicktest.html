@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> - jsFiddle demo</title>
+  
+  
+  
+  
+  
+  
+  <style type='text/css'>
+    </style> <link rel="stylesheet" type="text/css" href="../plottable.css"> <style type="text/css">
+/*-- Add custom styles after this line --*/
+ .demo-title {
+    font-size: 24 pt;
+}
+.plottable .y-axis .tick line {
+    opacity: 1
+}
+
+.plottable .x-axis .tick line {
+    opacity: 1
+}
+
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+
+     var ds;
+        var dataLong = [
+          { name: "an elephant is a large gray animal that eats peanuts and is scared of rice", age: 1 },
+          { name: "a bird is an animal that flies and eat worms", age: 3},
+          { name: "a cat is an animal that can be kinda cranky but is usually fuzzy", age: 7 },
+          { name: "a dinosaur is extinct but sometimes we find their bones", age: 13 },
+          { name: "an antelope runs really fast and lives in warm climates and is afraid of lions", age: 21 }
+        ];
+        var dataShort = [
+          { name: "elephant", age: 1 },
+          { name: "bird", age: 3},
+          { name: "cat", age: 7 },
+          { name: "dinosaur", age: 13 },
+          { name: "antelope", age: 21 }
+        ];
+
+    window.onload = function() {
+
+
+
+
+      ds = new Plottable.DataSource(dataLong);
+      var xScale = new Plottable.Scale.Ordinal();
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+
+      var yScale = new Plottable.Scale.Linear();
+      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+
+      var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
+                              .project("x", "name", xScale)
+                              .project("y", "age", yScale)
+                              .project("fill", function() {return "steelblue"; })
+      var chart = new Plottable.Component.Table([
+                                  [yAxis, barRenderer],
+                                  [null,  xAxis]
+                                ]);
+
+
+
+
+
+        chart.renderTo("#cataxis");
+}
+
+function bigName(){
+    ds.data(dataLong);
+}    
+function shortName(){
+     ds.data(dataShort);
+
+}    
+
+    
+    
+
+//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../plottable_multifile.js"></script>
+<script src="../examples/exampleUtil.js"></script>
+<div class="demo-title">Simple Chart</div>
+<br>
+
+
+<br>
+<svg id="cataxis" width="100%" height="500"></svg>
+    <p />
+    <button name="rotate" onclick="bigName()">long labels</button>
+    <button name="rotate" onclick="shortName()">shortened labels</button>
+
+    <p />
+<p />
+  
+</body>
+
+
+</html>
+

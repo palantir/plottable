@@ -135,22 +135,29 @@ var Plottable;
             }
             Methods.arrayEq = arrayEq;
 
-            // TODO: docstring
+            /**
+            * @param {any} a Object to check against b for equality.
+            * @param {any} b Object to check against a for equality.
+            *
+            * @returns {boolean} whether or not two objects share the same keys, and
+            *          values associated with those keys. Values will be compared
+            *          with ===.
+            */
             function objEq(a, b) {
                 if (a == null || b == null) {
                     return a === b;
                 }
-                return objSubset(a, b) && objSubset(b, a);
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) {
+                    return a[k];
+                });
+                var valuesB = keysB.map(function (k) {
+                    return b[k];
+                });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
             }
             Methods.objEq = objEq;
-
-            function objSubset(a, b) {
-                return Object.keys(a).map(function (k) {
-                    return a[k] === b[k];
-                }).reduce(function (x, y) {
-                    return x && y;
-                });
-            }
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
