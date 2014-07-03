@@ -17,7 +17,8 @@ export module Axis {
      */
     constructor(scale: Scale.CompositeOrdinal, orientation = "bottom") {
       super(scale, orientation);
-      this.tickLength(60);
+      this.tickLength(120);
+      this.formatter(new Plottable.Formatter.Custom(null, (d: string[], formatter: Formatter.Custom) => d[d.length - 1]));
     }
 
     public _generateTickMarkAttrHash() {
@@ -60,12 +61,34 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
+
+      var labels = this._getAllLabels();
+      var k = this._scale.getLevels();
+
+      // remove all the translation from tickLabels
+      Util.DOM.translate(this._tickLabelsG, 0, 0);
+
+      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(labels, (d) => d);
+      var getTickLabelTransform = (d: string, i: number) => {
+        var startAndWidth = this._scale.fullBandStartAndWidth(d);
+        var bandStartPosition = startAndWidth[0];
+        var offset = (k - d.length + .5) * this.tickLength() / k;
+        var x = this._isHorizontal() ? bandStartPosition : offset;
+        var y = this._isHorizontal() ? offset : bandStartPosition;
+        return "translate(" + x + "," + y + ")";
+      };
+      var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+      tickLabels.exit().remove();
+      tickLabels.attr("transform", getTickLabelTransform);
+      // erase all text first, then rewrite
+      tickLabels.text("");
+      this._measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
+
       // remove all the translation from tickMarks
       Util.DOM.translate(this._tickMarkContainer, 0, 0);
 
       // make tick length variable depending on level
       var tickMarks = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).data(this._getTickValues());
-      var k = this._scale.getLevels();
       tickMarks.attr("y2", (d: any[]) => (k - d.length + 1) * this.tickLength() / k);
       return this;
     }

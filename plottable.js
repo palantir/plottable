@@ -5311,7 +5311,7 @@ var Plottable;
                 } else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
+                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
 
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
@@ -5325,7 +5325,7 @@ var Plottable;
                 return this._scale.domain();
             };
 
-            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
+            Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
                 var draw = dataOrTicks instanceof d3.selection;
                 var self = this;
                 var textWriteResults = [];
@@ -5344,17 +5344,18 @@ var Plottable;
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
                     var textWriteResult;
+                    var formatter = self._formatter;
                     if (draw) {
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable.Util.Text.writeText(d[d.length - 1], width, height, tm, true, {
+                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true, {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     } else {
-                        textWriteResult = Plottable.Util.Text.writeText(d[d.length - 1], width, height, tm, true);
+                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true);
                     }
 
                     textWriteResults.push(textWriteResult);
@@ -5395,7 +5396,7 @@ var Plottable;
 
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
+                this._measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
@@ -5444,7 +5445,10 @@ var Plottable;
             function Composite(scale, orientation) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 _super.call(this, scale, orientation);
-                this.tickLength(60);
+                this.tickLength(120);
+                this.formatter(new Plottable.Formatter.Custom(null, function (d, formatter) {
+                    return d[d.length - 1];
+                }));
             }
             Composite.prototype._generateTickMarkAttrHash = function () {
                 var _this = this;
@@ -5492,12 +5496,36 @@ var Plottable;
                 var _this = this;
                 _super.prototype._doRender.call(this);
 
+                var labels = this._getAllLabels();
+                var k = this._scale.getLevels();
+
+                // remove all the translation from tickLabels
+                Plottable.Util.DOM.translate(this._tickLabelsG, 0, 0);
+
+                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(labels, function (d) {
+                    return d;
+                });
+                var getTickLabelTransform = function (d, i) {
+                    var startAndWidth = _this._scale.fullBandStartAndWidth(d);
+                    var bandStartPosition = startAndWidth[0];
+                    var offset = (k - d.length + .5) * _this.tickLength() / k;
+                    var x = _this._isHorizontal() ? bandStartPosition : offset;
+                    var y = _this._isHorizontal() ? offset : bandStartPosition;
+                    return "translate(" + x + "," + y + ")";
+                };
+                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+                tickLabels.exit().remove();
+                tickLabels.attr("transform", getTickLabelTransform);
+
+                // erase all text first, then rewrite
+                tickLabels.text("");
+                this._measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
+
                 // remove all the translation from tickMarks
                 Plottable.Util.DOM.translate(this._tickMarkContainer, 0, 0);
 
                 // make tick length variable depending on level
                 var tickMarks = this._tickMarkContainer.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS).data(this._getTickValues());
-                var k = this._scale.getLevels();
                 tickMarks.attr("y2", function (d) {
                     return (k - d.length + 1) * _this.tickLength() / k;
                 });
