@@ -1,4 +1,4 @@
-///<reference path="../reference.ts" />
+//<reference path="../reference.ts" />
 
 module Plottable {
 export module Scale {
@@ -30,6 +30,29 @@ export module Scale {
       } else {
         return super.rangeBand();
       }
+    }
+
+    public rangeBandLevel(n: number): number {
+      return n === 0 ? super.rangeBand() : this._subScales[n - 1].rangeBand();
+    }
+
+    public innerPaddingLevel(n: number): number {
+      return this.stepLevel(n) - this.rangeBandLevel(n);
+    }
+
+    public stepLevel(n: number): number {
+      var d = this.domain();
+      for (var i = 0; i <= n - 1; i++)
+        d = this.product(d, this._subScales[i].domain());
+      if (d.length < 2) {return 0;}
+      return Math.abs(this.scale(d[1]) - this.scale(d[0]));
+    }
+
+    public fullBandStartAndWidth(v: any) {
+      var n = v.length - 1;
+      var start = (this.scale(v) - this.innerPaddingLevel(n) / 2);
+      var width = this.rangeBandLevel(n) + this.innerPaddingLevel(n);
+      return [start, width];
     }
 
     // This is the magic that hierarchically updates the range bands
@@ -75,19 +98,27 @@ export module Scale {
       return ret;
     }
 
+    public getLevels(): number{ 
+      return this._subScales.length + 1;
+    }
+
+    public domainLevel(n: number): any[] {
+      return n === 0 ? this.domain() : this._subScales[n - 1].domain();
+    }
+
     // (bdwyer) - to be updated once we have custom domainers? This makes
     // assumptions about the layout of data and how it is mapped to the sub
     // scales. Deserves some more thought depending on how the domainers are
     // going to work.
     public updateDomains(data: any[], keys: any[]): CompositeOrdinal {
-      var init: any[][] = [];
+      var init: any[][] = [[]];
       var dom: any[] = [];
       for (var j = 0; j < data.length; j++) {
         if (dom.indexOf(data[j][keys[0]]) == -1) {
           dom.push(data[j][keys[0]]);
-          init.push([data[j][keys[0]]]);
         }
       }
+      init = this.product(init, dom);
       this.domain(init);
       this._subScales.forEach((subScale, i) => {
         if (keys[i + 1] === undefined) {
