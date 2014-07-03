@@ -4975,9 +4975,12 @@ var Plottable;
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+
+                // create a new text measurerer every time; see issue #643
+                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textLengths = tickValues.map(function (v) {
-                    var formattedTestValue = _this._formatter.format(v);
-                    return testTextEl.text(formattedTestValue).node().getComputedTextLength();
+                    var formattedValue = _this._formatter.format(v);
+                    return measurer(formattedValue).width;
                 });
                 testTextEl.remove();
 
@@ -4994,7 +4997,10 @@ var Plottable;
 
             Numeric.prototype._computeHeight = function () {
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
+
+                // create a new text measurerer every time; see issue #643
+                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
+                var textHeight = measurer("test").height;
                 testTextEl.remove();
 
                 if (this.tickLabelPositioning === "center") {

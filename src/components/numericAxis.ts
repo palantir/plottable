@@ -25,9 +25,11 @@ export module Axis {
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      // create a new text measurerer every time; see issue #643
+      var measurer = Util.Text.getTextMeasure(testTextEl);
       var textLengths = tickValues.map((v: any) => {
-        var formattedTestValue = this._formatter.format(v);
-        return (<SVGTextElement> testTextEl.text(formattedTestValue).node()).getComputedTextLength();
+        var formattedValue = this._formatter.format(v);
+        return measurer(formattedValue).width;
       });
       testTextEl.remove();
 
@@ -44,7 +46,9 @@ export module Axis {
 
     public _computeHeight() {
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var textHeight = Util.DOM.getBBox(testTextEl.text("test")).height;
+      // create a new text measurerer every time; see issue #643
+      var measurer = Util.Text.getTextMeasure(testTextEl);
+      var textHeight = measurer("test").height;
       testTextEl.remove();
 
       if (this.tickLabelPositioning === "center") {
