@@ -2789,6 +2789,7 @@ var Plottable;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250;
                 this._projectors = {};
+                this.animateOnNextRender = true;
                 this.clipPathEnabled = true;
                 this.classed("renderer", true);
 
@@ -2806,6 +2807,7 @@ var Plottable;
             }
             Plot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
+                this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this.updateAllProjectors();
                 return this;
@@ -2830,6 +2832,7 @@ var Plottable;
 
             Plot.prototype._onDataSourceUpdate = function () {
                 this.updateAllProjectors();
+                this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
             };
@@ -2876,6 +2879,7 @@ var Plottable;
                 if (this.element != null) {
                     this._paint();
                     this._dataChanged = false;
+                    this.animateOnNextRender = false;
                 }
                 return this;
             };
@@ -2948,7 +2952,7 @@ var Plottable;
             * @return {D3.Selection} The resulting selection (potentially after the transition)
             */
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this._animators[animatorKey] != null && !Plottable.Core.ResizeBroadcaster.resizing()) {
+                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
                     return this._animators[animatorKey].animate(selection, attrToProjector, this);
                 } else {
                     return selection.attr(attrToProjector);
