@@ -2675,7 +2675,7 @@ describe("Legends", function () {
             toggleLegend.toggleCallback(null); // this should remove the callback
             assert.throws(function () {
                 toggleEntry("a", 0);
-            }, "not a function");
+            });
             var selection = getSelection("a");
 
             // should have no classes
@@ -2857,7 +2857,7 @@ describe("Legends", function () {
             hoverLegend.hoverCallback(null); // this should remove the callback
             assert.throws(function () {
                 hoverEntry("a", 0);
-            }, "not a function");
+            });
             verifyEmpty("a");
 
             svg.remove();
