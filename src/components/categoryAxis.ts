@@ -16,8 +16,8 @@ export module Axis {
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom") {
-      super(scale, orientation);
+    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = new Plottable.Formatter.Identity()) {
+      super(scale, orientation, formatter);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
         throw new Error("Only rangeBands category axes are implemented");
@@ -97,17 +97,18 @@ export module Axis {
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
         var textWriteResult: Util.Text.IWriteTextResult;
+        var formatter = self._formatter;
         if (draw) {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = Util.Text.writeText(d, width, height, tm, true, {
+          textWriteResult = Util.Text.writeText(formatter.format(d), width, height, tm, true, {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = Util.Text.writeText(d, width, height, tm, true);
+          textWriteResult = Util.Text.writeText(formatter.format(d), width, height, tm, true);
         }
 
         textWriteResults.push(textWriteResult);

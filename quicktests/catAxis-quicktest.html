@@ -40,11 +40,9 @@
           { name: "Temporal Asynchronous Cat", age: -5 }
         ];
 
-      var cuteFormatter = function(d) { return d + " is a pretty darn cute cat"; } ;
-
       ds = new Plottable.DataSource(data);
       var xScale = new Plottable.Scale.Ordinal();
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom", cuteFormatter);
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
