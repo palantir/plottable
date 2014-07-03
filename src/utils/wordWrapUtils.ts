@@ -18,9 +18,9 @@ export module Util {
      * Wraps words and fits as much of the text as possible into the given width and height.
      */
     export function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): IWrappedText {
-      var widthMeasure = (s: string) => measureText(s)[0];
+      var widthMeasure = (s: string) => measureText(s).width;
       var lines = breakTextToFitWidth(text, width, widthMeasure);
-      var textHeight = measureText("hello world")[1];
+      var textHeight = measureText("hello world").height;
       var nLinesThatFit = Math.floor(height / textHeight);
       var textFit = nLinesThatFit >= lines.length;
       if (!textFit) {
