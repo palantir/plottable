@@ -6319,10 +6319,10 @@ var Plottable;
                 this.classed("line-renderer", true);
                 this.project("stroke", function () {
                     return "steelblue";
-                });
-                this.project("fill", function () {
-                    return "none";
-                });
+                }); // default
+                this.project("stroke-width", function () {
+                    return "2px";
+                }); // default
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6385,6 +6385,9 @@ var Plottable;
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
                     return "steelblue";
+                }); // default
+                this.project("fill-opacity", function () {
+                    return 0.5;
                 }); // default
                 this.project("stroke", function () {
                     return "none";
