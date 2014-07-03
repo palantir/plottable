@@ -134,6 +134,30 @@ var Plottable;
                 return true;
             }
             Methods.arrayEq = arrayEq;
+
+            /**
+            * @param {any} a Object to check against b for equality.
+            * @param {any} b Object to check against a for equality.
+            *
+            * @returns {boolean} whether or not two objects share the same keys, and
+            *          values associated with those keys. Values will be compared
+            *          with ===.
+            */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) {
+                    return a[k];
+                });
+                var valuesB = keysB.map(function (k) {
+                    return b[k];
+                });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -403,16 +427,18 @@ var Plottable;
         (function (Text) {
             ;
 
+            ;
+
             /**
-            * Returns a quasi-pure function of typesignature (t: string) => number[] which measures height and width of text
+            * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
             *
             * @param {D3.Selection} selection: The selection in which text will be drawn and measured
-            * @returns {number[]} width and height of the text
+            * @returns {Dimensions} width and height of the text
             */
             function getTextMeasure(selection) {
                 return function (s) {
                     if (s.trim() === "") {
-                        return [0, 0];
+                        return { width: 0, height: 0 };
                     }
                     var bb;
                     if (selection.node().nodeName === "text") {
@@ -420,12 +446,12 @@ var Plottable;
                         selection.text(s);
                         bb = Util.DOM.getBBox(selection);
                         selection.text(originalText);
-                        return [bb.width, bb.height];
+                        return { width: bb.width, height: bb.height };
                     } else {
                         var t = selection.append("text").text(s);
                         bb = Util.DOM.getBBox(t);
                         t.remove();
-                        return [bb.width, bb.height];
+                        return { width: bb.width, height: bb.height };
                     }
                 };
             }
@@ -448,11 +474,14 @@ var Plottable;
             function measureByCharacter(tm) {
                 return function (s) {
                     var whs = s.trim().split("").map(tm);
-                    return [d3.sum(whs, function (wh) {
-                            return wh[0];
-                        }), d3.max(whs, function (wh) {
-                            return wh[1];
-                        })];
+                    return {
+                        width: d3.sum(whs, function (wh) {
+                            return wh.width;
+                        }),
+                        height: d3.max(whs, function (wh) {
+                            return wh.height;
+                        })
+                    };
                 };
             }
 
@@ -460,7 +489,7 @@ var Plottable;
 
             /**
             * Some TextMeasurers get confused when measuring something that's only
-            * whitespace: only whitespace in a dom node takes up [0, 0] space.
+            * whitespace: only whitespace in a dom node takes up 0 x 0 space.
             *
             * @return {TextMeasurer} A function that if its argument is all
             *         whitespace, it will wrap its argument in CANONICAL_CHR before
@@ -472,13 +501,19 @@ var Plottable;
                         var whs = s.split("").map(function (c) {
                             var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
                             var whWrapping = tm(CANONICAL_CHR);
-                            return [wh[0] - 2 * whWrapping[0], wh[1]];
+                            return {
+                                width: wh.width - 2 * whWrapping.width,
+                                height: wh.height
+                            };
                         });
-                        return [d3.sum(whs, function (x) {
-                                return x[0];
-                            }), d3.max(whs, function (x) {
-                                return x[1];
-                            })];
+                        return {
+                            width: d3.sum(whs, function (x) {
+                                return x.width;
+                            }),
+                            height: d3.max(whs, function (x) {
+                                return x.height;
+                            })
+                        };
                     } else {
                         return tm(s);
                     }
@@ -498,7 +533,7 @@ var Plottable;
                 */
                 function CachingCharacterMeasurer(g) {
                     var _this = this;
-                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.arrayEq);
+                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.objEq);
                     this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) {
                         return _this.cache.get(s);
                     })));
@@ -523,7 +558,7 @@ var Plottable;
             * @returns {string} text - the shortened text
             */
             function getTruncatedText(text, availableWidth, measurer) {
-                if (measurer(text)[0] <= availableWidth) {
+                if (measurer(text).width <= availableWidth) {
                     return text;
                 } else {
                     return addEllipsesToLine(text, availableWidth, measurer);
@@ -538,7 +573,7 @@ var Plottable;
             * @return {number} The height of the text element, in pixels.
             */
             function getTextHeight(selection) {
-                return getTextMeasure(selection)("bqpdl")[1];
+                return getTextMeasure(selection)("bqpdl").height;
             }
             Text.getTextHeight = getTextHeight;
 
@@ -549,7 +584,7 @@ var Plottable;
             * @return {number} The width of the text element, in pixels.
             */
             function getTextWidth(textElement, text) {
-                return getTextMeasure(textElement)(text)[0];
+                return getTextMeasure(textElement)(text).width;
             }
             Text.getTextWidth = getTextWidth;
 
@@ -560,7 +595,7 @@ var Plottable;
             function addEllipsesToLine(line, width, measureText) {
                 var mutatedLine = line.trim();
                 var widthMeasure = function (s) {
-                    return measureText(s)[0];
+                    return measureText(s).width;
                 };
                 var lineWidth = widthMeasure(line);
                 var ellipsesWidth = widthMeasure("...");
@@ -596,7 +631,7 @@ var Plottable;
                 var w = bb.width;
                 if (w > width || h > height) {
                     console.log("Insufficient space to fit text");
-                    return [0, 0];
+                    return { width: 0, height: 0 };
                 }
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
                 var anchor = anchorConverter[xAlign];
@@ -605,7 +640,7 @@ var Plottable;
                 var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
                 Util.DOM.translate(innerG, xOff, yOff);
-                return [w, h];
+                return { width: w, height: h };
             }
             Text.writeLineHorizontally = writeLineHorizontally;
 
@@ -627,7 +662,7 @@ var Plottable;
                 xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
                 innerG.attr("transform", xForm.toString());
 
-                return [wh[1], wh[0]];
+                return wh;
             }
             Text.writeLineVertically = writeLineVertically;
 
@@ -641,15 +676,15 @@ var Plottable;
                     var innerG = blockG.append("g");
                     Util.DOM.translate(innerG, 0, i * h);
                     var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
-                    if (wh[0] > maxWidth) {
-                        maxWidth = wh[0];
+                    if (wh.width > maxWidth) {
+                        maxWidth = wh.width;
                     }
                 });
                 var usedSpace = h * brokenText.length;
                 var freeSpace = height - usedSpace;
                 var translator = { center: 0.5, top: 0, bottom: 1 };
                 Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
-                return [maxWidth, usedSpace];
+                return { width: maxWidth, height: usedSpace };
             }
             Text.writeTextHorizontally = writeTextHorizontally;
 
@@ -664,8 +699,8 @@ var Plottable;
                     var innerG = blockG.append("g");
                     Util.DOM.translate(innerG, i * h, 0);
                     var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
-                    if (wh[1] > maxHeight) {
-                        maxHeight = wh[1];
+                    if (wh.height > maxHeight) {
+                        maxHeight = wh.height;
                     }
                 });
                 var usedSpace = h * brokenText.length;
@@ -673,7 +708,7 @@ var Plottable;
                 var translator = { center: 0.5, left: 0, right: 1 };
                 Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
 
-                return [usedSpace, maxHeight];
+                return { width: usedSpace, height: maxHeight };
             }
             Text.writeTextVertically = writeTextVertically;
 
@@ -696,10 +731,10 @@ var Plottable;
                     var widthFn = orientHorizontally ? d3.max : d3.sum;
                     var heightFn = orientHorizontally ? d3.sum : d3.max;
                     usedWidth = widthFn(wrappedText.lines, function (line) {
-                        return tm(line)[0];
+                        return tm(line).width;
                     });
                     usedHeight = heightFn(wrappedText.lines, function (line) {
-                        return tm(line)[1];
+                        return tm(line).height;
                     });
                 } else {
                     var innerG = write.g.append("g").classed("writeText-inner-g", true);
@@ -708,8 +743,8 @@ var Plottable;
                     // will contain transforms specific to orienting the text properly within the block.
                     var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
                     var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
-                    usedWidth = wh[0];
-                    usedHeight = wh[1];
+                    usedWidth = wh.width;
+                    usedHeight = wh.height;
                 }
 
                 return {
@@ -742,10 +777,10 @@ var Plottable;
             */
             function breakTextToFitRect(text, width, height, measureText) {
                 var widthMeasure = function (s) {
-                    return measureText(s)[0];
+                    return measureText(s).width;
                 };
                 var lines = breakTextToFitWidth(text, width, widthMeasure);
-                var textHeight = measureText("hello world")[1];
+                var textHeight = measureText("hello world").height;
                 var nLinesThatFit = Math.floor(height / textHeight);
                 var textFit = nLinesThatFit >= lines.length;
                 if (!textFit) {
@@ -5347,8 +5382,8 @@ var Plottable;
 
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this.measurer(this.text);
-                var desiredWidth = this.orientation === "horizontal" ? desiredWH[0] : desiredWH[1];
-                var desiredHeight = this.orientation === "horizontal" ? desiredWH[1] : desiredWH[0];
+                var desiredWidth = this.orientation === "horizontal" ? desiredWH.width : desiredWH.height;
+                var desiredHeight = this.orientation === "horizontal" ? desiredWH.height : desiredWH.width;
 
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
