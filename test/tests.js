@@ -1603,7 +1603,6 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var assert = chai.assert;
-
 var CountingPlot = (function (_super) {
     __extends(CountingPlot, _super);
     function CountingPlot(dataset) {
@@ -1617,16 +1616,14 @@ var CountingPlot = (function (_super) {
     return CountingPlot;
 })(Plottable.Abstract.Plot);
 
-var quadraticDataset = makeQuadraticSeries(10);
-
-describe("Renderers", function () {
-    describe("base Renderer", function () {
-        it("Renderers default correctly", function () {
+describe("Plots", function () {
+    describe("Abstract Plot", function () {
+        it("Plots default correctly", function () {
             var r = new Plottable.Abstract.Plot();
             assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
         });
 
-        it("Base Renderer functionality works", function () {
+        it("Base Plot functionality works", function () {
             var svg = generateSVG(400, 300);
             var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
             var r = new Plottable.Abstract.Plot(d1);
@@ -1709,7 +1706,7 @@ describe("Renderers", function () {
             assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
         });
 
-        it("Renderer automatically generates a DataSource if only data is provided", function () {
+        it("Plot automatically generates a DataSource if only data is provided", function () {
             var data = ["foo", "bar"];
             var r = new Plottable.Abstract.Plot(data);
             var dataSource = r.dataSource();
@@ -1717,7 +1714,7 @@ describe("Renderers", function () {
             assert.deepEqual(dataSource.data(), data, "The generated DataSource has the correct data");
         });
 
-        it("Renderer.project works as intended", function () {
+        it("Plot.project works as intended", function () {
             var r = new Plottable.Abstract.Plot();
             var s = new Plottable.Scale.Linear().domain([0, 1]).range([0, 10]);
             r.project("attr", "a", s);
@@ -1726,7 +1723,7 @@ describe("Renderers", function () {
             assert.equal(projector({ "a": 0.5 }, 0), 5, "projector works as intended");
         });
 
-        it("Changing Renderer.dataSource to [] causes scale to contract", function () {
+        it("Changing Plot.dataSource().data to [] causes scale to contract", function () {
             var ds1 = new Plottable.DataSource([0, 1, 2]);
             var ds2 = new Plottable.DataSource([1, 2, 3]);
             var s = new Plottable.Scale.Linear();
@@ -1745,8 +1742,593 @@ describe("Renderers", function () {
             svg2.remove();
         });
     });
+});
 
-    describe("XYPlot functionality", function () {
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+
+describe("Plots", function () {
+    describe("AreaPlot", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var xAccessor;
+        var yAccessor;
+        var y0Accessor;
+        var colorAccessor;
+        var fillAccessor;
+        var simpleDataset;
+        var areaPlot;
+        var renderArea;
+        var verifier;
+
+        before(function () {
+            svg = generateSVG(500, 500);
+            verifier = new MultiTestVerifier();
+            xScale = new Plottable.Scale.Linear().domain([0, 1]);
+            yScale = new Plottable.Scale.Linear().domain([0, 1]);
+            xAccessor = function (d) {
+                return d.foo;
+            };
+            yAccessor = function (d) {
+                return d.bar;
+            };
+            y0Accessor = function () {
+                return 0;
+            };
+            colorAccessor = function (d, i, m) {
+                return d3.rgb(d.foo, d.bar, i).toString();
+            };
+            fillAccessor = function () {
+                return "steelblue";
+            };
+            simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
+            areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            renderArea = areaPlot.renderArea;
+        });
+
+        beforeEach(function () {
+            verifier.start();
+        });
+
+        it("draws area and line correctly", function () {
+            var areaPath = renderArea.select(".area");
+            assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+            assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
+            var areaComputedStyle = window.getComputedStyle(areaPath.node());
+            assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
+
+            var linePath = renderArea.select(".line");
+            assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+            assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
+            var lineComputedStyle = window.getComputedStyle(linePath.node());
+            assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+            verifier.end();
+        });
+
+        it("fill colors set appropriately from accessor", function () {
+            var areaPath = renderArea.select(".area");
+            assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
+            verifier.end();
+        });
+
+        it("fill colors can be changed by projecting new accessor and re-render appropriately", function () {
+            var newFillAccessor = function () {
+                return "pink";
+            };
+            areaPlot.project("fill", newFillAccessor);
+            areaPlot.renderTo(svg);
+            renderArea = areaPlot.renderArea;
+            var areaPath = renderArea.select(".area");
+            assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
+            verifier.end();
+        });
+
+        it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
+            areaPlot.project("y0", function (d) {
+                return d.bar / 2;
+            }, yScale);
+            areaPlot.renderTo(svg);
+            renderArea = areaPlot.renderArea;
+            var areaPath = renderArea.select(".area");
+            assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
+            verifier.end();
+        });
+
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+
+describe("Plots", function () {
+    describe("Bar Plot", function () {
+        describe("Vertical Bar Plot in points mode", function () {
+            var verifier = new MultiTestVerifier();
+            var svg;
+            var dataset;
+            var xScale;
+            var yScale;
+            var renderer;
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+
+            before(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+                yScale = new Plottable.Scale.Linear();
+                var data = [
+                    { x: "A", y: 1 },
+                    { x: "B", y: -1.5 },
+                    { x: "B", y: 1 }
+                ];
+                dataset = new Plottable.DataSource(data);
+
+                renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+                renderer.animate(false);
+                renderer.renderTo(svg);
+            });
+
+            beforeEach(function () {
+                yScale.domain([-2, 2]);
+                renderer.baseline(0);
+                verifier.start();
+            });
+
+            it("renders correctly", function () {
+                var renderArea = renderer.renderArea;
+                var bars = renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 3, "One bar was created per data point");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+                assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
+                assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
+                assert.equal(bar0.attr("x"), "150", "bar0 x is correct");
+                assert.equal(bar1.attr("x"), "450", "bar1 x is correct");
+                assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
+
+                var baseline = renderArea.select(".baseline");
+                assert.equal(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
+                assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
+                assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+                assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+                verifier.end();
+            });
+
+            it("baseline value can be changed; renderer updates appropriately", function () {
+                renderer.baseline(-1);
+
+                var renderArea = renderer.renderArea;
+                var bars = renderArea.selectAll("rect");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("height"), "200", "bar0 height is correct");
+                assert.equal(bar1.attr("height"), "50", "bar1 height is correct");
+                assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "300", "bar1 y is correct");
+
+                var baseline = renderArea.select(".baseline");
+                assert.equal(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
+                assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
+                assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
+                assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
+                verifier.end();
+            });
+
+            it("bar alignment can be changed; renderer updates appropriately", function () {
+                renderer.barAlignment("center");
+                var renderArea = renderer.renderArea;
+                var bars = renderArea.selectAll("rect");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+                assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
+                assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
+
+                renderer.barAlignment("right");
+                renderArea = renderer.renderArea;
+                bars = renderArea.selectAll("rect");
+                bar0 = d3.select(bars[0][0]);
+                bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
+                assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
+                assert.equal(bar0.attr("x"), "140", "bar0 x is correct");
+                assert.equal(bar1.attr("x"), "440", "bar1 x is correct");
+
+                assert.throws(function () {
+                    return renderer.barAlignment("blargh");
+                }, Error);
+                assert.equal(renderer._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
+                verifier.end();
+            });
+
+            it("can select and deselect bars", function () {
+                var selectedBar = renderer.selectBar(145, 150);
+
+                assert.isNotNull(selectedBar, "clicked on a bar");
+                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
+                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+                renderer.deselectAll();
+                assert.isFalse(selectedBar.classed("selected"), "the bar is no longer selected");
+
+                selectedBar = renderer.selectBar(-1, -1); // no bars here
+                assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                selectedBar = renderer.selectBar(200, 50); // between the two bars
+                assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                selectedBar = renderer.selectBar(145, 10); // above bar 0
+                assert.isNull(selectedBar, "returns null if no bar was selected");
+
+                // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
+                // origin is at the top left!
+                selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 150 }, true);
+                assert.isNotNull(selectedBar, "line between middle of two bars");
+                assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
+                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.equal(selectedBar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+                selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 350 }, true);
+                assert.isNotNull(selectedBar, "square between middle of two bars, & over the whole area");
+                assert.lengthOf(selectedBar.data(), 3, "selected all the bars");
+                assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+                assert.equal(selectedBar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+                assert.equal(selectedBar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
+                assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
+
+                // the runtime parameter validation should be strict, so no strings or
+                // mangled objects
+                assert.throws(function () {
+                    return renderer.selectBar("blargh", 150);
+                }, Error);
+                assert.throws(function () {
+                    return renderer.selectBar({ min: 150 }, 150);
+                }, Error);
+
+                verifier.end();
+            });
+
+            it("shouldn't blow up if members called before the first render", function () {
+                var brandNew = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
+
+                assert.isNotNull(brandNew.deselectAll(), "deselects return self");
+                assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
+
+                brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
+
+                assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
+                assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
+
+                verifier.end();
+            });
+
+            after(function () {
+                if (verifier.passed) {
+                    svg.remove();
+                }
+                ;
+            });
+        });
+
+        describe("Horizontal Bar Plot in Points Mode", function () {
+            var verifier = new MultiTestVerifier();
+            var svg;
+            var dataset;
+            var yScale;
+            var xScale;
+            var renderer;
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+            before(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
+                xScale = new Plottable.Scale.Linear();
+
+                var data = [
+                    { y: "A", x: 1 },
+                    { y: "B", x: -1.5 },
+                    { y: "B", x: 1 }
+                ];
+                dataset = new Plottable.DataSource(data);
+
+                renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
+                renderer._animate = false;
+                renderer.renderTo(svg);
+            });
+
+            beforeEach(function () {
+                xScale.domain([-3, 3]);
+                renderer.baseline(0);
+                verifier.start();
+            });
+
+            it("renders correctly", function () {
+                var renderArea = renderer.renderArea;
+                var bars = renderArea.selectAll("rect");
+                assert.lengthOf(bars[0], 3, "One bar was created per data point");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+                assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
+                assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
+                assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
+                assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
+                assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+
+                var baseline = renderArea.select(".baseline");
+                assert.equal(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
+                assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
+                assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+                assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+                verifier.end();
+            });
+
+            it("baseline value can be changed; renderer updates appropriately", function () {
+                renderer.baseline(-1);
+
+                var renderArea = renderer.renderArea;
+                var bars = renderArea.selectAll("rect");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("width"), "200", "bar0 width is correct");
+                assert.equal(bar1.attr("width"), "50", "bar1 width is correct");
+                assert.equal(bar0.attr("x"), "200", "bar0 x is correct");
+                assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
+
+                var baseline = renderArea.select(".baseline");
+                assert.equal(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
+                assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
+                assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
+                assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
+                verifier.end();
+            });
+
+            it("bar alignment can be changed; renderer updates appropriately", function () {
+                renderer.barAlignment("center");
+                var renderArea = renderer.renderArea;
+                var bars = renderArea.selectAll("rect");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+                assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
+
+                renderer.barAlignment("bottom");
+                renderArea = renderer.renderArea;
+                bars = renderArea.selectAll("rect");
+                bar0 = d3.select(bars[0][0]);
+                bar1 = d3.select(bars[0][1]);
+                assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
+                assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
+                assert.equal(bar0.attr("y"), "290", "bar0 y is correct");
+                assert.equal(bar1.attr("y"), "90", "bar1 y is correct");
+
+                assert.throws(function () {
+                    return renderer.barAlignment("blargh");
+                }, Error);
+
+                verifier.end();
+            });
+
+            after(function () {
+                if (verifier.passed) {
+                    svg.remove();
+                }
+                ;
+            });
+        });
+
+        describe("Horizontal Bar Plot in Bands mode", function () {
+            var verifier = new MultiTestVerifier();
+            var svg;
+            var dataset;
+            var yScale;
+            var xScale;
+            var renderer;
+            var SVG_WIDTH = 600;
+            var SVG_HEIGHT = 400;
+            var axisWidth = 0;
+            var bandWidth = 0;
+
+            var numAttr = function (s, a) {
+                return parseFloat(s.attr(a));
+            };
+
+            before(function () {
+                svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
+                xScale = new Plottable.Scale.Linear();
+
+                var data = [
+                    { y: "A", x: 1 },
+                    { y: "B", x: 2 }
+                ];
+                dataset = new Plottable.DataSource(data);
+
+                renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
+                renderer.baseline(0);
+                renderer._animate = false;
+                var yAxis = new Plottable.Axis.Category(yScale, "left");
+                var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+                axisWidth = yAxis.availableWidth;
+                bandWidth = yScale.rangeBand();
+            });
+            beforeEach(function () {
+                verifier.start();
+            });
+            after(function () {
+                if (verifier.passed) {
+                    svg.remove();
+                }
+                ;
+            });
+
+            it("renders correctly", function () {
+                var bars = renderer.renderArea.selectAll("rect");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                var bar0y = bar0.data()[0].y;
+                var bar1y = bar1.data()[0].y;
+                assert.closeTo(numAttr(bar0, "height"), 104, 2);
+                assert.closeTo(numAttr(bar1, "height"), 104, 2);
+                assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "width is correct for bar0");
+                assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "width is correct for bar1");
+
+                // check that bar is aligned on the center of the scale
+                assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "y pos correct for bar0");
+                assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "y pos correct for bar1");
+                verifier.end();
+            });
+
+            it("width projector may be overwritten, and calling project queues rerender", function () {
+                var bars = renderer.renderArea.selectAll("rect");
+                var bar0 = d3.select(bars[0][0]);
+                var bar1 = d3.select(bars[0][1]);
+                var bar0y = bar0.data()[0].y;
+                var bar1y = bar1.data()[0].y;
+                renderer.project("width", 10);
+                assert.equal(numAttr(bar0, "height"), 10, "bar0 height");
+                assert.equal(numAttr(bar1, "height"), 10, "bar1 height");
+                assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "bar0 width");
+                assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "bar1 width");
+                assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "bar0 ypos");
+                assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "bar1 ypos");
+                verifier.end();
+            });
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+
+describe("Plots", function () {
+    describe("GridPlot", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 200;
+        var DATA = [
+            { x: "A", y: "U", magnitude: 0 },
+            { x: "B", y: "U", magnitude: 2 },
+            { x: "A", y: "V", magnitude: 16 },
+            { x: "B", y: "V", magnitude: 8 }
+        ];
+
+        var VERIFY_CELLS = function (cells) {
+            assert.equal(cells.length, 4);
+
+            var cellAU = d3.select(cells[0]);
+            var cellBU = d3.select(cells[1]);
+            var cellAV = d3.select(cells[2]);
+            var cellBV = d3.select(cells[3]);
+
+            assert.equal(cellAU.attr("height"), "100", "cell 'AU' height is correct");
+            assert.equal(cellAU.attr("width"), "200", "cell 'AU' width is correct");
+            assert.equal(cellAU.attr("x"), "0", "cell 'AU' x coord is correct");
+            assert.equal(cellAU.attr("y"), "100", "cell 'AU' x coord is correct");
+            assert.equal(cellAU.attr("fill"), "#000000", "cell 'AU' color is correct");
+
+            assert.equal(cellBU.attr("height"), "100", "cell 'BU' height is correct");
+            assert.equal(cellBU.attr("width"), "200", "cell 'BU' width is correct");
+            assert.equal(cellBU.attr("x"), "200", "cell 'BU' x coord is correct");
+            assert.equal(cellBU.attr("y"), "100", "cell 'BU' x coord is correct");
+            assert.equal(cellBU.attr("fill"), "#212121", "cell 'BU' color is correct");
+
+            assert.equal(cellAV.attr("height"), "100", "cell 'AV' height is correct");
+            assert.equal(cellAV.attr("width"), "200", "cell 'AV' width is correct");
+            assert.equal(cellAV.attr("x"), "0", "cell 'AV' x coord is correct");
+            assert.equal(cellAV.attr("y"), "0", "cell 'AV' x coord is correct");
+            assert.equal(cellAV.attr("fill"), "#ffffff", "cell 'AV' color is correct");
+
+            assert.equal(cellBV.attr("height"), "100", "cell 'BV' height is correct");
+            assert.equal(cellBV.attr("width"), "200", "cell 'BV' width is correct");
+            assert.equal(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
+            assert.equal(cellBV.attr("y"), "0", "cell 'BV' x coord is correct");
+            assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
+        };
+
+        it("renders correctly", function () {
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Ordinal();
+            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var renderer = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
+            renderer.renderTo(svg);
+            VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+            svg.remove();
+        });
+
+        it("renders correctly when data is set after construction", function () {
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Ordinal();
+            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
+            renderer.renderTo(svg);
+            renderer.dataSource().data(DATA);
+            VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
+            svg.remove();
+        });
+
+        it("can invert y axis correctly", function () {
+            var xScale = new Plottable.Scale.Ordinal();
+            var yScale = new Plottable.Scale.Ordinal();
+            var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude");
+            renderer.renderTo(svg);
+
+            yScale.domain(["U", "V"]);
+            renderer.dataSource().data(DATA);
+
+            var cells = renderer.renderArea.selectAll("rect")[0];
+            var cellAU = d3.select(cells[0]);
+            var cellAV = d3.select(cells[2]);
+            cellAU.attr("fill", "#000000");
+            cellAU.attr("x", "0");
+            cellAU.attr("y", "100");
+
+            cellAV.attr("fill", "#ffffff");
+            cellAV.attr("x", "0");
+            cellAV.attr("y", "0");
+
+            yScale.domain(["V", "U"]);
+            cells = renderer.renderArea.selectAll("rect")[0];
+            cellAU = d3.select(cells[0]);
+            cellAV = d3.select(cells[2]);
+            cellAU.attr("fill", "#000000");
+            cellAU.attr("x", "0");
+            cellAU.attr("y", "0");
+
+            cellAV.attr("fill", "#ffffff");
+            cellAV.attr("x", "0");
+            cellAV.attr("y", "100");
+
+            svg.remove();
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+
+describe("Plots", function () {
+    describe("ScatterPlot", function () {
         it("the accessors properly access data, index, and metadata", function () {
             var svg = generateSVG(400, 400);
             var xScale = new Plottable.Scale.Linear();
@@ -1789,103 +2371,7 @@ describe("Renderers", function () {
             svg.remove();
         });
 
-        describe("Basic AreaPlot functionality", function () {
-            var svg;
-            var xScale;
-            var yScale;
-            var xAccessor;
-            var yAccessor;
-            var y0Accessor;
-            var colorAccessor;
-            var fillAccessor;
-            var simpleDataset;
-            var areaPlot;
-            var renderArea;
-            var verifier;
-
-            before(function () {
-                svg = generateSVG(500, 500);
-                verifier = new MultiTestVerifier();
-                xScale = new Plottable.Scale.Linear().domain([0, 1]);
-                yScale = new Plottable.Scale.Linear().domain([0, 1]);
-                xAccessor = function (d) {
-                    return d.foo;
-                };
-                yAccessor = function (d) {
-                    return d.bar;
-                };
-                y0Accessor = function () {
-                    return 0;
-                };
-                colorAccessor = function (d, i, m) {
-                    return d3.rgb(d.foo, d.bar, i).toString();
-                };
-                fillAccessor = function () {
-                    return "steelblue";
-                };
-                simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
-                areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
-                areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
-                renderArea = areaPlot.renderArea;
-            });
-
-            beforeEach(function () {
-                verifier.start();
-            });
-
-            it("draws area and line correctly", function () {
-                var areaPath = renderArea.select(".area");
-                assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
-                assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
-                var areaComputedStyle = window.getComputedStyle(areaPath.node());
-                assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
-
-                var linePath = renderArea.select(".line");
-                assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
-                assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
-                var lineComputedStyle = window.getComputedStyle(linePath.node());
-                assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
-                verifier.end();
-            });
-
-            it("fill colors set appropriately from accessor", function () {
-                var areaPath = renderArea.select(".area");
-                assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
-                verifier.end();
-            });
-
-            it("fill colors can be changed by projecting new accessor and re-render appropriately", function () {
-                var newFillAccessor = function () {
-                    return "pink";
-                };
-                areaPlot.project("fill", newFillAccessor);
-                areaPlot.renderTo(svg);
-                renderArea = areaPlot.renderArea;
-                var areaPath = renderArea.select(".area");
-                assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
-                verifier.end();
-            });
-
-            it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
-                areaPlot.project("y0", function (d) {
-                    return d.bar / 2;
-                }, yScale);
-                areaPlot.renderTo(svg);
-                renderArea = areaPlot.renderArea;
-                var areaPath = renderArea.select(".area");
-                assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
-                verifier.end();
-            });
-
-            after(function () {
-                if (verifier.passed) {
-                    svg.remove();
-                }
-                ;
-            });
-        });
-
-        describe("Example CirclePlot with quadratic series", function () {
+        describe("Example ScatterPlot with quadratic series", function () {
             var svg;
             var xScale;
             var yScale;
@@ -1901,6 +2387,7 @@ describe("Renderers", function () {
                 return d3.rgb(d.x, d.y, i).toString();
             };
             var circlesInArea;
+            var quadraticDataset = makeQuadraticSeries(10);
 
             function getCirclePlotVerifier() {
                 // creates a function that verifies that circles are drawn properly after accounting for svg transform
@@ -1979,474 +2466,6 @@ describe("Renderers", function () {
                     svg.remove();
                 }
                 ;
-            });
-        });
-        describe("Bar Plot", function () {
-            describe("Vertical Bar Plot in points mode", function () {
-                var verifier = new MultiTestVerifier();
-                var svg;
-                var dataset;
-                var xScale;
-                var yScale;
-                var renderer;
-                var SVG_WIDTH = 600;
-                var SVG_HEIGHT = 400;
-
-                before(function () {
-                    svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                    xScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
-                    yScale = new Plottable.Scale.Linear();
-                    var data = [
-                        { x: "A", y: 1 },
-                        { x: "B", y: -1.5 },
-                        { x: "B", y: 1 }
-                    ];
-                    dataset = new Plottable.DataSource(data);
-
-                    renderer = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
-                    renderer.animate(false);
-                    renderer.renderTo(svg);
-                });
-
-                beforeEach(function () {
-                    yScale.domain([-2, 2]);
-                    renderer.baseline(0);
-                    verifier.start();
-                });
-
-                it("renders correctly", function () {
-                    var renderArea = renderer.renderArea;
-                    var bars = renderArea.selectAll("rect");
-                    assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                    var bar0 = d3.select(bars[0][0]);
-                    var bar1 = d3.select(bars[0][1]);
-                    assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                    assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-                    assert.equal(bar0.attr("height"), "100", "bar0 height is correct");
-                    assert.equal(bar1.attr("height"), "150", "bar1 height is correct");
-                    assert.equal(bar0.attr("x"), "150", "bar0 x is correct");
-                    assert.equal(bar1.attr("x"), "450", "bar1 x is correct");
-                    assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
-                    assert.equal(bar1.attr("y"), "200", "bar1 y is correct");
-
-                    var baseline = renderArea.select(".baseline");
-                    assert.equal(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
-                    assert.equal(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
-                    assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-                    assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-                    verifier.end();
-                });
-
-                it("baseline value can be changed; renderer updates appropriately", function () {
-                    renderer.baseline(-1);
-
-                    var renderArea = renderer.renderArea;
-                    var bars = renderArea.selectAll("rect");
-                    var bar0 = d3.select(bars[0][0]);
-                    var bar1 = d3.select(bars[0][1]);
-                    assert.equal(bar0.attr("height"), "200", "bar0 height is correct");
-                    assert.equal(bar1.attr("height"), "50", "bar1 height is correct");
-                    assert.equal(bar0.attr("y"), "100", "bar0 y is correct");
-                    assert.equal(bar1.attr("y"), "300", "bar1 y is correct");
-
-                    var baseline = renderArea.select(".baseline");
-                    assert.equal(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
-                    assert.equal(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
-                    assert.equal(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-                    assert.equal(baseline.attr("x2"), SVG_WIDTH, "the baseline ends at the edge of the chart");
-                    verifier.end();
-                });
-
-                it("bar alignment can be changed; renderer updates appropriately", function () {
-                    renderer.barAlignment("center");
-                    var renderArea = renderer.renderArea;
-                    var bars = renderArea.selectAll("rect");
-                    var bar0 = d3.select(bars[0][0]);
-                    var bar1 = d3.select(bars[0][1]);
-                    assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                    assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-                    assert.equal(bar0.attr("x"), "145", "bar0 x is correct");
-                    assert.equal(bar1.attr("x"), "445", "bar1 x is correct");
-
-                    renderer.barAlignment("right");
-                    renderArea = renderer.renderArea;
-                    bars = renderArea.selectAll("rect");
-                    bar0 = d3.select(bars[0][0]);
-                    bar1 = d3.select(bars[0][1]);
-                    assert.equal(bar0.attr("width"), "10", "bar0 width is correct");
-                    assert.equal(bar1.attr("width"), "10", "bar1 width is correct");
-                    assert.equal(bar0.attr("x"), "140", "bar0 x is correct");
-                    assert.equal(bar1.attr("x"), "440", "bar1 x is correct");
-
-                    assert.throws(function () {
-                        return renderer.barAlignment("blargh");
-                    }, Error);
-                    assert.equal(renderer._barAlignmentFactor, 1, "the bad barAlignment didnt break internal state");
-                    verifier.end();
-                });
-
-                it("can select and deselect bars", function () {
-                    var selectedBar = renderer.selectBar(145, 150);
-
-                    assert.isNotNull(selectedBar, "clicked on a bar");
-                    assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
-                    assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
-
-                    renderer.deselectAll();
-                    assert.isFalse(selectedBar.classed("selected"), "the bar is no longer selected");
-
-                    selectedBar = renderer.selectBar(-1, -1); // no bars here
-                    assert.isNull(selectedBar, "returns null if no bar was selected");
-
-                    selectedBar = renderer.selectBar(200, 50); // between the two bars
-                    assert.isNull(selectedBar, "returns null if no bar was selected");
-
-                    selectedBar = renderer.selectBar(145, 10); // above bar 0
-                    assert.isNull(selectedBar, "returns null if no bar was selected");
-
-                    // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
-                    // origin is at the top left!
-                    selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 150 }, true);
-                    assert.isNotNull(selectedBar, "line between middle of two bars");
-                    assert.lengthOf(selectedBar.data(), 2, "selected 2 bars (not the negative one)");
-                    assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-                    assert.equal(selectedBar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
-                    assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
-
-                    selectedBar = renderer.selectBar({ min: 145, max: 445 }, { min: 150, max: 350 }, true);
-                    assert.isNotNull(selectedBar, "square between middle of two bars, & over the whole area");
-                    assert.lengthOf(selectedBar.data(), 3, "selected all the bars");
-                    assert.equal(selectedBar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-                    assert.equal(selectedBar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
-                    assert.equal(selectedBar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
-                    assert.isTrue(selectedBar.classed("selected"), "the bar was classed \"selected\"");
-
-                    // the runtime parameter validation should be strict, so no strings or
-                    // mangled objects
-                    assert.throws(function () {
-                        return renderer.selectBar("blargh", 150);
-                    }, Error);
-                    assert.throws(function () {
-                        return renderer.selectBar({ min: 150 }, 150);
-                    }, Error);
-
-                    verifier.end();
-                });
-
-                it("shouldn't blow up if members called before the first render", function () {
-                    var brandNew = new Plottable.Plot.VerticalBar(dataset, xScale, yScale);
-
-                    assert.isNotNull(brandNew.deselectAll(), "deselects return self");
-                    assert.isNull(brandNew.selectBar(0, 0), "selects return empty");
-
-                    brandNew._anchor(d3.select(document.createElement("svg"))); // calls `_setup()`
-
-                    assert.isNotNull(brandNew.deselectAll(), "deselects return self after setup");
-                    assert.isNull(brandNew.selectBar(0, 0), "selects return empty after setup");
-
-                    verifier.end();
-                });
-
-                after(function () {
-                    if (verifier.passed) {
-                        svg.remove();
-                    }
-                    ;
-                });
-            });
-
-            describe("Horizontal Bar Plot in Points Mode", function () {
-                var verifier = new MultiTestVerifier();
-                var svg;
-                var dataset;
-                var yScale;
-                var xScale;
-                var renderer;
-                var SVG_WIDTH = 600;
-                var SVG_HEIGHT = 400;
-                before(function () {
-                    svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                    yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]).rangeType("points");
-                    xScale = new Plottable.Scale.Linear();
-
-                    var data = [
-                        { y: "A", x: 1 },
-                        { y: "B", x: -1.5 },
-                        { y: "B", x: 1 }
-                    ];
-                    dataset = new Plottable.DataSource(data);
-
-                    renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
-                    renderer._animate = false;
-                    renderer.renderTo(svg);
-                });
-
-                beforeEach(function () {
-                    xScale.domain([-3, 3]);
-                    renderer.baseline(0);
-                    verifier.start();
-                });
-
-                it("renders correctly", function () {
-                    var renderArea = renderer.renderArea;
-                    var bars = renderArea.selectAll("rect");
-                    assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                    var bar0 = d3.select(bars[0][0]);
-                    var bar1 = d3.select(bars[0][1]);
-                    assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                    assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-                    assert.equal(bar0.attr("width"), "100", "bar0 width is correct");
-                    assert.equal(bar1.attr("width"), "150", "bar1 width is correct");
-                    assert.equal(bar0.attr("y"), "300", "bar0 y is correct");
-                    assert.equal(bar1.attr("y"), "100", "bar1 y is correct");
-                    assert.equal(bar0.attr("x"), "300", "bar0 x is correct");
-                    assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
-
-                    var baseline = renderArea.select(".baseline");
-                    assert.equal(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
-                    assert.equal(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
-                    assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-                    assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-                    verifier.end();
-                });
-
-                it("baseline value can be changed; renderer updates appropriately", function () {
-                    renderer.baseline(-1);
-
-                    var renderArea = renderer.renderArea;
-                    var bars = renderArea.selectAll("rect");
-                    var bar0 = d3.select(bars[0][0]);
-                    var bar1 = d3.select(bars[0][1]);
-                    assert.equal(bar0.attr("width"), "200", "bar0 width is correct");
-                    assert.equal(bar1.attr("width"), "50", "bar1 width is correct");
-                    assert.equal(bar0.attr("x"), "200", "bar0 x is correct");
-                    assert.equal(bar1.attr("x"), "150", "bar1 x is correct");
-
-                    var baseline = renderArea.select(".baseline");
-                    assert.equal(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
-                    assert.equal(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
-                    assert.equal(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-                    assert.equal(baseline.attr("y2"), SVG_HEIGHT, "the baseline ends at the bottom of the chart");
-                    verifier.end();
-                });
-
-                it("bar alignment can be changed; renderer updates appropriately", function () {
-                    renderer.barAlignment("center");
-                    var renderArea = renderer.renderArea;
-                    var bars = renderArea.selectAll("rect");
-                    var bar0 = d3.select(bars[0][0]);
-                    var bar1 = d3.select(bars[0][1]);
-                    assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                    assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-                    assert.equal(bar0.attr("y"), "295", "bar0 y is correct");
-                    assert.equal(bar1.attr("y"), "95", "bar1 y is correct");
-
-                    renderer.barAlignment("bottom");
-                    renderArea = renderer.renderArea;
-                    bars = renderArea.selectAll("rect");
-                    bar0 = d3.select(bars[0][0]);
-                    bar1 = d3.select(bars[0][1]);
-                    assert.equal(bar0.attr("height"), "10", "bar0 height is correct");
-                    assert.equal(bar1.attr("height"), "10", "bar1 height is correct");
-                    assert.equal(bar0.attr("y"), "290", "bar0 y is correct");
-                    assert.equal(bar1.attr("y"), "90", "bar1 y is correct");
-
-                    assert.throws(function () {
-                        return renderer.barAlignment("blargh");
-                    }, Error);
-
-                    verifier.end();
-                });
-
-                after(function () {
-                    if (verifier.passed) {
-                        svg.remove();
-                    }
-                    ;
-                });
-            });
-
-            describe("Horizontal Bar Plot in Bands mode", function () {
-                var verifier = new MultiTestVerifier();
-                var svg;
-                var dataset;
-                var yScale;
-                var xScale;
-                var renderer;
-                var SVG_WIDTH = 600;
-                var SVG_HEIGHT = 400;
-                var axisWidth = 0;
-                var bandWidth = 0;
-
-                var numAttr = function (s, a) {
-                    return parseFloat(s.attr(a));
-                };
-
-                before(function () {
-                    svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                    yScale = new Plottable.Scale.Ordinal().domain(["A", "B"]);
-                    xScale = new Plottable.Scale.Linear();
-
-                    var data = [
-                        { y: "A", x: 1 },
-                        { y: "B", x: 2 }
-                    ];
-                    dataset = new Plottable.DataSource(data);
-
-                    renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
-                    renderer.baseline(0);
-                    renderer._animate = false;
-                    var yAxis = new Plottable.Axis.Category(yScale, "left");
-                    var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
-                    axisWidth = yAxis.availableWidth;
-                    bandWidth = yScale.rangeBand();
-                });
-                beforeEach(function () {
-                    verifier.start();
-                });
-                after(function () {
-                    if (verifier.passed) {
-                        svg.remove();
-                    }
-                    ;
-                });
-
-                it("renders correctly", function () {
-                    var bars = renderer.renderArea.selectAll("rect");
-                    var bar0 = d3.select(bars[0][0]);
-                    var bar1 = d3.select(bars[0][1]);
-                    var bar0y = bar0.data()[0].y;
-                    var bar1y = bar1.data()[0].y;
-                    assert.closeTo(numAttr(bar0, "height"), 104, 2);
-                    assert.closeTo(numAttr(bar1, "height"), 104, 2);
-                    assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "width is correct for bar0");
-                    assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "width is correct for bar1");
-
-                    // check that bar is aligned on the center of the scale
-                    assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "y pos correct for bar0");
-                    assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "y pos correct for bar1");
-                    verifier.end();
-                });
-
-                it("width projector may be overwritten, and calling project queues rerender", function () {
-                    var bars = renderer.renderArea.selectAll("rect");
-                    var bar0 = d3.select(bars[0][0]);
-                    var bar1 = d3.select(bars[0][1]);
-                    var bar0y = bar0.data()[0].y;
-                    var bar1y = bar1.data()[0].y;
-                    renderer.project("width", 10);
-                    assert.equal(numAttr(bar0, "height"), 10, "bar0 height");
-                    assert.equal(numAttr(bar1, "height"), 10, "bar1 height");
-                    assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "bar0 width");
-                    assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "bar1 width");
-                    assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "bar0 ypos");
-                    assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "bar1 ypos");
-                    verifier.end();
-                });
-            });
-        });
-
-        describe("Grid Renderer", function () {
-            var SVG_WIDTH = 400;
-            var SVG_HEIGHT = 200;
-            var DATA = [
-                { x: "A", y: "U", magnitude: 0 },
-                { x: "B", y: "U", magnitude: 2 },
-                { x: "A", y: "V", magnitude: 16 },
-                { x: "B", y: "V", magnitude: 8 }
-            ];
-
-            var VERIFY_CELLS = function (cells) {
-                assert.equal(cells.length, 4);
-
-                var cellAU = d3.select(cells[0]);
-                var cellBU = d3.select(cells[1]);
-                var cellAV = d3.select(cells[2]);
-                var cellBV = d3.select(cells[3]);
-
-                assert.equal(cellAU.attr("height"), "100", "cell 'AU' height is correct");
-                assert.equal(cellAU.attr("width"), "200", "cell 'AU' width is correct");
-                assert.equal(cellAU.attr("x"), "0", "cell 'AU' x coord is correct");
-                assert.equal(cellAU.attr("y"), "100", "cell 'AU' x coord is correct");
-                assert.equal(cellAU.attr("fill"), "#000000", "cell 'AU' color is correct");
-
-                assert.equal(cellBU.attr("height"), "100", "cell 'BU' height is correct");
-                assert.equal(cellBU.attr("width"), "200", "cell 'BU' width is correct");
-                assert.equal(cellBU.attr("x"), "200", "cell 'BU' x coord is correct");
-                assert.equal(cellBU.attr("y"), "100", "cell 'BU' x coord is correct");
-                assert.equal(cellBU.attr("fill"), "#212121", "cell 'BU' color is correct");
-
-                assert.equal(cellAV.attr("height"), "100", "cell 'AV' height is correct");
-                assert.equal(cellAV.attr("width"), "200", "cell 'AV' width is correct");
-                assert.equal(cellAV.attr("x"), "0", "cell 'AV' x coord is correct");
-                assert.equal(cellAV.attr("y"), "0", "cell 'AV' x coord is correct");
-                assert.equal(cellAV.attr("fill"), "#ffffff", "cell 'AV' color is correct");
-
-                assert.equal(cellBV.attr("height"), "100", "cell 'BV' height is correct");
-                assert.equal(cellBV.attr("width"), "200", "cell 'BV' width is correct");
-                assert.equal(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
-                assert.equal(cellBV.attr("y"), "0", "cell 'BV' x coord is correct");
-                assert.equal(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
-            };
-
-            it("renders correctly", function () {
-                var xScale = new Plottable.Scale.Ordinal();
-                var yScale = new Plottable.Scale.Ordinal();
-                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var renderer = new Plottable.Plot.Grid(DATA, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
-                renderer.renderTo(svg);
-                VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
-                svg.remove();
-            });
-
-            it("renders correctly when data is set after construction", function () {
-                var xScale = new Plottable.Scale.Ordinal();
-                var yScale = new Plottable.Scale.Ordinal();
-                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude", colorScale);
-                renderer.renderTo(svg);
-                renderer.dataSource().data(DATA);
-                VERIFY_CELLS(renderer.renderArea.selectAll("rect")[0]);
-                svg.remove();
-            });
-
-            it("can invert y axis correctly", function () {
-                var xScale = new Plottable.Scale.Ordinal();
-                var yScale = new Plottable.Scale.Ordinal();
-                var colorScale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
-                var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var renderer = new Plottable.Plot.Grid(null, xScale, yScale, colorScale).project("fill", "magnitude");
-                renderer.renderTo(svg);
-
-                yScale.domain(["U", "V"]);
-                renderer.dataSource().data(DATA);
-
-                var cells = renderer.renderArea.selectAll("rect")[0];
-                var cellAU = d3.select(cells[0]);
-                var cellAV = d3.select(cells[2]);
-                cellAU.attr("fill", "#000000");
-                cellAU.attr("x", "0");
-                cellAU.attr("y", "100");
-
-                cellAV.attr("fill", "#ffffff");
-                cellAV.attr("x", "0");
-                cellAV.attr("y", "0");
-
-                yScale.domain(["V", "U"]);
-                cells = renderer.renderArea.selectAll("rect")[0];
-                cellAU = d3.select(cells[0]);
-                cellAV = d3.select(cells[2]);
-                cellAU.attr("fill", "#000000");
-                cellAU.attr("x", "0");
-                cellAU.attr("y", "0");
-
-                cellAV.attr("fill", "#ffffff");
-                cellAV.attr("x", "0");
-                cellAV.attr("y", "100");
-
-                svg.remove();
             });
         });
     });
