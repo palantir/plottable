@@ -7,3 +7,7 @@ node_modules
 
 # vim
 *.swp
+
+# ignore _site by Jekyll
+_site
+.sass-cache
