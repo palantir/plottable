@@ -9,8 +9,6 @@ export module Scale {
 
     constructor() {
       super();
-      // (bdwyer) - this may not be necessary depending on how the new domainers work
-      this._autoDomainAutomatically = false;
     }
 
     public addSubscale(scale: Ordinal): CompositeOrdinal {

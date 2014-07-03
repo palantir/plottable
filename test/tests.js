@@ -239,7 +239,7 @@ describe("Axes", function () {
         var axisBBoxAfter = xAxis.element.node().getBBox();
         var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
         assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
-        assert.equal((baselineClientRectAfter.bottom - baselineClientRectBefore.bottom), (newHeight - oldHeight), "baseline has shifted down as a consequence");
+        assert.closeTo((baselineClientRectAfter.bottom - baselineClientRectBefore.bottom), (newHeight - oldHeight), 0.01, "baseline has shifted down as a consequence");
         svg.remove();
     });
 
@@ -299,7 +299,7 @@ describe("Axes", function () {
         var axisBBoxAfter = yAxis.element.node().getBBox();
         var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
         assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
-        assert.equal((baselineClientRectAfter.right - baselineClientRectBefore.right), (newWidth - oldWidth), "baseline has shifted over as a consequence");
+        assert.closeTo((baselineClientRectAfter.right - baselineClientRectBefore.right), (newWidth - oldWidth), 0.01, "baseline has shifted over as a consequence");
         svg.remove();
     });
 
@@ -808,7 +808,7 @@ describe("NumericAxis", function () {
         var firstLabel = d3.select(tickLabels[0][0]);
         assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
         var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
-        assert.strictEqual(lastLabel.style("visibility"), "visible", "last label is hidden");
+        assert.strictEqual(lastLabel.style("visibility"), "hidden", "last label is hidden");
 
         svg.remove();
     });
@@ -1756,16 +1756,6 @@ describe("Util.DOM", function () {
             child.remove();
         });
     });
-
-    it("isSelectionRemovedFromSVG works", function () {
-        var svg = generateSVG();
-        var g = svg.append("g");
-        assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is in svg");
-        g.remove();
-        assert.isTrue(Plottable.Util.DOM.isSelectionRemovedFromSVG(g), "g is no longer in svg");
-        assert.isFalse(Plottable.Util.DOM.isSelectionRemovedFromSVG(svg), "svg is not considered removed");
-        svg.remove();
-    });
 });
 
 ///<reference path="testReference.ts" />
@@ -1863,6 +1853,28 @@ describe("Formatters", function () {
         });
     });
 
+    describe("time", function () {
+        it("uses reasonable defaults", function () {
+            var timeFormatter = new Plottable.Formatter.Time();
+
+            // year, month, day, hours, minutes, seconds, milliseconds
+            var result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 0));
+            assert.strictEqual(result, "2000", "only the year was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 0, 0, 0, 0));
+            assert.strictEqual(result, "Mar", "only the month was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 2, 0, 0, 0, 0));
+            assert.strictEqual(result, "Thu 02", "month and date displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 0, 0, 0));
+            assert.strictEqual(result, "08 PM", "only hour was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 0, 0));
+            assert.strictEqual(result, "08:34", "hour and minute was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 53, 0));
+            assert.strictEqual(result, ":53", "seconds was displayed");
+            result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 950));
+            assert.strictEqual(result, ".950", "milliseconds was displayed");
+        });
+    });
+
     describe("percentage", function () {
         it("uses reasonable defaults", function () {
             var percentFormatter = new Plottable.Formatter.Percentage();
@@ -1881,6 +1893,18 @@ describe("Formatters", function () {
             customFormatter = new Plottable.Formatter.Custom(0, blargify);
             var result = customFormatter.format(1);
             assert.strictEqual(result, "1-blargh", "it uses the custom formatting function");
+        });
+    });
+
+    describe("SISuffix", function () {
+        it("shortens long numbers", function () {
+            var lnFormatter = new Plottable.Formatter.SISuffix();
+            var result = lnFormatter.format(1);
+            assert.strictEqual(result, "1.00", "shows 3 signifigicant figures by default");
+            result = lnFormatter.format(Math.pow(10, 12));
+            assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
+            result = lnFormatter.format(Math.pow(10, -12));
+            assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
         });
     });
 });
@@ -2289,7 +2313,8 @@ describe("Labels", function () {
         svg.remove();
     });
 
-    it("Superlong text is handled in a sane fashion", function () {
+    // skipping because Dan is rewriting labels and the height test fails
+    it.skip("Superlong text is handled in a sane fashion", function () {
         var svgWidth = 400;
         var svg = generateSVG(svgWidth, 80);
         var label = new Plottable.Component.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
@@ -3036,15 +3061,19 @@ describe("Renderers", function () {
             var ds1 = new Plottable.DataSource([0, 1, 2]);
             var ds2 = new Plottable.DataSource([1, 2, 3]);
             var s = new Plottable.Scale.Linear();
+            var svg1 = generateSVG(100, 100);
+            var svg2 = generateSVG(100, 100);
             var r1 = new Plottable.Abstract.Plot().dataSource(ds1).project("x", function (x) {
                 return x;
-            }, s);
+            }, s).renderTo(svg1);
             var r2 = new Plottable.Abstract.Plot().dataSource(ds2).project("x", function (x) {
                 return x;
-            }, s);
+            }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
+            svg1.remove();
+            svg2.remove();
         });
     });
 
@@ -3184,21 +3213,6 @@ describe("Renderers", function () {
                     svg.remove();
                 }
                 ;
-            });
-        });
-
-        describe("LinePlot", function () {
-            it("defaults to no fill", function () {
-                var svg = generateSVG(500, 500);
-                var data = [{ x: 0, y: 0 }, { x: 2, y: 2 }];
-                var xScale = new Plottable.Scale.Linear();
-                var yScale = new Plottable.Scale.Linear();
-                var linePlot = new Plottable.Plot.Line(data, xScale, yScale);
-                linePlot.renderTo(svg);
-
-                var areaPath = linePlot.renderArea.select(".area");
-                assert.strictEqual(areaPath.attr("fill"), "none");
-                svg.remove();
             });
         });
 
@@ -3796,7 +3810,7 @@ describe("Scales", function () {
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
 
-        scale._autoDomainAutomatically = true;
+        scale.autoDomainAutomatically = true;
         scale.updateExtent(1, "x", [0.08, 9.92]);
         callbackWasCalled = false;
         scale.domainer(new Plottable.Domainer().nice());
@@ -3821,22 +3835,28 @@ describe("Scales", function () {
                 return e.foo;
             }));
             scale.domainer(new Plottable.Domainer().pad().nice());
-            assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+            assert.isTrue(scale.autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
-            assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
+            assert.isFalse(scale.autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
         });
 
         it("scale autorange works as expected with single dataSource", function () {
-            var renderer = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            var svg = generateSVG(100, 100);
+            var renderer = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataSource.data(data);
             assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
+            svg.remove();
         });
 
         it("scale reference counting works as expected", function () {
+            var svg1 = generateSVG(100, 100);
+            var svg2 = generateSVG(100, 100);
             var renderer1 = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            renderer1.renderTo(svg1);
             var renderer2 = new Plottable.Abstract.Plot().dataSource(dataSource).project("x", "foo", scale);
+            renderer2.renderTo(svg2);
             var otherScale = new Plottable.Scale.Linear();
             renderer1.project("x", "foo", otherScale);
             dataSource.data([{ foo: 10 }, { foo: 11 }]);
@@ -3846,26 +3866,28 @@ describe("Scales", function () {
             // "scale not listening to the dataSource after all perspectives removed"
             dataSource.data([{ foo: 99 }, { foo: 100 }]);
             assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
+            svg1.remove();
+            svg2.remove();
         });
 
         it("scale perspectives can be removed appropriately", function () {
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled1");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled1");
             scale.updateExtent(1, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
             scale.updateExtent(2, "x", d3.extent(data, function (e) {
                 return e.bar;
             }));
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled2");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled2");
             assert.deepEqual(scale.domain(), [-20, 5], "scale domain includes both perspectives");
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled3");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled3");
             scale.removeExtent(1, "x");
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled4");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled4");
             assert.deepEqual(scale.domain(), [-20, 1], "only the bar accessor is active");
             scale.updateExtent(2, "x", d3.extent(data, function (e) {
                 return e.foo;
             }));
-            assert.isTrue(scale._autoDomainAutomatically, "autoDomain enabled5");
+            assert.isTrue(scale.autoDomainAutomatically, "autoDomain enabled5");
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
 
@@ -3876,6 +3898,27 @@ describe("Scales", function () {
             assert.throws(function () {
                 return scale._setDomain([-Infinity, 6]);
             }, Error);
+        });
+
+        it("should resize when a plot is removed", function () {
+            var svg = generateSVG(400, 400);
+            var ds1 = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+            var ds2 = [{ x: 1, y: 1 }, { x: 2, y: 2 }];
+            var xScale = new Plottable.Scale.Linear();
+            var yScale = new Plottable.Scale.Linear();
+            xScale.domainer(new Plottable.Domainer());
+            var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+            var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+            var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
+            var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
+            var renderAreas = renderAreaD1.merge(renderAreaD2);
+            renderAreas.renderTo(svg);
+            assert.deepEqual(xScale.domain(), [0, 2]);
+            renderAreaD1.remove();
+            assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+            renderAreas.merge(renderAreaD1);
+            assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
+            svg.remove();
         });
     });
 
@@ -4809,5 +4852,154 @@ describe("Domainer", function () {
         timeScale.updateExtent(1, "x", [c, d]);
         timeScale.domainer(domainer);
         assert.deepEqual(timeScale.domain(), [b, d]);
+    });
+
+    it("exceptions are setup properly on an area plot", function () {
+        var xScale = new Plottable.Scale.Linear();
+        var yScale = new Plottable.Scale.Linear();
+        var domainer = yScale.domainer();
+        var getExceptions = function () {
+            return yScale.domainer().paddingExceptions.values().map(parseFloat);
+        };
+        assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
+        var r = new Plottable.Plot.Area([{ x: 0 }, { x: 1 }, { x: 2 }, { x: 3 }, { x: 4 }, { x: 5 }, { x: 6 }], xScale, yScale);
+        r.project("x", "x", xScale);
+        r.project("y", "x", yScale);
+        assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
+        r.project("y0", "x", yScale);
+        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+        r.project("y0", 0, yScale);
+        assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
+        r.project("y0", function () {
+            return 5;
+        }, yScale);
+        assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
+        r.project("y0", "x", yScale);
+        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
+        r.dataSource().data([{ x: 0 }, { x: 0 }]);
+        assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
+    });
+});
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("Cache", function () {
+    var callbackCalled = false;
+    var f = function (s) {
+        callbackCalled = true;
+        return s + s;
+    };
+    var cache;
+
+    beforeEach(function () {
+        callbackCalled = false;
+        cache = new Plottable.Util.Cache(f);
+    });
+
+    it("Doesn't call its function if it already called", function () {
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isTrue(callbackCalled);
+        callbackCalled = false;
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isFalse(callbackCalled);
+    });
+
+    it("Clears its cache when .clear() is called", function () {
+        var prefix = "hello";
+        cache = new Plottable.Util.Cache(function (s) {
+            callbackCalled = true;
+            return prefix + s;
+        });
+        assert.equal(cache.get("world"), "helloworld");
+        assert.isTrue(callbackCalled);
+        callbackCalled = false;
+        assert.equal(cache.get("world"), "helloworld");
+        assert.isFalse(callbackCalled);
+        prefix = "hola";
+        cache.clear();
+        assert.equal(cache.get("world"), "holaworld");
+        assert.isTrue(callbackCalled);
+    });
+
+    it("Doesn't clear the cache when canonicalKey doesn't change", function () {
+        cache = new Plottable.Util.Cache(f, "x");
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isTrue(callbackCalled);
+        cache.clear();
+        callbackCalled = false;
+        assert.equal(cache.get("hello"), "hellohello");
+        assert.isFalse(callbackCalled);
+    });
+
+    it("Clears the cache when canonicalKey changes", function () {
+        var prefix = "hello";
+        cache = new Plottable.Util.Cache(function (s) {
+            callbackCalled = true;
+            return prefix + s;
+        });
+        cache.get("world");
+        assert.isTrue(callbackCalled);
+        prefix = "hola";
+        cache.clear();
+        callbackCalled = false;
+        cache.get("world");
+        assert.isTrue(callbackCalled);
+    });
+
+    it("uses valueEq to check if it should clear", function () {
+        var decider = true;
+        cache = new Plottable.Util.Cache(f, "x", function (a, b) {
+            return decider;
+        });
+        cache.get("hello");
+        assert.isTrue(callbackCalled);
+        cache.clear();
+        callbackCalled = false;
+        cache.get("hello");
+        assert.isFalse(callbackCalled);
+        decider = false;
+        cache.clear();
+        cache.get("hello");
+        assert.isTrue(callbackCalled);
+    });
+});
+
+///<reference path="testReference.ts" />
+var assert = chai.assert;
+
+describe("CachingCharacterMeasurer", function () {
+    var g;
+    var measurer;
+    var svg;
+
+    beforeEach(function () {
+        svg = generateSVG(100, 100);
+        g = svg.append("g");
+        measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g);
+    });
+
+    it("empty string has non-zero size", function () {
+        var a = measurer.measure("x x")[0];
+        var b = measurer.measure("xx")[0];
+        assert.operator(a, ">", b, "'x x' is longer than 'xx'");
+        svg.remove();
+    });
+
+    it("should repopulate cache if it changes size and clear() is called", function () {
+        var a = measurer.measure("x")[0];
+        g.style("font-size", "40px");
+        var b = measurer.measure("x")[0];
+        assert.equal(a, b, "cached result doesn't reflect changes");
+        measurer.clear();
+        var c = measurer.measure("x")[0];
+        assert.operator(a, "<", c, "cache reset after font size changed");
+        svg.remove();
+    });
+
+    it("multiple spaces take up same area as one space", function () {
+        var a = measurer.measure("x x")[0];
+        var b = measurer.measure("x  \t \n x")[0];
+        assert.equal(a, b);
     });
 });

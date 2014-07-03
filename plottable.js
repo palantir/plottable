@@ -1,5 +1,5 @@
 /*!
-Plottable 0.18.2 (https://github.com/palantir/plottable)
+Plottable 0.19.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -114,6 +114,26 @@ var Plottable;
                 return Array.prototype.concat.apply([], a);
             }
             Methods.flatten = flatten;
+
+            /**
+            * Check if two arrays are equal by strict equality.
+            */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -315,6 +335,71 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (Util) {
+        var Cache = (function () {
+            /**
+            * @constructor
+            *
+            * @param {string} compute The function whose results will be cached.
+            * @param {string} [canonicalKey] If present, when clear() is called,
+            *        this key will be re-computed. If its result hasn't been changed,
+            *        the cache will not be cleared.
+            * @param {(v: T, w: T) => boolean} [valueEq]
+            *        Used to determine if the value of canonicalKey has changed.
+            *        If omitted, defaults to === comparision.
+            */
+            function Cache(compute, canonicalKey, valueEq) {
+                if (typeof valueEq === "undefined") { valueEq = function (v, w) {
+                    return v === w;
+                }; }
+                this.cache = d3.map();
+                this.canonicalKey = null;
+                this.compute = compute;
+                this.canonicalKey = canonicalKey;
+                this.valueEq = valueEq;
+                if (canonicalKey !== undefined) {
+                    this.cache.set(this.canonicalKey, this.compute(this.canonicalKey));
+                }
+            }
+            /**
+            * Attempt to look up k in the cache, computing the result if it isn't
+            * found.
+            *
+            * @param {string} k The key to look up in the cache.
+            * @return {T} The value associated with k; the result of compute(k).
+            */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+
+            /**
+            * Reset the cache empty.
+            *
+            * If canonicalKey was provided at construction, compute(canonicalKey)
+            * will be re-run. If the result matches what is already in the cache,
+            * it will not clear the cache.
+            *
+            * @return {Cache<T>} The calling Cache.
+            */
+            Cache.prototype.clear = function () {
+                if (this.canonicalKey === undefined || !this.valueEq(this.cache.get(this.canonicalKey), this.compute(this.canonicalKey))) {
+                    this.cache = d3.map();
+                }
+                return this;
+            };
+            return Cache;
+        })();
+        Util.Cache = Cache;
+    })(Plottable.Util || (Plottable.Util = {}));
+    var Util = Plottable.Util;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    (function (Util) {
         (function (Text) {
             ;
 
@@ -328,9 +413,6 @@ var Plottable;
                 return function (s) {
                     if (s.trim() === "") {
                         return [0, 0];
-                    }
-                    if (Util.DOM.isSelectionRemovedFromSVG(selection)) {
-                        throw new Error("Cannot measure text in a removed node");
                     }
                     var bb;
                     if (selection.node().nodeName === "text") {
@@ -348,6 +430,89 @@ var Plottable;
                 };
             }
             Text.getTextMeasure = getTextMeasure;
+
+            /**
+            * @return {TextMeasurer} A test measurer that will treat all sequences
+            *         of consecutive whitespace as a single " ".
+            */
+            function combineWhitespace(tm) {
+                return function (s) {
+                    return tm(s.replace(/\s+/g, " "));
+                };
+            }
+
+            /**
+            * Returns a text measure that measures each individual character of the
+            * string with tm, then combines all the individual measurements.
+            */
+            function measureByCharacter(tm) {
+                return function (s) {
+                    var whs = s.trim().split("").map(tm);
+                    return [d3.sum(whs, function (wh) {
+                            return wh[0];
+                        }), d3.max(whs, function (wh) {
+                            return wh[1];
+                        })];
+                };
+            }
+
+            var CANONICAL_CHR = "a";
+
+            /**
+            * Some TextMeasurers get confused when measuring something that's only
+            * whitespace: only whitespace in a dom node takes up [0, 0] space.
+            *
+            * @return {TextMeasurer} A function that if its argument is all
+            *         whitespace, it will wrap its argument in CANONICAL_CHR before
+            *         measuring in order to get a non-zero size of the whitespace.
+            */
+            function wrapWhitespace(tm) {
+                return function (s) {
+                    if (/^\s*$/.test(s)) {
+                        var whs = s.split("").map(function (c) {
+                            var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
+                            var whWrapping = tm(CANONICAL_CHR);
+                            return [wh[0] - 2 * whWrapping[0], wh[1]];
+                        });
+                        return [d3.sum(whs, function (x) {
+                                return x[0];
+                            }), d3.max(whs, function (x) {
+                                return x[1];
+                            })];
+                    } else {
+                        return tm(s);
+                    }
+                };
+            }
+
+            /**
+            * This class will measure text by measuring each character individually,
+            * then adding up the dimensions. It will also cache the dimensions of each
+            * letter.
+            */
+            var CachingCharacterMeasurer = (function () {
+                /**
+                * @param {D3.Selection} g The element that will have text inserted into
+                *        it in order to measure text. The styles present for text in
+                *        this element will to the text being measured.
+                */
+                function CachingCharacterMeasurer(g) {
+                    var _this = this;
+                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.arrayEq);
+                    this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) {
+                        return _this.cache.get(s);
+                    })));
+                }
+                /**
+                * Clear the cache, if it seems that the text has changed size.
+                */
+                CachingCharacterMeasurer.prototype.clear = function () {
+                    this.cache.clear();
+                    return this;
+                };
+                return CachingCharacterMeasurer;
+            })();
+            Text.CachingCharacterMeasurer = CachingCharacterMeasurer;
 
             /**
             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
@@ -515,29 +680,42 @@ var Plottable;
             ;
 
             /**
-            * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
-            * Contains the text within a rectangle with dimensions width, height. Tries to
-            * orient the text using xOrient and yOrient parameters.
-            * Will align the text vertically if it seems like that is appropriate.
+            * @param {write} [IWriteOptions] If supplied, the text will be written
+            *        To the given g. Will align the text vertically if it seems like
+            *        that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text, g, width, height, xAlign, yAlign, horizontally) {
+            function writeText(text, width, height, tm, horizontally, write) {
                 var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
-                var innerG = g.append("g").classed("writeText-inner-g", true);
-
-                // the outerG contains general transforms for positining the whole block, the inner g
-                // will contain transforms specific to orienting the text properly within the block.
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
-                var measureText = getTextMeasure(innerG);
-                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, measureText);
+                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
-                var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-                var wh = wTF(wrappedText.lines, innerG, width, height, xAlign, yAlign);
+                var usedWidth, usedHeight;
+                if (write == null) {
+                    var widthFn = orientHorizontally ? d3.max : d3.sum;
+                    var heightFn = orientHorizontally ? d3.sum : d3.max;
+                    usedWidth = widthFn(wrappedText.lines, function (line) {
+                        return tm(line)[0];
+                    });
+                    usedHeight = heightFn(wrappedText.lines, function (line) {
+                        return tm(line)[1];
+                    });
+                } else {
+                    var innerG = write.g.append("g").classed("writeText-inner-g", true);
+
+                    // the outerG contains general transforms for positining the whole block, the inner g
+                    // will contain transforms specific to orienting the text properly within the block.
+                    var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+                    var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+                    usedWidth = wh[0];
+                    usedHeight = wh[1];
+                }
+
                 return {
                     textFits: wrappedText.textFits,
-                    usedWidth: wh[0],
-                    usedHeight: wh[1]
+                    usedWidth: usedWidth,
+                    usedHeight: usedHeight
                 };
             }
             Text.writeText = writeText;
@@ -864,10 +1042,7 @@ var Plottable;
         var Formatter = (function () {
             function Formatter(precision) {
                 this._onlyShowUnchanged = true;
-                if (precision < 0 || precision > 20) {
-                    throw new RangeError("Formatter precision must be between 0 and 20");
-                }
-                this._precision = precision;
+                this.precision(precision);
             }
             /**
             * Format an input value.
@@ -890,6 +1065,9 @@ var Plottable;
             Formatter.prototype.precision = function (value) {
                 if (value === undefined) {
                     return this._precision;
+                }
+                if (value < 0 || value > 20) {
+                    throw new RangeError("Formatter precision must be between 0 and 20");
                 }
                 this._precision = value;
                 return this;
@@ -1115,6 +1293,41 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Formatter) {
+        var SISuffix = (function (_super) {
+            __extends(SISuffix, _super);
+            /**
+            * Creates a formatter for values that displays [precision] significant figures.
+            *
+            * @constructor
+            * @param {number} [precision] The number of significant figures to display.
+            */
+            function SISuffix(precision) {
+                if (typeof precision === "undefined") { precision = 3; }
+                _super.call(this, precision);
+                this.showOnlyUnchangedValues(false);
+            }
+            SISuffix.prototype.precision = function (value) {
+                var returnValue = _super.prototype.precision.call(this, value);
+                this._formatFunction = d3.format("." + this._precision + "s");
+                return returnValue;
+            };
+            return SISuffix;
+        })(Plottable.Abstract.Formatter);
+        Formatter.SISuffix = SISuffix;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
         var Custom = (function (_super) {
             __extends(Custom, _super);
             function Custom(precision, customFormatFunction) {
@@ -1127,6 +1340,97 @@ var Plottable;
             return Custom;
         })(Plottable.Abstract.Formatter);
         Formatter.Custom = Custom;
+    })(Plottable.Formatter || (Plottable.Formatter = {}));
+    var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Formatter) {
+        var Time = (function (_super) {
+            __extends(Time, _super);
+            /**
+            * Creates a formatter that displays dates
+            *
+            * @constructor
+            */
+            function Time() {
+                _super.call(this, null);
+
+                var numFormats = 8;
+
+                // these defaults were taken from d3
+                // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
+                var timeFormat = {};
+
+                timeFormat[0] = {
+                    format: ".%L",
+                    filter: function (d) {
+                        return d.getMilliseconds() !== 0;
+                    }
+                };
+                timeFormat[1] = {
+                    format: ":%S",
+                    filter: function (d) {
+                        return d.getSeconds() !== 0;
+                    }
+                };
+                timeFormat[2] = {
+                    format: "%I:%M",
+                    filter: function (d) {
+                        return d.getMinutes() !== 0;
+                    }
+                };
+                timeFormat[3] = {
+                    format: "%I %p",
+                    filter: function (d) {
+                        return d.getHours() !== 0;
+                    }
+                };
+                timeFormat[4] = {
+                    format: "%a %d",
+                    filter: function (d) {
+                        return d.getDay() !== 0 && d.getDate() !== 1;
+                    }
+                };
+                timeFormat[5] = {
+                    format: "%b %d",
+                    filter: function (d) {
+                        return d.getDate() !== 1;
+                    }
+                };
+                timeFormat[6] = {
+                    format: "%b",
+                    filter: function (d) {
+                        return d.getMonth() !== 0;
+                    }
+                };
+                timeFormat[7] = {
+                    format: "%Y",
+                    filter: function () {
+                        return true;
+                    }
+                };
+
+                this._formatFunction = function (d) {
+                    for (var i = 0; i < numFormats; i++) {
+                        if (timeFormat[i].filter(d)) {
+                            return d3.time.format(timeFormat[i].format)(d);
+                        }
+                    }
+                };
+                this.showOnlyUnchangedValues(false);
+            }
+            return Time;
+        })(Plottable.Abstract.Formatter);
+        Formatter.Time = Time;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
 })(Plottable || (Plottable = {}));
@@ -2371,7 +2675,7 @@ var Plottable;
             */
             function Scale(scale) {
                 _super.call(this);
-                this._autoDomainAutomatically = true;
+                this.autoDomainAutomatically = true;
                 this.broadcaster = new Plottable.Core.Broadcaster(this);
                 this._rendererAttrID2Extent = {};
                 this._d3Scale = scale;
@@ -2392,8 +2696,15 @@ var Plottable;
             * represents a view in to the data.
             */
             Scale.prototype.autoDomain = function () {
+                this.autoDomainAutomatically = true;
                 this._setDomain(this._getExtent());
                 return this;
+            };
+
+            Scale.prototype._autoDomainIfAutomaticMode = function () {
+                if (this.autoDomainAutomatically) {
+                    this.autoDomain();
+                }
             };
 
             /**
@@ -2410,7 +2721,7 @@ var Plottable;
                 if (values == null) {
                     return this._d3Scale.domain();
                 } else {
-                    this._autoDomainAutomatically = false;
+                    this.autoDomainAutomatically = false;
                     this._setDomain(values);
                     return this;
                 }
@@ -2454,17 +2765,13 @@ var Plottable;
             */
             Scale.prototype.updateExtent = function (rendererID, attr, extent) {
                 this._rendererAttrID2Extent[rendererID + attr] = extent;
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
+                this._autoDomainIfAutomaticMode();
                 return this;
             };
 
             Scale.prototype.removeExtent = function (rendererID, attr) {
                 delete this._rendererAttrID2Extent[rendererID + attr];
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
+                this._autoDomainIfAutomaticMode();
                 return this;
             };
             return Scale;
@@ -2511,6 +2818,7 @@ var Plottable;
             Plot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
                 this._dataChanged = true;
+                this.updateAllProjectors();
                 return this;
             };
 
@@ -2525,14 +2833,16 @@ var Plottable;
                 }
                 this._dataSource = source;
                 this._dataSource.broadcaster.registerListener(this, function () {
-                    _this.updateAllProjectors();
-                    _this._dataChanged = true;
-                    _this._render();
+                    return _this._onDataSourceUpdate();
                 });
+                this._onDataSourceUpdate();
+                return this;
+            };
+
+            Plot.prototype._onDataSourceUpdate = function () {
                 this.updateAllProjectors();
                 this._dataChanged = true;
                 this._render();
-                return this;
             };
 
             Plot.prototype.project = function (attrToSet, accessor, scale) {
@@ -2601,6 +2911,14 @@ var Plottable;
                 return this;
             };
 
+            Plot.prototype.remove = function () {
+                _super.prototype.remove.call(this);
+
+                // make the domain resize
+                this.updateAllProjectors();
+                return this;
+            };
+
             /**
             * This function makes sure that all of the scales in this._projectors
             * have an extent that includes all the data that is projected onto them.
@@ -2617,7 +2935,7 @@ var Plottable;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     var extent = this.dataSource()._getExtent(projector.accessor);
-                    if (extent.length === 0) {
+                    if (extent.length === 0 || !this._isAnchored) {
                         projector.scale.removeExtent(this._plottableID, attr);
                     } else {
                         projector.scale.updateExtent(this._plottableID, attr, extent);
@@ -3172,9 +3490,7 @@ var Plottable;
                 } else {
                     this._domainer = domainer;
                     this._userSetDomainer = true;
-                    if (this._autoDomainAutomatically) {
-                        this.autoDomain();
-                    }
+                    this._autoDomainIfAutomaticMode();
                     return this;
                 }
             };
@@ -3343,6 +3659,15 @@ var Plottable;
                     return this;
                 }
             };
+
+            /**
+            * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+            *
+            * @returns {Ordinal} A copy of the calling Scale.
+            */
+            Ordinal.prototype.copy = function () {
+                return new Ordinal(this._d3Scale.copy());
+            };
             return Ordinal;
         })(Plottable.Abstract.Scale);
         Scale.Ordinal = Ordinal;
@@ -3365,9 +3690,6 @@ var Plottable;
             function CompositeOrdinal() {
                 _super.call(this);
                 this._subScales = [];
-
-                // (bdwyer) - this may not be necessary depending on how the new domainers work
-                this._autoDomainAutomatically = false;
             }
             CompositeOrdinal.prototype.addSubscale = function (scale) {
                 this._subScales.push(scale);
@@ -3583,13 +3905,9 @@ var Plottable;
     (function (Scale) {
         var Time = (function (_super) {
             __extends(Time, _super);
-            /**
-            * Creates a new TimeScale.
-            *
-            * @constructor
-            */
-            function Time() {
-                _super.call(this, d3.time.scale());
+            function Time(scale) {
+                // need to cast since d3 time scales do not descend from quantitive scales
+                _super.call(this, (scale == null ? d3.time.scale() : scale));
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }
             Time.prototype._setDomain = function (values) {
@@ -3718,9 +4036,7 @@ var Plottable;
 
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = InterpolatedColor.getD3InterpolatedScale(this._colorRange, this._scaleType);
-                if (this._autoDomainAutomatically) {
-                    this.autoDomain();
-                }
+                this._autoDomainIfAutomaticMode();
                 this.broadcaster.broadcast();
             };
 
@@ -4364,6 +4680,7 @@ var Plottable;
                 this._height = "auto";
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
+                this._showEndTickLabels = false;
                 this._scale = scale;
                 this.orient(orientation);
 
@@ -4430,6 +4747,16 @@ var Plottable;
                 };
             };
 
+            Axis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                if (this._isHorizontal()) {
+                    this._scale.range([0, this.availableWidth]);
+                } else {
+                    this._scale.range([this.availableHeight, 0]);
+                }
+                return this;
+            };
+
             Axis.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tickMarkContainer = this.content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
@@ -4452,7 +4779,6 @@ var Plottable;
                 tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
                 tickMarks.attr(this._generateTickMarkAttrHash());
                 tickMarks.exit().remove();
-
                 this._baseline.attr(this._generateBaselineAttrHash());
 
                 return this;
@@ -4626,6 +4952,68 @@ var Plottable;
                     this._invalidateLayout();
                     return this;
                 }
+            };
+
+            Axis.prototype.showEndTickLabels = function (show) {
+                if (show == null) {
+                    return this._showEndTickLabels;
+                }
+                this._showEndTickLabels = show;
+                this._render();
+                return this;
+            };
+
+            Axis.prototype._hideEndTickLabels = function () {
+                var _this = this;
+                var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+                var isInsideBBox = function (tickBox) {
+                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
+                };
+
+                var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
+                var firstTickLabel = tickLabels[0][0];
+                if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+                    d3.select(firstTickLabel).style("visibility", "hidden");
+                }
+                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
+                if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+                    d3.select(lastTickLabel).style("visibility", "hidden");
+                }
+            };
+
+            Axis.prototype._hideOverlappingTickLabels = function () {
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                var lastLabelClientRect;
+
+                function boxesOverlap(boxA, boxB) {
+                    if (boxA.right < boxB.left) {
+                        return false;
+                    }
+                    if (boxA.left > boxB.right) {
+                        return false;
+                    }
+                    if (boxA.bottom < boxB.top) {
+                        return false;
+                    }
+                    if (boxA.top > boxB.bottom) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                visibleTickLabels.each(function (d) {
+                    var clientRect = this.getBoundingClientRect();
+                    var tickLabel = d3.select(this);
+                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+                        tickLabel.style("visibility", "hidden");
+                    } else {
+                        lastLabelClientRect = clientRect;
+                        tickLabel.style("visibility", "visible");
+                    }
+                });
             };
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
@@ -4801,10 +5189,11 @@ var Plottable;
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
 
-                this.hideEndTickLabels();
+                if (!this.showEndTickLabels()) {
+                    this._hideEndTickLabels();
+                }
 
-                this.hideOverlappingTickLabels();
-
+                this._hideOverlappingTickLabels();
                 return this;
             };
 
@@ -4826,59 +5215,6 @@ var Plottable;
                     this._invalidateLayout();
                     return this;
                 }
-            };
-
-            Numeric.prototype.hideEndTickLabels = function () {
-                var _this = this;
-                var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-                var isInsideBBox = function (tickBox) {
-                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
-                };
-
-                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
-                var firstTickLabel = tickLabels[0][0];
-                if (!this.showFirstTickLabel && !isInsideBBox(firstTickLabel.getBoundingClientRect())) {
-                    d3.select(firstTickLabel).style("visibility", "hidden");
-                }
-                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!this.showLastTickLabel && !isInsideBBox(lastTickLabel.getBoundingClientRect())) {
-                    d3.select(lastTickLabel).style("visibility", "hidden");
-                }
-            };
-
-            Numeric.prototype.hideOverlappingTickLabels = function () {
-                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
-                    return d3.select(this).style("visibility") === "visible";
-                });
-                var lastLabelClientRect;
-
-                function boxesOverlap(boxA, boxB) {
-                    if (boxA.right < boxB.left) {
-                        return false;
-                    }
-                    if (boxA.left > boxB.right) {
-                        return false;
-                    }
-                    if (boxA.bottom < boxB.top) {
-                        return false;
-                    }
-                    if (boxA.top > boxB.bottom) {
-                        return false;
-                    }
-                    return true;
-                }
-
-                visibleTickLabels.each(function (d) {
-                    var clientRect = this.getBoundingClientRect();
-                    var tickLabel = d3.select(this);
-                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
-                        tickLabel.style("visibility", "hidden");
-                    } else {
-                        lastLabelClientRect = clientRect;
-                        tickLabel.style("visibility", "visible");
-                    }
-                });
             };
 
             Numeric.prototype.showEndTickLabel = function (orientation, show) {
@@ -4944,6 +5280,7 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
+                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelsG);
                 return this;
             };
 
@@ -4967,16 +5304,14 @@ var Plottable;
                         wantsHeight: false
                     };
                 }
+
+                var fakeScale = this._scale.copy();
                 if (this._isHorizontal()) {
-                    this._scale.range([0, offeredWidth]);
+                    fakeScale.range([0, offeredWidth]);
                 } else {
-                    this._scale.range([offeredHeight, 0]);
+                    fakeScale.range([offeredHeight, 0]);
                 }
-                var testG = this._tickLabelsG.append("g");
-                var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
-                fakeTicks.enter().append("g").classed("tick", true);
-                var textResult = this.writeTextToTicks(offeredWidth, offeredHeight, fakeTicks);
-                testG.remove();
+                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
 
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
@@ -4990,19 +5325,38 @@ var Plottable;
                 return this._scale.domain();
             };
 
-            Category.prototype.writeTextToTicks = function (axisWidth, axisHeight, ticks) {
+            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
+                var draw = dataOrTicks instanceof d3.selection;
                 var self = this;
                 var textWriteResults = [];
-                ticks.each(function (d, i) {
-                    var d3this = d3.select(this);
-                    var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
+                var tm = function (s) {
+                    return self.measurer.measure(s);
+                };
+                var iterator = draw ? function (f) {
+                    return dataOrTicks.each(f);
+                } : function (f) {
+                    return dataOrTicks.forEach(f);
+                };
+
+                iterator(function (d) {
+                    var bandWidth = scale.fullBandStartAndWidth(d)[1];
                     var width = self._isHorizontal() ? bandWidth : axisWidth - self.tickLength() - self.tickLabelPadding();
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-                    var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
-                    var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                    var textWriteResult;
+                    if (draw) {
+                        var d3this = d3.select(this);
+                        var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
+                        var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
+                        textWriteResult = Plottable.Util.Text.writeText(d[d.length - 1], width, height, tm, true, {
+                            g: d3this,
+                            xAlign: xAlign[self._orientation],
+                            yAlign: yAlign[self._orientation]
+                        });
+                    } else {
+                        textWriteResult = Plottable.Util.Text.writeText(d[d.length - 1], width, height, tm, true);
+                    }
 
-                    var textWriteResult = Plottable.Util.Text.writeText(d, d3this, width, height, xAlign[self._orientation], yAlign[self._orientation], true);
                     textWriteResults.push(textWriteResult);
                 });
 
@@ -5041,7 +5395,7 @@ var Plottable;
 
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
+                this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
@@ -5049,6 +5403,14 @@ var Plottable;
                 Plottable.Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
                 Plottable.Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
                 return this;
+            };
+
+            Category.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
+                // When anyone calls _invalidateLayout, _computeLayout will be called
+                // on everyone, including this. Since CSS or something might have
+                // affected the size of the characters, clear the cache.
+                this.measurer.clear();
+                return _super.prototype._computeLayout.call(this, xOrigin, yOrigin, availableWidth, availableHeight);
             };
             return Category;
         })(Plottable.Abstract.Axis);
@@ -6012,9 +6374,7 @@ var Plottable;
                     var qscale = scale;
                     if (!qscale._userSetDomainer && this._baselineValue != null) {
                         qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
-                        if (qscale._autoDomainAutomatically) {
-                            qscale.autoDomain();
-                        }
+                        qscale._autoDomainIfAutomaticMode();
                     }
                 }
                 return this;
@@ -6170,68 +6530,59 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
-        var Area = (function (_super) {
-            __extends(Area, _super);
+        var Line = (function (_super) {
+            __extends(Line, _super);
             /**
-            * Creates an AreaPlot.
+            * Creates a LinePlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
             * @param {Scale} xScale The x scale to use.
             * @param {Scale} yScale The y scale to use.
             */
-            function Area(dataset, xScale, yScale) {
+            function Line(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this._animators = {
-                    "area-reset": new Plottable.Animator.Null(),
-                    "area": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
+                    "line-reset": new Plottable.Animator.Null(),
+                    "line": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
                 };
-                this.classed("area-renderer", true);
-                this.project("y0", 0, yScale); // default
-                this.project("fill", function () {
-                    return "steelblue";
-                }); // default
+                this.classed("line-renderer", true);
                 this.project("stroke", function () {
+                    return "steelblue";
+                });
+                this.project("fill", function () {
                     return "none";
-                }); // default
+                });
             }
-            Area.prototype._setup = function () {
+            Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.areaPath = this.renderArea.append("path").classed("area", true);
                 this.linePath = this.renderArea.append("path").classed("line", true);
                 return this;
             };
 
-            Area.prototype._paint = function () {
+            Line.prototype._paint = function () {
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
                 var xFunction = attrToProjector["x"];
-                var y0Function = attrToProjector["y0"];
                 var yFunction = attrToProjector["y"];
                 delete attrToProjector["x"];
-                delete attrToProjector["y0"];
                 delete attrToProjector["y"];
 
-                this.areaPath.datum(this._dataSource.data());
                 this.linePath.datum(this._dataSource.data());
 
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
-                    this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
-
-                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(y0Function);
-                    this._applyAnimatedAttributes(this.linePath, "area-reset", attrToProjector);
+                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(function () {
+                        return 0;
+                    });
+                    this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
                 }
 
-                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
-                this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
-
                 attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
-                this._applyAnimatedAttributes(this.linePath, "area", attrToProjector);
+                this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
             };
-            return Area;
+            return Line;
         })(Plottable.Abstract.XYPlot);
-        Plot.Area = Area;
+        Plot.Line = Line;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
@@ -6246,29 +6597,102 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
-        var Line = (function (_super) {
-            __extends(Line, _super);
+        var Area = (function (_super) {
+            __extends(Area, _super);
             /**
-            * Creates a LinePlot.
+            * Creates an AreaPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
             * @param {Scale} xScale The x scale to use.
             * @param {Scale} yScale The y scale to use.
             */
-            function Line(dataset, xScale, yScale) {
+            function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this.classed("line-renderer", true);
-                this.project("stroke", function () {
-                    return "steelblue";
-                });
+                this.constantBaseline = null;
+                this.previousBaseline = null;
+                this.classed("area-renderer", true);
+                this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
+                    return "steelblue";
+                }); // default
+                this.project("stroke", function () {
                     return "none";
-                });
+                }); // default
+                this._animators["area-reset"] = new Plottable.Animator.Null();
+                this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
-            return Line;
-        })(Plot.Area);
-        Plot.Line = Line;
+            Area.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this.areaPath = this.renderArea.append("path").classed("area", true);
+                return this;
+            };
+
+            Area.prototype._onDataSourceUpdate = function () {
+                _super.prototype._onDataSourceUpdate.call(this);
+                if (this.yScale != null) {
+                    this._updateYDomainer();
+                }
+            };
+
+            Area.prototype._updateYDomainer = function () {
+                _super.prototype._updateYDomainer.call(this);
+                var scale = this.yScale;
+
+                var y0Projector = this._projectors["y0"];
+                var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
+                var extent = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
+                if (extent.length === 2 && extent[0] === extent[1]) {
+                    this.constantBaseline = extent[0];
+                } else {
+                    this.constantBaseline = null;
+                }
+
+                if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
+                    if (this.previousBaseline != null) {
+                        scale.domainer().paddingException(this.previousBaseline, false);
+                        this.previousBaseline = null;
+                    }
+                    if (this.constantBaseline != null) {
+                        scale.domainer().paddingException(this.constantBaseline, true);
+                        this.previousBaseline = this.constantBaseline;
+                    }
+                    scale._autoDomainIfAutomaticMode();
+                }
+                return this;
+            };
+
+            Area.prototype.project = function (attrToSet, accessor, scale) {
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                if (attrToSet === "y0") {
+                    this._updateYDomainer();
+                }
+                return this;
+            };
+
+            Area.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+                var attrToProjector = this._generateAttrToProjector();
+                var xFunction = attrToProjector["x"];
+                var y0Function = attrToProjector["y0"];
+                var yFunction = attrToProjector["y"];
+                delete attrToProjector["x"];
+                delete attrToProjector["y0"];
+                delete attrToProjector["y"];
+
+                this.areaPath.datum(this._dataSource.data());
+
+                if (this._dataChanged) {
+                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
+                    this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
+                }
+
+                attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
+                this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
+            };
+            return Area;
+        })(Plot.Line);
+        Plot.Area = Area;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
