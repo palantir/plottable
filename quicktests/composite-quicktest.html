@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <title>Composite Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <style>
+    </style>
+
+    <script>
+    var domainList = [
+    ["J", "K"],
+    ["G", "M", "Q", "S"],
+    ["H", "E", "F"],
+    ["A", "B", "C"]
+    ];
+
+    var data = [], domain = [];
+    var index = 0;
+    function makeTieredData(level, curelem) {
+      if (level == domainList.length) {
+        var add = {};
+        for (var i = 0; i < level; i++) {
+          add["key" + (i + 1)] = curelem[i];
+        }
+        index = index + 1;
+        add["y"] = index;
+        data.push(add);
+        return;
+      }
+      for (var i = 0; i < domainList[level].length; i++) {
+        curelem[level] = domainList[level][i];
+        makeTieredData(level + 1, curelem);
+      }
+    }
+
+    var order;
+    var xScale;
+    window.onload = function() {
+      makeTieredData(0, []);
+      var ds = new Plottable.DataSource(data);
+
+      xScale = new Plottable.Scale.CompositeOrdinal().rangeType("bands", .05, .1);
+      xScale.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
+      xScale.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
+      xScale.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
+      var xAxis = new Plottable.Axis.Composite(xScale, "bottom");
+
+      order = ["key1", "key2", "key3", "key4"];
+      xScale.updateDomains(data, order);
+      var yScale = new Plottable.Scale.Linear();
+      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+
+      var plot = new Plottable.Plot.VerticalBar(ds, xScale, yScale);
+      plot.project("x", function(d) {
+        var x = [];
+        for (var i = 0; i < order.length; i++) {
+          x.push(d[order[i]]);
+        }
+        console.log(x);
+        return x;
+      }, xScale);
+
+      var chart = new Plottable.Component.Table([
+                                  [yAxis, plot],
+                                  [null,  xAxis]
+                                ]);
+        chart.renderTo("#chart");
+    }
+
+    function oneFront() {
+      order.splice(order.indexOf("key1"), 1);
+      order.push("key1");
+      xScale.updateDomains(data, order);
+    }
+
+    function twoFront() {
+      order.splice(order.indexOf("key2"), 1);
+      order.push("key2");
+      xScale.updateDomains(data, order);
+    }
+
+    function threeFront() {
+      order.splice(order.indexOf("key3"), 1);
+      order.push("key3");
+      xScale.updateDomains(data, order);
+    }
+
+    function fourFront() {
+      order.splice(order.indexOf("key4"), 1);
+      order.push("key4");
+      xScale.updateDomains(data, order);
+    }
+
+    </script>
+  </head>
+  <body>
+    <svg id="chart" width="1200" height="400"></svg>
+    <p>
+    <button onclick="oneFront()">One</button>
+    <button onclick="twoFront()">Two</button>
+    <button onclick="threeFront()">Three</button>
+    <button onclick="fourFront()">Four</button>
+  </body>
+
+</html>
