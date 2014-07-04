@@ -6384,6 +6384,26 @@ var Plottable;
                 return this;
             };
 
+            Line.prototype._getResetYFunction = function () {
+                // gets the y-value generator for the animation start point
+                var yDomain = this.yScale.domain();
+                var domainMax = Math.max(yDomain[0], yDomain[1]);
+                var domainMin = Math.min(yDomain[0], yDomain[1]);
+
+                // start from zero, or the closest domain value to zero
+                // avoids lines zooming on from offscreen.
+                var startValue = 0;
+                if (domainMax < 0) {
+                    startValue = domainMax;
+                } else if (domainMin > 0) {
+                    startValue = domainMin;
+                }
+                var scaledStartValue = this.yScale.scale(startValue);
+                return function (d, i) {
+                    return scaledStartValue;
+                };
+            };
+
             Line.prototype._paint = function () {
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
@@ -6395,9 +6415,7 @@ var Plottable;
                 this.linePath.datum(this._dataSource.data());
 
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(function () {
-                        return 0;
-                    });
+                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
                 }
 
@@ -6497,6 +6515,10 @@ var Plottable;
                 return this;
             };
 
+            Area.prototype._getResetYFunction = function () {
+                return this._generateAttrToProjector()["y0"];
+            };
+
             Area.prototype._paint = function () {
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
@@ -6510,7 +6532,7 @@ var Plottable;
                 this.areaPath.datum(this._dataSource.data());
 
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
+                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
                 }
 
