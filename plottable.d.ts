@@ -1802,6 +1802,13 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Ordinal, orientation?: string);
+            /**
+            * Set the text orientation on the category axis. Defaults to "horizontal".
+            *
+            * @param {string} orientation The orientation to write, may be "vertical" or "horizontal"
+            * @returns {Axis.Category} The calling Category Axis
+            */
+            public textOrientation(newOrient: string): Category;
         }
     }
 }

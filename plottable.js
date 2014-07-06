@@ -5178,6 +5178,7 @@ var Plottable;
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 var _this = this;
                 _super.call(this, scale, orientation);
+                this.writeTextHorizontally = true;
                 this.classed("category-axis", true);
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
@@ -5230,6 +5231,22 @@ var Plottable;
                 };
             };
 
+            /**
+            * Set the text orientation on the category axis. Defaults to "horizontal".
+            *
+            * @param {string} orientation The orientation to write, may be "vertical" or "horizontal"
+            * @returns {Axis.Category} The calling Category Axis
+            */
+            Category.prototype.textOrientation = function (newOrient) {
+                newOrient = newOrient.toLowerCase();
+                if (newOrient !== "vertical" && newOrient !== "horizontal") {
+                    throw new Error("Orientation \"" + newOrient + "\" is not a valid CategoryAxis text orientation");
+                }
+                this.writeTextHorizontally = newOrient === "horizontal";
+                this._invalidateLayout();
+                return this;
+            };
+
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
             };
@@ -5257,13 +5274,13 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true, {
+                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, self.writeTextHorizontally, {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     } else {
-                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true);
+                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, self.writeTextHorizontally);
                     }
 
                     textWriteResults.push(textWriteResult);

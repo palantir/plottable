@@ -3,12 +3,12 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title> - jsFiddle demo</title>
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
   <style type='text/css'>
     </style> <link rel="stylesheet" type="text/css" href="../plottable.css"> <style type="text/css">
 /*-- Add custom styles after this line --*/
@@ -24,10 +24,10 @@
 }
 
   </style>
-  
 
 
-<script type='text/javascript'>//<![CDATA[ 
+
+<script type='text/javascript'>//<![CDATA[
 
      var ds;
         var data = [];
@@ -72,7 +72,7 @@
 
       ds = new Plottable.DataSource(data);
       var xScale = new Plottable.Scale.Ordinal();
-      xAxis = new Plottable.Axis.Category(xScale, "bottom");
+      xAxis = new Plottable.Axis.Category(xScale, "bottom").textOrientation("vertical");
 
       // var requestedSpace = xAxis._requestedSpace;
       // xAxis._requestedSpace = function(offeredWidth, offeredHeight) {
@@ -93,7 +93,7 @@
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.YAxis(yScale, "left");
       yAxis.showEndTickLabels(true);
-        
+
       var gridlines = new Plottable.Component.Gridlines(null, yScale);
 
       var barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
@@ -134,10 +134,10 @@ function removeBar() {
   ds.data(data);
 }
 
-    
-    
 
-//]]>  
+
+
+//]]>
 
 </script>
 
@@ -159,7 +159,7 @@ function removeBar() {
 
     <p />
 <p />
-  
+
 </body>
 
 
