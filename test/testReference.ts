@@ -7,9 +7,9 @@
 ///<reference path="../build/plottable.d.ts" />
 
 ///<reference path="globalInitialization.ts" />
-///<reference path="axisTests.ts" />
 ///<reference path="baseAxisTests.ts" />
 ///<reference path="numericAxisTests.ts" />
+///<reference path="categoryAxisTests.ts" />
 ///<reference path="broadcasterTests.ts" />
 ///<reference path="componentContainerTests.ts" />
 ///<reference path="componentGroupTests.ts" />
