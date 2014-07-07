@@ -22,7 +22,7 @@ function loadPlottable(branchName) {
     if (branchName !== "#local") {
       url = "https://rawgithub.com/palantir/plottable/" + branchName + "/plottable.js";
     } else {
-      url = "plottable.js"; //load local version
+      url = "/plottable.js"; //load local version
     }
     loadScript(url).then(function() {
       Plottables[branchName] = Plottable;
@@ -36,19 +36,20 @@ function loadPlottable(branchName) {
 var data1 = makeRandomData(50);
 var data2 = makeRandomData(50);
 
-function runSingleQuicktest(container, quickTest, Plottable) {
+function runSingleQuicktest(container, quickTest, data, Plottable) {
   console.log("running single quicktest");
   container.append("p").text(quickTest.name);
-  var svg = container.append("svg").attr("height", 500);
-  quickTest.function(svg, _.cloneDeep([data1, data2]), Plottable);
+  var div = container.append("div");
+  quickTest.run(div, data, Plottable);
   console.log("--finished single quicktest");
 }
 
 function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
   var tr = tableSelection.append("tr").classed("quicktest-row", true);
-  runSingleQuicktest(tr.append("td"), quickTest, Plottable1);
+  var data = quickTest.makeData();
+  runSingleQuicktest(tr.append("td"), quickTest, data, Plottable1);
   tr.append("td");
-  runSingleQuicktest(tr.append("td"), quickTest, Plottable2);
+  runSingleQuicktest(tr.append("td"), quickTest, data, Plottable2);
 }
 
 function initializeByLoadingAllQuicktests() {
@@ -67,7 +68,7 @@ function initializeByLoadingAllQuicktests() {
 
 function loadListOfQuicktests() {
   return new Promise(function (f, r) {
-    d3.json("quicktests/list_of_quicktests.json", function (error, json) {
+    d3.json("/quicktests/list_of_quicktests.json", function (error, json) {
       if (json !== undefined) {
         f(json)
       } else {
@@ -85,8 +86,11 @@ function loadTheQuicktests(quicktestsJSONArray) {
   return new Promise(function (f, r) {
     quicktestsJSONArray.forEach(function(q) {
       var name = q.name;
-      d3.text("quicktests/quicktests/" + name + ".js", function(error, text) {
-        q.function = new Function("svg", "data", "Plottable", text);
+      d3.text("/quicktests/quicktests/" + name + ".js", function(error, text) {
+        text += ";return {makeData: makeData, run: run};";
+        obj = new Function(text)();
+        q.makeData = obj.makeData;
+        q.run = obj.run;
         window.quicktests.push(q);
         if (++numLoaded === numToLoad) f();
       });

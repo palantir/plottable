@@ -1,33 +1,39 @@
-// Will receive function arguments: (svg, data, Plottable)
-
-var dataseries = data[0].slice(0, 20);
-var dataseries_top = data[1].slice(0, 20);
-for (var i = 0; i < 20; ++i) {
-  dataseries_top[i].x = dataseries[i].x;
-  dataseries_top[i].y += dataseries[i].y;
+function makeData() {
+  return [makeRandomData(50), makeRandomData(50)];
 }
 
-var xScale = new Plottable.Scale.Linear();
-var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+function run(div, data, Plottable) {
+  var svg = div.append("svg").attr("height", 500);
+  var dataseries = data[0].slice(0, 20);
+  var dataseries_top = data[1].slice(0, 20);
+  for (var i = 0; i < 20; ++i) {
+    dataseries_top[i].x = dataseries[i].x;
+    dataseries_top[i].y += dataseries[i].y;
+  }
 
-var yScale = new Plottable.Scale.Linear();
-var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+  var xScale = new Plottable.Scale.Linear();
+  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
-var y0Accessor = function(d, i) { return dataseries[i].y; }
+  var yScale = new Plottable.Scale.Linear();
+  var yAxis = new Plottable.Axis.YAxis(yScale, "left");
 
-var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
-var renderAreaD2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
+  var y0Accessor = function(d, i) { return dataseries[i].y; }
 
-var fillAccessor = function() { return "steelblue"; }
-var fillAccessorTop = function() { return "pink"; }
-renderAreaD1.project("fill", fillAccessor)
-renderAreaD2.project("fill", fillAccessorTop)
+  var renderAreaD1 = new Plottable.Plot.Area(dataseries, xScale, yScale);
+  var renderAreaD2 = new Plottable.Plot.Area(dataseries_top, xScale, yScale, "x", "y", y0Accessor);
 
-var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1, renderAreaD2]);
+  var fillAccessor = function() { return "steelblue"; }
+  var fillAccessorTop = function() { return "pink"; }
+  renderAreaD1.project("fill", fillAccessor)
+  renderAreaD2.project("fill", fillAccessorTop)
 
-var chart = new Plottable.Template.StandardChart()
-                .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
-                .renderTo(svg);
+  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+  var renderGroup = new Plottable.Component.Group([gridlines, renderAreaD1, renderAreaD2]);
 
-window.x = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
+  var chart = new Plottable.Template.StandardChart()
+                  .center(renderGroup).xAxis(xAxis).yAxis(yAxis)
+                  .renderTo(svg);
+
+  window.x = new Plottable.Interaction.XDragBox(renderGroup).setupZoomCallback(xScale, null).registerWithComponent();
+
+}
