@@ -8,17 +8,6 @@ $font-weight-bold: 700;
 $font-weight-bolder: 800;
 
 @font-face {
-  font-family: "palantir";
-  src: url('../../fonts/palantir.eot');
-  src: url('../../fonts/palantir.eot') format('embedded-opentype'),
-       url('../../fonts/palantir.woff') format('woff'),
-       url('../../fonts/palantir.ttf') format('truetype'),
-       url('../../fonts/palantir.svg#palantir') format('svg');
-  font-weight: $font-weight-normal;
-  font-style: normal;
-}
-
-@font-face {
   font-family: "DIN";
   src: url('../../fonts/DIN/DINNextLTW04-Regular.eot');
   src: url('../../fonts/DIN/DINNextLTW04-Regular.eot#iefix') format('embedded-opentype'),
