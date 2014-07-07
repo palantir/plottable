@@ -12,7 +12,7 @@ body {
   @include relative-line-height($line-height-base-px, $font-size-base);
 
   font-family: $font-body;
-  //-webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
 
   @media (min-width: $screen-md-min) {
     @include rem(font-size, 18px);
@@ -145,8 +145,9 @@ a, button, input[type="submit"] {
         margin-right: 10px;
         background-repeat: no-repeat;
         display: inline-block;
-        .no-svg & { background-image: url(/build/images/icon-download.png); }
-        .svg & { background-image: url(/build/images/icon-download.svg); }
+        background-size: 15px 12px;
+        .no-retina & { background-image: url(../images/icon-download.png); }
+        .retina & { background-image: url(../images/icon-download@2x.png); }
       }
     }
 

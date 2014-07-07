@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-  var _banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+  var _banner = '/*! <%= pkg.name %> - v<%= pkg.version %>\n' +
           '    Copyright <%= grunt.template.today("yyyy") %> <%= pkg.company %> */';
 
   grunt.initConfig({
@@ -55,9 +55,13 @@ module.exports = function(grunt) {
 
     svgmin: {
       options: {
-        plugins: [{
-          removeViewBox: false
-        }]
+        plugins: [
+          { removeViewBox: false },
+          { removeUselessStrokeAndFill: false },
+          { removeEmptyAttrs: false },
+          { removeEmptyTile: false },
+          { removeUnknownsAndDefaults: false }
+        ]
       },
       dist: {
         files: [{

@@ -35,6 +35,15 @@ header {
     }
   }
 
+  div.navbar-collapse {
+    border: none;
+    text-align: center;
+
+    @media (min-width: $screen-md-min) {
+      margin-top: 10px;
+    }
+  }
+
   .navbar {
     background: transparent;
     border: none;
@@ -52,7 +61,7 @@ header {
       }
 
       span.icon-bar {
-        background-color: $COLOR_WHITE1;
+        background-color: $COLOR_GRAY2;
       }
 
     }
@@ -68,10 +77,10 @@ header {
       @include transition-property(opacity);
       @include transition-duration($transition-duration);
       @include opacity(1);
-      color: $COLOR_WHITE1;
+      color: $COLOR_GRAY1;
 
       .no-touch &:hover {
-        color: $COLOR_WHITE1;
+        color: $COLOR_GRAY1;
         @include opacity(0.4);
       }
     }
@@ -104,8 +113,6 @@ header {
     font-weight: $font-weight-bold;
     @include rem(font-size, 36px);
 
-
-
     small {
       margin-top: 1em;
       @include rem(font-size, 10px);
@@ -117,6 +124,7 @@ header {
     }
 
     @media (min-width: $screen-md-min) {
+      margin-top: 60px;
       @include rem(font-size, 72px);
 
       small {
