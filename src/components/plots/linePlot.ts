@@ -23,8 +23,8 @@ export module Plot {
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
       this.classed("line-renderer", true);
-      this.project("stroke", () => "steelblue");
-      this.project("fill", () => "none");
+      this.project("stroke", () => "steelblue"); // default
+      this.project("stroke-width", () => "2px"); // default
     }
 
     public _setup() {

@@ -1405,7 +1405,7 @@ describe("Legends", function () {
             toggleLegend.toggleCallback(null); // this should remove the callback
             assert.throws(function () {
                 toggleEntry("a", 0);
-            }, "not a function");
+            });
             var selection = getSelection("a");
 
             // should have no classes
@@ -1587,7 +1587,7 @@ describe("Legends", function () {
             hoverLegend.hoverCallback(null); // this should remove the callback
             assert.throws(function () {
                 hoverEntry("a", 0);
-            }, "not a function");
+            });
             verifyEmpty("a");
 
             svg.remove();
@@ -3045,7 +3045,12 @@ describe("Component behavior", function () {
         var expectedClipPathID = c._plottableID;
         c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
         var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
-        assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
+
+        // IE 9 has clipPath like 'url("#clipPath")', must accomodate
+        var normalizeClipPath = function (s) {
+            return s.replace(/"/g, "");
+        };
+        assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");
         assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
         assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
@@ -4345,26 +4350,26 @@ describe("CachingCharacterMeasurer", function () {
     });
 
     it("empty string has non-zero size", function () {
-        var a = measurer.measure("x x")[0];
-        var b = measurer.measure("xx")[0];
+        var a = measurer.measure("x x").width;
+        var b = measurer.measure("xx").width;
         assert.operator(a, ">", b, "'x x' is longer than 'xx'");
         svg.remove();
     });
 
     it("should repopulate cache if it changes size and clear() is called", function () {
-        var a = measurer.measure("x")[0];
+        var a = measurer.measure("x").width;
         g.style("font-size", "40px");
-        var b = measurer.measure("x")[0];
+        var b = measurer.measure("x").width;
         assert.equal(a, b, "cached result doesn't reflect changes");
         measurer.clear();
-        var c = measurer.measure("x")[0];
+        var c = measurer.measure("x").width;
         assert.operator(a, "<", c, "cache reset after font size changed");
         svg.remove();
     });
 
     it("multiple spaces take up same area as one space", function () {
-        var a = measurer.measure("x x")[0];
-        var b = measurer.measure("x  \t \n x")[0];
+        var a = measurer.measure("x x").width;
+        var b = measurer.measure("x  \t \n x").width;
         assert.equal(a, b);
     });
 });
@@ -4512,7 +4517,7 @@ describe("Util.Text", function () {
         });
 
         it("works as expected when given only one periods worth of space", function () {
-            var w = measure(".")[0];
+            var w = measure(".").width;
             assert.equal(e("this won't fit", w), ".", "returned a single period");
         });
 
@@ -4521,13 +4526,13 @@ describe("Util.Text", function () {
         });
 
         it("works as expected with insufficient space", function () {
-            var w = measure("this won't fit")[0];
+            var w = measure("this won't fit").width;
             assert.equal(e("this won't fit", w), "this won't...");
         });
 
         it("handles spaces intelligently", function () {
             var spacey = "this            xx";
-            var w = measure(spacey)[0] - 1;
+            var w = measure(spacey).width - 1;
             assert.equal(e(spacey, w), "this...");
         });
 
@@ -4548,14 +4553,14 @@ describe("Util.Text", function () {
             t = svg.append("text");
             t.text("hi there");
             canonicalBB = Plottable.Util.DOM.getBBox(t);
-            canonicalResult = [canonicalBB.width, canonicalBB.height];
+            canonicalResult = { width: canonicalBB.width, height: canonicalBB.height };
             t.text("bla bla bla");
         });
 
         it("works on empty string", function () {
             var measure = Plottable.Util.Text.getTextMeasure(t);
             var result = measure("");
-            assert.deepEqual(result, [0, 0], "empty string has 0 width and height");
+            assert.deepEqual(result, { width: 0, height: 0 }, "empty string has 0 width and height");
         });
         it("works on non-empty string and has no side effects", function () {
             var measure = Plottable.Util.Text.getTextMeasure(t);
@@ -4744,6 +4749,15 @@ describe("Util.s", function () {
     it("uniq works as expected", function () {
         var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
         assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+    });
+
+    it("objEq works as expected", function () {
+        assert.isTrue(Plottable.Util.Methods.objEq({}, {}));
+        assert.isTrue(Plottable.Util.Methods.objEq({ a: 5 }, { a: 5 }));
+        assert.isFalse(Plottable.Util.Methods.objEq({ a: 5, b: 6 }, { a: 5 }));
+        assert.isFalse(Plottable.Util.Methods.objEq({ a: 5 }, { a: 5, b: 6 }));
+        assert.isTrue(Plottable.Util.Methods.objEq({ a: "hello" }, { a: "hello" }));
+        assert.isFalse(Plottable.Util.Methods.objEq({ constructor: {}.constructor }, {}), "using \"constructor\" isn't hidden");
     });
 });
 
