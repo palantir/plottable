@@ -58,7 +58,6 @@
         for (var i = 0; i < order.length; i++) {
           x.push(d[order[i]]);
         }
-        console.log(x);
         return x;
       }, xScale);
 
@@ -86,6 +85,7 @@
       order.push("key3");
       xScale.updateDomains(data, order);
     }
+
 
     function fourFront() {
       order.splice(order.indexOf("key4"), 1);

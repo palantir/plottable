@@ -5446,7 +5446,7 @@ var Plottable;
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 _super.call(this, scale, orientation);
                 this.tickLength(120);
-                this.formatter(new Plottable.Formatter.Custom(null, function (d, formatter) {
+                this.formatter(new Plottable.Formatter.Custom(null, function (d) {
                     return d[d.length - 1];
                 }));
             }
@@ -5502,7 +5502,7 @@ var Plottable;
                 // remove all the translation from tickLabels
                 Plottable.Util.DOM.translate(this._tickLabelsG, 0, 0);
 
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(labels, function (d) {
+                var tickLabels = this._tickLabelsG.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(labels, function (d) {
                     return d;
                 });
                 var getTickLabelTransform = function (d, i) {
@@ -5513,7 +5513,7 @@ var Plottable;
                     var y = _this._isHorizontal() ? offset : bandStartPosition;
                     return "translate(" + x + "," + y + ")";
                 };
-                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+                var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
 

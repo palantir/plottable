@@ -18,7 +18,7 @@ export module Axis {
     constructor(scale: Scale.CompositeOrdinal, orientation = "bottom") {
       super(scale, orientation);
       this.tickLength(120);
-      this.formatter(new Plottable.Formatter.Custom(null, (d: string[], formatter: Formatter.Custom) => d[d.length - 1]));
+      this.formatter(new Plottable.Formatter.Custom(null, (d: string[]) => d[d.length - 1]));
     }
 
     public _generateTickMarkAttrHash() {
@@ -68,7 +68,7 @@ export module Axis {
       // remove all the translation from tickLabels
       Util.DOM.translate(this._tickLabelsG, 0, 0);
 
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(labels, (d) => d);
+      var tickLabels = this._tickLabelsG.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(labels, (d) => d);
       var getTickLabelTransform = (d: string, i: number) => {
         var startAndWidth = this._scale.fullBandStartAndWidth(d);
         var bandStartPosition = startAndWidth[0];
@@ -77,7 +77,7 @@ export module Axis {
         var y = this._isHorizontal() ? offset : bandStartPosition;
         return "translate(" + x + "," + y + ")";
       };
-      var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+      var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
