@@ -5001,7 +5001,7 @@ var Plottable;
             };
 
             Numeric.prototype._getTickValues = function () {
-                return this._scale.ticks(10);
+                return this._scale.ticks();
             };
 
             Numeric.prototype._doRender = function () {
