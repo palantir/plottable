@@ -7,29 +7,39 @@
 ///<reference path="../build/plottable.d.ts" />
 
 ///<reference path="globalInitialization.ts" />
-///<reference path="axisTests.ts" />
-///<reference path="baseAxisTests.ts" />
-///<reference path="numericAxisTests.ts" />
-///<reference path="broadcasterTests.ts" />
-///<reference path="componentContainerTests.ts" />
-///<reference path="componentGroupTests.ts" />
-///<reference path="componentTests.ts" />
-///<reference path="coordinatorTests.ts" />
-///<reference path="dataSourceTests.ts" />
-///<reference path="domUtilsTests.ts" />
-///<reference path="formatterTests.ts" />
-///<reference path="gridlinesTests.ts" />
-///<reference path="idCounterTests.ts" />
-///<reference path="interactionTests.ts" />
-///<reference path="labelTests.ts" />
-///<reference path="legendTests.ts" />
 ///<reference path="perfdiagnostics.ts" />
-///<reference path="rendererTests.ts" />
-///<reference path="scaleTests.ts" />
-///<reference path="strictEqualityAssociativeArrayTests.ts" />
-///<reference path="tableTests.ts" />
-///<reference path="textUtilsTests.ts" />
-///<reference path="utilsTests.ts" />
-///<reference path="domainerTests.ts" />
-///<reference path="cacheTests.ts" />
-///<reference path="cachingCharacterMeasurerTests.ts" />
+
+///<reference path="components/axisTests.ts" />
+///<reference path="components/baseAxisTests.ts" />
+///<reference path="components/numericAxisTests.ts" />
+///<reference path="components/gridlinesTests.ts" />
+///<reference path="components/labelTests.ts" />
+///<reference path="components/legendTests.ts" />
+///<reference path="components/plots/plotTests.ts" />
+///<reference path="components/plots/areaPlotTests.ts" />
+///<reference path="components/plots/barPlotTests.ts" />
+///<reference path="components/plots/gridPlotTests.ts" />
+///<reference path="components/plots/scatterPlotTests.ts" />
+
+///<reference path="core/broadcasterTests.ts" />
+///<reference path="core/componentContainerTests.ts" />
+///<reference path="core/componentGroupTests.ts" />
+///<reference path="core/componentTests.ts" />
+///<reference path="core/dataSourceTests.ts" />
+///<reference path="core/tableTests.ts" />
+///<reference path="core/domainerTests.ts" />
+
+///<reference path="scales/coordinatorTests.ts" />
+///<reference path="scales/scaleTests.ts" />
+
+///<reference path="utils/domUtilsTests.ts" />
+///<reference path="utils/formatterTests.ts" />
+///<reference path="utils/idCounterTests.ts" />
+///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
+///<reference path="utils/cachingCharacterMeasurerTests.ts" />
+///<reference path="utils/cacheTests.ts" />
+///<reference path="utils/textUtilsTests.ts" />
+///<reference path="utils/utilsTests.ts" />
+
+///<reference path="interactions/interactionTests.ts" />
+
