@@ -5,6 +5,7 @@ export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
     public _tickLabelsG: D3.Selection;
+    private writeTextHorizontally = true;
     private measurer: Util.Text.CachingCharacterMeasurer;
 
     /**
@@ -70,6 +71,22 @@ export module Axis {
       };
     }
 
+    /**
+     * Set the text orientation on the category axis. Defaults to "horizontal".
+     *
+     * @param {string} orientation The orientation to write, may be "vertical" or "horizontal"
+     * @returns {Axis.Category} The calling Category Axis
+     */
+    public textOrientation(newOrient: string): Category {
+      newOrient = newOrient.toLowerCase();
+      if (newOrient !== "vertical" && newOrient !== "horizontal") {
+        throw new Error("Orientation \"" + newOrient + "\" is not a valid CategoryAxis text orientation");
+      }
+      this.writeTextHorizontally = newOrient === "horizontal";
+      this._invalidateLayout();
+      return this;
+    }
+
     public _getTickValues(): string[] {
       return this._scale.domain();
     }
@@ -103,13 +120,13 @@ export module Axis {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = Util.Text.writeText(d, width, height, tm, true, {
+          textWriteResult = Util.Text.writeText(d, width, height, tm, self.writeTextHorizontally, {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = Util.Text.writeText(d, width, height, tm, true);
+          textWriteResult = Util.Text.writeText(d, width, height, tm, self.writeTextHorizontally);
         }
 
         textWriteResults.push(textWriteResult);
