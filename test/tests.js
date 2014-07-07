@@ -1445,7 +1445,12 @@ describe("Component behavior", function () {
         var expectedClipPathID = c._plottableID;
         c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
         var expectedClipPathURL = "url(#clipPath" + expectedClipPathID + ")";
-        assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
+
+        // IE 9 has clipPath like 'url("#clipPath")', must accomodate
+        var normalizeClipPath = function (s) {
+            return s.replace(/"/g, "");
+        };
+        assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
         var clipRect = c.boxContainer.select(".clip-rect");
         assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
         assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");
@@ -2670,7 +2675,7 @@ describe("Legends", function () {
             toggleLegend.toggleCallback(null); // this should remove the callback
             assert.throws(function () {
                 toggleEntry("a", 0);
-            }, "not a function");
+            });
             var selection = getSelection("a");
 
             // should have no classes
@@ -2852,7 +2857,7 @@ describe("Legends", function () {
             hoverLegend.hoverCallback(null); // this should remove the callback
             assert.throws(function () {
                 hoverEntry("a", 0);
-            }, "not a function");
+            });
             verifyEmpty("a");
 
             svg.remove();
@@ -3134,6 +3139,9 @@ describe("Renderers", function () {
             var renderArea;
             var verifier;
 
+            // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
+            var normalizePath;
+
             before(function () {
                 svg = generateSVG(500, 500);
                 verifier = new MultiTestVerifier();
@@ -3158,6 +3166,9 @@ describe("Renderers", function () {
                 areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
                 areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
                 renderArea = areaPlot.renderArea;
+                normalizePath = function (s) {
+                    return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+                };
             });
 
             beforeEach(function () {
@@ -3166,13 +3177,13 @@ describe("Renderers", function () {
 
             it("draws area and line correctly", function () {
                 var areaPath = renderArea.select(".area");
-                assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+                assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
                 assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
                 var areaComputedStyle = window.getComputedStyle(areaPath.node());
                 assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
 
                 var linePath = renderArea.select(".line");
-                assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+                assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
                 assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
                 var lineComputedStyle = window.getComputedStyle(linePath.node());
                 assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
@@ -3204,7 +3215,7 @@ describe("Renderers", function () {
                 areaPlot.renderTo(svg);
                 renderArea = areaPlot.renderArea;
                 var areaPath = renderArea.select(".area");
-                assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
+                assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
                 verifier.end();
             });
 
@@ -3251,8 +3262,8 @@ describe("Renderers", function () {
                     var y = +selection.attr("cy") * scale[1] + translate[1] + elementTranslate[1];
                     if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
                         circlesInArea++;
-                        assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
-                        assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+                        assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
+                        assert.closeTo(y, yScale.scale(datum.y), 0.01, "the scaled/translated y is correct");
                         assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
                     }
                     ;
@@ -3650,12 +3661,12 @@ describe("Renderers", function () {
                     var bar1y = bar1.data()[0].y;
                     assert.closeTo(numAttr(bar0, "height"), 104, 2);
                     assert.closeTo(numAttr(bar1, "height"), 104, 2);
-                    assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "width is correct for bar0");
-                    assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "width is correct for bar1");
+                    assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
+                    assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
 
                     // check that bar is aligned on the center of the scale
-                    assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "y pos correct for bar0");
-                    assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "y pos correct for bar1");
+                    assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "y pos correct for bar0");
+                    assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "y pos correct for bar1");
                     verifier.end();
                 });
 
@@ -3666,12 +3677,12 @@ describe("Renderers", function () {
                     var bar0y = bar0.data()[0].y;
                     var bar1y = bar1.data()[0].y;
                     renderer.project("width", 10);
-                    assert.equal(numAttr(bar0, "height"), 10, "bar0 height");
-                    assert.equal(numAttr(bar1, "height"), 10, "bar1 height");
-                    assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "bar0 width");
-                    assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "bar1 width");
-                    assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "bar0 ypos");
-                    assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "bar1 ypos");
+                    assert.closeTo(numAttr(bar0, "height"), 10, 0.01, "bar0 height");
+                    assert.closeTo(numAttr(bar1, "height"), 10, 0.01, "bar1 height");
+                    assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "bar0 width");
+                    assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "bar1 width");
+                    assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
+                    assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
                     verifier.end();
                 });
             });
