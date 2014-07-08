@@ -3982,11 +3982,13 @@ var Plottable;
             InterpolatedColor.prototype.autoDomain = function () {
                 // unlike other QuantitiveScales, interpolatedColorScale ignores its domainer
                 var extents = this._getAllExtents();
-                this._setDomain([d3.min(extents, function (x) {
-                        return x[0];
-                    }), d3.max(extents, function (x) {
-                        return x[1];
-                    })]);
+                if (extents.length > 0) {
+                    this._setDomain([d3.min(extents, function (x) {
+                            return x[0];
+                        }), d3.max(extents, function (x) {
+                            return x[1];
+                        })]);
+                }
                 return this;
             };
             InterpolatedColor.COLOR_SCALES = {

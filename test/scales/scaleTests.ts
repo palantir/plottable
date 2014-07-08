@@ -254,5 +254,13 @@ describe("Scales", () => {
       assert.equal("#ffffff", scale.scale(16));
       assert.equal("#e3e3e3", scale.scale(8));
     });
+
+    it("doesn't use a domainer", () => {
+      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var startDomain = scale.domain();
+      scale.domainer().pad(1.0);
+      scale.autoDomain();
+      assert.equal(scale.domain(), startDomain);
+    });
   });
 });
