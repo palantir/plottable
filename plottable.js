@@ -5173,6 +5173,7 @@ var Plottable;
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            * @param {formatter} formatter The formatter of the Axis (default Formatter.Identity)
             */
             function Category(scale, orientation, formatter) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
