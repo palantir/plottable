@@ -32,6 +32,7 @@
 /// <reference path="core/animator.ts" />
 /// <reference path="core/interfaces.ts" />
 /// <reference path="core/domainer.ts" />
+/// <reference path="core/version.ts" />
 
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />
