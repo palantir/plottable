@@ -36,8 +36,18 @@ describe("Domainer", () => {
   it("pad() works on log scales", () => {
     var logScale = new Plottable.Scale.Log();
     logScale.updateExtent(1, "x", [10, 100]);
+    logScale.range([0, 1]);
     logScale.domainer(domainer.pad(2.0));
-    assert.deepEqual(logScale.domain(), [1, 1000]);
+    assert.closeTo(logScale.domain()[0], 1, 0.001);
+    assert.closeTo(logScale.domain()[1], 1000, 0.001);
+    logScale.range([50, 60]);
+    logScale.autoDomain();
+    assert.closeTo(logScale.domain()[0], 1, 0.001);
+    assert.closeTo(logScale.domain()[1], 1000, 0.001);
+    logScale.range([-1, -2]);
+    logScale.autoDomain();
+    assert.closeTo(logScale.domain()[0], 1, 0.001);
+    assert.closeTo(logScale.domain()[1], 1000, 0.001);
   });
 
   it("pad() defaults to [v-1, v+1] if there's only one numeric value", () => {
