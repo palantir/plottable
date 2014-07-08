@@ -1820,7 +1820,7 @@ declare module Plottable {
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {formatter} formatter The formatter of the Axis (default Formatter.Identity)
+            * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
             */
             constructor(scale: Scale.Ordinal, orientation?: string, formatter?: Formatter.Identity);
         }
