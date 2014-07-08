@@ -18,9 +18,11 @@ export module Abstract {
     public _computedHeight: number;
     private _tickLength = 5;
     private _tickLabelPadding = 3;
+    private _showEndTickLabels = false;
 
     constructor(scale: Abstract.Scale, orientation: string, formatter?: Abstract.Formatter) {
       super();
+      if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
       this.orient(orientation);
 
@@ -120,7 +122,6 @@ export module Abstract {
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
-
       this._baseline.attr(this._generateBaselineAttrHash());
 
       return this;
@@ -359,6 +360,80 @@ export module Abstract {
         this._invalidateLayout();
         return this;
       }
+    }
+
+    /**
+     * Checks whether the Axis is currently set to show the first and last
+     * tick labels.
+     *
+     * @returns {boolean}
+     */
+    public showEndTickLabels(): boolean;
+    /**
+     * Set whether or not to show the first and last tick labels.
+     *
+     * @param {boolean} show Whether or not to show the first and last labels.
+     * @returns {Axis} The calling Axis.
+     */
+    public showEndTickLabels(show: boolean): Axis;
+    public showEndTickLabels(show?: boolean): any {
+      if (show == null) {
+        return this._showEndTickLabels;
+      }
+      this._showEndTickLabels = show;
+      this._render();
+      return this;
+    }
+
+    public _hideEndTickLabels() {
+      var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
+
+      var isInsideBBox = (tickBox: ClientRect) => {
+        return (
+          Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
+          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
+          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.availableWidth) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.availableHeight)
+        );
+      };
+
+      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
+      var firstTickLabel = tickLabels[0][0];
+      if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
+        d3.select(firstTickLabel).style("visibility", "hidden");
+      }
+      var lastTickLabel = tickLabels[0][tickLabels[0].length-1];
+      if (!isInsideBBox(lastTickLabel.getBoundingClientRect())) {
+        d3.select(lastTickLabel).style("visibility", "hidden");
+      }
+    }
+
+    public _hideOverlappingTickLabels() {
+      var visibleTickLabels = this._tickLabelContainer
+                                    .selectAll("." + Abstract.Axis.TICK_LABEL_CLASS)
+                                    .filter(function(d: any, i: number) {
+                                      return d3.select(this).style("visibility") === "visible";
+                                    });
+      var lastLabelClientRect: ClientRect;
+
+      function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
+        if (boxA.right < boxB.left) { return false; }
+        if (boxA.left > boxB.right) { return false; }
+        if (boxA.bottom < boxB.top) { return false; }
+        if (boxA.top > boxB.bottom) { return false; }
+        return true;
+      }
+
+      visibleTickLabels.each(function (d: any) {
+        var clientRect = this.getBoundingClientRect();
+        var tickLabel = d3.select(this);
+        if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+          tickLabel.style("visibility", "hidden");
+        } else {
+          lastLabelClientRect = clientRect;
+          tickLabel.style("visibility", "visible");
+        }
+      });
     }
   }
 }

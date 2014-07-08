@@ -47,6 +47,15 @@ declare module Plottable {
             * Check if two arrays are equal by strict equality.
             */
             function arrayEq<T>(a: T[], b: T[]): boolean;
+            /**
+            * @param {any} a Object to check against b for equality.
+            * @param {any} b Object to check against a for equality.
+            *
+            * @returns {boolean} whether or not two objects share the same keys, and
+            *          values associated with those keys. Values will be compared
+            *          with ===.
+            */
+            function objEq(a: any, b: any): boolean;
         }
     }
 }
@@ -214,14 +223,18 @@ declare module Plottable {
 declare module Plottable {
     module Util {
         module Text {
+            interface Dimensions {
+                width: number;
+                height: number;
+            }
             interface TextMeasurer {
-                (s: string): number[];
+                (s: string): Dimensions;
             }
             /**
-            * Returns a quasi-pure function of typesignature (t: string) => number[] which measures height and width of text
+            * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
             *
             * @param {D3.Selection} selection: The selection in which text will be drawn and measured
-            * @returns {number[]} width and height of the text
+            * @returns {Dimensions} width and height of the text
             */
             function getTextMeasure(selection: D3.Selection): TextMeasurer;
             /**
@@ -232,7 +245,7 @@ declare module Plottable {
             class CachingCharacterMeasurer {
                 /**
                 * @param {string} s The string to be measured.
-                * @return {number[]} [width, height] pair.
+                * @return {Dimensions} The width and height of the measured text.
                 */
                 public measure: TextMeasurer;
                 /**
@@ -274,10 +287,22 @@ declare module Plottable {
             * shortening the line as required to ensure that it fits within width.
             */
             function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
-            function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
-            function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
-            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
-            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
+            function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
+                width: number;
+                height: number;
+            };
+            function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
+                width: number;
+                height: number;
+            };
+            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
+                width: number;
+                height: number;
+            };
+            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
+                width: number;
+                height: number;
+            };
             interface IWriteTextResult {
                 textFits: boolean;
                 usedWidth: number;
@@ -509,6 +534,24 @@ declare module Plottable {
     module Formatter {
         class Custom extends Abstract.Formatter {
             constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
+        }
+    }
+}
+
+
+declare module Plottable {
+    interface FilterFormat {
+        format: string;
+        filter: (d: any) => any;
+    }
+    module Formatter {
+        class Time extends Abstract.Formatter {
+            /**
+            * Creates a formatter that displays dates
+            *
+            * @constructor
+            */
+            constructor();
         }
     }
 }
@@ -1404,6 +1447,12 @@ declare module Plottable {
             * @returns {Ordinal} The calling Ordinal Scale.
             */
             public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
+            /**
+            * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+            *
+            * @returns {Ordinal} A copy of the calling Scale.
+            */
+            public copy(): Ordinal;
         }
     }
 }
@@ -1429,11 +1478,13 @@ declare module Plottable {
     module Scale {
         class Time extends Abstract.QuantitiveScale {
             /**
-            * Creates a new TimeScale.
+            * Creates a new Time Scale.
             *
             * @constructor
+            * @param {D3.Scale.Time} [scale] The D3 TimeScale backing the TimeScale. If not supplied, uses a default scale.
             */
             constructor();
+            constructor(scale: D3.Scale.TimeScale);
         }
     }
 }
@@ -1683,6 +1734,20 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public orient(newOrientation: string): Axis;
+            /**
+            * Checks whether the Axis is currently set to show the first and last
+            * tick labels.
+            *
+            * @returns {boolean}
+            */
+            public showEndTickLabels(): boolean;
+            /**
+            * Set whether or not to show the first and last tick labels.
+            *
+            * @param {boolean} show Whether or not to show the first and last labels.
+            * @returns {Axis} The calling Axis.
+            */
+            public showEndTickLabels(show: boolean): Axis;
         }
     }
 }
