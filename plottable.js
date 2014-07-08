@@ -3277,7 +3277,7 @@ var Plottable;
             var domain;
             domain = this.combineExtents(extents);
             domain = this.includeDomain(domain);
-            domain = this.padDomain(domain);
+            domain = this.padDomain(scale, domain);
             domain = this.niceDomain(scale, domain);
             return domain;
         };
@@ -3287,6 +3287,13 @@ var Plottable;
         *
         * @param {number} [padProportion] Proportionally how much bigger the
         *         new domain should be (0.05 = 5% larger).
+        *
+        *         A domainer will pad equal visual amounts on each side.
+        *         On a linear scale, this means both sides are padded the same
+        *         amount: [10, 20] will be padded to [5, 25].
+        *         On a log scale, the top will be padded more than the bottom, so
+        *         [10, 100] will be padded to [1, 1000].
+        *
         * @return {Domainer} The calling Domainer.
         */
         Domainer.prototype.pad = function (padProportion) {
@@ -3395,10 +3402,12 @@ var Plottable;
             }
         };
 
-        Domainer.prototype.padDomain = function (domain) {
-            if (domain[0] === domain[1] && this.padProportion > 0.0) {
-                var d = domain[0].valueOf();
-                if (domain[0] instanceof Date) {
+        Domainer.prototype.padDomain = function (scale, domain) {
+            var min = domain[0];
+            var max = domain[1];
+            if (min === max && this.padProportion > 0.0) {
+                var d = min.valueOf();
+                if (min instanceof Date) {
                     return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
                 } else {
                     return [
@@ -3406,20 +3415,21 @@ var Plottable;
                         d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
-            var extent = domain[1] - domain[0];
-            var newDomain = [
-                domain[0].valueOf() - this.padProportion / 2 * extent,
-                domain[1].valueOf() + this.padProportion / 2 * extent];
+            var p = this.padProportion / 2;
 
+            // This scaling is done to account for log scales and other non-linear
+            // scales. A log scale should be padded more on the max than on the min.
+            var newMin = scale._d3Scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
+            var newMax = scale._d3Scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
             var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
             var exceptionSet = d3.set(exceptionValues);
-            if (exceptionSet.has(domain[0])) {
-                newDomain[0] = domain[0];
+            if (exceptionSet.has(min)) {
+                newMin = min;
             }
-            if (exceptionSet.has(domain[1])) {
-                newDomain[1] = domain[1];
+            if (exceptionSet.has(max)) {
+                newMax = max;
             }
-            return newDomain;
+            return [newMin, newMax];
         };
 
         Domainer.prototype.niceDomain = function (scale, domain) {
@@ -3967,6 +3977,17 @@ var Plottable;
                 } else {
                     return InterpolatedColor.COLOR_SCALES["reds"];
                 }
+            };
+
+            InterpolatedColor.prototype.autoDomain = function () {
+                // unlike other QuantitiveScales, interpolatedColorScale ignores its domainer
+                var extents = this._getAllExtents();
+                this._setDomain([d3.min(extents, function (x) {
+                        return x[0];
+                    }), d3.max(extents, function (x) {
+                        return x[1];
+                    })]);
+                return this;
             };
             InterpolatedColor.COLOR_SCALES = {
                 reds: [

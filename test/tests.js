@@ -3648,6 +3648,13 @@ describe("Domainer", function () {
         assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
     });
 
+    it("pad() works on log scales", function () {
+        var logScale = new Plottable.Scale.Log();
+        logScale.updateExtent(1, "x", [10, 100]);
+        logScale.domainer(domainer.pad(2.0));
+        assert.deepEqual(logScale.domain(), [1, 1000]);
+    });
+
     it("pad() defaults to [v-1, v+1] if there's only one numeric value", function () {
         domainer.pad();
         var domain = domainer.computeDomain([[5, 5]], scale);

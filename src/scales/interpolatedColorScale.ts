@@ -198,6 +198,13 @@ export module Scale {
         return InterpolatedColor.COLOR_SCALES["reds"];
       }
     }
+
+    public autoDomain() {
+      // unlike other QuantitiveScales, interpolatedColorScale ignores its domainer
+      var extents = this._getAllExtents();
+      this._setDomain([d3.min(extents, (x) => x[0]), d3.max(extents, (x) => x[1])]);
+      return this;
+    }
   }
 }
 }
