@@ -1,4 +1,4 @@
-///<reference path="testReference.ts" />
+///<reference path="../testReference.ts" />
 
 var assert = chai.assert;
 
@@ -301,7 +301,7 @@ describe("Legends", () => {
       assert.equal(state, true, "callback was successful");
 
       toggleLegend.toggleCallback(null); // this should remove the callback
-      assert.throws(function() {toggleEntry("a", 0);}, "not a function");
+      assert.throws(function() {toggleEntry("a", 0);});
       var selection = getSelection("a");
       // should have no classes
       assert.equal(selection.classed("toggled-on"), false, "is not toggled-on");
@@ -478,7 +478,7 @@ describe("Legends", () => {
       assert.equal(focused, undefined, "callback was successful");
 
       hoverLegend.hoverCallback(null); // this should remove the callback
-      assert.throws(function() {hoverEntry("a", 0);}, "not a function");
+      assert.throws(function() {hoverEntry("a", 0);});
       verifyEmpty("a");
 
       svg.remove();

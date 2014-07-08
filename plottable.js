@@ -3267,10 +3267,11 @@ var Plottable;
             if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
             this.doNice = false;
             this.padProportion = 0.0;
-            this.paddingExceptions = d3.set([]);
-            // This must be a map rather than a set so we can get the original values
-            // back out, rather than their stringified versions.
-            this.includedValues = d3.map([]);
+            this.paddingExceptions = d3.map();
+            this.unregisteredPaddingExceptions = d3.set();
+            this.includedValues = d3.map();
+            // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+            this.unregisteredIncludedValues = d3.map();
             this.combineExtents = combineExtents;
         }
         /**
@@ -3305,21 +3306,77 @@ var Plottable;
         };
 
         /**
-        * Adds a value that will not be padded if either end of the domain.
-        * For example, after paddingException(0), a domainer will pad
-        * [0, 100] to [0, 102.5].
+        * Add a padding exception, a value that will not be padded at either end of the domain.
         *
-        * @param {any} exception The value that will not be padded.
-        * @param {boolean} add Defaults to true. If true, add the exception,
-        *                  if false, removes the exception.
-        * @return {Domainer} The calling Domainer.
+        * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
+        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+        * If a key is not provided, it will be added with set semantics (Can be removed by value)
+        *
+        * @param {any} exception The padding exception to add.
+        * @param string [key] The key to register the exception under.
+        * @return Domainer The calling domainer
         */
-        Domainer.prototype.paddingException = function (exception, add) {
-            if (typeof add === "undefined") { add = true; }
-            if (add) {
-                this.paddingExceptions.add(exception);
+        Domainer.prototype.addPaddingException = function (exception, key) {
+            if (key != null) {
+                this.paddingExceptions.set(key, exception);
             } else {
-                this.paddingExceptions.remove(exception);
+                this.unregisteredPaddingExceptions.add(exception);
+            }
+            return this;
+        };
+
+        /**
+        * Remove a padding exception, allowing the domain to pad out that value again.
+        *
+        * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
+        * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
+        *
+        * @param {any} keyOrException The key for the value to remove, or the value to remove
+        * @return Domainer The calling domainer
+        */
+        Domainer.prototype.removePaddingException = function (keyOrException) {
+            if (typeof (keyOrException) === "string") {
+                this.paddingExceptions.remove(keyOrException);
+            } else {
+                this.unregisteredPaddingExceptions.remove(keyOrException);
+            }
+            return this;
+        };
+
+        /**
+        * Add an included value, a value that must be included inside the domain.
+        *
+        * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
+        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+        * If a key is not provided, it will be added with set semantics (Can be removed by value)
+        *
+        * @param {any} value The included value to add.
+        * @param string [key] The key to register the value under.
+        * @return Domainer The calling domainer
+        */
+        Domainer.prototype.addIncludedValue = function (value, key) {
+            if (key != null) {
+                this.includedValues.set(key, value);
+            } else {
+                this.unregisteredIncludedValues.set(value, value);
+            }
+            return this;
+        };
+
+        /**
+        * Remove an included value, allowing the domain to not include that value gain again.
+        *
+        * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
+        * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
+        *
+        * @param {any} keyOrException The key for the value to remove, or the value to remove
+        * @return Domainer The calling domainer
+        */
+        Domainer.prototype.removeIncludedValue = function (valueOrKey) {
+            if (typeof (valueOrKey) === "string") {
+                this.includedValues.remove(valueOrKey);
+            } else {
+                this.unregisteredIncludedValues.remove(valueOrKey);
             }
             return this;
         };
@@ -3333,28 +3390,6 @@ var Plottable;
         Domainer.prototype.nice = function (count) {
             this.doNice = true;
             this.niceCount = count;
-            return this;
-        };
-
-        /**
-        * Ensure that the domain produced includes value.
-        *
-        * For example, after include(0), the domain [3, 5] will become [0, 5],
-        * and the domain [-9, -8] will become [-9, 0].
-        *
-        * @param {any} value The value that will be included.
-        * @param {boolean} include Defaults to true. If true, this value will
-        *                  always be included, if false, this value will not
-        *                  necessarily be included.
-        * @return {Domainer} The calling Domainer.
-        */
-        Domainer.prototype.include = function (value, include) {
-            if (typeof include === "undefined") { include = true; }
-            if (include) {
-                this.includedValues.set(value, value);
-            } else {
-                this.includedValues.remove(value);
-            }
             return this;
         };
 
@@ -3385,10 +3420,13 @@ var Plottable;
             var newDomain = [
                 domain[0].valueOf() - this.padProportion / 2 * extent,
                 domain[1].valueOf() + this.padProportion / 2 * extent];
-            if (this.paddingExceptions.has(domain[0])) {
+
+            var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+            var exceptionSet = d3.set(exceptionValues);
+            if (exceptionSet.has(domain[0])) {
                 newDomain[0] = domain[0];
             }
-            if (this.paddingExceptions.has(domain[1])) {
+            if (exceptionSet.has(domain[1])) {
                 newDomain[1] = domain[1];
             }
             return newDomain;
@@ -3403,7 +3441,8 @@ var Plottable;
         };
 
         Domainer.prototype.includeDomain = function (domain) {
-            return this.includedValues.values().reduce(function (domain, value) {
+            var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
+            return includedValues.reduce(function (domain, value) {
                 return [Math.min(domain[0], value), Math.max(domain[1], value)];
             }, domain);
         };
@@ -5185,11 +5224,13 @@ var Plottable;
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
             */
-            function Category(scale, orientation) {
+            function Category(scale, orientation, formatter) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
+                if (typeof formatter === "undefined") { formatter = new Plottable.Formatter.Identity(); }
                 var _this = this;
-                _super.call(this, scale, orientation);
+                _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
@@ -5200,8 +5241,7 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
-                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelsG);
+                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
                 return this;
             };
 
@@ -5265,17 +5305,18 @@ var Plottable;
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
                     var textWriteResult;
+                    var formatter = self._formatter;
                     if (draw) {
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true, {
+                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true, {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     } else {
-                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true);
+                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true);
                     }
 
                     textWriteResults.push(textWriteResult);
@@ -5299,7 +5340,7 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), function (d) {
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) {
                     return d;
                 });
 
@@ -5310,7 +5351,7 @@ var Plottable;
                     var y = _this._isHorizontal() ? 0 : bandStartPosition;
                     return "translate(" + x + "," + y + ")";
                 };
-                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+                tickLabels.enter().append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
 
@@ -5321,7 +5362,7 @@ var Plottable;
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
-                Plottable.Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
+                Plottable.Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 Plottable.Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
                 return this;
             };
@@ -6053,7 +6094,6 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
-                this.previousBaselineValue = null;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -6122,7 +6162,6 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.baseline = function (value) {
-                this.previousBaselineValue = this._baselineValue;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
@@ -6208,10 +6247,16 @@ var Plottable;
             BarPlot.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Abstract.QuantitiveScale) {
                     var qscale = scale;
-                    if (!qscale._userSetDomainer && this._baselineValue != null) {
-                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
-                        qscale._autoDomainIfAutomaticMode();
+                    if (!qscale._userSetDomainer) {
+                        if (this._baselineValue != null) {
+                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+                        } else {
+                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
+                        }
                     }
+
+                    // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
+                    qscale._autoDomainIfAutomaticMode();
                 }
                 return this;
             };
@@ -6445,8 +6490,6 @@ var Plottable;
             */
             function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this.constantBaseline = null;
-                this.previousBaseline = null;
                 this.classed("area-renderer", true);
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
@@ -6481,21 +6524,16 @@ var Plottable;
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
                 var extent = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
-                if (extent.length === 2 && extent[0] === extent[1]) {
-                    this.constantBaseline = extent[0];
-                } else {
-                    this.constantBaseline = null;
-                }
+                var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
-                if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
-                    if (this.previousBaseline != null) {
-                        scale.domainer().paddingException(this.previousBaseline, false);
-                        this.previousBaseline = null;
+                if (!scale._userSetDomainer) {
+                    if (constantBaseline != null) {
+                        scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+                    } else {
+                        scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
                     }
-                    if (this.constantBaseline != null) {
-                        scale.domainer().paddingException(this.constantBaseline, true);
-                        this.previousBaseline = this.constantBaseline;
-                    }
+
+                    // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }
                 return this;
