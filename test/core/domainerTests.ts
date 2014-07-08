@@ -65,22 +65,25 @@ describe("Domainer", () => {
   });
 
   it("paddingException(n) will not pad beyond n", () => {
-    domainer.pad(0.1).paddingException(0).paddingException(200);
+    domainer.pad(0.1).addPaddingException(0, "key").addPaddingException(200);
     var domain = domainer.computeDomain([[0, 100]], scale);
-    assert.deepEqual(domain, [0, 105]);
+    assert.deepEqual(domain, [0, 105], "padding exceptions can be added by key");
     domain = domainer.computeDomain([[-100, 0]], scale);
     assert.deepEqual(domain, [-105, 0]);
     domain = domainer.computeDomain([[0, 200]], scale);
     assert.deepEqual(domain, [0, 200]);
-    domainer.paddingException(0, false);
+    domainer.removePaddingException("key");
     domain = domainer.computeDomain([[0, 200]], scale);
-    assert.deepEqual(domain, [-10, 200]);
+    assert.deepEqual(domain, [-10, 200], "paddingExceptions can be removed by key");
+    domainer.removePaddingException(200);
+    domain = domainer.computeDomain([[0, 200]], scale);
+    assert.notEqual(domain[1], 200, "unregistered paddingExceptions can be removed using boolean argument");
   });
 
   it("paddingException(n) works on dates", () => {
     var a = new Date(2000, 5, 5);
     var b = new Date(2003, 0, 1);
-    domainer.pad().paddingException(a);
+    domainer.pad().addPaddingException(a);
     var timeScale = new Plottable.Scale.Time();
     timeScale.updateExtent(1, "x", [a, b]);
     timeScale.domainer(domainer);
@@ -90,7 +93,7 @@ describe("Domainer", () => {
   });
 
   it("include(n) works an expected", () => {
-    domainer.include(5);
+    domainer.addIncludedValue(5);
     var domain = domainer.computeDomain([[0, 10]], scale);
     assert.deepEqual(domain, [0, 10]);
     domain = domainer.computeDomain([[0, 3]], scale);
@@ -98,21 +101,24 @@ describe("Domainer", () => {
     domain = domainer.computeDomain([[100, 200]], scale);
     assert.deepEqual(domain, [5, 200]);
 
-    domainer.include(-3).include(0).include(10);
+    domainer.addIncludedValue(-3).addIncludedValue(0).addIncludedValue(10, "key");
     domain = domainer.computeDomain([[100, 200]], scale);
     assert.deepEqual(domain, [-3, 200]);
     domain = domainer.computeDomain([[0, 0]], scale);
     assert.deepEqual(domain, [-3, 10]);
 
-    domainer.include(10, false);
+    domainer.removeIncludedValue("key");
     domain = domainer.computeDomain([[100, 200]], scale);
     assert.deepEqual(domain, [-3, 200]);
     domain = domainer.computeDomain([[-100, -50]], scale);
     assert.deepEqual(domain, [-100, 5]);
 
-    domainer.include(10);
+    domainer.addIncludedValue(10);
     domain = domainer.computeDomain([[-100, -50]], scale);
-    assert.deepEqual(domain, [-100, 10]);
+    assert.deepEqual(domain, [-100, 10], "unregistered includedValues can be added");
+    domainer.removeIncludedValue(10);
+    domain = domainer.computeDomain([[-100, -50]], scale);
+    assert.deepEqual(domain, [-100, 5], "unregistered includedValues can be removed with addOrRemove argument");
   });
 
   it("include(n) works on dates", () => {
@@ -120,7 +126,7 @@ describe("Domainer", () => {
     var b = new Date(2000, 5, 5);
     var c = new Date(2000, 5, 6);
     var d = new Date(2003, 0, 1);
-    domainer.include(b);
+    domainer.addIncludedValue(b);
     var timeScale = new Plottable.Scale.Time();
     timeScale.updateExtent(1, "x", [c, d]);
     timeScale.domainer(domainer);
@@ -131,21 +137,38 @@ describe("Domainer", () => {
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();
     var domainer = yScale.domainer();
-    var getExceptions = () => (<any> yScale.domainer()).paddingExceptions.values().map(parseFloat);
-    assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
-    var r = new Plottable.Plot.Area([{x: 0}, {x: 1}, {x: 2}, {x: 3}, {x: 4}, {x: 5}, {x: 6}], xScale, yScale);
+    var data = [{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 5}];
+    var r = new Plottable.Plot.Area(data, xScale, yScale);
+    var svg = generateSVG();
     r.project("x", "x", xScale);
-    r.project("y", "x", yScale);
+    r.project("y", "y", yScale);
+    r.renderTo(svg);
+
+    function getExceptions() {
+      yScale.autoDomain();
+      var yDomain = yScale.domain();
+      var exceptions: number[] = [];
+      if (yDomain[0] === 0) {
+          exceptions.push(0);
+      }
+      if (yDomain[1] === 5) {
+          exceptions.push(5);
+      }
+      return exceptions;
+    }
+
     assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
-    r.project("y0", "x", yScale);
+    // assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
+    r.project("y0", "y0", yScale);
     assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
     r.project("y0", 0, yScale);
     assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
     r.project("y0", () => 5, yScale);
     assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
-    r.project("y0", "x", yScale);
+    r.project("y0", "y0", yScale);
     assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception");
-    r.dataSource().data([{x: 0}, {x: 0}]);
+    r.dataSource().data([{x: 0, y: 0, y0: 0}, {x: 5, y: 5, y0: 0}]);
     assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
+    svg.remove();
   });
 });
