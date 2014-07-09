@@ -720,6 +720,10 @@ var Plottable;
                 var secondaryDimension = orientHorizontally ? height : width;
                 var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
+                if (wrappedText.lines.length === 0) {
+                    return { textFits: wrappedText.textFits, usedWidth: 0, usedHeight: 0 };
+                }
+
                 var usedWidth, usedHeight;
                 if (write == null) {
                     var widthFn = orientHorizontally ? d3.max : d3.sum;
@@ -735,17 +739,13 @@ var Plottable;
 
                     // the outerG contains general transforms for positining the whole block, the inner g
                     // will contain transforms specific to orienting the text properly within the block.
-                    var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-                    var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+                    var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+                    var wh = writeTextFn(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
                     usedWidth = wh.width;
                     usedHeight = wh.height;
                 }
 
-                return {
-                    textFits: wrappedText.textFits,
-                    usedWidth: usedWidth,
-                    usedHeight: usedHeight
-                };
+                return { textFits: wrappedText.textFits, usedWidth: usedWidth, usedHeight: usedHeight };
             }
             Text.writeText = writeText;
         })(Util.Text || (Util.Text = {}));
