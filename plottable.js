@@ -1,5 +1,5 @@
 /*!
-Plottable 0.19.0 (https://github.com/palantir/plottable)
+Plottable 0.19.3 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -134,6 +134,30 @@ var Plottable;
                 return true;
             }
             Methods.arrayEq = arrayEq;
+
+            /**
+            * @param {any} a Object to check against b for equality.
+            * @param {any} b Object to check against a for equality.
+            *
+            * @returns {boolean} whether or not two objects share the same keys, and
+            *          values associated with those keys. Values will be compared
+            *          with ===.
+            */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) {
+                    return a[k];
+                });
+                var valuesB = keysB.map(function (k) {
+                    return b[k];
+                });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
         })(Util.Methods || (Util.Methods = {}));
         var Methods = Util.Methods;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -403,16 +427,18 @@ var Plottable;
         (function (Text) {
             ;
 
+            ;
+
             /**
-            * Returns a quasi-pure function of typesignature (t: string) => number[] which measures height and width of text
+            * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
             *
             * @param {D3.Selection} selection: The selection in which text will be drawn and measured
-            * @returns {number[]} width and height of the text
+            * @returns {Dimensions} width and height of the text
             */
             function getTextMeasure(selection) {
                 return function (s) {
                     if (s.trim() === "") {
-                        return [0, 0];
+                        return { width: 0, height: 0 };
                     }
                     var bb;
                     if (selection.node().nodeName === "text") {
@@ -420,12 +446,12 @@ var Plottable;
                         selection.text(s);
                         bb = Util.DOM.getBBox(selection);
                         selection.text(originalText);
-                        return [bb.width, bb.height];
+                        return { width: bb.width, height: bb.height };
                     } else {
                         var t = selection.append("text").text(s);
                         bb = Util.DOM.getBBox(t);
                         t.remove();
-                        return [bb.width, bb.height];
+                        return { width: bb.width, height: bb.height };
                     }
                 };
             }
@@ -448,11 +474,14 @@ var Plottable;
             function measureByCharacter(tm) {
                 return function (s) {
                     var whs = s.trim().split("").map(tm);
-                    return [d3.sum(whs, function (wh) {
-                            return wh[0];
-                        }), d3.max(whs, function (wh) {
-                            return wh[1];
-                        })];
+                    return {
+                        width: d3.sum(whs, function (wh) {
+                            return wh.width;
+                        }),
+                        height: d3.max(whs, function (wh) {
+                            return wh.height;
+                        })
+                    };
                 };
             }
 
@@ -460,7 +489,7 @@ var Plottable;
 
             /**
             * Some TextMeasurers get confused when measuring something that's only
-            * whitespace: only whitespace in a dom node takes up [0, 0] space.
+            * whitespace: only whitespace in a dom node takes up 0 x 0 space.
             *
             * @return {TextMeasurer} A function that if its argument is all
             *         whitespace, it will wrap its argument in CANONICAL_CHR before
@@ -472,13 +501,19 @@ var Plottable;
                         var whs = s.split("").map(function (c) {
                             var wh = tm(CANONICAL_CHR + c + CANONICAL_CHR);
                             var whWrapping = tm(CANONICAL_CHR);
-                            return [wh[0] - 2 * whWrapping[0], wh[1]];
+                            return {
+                                width: wh.width - 2 * whWrapping.width,
+                                height: wh.height
+                            };
                         });
-                        return [d3.sum(whs, function (x) {
-                                return x[0];
-                            }), d3.max(whs, function (x) {
-                                return x[1];
-                            })];
+                        return {
+                            width: d3.sum(whs, function (x) {
+                                return x.width;
+                            }),
+                            height: d3.max(whs, function (x) {
+                                return x.height;
+                            })
+                        };
                     } else {
                         return tm(s);
                     }
@@ -498,7 +533,7 @@ var Plottable;
                 */
                 function CachingCharacterMeasurer(g) {
                     var _this = this;
-                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.arrayEq);
+                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.objEq);
                     this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) {
                         return _this.cache.get(s);
                     })));
@@ -523,7 +558,7 @@ var Plottable;
             * @returns {string} text - the shortened text
             */
             function getTruncatedText(text, availableWidth, measurer) {
-                if (measurer(text)[0] <= availableWidth) {
+                if (measurer(text).width <= availableWidth) {
                     return text;
                 } else {
                     return addEllipsesToLine(text, availableWidth, measurer);
@@ -538,7 +573,7 @@ var Plottable;
             * @return {number} The height of the text element, in pixels.
             */
             function getTextHeight(selection) {
-                return getTextMeasure(selection)("bqpdl")[1];
+                return getTextMeasure(selection)("bqpdl").height;
             }
             Text.getTextHeight = getTextHeight;
 
@@ -549,7 +584,7 @@ var Plottable;
             * @return {number} The width of the text element, in pixels.
             */
             function getTextWidth(textElement, text) {
-                return getTextMeasure(textElement)(text)[0];
+                return getTextMeasure(textElement)(text).width;
             }
             Text.getTextWidth = getTextWidth;
 
@@ -560,7 +595,7 @@ var Plottable;
             function addEllipsesToLine(line, width, measureText) {
                 var mutatedLine = line.trim();
                 var widthMeasure = function (s) {
-                    return measureText(s)[0];
+                    return measureText(s).width;
                 };
                 var lineWidth = widthMeasure(line);
                 var ellipsesWidth = widthMeasure("...");
@@ -596,7 +631,7 @@ var Plottable;
                 var w = bb.width;
                 if (w > width || h > height) {
                     console.log("Insufficient space to fit text");
-                    return [0, 0];
+                    return { width: 0, height: 0 };
                 }
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
                 var anchor = anchorConverter[xAlign];
@@ -605,7 +640,7 @@ var Plottable;
                 var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
                 Util.DOM.translate(innerG, xOff, yOff);
-                return [w, h];
+                return { width: w, height: h };
             }
             Text.writeLineHorizontally = writeLineHorizontally;
 
@@ -627,7 +662,7 @@ var Plottable;
                 xForm.translate = [isRight ? width : 0, isRight ? 0 : height];
                 innerG.attr("transform", xForm.toString());
 
-                return [wh[1], wh[0]];
+                return wh;
             }
             Text.writeLineVertically = writeLineVertically;
 
@@ -641,15 +676,15 @@ var Plottable;
                     var innerG = blockG.append("g");
                     Util.DOM.translate(innerG, 0, i * h);
                     var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
-                    if (wh[0] > maxWidth) {
-                        maxWidth = wh[0];
+                    if (wh.width > maxWidth) {
+                        maxWidth = wh.width;
                     }
                 });
                 var usedSpace = h * brokenText.length;
                 var freeSpace = height - usedSpace;
                 var translator = { center: 0.5, top: 0, bottom: 1 };
                 Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
-                return [maxWidth, usedSpace];
+                return { width: maxWidth, height: usedSpace };
             }
             Text.writeTextHorizontally = writeTextHorizontally;
 
@@ -664,8 +699,8 @@ var Plottable;
                     var innerG = blockG.append("g");
                     Util.DOM.translate(innerG, i * h, 0);
                     var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
-                    if (wh[1] > maxHeight) {
-                        maxHeight = wh[1];
+                    if (wh.height > maxHeight) {
+                        maxHeight = wh.height;
                     }
                 });
                 var usedSpace = h * brokenText.length;
@@ -673,7 +708,7 @@ var Plottable;
                 var translator = { center: 0.5, left: 0, right: 1 };
                 Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
 
-                return [usedSpace, maxHeight];
+                return { width: usedSpace, height: maxHeight };
             }
             Text.writeTextVertically = writeTextVertically;
 
@@ -696,10 +731,10 @@ var Plottable;
                     var widthFn = orientHorizontally ? d3.max : d3.sum;
                     var heightFn = orientHorizontally ? d3.sum : d3.max;
                     usedWidth = widthFn(wrappedText.lines, function (line) {
-                        return tm(line)[0];
+                        return tm(line).width;
                     });
                     usedHeight = heightFn(wrappedText.lines, function (line) {
-                        return tm(line)[1];
+                        return tm(line).height;
                     });
                 } else {
                     var innerG = write.g.append("g").classed("writeText-inner-g", true);
@@ -708,8 +743,8 @@ var Plottable;
                     // will contain transforms specific to orienting the text properly within the block.
                     var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
                     var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
-                    usedWidth = wh[0];
-                    usedHeight = wh[1];
+                    usedWidth = wh.width;
+                    usedHeight = wh.height;
                 }
 
                 return {
@@ -742,10 +777,10 @@ var Plottable;
             */
             function breakTextToFitRect(text, width, height, measureText) {
                 var widthMeasure = function (s) {
-                    return measureText(s)[0];
+                    return measureText(s).width;
                 };
                 var lines = breakTextToFitWidth(text, width, widthMeasure);
-                var textHeight = measureText("hello world")[1];
+                var textHeight = measureText("hello world").height;
                 var nLinesThatFit = Math.floor(height / textHeight);
                 var textFit = nLinesThatFit >= lines.length;
                 if (!textFit) {
@@ -1321,6 +1356,9 @@ var Plottable;
             __extends(Custom, _super);
             function Custom(precision, customFormatFunction) {
                 _super.call(this, precision);
+                if (customFormatFunction == null) {
+                    throw new Error("Custom Formatters require a formatting function");
+                }
                 this._onlyShowUnchanged = false;
                 this._formatFunction = function (d) {
                     return customFormatFunction(d, this);
@@ -2814,6 +2852,7 @@ var Plottable;
                 this._animators = {};
                 this._ANIMATION_DURATION = 250;
                 this._projectors = {};
+                this.animateOnNextRender = true;
                 this.clipPathEnabled = true;
                 this.classed("renderer", true);
 
@@ -2831,6 +2870,7 @@ var Plottable;
             }
             Plot.prototype._anchor = function (element) {
                 _super.prototype._anchor.call(this, element);
+                this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this.updateAllProjectors();
                 return this;
@@ -2870,6 +2910,7 @@ var Plottable;
 
             Plot.prototype._onDataSourceUpdate = function () {
                 this.updateAllProjectors();
+                this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
             };
@@ -2916,6 +2957,7 @@ var Plottable;
                 if (this.element != null) {
                     this._paint();
                     this._dataChanged = false;
+                    this.animateOnNextRender = false;
                 }
                 return this;
             };
@@ -2988,7 +3030,7 @@ var Plottable;
             * @return {D3.Selection} The resulting selection (potentially after the transition)
             */
             Plot.prototype._applyAnimatedAttributes = function (selection, animatorKey, attrToProjector) {
-                if (this._animate && this._animators[animatorKey] != null && !Plottable.Core.ResizeBroadcaster.resizing()) {
+                if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
                     return this._animators[animatorKey].animate(selection, attrToProjector, this);
                 } else {
                     return selection.attr(attrToProjector);
@@ -3255,10 +3297,11 @@ var Plottable;
             if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
             this.doNice = false;
             this.padProportion = 0.0;
-            this.paddingExceptions = d3.set([]);
-            // This must be a map rather than a set so we can get the original values
-            // back out, rather than their stringified versions.
-            this.includedValues = d3.map([]);
+            this.paddingExceptions = d3.map();
+            this.unregisteredPaddingExceptions = d3.set();
+            this.includedValues = d3.map();
+            // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+            this.unregisteredIncludedValues = d3.map();
             this.combineExtents = combineExtents;
         }
         /**
@@ -3293,21 +3336,77 @@ var Plottable;
         };
 
         /**
-        * Adds a value that will not be padded if either end of the domain.
-        * For example, after paddingException(0), a domainer will pad
-        * [0, 100] to [0, 102.5].
+        * Add a padding exception, a value that will not be padded at either end of the domain.
         *
-        * @param {any} exception The value that will not be padded.
-        * @param {boolean} add Defaults to true. If true, add the exception,
-        *                  if false, removes the exception.
-        * @return {Domainer} The calling Domainer.
+        * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
+        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+        * If a key is not provided, it will be added with set semantics (Can be removed by value)
+        *
+        * @param {any} exception The padding exception to add.
+        * @param string [key] The key to register the exception under.
+        * @return Domainer The calling domainer
         */
-        Domainer.prototype.paddingException = function (exception, add) {
-            if (typeof add === "undefined") { add = true; }
-            if (add) {
-                this.paddingExceptions.add(exception);
+        Domainer.prototype.addPaddingException = function (exception, key) {
+            if (key != null) {
+                this.paddingExceptions.set(key, exception);
             } else {
-                this.paddingExceptions.remove(exception);
+                this.unregisteredPaddingExceptions.add(exception);
+            }
+            return this;
+        };
+
+        /**
+        * Remove a padding exception, allowing the domain to pad out that value again.
+        *
+        * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
+        * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
+        *
+        * @param {any} keyOrException The key for the value to remove, or the value to remove
+        * @return Domainer The calling domainer
+        */
+        Domainer.prototype.removePaddingException = function (keyOrException) {
+            if (typeof (keyOrException) === "string") {
+                this.paddingExceptions.remove(keyOrException);
+            } else {
+                this.unregisteredPaddingExceptions.remove(keyOrException);
+            }
+            return this;
+        };
+
+        /**
+        * Add an included value, a value that must be included inside the domain.
+        *
+        * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
+        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+        * If a key is not provided, it will be added with set semantics (Can be removed by value)
+        *
+        * @param {any} value The included value to add.
+        * @param string [key] The key to register the value under.
+        * @return Domainer The calling domainer
+        */
+        Domainer.prototype.addIncludedValue = function (value, key) {
+            if (key != null) {
+                this.includedValues.set(key, value);
+            } else {
+                this.unregisteredIncludedValues.set(value, value);
+            }
+            return this;
+        };
+
+        /**
+        * Remove an included value, allowing the domain to not include that value gain again.
+        *
+        * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
+        * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
+        *
+        * @param {any} keyOrException The key for the value to remove, or the value to remove
+        * @return Domainer The calling domainer
+        */
+        Domainer.prototype.removeIncludedValue = function (valueOrKey) {
+            if (typeof (valueOrKey) === "string") {
+                this.includedValues.remove(valueOrKey);
+            } else {
+                this.unregisteredIncludedValues.remove(valueOrKey);
             }
             return this;
         };
@@ -3321,28 +3420,6 @@ var Plottable;
         Domainer.prototype.nice = function (count) {
             this.doNice = true;
             this.niceCount = count;
-            return this;
-        };
-
-        /**
-        * Ensure that the domain produced includes value.
-        *
-        * For example, after include(0), the domain [3, 5] will become [0, 5],
-        * and the domain [-9, -8] will become [-9, 0].
-        *
-        * @param {any} value The value that will be included.
-        * @param {boolean} include Defaults to true. If true, this value will
-        *                  always be included, if false, this value will not
-        *                  necessarily be included.
-        * @return {Domainer} The calling Domainer.
-        */
-        Domainer.prototype.include = function (value, include) {
-            if (typeof include === "undefined") { include = true; }
-            if (include) {
-                this.includedValues.set(value, value);
-            } else {
-                this.includedValues.remove(value);
-            }
             return this;
         };
 
@@ -3373,10 +3450,13 @@ var Plottable;
             var newDomain = [
                 domain[0].valueOf() - this.padProportion / 2 * extent,
                 domain[1].valueOf() + this.padProportion / 2 * extent];
-            if (this.paddingExceptions.has(domain[0])) {
+
+            var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+            var exceptionSet = d3.set(exceptionValues);
+            if (exceptionSet.has(domain[0])) {
                 newDomain[0] = domain[0];
             }
-            if (this.paddingExceptions.has(domain[1])) {
+            if (exceptionSet.has(domain[1])) {
                 newDomain[1] = domain[1];
             }
             return newDomain;
@@ -3391,7 +3471,8 @@ var Plottable;
         };
 
         Domainer.prototype.includeDomain = function (domain) {
-            return this.includedValues.values().reduce(function (domain, value) {
+            var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
+            return includedValues.reduce(function (domain, value) {
                 return [Math.min(domain[0], value), Math.max(domain[1], value)];
             }, domain);
         };
@@ -3995,6 +4076,9 @@ var Plottable;
                 does change its domain, it re-propogates the change to every linked scale.
                 */
                 this.rescaleInProgress = false;
+                if (scales == null) {
+                    throw new Error("ScaleDomainCoordinator requires scales to coordinate");
+                }
                 this.scales = scales;
                 this.scales.forEach(function (s) {
                     return s.broadcaster.registerListener(_this, function (sx) {
@@ -4587,6 +4671,9 @@ var Plottable;
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
                 this._showEndTickLabels = false;
+                if (scale == null || orientation == null) {
+                    throw new Error("Axis requires a scale and orientation");
+                }
                 this._scale = scale;
                 this.orient(orientation);
 
@@ -5175,11 +5262,13 @@ var Plottable;
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
             */
-            function Category(scale, orientation) {
+            function Category(scale, orientation, formatter) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
+                if (typeof formatter === "undefined") { formatter = new Plottable.Formatter.Identity(); }
                 var _this = this;
-                _super.call(this, scale, orientation);
+                _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
                 if (scale.rangeType() !== "bands") {
                     throw new Error("Only rangeBands category axes are implemented");
@@ -5190,8 +5279,7 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
-                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelsG);
+                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
                 return this;
             };
 
@@ -5237,7 +5325,7 @@ var Plottable;
             };
 
             Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
-                var draw = dataOrTicks instanceof d3.selection;
+                var draw = typeof dataOrTicks[0] !== "string";
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) {
@@ -5255,17 +5343,18 @@ var Plottable;
                     var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
                     var textWriteResult;
+                    var formatter = self._formatter;
                     if (draw) {
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true, {
+                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true, {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     } else {
-                        textWriteResult = Plottable.Util.Text.writeText(d, width, height, tm, true);
+                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true);
                     }
 
                     textWriteResults.push(textWriteResult);
@@ -5289,7 +5378,7 @@ var Plottable;
             Category.prototype._doRender = function () {
                 var _this = this;
                 _super.prototype._doRender.call(this);
-                var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), function (d) {
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) {
                     return d;
                 });
 
@@ -5300,7 +5389,7 @@ var Plottable;
                     var y = _this._isHorizontal() ? 0 : bandStartPosition;
                     return "translate(" + x + "," + y + ")";
                 };
-                var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+                tickLabels.enter().append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", getTickLabelTransform);
 
@@ -5311,7 +5400,7 @@ var Plottable;
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
                 var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
-                Plottable.Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
+                Plottable.Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 Plottable.Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
                 return this;
             };
@@ -5384,8 +5473,8 @@ var Plottable;
 
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this.measurer(this.text);
-                var desiredWidth = this.orientation === "horizontal" ? desiredWH[0] : desiredWH[1];
-                var desiredHeight = this.orientation === "horizontal" ? desiredWH[1] : desiredWH[0];
+                var desiredWidth = this.orientation === "horizontal" ? desiredWH.width : desiredWH.height;
+                var desiredHeight = this.orientation === "horizontal" ? desiredWH.height : desiredWH.width;
 
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
@@ -5702,6 +5791,9 @@ var Plottable;
             function Gridlines(xScale, yScale) {
                 var _this = this;
                 _super.call(this);
+                if (xScale == null && yScale == null) {
+                    throw new Error("Gridlines must have at least one scale");
+                }
                 this.classed("gridlines", true);
                 this.xScale = xScale;
                 this.yScale = yScale;
@@ -5827,6 +5919,9 @@ var Plottable;
             */
             function XYPlot(dataset, xScale, yScale) {
                 _super.call(this, dataset);
+                if (xScale == null || yScale == null) {
+                    throw new Error("XYPlots require an xScale and yScale");
+                }
                 this.classed("xy-renderer", true);
 
                 this.project("x", "x", xScale); // default accessor
@@ -6048,7 +6143,6 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
-                this.previousBaselineValue = null;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -6117,7 +6211,6 @@ var Plottable;
             * @return {AbstractBarPlot} The calling AbstractBarPlot.
             */
             BarPlot.prototype.baseline = function (value) {
-                this.previousBaselineValue = this._baselineValue;
                 this._baselineValue = value;
                 this._updateXDomainer();
                 this._updateYDomainer();
@@ -6203,10 +6296,16 @@ var Plottable;
             BarPlot.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Abstract.QuantitiveScale) {
                     var qscale = scale;
-                    if (!qscale._userSetDomainer && this._baselineValue != null) {
-                        qscale.domainer().paddingException(this.previousBaselineValue, false).include(this.previousBaselineValue, false).paddingException(this._baselineValue).include(this._baselineValue);
-                        qscale._autoDomainIfAutomaticMode();
+                    if (!qscale._userSetDomainer) {
+                        if (this._baselineValue != null) {
+                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+                        } else {
+                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
+                        }
                     }
+
+                    // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
+                    qscale._autoDomainIfAutomaticMode();
                 }
                 return this;
             };
@@ -6380,10 +6479,10 @@ var Plottable;
                 this.classed("line-renderer", true);
                 this.project("stroke", function () {
                     return "steelblue";
-                });
-                this.project("fill", function () {
-                    return "none";
-                });
+                }); // default
+                this.project("stroke-width", function () {
+                    return "2px";
+                }); // default
             }
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6440,12 +6539,13 @@ var Plottable;
             */
             function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this.constantBaseline = null;
-                this.previousBaseline = null;
                 this.classed("area-renderer", true);
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
                     return "steelblue";
+                }); // default
+                this.project("fill-opacity", function () {
+                    return 0.5;
                 }); // default
                 this.project("stroke", function () {
                     return "none";
@@ -6473,21 +6573,16 @@ var Plottable;
                 var y0Projector = this._projectors["y0"];
                 var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
                 var extent = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
-                if (extent.length === 2 && extent[0] === extent[1]) {
-                    this.constantBaseline = extent[0];
-                } else {
-                    this.constantBaseline = null;
-                }
+                var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
-                if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
-                    if (this.previousBaseline != null) {
-                        scale.domainer().paddingException(this.previousBaseline, false);
-                        this.previousBaseline = null;
+                if (!scale._userSetDomainer) {
+                    if (constantBaseline != null) {
+                        scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+                    } else {
+                        scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
                     }
-                    if (this.constantBaseline != null) {
-                        scale.domainer().paddingException(this.constantBaseline, true);
-                        this.previousBaseline = this.constantBaseline;
-                    }
+
+                    // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }
                 return this;
@@ -6691,6 +6786,9 @@ var Plottable;
             * @param {Component} componentToListenTo The component to listen for interactions on.
             */
             function Interaction(componentToListenTo) {
+                if (componentToListenTo == null) {
+                    throw new Error("Interactions require a component to listen to");
+                }
                 this.componentToListenTo = componentToListenTo;
             }
             Interaction.prototype._anchor = function (hitBox) {
@@ -6898,6 +6996,9 @@ var Plottable;
             function PanZoom(componentToListenTo, xScale, yScale) {
                 var _this = this;
                 _super.call(this, componentToListenTo);
+                if (xScale == null || yScale == null) {
+                    throw new Error("panZoomInteractions require an xScale and yScale");
+                }
                 this.xScale = xScale;
                 this.yScale = yScale;
                 this.zoom = d3.behavior.zoom();

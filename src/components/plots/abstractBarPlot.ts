@@ -10,7 +10,6 @@ export module Abstract {
     public _barAlignmentFactor = 0;
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
-    private previousBaselineValue: number = null;
 
     public _animators: Animator.IPlotAnimatorMap = {
       "bars-reset" : new Animator.Null(),
@@ -86,7 +85,6 @@ export module Abstract {
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
     public baseline(value: number) {
-      this.previousBaselineValue = this._baselineValue;
       this._baselineValue = value;
       this._updateXDomainer();
       this._updateYDomainer();
@@ -188,14 +186,19 @@ export module Abstract {
     public _updateDomainer(scale: Scale) {
       if (scale instanceof Abstract.QuantitiveScale) {
         var qscale = <Abstract.QuantitiveScale> scale;
-        if (!qscale._userSetDomainer && this._baselineValue != null) {
-          qscale.domainer()
-            .paddingException(this.previousBaselineValue, false)
-            .include(this.previousBaselineValue, false)
-            .paddingException(this._baselineValue)
-            .include(this._baselineValue);
-          qscale._autoDomainIfAutomaticMode();
+        if (!qscale._userSetDomainer) {
+          if (this._baselineValue != null) {
+            qscale.domainer()
+              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
+              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+          } else {
+            qscale.domainer()
+              .removePaddingException("BAR_PLOT+" + this._plottableID)
+              .removeIncludedValue("BAR_PLOT+" + this._plottableID);
+          }
         }
+            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
+        qscale._autoDomainIfAutomaticMode();
       }
       return this;
     }

@@ -1,4 +1,4 @@
-///<reference path="testReference.ts" />
+///<reference path="../testReference.ts" />
 
 var assert = chai.assert;
 
@@ -201,7 +201,10 @@ it("components can be offset relative to their alignment, and throw errors if th
     var expectedClipPathID = c._plottableID;
     c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
     var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
-    assert.equal(c.element.attr("clip-path"), expectedClipPathURL, "the element has clip-path url attached");
+    // IE 9 has clipPath like 'url("#clipPath")', must accomodate
+    var normalizeClipPath = (s: string) => s.replace(/"/g, "");
+    assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL,
+                  "the element has clip-path url attached");
     var clipRect = (<any> c).boxContainer.select(".clip-rect");
     assert.equal(clipRect.attr("width"), 100, "the clipRect has an appropriate width");
     assert.equal(clipRect.attr("height"), 100, "the clipRect has an appropriate height");

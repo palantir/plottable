@@ -1,4 +1,4 @@
-///<reference path="testReference.ts" />
+///<reference path="../testReference.ts" />
 
 var assert = chai.assert;
 describe("Util.Text", () => {
@@ -56,7 +56,7 @@ describe("Util.Text", () => {
     });
 
     it("works as expected when given only one periods worth of space", () => {
-      var w = measure(".")[0];
+      var w = measure(".").width;
       assert.equal(e("this won't fit", w), ".", "returned a single period");
     });
 
@@ -65,13 +65,13 @@ describe("Util.Text", () => {
     });
 
     it("works as expected with insufficient space", () => {
-      var w = measure("this won't fit")[0];
+      var w = measure("this won't fit").width;
       assert.equal(e("this won't fit", w), "this won't...");
     });
 
     it("handles spaces intelligently", () => {
       var spacey = "this            xx";
-      var w = measure(spacey)[0] - 1;
+      var w = measure(spacey).width - 1;
       assert.equal(e(spacey, w), "this...");
     });
 
@@ -85,14 +85,14 @@ describe("Util.Text", () => {
     var svg: D3.Selection;
     var t: D3.Selection;
     var canonicalBB: any;
-    var canonicalResult: number[];
+    var canonicalResult: Plottable.Util.Text.Dimensions;
 
     before(() => {
       svg = generateSVG(200, 200);
       t = svg.append("text");
       t.text("hi there");
       canonicalBB = Plottable.Util.DOM.getBBox(t);
-      canonicalResult = [canonicalBB.width, canonicalBB.height];
+      canonicalResult = {width: canonicalBB.width, height: canonicalBB.height};
       t.text("bla bla bla");
     });
 
@@ -100,7 +100,7 @@ describe("Util.Text", () => {
     it("works on empty string", () => {
       var measure = Plottable.Util.Text.getTextMeasure(t);
       var result = measure("");
-      assert.deepEqual(result, [0, 0], "empty string has 0 width and height");
+      assert.deepEqual(result, {width: 0, height: 0}, "empty string has 0 width and height");
     });
     it("works on non-empty string and has no side effects", () => {
       var measure = Plottable.Util.Text.getTextMeasure(t);

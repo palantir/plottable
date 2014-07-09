@@ -1,4 +1,4 @@
-///<reference path="testReference.ts" />
+///<reference path="../testReference.ts" />
 
 var assert = chai.assert;
 
@@ -40,5 +40,15 @@ describe("Util.s", () => {
   it("uniq works as expected", () => {
     var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
     assert.deepEqual(Plottable.Util.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
+  });
+
+  it("objEq works as expected", () => {
+    assert.isTrue(Plottable.Util.Methods.objEq({}, {}));
+    assert.isTrue(Plottable.Util.Methods.objEq({a: 5}, {a: 5}));
+    assert.isFalse(Plottable.Util.Methods.objEq({a: 5, b: 6}, {a: 5}));
+    assert.isFalse(Plottable.Util.Methods.objEq({a: 5}, {a: 5, b: 6}));
+    assert.isTrue(Plottable.Util.Methods.objEq({a: "hello"}, {a: "hello"}));
+    assert.isFalse(Plottable.Util.Methods.objEq({constructor: {}.constructor}, {}),
+                  "using \"constructor\" isn't hidden");
   });
 });

@@ -22,6 +22,7 @@ export module Abstract {
 
     constructor(scale: Abstract.Scale, orientation: string, formatter?: Abstract.Formatter) {
       super();
+      if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
       this.orient(orientation);
 

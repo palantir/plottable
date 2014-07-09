@@ -47,6 +47,15 @@ declare module Plottable {
             * Check if two arrays are equal by strict equality.
             */
             function arrayEq<T>(a: T[], b: T[]): boolean;
+            /**
+            * @param {any} a Object to check against b for equality.
+            * @param {any} b Object to check against a for equality.
+            *
+            * @returns {boolean} whether or not two objects share the same keys, and
+            *          values associated with those keys. Values will be compared
+            *          with ===.
+            */
+            function objEq(a: any, b: any): boolean;
         }
     }
 }
@@ -214,14 +223,18 @@ declare module Plottable {
 declare module Plottable {
     module Util {
         module Text {
+            interface Dimensions {
+                width: number;
+                height: number;
+            }
             interface TextMeasurer {
-                (s: string): number[];
+                (s: string): Dimensions;
             }
             /**
-            * Returns a quasi-pure function of typesignature (t: string) => number[] which measures height and width of text
+            * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
             *
             * @param {D3.Selection} selection: The selection in which text will be drawn and measured
-            * @returns {number[]} width and height of the text
+            * @returns {Dimensions} width and height of the text
             */
             function getTextMeasure(selection: D3.Selection): TextMeasurer;
             /**
@@ -232,7 +245,7 @@ declare module Plottable {
             class CachingCharacterMeasurer {
                 /**
                 * @param {string} s The string to be measured.
-                * @return {number[]} [width, height] pair.
+                * @return {Dimensions} The width and height of the measured text.
                 */
                 public measure: TextMeasurer;
                 /**
@@ -274,10 +287,22 @@ declare module Plottable {
             * shortening the line as required to ensure that it fits within width.
             */
             function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
-            function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
-            function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
-            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): number[];
-            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): number[];
+            function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
+                width: number;
+                height: number;
+            };
+            function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
+                width: number;
+                height: number;
+            };
+            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
+                width: number;
+                height: number;
+            };
+            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
+                width: number;
+                height: number;
+            };
             interface IWriteTextResult {
                 textFits: boolean;
                 usedWidth: number;
@@ -1180,16 +1205,49 @@ declare module Plottable {
         */
         public pad(padProportion?: number): Domainer;
         /**
-        * Adds a value that will not be padded if either end of the domain.
-        * For example, after paddingException(0), a domainer will pad
-        * [0, 100] to [0, 102.5].
+        * Add a padding exception, a value that will not be padded at either end of the domain.
         *
-        * @param {any} exception The value that will not be padded.
-        * @param {boolean} add Defaults to true. If true, add the exception,
-        *                  if false, removes the exception.
-        * @return {Domainer} The calling Domainer.
+        * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
+        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+        * If a key is not provided, it will be added with set semantics (Can be removed by value)
+        *
+        * @param {any} exception The padding exception to add.
+        * @param string [key] The key to register the exception under.
+        * @return Domainer The calling domainer
         */
-        public paddingException(exception: any, add?: boolean): Domainer;
+        public addPaddingException(exception: any, key?: string): Domainer;
+        /**
+        * Remove a padding exception, allowing the domain to pad out that value again.
+        *
+        * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
+        * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
+        *
+        * @param {any} keyOrException The key for the value to remove, or the value to remove
+        * @return Domainer The calling domainer
+        */
+        public removePaddingException(keyOrException: any): Domainer;
+        /**
+        * Add an included value, a value that must be included inside the domain.
+        *
+        * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
+        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+        * If a key is not provided, it will be added with set semantics (Can be removed by value)
+        *
+        * @param {any} value The included value to add.
+        * @param string [key] The key to register the value under.
+        * @return Domainer The calling domainer
+        */
+        public addIncludedValue(value: any, key?: string): Domainer;
+        /**
+        * Remove an included value, allowing the domain to not include that value gain again.
+        *
+        * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
+        * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
+        *
+        * @param {any} keyOrException The key for the value to remove, or the value to remove
+        * @return Domainer The calling domainer
+        */
+        public removeIncludedValue(valueOrKey: any): Domainer;
         /**
         * Extends the scale's domain so it starts and ends with "nice" values.
         *
@@ -1197,19 +1255,6 @@ declare module Plottable {
         * @return {Domainer} The calling Domainer.
         */
         public nice(count?: number): Domainer;
-        /**
-        * Ensure that the domain produced includes value.
-        *
-        * For example, after include(0), the domain [3, 5] will become [0, 5],
-        * and the domain [-9, -8] will become [-9, 0].
-        *
-        * @param {any} value The value that will be included.
-        * @param {boolean} include Defaults to true. If true, this value will
-        *                  always be included, if false, this value will not
-        *                  necessarily be included.
-        * @return {Domainer} The calling Domainer.
-        */
-        public include(value: any, include?: boolean): Domainer;
     }
 }
 
@@ -1787,8 +1832,9 @@ declare module Plottable {
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
             */
-            constructor(scale: Scale.Ordinal, orientation?: string);
+            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: Formatter.Identity);
         }
     }
 }
