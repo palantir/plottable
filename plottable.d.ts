@@ -1661,7 +1661,7 @@ declare module Plottable {
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
             public axisElement: D3.Selection;
-            constructor(scale: Scale, orientation: string, formatter?: Formatter);
+            constructor(scale: Scale, orientation: string, formatter?: any);
             /**
             * Gets the current width.
             *
@@ -1694,7 +1694,7 @@ declare module Plottable {
             * @param {Abstract.Formatter} formatter
             * @returns {BaseAxis} The calling BaseAxis.
             */
-            public formatter(formatter: Formatter): Axis;
+            public formatter(formatter: any): Axis;
             /**
             * Gets the current tick mark length.
             *
@@ -1822,7 +1822,7 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
             */
-            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: Formatter.Identity);
+            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: any);
         }
     }
 }

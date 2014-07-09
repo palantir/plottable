@@ -4858,6 +4858,10 @@ var Plottable;
             * @returns {BaseAxis} The calling BaseAxis.
             */
             Axis.prototype.formatter = function (formatter) {
+                if (typeof (formatter) === "function") {
+                    formatter = new Plottable.Formatter.Custom(formatter);
+                    formatter.showOnlyUnchangedValues(false);
+                }
                 this._formatter = formatter;
                 this._invalidateLayout();
                 return this;

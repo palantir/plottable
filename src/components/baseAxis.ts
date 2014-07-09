@@ -20,7 +20,7 @@ export module Abstract {
     private _tickLabelPadding = 3;
     private _showEndTickLabels = false;
 
-    constructor(scale: Abstract.Scale, orientation: string, formatter?: Abstract.Formatter) {
+    constructor(scale: Abstract.Scale, orientation: string, formatter?: any) {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
@@ -274,7 +274,11 @@ export module Abstract {
      * @param {Abstract.Formatter} formatter
      * @returns {BaseAxis} The calling BaseAxis.
      */
-    public formatter(formatter: Abstract.Formatter) {
+    public formatter(formatter: any) {
+      if (typeof(formatter) === "function") {
+        formatter = new Plottable.Formatter.Custom(formatter);
+        formatter.showOnlyUnchangedValues(false);
+      }
       this._formatter = formatter;
       this._invalidateLayout();
       return this;
