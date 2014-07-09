@@ -5014,12 +5014,13 @@ var Plottable;
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                var epsilon = Math.pow(10, -this._formatter.precision());
 
                 // create a new text measurerer every time; see issue #643
                 var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textLengths = tickValues.map(function (v) {
-                    var formattedValue = _this._formatter.format(v);
-                    return measurer(formattedValue).width;
+                    var formattedValue = _this._formatter.format(v + epsilon);
+                    return measurer("X" + formattedValue).width;
                 });
                 testTextEl.remove();
 
