@@ -557,6 +557,11 @@ declare module Plottable {
 
 
 declare module Plottable {
+    var version: string;
+}
+
+
+declare module Plottable {
     module Abstract {
         class PlottableObject {
             public _plottableID: number;

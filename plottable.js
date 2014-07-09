@@ -1458,6 +1458,12 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    Plottable.version = "0.19.3";
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     (function (Abstract) {
         var PlottableObject = (function () {
             function PlottableObject() {
