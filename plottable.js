@@ -1347,7 +1347,8 @@ var Plottable;
     (function (Formatter) {
         var Custom = (function (_super) {
             __extends(Custom, _super);
-            function Custom(precision, customFormatFunction) {
+            function Custom(customFormatFunction, precision) {
+                if (typeof precision === "undefined") { precision = 0; }
                 _super.call(this, precision);
                 if (customFormatFunction == null) {
                     throw new Error("Custom Formatters require a formatting function");

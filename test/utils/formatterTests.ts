@@ -131,7 +131,7 @@ describe("Formatters", () => {
         assert.strictEqual(f, customFormatter, "Formatter itself was supplied as second argument");
         return String(d) + "-blargh";
       };
-      customFormatter = new Plottable.Formatter.Custom(0, blargify);
+      customFormatter = new Plottable.Formatter.Custom(blargify);
       var result = customFormatter.format(1);
       assert.strictEqual(result, "1-blargh", "it uses the custom formatting function");
     });
