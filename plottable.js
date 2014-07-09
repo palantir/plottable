@@ -5578,6 +5578,13 @@ var Plottable;
                 this.xAlign("RIGHT").yAlign("TOP");
                 this.xOffset(5).yOffset(5);
             }
+            Legend.prototype.remove = function () {
+                _super.prototype.remove.call(this);
+                if (this.colorScale != null) {
+                    this.colorScale.broadcaster.deregisterListener(this);
+                }
+            };
+
             Legend.prototype.toggleCallback = function (callback) {
                 if (callback !== undefined) {
                     this._toggleCallback = callback;

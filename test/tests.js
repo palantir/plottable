@@ -1741,6 +1741,15 @@ describe("Plots", function () {
             svg1.remove();
             svg2.remove();
         });
+
+        it("remove() disconnects plots from its scales", function () {
+            var r = new Plottable.Abstract.Plot();
+            var s = new Plottable.Scale.Linear();
+            r.project("attr", "a", s);
+            r.remove();
+            var listener2Callback = s.broadcaster.listener2Callback;
+            assert.isUndefined(listener2Callback.get(r), "the plot is no longer attached to the scale");
+        });
     });
 });
 

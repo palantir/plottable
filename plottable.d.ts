@@ -1891,6 +1891,7 @@ declare module Plottable {
             * @param {ColorScale} colorScale
             */
             constructor(colorScale?: Scale.Color);
+            public remove(): void;
             /**
             * Assigns or gets the callback to the Legend
             * This callback is associated with toggle events, which trigger when a legend row is clicked.
