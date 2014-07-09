@@ -14,13 +14,13 @@ export module Component {
      * Creates a Label.
      *
      * @constructor
-     * @param {string} [text] The text of the Label.
+     * @param {string} [displayText] The text of the Label.
      * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
      */
-    constructor(inputText = "", orientation = "horizontal") {
+    constructor(displayText = "", orientation = "horizontal") {
       super();
       this.classed("label", true);
-      this.text(inputText);
+      this.text(displayText);
       orientation = orientation.toLowerCase();
       if (orientation === "vertical-left")  { orientation = "left" ; }
       if (orientation === "vertical-right") { orientation = "right"; }
@@ -67,23 +67,23 @@ export module Component {
     }
 
     /**
-     * Sets the text on the Label.
-     *
-     * @param {string} text The new text for the Label.
-     * @returns {Label} The calling Label.
-     */
-    public text(inputText: string): Label;
-    /**
      * Retrieve the current text on the Label.
      *
      * @returns {string} The text on the label.
      */
     public text(): string;
-    public text(inputText?: string): any {
-      if (inputText === undefined) {
+    /**
+     * Sets the text on the Label.
+     *
+     * @param {string} displayText The new text for the Label.
+     * @returns {Label} The calling Label.
+     */
+    public text(displayText: string): Label;
+    public text(displayText?: string): any {
+      if (displayText === undefined) {
         return this._text;
       } else {
-        this._text = inputText;
+        this._text = displayText;
         this._invalidateLayout();
         return this;
       }
