@@ -4643,6 +4643,12 @@ var Plottable;
                 if (formatter == null) {
                     formatter = new Plottable.Formatter.General();
                     formatter.showOnlyUnchangedValues(false);
+                } else if (!(formatter instanceof Plottable.Abstract.Formatter)) {
+                    if (typeof (formatter) !== "function") {
+                        throw new Error("AxisFormatterError: Formatter must be either undefined, a Plottable Formatter, or a function");
+                    }
+                    formatter = new Plottable.Formatter.Custom(formatter);
+                    formatter.showOnlyUnchangedValues(false);
                 }
                 this.formatter(formatter);
 
