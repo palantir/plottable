@@ -9,9 +9,9 @@
 ///<reference path="globalInitialization.ts" />
 ///<reference path="perfdiagnostics.ts" />
 
-///<reference path="components/axisTests.ts" />
 ///<reference path="components/baseAxisTests.ts" />
 ///<reference path="components/numericAxisTests.ts" />
+///<reference path="components/categoryAxisTests.ts" />
 ///<reference path="components/gridlinesTests.ts" />
 ///<reference path="components/labelTests.ts" />
 ///<reference path="components/legendTests.ts" />

@@ -42,7 +42,6 @@
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
-/// <reference path="components/axis.ts" />
 /// <reference path="components/baseAxis.ts" />
 /// <reference path="components/numericAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />
