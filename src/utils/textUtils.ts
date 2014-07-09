@@ -140,7 +140,7 @@ export module Util {
       if (measurer(text).width <= availableWidth) {
         return text;
       } else {
-        return addEllipsesToLine(text, availableWidth, measurer);
+        return _addEllipsesToLine(text, availableWidth, measurer);
       }
     }
 
@@ -169,7 +169,7 @@ export module Util {
      * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
      * shortening the line as required to ensure that it fits within width.
      */
-    export function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
+    export function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
       var mutatedLine = line.trim(); // Leave original around for debugging utility
       var widthMeasure = (s: string) => measureText(s).width;
       var lineWidth = widthMeasure(line);
@@ -184,7 +184,7 @@ export module Util {
         lineWidth = widthMeasure(mutatedLine);
       }
       if (widthMeasure(mutatedLine + "...") > width) {
-        throw new Error("addEllipsesToLine failed :(");
+        throw new Error("_addEllipsesToLine failed :(");
       }
       return mutatedLine + "...";
     }

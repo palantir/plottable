@@ -27,7 +27,7 @@ export module Util {
         lines = lines.splice(0, nLinesThatFit);
         if (nLinesThatFit > 0) {
           // Overwrite the last line to one that has had a ... appended to the end
-          lines[nLinesThatFit-1] = Text.addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
+          lines[nLinesThatFit-1] = Text._addEllipsesToLine(lines[nLinesThatFit-1], width, measureText);
         }
       }
       return {originalText: text, lines: lines, textFits: textFit};
@@ -38,7 +38,7 @@ export module Util {
      * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
      * the word is too big to fit within width on its own.
      */
-    export function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[] {
+    function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[] {
       var ret: string[] = [];
       var paragraphs = text.split("\n");
       for (var i = 0, len = paragraphs.length; i < len; i++) {
