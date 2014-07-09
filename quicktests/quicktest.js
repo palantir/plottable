@@ -1,5 +1,7 @@
 // you were going to find out how to fix this race condition
 
+var quicktests = {};
+
 function loadScript(url) {
   return new Promise(function(resolve, reject) {
     var element = document.createElement("script");
@@ -81,10 +83,13 @@ function loadTheQuicktests(quicktestsJSONArray) {
     quicktestsJSONArray.forEach(function(q) {
       var name = q.name;
       d3.text("/quicktests/" + name + ".js", function(error, text) {
-        text += ";return {makeData: makeData, run: run};";
-        obj = new Function(text)();
-        q.makeData = obj.makeData;
-        q.run = obj.run;
+        text = "(function(){" + text +
+          "\nreturn {makeData: makeData, run: run};" +
+               "})();" +
+          "\n////# sourceURL=" + name + ".js\n";
+        var result = eval(text);
+        q.makeData = result.makeData;
+        q.run = result.run;
         window.quicktests.push(q);
         if (++numLoaded === numToLoad) f();
       });

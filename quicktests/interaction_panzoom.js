@@ -4,7 +4,6 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
-  console.log(data);
 
   var xScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
