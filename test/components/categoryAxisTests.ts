@@ -1,4 +1,4 @@
-///<reference path="testReference.ts" />
+///<reference path="../testReference.ts" />
 
 var assert = chai.assert;
 describe("Category Axes", () => {
@@ -7,9 +7,9 @@ describe("Category Axes", () => {
     var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axis.Category(xScale, "left");
     ca.renderTo(svg);
-    assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+    assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
     assert.doesNotThrow(() => xScale.domain(["bar", "baz", "bam"]));
-    assert.deepEqual(ca._tickLabelsG.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+    assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
     svg.remove();
   });
 
