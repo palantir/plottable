@@ -86,7 +86,7 @@ function loadTheQuicktests(quicktestsJSONArray) {
   return new Promise(function (f, r) {
     quicktestsJSONArray.forEach(function(q) {
       var name = q.name;
-      d3.text("/quicktests/quicktests/" + name + ".js", function(error, text) {
+      d3.text("/quicktests/" + name + ".js", function(error, text) {
         text += ";return {makeData: makeData, run: run};";
         obj = new Function(text)();
         q.makeData = obj.makeData;
