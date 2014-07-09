@@ -1694,7 +1694,7 @@ declare module Plottable {
             * @param {Abstract.Formatter} formatter
             * @returns {BaseAxis} The calling BaseAxis.
             */
-            public formatter(formatter: Formatter): Axis;
+            public formatter(formatter: any): Axis;
             /**
             * Gets the current tick mark length.
             *
