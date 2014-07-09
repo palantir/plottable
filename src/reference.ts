@@ -17,6 +17,7 @@
 /// <reference path="utils/formatters/timeFormatter.ts" />
 
 
+/// <reference path="core/version.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
@@ -32,7 +33,6 @@
 /// <reference path="core/animator.ts" />
 /// <reference path="core/interfaces.ts" />
 /// <reference path="core/domainer.ts" />
-/// <reference path="core/version.ts" />
 
 /// <reference path="scales/quantitiveScale.ts" />
 /// <reference path="scales/linearScale.ts" />

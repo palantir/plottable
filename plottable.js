@@ -1465,6 +1465,12 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    Plottable.version = "0.19.3";
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
     (function (Abstract) {
         var PlottableObject = (function () {
             function PlottableObject() {
@@ -3441,12 +3447,6 @@ var Plottable;
         return Domainer;
     })();
     Plottable.Domainer = Domainer;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    Plottable.version = "0.19.3";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
