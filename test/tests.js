@@ -4518,7 +4518,7 @@ describe("Util.Text", function () {
         svg.remove();
     });
 
-    describe("addEllipsesToLine", function () {
+    describe("_addEllipsesToLine", function () {
         var svg;
         var measure;
         var e;
@@ -4527,7 +4527,7 @@ describe("Util.Text", function () {
             svg = generateSVG();
             measure = Plottable.Util.Text.getTextMeasure(svg);
             e = function (text, width) {
-                return Plottable.Util.Text.addEllipsesToLine(text, width, measure);
+                return Plottable.Util.Text._addEllipsesToLine(text, width, measure);
             };
         });
         it("works on an empty string", function () {

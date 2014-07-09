@@ -286,7 +286,7 @@ declare module Plottable {
             * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
             * shortening the line as required to ensure that it fits within width.
             */
-            function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
+            function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
@@ -338,12 +338,6 @@ declare module Plottable {
             * Wraps words and fits as much of the text as possible into the given width and height.
             */
             function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): IWrappedText;
-            /**
-            * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
-            * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
-            * the word is too big to fit within width on its own.
-            */
-            function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[];
             /**
             * Determines if it is possible to fit a given text within width without breaking any of the words.
             * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
