@@ -126,8 +126,8 @@ describe("Scales", () => {
       var renderAreas = renderAreaD1.merge(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
-      renderAreaD1.remove();
-      assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+      renderAreaD1.detach();
+      assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
       renderAreas.merge(renderAreaD1);
       assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
       svg.remove();
