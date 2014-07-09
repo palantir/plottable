@@ -3686,6 +3686,38 @@ describe("Scales", function () {
         });
     });
 
+    it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {
+        // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
+        var xScale = new Plottable.Scale.Ordinal();
+        var yScale = new Plottable.Scale.Linear();
+        var dA = { x: "A", y: 2 };
+        var dB = { x: "B", y: 2 };
+        var dC = { x: "C", y: 2 };
+        var barPlot = new Plottable.Plot.VerticalBar([dA, dB], xScale, yScale);
+        var svg = generateSVG();
+        assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
+        barPlot.renderTo(svg);
+        assert.deepEqual(xScale.domain(), ["A", "B"], "after anchoring, the bar plot's data is on the scale");
+
+        function iterateDataChanges() {
+            var dataChanges = [];
+            for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                dataChanges[_i] = arguments[_i + 0];
+            }
+            dataChanges.forEach(function (dataChange) {
+                barPlot.dataSource().data(dataChange);
+            });
+        }
+
+        iterateDataChanges([], [dA, dB, dC], []);
+        assert.lengthOf(xScale.domain(), 0);
+
+        iterateDataChanges([dA], [dB]);
+        assert.lengthOf(xScale.domain(), 1);
+        iterateDataChanges([], [dA, dB, dC]);
+        assert.lengthOf(xScale.domain(), 3);
+    });
+
     describe("Color Scales", function () {
         it("accepts categorical string types and ordinal domain", function () {
             var scale = new Plottable.Scale.Color("10");
