@@ -62,7 +62,7 @@ export module Axis {
     }
 
     public _getTickValues(): any[] {
-      return this._scale.ticks(10);
+      return this._scale.ticks();
     }
 
     public _doRender() {
