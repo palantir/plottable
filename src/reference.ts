@@ -17,6 +17,7 @@
 /// <reference path="utils/formatters/timeFormatter.ts" />
 
 
+/// <reference path="core/version.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
