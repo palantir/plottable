@@ -72,10 +72,21 @@ export module Component {
      * @param {string} text The new text for the Label.
      * @returns {Label} The calling Label.
      */
-    public text(inputText: string) {
-      this._text = inputText;
-      this._invalidateLayout();
-      return this;
+    public text(inputText: string): Label;
+    /**
+     * Retrieve the current text on the Label.
+     *
+     * @returns {string} The text on the label.
+     */
+    public text(): string;
+    public text(inputText?: string): any {
+      if (inputText === undefined) {
+        return this._text;
+      } else {
+        this._text = inputText;
+        this._invalidateLayout();
+        return this;
+      }
     }
 
     public _doRender() {

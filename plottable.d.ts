@@ -1848,6 +1848,12 @@ declare module Plottable {
             * @returns {Label} The calling Label.
             */
             public text(inputText: string): Label;
+            /**
+            * Retrieve the current text on the Label.
+            *
+            * @returns {string} The text on the label.
+            */
+            public text(): string;
         }
         class TitleLabel extends Label {
             constructor(text?: string, orientation?: string);

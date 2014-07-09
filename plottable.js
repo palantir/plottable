@@ -5442,16 +5442,14 @@ var Plottable;
                 return this;
             };
 
-            /**
-            * Sets the text on the Label.
-            *
-            * @param {string} text The new text for the Label.
-            * @returns {Label} The calling Label.
-            */
             Label.prototype.text = function (inputText) {
-                this._text = inputText;
-                this._invalidateLayout();
-                return this;
+                if (inputText === undefined) {
+                    return this._text;
+                } else {
+                    this._text = inputText;
+                    this._invalidateLayout();
+                    return this;
+                }
             };
 
             Label.prototype._doRender = function () {
