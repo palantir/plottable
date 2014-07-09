@@ -37,7 +37,7 @@ describe("Util.Text", () => {
     svg.remove();
   });
 
-  describe("addEllipsesToLine", () => {
+  describe("_addEllipsesToLine", () => {
     var svg: D3.Selection;
     var measure: any;
     var e: any;
@@ -45,7 +45,7 @@ describe("Util.Text", () => {
     before(() => {
       svg = generateSVG();
       measure = Plottable.Util.Text.getTextMeasure(svg);
-      e = (text: string, width: number) => Plottable.Util.Text.addEllipsesToLine(text, width, measure);
+      e = (text: string, width: number) => Plottable.Util.Text._addEllipsesToLine(text, width, measure);
     });
     it("works on an empty string" ,() => {
       assert.equal(e("", 200), "...", "produced \"...\" with plenty of space");

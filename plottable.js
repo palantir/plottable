@@ -561,7 +561,7 @@ var Plottable;
                 if (measurer(text).width <= availableWidth) {
                     return text;
                 } else {
-                    return addEllipsesToLine(text, availableWidth, measurer);
+                    return _addEllipsesToLine(text, availableWidth, measurer);
                 }
             }
             Text.getTruncatedText = getTruncatedText;
@@ -592,7 +592,7 @@ var Plottable;
             * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
             * shortening the line as required to ensure that it fits within width.
             */
-            function addEllipsesToLine(line, width, measureText) {
+            function _addEllipsesToLine(line, width, measureText) {
                 var mutatedLine = line.trim();
                 var widthMeasure = function (s) {
                     return measureText(s).width;
@@ -609,11 +609,11 @@ var Plottable;
                     lineWidth = widthMeasure(mutatedLine);
                 }
                 if (widthMeasure(mutatedLine + "...") > width) {
-                    throw new Error("addEllipsesToLine failed :(");
+                    throw new Error("_addEllipsesToLine failed :(");
                 }
                 return mutatedLine + "...";
             }
-            Text.addEllipsesToLine = addEllipsesToLine;
+            Text._addEllipsesToLine = _addEllipsesToLine;
 
             function writeLineHorizontally(line, g, width, height, xAlign, yAlign) {
                 if (typeof xAlign === "undefined") { xAlign = "left"; }
@@ -787,7 +787,7 @@ var Plottable;
                     lines = lines.splice(0, nLinesThatFit);
                     if (nLinesThatFit > 0) {
                         // Overwrite the last line to one that has had a ... appended to the end
-                        lines[nLinesThatFit - 1] = Util.Text.addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
+                        lines[nLinesThatFit - 1] = Util.Text._addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
                     }
                 }
                 return { originalText: text, lines: lines, textFits: textFit };
@@ -812,7 +812,6 @@ var Plottable;
                 }
                 return ret;
             }
-            WordWrap.breakTextToFitWidth = breakTextToFitWidth;
 
             /**
             * Determines if it is possible to fit a given text within width without breaking any of the words.
@@ -1460,6 +1459,12 @@ var Plottable;
         Formatter.Time = Time;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    Plottable.version = "0.19.3";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4113,553 +4118,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (_Axis) {
-        var Axis = (function (_super) {
-            __extends(Axis, _super);
-            /**
-            * Creates an Axis.
-            *
-            * @constructor
-            * @param {Scale} scale The Scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
-            */
-            function Axis(axisScale, orientation, formatter) {
-                var _this = this;
-                _super.call(this);
-                this._showEndTickLabels = false;
-                this.tickPositioning = "center";
-                this.orientToAlign = { left: "right", right: "left", top: "bottom", bottom: "top" };
-                this._axisScale = axisScale;
-                orientation = orientation.toLowerCase();
-                this.d3Axis = d3.svg.axis().scale(axisScale._d3Scale).orient(orientation);
-                this.classed("axis", true);
-                var formatFunction = formatter;
-                if (formatter == null) {
-                    formatter = new Plottable.Formatter.General();
-                }
-                if (formatter instanceof Plottable.Abstract.Formatter) {
-                    formatFunction = function (d) {
-                        return formatter.format(d);
-                    };
-                }
-                this.tickFormat(formatFunction);
-                this._axisScale.broadcaster.registerListener(this, function () {
-                    return _this._render();
-                });
-            }
-            Axis.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this.axisElement = this.content.append("g").classed("axis", true);
-                return this;
-            };
-
-            Axis.prototype.remove = function () {
-                _super.prototype.remove.call(this);
-                this._axisScale.broadcaster.deregisterListener(this);
-            };
-
-            Axis.prototype._doRender = function () {
-                var domain = this._axisScale.domain();
-                var extent = Math.abs(domain[1] - domain[0]);
-                var min = +d3.min(domain);
-                var max = +d3.max(domain);
-                var newDomain;
-                var standardOrder = domain[0] < domain[1];
-                if (typeof (domain[0]) === "number") {
-                    newDomain = standardOrder ? [min - extent, max + extent] : [max + extent, min - extent];
-                } else {
-                    newDomain = standardOrder ? [new Date(min - extent), new Date(max + extent)] : [new Date(max + extent), new Date(min - extent)];
-                }
-
-                // hackhack Make tiny-zero representations not look terrible, by rounding them to 0
-                if (this._axisScale.ticks != null) {
-                    var scale = this._axisScale;
-                    var nTicks = 10;
-                    var ticks = scale.ticks(nTicks);
-                    var numericDomain = scale.domain();
-                    var interval = numericDomain[1] - numericDomain[0];
-                    var cleanTick = function (n) {
-                        return Math.abs(n / interval / nTicks) < 0.0001 ? 0 : n;
-                    };
-                    ticks = ticks.map(cleanTick);
-                    this.d3Axis.tickValues(ticks);
-                }
-
-                this.axisElement.call(this.d3Axis);
-
-                this.axisElement.selectAll(".tick").select("text").style("visibility", "visible");
-
-                return this;
-            };
-
-            Axis.prototype.showEndTickLabels = function (show) {
-                if (show == null) {
-                    return this._showEndTickLabels;
-                }
-                this._showEndTickLabels = show;
-                return this;
-            };
-
-            Axis.prototype._hideCutOffTickLabels = function () {
-                var _this = this;
-                var availableWidth = this.availableWidth;
-                var availableHeight = this.availableHeight;
-                var tickLabels = this.axisElement.selectAll(".tick").select("text");
-
-                var boundingBox = this.element.select(".bounding-box")[0][0].getBoundingClientRect();
-
-                var isInsideBBox = function (tickBox) {
-                    return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
-                };
-
-                tickLabels.each(function (d) {
-                    if (!isInsideBBox(this.getBoundingClientRect())) {
-                        d3.select(this).style("visibility", "hidden");
-                    }
-                });
-
-                return this;
-            };
-
-            Axis.prototype._hideOverlappingTickLabels = function () {
-                var tickLabels = this.axisElement.selectAll(".tick").select("text");
-                var lastLabelClientRect;
-
-                function boxesOverlap(boxA, boxB) {
-                    if (boxA.right < boxB.left) {
-                        return false;
-                    }
-                    if (boxA.left > boxB.right) {
-                        return false;
-                    }
-                    if (boxA.bottom < boxB.top) {
-                        return false;
-                    }
-                    if (boxA.top > boxB.bottom) {
-                        return false;
-                    }
-                    return true;
-                }
-
-                tickLabels.each(function (d) {
-                    var clientRect = this.getBoundingClientRect();
-                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
-                        d3.select(this).style("visibility", "hidden");
-                    } else {
-                        lastLabelClientRect = clientRect;
-                        d3.select(this).style("visibility", "visible");
-                    }
-                });
-            };
-
-            Axis.prototype.scale = function (newScale) {
-                if (newScale == null) {
-                    return this._axisScale;
-                } else {
-                    this._axisScale = newScale;
-                    this.d3Axis.scale(newScale._d3Scale);
-                    return this;
-                }
-            };
-
-            Axis.prototype.tickLabelPosition = function (position) {
-                if (position == null) {
-                    return this.tickPositioning;
-                } else {
-                    this.tickPositioning = position;
-                    return this;
-                }
-            };
-
-            Axis.prototype.orient = function (newOrient) {
-                if (newOrient == null) {
-                    return this.d3Axis.orient();
-                } else {
-                    this.d3Axis.orient(newOrient);
-                    return this;
-                }
-            };
-
-            Axis.prototype.ticks = function () {
-                var args = [];
-                for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                    args[_i] = arguments[_i + 0];
-                }
-                if (args == null || args.length === 0) {
-                    return this.d3Axis.ticks();
-                } else {
-                    this.d3Axis.ticks(args);
-                    return this;
-                }
-            };
-
-            Axis.prototype.tickValues = function () {
-                var args = [];
-                for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                    args[_i] = arguments[_i + 0];
-                }
-                if (args == null) {
-                    return this.d3Axis.tickValues();
-                } else {
-                    this.d3Axis.tickValues(args);
-                    return this;
-                }
-            };
-
-            Axis.prototype.tickSize = function (inner, outer) {
-                if (inner != null && outer != null) {
-                    this.d3Axis.tickSize(inner, outer);
-                    return this;
-                } else if (inner != null) {
-                    this.d3Axis.tickSize(inner);
-                    return this;
-                } else {
-                    return this.d3Axis.tickSize();
-                }
-            };
-
-            Axis.prototype.innerTickSize = function (val) {
-                if (val == null) {
-                    return this.d3Axis.innerTickSize();
-                } else {
-                    this.d3Axis.innerTickSize(val);
-                    return this;
-                }
-            };
-
-            Axis.prototype.outerTickSize = function (val) {
-                if (val == null) {
-                    return this.d3Axis.outerTickSize();
-                } else {
-                    this.d3Axis.outerTickSize(val);
-                    return this;
-                }
-            };
-
-            Axis.prototype.tickPadding = function (val) {
-                if (val == null) {
-                    return this.d3Axis.tickPadding();
-                } else {
-                    this.d3Axis.tickPadding(val);
-                    return this;
-                }
-            };
-
-            Axis.prototype.tickFormat = function (formatter) {
-                if (formatter == null) {
-                    return this.d3Axis.tickFormat();
-                } else {
-                    this.d3Axis.tickFormat(formatter);
-                    this._invalidateLayout();
-                    return this;
-                }
-            };
-            Axis._DEFAULT_TICK_SIZE = 6;
-            return Axis;
-        })(Plottable.Abstract.Component);
-        _Axis.Axis = Axis;
-
-        var XAxis = (function (_super) {
-            __extends(XAxis, _super);
-            /**
-            * Creates an XAxis (a horizontal Axis).
-            *
-            * @constructor
-            * @param {Scale} scale The Scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom)
-            * @param {any} [formatter] a D3 formatter
-            */
-            function XAxis(scale, orientation, formatter) {
-                if (typeof orientation === "undefined") { orientation = "bottom"; }
-                if (typeof formatter === "undefined") { formatter = null; }
-                _super.call(this, scale, orientation, formatter);
-                this._height = 30;
-                var orientation = orientation.toLowerCase();
-                if (orientation !== "top" && orientation !== "bottom") {
-                    throw new Error(orientation + " is not a valid orientation for XAxis");
-                }
-                this.tickLabelPosition("center");
-                var desiredAlignment = this.orientToAlign[orientation];
-                this.yAlign(desiredAlignment);
-            }
-            XAxis.prototype.height = function (h) {
-                this._height = h;
-                this._invalidateLayout();
-                return this;
-            };
-
-            XAxis.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this.axisElement.classed("x-axis", true);
-                return this;
-            };
-
-            XAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                return {
-                    width: 0,
-                    height: Math.min(offeredHeight, this._height),
-                    wantsWidth: false,
-                    wantsHeight: offeredHeight < this._height
-                };
-            };
-
-            XAxis.prototype.tickLabelPosition = function (position) {
-                if (position == null) {
-                    return _super.prototype.tickLabelPosition.call(this);
-                } else {
-                    var positionLC = position.toLowerCase();
-                    if (positionLC === "left" || positionLC === "center" || positionLC === "right") {
-                        if (positionLC === "center") {
-                            this.tickSize(XAxis._DEFAULT_TICK_SIZE);
-                        } else {
-                            this.tickSize(12); // longer than default tick size
-                        }
-                        return _super.prototype.tickLabelPosition.call(this, positionLC);
-                    } else {
-                        throw new Error(position + " is not a valid tick label position for XAxis");
-                    }
-                }
-            };
-
-            XAxis.prototype._doRender = function () {
-                var _this = this;
-                _super.prototype._doRender.call(this);
-                if (this.orient() === "top") {
-                    this.axisElement.attr("transform", "translate(0," + this._height + ")");
-                } else if (this.orient() === "bottom") {
-                    this.axisElement.attr("transform", "");
-                }
-
-                var tickTextLabels = this.axisElement.selectAll("text");
-                if (tickTextLabels[0].length > 0) {
-                    if (this.tickLabelPosition() !== "center") {
-                        tickTextLabels.attr("y", "0px");
-
-                        if (this.orient() === "bottom") {
-                            tickTextLabels.attr("dy", "1em");
-                        } else {
-                            tickTextLabels.attr("dy", "-0.25em");
-                        }
-
-                        if (this.tickLabelPosition() === "right") {
-                            tickTextLabels.attr("dx", "0.2em").style("text-anchor", "start");
-                        } else if (this.tickLabelPosition() === "left") {
-                            tickTextLabels.attr("dx", "-0.2em").style("text-anchor", "end");
-                        }
-                    }
-
-                    if (this._axisScale.rangeType != null) {
-                        var scaleRange = this._axisScale.range();
-                        var availableWidth = this.availableWidth;
-                        var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("y")));
-                        var availableHeight = this.availableHeight - tickLengthWithPadding;
-                        if (tickTextLabels[0].length > 1) {
-                            var tickValues = tickTextLabels.data();
-                            var tickPositions = tickValues.map(function (v) {
-                                return _this._axisScale.scale(v);
-                            });
-                            tickPositions.forEach(function (p, i) {
-                                var spacing = Math.abs(tickPositions[i + 1] - p);
-                                availableWidth = (spacing < availableWidth) ? spacing : availableWidth;
-                            });
-                        }
-
-                        availableWidth = 0.9 * availableWidth; // add in some padding
-
-                        tickTextLabels.each(function (t, i) {
-                            var textEl = d3.select(this);
-                            var currentText = textEl.text();
-                            var measure = Plottable.Util.Text.getTextMeasure(textEl);
-                            var wrappedLines = Plottable.Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
-                            if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, measure));
-                            } else {
-                                textEl.text("");
-                                var tspans = textEl.selectAll("tspan").data(wrappedLines);
-                                tspans.enter().append("tspan");
-                                tspans.text(function (line) {
-                                    return line;
-                                }).attr("x", "0").attr("dy", function (line, i) {
-                                    return (i === 0) ? textEl.attr("dy") : "1em";
-                                }).style("text-anchor", textEl.style("text-anchor"));
-                            }
-                        });
-                    } else {
-                        this._hideOverlappingTickLabels();
-                    }
-                }
-
-                if (!this.showEndTickLabels()) {
-                    this._hideCutOffTickLabels();
-                }
-                return this;
-            };
-            return XAxis;
-        })(Axis);
-        _Axis.XAxis = XAxis;
-
-        var YAxis = (function (_super) {
-            __extends(YAxis, _super);
-            /**
-            * Creates a YAxis (a vertical Axis).
-            *
-            * @constructor
-            * @param {Scale} scale The Scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (left/right)
-            * @param {any} [formatter] a D3 formatter
-            */
-            function YAxis(scale, orientation, formatter) {
-                if (typeof orientation === "undefined") { orientation = "left"; }
-                if (typeof formatter === "undefined") { formatter = null; }
-                _super.call(this, scale, orientation, formatter);
-                this._width = 50;
-                orientation = orientation.toLowerCase();
-                if (orientation !== "left" && orientation !== "right") {
-                    throw new Error(orientation + " is not a valid orientation for YAxis");
-                }
-                this.tickLabelPosition("middle");
-                var desiredAlignment = this.orientToAlign[orientation];
-                this.xAlign(desiredAlignment);
-            }
-            YAxis.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this.axisElement.classed("y-axis", true);
-                return this;
-            };
-
-            YAxis.prototype.width = function (w) {
-                this._width = w;
-                this._invalidateLayout();
-                return this;
-            };
-
-            YAxis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                return {
-                    width: Math.min(offeredWidth, this._width),
-                    height: 0,
-                    wantsWidth: offeredWidth < this._width,
-                    wantsHeight: false
-                };
-            };
-
-            YAxis.prototype.tickLabelPosition = function (position) {
-                if (position == null) {
-                    return _super.prototype.tickLabelPosition.call(this);
-                } else {
-                    var positionLC = position.toLowerCase();
-                    if (positionLC === "top" || positionLC === "middle" || positionLC === "bottom") {
-                        if (positionLC === "middle") {
-                            this.tickSize(YAxis._DEFAULT_TICK_SIZE);
-                        } else {
-                            this.tickSize(30); // longer than default tick size
-                        }
-                        return _super.prototype.tickLabelPosition.call(this, positionLC);
-                    } else {
-                        throw new Error(position + " is not a valid tick label position for YAxis");
-                    }
-                }
-            };
-
-            YAxis.prototype._doRender = function () {
-                var _this = this;
-                _super.prototype._doRender.call(this);
-                if (this.orient() === "left") {
-                    this.axisElement.attr("transform", "translate(" + this._width + ", 0)");
-                } else if (this.orient() === "right") {
-                    this.axisElement.attr("transform", "");
-                }
-
-                var tickTextLabels = this.axisElement.selectAll("text");
-                if (tickTextLabels[0].length > 0) {
-                    if (this.tickLabelPosition() !== "middle") {
-                        tickTextLabels.attr("x", "0px");
-
-                        if (this.orient() === "left") {
-                            tickTextLabels.attr("dx", "-0.25em");
-                        } else {
-                            tickTextLabels.attr("dx", "0.25em");
-                        }
-
-                        if (this.tickLabelPosition() === "top") {
-                            tickTextLabels.attr("dy", "-0.3em");
-                        } else if (this.tickLabelPosition() === "bottom") {
-                            tickTextLabels.attr("dy", "1em");
-                        }
-                    }
-
-                    if (this._axisScale.rangeType != null) {
-                        var scaleRange = this._axisScale.range();
-                        var tickLengthWithPadding = Math.abs(parseFloat(d3.select(tickTextLabels[0][0]).attr("x")));
-                        var availableWidth = this.availableWidth - tickLengthWithPadding;
-                        var availableHeight = this.availableHeight;
-                        if (tickTextLabels[0].length > 1) {
-                            var tickValues = tickTextLabels.data();
-                            var tickPositions = tickValues.map(function (v) {
-                                return _this._axisScale.scale(v);
-                            });
-                            tickPositions.forEach(function (p, i) {
-                                var spacing = Math.abs(tickPositions[i + 1] - p);
-                                availableHeight = (spacing < availableHeight) ? spacing : availableHeight;
-                            });
-                        }
-
-                        var tickLabelPosition = this.tickLabelPosition();
-                        tickTextLabels.each(function (t, i) {
-                            var textEl = d3.select(this);
-                            var currentText = textEl.text();
-                            var measure = Plottable.Util.Text.getTextMeasure(textEl);
-                            var wrappedLines = Plottable.Util.WordWrap.breakTextToFitRect(currentText, availableWidth, availableHeight, measure).lines;
-                            if (wrappedLines.length === 1) {
-                                textEl.text(Plottable.Util.Text.getTruncatedText(currentText, availableWidth, measure));
-                            } else {
-                                var baseY = 0;
-                                if (tickLabelPosition === "top") {
-                                    baseY = -(wrappedLines.length - 1);
-                                } else if (tickLabelPosition === "middle") {
-                                    baseY = -(wrappedLines.length - 1) / 2;
-                                }
-
-                                textEl.text("");
-                                var tspans = textEl.selectAll("tspan").data(wrappedLines);
-                                tspans.enter().append("tspan");
-                                tspans.text(function (line) {
-                                    return line;
-                                }).attr({
-                                    "dy": textEl.attr("dy"),
-                                    "x": textEl.attr("x"),
-                                    "y": function (line, i) {
-                                        return (baseY + i) + "em";
-                                    }
-                                }).style("text-anchor", textEl.style("text-anchor"));
-                            }
-                        });
-                    } else {
-                        this._hideOverlappingTickLabels();
-                    }
-                }
-
-                if (!this.showEndTickLabels()) {
-                    this._hideCutOffTickLabels();
-                }
-                return this;
-            };
-            return YAxis;
-        })(Axis);
-        _Axis.YAxis = YAxis;
-    })(Plottable.Axis || (Plottable.Axis = {}));
-    var Axis = Plottable.Axis;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
     (function (Abstract) {
         var Axis = (function (_super) {
             __extends(Axis, _super);
@@ -6497,6 +5955,26 @@ var Plottable;
                 return this;
             };
 
+            Line.prototype._getResetYFunction = function () {
+                // gets the y-value generator for the animation start point
+                var yDomain = this.yScale.domain();
+                var domainMax = Math.max(yDomain[0], yDomain[1]);
+                var domainMin = Math.min(yDomain[0], yDomain[1]);
+
+                // start from zero, or the closest domain value to zero
+                // avoids lines zooming on from offscreen.
+                var startValue = 0;
+                if (domainMax < 0) {
+                    startValue = domainMax;
+                } else if (domainMin > 0) {
+                    startValue = domainMin;
+                }
+                var scaledStartValue = this.yScale.scale(startValue);
+                return function (d, i) {
+                    return scaledStartValue;
+                };
+            };
+
             Line.prototype._paint = function () {
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
@@ -6508,9 +5986,7 @@ var Plottable;
                 this.linePath.datum(this._dataSource.data());
 
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(function () {
-                        return 0;
-                    });
+                    attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.linePath, "line-reset", attrToProjector);
                 }
 
@@ -6603,6 +6079,10 @@ var Plottable;
                 return this;
             };
 
+            Area.prototype._getResetYFunction = function () {
+                return this._generateAttrToProjector()["y0"];
+            };
+
             Area.prototype._paint = function () {
                 _super.prototype._paint.call(this);
                 var attrToProjector = this._generateAttrToProjector();
@@ -6616,7 +6096,7 @@ var Plottable;
                 this.areaPath.datum(this._dataSource.data());
 
                 if (this._dataChanged) {
-                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(y0Function);
+                    attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());
                     this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
                 }
 

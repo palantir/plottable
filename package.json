@@ -24,7 +24,6 @@
     "typescript": "1.0.1",
     "grunt-sed": "~0.1.1",
     "grunt-git": "~0.2.6",
-    "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-clean": "~0.4.0",
     "grunt-bump": "0.0.13",
     "grunt-contrib-compress": "~0.9.1",

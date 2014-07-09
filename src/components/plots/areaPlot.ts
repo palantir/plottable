@@ -68,6 +68,10 @@ export module Plot {
       return this;
     }
 
+    public _getResetYFunction() {
+      return this._generateAttrToProjector()["y0"];
+    }
+
     public _paint() {
       super._paint();
       var attrToProjector = this._generateAttrToProjector();
@@ -84,7 +88,7 @@ export module Plot {
         attrToProjector["d"] = d3.svg.area()
           .x(xFunction)
           .y0(y0Function)
-          .y1(y0Function);
+          .y1(this._getResetYFunction());
         this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
       }
 
