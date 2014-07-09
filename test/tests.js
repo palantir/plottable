@@ -1041,7 +1041,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
         assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
-        label.setText("hello world");
+        label.text("hello world");
         label.renderTo(svg);
         assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
         assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
@@ -1087,7 +1087,7 @@ describe("Labels", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.Component.TitleLabel("foo");
         label.renderTo(svg);
-        label.setText("");
+        label.text("");
         assert.equal(label.availableWidth, 0, "width updated to 0");
         svg.remove();
     });

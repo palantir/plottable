@@ -63,7 +63,7 @@ export module Template {
       if (y != null) {
         if (this._yLabel != null) {
           if (typeof(y) === "string") {
-            this._yLabel.setText(y);
+            this._yLabel.text(y);
             return this;
           } else {
             throw new Error("yLabel already assigned!");
@@ -87,7 +87,7 @@ export module Template {
       if (x != null) {
         if (this._xLabel != null) {
           if (typeof(x) === "string") {
-            this._xLabel.setText(x);
+            this._xLabel.text(x);
             return this;
           } else {
             throw new Error("xLabel already assigned!");
@@ -111,7 +111,7 @@ export module Template {
       if (x != null) {
         if (this._titleLabel != null) {
           if (typeof(x) === "string") {
-            this._titleLabel.setText(x);
+            this._titleLabel.text(x);
             return this;
           } else {
             throw new Error("titleLabel already assigned!");

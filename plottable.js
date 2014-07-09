@@ -5388,12 +5388,12 @@ var Plottable;
             * @param {string} [text] The text of the Label.
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
-            function Label(text, orientation) {
-                if (typeof text === "undefined") { text = ""; }
+            function Label(inputText, orientation) {
+                if (typeof inputText === "undefined") { inputText = ""; }
                 if (typeof orientation === "undefined") { orientation = "horizontal"; }
                 _super.call(this);
                 this.classed("label", true);
-                this.setText(text);
+                this.text(inputText);
                 orientation = orientation.toLowerCase();
                 if (orientation === "vertical-left") {
                     orientation = "left";
@@ -5422,7 +5422,7 @@ var Plottable;
             };
 
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var desiredWH = this.measurer(this.text);
+                var desiredWH = this.measurer(this._text);
                 var desiredWidth = this.orientation === "horizontal" ? desiredWH.width : desiredWH.height;
                 var desiredHeight = this.orientation === "horizontal" ? desiredWH.height : desiredWH.width;
 
@@ -5438,7 +5438,7 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this.textContainer = this.content.append("g");
                 this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
-                this.setText(this.text);
+                this.text(this._text);
                 return this;
             };
 
@@ -5448,8 +5448,8 @@ var Plottable;
             * @param {string} text The new text for the Label.
             * @returns {Label} The calling Label.
             */
-            Label.prototype.setText = function (text) {
-                this.text = text;
+            Label.prototype.text = function (inputText) {
+                this._text = inputText;
                 this._invalidateLayout();
                 return this;
             };
@@ -5458,7 +5458,7 @@ var Plottable;
                 _super.prototype._doRender.call(this);
                 this.textContainer.selectAll("text").remove();
                 var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
-                var truncatedText = Plottable.Util.Text.getTruncatedText(this.text, dimension, this.measurer);
+                var truncatedText = Plottable.Util.Text.getTruncatedText(this._text, dimension, this.measurer);
                 if (this.orientation === "horizontal") {
                     Plottable.Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight, this.xAlignment, this.yAlignment);
                 } else {
@@ -7342,7 +7342,7 @@ var Plottable;
                 if (y != null) {
                     if (this._yLabel != null) {
                         if (typeof (y) === "string") {
-                            this._yLabel.setText(y);
+                            this._yLabel.text(y);
                             return this;
                         } else {
                             throw new Error("yLabel already assigned!");
@@ -7363,7 +7363,7 @@ var Plottable;
                 if (x != null) {
                     if (this._xLabel != null) {
                         if (typeof (x) === "string") {
-                            this._xLabel.setText(x);
+                            this._xLabel.text(x);
                             return this;
                         } else {
                             throw new Error("xLabel already assigned!");
@@ -7384,7 +7384,7 @@ var Plottable;
                 if (x != null) {
                     if (this._titleLabel != null) {
                         if (typeof (x) === "string") {
-                            this._titleLabel.setText(x);
+                            this._titleLabel.text(x);
                             return this;
                         } else {
                             throw new Error("titleLabel already assigned!");

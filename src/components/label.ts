@@ -4,7 +4,7 @@ module Plottable {
 export module Component {
   export class Label extends Abstract.Component {
     private textContainer: D3.Selection;
-    private text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
+    private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private orientation: string;
     private measurer: Util.Text.TextMeasurer;
     private xAlignment: string;
@@ -17,10 +17,10 @@ export module Component {
      * @param {string} [text] The text of the Label.
      * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
      */
-    constructor(text = "", orientation = "horizontal") {
+    constructor(inputText = "", orientation = "horizontal") {
       super();
       this.classed("label", true);
-      this.setText(text);
+      this.text(inputText);
       orientation = orientation.toLowerCase();
       if (orientation === "vertical-left")  { orientation = "left" ; }
       if (orientation === "vertical-right") { orientation = "right"; }
@@ -46,7 +46,7 @@ export module Component {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var desiredWH = this.measurer(this.text);
+      var desiredWH = this.measurer(this._text);
       var desiredWidth  = this.orientation === "horizontal" ? desiredWH.width : desiredWH.height;
       var desiredHeight = this.orientation === "horizontal" ? desiredWH.height : desiredWH.width;
 
@@ -62,7 +62,7 @@ export module Component {
       super._setup();
       this.textContainer = this.content.append("g");
       this.measurer = Util.Text.getTextMeasure(this.textContainer);
-      this.setText(this.text);
+      this.text(this._text);
       return this;
     }
 
@@ -72,8 +72,8 @@ export module Component {
      * @param {string} text The new text for the Label.
      * @returns {Label} The calling Label.
      */
-    public setText(text: string) {
-      this.text = text;
+    public text(inputText: string) {
+      this._text = inputText;
       this._invalidateLayout();
       return this;
     }
@@ -82,7 +82,7 @@ export module Component {
       super._doRender();
       this.textContainer.selectAll("text").remove();
       var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
-      var truncatedText = Util.Text.getTruncatedText(this.text, dimension, this.measurer);
+      var truncatedText = Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {
         Util.Text.writeLineHorizontally(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
                                         this.xAlignment, this.yAlignment);
