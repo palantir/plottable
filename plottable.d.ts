@@ -1750,7 +1750,7 @@ declare module Plottable {
             * @param {string} [text] The text of the Label.
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
-            constructor(text?: string, orientation?: string);
+            constructor(inputText?: string, orientation?: string);
             public xAlign(alignment: string): Label;
             public yAlign(alignment: string): Label;
             /**
@@ -1759,7 +1759,13 @@ declare module Plottable {
             * @param {string} text The new text for the Label.
             * @returns {Label} The calling Label.
             */
-            public setText(text: string): Label;
+            public text(inputText: string): Label;
+            /**
+            * Retrieve the current text on the Label.
+            *
+            * @returns {string} The text on the label.
+            */
+            public text(): string;
         }
         class TitleLabel extends Label {
             constructor(text?: string, orientation?: string);
