@@ -70,15 +70,13 @@ svg.plottable {
   font-size: 14pt;
 }
 
-.plottable .area-renderer path.area {
-  stroke: none;
-  fill-opacity: 0.5;
+.plottable .line-renderer path.line {
+  fill: none;
+  vector-effect: non-scaling-stroke;
 }
 
-.plottable .area-renderer path.line {
-  fill: none;
-  stroke-width: 2px;
-  vector-effect: non-scaling-stroke;
+.plottable .area-renderer path.area {
+  stroke: none;
 }
 
 .plottable .legend .toggled-off circle {

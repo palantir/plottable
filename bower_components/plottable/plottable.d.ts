@@ -43,6 +43,10 @@ declare module Plottable {
             * @return {T[]} Every array in a, concatenated together in the order they appear.
             */
             function flatten<T>(a: T[][]): T[];
+            /**
+            * Check if two arrays are equal by strict equality.
+            */
+            function arrayEq<T>(a: T[], b: T[]): boolean;
         }
     }
 }
@@ -171,6 +175,44 @@ declare module Plottable {
 
 declare module Plottable {
     module Util {
+        class Cache<T> {
+            /**
+            * @constructor
+            *
+            * @param {string} compute The function whose results will be cached.
+            * @param {string} [canonicalKey] If present, when clear() is called,
+            *        this key will be re-computed. If its result hasn't been changed,
+            *        the cache will not be cleared.
+            * @param {(v: T, w: T) => boolean} [valueEq]
+            *        Used to determine if the value of canonicalKey has changed.
+            *        If omitted, defaults to === comparision.
+            */
+            constructor(compute: (k: string) => T, canonicalKey?: string, valueEq?: (v: T, w: T) => boolean);
+            /**
+            * Attempt to look up k in the cache, computing the result if it isn't
+            * found.
+            *
+            * @param {string} k The key to look up in the cache.
+            * @return {T} The value associated with k; the result of compute(k).
+            */
+            public get(k: string): T;
+            /**
+            * Reset the cache empty.
+            *
+            * If canonicalKey was provided at construction, compute(canonicalKey)
+            * will be re-run. If the result matches what is already in the cache,
+            * it will not clear the cache.
+            *
+            * @return {Cache<T>} The calling Cache.
+            */
+            public clear(): Cache<T>;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Util {
         module Text {
             interface TextMeasurer {
                 (s: string): number[];
@@ -183,6 +225,28 @@ declare module Plottable {
             */
             function getTextMeasure(selection: D3.Selection): TextMeasurer;
             /**
+            * This class will measure text by measuring each character individually,
+            * then adding up the dimensions. It will also cache the dimensions of each
+            * letter.
+            */
+            class CachingCharacterMeasurer {
+                /**
+                * @param {string} s The string to be measured.
+                * @return {number[]} [width, height] pair.
+                */
+                public measure: TextMeasurer;
+                /**
+                * @param {D3.Selection} g The element that will have text inserted into
+                *        it in order to measure text. The styles present for text in
+                *        this element will to the text being measured.
+                */
+                constructor(g: D3.Selection);
+                /**
+                * Clear the cache, if it seems that the text has changed size.
+                */
+                public clear(): CachingCharacterMeasurer;
+            }
+            /**
             * Gets a truncated version of a sting that fits in the available space, given the element in which to draw the text
             *
             * @param {string} text: The string to be truncated
@@ -190,7 +254,7 @@ declare module Plottable {
             * @param {D3.Selection} element: The text element used to measure the text
             * @returns {string} text - the shortened text
             */
-            function getTruncatedText(text: string, availableWidth: number, element: D3.Selection): string;
+            function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
             /**
             * Gets the height of a text element, as rendered.
             *
@@ -219,14 +283,18 @@ declare module Plottable {
                 usedWidth: number;
                 usedHeight: number;
             }
+            interface IWriteOptions {
+                g: D3.Selection;
+                xAlign: string;
+                yAlign: string;
+            }
             /**
-            * Attempt to write the string 'text' to a D3.Selection containing a svg.g.
-            * Contains the text within a rectangle with dimensions width, height. Tries to
-            * orient the text using xOrient and yOrient parameters.
-            * Will align the text vertically if it seems like that is appropriate.
+            * @param {write} [IWriteOptions] If supplied, the text will be written
+            *        To the given g. Will align the text vertically if it seems like
+            *        that is appropriate.
             * Returns an IWriteTextResult with info on whether the text fit, and how much width/height was used.
             */
-            function writeText(text: string, g: D3.Selection, width: number, height: number, xAlign: string, yAlign: string, horizontally?: boolean): IWriteTextResult;
+            function writeText(text: string, width: number, height: number, tm: TextMeasurer, horizontally?: boolean, write?: IWriteOptions): IWriteTextResult;
         }
     }
 }
@@ -411,8 +479,54 @@ declare module Plottable {
 
 declare module Plottable {
     module Formatter {
+        class SISuffix extends Abstract.Formatter {
+            /**
+            * Creates a formatter for values that displays [precision] significant figures.
+            *
+            * @constructor
+            * @param {number} [precision] The number of significant figures to display.
+            */
+            constructor(precision?: number);
+            /**
+            * Gets the current number of significant figures shown by the Formatter.
+            *
+            * @returns {number} The current precision.
+            */
+            public precision(): number;
+            /**
+            * Sets the number of significant figures to be shown by the Formatter.
+            *
+            * @param {number} [value] The new precision.
+            * @returns {Formatter} The calling SISuffix Formatter.
+            */
+            public precision(value: number): SISuffix;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Formatter {
         class Custom extends Abstract.Formatter {
             constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
+        }
+    }
+}
+
+
+declare module Plottable {
+    interface FilterFormat {
+        format: string;
+        filter: (d: any) => any;
+    }
+    module Formatter {
+        class Time extends Abstract.Formatter {
+            /**
+            * Creates a formatter that displays dates
+            *
+            * @constructor
+            */
+            constructor();
         }
     }
 }
@@ -836,6 +950,7 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
+            public remove(): Plot;
             /**
             * Gets the animator associated with the specified Animator key.
             *
@@ -1287,6 +1402,12 @@ declare module Plottable {
             * @returns {Ordinal} The calling Ordinal Scale.
             */
             public rangeType(rangeType: string, outerPadding?: number, innerPadding?: number): Ordinal;
+            /**
+            * Creates a copy of the Scale with the same domain and range but without any registered listeners.
+            *
+            * @returns {Ordinal} A copy of the calling Scale.
+            */
+            public copy(): Ordinal;
         }
     }
 }
@@ -1312,11 +1433,13 @@ declare module Plottable {
     module Scale {
         class Time extends Abstract.QuantitiveScale {
             /**
-            * Creates a new TimeScale.
+            * Creates a new Time Scale.
             *
             * @constructor
+            * @param {D3.Scale.Time} [scale] The D3 TimeScale backing the TimeScale. If not supplied, uses a default scale.
             */
             constructor();
+            constructor(scale: D3.Scale.TimeScale);
         }
     }
 }
@@ -1612,6 +1735,29 @@ declare module Plottable {
             * @returns {NumericAxis} The calling NumericAxis.
             */
             public tickLabelPosition(position: string): Numeric;
+            /**
+            * Return whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @returns {boolean} The current setting.
+            */
+            public showEndTickLabel(orientation: string): boolean;
+            /**
+            * Control whether or not the tick labels at the end of the graph are
+            * displayed when partially cut off.
+            *
+            * @param {string} orientation Where on the scale to change tick labels.
+            *                 On a "top" or "bottom" axis, this can be "left" or
+            *                 "right". On a "left" or "right" axis, this can be "top"
+            *                 or "bottom".
+            * @param {boolean} show Whether or not the given tick should be displayed.
+            * @returns {Numeric} The calling Numeric.
+            */
+            public showEndTickLabel(orientation: string, show: boolean): Numeric;
         }
     }
 }
@@ -1623,7 +1769,7 @@ declare module Plottable {
             /**
             * Creates a CategoryAxis.
             *
-            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+            * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
             * display the scale as efficiently as possible.
             *
             * @constructor
@@ -1647,6 +1793,8 @@ declare module Plottable {
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
             constructor(text?: string, orientation?: string);
+            public xAlign(alignment: string): Label;
+            public yAlign(alignment: string): Label;
             /**
             * Sets the text on the Label.
             *
@@ -1914,9 +2062,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Area extends Abstract.XYPlot {
+        class Line extends Abstract.XYPlot {
             /**
-            * Creates an AreaPlot.
+            * Creates a LinePlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1931,9 +2079,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class Line extends Area {
+        class Area extends Line {
             /**
-            * Creates a LinePlot.
+            * Creates an AreaPlot.
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
@@ -1941,6 +2089,7 @@ declare module Plottable {
             * @param {Scale} yScale The y scale to use.
             */
             constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale);
+            public project(attrToSet: string, accessor: any, scale?: Abstract.Scale): Area;
         }
     }
 }
