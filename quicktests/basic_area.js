@@ -4,7 +4,8 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
-  yScales = []
+  yScales = [];
+  data = _.cloneDeep(data);
 
   // Will receive function arguments: (svg, data, Plottable)
   function getY(d) { return d.y};
@@ -15,7 +16,6 @@ function run(div, data, Plottable) {
     dataseries_top[i].x = dataseries[i].x;
     dataseries_top[i].y += dataseries[i].y;
   }
-  console.log("SUM:", d3.sum(dataseries, getY), d3.sum(dataseries_top, getY));
 
   var xScale = new Plottable.Scale.Linear();
   var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");

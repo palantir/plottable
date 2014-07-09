@@ -4,6 +4,7 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
+  data = _.cloneDeep(data);
   var dataseries = data[0].slice(0, 20);
   var dataseries_top = data[1].slice(0, 20);
   for (var i = 0; i < 20; ++i) {

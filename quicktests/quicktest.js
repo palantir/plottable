@@ -1,16 +1,14 @@
-
+// you were going to find out how to fix this race condition
 
 function loadScript(url) {
-  console.log("loadScript called with url", url);
   return new Promise(function(resolve, reject) {
     var element = document.createElement("script");
     element.type = "text/javascript";
     element.src = url;
-    element.onload = function() {console.log("loaded", url); resolve();};
+    element.onload = resolve;
     document.head.appendChild(element);
   });
 }
-
 
 var Plottables = {};
 function loadPlottable(branchName) {
@@ -24,7 +22,7 @@ function loadPlottable(branchName) {
     } else {
       url = "/plottable.js"; //load local version
     }
-    loadScript(url).then(function() {
+    return loadScript(url).then(function() {
       Plottables[branchName] = Plottable;
       Plottable = null;
       fulfill();
@@ -37,11 +35,9 @@ var data1 = makeRandomData(50);
 var data2 = makeRandomData(50);
 
 function runSingleQuicktest(container, quickTest, data, Plottable) {
-  console.log("running single quicktest");
   container.append("p").text(quickTest.name);
   var div = container.append("div");
   quickTest.run(div, data, Plottable);
-  console.log("--finished single quicktest");
 }
 
 function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
@@ -56,9 +52,7 @@ function initializeByLoadingAllQuicktests() {
   return new Promise(function(f, r) {
     if (window.list_of_quicktests == null) {
       loadListOfQuicktests()
-        .then(reporter("JSON->LOAD"))
         .then(loadTheQuicktests)
-        .then(reporter("load->fulfill"))
         .then(f)
     } else {
       f();
@@ -115,11 +109,12 @@ function main() {
   if (secondBranch === "") {secondBranch = "#local"};
   var quicktestCategory = $('#filterWord').val();
   initializeByLoadingAllQuicktests()
-      .then(reporter("LOAD -> PLOTTABLE1"), Plottables)
-      .then(loadPlottable(firstBranch))
-      .then(reporter("PLOTTABLE1 -> PLOTTABLE2", Plottables))
-      .then(loadPlottable(secondBranch))
-      .then(reporter("PLOTTABLE2 -> FILTER", Plottables))
+      .then(function() {
+        return loadPlottable(firstBranch);
+      })
+      .then(function() {
+        return loadPlottable(secondBranch);
+      })
       .then(function () {
         return window.quicktests.filter(function(q) {
           if (quicktestCategory === "" || quicktestCategory === undefined) {
@@ -129,11 +124,8 @@ function main() {
           };
         });
       })
-      .then(reporter("filtered quicktests"))
       .then(function(qts) {
-        console.log(qts);
         qts.forEach(function(q) {
-          console.log("iterate", q);
           runQuicktest(table, q, Plottables[firstBranch], Plottables[secondBranch]);
         });
       });

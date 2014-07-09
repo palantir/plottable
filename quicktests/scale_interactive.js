@@ -4,6 +4,7 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
+  data = _.cloneDeep(data);
   var dataseries = data[0].splice(0, 20);
 
   var xScale = new Plottable.Scale.Linear();
