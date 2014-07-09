@@ -533,7 +533,7 @@ declare module Plottable {
 declare module Plottable {
     module Formatter {
         class Custom extends Abstract.Formatter {
-            constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
+            constructor(customFormatFunction: (d: any, formatter: Custom) => string, precision?: number);
         }
     }
 }
