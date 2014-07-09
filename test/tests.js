@@ -4564,6 +4564,25 @@ describe("Util.Text", function () {
         });
     });
 
+    describe("writeText", function () {
+        it("behaves appropriately when there is too little height to fit any text", function () {
+            var svg = generateSVG();
+            var measure = Plottable.Util.Text.getTextMeasure(svg);
+            var results = Plottable.Util.Text.writeText("hello world", 1, 1, measure, true);
+            assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
+            assert.equal(0, results.usedWidth, "measurement mode: no width used");
+            assert.equal(0, results.usedHeight, "measurement mode: no height used");
+
+            var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
+            results = Plottable.Util.Text.writeText("hello world", 1, 1, measure, true, writeOptions);
+            assert.isFalse(results.textFits, "write mode: text doesn't fit");
+            assert.equal(0, results.usedWidth, "write mode: no width used");
+            assert.equal(0, results.usedHeight, "write mode: no height used");
+            assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
+            svg.remove();
+        });
+    });
+
     describe("getTextMeasure", function () {
         var svg;
         var t;
