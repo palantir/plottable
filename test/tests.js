@@ -3979,6 +3979,12 @@ describe("Scales", function () {
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
         });
+
+        it("autorange defaults to [1, 10] on log scale", function () {
+            var scale = new Plottable.Scale.Log();
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [1, 10]);
+        });
     });
 
     describe("Ordinal Scales", function () {
