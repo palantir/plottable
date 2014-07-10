@@ -1,4 +1,4 @@
-///<reference path="../src/reference.ts" />
+///<reference path="exampleReference.ts" />
 
 var ordinalDomain: string[] = ["a", "b", "c", "d", "e"];
 var ordinalData = [{x: "a", y: 3}, {x: "b", y: -2}, {x: "c", y: 4}, {x: "d", y: -3}, {x: "e", y: 5}];
