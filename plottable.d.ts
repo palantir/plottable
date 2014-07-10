@@ -1609,7 +1609,7 @@ declare module Plottable {
             /**
             * Sets a new tick formatter.
             *
-            * @param {Abstract.Formatter} formatter
+            * @param {function | Abstract.Formatter} formatter
             * @returns {Abstract.Axis} The calling Axis.
             */
             public formatter(formatter: any): Axis;
