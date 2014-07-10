@@ -26,7 +26,7 @@ module Plottable {
      *        merging them all into one [min, max] pair. It defaults to taking
      *        the min of the first elements and the max of the second arguments.
      */
-    constructor(combineExtents: (extents: any[][]) => any[] = Domainer.defaultCombineExtents) {
+    constructor(combineExtents?: (extents: any[][]) => any[]) {
       this.combineExtents = combineExtents;
     }
 
@@ -41,7 +41,13 @@ module Plottable {
      */
     public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[] {
       var domain: any[];
-      domain = this.combineExtents(extents);
+      if (this.combineExtents != null) {
+        domain = this.combineExtents(extents);
+      } else if (extents.length === 0) {
+        domain = scale._defaultExtent();
+      } else {
+        domain = [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
+      }
       domain = this.includeDomain(domain);
       domain = this.padDomain(scale, domain);
       domain = this.niceDomain(scale, domain);

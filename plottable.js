@@ -3254,7 +3254,6 @@ var Plottable;
         *        the min of the first elements and the max of the second arguments.
         */
         function Domainer(combineExtents) {
-            if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
             this.doNice = false;
             this.padProportion = 0.0;
             this.paddingExceptions = d3.map();
@@ -3275,7 +3274,17 @@ var Plottable;
         */
         Domainer.prototype.computeDomain = function (extents, scale) {
             var domain;
-            domain = this.combineExtents(extents);
+            if (this.combineExtents != null) {
+                domain = this.combineExtents(extents);
+            } else if (extents.length === 0) {
+                domain = scale._defaultExtent();
+            } else {
+                domain = [d3.min(extents, function (e) {
+                        return e[0];
+                    }), d3.max(extents, function (e) {
+                        return e[1];
+                    })];
+            }
             domain = this.includeDomain(domain);
             domain = this.padDomain(scale, domain);
             domain = this.niceDomain(scale, domain);
@@ -3574,6 +3583,10 @@ var Plottable;
                     return this;
                 }
             };
+
+            QuantitiveScale.prototype._defaultExtent = function () {
+                return [0, 1];
+            };
             return QuantitiveScale;
         })(Abstract.Scale);
         Abstract.QuantitiveScale = QuantitiveScale;
@@ -3633,6 +3646,10 @@ var Plottable;
             */
             Log.prototype.copy = function () {
                 return new Log(this._d3Scale.copy());
+            };
+
+            Log.prototype._defaultExtent = function () {
+                return [1, 10];
             };
             return Log;
         })(Plottable.Abstract.QuantitiveScale);

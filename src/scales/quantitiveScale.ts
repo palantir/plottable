@@ -157,6 +157,10 @@ export module Abstract {
         return this;
       }
     }
+
+    public _defaultExtent(): any[] {
+      return [0, 1];
+    }
   }
 }
 }
