@@ -43,6 +43,13 @@ export module Component {
       this.xOffset(5).yOffset(5);
     }
 
+    public remove() {
+      super.remove();
+      if (this.colorScale != null) {
+        this.colorScale.broadcaster.deregisterListener(this);
+      }
+    }
+
     /**
      * Assigns or gets the callback to the Legend
      * This callback is associated with toggle events, which trigger when a legend row is clicked.

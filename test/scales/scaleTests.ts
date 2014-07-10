@@ -119,15 +119,15 @@ describe("Scales", () => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       xScale.domainer(new Plottable.Domainer());
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
-      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
       var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
       var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
       var renderAreas = renderAreaD1.merge(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
-      renderAreaD1.remove();
-      assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+      renderAreaD1.detach();
+      assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
       renderAreas.merge(renderAreaD1);
       assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
       svg.remove();
@@ -180,6 +180,34 @@ describe("Scales", () => {
       scale.rangeType("points");
       assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
+  });
+
+  it("OrdinalScale + BarPlot combo works as expected when the data is swapped", () => {
+    // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
+    var xScale = new Plottable.Scale.Ordinal();
+    var yScale = new Plottable.Scale.Linear();
+    var dA = {x: "A", y: 2};
+    var dB = {x: "B", y: 2};
+    var dC = {x: "C", y: 2};
+    var barPlot = new Plottable.Plot.VerticalBar([dA, dB], xScale, yScale);
+    var svg = generateSVG();
+    assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
+    barPlot.renderTo(svg);
+    assert.deepEqual(xScale.domain(), ["A", "B"], "after anchoring, the bar plot's data is on the scale");
+
+    function iterateDataChanges(...dataChanges: any[]) {
+      dataChanges.forEach((dataChange) => {
+        barPlot.dataSource().data(dataChange);
+      });
+    }
+
+    iterateDataChanges([], [dA, dB, dC], []);
+    assert.lengthOf(xScale.domain(), 0);
+
+    iterateDataChanges([dA], [dB]);
+    assert.lengthOf(xScale.domain(), 1);
+    iterateDataChanges([], [dA, dB, dC]);
+    assert.lengthOf(xScale.domain(), 3);
   });
 
   describe("Color Scales", () => {
