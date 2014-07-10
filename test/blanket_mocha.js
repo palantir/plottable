@@ -5429,7 +5429,7 @@ _blanket.extend({
     blanket.beforeStartTestRunner({
         callback: function(){
             if (!blanket.options("existingRequireJS")){
-                oldRun(oldCallback);
+                // oldRun(oldCallback);
             }
             mocha.run = oldRun;
         }
