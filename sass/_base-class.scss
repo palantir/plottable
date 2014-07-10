@@ -4,6 +4,10 @@
 
 /** Tags
  -------------------------------------------------- */
+html, body {
+  width: 100%;
+  height: 100%;
+}
 
 html { font-size: 62.5%; } // base font is 10px
 
@@ -42,6 +46,11 @@ h2 {
 h3 {
   @include rem(font-size, 18px);
   @include relative-line-height(18px, 18px);
+
+  span.badge {
+    display: inline-block;
+    margin-bottom: 10px;
+  }
 }
 
 p {
@@ -195,4 +204,10 @@ a, button, input[type="submit"] {
 .nopadding {
   margin: 0 !important;
   padding: 0 !important;
+}
+
+.badge {
+  @include border-radius(2px);
+  background-color: $COLOR_BLUE2;
+  color: $COLOR_BLUE1;
 }

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="shortcut icon" href="/favicon.ico" sizes="16x16 32x32" type="image/x-icon">
+  {% unless page.title %}
+  <title>Plottable.js | Palantir</title>
+  {% else %}
+  <title>{{ page.title }} | Palantir</title>
+  {% endunless %}
+  <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="Flexible, interactive, performant charts for the web made easy">
+  <link rel="stylesheet" href="../build/css/style.css" media="screen">
+  <!-- Modernizr -->
+  <script src="../build/js/modernizr-custom-2.8.2.min.js"></script>
+
+  <!--[if lt IE 9]>
+  <script src="../build/js/respond-1.4.2.min.js"></script>
+  <link rel="stylesheet" href="../build/css/ie.css" media="screen, projection" type="text/css">
+  <![endif]-->
+
+  <!-- OpenGraph -->
+  <meta property="og:title" content="Home">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="//palantir.github.io/plottable/">
+  <meta property="og:site_name" content="Plottable.js">
+  <meta property="og:description" content="Flexible, interactive, performant charts for the web made easy.">
+</head>
+<body>
+  <header>
+    {% include nav.html %}
+  </header><!-- /header -->
+
+  {{ content }}
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    © 2014 <a href="https://palantir.com/" title="Palantir Technologies">Palantir Technologies</a>. <a href="https://github.com/palantir/plottable" title="Plottable on Github.">Plottable.js</a> is released under the <a href="https://github.com/palantir/plottable/blob/master/LICENSE">MIT license</a>.
+  </footer><!-- /footer -->
+
+  {% if site.google_analytics != '' %}
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', '{{ site.google_analytics }}', 'none');
+    ga('send', 'pageview');
+  </script>
+  {% endif %}
+
+  <script src="../build/js/compiled.min.js"></script>
+</body>
+</html>

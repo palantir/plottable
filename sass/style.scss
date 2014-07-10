@@ -35,6 +35,7 @@ $grid-float-breakpoint:     $screen-md-min;
  -------------------------------------------------- */
 @import "base-class";
 @import "content";
+@import "plottable_examples";
 
 // Include style for syntax highlighting
 @import "syntax";

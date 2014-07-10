@@ -1,0 +1,42 @@
+svg.plottable {
+
+  .label text,
+  .legend-row text {
+    font-family: $font-body;
+  }
+
+  .legend-row text {
+    fill: $COLOR_GRAY3;
+    font-size: 11pt;
+    font-family: $font-headers;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+  }
+
+  .title-label text {
+    fill: $COLOR_BLACK1;
+    font-size: 18pt;
+    font-family: $font-headers;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+  }
+
+  .axis-label text {
+    font-size: 11pt;
+    fill: $COLOR_GRAY3;
+    font-family: $font-headers;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+  }
+
+  .axis text {
+    font-family: $font-body;
+  }
+
+}
+
+section#section-example-1 {
+
+  text-align: left;
+
+}
