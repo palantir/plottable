@@ -77,3 +77,5 @@
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 
 /// <reference path="templates/standardChart.ts" />
+
+/// <reference path="../examples/component_example_list.ts" />

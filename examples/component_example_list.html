@@ -1,0 +1,88 @@
+<html>
+  <head>
+    <title>List of all examples</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <script src="../build/src/examples/component_example_list.js"></script>
+    <style>
+    </style>
+
+    <script>
+    window.onload = function() {
+      // axis
+      var axisTypes = ["numeric", "category"];
+      var orient = ["bottom", "top", "right", "left"];
+      axisTypes.forEach(function(type) {
+        orient.forEach(function(or) {
+          makeTitle("axis " + type + " " + or);
+          axis(type, or);
+        })
+      });
+
+      // orient.forEach(function(or) {
+      //   catAxisWrap(or);
+      // });
+
+      // plots
+      makeTitle("vertical bar plot");
+      verticalBarPlot();
+      makeTitle("horizontal bar plot");
+      horizontalBarPlot();
+
+      var xyPlotTypes = ["area", "line", "scatter"];
+      xyPlotTypes.forEach(function(type) {
+        makeTitle(type + " plot");
+        makeXYPlot(type);
+      });
+      makeTitle("area plot with stroke");
+      makeAreaStroke();
+
+      xyPlotTypes.forEach(function(type) {
+        makeTitle("multiple " + type + " plot");
+        makeXYPlotMulti(type);
+      });
+
+      makeTitle("grid plot");
+      gridPlot();
+
+      // labels
+      var labelOrientations = ["vertical-left", "vertical-right", "horizontal"];
+      labelOrientations.forEach(function(or) {
+        makeTitle(or + " label");
+        label("ABCDEFGHIJKLMNOPQRSTUVWXYZ", or);
+      });
+
+      // gridlines
+      makeTitle("x gridlines");
+      gridline(true, false);
+      makeTitle("y gridlines");
+      gridline(false, true);
+      makeTitle("x/y gridlines")
+      gridline(true, true);
+
+      // legends
+      makeTitle("interactive legend");
+      legend();
+
+      // interactions
+      makeTitle("xy drag box");
+      xydrag();
+      makeTitle("x drag box");
+      xdrag();
+      makeTitle("pan zoom interaction");
+      panZoomInteraction();
+
+      // complete examples
+      makeTitle("animations");
+      animate1();
+      animate2();
+      animate3();
+    }
+    </script>
+  </head>
+  <body>
+  </body>
+
+</html>
