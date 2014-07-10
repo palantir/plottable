@@ -3,10 +3,10 @@
 var doAnimate = true;
 var lineRenderer;
 var xScale = new Plottable.Scale.Linear();
-var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
 var yScale = new Plottable.Scale.Linear();
-var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
 lineRenderer = new Plottable.Plot.Line(data[0].slice(0, 20), xScale, yScale);
 lineRenderer.project("opacity", 0.75);

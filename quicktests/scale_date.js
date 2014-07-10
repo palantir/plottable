@@ -17,8 +17,8 @@ function run(div, data, Plottable) {
   yScale = new Plottable.Scale.Linear();
   linePlot = new Plottable.Plot.Line(dataPts, xScale, yScale)
                               .project("x", function (d) { return d3.time.format("%x").parse(d.x)});
-  xAxis = new Plottable.Axis.XAxis(xScale);
-  yAxis = new Plottable.Axis.YAxis(yScale);
+  xAxis = new Plottable.Axis.Numeric(xScale);
+  yAxis = new Plottable.Axis.Numeric(yScale);
   new Plottable.Template.StandardChart().center(linePlot).xAxis(xAxis).yAxis(yAxis).renderTo(svg);
 
 

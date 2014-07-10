@@ -7,10 +7,10 @@ function run(div, data, Plottable) {
   var doAnimate = true;
   var vBarRenderer;
   var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
   var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
   vBarRenderer = new Plottable.Plot.VerticalBar(data[0].slice(0, 6), xScale, yScale);
   vBarRenderer.project("opacity", 0.75);

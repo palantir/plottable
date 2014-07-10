@@ -14,8 +14,8 @@ function run(div, data, Plottable) {
   //Axis
   var xScale = new Plottable.Scale.Linear();
   var yScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
-  var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
 
   var colorProjector = function(d, i, m) {

@@ -14,10 +14,10 @@ function run(div, data, Plottable) {
 
     var ds = new Plottable.DataSource(data);
     var xScale = new Plottable.Scale.Ordinal().rangeType("bands");
-    var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", function(d) { return d; } );
+    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom", function(d) { return d; } );
 
     var yScale = new Plottable.Scale.Linear();
-    var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
     yAxis.showEndTickLabels(true);
 
     var barPlot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
