@@ -180,6 +180,12 @@ describe("Scales", () => {
       scale.rangeType("points");
       assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
+
+    it("ordinalScale converts non-string domains into strings", () => {
+      var scale = new Plottable.Scale.Ordinal();
+      scale.domain([1,2,3,4,5]);
+      assert.deepEqual(scale.domain(), ["1", "2", "3", "4", "5"]);
+    });
   });
 
   it("OrdinalScale + BarPlot combo works as expected when the data is swapped", () => {

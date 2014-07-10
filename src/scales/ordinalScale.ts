@@ -46,7 +46,7 @@ export module Scale {
     }
 
     public _setDomain(values: any[]) {
-      super._setDomain(values);
+      super._setDomain(values.map(x => x.toString()));
       this.range(this.range()); // update range
     }
 
