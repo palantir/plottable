@@ -17,7 +17,7 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = new Plottable.Formatter.Identity()) {
+    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter: any = new Plottable.Formatter.Identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {

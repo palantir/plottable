@@ -2,7 +2,7 @@ function makeBarChart() {
   var xScale = new Plottable.Scale.Ordinal();
   var yScale = new Plottable.Scale.Linear();
 
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom", function(d) { return d; });
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom", function(d) { return d; });
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
   var renderer = new Plottable.Plot.VerticalBar(barData, xScale, yScale)
                               .project("x", "category", xScale)
