@@ -274,12 +274,22 @@ export module Abstract {
     }
 
     /**
+     * Get the current formatter on the axis.
+     *
+     * @returns {Abstract.Formatter} the axis formatter
+     */
+    public formatter(): Abstract.Formatter;
+    /**
      * Sets a new tick formatter.
      *
-     * @param {Abstract.Formatter} formatter
-     * @returns {BaseAxis} The calling BaseAxis.
+     * @param {function | Abstract.Formatter} formatter
+     * @returns {Abstract.Axis} The calling Axis.
      */
-    public formatter(formatter: any) {
+    public formatter(formatter: any): Abstract.Axis;
+    public formatter(formatter?: any): any {
+      if (formatter === undefined) {
+        return this._formatter;
+      }
       if (typeof(formatter) === "function") {
         formatter = new Plottable.Formatter.Custom(formatter);
         formatter.showOnlyUnchangedValues(false);

@@ -1,5 +1,5 @@
 /*!
-Plottable 0.20.2 (https://github.com/palantir/plottable)
+Plottable 0.20.3 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1465,7 +1465,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.20.2";
+    Plottable.version = "0.20.3";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4359,13 +4359,10 @@ var Plottable;
                 }
             };
 
-            /**
-            * Sets a new tick formatter.
-            *
-            * @param {Abstract.Formatter} formatter
-            * @returns {BaseAxis} The calling BaseAxis.
-            */
             Axis.prototype.formatter = function (formatter) {
+                if (formatter === undefined) {
+                    return this._formatter;
+                }
                 if (typeof (formatter) === "function") {
                     formatter = new Plottable.Formatter.Custom(formatter);
                     formatter.showOnlyUnchangedValues(false);

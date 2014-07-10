@@ -1601,10 +1601,16 @@ declare module Plottable {
             */
             public height(h: any): Axis;
             /**
+            * Get the current formatter on the axis.
+            *
+            * @returns {Abstract.Formatter} the axis formatter
+            */
+            public formatter(): Formatter;
+            /**
             * Sets a new tick formatter.
             *
             * @param {Abstract.Formatter} formatter
-            * @returns {BaseAxis} The calling BaseAxis.
+            * @returns {Abstract.Axis} The calling Axis.
             */
             public formatter(formatter: any): Axis;
             /**
