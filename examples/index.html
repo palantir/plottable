@@ -1,0 +1,196 @@
+---
+layout: example
+---
+<section id="section-example-1">
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-3">
+        <h3>
+          <span class="badge">Example</span><br>
+          Plottable Commits and Contributors vs Time
+        </h3>
+        <p>This Plottable chart displays Plottable's number of commits and contributors over time. Contributors are displayed using a LinePlot over the number of commits displayed as an AreaPlot.</p>
+        <p><a id="button-show-source-example-1-source" href="#example-1-source" class="button button-small">Show Source</a></p>
+      </div>
+
+      <div id="example-chart-1-container" class="col-md-8 col-md-offset-1">
+        <div id="example-chart-1"></div>
+      </div>
+
+    </div>
+
+    <div id="example-chart-1-source-wrapper" class="row">
+      <div id="example-chart-1-source" style="display: none;" class="col-md-10 col-md-offset-1">
+{% highlight javascript %}
+function makeCommiterChart(svg, commitData, contributorData) {
+  var xScale = new Plottable.Scale.Time();
+  var yScaleCommits = new Plottable.Scale.Linear();
+  var yScaleContrib = new Plottable.Scale.Linear();
+
+  var colorScale = new Plottable.Scale.Color("10");
+
+  var format = d3.time.format("%Y/%m/%d");
+  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", format);
+  var yAxisCommits = new Plottable.Axis.YAxis(yScaleCommits, "left");
+  var yAxisContrib = new Plottable.Axis.YAxis(yScaleContrib, "right");
+
+  var lineCommits = new Plottable.Plot.Area(commitData, xScale, yScaleCommits)
+                    .project("x", "parsedDate", xScale)
+                    .project("y", "nCommits", yScaleCommits)
+                    .project("fill", function() {return "Commits"}, colorScale);
+
+  var lineContrib = new Plottable.Plot.Line(contributorData, xScale, yScaleContrib)
+                    .project("x", "parsedDate", xScale)
+                    .project("y", "nContrib", yScaleContrib)
+                    .project("stroke", function() {return "Contributors"}, colorScale);
+
+  var grid = new Plottable.Component.Gridlines(xScale, null);
+
+  var group = lineCommits.merge(lineContrib).merge(grid);
+
+  var leftLabel = new Plottable.Component.AxisLabel("Number of Commits", "vertical-left");
+  var rightLabel = new Plottable.Component.AxisLabel("Number of Contributors", "vertical-left");
+  var legend = new Plottable.Component.Legend(colorScale).xAlign("center");
+
+  var title = new Plottable.Component.TitleLabel("Plottable - Commits & Contributors over Time");
+  var titleAndLegend = new Plottable.Component.Table([[title], [legend]]).xAlign("center");
+
+  var table = new Plottable.Component.Table([
+    [leftLabel, yAxisCommits, group, yAxisContrib, rightLabel],
+    [null, null, xAxis, null, null],
+  ]);
+
+  var outerMost = new Plottable.Component.Table([[titleAndLegend], [table]]).renderTo(svg);
+
+  xScale._autoPad = false;
+  xScale.autoDomain();
+}
+
+window.onload = function() {
+  d3.json("gitstats2.json", function(data) {
+    data.forEach(function(d) {
+      d.parsedDate = new Date(d.date);
+      d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
+    });
+    data.sort(function(a, b) {return a.parsedDate - b.parsedDate})
+    var nCommits = 0;
+    commitData = data.map(function(d) {
+      return {parsedDate: d.parsedDate, nCommits: ++nCommits};
+    });
+    var contribSet = d3.set();
+    contribData = [];
+    data.forEach(function(d) {
+      var c = d.name;
+      contribData.push({parsedDate: d.parsedDate, nContrib: contribSet.size()});
+      contribSet.add(c);
+      contribData.push({parsedDate: d.parsedDate, nContrib: contribSet.size()});
+    });
+    var svg = d3.select("#example-chart-1").append("svg").attr("width", "100%").attr("height", 600);
+    makeCommiterChart(svg, commitData, contribData);
+  });
+}
+{% endhighlight %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script id="example-1-source">
+  function makeCommiterChart(svg, commitData, contributorData) {
+    var xScale = new Plottable.Scale.Time();
+    var yScaleCommits = new Plottable.Scale.Linear();
+    var yScaleContrib = new Plottable.Scale.Linear();
+
+    var colorScale = new Plottable.Scale.Color("10");
+
+    var format = d3.time.format("%Y/%m/%d");
+    var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", format);
+    var yAxisCommits = new Plottable.Axis.YAxis(yScaleCommits, "left");
+    var yAxisContrib = new Plottable.Axis.YAxis(yScaleContrib, "right");
+
+    var lineCommits = new Plottable.Plot.Area(commitData, xScale, yScaleCommits)
+                      .project("x", "parsedDate", xScale)
+                      .project("y", "nCommits", yScaleCommits)
+                      .project("fill", function() {return "Commits"}, colorScale);
+
+    var lineContrib = new Plottable.Plot.Line(contributorData, xScale, yScaleContrib)
+                      .project("x", "parsedDate", xScale)
+                      .project("y", "nContrib", yScaleContrib)
+                      .project("stroke", function() {return "Contributors"}, colorScale);
+
+    var grid = new Plottable.Component.Gridlines(xScale, null);
+
+    var group = lineCommits.merge(lineContrib).merge(grid);
+
+    var leftLabel = new Plottable.Component.AxisLabel("Number of Commits", "vertical-left");
+    var rightLabel = new Plottable.Component.AxisLabel("Number of Contributors", "vertical-left");
+    var legend = new Plottable.Component.Legend(colorScale).xAlign("center");
+
+    var title = new Plottable.Component.TitleLabel("Plottable - Commits & Contributors over Time");
+    var titleAndLegend = new Plottable.Component.Table([[title], [legend]]).xAlign("center");
+
+    var table = new Plottable.Component.Table([
+      [leftLabel, yAxisCommits, group, yAxisContrib, rightLabel],
+      [null, null, xAxis, null, null],
+      ]);
+
+    var outerMost = new Plottable.Component.Table([[titleAndLegend], [table]]).renderTo(svg);
+
+    xScale._autoPad = false;
+    xScale.autoDomain();
+
+  }
+
+  window.onload = function() {
+    d3.json("gitstats2.json", function(data) {
+      data.forEach(function(d) {
+        d.parsedDate = new Date(d.date);
+        d.name = d.name === "ashwinraman9" ? "aramaswamy" : d.name;
+      });
+      data.sort(function(a, b) {return a.parsedDate - b.parsedDate})
+      var nCommits = 0;
+      commitData = data.map(function(d) {
+        return {parsedDate: d.parsedDate, nCommits: ++nCommits};
+      });
+      var contribSet = d3.set();
+      contribData = [];
+      data.forEach(function(d) {
+        var c = d.name;
+        contribData.push({parsedDate: d.parsedDate, nContrib: contribSet.size()});
+        contribSet.add(c);
+        contribData.push({parsedDate: d.parsedDate, nContrib: contribSet.size()});
+      });
+      var svg = d3.select("#example-chart-1").append("svg").attr("width", "100%").attr("height", 600);
+      makeCommiterChart(svg, commitData, contribData);
+    });
+  }
+</script>
+
+<script>
+  $(function() {
+    $('a#button-show-source-example-1-source').on('click', function(event) {
+      var $this = $(this);
+      if ($this.data('showing-source')) {
+        $this.data('showing-source', false);
+        $this.text('Show Source');
+      } else {
+        $this.data('showing-source', true);
+        $this.text('Hide Source');
+      }
+
+      var $source = $('#example-chart-1-source').show();
+      if ($this.data('showing-source')) {
+        if (!$source.length) {
+          $source = $("<div/>").attr('id', 'example-chart-1-source').html('<pre>' + $('#example-1-source').html() + '</pre>');
+        }
+        $('#example-chart-1-source-wrapper').append($source);
+        $('html, body').animate({ scrollTop: $source.offset().top });
+      } else {
+        $source.hide();
+      }
+
+      event.preventDefault();
+    });
+  });
+</script>

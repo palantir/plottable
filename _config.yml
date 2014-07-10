@@ -4,3 +4,4 @@ exclude: ['Gemfile', 'Gemfile.lock', 'README.md', 'Gruntfile.js', 'package.json'
 company: 'Palantir'
 title: 'Palantir'
 google_analytics: ''
+baseurl: /plottable
