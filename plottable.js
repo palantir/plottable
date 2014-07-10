@@ -1,5 +1,5 @@
 /*!
-Plottable 0.19.3 (https://github.com/palantir/plottable)
+Plottable 0.20.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1465,7 +1465,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.19.3";
+    Plottable.version = "0.20.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4894,15 +4894,15 @@ var Plottable;
             * Creates a Label.
             *
             * @constructor
-            * @param {string} [text] The text of the Label.
+            * @param {string} [displayText] The text of the Label.
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
-            function Label(inputText, orientation) {
-                if (typeof inputText === "undefined") { inputText = ""; }
+            function Label(displayText, orientation) {
+                if (typeof displayText === "undefined") { displayText = ""; }
                 if (typeof orientation === "undefined") { orientation = "horizontal"; }
                 _super.call(this);
                 this.classed("label", true);
-                this.text(inputText);
+                this.text(displayText);
                 orientation = orientation.toLowerCase();
                 if (orientation === "vertical-left") {
                     orientation = "left";
@@ -4951,11 +4951,11 @@ var Plottable;
                 return this;
             };
 
-            Label.prototype.text = function (inputText) {
-                if (inputText === undefined) {
+            Label.prototype.text = function (displayText) {
+                if (displayText === undefined) {
                     return this._text;
                 } else {
-                    this._text = inputText;
+                    this._text = displayText;
                     this._invalidateLayout();
                     return this;
                 }
