@@ -1,6 +1,6 @@
 function makeChartWithSubplots() {
   var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
 
   var lineYScale = new Plottable.Scale.Linear();
   var lineYAxis = new Plottable.Axis.Numeric(lineYScale, "left");
