@@ -3627,15 +3627,6 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
 
-        it("scales don't allow Infinity", function () {
-            assert.throws(function () {
-                return scale._setDomain([5, Infinity]);
-            }, Error);
-            assert.throws(function () {
-                return scale._setDomain([-Infinity, 6]);
-            }, Error);
-        });
-
         it("should resize when a plot is removed", function () {
             var svg = generateSVG(400, 400);
             var ds1 = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
@@ -3665,6 +3656,23 @@ describe("Scales", function () {
             var d = scale.domain();
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
+        });
+
+        it("domain can't include NaN or Infinity", function () {
+            var scale = new Plottable.Scale.Linear();
+            var log = console.log;
+            console.log = function () {
+            }; // stop warnings from going to console
+            scale.domain([0, 1]);
+            scale.domain([5, Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
+            scale.domain([5, -Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
+            scale.domain([NaN, 7]);
+            assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
+            scale.domain([-1, 5]);
+            assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+            console.log = log; // reset console.log
         });
     });
 

@@ -49,6 +49,15 @@ export module Abstract {
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
 
+    public _setDomain(values: any[]) {
+        var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
+        if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
+            console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            return;
+        }
+        super._setDomain(values);
+    }
+
     /**
      * Sets or gets the QuantitiveScale's output interpolator
      *
