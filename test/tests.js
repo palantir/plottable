@@ -1880,12 +1880,12 @@ describe("Plots", function () {
                 var bar1y = bar1.data()[0].y;
                 assert.closeTo(numAttr(bar0, "height"), 104, 2);
                 assert.closeTo(numAttr(bar1, "height"), 104, 2);
-                assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "width is correct for bar0");
-                assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "width is correct for bar1");
+                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
+                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
 
                 // check that bar is aligned on the center of the scale
-                assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "y pos correct for bar0");
-                assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "y pos correct for bar1");
+                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "y pos correct for bar0");
+                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "y pos correct for bar1");
                 verifier.end();
             });
 
@@ -1896,12 +1896,12 @@ describe("Plots", function () {
                 var bar0y = bar0.data()[0].y;
                 var bar1y = bar1.data()[0].y;
                 renderer.project("width", 10);
-                assert.equal(numAttr(bar0, "height"), 10, "bar0 height");
-                assert.equal(numAttr(bar1, "height"), 10, "bar1 height");
-                assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "bar0 width");
-                assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "bar1 width");
-                assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "bar0 ypos");
-                assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "bar1 ypos");
+                assert.closeTo(numAttr(bar0, "height"), 10, 0.01, "bar0 height");
+                assert.closeTo(numAttr(bar1, "height"), 10, 0.01, "bar1 height");
+                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "bar0 width");
+                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "bar1 width");
+                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
+                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
                 verifier.end();
             });
         });
@@ -2100,8 +2100,8 @@ describe("Plots", function () {
                     var y = +selection.attr("cy") * scale[1] + translate[1] + elementTranslate[1];
                     if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
                         circlesInArea++;
-                        assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
-                        assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+                        assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
+                        assert.closeTo(y, yScale.scale(datum.y), 0.01, "the scaled/translated y is correct");
                         assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
                     }
                     ;

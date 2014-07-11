@@ -104,7 +104,7 @@ export module Component {
       return this;
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.measurer = Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
       return this;

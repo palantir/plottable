@@ -20,29 +20,28 @@
     <script src="../bower_components/jQuery/dist/jquery.js"></script>
     <script src="../bower_components/jquery.simulate/libs/jquery.simulate.js"></script>
     <script src="../bower_components/jquery.simulate/src/jquery.simulate.ext.js"></script>
-    <script src="blanket_mocha.js"></script>
     <script src="../plottable_multifile.js"></script>
     <script>
       mocha.setup({
-        // globals: ["LiveReload", "Pixel_CloseTo_Requirement"],
+        globals: ["LiveReload", "Pixel_CloseTo_Requirement"],
         ui: "bdd"
       }).timeout(1500);
     </script>
 
     <script src="../test/tests_multifile.js"></script>
     <script>
-        // if (window.PHANTOMJS) {
-        //     blanket.options("reporter", "../node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
-        // }
+        if (window.PHANTOMJS) {
+            blanket.options("reporter", "../node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
+        }
     </script>
   </head>
 
   <body>
     <div id="mocha"></div>
     <script>
-      // mocha.checkLeaks();
+      mocha.checkLeaks();
     onload=function() {
-      var runner;// = mocha.run();
+      var runner;
       if (window.mochaPhantomJS) {
         runner = mochaPhantomJS.run();
       } else {
