@@ -286,7 +286,7 @@ declare module Plottable {
             * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
             * shortening the line as required to ensure that it fits within width.
             */
-            function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
+            function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
@@ -338,12 +338,6 @@ declare module Plottable {
             * Wraps words and fits as much of the text as possible into the given width and height.
             */
             function breakTextToFitRect(text: string, width: number, height: number, measureText: Text.TextMeasurer): IWrappedText;
-            /**
-            * Splits up the text so that it will fit in width (or splits into a list of single characters if it is impossible
-            * to fit in width). Tries to avoid breaking words on non-linebreak-or-space characters, and will only break a word if
-            * the word is too big to fit within width on its own.
-            */
-            function breakTextToFitWidth(text: string, width: number, widthMeasure: (s: string) => number): string[];
             /**
             * Determines if it is possible to fit a given text within width without breaking any of the words.
             * Simple algorithm, split the text up into tokens, and make sure that the widest token doesn't exceed
@@ -533,7 +527,7 @@ declare module Plottable {
 declare module Plottable {
     module Formatter {
         class Custom extends Abstract.Formatter {
-            constructor(precision: number, customFormatFunction: (d: any, formatter: Custom) => string);
+            constructor(customFormatFunction: (d: any, formatter: Custom) => string, precision?: number);
         }
     }
 }
@@ -554,6 +548,11 @@ declare module Plottable {
             constructor();
         }
     }
+}
+
+
+declare module Plottable {
+    var version: string;
 }
 
 
@@ -748,9 +747,16 @@ declare module Plottable {
             */
             public merge(c: Component): Component.Group;
             /**
-            * Removes a Component from the DOM.
+            * Detaches a Component from the DOM. The component can be reused.
+            *
+            * @returns The calling Component.
             */
-            public remove(): Component;
+            public detach(): Component;
+            /**
+            * Removes a Component from the DOM and disconnects it from everything it's
+            * listening to (effectively destroying it).
+            */
+            public remove(): void;
         }
     }
 }
@@ -772,11 +778,13 @@ declare module Plottable {
             */
             public empty(): boolean;
             /**
-            * Remove all components contained in the  ComponentContainer
+            * Detaches all components contained in the ComponentContainer, and
+            * empties the ComponentContainer.
             *
             * @returns {ComponentContainer} The calling ComponentContainer
             */
-            public removeAll(): ComponentContainer;
+            public detachAll(): ComponentContainer;
+            public remove(): void;
         }
     }
 }
@@ -955,6 +963,7 @@ declare module Plottable {
             constructor();
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
+            public remove(): void;
             /**
             * Gets the Plot's DataSource.
             *
@@ -975,7 +984,7 @@ declare module Plottable {
             * @param {boolean} enabled Whether or not to animate.
             */
             public animate(enabled: boolean): Plot;
-            public remove(): Plot;
+            public detach(): Plot;
             /**
             * Gets the animator associated with the specified Animator key.
             *
@@ -1195,16 +1204,49 @@ declare module Plottable {
         */
         public pad(padProportion?: number): Domainer;
         /**
-        * Adds a value that will not be padded if either end of the domain.
-        * For example, after paddingException(0), a domainer will pad
-        * [0, 100] to [0, 102.5].
+        * Add a padding exception, a value that will not be padded at either end of the domain.
         *
-        * @param {any} exception The value that will not be padded.
-        * @param {boolean} add Defaults to true. If true, add the exception,
-        *                  if false, removes the exception.
-        * @return {Domainer} The calling Domainer.
+        * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
+        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+        * If a key is not provided, it will be added with set semantics (Can be removed by value)
+        *
+        * @param {any} exception The padding exception to add.
+        * @param string [key] The key to register the exception under.
+        * @return Domainer The calling domainer
         */
-        public paddingException(exception: any, add?: boolean): Domainer;
+        public addPaddingException(exception: any, key?: string): Domainer;
+        /**
+        * Remove a padding exception, allowing the domain to pad out that value again.
+        *
+        * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
+        * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
+        *
+        * @param {any} keyOrException The key for the value to remove, or the value to remove
+        * @return Domainer The calling domainer
+        */
+        public removePaddingException(keyOrException: any): Domainer;
+        /**
+        * Add an included value, a value that must be included inside the domain.
+        *
+        * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
+        * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+        * If a key is not provided, it will be added with set semantics (Can be removed by value)
+        *
+        * @param {any} value The included value to add.
+        * @param string [key] The key to register the value under.
+        * @return Domainer The calling domainer
+        */
+        public addIncludedValue(value: any, key?: string): Domainer;
+        /**
+        * Remove an included value, allowing the domain to not include that value gain again.
+        *
+        * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
+        * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
+        *
+        * @param {any} keyOrException The key for the value to remove, or the value to remove
+        * @return Domainer The calling domainer
+        */
+        public removeIncludedValue(valueOrKey: any): Domainer;
         /**
         * Extends the scale's domain so it starts and ends with "nice" values.
         *
@@ -1212,19 +1254,6 @@ declare module Plottable {
         * @return {Domainer} The calling Domainer.
         */
         public nice(count?: number): Domainer;
-        /**
-        * Ensure that the domain produced includes value.
-        *
-        * For example, after include(0), the domain [3, 5] will become [0, 5],
-        * and the domain [-9, -8] will become [-9, 0].
-        *
-        * @param {any} value The value that will be included.
-        * @param {boolean} include Defaults to true. If true, this value will
-        *                  always be included, if false, this value will not
-        *                  necessarily be included.
-        * @return {Domainer} The calling Domainer.
-        */
-        public include(value: any, include?: boolean): Domainer;
     }
 }
 
@@ -1538,110 +1567,13 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Axis {
-        class Axis extends Abstract.Component {
-            public axisElement: D3.Selection;
-            public orientToAlign: {
-                [s: string]: string;
-            };
-            static _DEFAULT_TICK_SIZE: number;
-            /**
-            * Creates an Axis.
-            *
-            * @constructor
-            * @param {Scale} scale The Scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {any} [formatter] a D3 formatter or a Plottable Formatter.
-            */
-            constructor(axisScale: Abstract.Scale, orientation: string, formatter?: any);
-            public showEndTickLabels(): boolean;
-            public showEndTickLabels(show: boolean): Axis;
-            public scale(): Abstract.Scale;
-            public scale(newScale: Abstract.Scale): Axis;
-            /**
-            * Sets or gets the tick label position relative to the tick marks.
-            * The exact consequences of particular tick label positionings depends on the subclass implementation.
-            *
-            * @param {string} [position] The relative position of the tick label.
-            * @returns {string|Axis} The current tick label position, or the calling Axis.
-            */
-            public tickLabelPosition(): string;
-            public tickLabelPosition(position: string): Axis;
-            public orient(): string;
-            public orient(newOrient: string): Axis;
-            public ticks(): any[];
-            public ticks(...args: any[]): Axis;
-            public tickValues(): any[];
-            public tickValues(...args: any[]): Axis;
-            public tickSize(): number;
-            public tickSize(inner: number): Axis;
-            public tickSize(inner: number, outer: number): Axis;
-            public innerTickSize(): number;
-            public innerTickSize(val: number): Axis;
-            public outerTickSize(): number;
-            public outerTickSize(val: number): Axis;
-            public tickPadding(): number;
-            public tickPadding(val: number): Axis;
-            /**
-            * Gets the current tick formatting function, or sets the tick formatting function.
-            *
-            * @param {(value: any) => string} [formatter] The new tick formatting function.
-            * @returns The current tick formatting function, or the calling Axis.
-            */
-            public tickFormat(): (value: any) => string;
-            public tickFormat(formatter: (value: any) => string): Axis;
-        }
-        class XAxis extends Axis {
-            /**
-            * Creates an XAxis (a horizontal Axis).
-            *
-            * @constructor
-            * @param {Scale} scale The Scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom)
-            * @param {any} [formatter] a D3 formatter
-            */
-            constructor(scale: Abstract.Scale, orientation?: string, formatter?: any);
-            public height(h: number): XAxis;
-            /**
-            * Sets or gets the tick label position relative to the tick marks.
-            *
-            * @param {string} [position] The relative position of the tick label (left/center/right).
-            * @returns {string|XAxis} The current tick label position, or the calling XAxis.
-            */
-            public tickLabelPosition(): string;
-            public tickLabelPosition(position: string): XAxis;
-        }
-        class YAxis extends Axis {
-            /**
-            * Creates a YAxis (a vertical Axis).
-            *
-            * @constructor
-            * @param {Scale} scale The Scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (left/right)
-            * @param {any} [formatter] a D3 formatter
-            */
-            constructor(scale: Abstract.Scale, orientation?: string, formatter?: any);
-            public width(w: number): YAxis;
-            /**
-            * Sets or gets the tick label position relative to the tick marks.
-            *
-            * @param {string} [position] The relative position of the tick label (top/middle/bottom).
-            * @returns {string|YAxis} The current tick label position, or the calling YAxis.
-            */
-            public tickLabelPosition(): string;
-            public tickLabelPosition(position: string): YAxis;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Abstract {
         class Axis extends Component {
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
             public axisElement: D3.Selection;
-            constructor(scale: Scale, orientation: string, formatter?: Formatter);
+            constructor(scale: Scale, orientation: string, formatter?: any);
+            public remove(): void;
             /**
             * Gets the current width.
             *
@@ -1669,12 +1601,18 @@ declare module Plottable {
             */
             public height(h: any): Axis;
             /**
+            * Get the current formatter on the axis.
+            *
+            * @returns {Abstract.Formatter} the axis formatter
+            */
+            public formatter(): Formatter;
+            /**
             * Sets a new tick formatter.
             *
-            * @param {Abstract.Formatter} formatter
-            * @returns {BaseAxis} The calling BaseAxis.
+            * @param {function | Abstract.Formatter} formatter
+            * @returns {Abstract.Axis} The calling Axis.
             */
-            public formatter(formatter: Formatter): Axis;
+            public formatter(formatter: any): Axis;
             /**
             * Gets the current tick mark length.
             *
@@ -1744,7 +1682,7 @@ declare module Plottable {
             * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
             * @param {Formatter} [formatter] A function to format tick labels.
             */
-            constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: Abstract.Formatter);
+            constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: any);
             /**
             * Gets the tick label position relative to the tick marks.
             *
@@ -1800,8 +1738,9 @@ declare module Plottable {
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
             */
-            constructor(scale: Scale.Ordinal, orientation?: string);
+            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: any);
         }
     }
 }
@@ -1814,19 +1753,25 @@ declare module Plottable {
             * Creates a Label.
             *
             * @constructor
-            * @param {string} [text] The text of the Label.
+            * @param {string} [displayText] The text of the Label.
             * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
             */
-            constructor(text?: string, orientation?: string);
+            constructor(displayText?: string, orientation?: string);
             public xAlign(alignment: string): Label;
             public yAlign(alignment: string): Label;
             /**
+            * Retrieve the current text on the Label.
+            *
+            * @returns {string} The text on the label.
+            */
+            public text(): string;
+            /**
             * Sets the text on the Label.
             *
-            * @param {string} text The new text for the Label.
+            * @param {string} displayText The new text for the Label.
             * @returns {Label} The calling Label.
             */
-            public setText(text: string): Label;
+            public text(displayText: string): Label;
         }
         class TitleLabel extends Label {
             constructor(text?: string, orientation?: string);
@@ -1858,6 +1803,7 @@ declare module Plottable {
             * @param {ColorScale} colorScale
             */
             constructor(colorScale?: Scale.Color);
+            public remove(): void;
             /**
             * Assigns or gets the callback to the Legend
             * This callback is associated with toggle events, which trigger when a legend row is clicked.
@@ -1904,6 +1850,7 @@ declare module Plottable {
             * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
             */
             constructor(xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale);
+            public remove(): Gridlines;
         }
     }
 }
@@ -2388,10 +2335,10 @@ declare module Plottable {
     module Template {
         class StandardChart extends Component.Table {
             constructor();
-            public yAxis(y: Axis.YAxis): StandardChart;
-            public yAxis(): Axis.YAxis;
-            public xAxis(x: Axis.XAxis): StandardChart;
-            public xAxis(): Axis.XAxis;
+            public yAxis(y: Abstract.Axis): StandardChart;
+            public yAxis(): Abstract.Axis;
+            public xAxis(x: Abstract.Axis): StandardChart;
+            public xAxis(): Abstract.Axis;
             public yLabel(y: Component.AxisLabel): StandardChart;
             public yLabel(y: string): StandardChart;
             public yLabel(): Component.AxisLabel;

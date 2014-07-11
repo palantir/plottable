@@ -74,11 +74,6 @@ module.exports = function(grunt) {
       replacement: "",
       path: "plottable.d.ts",
     },
-    header: {
-      pattern: "VERSION",
-      replacement: "<%= pkg.version %>",
-      path: "license_header.tmp",
-    },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/src/$1.js");',
@@ -98,6 +93,11 @@ module.exports = function(grunt) {
       pattern: "(.*\\.ts)",
       replacement: '/// <reference path="../$1" />',
       path: "build/sublime.d.ts",
+    },
+    version_number: {
+      pattern: "@VERSION",
+      replacement: "<%= pkg.version %>",
+      path: "plottable.js"
     }
   };
 
@@ -171,7 +171,7 @@ module.exports = function(grunt) {
     bump: bumpJSON,
     concat: {
       header: {
-        src: ["license_header.tmp", "plottable.js"],
+        src: ["license_header.txt", "plottable.js"],
         dest: "plottable.js",
       },
       plottable_multifile: {
@@ -214,7 +214,7 @@ module.exports = function(grunt) {
       },
       "rebuild": {
         "tasks": ["dev-compile"],
-        "files": ["src/**/*.ts"]
+        "files": ["src/**/*.ts", "examples/**/*.ts"]
       },
       "tests": {
         "tasks": ["test-compile"],
@@ -235,13 +235,10 @@ module.exports = function(grunt) {
         }
       }
     },
-    clean: {tscommand: ["tscommand*.tmp.txt"], header: ["license_header.tmp"]},
-    sed: sedJSON,
-    copy: {
-      header: {
-        files: [{src: "license_header.txt", dest: "license_header.tmp"}]
-      }
+    clean: {
+      tscommand: ["tscommand*.tmp.txt"]
     },
+    sed: sedJSON,
     gitcommit: {
       version: {
         options: {
@@ -304,8 +301,6 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   // default task (this is what runs when a task isn't specified)
-  grunt.registerTask("handle-header",
-            ["copy:header", "sed:header", "concat:header", "clean:header"]);
   grunt.registerTask("update_ts_files", updateTsFiles);
   grunt.registerTask("update_test_ts_files", updateTestTsFiles);
   grunt.registerTask("definitions_prod", function() {
@@ -326,9 +321,10 @@ module.exports = function(grunt) {
                                   "concat:definitions",
                                   "sed:definitions",
                                   "sed:private_definitions",
+                                  "concat:header",
+                                  "sed:version_number",
                                   "definitions_prod",
                                   "test-compile",
-                                  "handle-header",
                                   "sed:protected_definitions",
                                   "concat:plottable_multifile",
                                   "sed:plottable_multifile",
