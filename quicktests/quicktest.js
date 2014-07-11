@@ -1,5 +1,3 @@
-// you were going to find out how to fix this race condition
-
 var quicktests = {};
 
 function loadScript(url) {
