@@ -22,10 +22,12 @@ function axis(type: string, orientation: string) {
 	if (type === "numeric") {
 		var lscale = new Plottable.Scale.Linear();
 		axis = new Plottable.Axis.Numeric(lscale, orientation);
-	} else {
+	} else if (type === "category") {
 		var oscale = new Plottable.Scale.Ordinal();
 		oscale.domain (ordinalDomain);
 		axis = new Plottable.Axis.Category(oscale, orientation);
+	} else {
+		throw new Error ("unrecognized type: " + type);
 	}
 	axis.renderTo(svg);
 }
@@ -34,10 +36,11 @@ function catAxisWrap(orientation: string) {
 	var svg = generateSVG();
 	var scale = new Plottable.Scale.Ordinal();
 	scale.domain([
-		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-		"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-		"ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-		"ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+		"Brazil",
+		"United States of America",
+		"Tatooine",
+		"People's Republic of China",
+		"United Kingdom of Great Britain and Northern Ireland"
 	]);
 	var axis = new Plottable.Axis.Category(scale, orientation);
 	axis.renderTo(svg);
