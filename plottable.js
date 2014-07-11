@@ -3715,7 +3715,9 @@ var Plottable;
             };
 
             Ordinal.prototype._setDomain = function (values) {
-                _super.prototype._setDomain.call(this, values);
+                _super.prototype._setDomain.call(this, values.map(function (x) {
+                    return x.toString();
+                }));
                 this.range(this.range()); // update range
             };
 
