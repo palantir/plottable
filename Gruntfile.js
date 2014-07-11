@@ -180,7 +180,7 @@ module.exports = function(grunt) {
       },
       "rebuild": {
         "tasks": ["dev-compile"],
-        "files": ["src/**/*.ts"]
+        "files": ["src/**/*.ts", "examples/**/*.ts"]
       },
       "tests": {
         "tasks": ["test-compile"],
