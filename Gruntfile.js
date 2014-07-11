@@ -3,30 +3,6 @@ module.exports = function(grunt) {
 
   var path = require("path");
   var cwd = process.cwd();
- 
-  var browsers = [{
-      browserName: "firefox",
-      version: "19",
-      platform: "XP"
-  }, {
-      browserName: "chrome",
-      platform: "XP"
-  }, {
-      browserName: "chrome",
-      platform: "linux"
-  }, {
-      browserName: "internet explorer",
-      platform: "WIN8",
-      version: "10"
-  }, {
-      browserName: "internet explorer",
-      platform: "VISTA",
-      version: "9"
-  }, {
-      browserName: "opera",
-      platform: "Windows 2008",
-      version: "12"
-  }];
 
   var tsJSON = {
     dev: {
@@ -158,30 +134,36 @@ module.exports = function(grunt) {
 
   var browsers = [{
     browserName: "firefox",
-    version: "19",
+    version: "30",
+    platform: "WIN7"
+  }, {
+    browserName: "firefox",
+    version: "30",
+    platform: "linux"
+  }, {
+    browserName: "firefox",
+    version: "30",
+    platform: "OS X 10.9"
+  }, {
+    browserName: "chrome",
+    version: "35",
     platform: "XP"
   }, {
     browserName: "chrome",
-    platform: "XP"
-  }, {
-    browserName: "chrome",
+    version: "35",
     platform: "linux"
   }, {
     browserName: "chrome",
+    version: "35",
     platform: "OS X 10.9",
-    version: "35"
   }, {
     browserName: "internet explorer",
-    platform: "WIN8",
-    version: "10"
+    version: "10",
+    platform: "WIN8"
   }, {
     browserName: "internet explorer",
-    platform: "VISTA",
-    version: "9"
-  }, {
-    browserName: "opera",
-    platform: "Windows 2008",
-    version: "12"
+    version: "9",
+    platform: "WIN7"
   }];
 
   var configJSON = {
