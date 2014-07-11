@@ -1,5 +1,3 @@
----
----
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -9,7 +7,11 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="shortcut icon" href="/favicon.ico" sizes="16x16 32x32" type="image/x-icon">
+  {% unless page.title %}
   <title>Plottable.js | Palantir</title>
+  {% else %}
+  <title>{{ page.title }} | Palantir</title>
+  {% endunless %}
   <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="description" content="Flexible, interactive, performant charts for the web made easy">
@@ -21,6 +23,10 @@
   <script src="{{ site.baseurl }}/build/js/respond-1.4.2.min.js"></script>
   <link rel="stylesheet" href="{{ site.baseurl }}/build/css/ie.css" media="screen, projection" type="text/css">
   <![endif]-->
+  <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/bower_components/plottable/plottable.css">
+  <script src="{{ site.baseurl }}/bower_components/d3/d3.min.js"></script>
+  <script src="{{ site.baseurl }}/bower_components/plottable/plottable.js"></script>
+  <script src="{{ site.baseurl }}/build/js/compiled.min.js"></script>
 
   <!-- OpenGraph -->
   <meta property="og:title" content="Home">
@@ -29,47 +35,12 @@
   <meta property="og:site_name" content="Plottable.js">
   <meta property="og:description" content="Flexible, interactive, performant charts for the web made easy.">
 </head>
-<body id="page-index">
+<body>
   <header>
     {% include nav.html %}
-
-    <h1>
-      Plottable.js
-      <small>Flexible, interactive, performant charts for the web made easy</small>
-    </h1>
-    <div id="global-download">
-      <a href="https://github.com/palantir/plottable/archive/master.zip" class="button icon-download no-arrow">Download <span id="version-tag">(0.19.3)</span></a>
-    </div>
-
-    <p>
-      Follow our development on <a href="https://github.com/palantir/plottable" title="Plottable on Github.">Github</a>
-    </p>
-
-    <div id="chart-separator">
-      <img class="no-svg" src="{{ site.baseurl }}/build/images/plot-background.png">
-      <img class="svg" src="{{ site.baseurl }}/build/images/plot-background.svg">
-    </div>
   </header><!-- /header -->
 
-
-  <section id="section-built-on-d3">
-    <div class="content">
-      <h2>Built On Top Of D3</h2>
-      <p><strong>Plottable.js</strong> consists of pluggable set of Components which encapsulate rendering logic, and a layout engine that is responsible for positioning them.</p>
-    </div>
-  </section>
-
-  <section id="section-easier-more-usable">
-    <div class="content">
-      <h2>Easier, More Usable</h2>
-      <p>Because Plottable handles layout, sizing, and positioning, Plottable charts are easier to create and more reusable than charts built only with D3. And, since Plottable Components are powered by D3, the full flexibility of D3 is still available.</p>
-      <div id="plot-separator">
-        <img class="no-svg" src="{{ site.baseurl }}/build/images/plots.png">
-        <img class="svg" src="{{ site.baseurl }}/build/images/plots.svg">
-      </div>
-      <p>Plottable currently includes components like <strong>LinePlots</strong>, <strong>AreaPlots</strong>, <strong>BarPlots</strong>, <strong>CategoryAxes</strong> (with automatic word-wrapping), <strong>interactive Legends</strong>, and <strong>Labels</strong>. Plottable is open-sourced under the MIT license, and is under active development by <strong>Palantir Technologies</strong>.</p>
-    </div>
-  </section>
+  {{ content }}
 
   <!-- Footer -->
   <footer role="contentinfo">
@@ -88,6 +59,5 @@
   </script>
   {% endif %}
 
-  <script src="{{ site.baseurl }}/build/js/compiled.min.js"></script>
 </body>
 </html>
