@@ -5114,7 +5114,7 @@ var Plottable;
                 });
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
-                var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
+                var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
                     height: rowsICanFit * textHeight,
