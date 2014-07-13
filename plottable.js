@@ -3514,9 +3514,8 @@ var Plottable;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
             }
-            QuantitiveScale.prototype.autoDomain = function () {
-                this._setDomain(this._domainer.computeDomain(this._getAllExtents(), this));
-                return this;
+            QuantitiveScale.prototype._getExtent = function () {
+                return this._domainer.computeDomain(this._getAllExtents(), this);
             };
 
             /**
