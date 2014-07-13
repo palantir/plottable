@@ -2786,9 +2786,6 @@ var Plottable;
             };
 
             Scale.prototype._setDomain = function (values) {
-                if (values[0] === Infinity || values[0] === -Infinity || values[1] === Infinity || values[1] === -Infinity) {
-                    throw new Error("data cannot contain Infinity or -Infinity");
-                }
                 this._d3Scale.domain(values);
                 this.broadcaster.broadcast();
             };
@@ -3540,6 +3537,17 @@ var Plottable;
 
             QuantitiveScale.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
+            };
+
+            QuantitiveScale.prototype._setDomain = function (values) {
+                var isNaNOrInfinity = function (x) {
+                    return x !== x || x === Infinity || x === -Infinity;
+                };
+                if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
+                    console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+                    return;
+                }
+                _super.prototype._setDomain.call(this, values);
             };
 
             QuantitiveScale.prototype.interpolate = function (factory) {
