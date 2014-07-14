@@ -19,4 +19,13 @@ function run(div, data, Plottable) {
   var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
                                            [null,  xAxis]]);
   areaChart.renderTo(svg);
+
+    cb = function(x, y){
+    d = areaRenderer.dataSource().data();
+    areaRenderer.dataSource().data(d);
+  }  
+
+  window.xy = new Plottable.Interaction.Click(areaRenderer)
+    .callback(cb)
+    .registerWithComponent();
 }

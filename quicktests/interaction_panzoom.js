@@ -17,11 +17,10 @@ function run(div, data, Plottable) {
   var renderGroup = renderAreaD1.merge(gridlines);
   var chart = new Plottable.Component.Table([[yAxis, renderGroup],
                                          [null,  xAxis]]);
-  var pzi = new Plottable.Interaction.PanZoom(renderGroup, xScale, yScale);
-  pzi.registerWithComponent();
+
   chart.renderTo(svg);
 
-
-
+  var pzi = new Plottable.Interaction.PanZoom(renderAreaD1, xScale, yScale);
+  pzi.registerWithComponent();
 
 }

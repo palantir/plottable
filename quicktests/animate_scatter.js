@@ -21,10 +21,14 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   circleChart.renderTo(svg);
 
+  cb = function(x, y){
+    d = circleRenderer.dataSource().data();
+    circleRenderer.dataSource().data(d);
+  }  
 
-
-
-
+  window.xy = new Plottable.Interaction.Click(circleRenderer)
+    .callback(cb)
+    .registerWithComponent();
 
 
 }

@@ -20,5 +20,13 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   hBarChart.renderTo(svg);
 
+  cb = function(x, y){
+    d = hBarRenderer.dataSource().data();
+    hBarRenderer.dataSource().data(d);
+  }  
+
+  window.xy = new Plottable.Interaction.Click(hBarRenderer)
+    .callback(cb)
+    .registerWithComponent();
 
 }
