@@ -288,6 +288,7 @@ module.exports = function(grunt) {
           testname: 'Plottable Sauce Unit Tests',
           browsers: browsers,
           build: process.env.TRAVIS_JOB_ID,
+          "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
         }
       }
     }
