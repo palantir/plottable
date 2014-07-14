@@ -17,8 +17,14 @@ export module Plot {
       super(dataset, xScale, yScale);
     }
 
-    public _updateYDomainer() {
-      this._updateDomainer(this.yScale);
+    public _updateXDomainer() {
+      super._updateXDomainer();
+      var domainer = this._getDomainer(this.xScale);
+      if (domainer != null) {
+        this._addBaseline(domainer);
+        this.xScale._autoDomainIfAutomaticMode();
+        domainer.pad(0);
+      }
       return this;
     }
 

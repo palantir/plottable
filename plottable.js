@@ -6057,21 +6057,22 @@ var Plottable;
                 return this;
             };
 
-            BarPlot.prototype._updateDomainer = function (scale) {
+            BarPlot.prototype._getDomainer = function (scale) {
                 if (scale instanceof Abstract.QuantitiveScale) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
-                        if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-                        } else {
-                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
-                        }
+                        return qscale.domainer();
                     }
-
-                    // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-                    qscale._autoDomainIfAutomaticMode();
                 }
-                return this;
+                return null;
+            };
+
+            BarPlot.prototype._addBaseline = function (domainer) {
+                if (this._baselineValue != null) {
+                    domainer.addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+                } else {
+                    domainer.removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
+                }
             };
 
             BarPlot.prototype._generateAttrToProjector = function () {
@@ -6155,8 +6156,14 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this._isVertical = true;
             }
-            VerticalBar.prototype._updateYDomainer = function () {
-                this._updateDomainer(this.yScale);
+            VerticalBar.prototype._updateXDomainer = function () {
+                _super.prototype._updateXDomainer.call(this);
+                var domainer = this._getDomainer(this.xScale);
+                if (domainer != null) {
+                    this._addBaseline(domainer);
+                    this.xScale._autoDomainIfAutomaticMode();
+                    domainer.pad(0);
+                }
                 return this;
             };
             VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
@@ -6192,7 +6199,13 @@ var Plottable;
                 this.isVertical = false;
             }
             HorizontalBar.prototype._updateXDomainer = function () {
-                this._updateDomainer(this.xScale);
+                _super.prototype._updateXDomainer.call(this);
+                var domainer = this._getDomainer(this.xScale);
+                if (domainer != null) {
+                    this._addBaseline(domainer);
+                    this.xScale._autoDomainIfAutomaticMode();
+                    domainer.pad(0);
+                }
                 return this;
             };
 
