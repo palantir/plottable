@@ -1148,6 +1148,10 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     }
+    interface Point {
+        x: number;
+        y: number;
+    }
     interface FullSelectionArea {
         pixel: SelectionArea;
         data: SelectionArea;
@@ -2212,24 +2216,24 @@ declare module Plottable {
             /**
             * Attaches a callback to be called on mouseover.
             *
-            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
             * @return {Mouse} The calling Mouse Interaction.
             */
-            public mouseover(callback: (x: number, y: number) => any): Mouse;
+            public mouseover(callback: (location: Point) => any): Mouse;
             /**
             * Attaches a callback to be called on mousemove.
             *
-            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
             * @return {Mouse} The calling Mouse Interaction.
             */
-            public mousemove(callback: (x: number, y: number) => any): Mouse;
+            public mousemove(callback: (location: Point) => any): Mouse;
             /**
             * Attaches a callback to be called on mouseout.
             *
-            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
             * @return {Mouse} The calling Mouse Interaction.
             */
-            public mouseout(callback: (x: number, y: number) => any): Mouse;
+            public mouseout(callback: (location: Point) => any): Mouse;
         }
     }
 }

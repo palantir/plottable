@@ -5635,14 +5635,14 @@ var Plottable;
 
                 this._tooltip = this.foregroundContainer.append("g").classed("tooltip", true);
                 this._tooltip.append("rect").attr("rx", this.TOOLTIP_RADIUS).attr("ry", this.TOOLTIP_RADIUS);
-                var ttText = this._tooltip.append("text").attr("dy", "0.9em");
+                var ttText = this._tooltip.append("text");
                 this.tooltipTextMeasurer = Plottable.Util.Text.getTextMeasure(ttText);
                 this._tooltip.append("g").classed("text-container", true);
                 this._eraseTooltip();
 
                 this.hoverInteraction = new Plottable.Interaction.Mouse(this);
 
-                this.hoverInteraction.mousemove(function (x, y) {
+                this.hoverInteraction.mousemove(function (p) {
                     if (!_this._showTooltip()) {
                         return;
                     }
@@ -5652,8 +5652,8 @@ var Plottable;
                     _this.deselectAll();
 
                     var fullExtent = { min: 0, max: Infinity };
-                    var selectX = (_this._isVertical) ? x : fullExtent;
-                    var selectY = (_this._isVertical) ? fullExtent : y;
+                    var selectX = (_this._isVertical) ? p.x : fullExtent;
+                    var selectY = (_this._isVertical) ? fullExtent : p.y;
                     var bar = _this.selectBar(selectX, selectY, true);
                     if (bar != null) {
                         _this._drawTooltip(_this._getTooltipText(bar), 0, 0);
@@ -5661,7 +5661,7 @@ var Plottable;
                     }
                 });
 
-                this.hoverInteraction.mouseout(function (x, y) {
+                this.hoverInteraction.mouseout(function (p) {
                     if (!_this._showTooltip()) {
                         return;
                     }
@@ -5682,7 +5682,6 @@ var Plottable;
                 }
 
                 var tooltipTextFunction = Plottable.Util.Methods.applyAccessor(textProjector.accessor, this._dataSource);
-
                 return tooltipTextFunction(bar.data()[0], null);
             };
 
@@ -5732,11 +5731,10 @@ var Plottable;
                         return bbox.height;
                     });
                     this._eraseTooltip();
-                    var maxHeight = Math.max.apply(null, tooltipHeights);
+                    var maxHeight = d3.max(tooltipHeights);
                     var extraSpace = maxHeight + 2 * this.TOOLTIP_OUTER_PADDING;
-
                     var yRange = this.yScale.range();
-                    yRange[1] += extraSpace;
+                    yRange[1] = extraSpace;
                     this.yScale.range(yRange);
                 }
 
@@ -5852,16 +5850,6 @@ var Plottable;
                 }
             };
 
-            /**
-            * Determines whether or not to show hover-over tooltips.
-            *
-            * @param {boolean} show Whether or not to show the hover-over tooltip.
-            * @return {BarPlot} The calling BarPlot.
-            */
-            // public showTooltip(show: boolean) {
-            //   this._showTooltip = show;
-            //   return this;
-            // }
             BarPlot.prototype._showTooltip = function () {
                 return this._projectors["tooltip-text"] != null;
             };
@@ -6507,25 +6495,31 @@ var Plottable;
                 hitBox.on("mouseover", function () {
                     if (_this._mouseover != null) {
                         var xy = d3.mouse(hitBox.node());
-                        var x = xy[0];
-                        var y = xy[1];
-                        _this._mouseover(x, y);
+                        var p = {
+                            x: xy[0],
+                            y: xy[1]
+                        };
+                        _this._mouseover(p);
                     }
                 });
                 hitBox.on("mousemove", function () {
                     if (_this._mousemove != null) {
                         var xy = d3.mouse(hitBox.node());
-                        var x = xy[0];
-                        var y = xy[1];
-                        _this._mousemove(x, y);
+                        var p = {
+                            x: xy[0],
+                            y: xy[1]
+                        };
+                        _this._mousemove(p);
                     }
                 });
                 hitBox.on("mouseout", function () {
                     if (_this._mouseout != null) {
                         var xy = d3.mouse(hitBox.node());
-                        var x = xy[0];
-                        var y = xy[1];
-                        _this._mouseout(x, y);
+                        var p = {
+                            x: xy[0],
+                            y: xy[1]
+                        };
+                        _this._mouseout(p);
                     }
                 });
             };
@@ -6533,7 +6527,7 @@ var Plottable;
             /**
             * Attaches a callback to be called on mouseover.
             *
-            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
             * @return {Mouse} The calling Mouse Interaction.
             */
             Mouse.prototype.mouseover = function (callback) {
@@ -6544,7 +6538,7 @@ var Plottable;
             /**
             * Attaches a callback to be called on mousemove.
             *
-            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
             * @return {Mouse} The calling Mouse Interaction.
             */
             Mouse.prototype.mousemove = function (callback) {
@@ -6555,7 +6549,7 @@ var Plottable;
             /**
             * Attaches a callback to be called on mouseout.
             *
-            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
             * @return {Mouse} The calling Mouse Interaction.
             */
             Mouse.prototype.mouseout = function (callback) {

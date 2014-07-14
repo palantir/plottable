@@ -24,6 +24,11 @@ module Plottable {
     yMax: number;
   }
 
+  export interface Point {
+    x: number;
+    y: number;
+  }
+
   export interface FullSelectionArea {
     pixel: SelectionArea;
     data: SelectionArea;

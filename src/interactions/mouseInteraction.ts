@@ -3,9 +3,9 @@
 module Plottable {
 export module Interaction {
   export class Mouse extends Abstract.Interaction {
-    private _mouseover: (x: number, y: number) => any;
-    private _mousemove: (x: number, y: number) => any;
-    private _mouseout: (x: number, y: number) => any;
+    private _mouseover: (location: Point) => any;
+    private _mousemove: (location: Point) => any;
+    private _mouseout: (location: Point) => any;
 
     constructor(componentToListenTo: Abstract.Component) {
       super(componentToListenTo);
@@ -16,25 +16,31 @@ export module Interaction {
       hitBox.on("mouseover", () => {
         if (this._mouseover != null) {
           var xy = d3.mouse(hitBox.node());
-          var x = xy[0];
-          var y = xy[1];
-          this._mouseover(x, y);
+          var p: Point = {
+            x: xy[0],
+            y: xy[1]
+          }
+          this._mouseover(p);
         }
       });
       hitBox.on("mousemove", () => {
         if (this._mousemove != null) {
           var xy = d3.mouse(hitBox.node());
-          var x = xy[0];
-          var y = xy[1];
-          this._mousemove(x, y);
+          var p: Point = {
+            x: xy[0],
+            y: xy[1]
+          }
+          this._mousemove(p);
         }
       });
       hitBox.on("mouseout", () => {
         if (this._mouseout != null) {
           var xy = d3.mouse(hitBox.node());
-          var x = xy[0];
-          var y = xy[1];
-          this._mouseout(x, y);
+          var p: Point = {
+            x: xy[0],
+            y: xy[1]
+          }
+          this._mouseout(p);
         }
       });
     }
@@ -42,10 +48,10 @@ export module Interaction {
     /**
      * Attaches a callback to be called on mouseover.
      *
-     * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+     * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
      * @return {Mouse} The calling Mouse Interaction.
      */
-    public mouseover(callback: (x: number, y: number) => any) {
+    public mouseover(callback: (location: Point) => any) {
       this._mouseover = callback;
       return this;
     }
@@ -53,10 +59,10 @@ export module Interaction {
     /**
      * Attaches a callback to be called on mousemove.
      *
-     * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+     * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
      * @return {Mouse} The calling Mouse Interaction.
      */
-    public mousemove(callback: (x: number, y: number) => any) {
+    public mousemove(callback: (location: Point) => any) {
       this._mousemove = callback;
       return this;
     }
@@ -64,10 +70,10 @@ export module Interaction {
     /**
      * Attaches a callback to be called on mouseout.
      *
-     * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+     * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
      * @return {Mouse} The calling Mouse Interaction.
      */
-    public mouseout(callback: (x: number, y: number) => any) {
+    public mouseout(callback: (location: Point) => any) {
       this._mouseout = callback;
       return this;
     }

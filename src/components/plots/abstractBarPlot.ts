@@ -10,7 +10,7 @@ export module Abstract {
     public _barAlignmentFactor = 0;
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
-    // private _showTooltip = false;
+
     public _tooltip: D3.Selection;
     private tooltipTextMeasurer: Util.Text.TextMeasurer;
     private TOOLTIP_RADIUS = 3;
@@ -50,14 +50,14 @@ export module Abstract {
       this._tooltip = this.foregroundContainer.append("g").classed("tooltip", true);
       this._tooltip.append("rect").attr("rx", this.TOOLTIP_RADIUS)
                                   .attr("ry", this.TOOLTIP_RADIUS);
-      var ttText = this._tooltip.append("text").attr("dy", "0.9em");
+      var ttText = this._tooltip.append("text");
       this.tooltipTextMeasurer = Util.Text.getTextMeasure(ttText);
       this._tooltip.append("g").classed("text-container", true);
       this._eraseTooltip();
 
       this.hoverInteraction = new Plottable.Interaction.Mouse(this);
 
-      this.hoverInteraction.mousemove((x: number, y: number) => {
+      this.hoverInteraction.mousemove((p: Point) => {
         if (!this._showTooltip()) {
           return;
         }
@@ -67,8 +67,8 @@ export module Abstract {
         this.deselectAll();
 
         var fullExtent: IExtent = { min: 0, max:Infinity };
-        var selectX: any = (this._isVertical) ? x : fullExtent;
-        var selectY: any = (this._isVertical) ? fullExtent : y;
+        var selectX: any = (this._isVertical) ? p.x : fullExtent;
+        var selectY: any = (this._isVertical) ? fullExtent : p.y;
         var bar = this.selectBar(selectX, selectY, true);
         if (bar != null) {
           this._drawTooltip(this._getTooltipText(bar), 0, 0);
@@ -76,7 +76,7 @@ export module Abstract {
         }
       });
 
-      this.hoverInteraction.mouseout((x: number, y: number) => {
+      this.hoverInteraction.mouseout((p: Point) => {
         if (!this._showTooltip()) {
           return;
         }
@@ -97,7 +97,6 @@ export module Abstract {
       }
 
       var tooltipTextFunction = Util.Methods.applyAccessor(textProjector.accessor, this._dataSource);
-
       return tooltipTextFunction(bar.data()[0], null);
     }
 
@@ -142,18 +141,17 @@ export module Abstract {
 
       // adjust space for tooltip, if necessary
       if (this._showTooltip()) {
-        var tooltipHeights = this._bars[0].map((barEl: any) => {
+        var tooltipHeights: number[] = this._bars[0].map((barEl: any) => {
           var bar = d3.select(barEl);
           this._drawTooltip(this._getTooltipText(bar), 0, 0);
           var bbox = Util.DOM.getBBox(this._tooltip);
           return bbox.height;
         });
         this._eraseTooltip();
-        var maxHeight = Math.max.apply(null, tooltipHeights);
+        var maxHeight = d3.max(tooltipHeights);
         var extraSpace = maxHeight + 2 * this.TOOLTIP_OUTER_PADDING;
-
         var yRange = this.yScale.range();
-        yRange[1] += extraSpace;
+        yRange[1] = extraSpace;
         this.yScale.range(yRange);
       }
 
@@ -280,17 +278,6 @@ export module Abstract {
         return null;
       }
     }
-
-    /**
-     * Determines whether or not to show hover-over tooltips.
-     *
-     * @param {boolean} show Whether or not to show the hover-over tooltip.
-     * @return {BarPlot} The calling BarPlot.
-     */
-    // public showTooltip(show: boolean) {
-    //   this._showTooltip = show;
-    //   return this;
-    // }
 
     private _showTooltip() {
       return this._projectors["tooltip-text"] != null;
