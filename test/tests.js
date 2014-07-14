@@ -1456,7 +1456,9 @@ describe("Plots", function () {
         var verifier;
 
         // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
-        var normalizePath;
+        var normalizePath = function (s) {
+            return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+        };
 
         before(function () {
             svg = generateSVG(500, 500);
@@ -1482,9 +1484,6 @@ describe("Plots", function () {
             areaPlot = new Plottable.Plot.Area(simpleDataset, xScale, yScale);
             areaPlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot.renderArea;
-            normalizePath = function (s) {
-                return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
-            };
         });
 
         beforeEach(function () {

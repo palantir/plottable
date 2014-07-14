@@ -17,7 +17,7 @@ describe("Plots", () => {
     var renderArea: D3.Selection;
     var verifier: MultiTestVerifier;
     // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
-    var normalizePath: (s: string) => string;
+    var normalizePath = (s: string) => s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
 
     before(() => {
       svg = generateSVG(500, 500);
@@ -38,7 +38,6 @@ describe("Plots", () => {
               .project("stroke", colorAccessor)
               .renderTo(svg);
       renderArea = areaPlot.renderArea;
-      normalizePath = (s: string) => s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
     });
 
     beforeEach(() => {

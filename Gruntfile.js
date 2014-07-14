@@ -133,9 +133,9 @@ module.exports = function(grunt) {
   updateTestTsFiles();
 
   var browsers = [{
-    browserName: "firefox",
-    version: "30"
-  }, {
+  //   browserName: "firefox",
+  //   version: "30"
+  // }, {
     browserName: "chrome",
     version: "35"
   }, {
@@ -209,7 +209,8 @@ module.exports = function(grunt) {
       server: {
         options: {
           port: 9999,
-          base: ""
+          base: "",
+          livereload: true
         }
       }
     },
@@ -276,8 +277,6 @@ module.exports = function(grunt) {
   // project configuration
   grunt.initConfig(configJSON);
 
-  grunt.loadNpmTasks('grunt-saucelabs');
-
   require('load-grunt-tasks')(grunt);
 
   // default task (this is what runs when a task isn't specified)
@@ -326,7 +325,9 @@ module.exports = function(grunt) {
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "connect", "saucelabs-mocha", "tslint", "ts:verify_d_ts"]);
+  grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
+  grunt.registerTask("test-local", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
+  grunt.registerTask("test", ["test-local", "test-sauce"]);
   grunt.registerTask("bm", ["blanket_mocha"]);
 
   grunt.registerTask("sublime", [
@@ -334,5 +335,4 @@ module.exports = function(grunt) {
                                   "sed:sublime",
                                   ]);
 
-  grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 };

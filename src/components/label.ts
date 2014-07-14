@@ -9,7 +9,6 @@ export module Component {
     private measurer: Util.Text.TextMeasurer;
     private xAlignment: string;
     private yAlignment: string;
-    public static MARGIN = 5;
 
     /**
      * Creates a Label.
@@ -48,8 +47,8 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var desiredWH = this.measurer(this._text);
-      var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height) + Label.MARGIN;
-      var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width) + Label.MARGIN;
+      var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
+      var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
 
       return {
         width : Math.min(desiredWidth , offeredWidth),
