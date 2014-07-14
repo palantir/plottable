@@ -138,6 +138,13 @@ describe("Scales", () => {
       assert.equal(d[1], 1);
     });
 
+
+    it("autorange defaults to [1, 10] on log scale", () => {
+      var scale = new Plottable.Scale.Log();
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [1, 10]);
+    });
+
     it("domain can't include NaN or Infinity", () => {
       var scale = new Plottable.Scale.Linear();
       var log = console.log;
@@ -292,6 +299,14 @@ describe("Scales", () => {
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
       assert.equal("#e3e3e3", scale.scale(8));
+    });
+
+    it("doesn't use a domainer", () => {
+      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var startDomain = scale.domain();
+      scale.domainer().pad(1.0);
+      scale.autoDomain();
+      assert.equal(scale.domain(), startDomain);
     });
   });
 });
