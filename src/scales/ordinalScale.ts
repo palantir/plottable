@@ -73,6 +73,7 @@ export module Scale {
         } else if (this._rangeType === "bands") {
           this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
         }
+        this.broadcaster.broadcast();
         return this;
       }
     }

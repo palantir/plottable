@@ -108,6 +108,7 @@ export module Abstract {
         return this._d3Scale.range();
       } else {
         this._d3Scale.range(values);
+        this.broadcaster.broadcast();
         return this;
       }
     }

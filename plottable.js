@@ -2798,6 +2798,7 @@ var Plottable;
                     return this._d3Scale.range();
                 } else {
                     this._d3Scale.range(values);
+                    this.broadcaster.broadcast();
                     return this;
                 }
             };
@@ -3729,6 +3730,7 @@ var Plottable;
                     } else if (this._rangeType === "bands") {
                         this._d3Scale.rangeBands(values, this._innerPadding, this._outerPadding);
                     }
+                    this.broadcaster.broadcast();
                     return this;
                 }
             };
@@ -5607,6 +5609,9 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
+                this.TOOLTIP_RADIUS = 3;
+                this.TOOLTIP_INNER_PADDING = 10;
+                this.TOOLTIP_OUTER_PADDING = 10;
                 this._animators = {
                     "bars-reset": new Plottable.Animator.Null(),
                     "bars": new Plottable.Animator.IterativeDelay(),
@@ -5623,16 +5628,117 @@ var Plottable;
                 this.baseline(this._baselineValue);
             }
             BarPlot.prototype._setup = function () {
+                var _this = this;
                 _super.prototype._setup.call(this);
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
                 this._bars = this.renderArea.selectAll("rect").data([]);
+
+                this._tooltip = this.foregroundContainer.append("g").classed("tooltip", true);
+                this._tooltip.append("rect").attr("rx", this.TOOLTIP_RADIUS).attr("ry", this.TOOLTIP_RADIUS);
+                var ttText = this._tooltip.append("text").attr("dy", "0.9em");
+                this.tooltipTextMeasurer = Plottable.Util.Text.getTextMeasure(ttText);
+                this._tooltip.append("g").classed("text-container", true);
+                this._eraseTooltip();
+
+                this.hoverInteraction = new Plottable.Interaction.Mouse(this);
+
+                this.hoverInteraction.mousemove(function (x, y) {
+                    if (!_this._showTooltip()) {
+                        return;
+                    }
+
+                    _this._eraseTooltip();
+                    _this._bars.classed("hover", false);
+                    _this.deselectAll();
+
+                    var fullExtent = { min: 0, max: Infinity };
+                    var selectX = (_this._isVertical) ? x : fullExtent;
+                    var selectY = (_this._isVertical) ? fullExtent : y;
+                    var bar = _this.selectBar(selectX, selectY, true);
+                    if (bar != null) {
+                        _this._drawTooltip(_this._getTooltipText(bar), 0, 0);
+                        _this._bars.classed("hover", true);
+                    }
+                });
+
+                this.hoverInteraction.mouseout(function (x, y) {
+                    if (!_this._showTooltip()) {
+                        return;
+                    }
+
+                    _this._eraseTooltip();
+                    _this._bars.classed("hover", false);
+                    _this.deselectAll();
+                });
+                this.hoverInteraction.registerWithComponent();
+
                 return this;
             };
 
+            BarPlot.prototype._getTooltipText = function (bar) {
+                var textProjector = this._projectors["tooltip-text"];
+                if (textProjector == null) {
+                    return "";
+                }
+
+                var tooltipTextFunction = Plottable.Util.Methods.applyAccessor(textProjector.accessor, this._dataSource);
+
+                return tooltipTextFunction(bar.data()[0], null);
+            };
+
+            BarPlot.prototype._drawTooltip = function (text, rootX, rootY) {
+                this._tooltip.style("visibility", "visible");
+
+                var textContainer = this._tooltip.select(".text-container");
+                textContainer.text(""); // clear everything
+                var maxWidth = this.availableWidth - 2 * this.TOOLTIP_INNER_PADDING - 2 * this.TOOLTIP_OUTER_PADDING;
+                var maxHeight = this.availableHeight - 2 * this.TOOLTIP_INNER_PADDING - 2 * this.TOOLTIP_OUTER_PADDING;
+                var writeOptions = {
+                    g: textContainer,
+                    xAlign: "left",
+                    yAlign: "top"
+                };
+                var writeResult = Plottable.Util.Text.writeText(text, maxWidth, maxHeight, this.tooltipTextMeasurer, true, writeOptions);
+
+                var ttRect = this._tooltip.select("rect");
+                ttRect.attr({
+                    x: -this.TOOLTIP_INNER_PADDING,
+                    y: -this.TOOLTIP_INNER_PADDING,
+                    width: writeResult.usedWidth + 2 * this.TOOLTIP_INNER_PADDING,
+                    height: writeResult.usedHeight + 2 * this.TOOLTIP_INNER_PADDING
+                });
+
+                var ttTransform = "translate(" + (2 * this.TOOLTIP_INNER_PADDING) + "," + (2 * this.TOOLTIP_INNER_PADDING) + ")";
+                this._tooltip.attr("transform", ttTransform);
+            };
+
+            BarPlot.prototype._eraseTooltip = function () {
+                this._tooltip.style("visibility", "hidden");
+            };
+
             BarPlot.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
+
                 this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
                 this._bars.enter().append("rect");
+
+                // adjust space for tooltip, if necessary
+                if (this._showTooltip()) {
+                    var tooltipHeights = this._bars[0].map(function (barEl) {
+                        var bar = d3.select(barEl);
+                        _this._drawTooltip(_this._getTooltipText(bar), 0, 0);
+                        var bbox = Plottable.Util.DOM.getBBox(_this._tooltip);
+                        return bbox.height;
+                    });
+                    this._eraseTooltip();
+                    var maxHeight = Math.max.apply(null, tooltipHeights);
+                    var extraSpace = maxHeight + 2 * this.TOOLTIP_OUTER_PADDING;
+
+                    var yRange = this.yScale.range();
+                    yRange[1] += extraSpace;
+                    this.yScale.range(yRange);
+                }
 
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -5744,6 +5850,20 @@ var Plottable;
                 } else {
                     return null;
                 }
+            };
+
+            /**
+            * Determines whether or not to show hover-over tooltips.
+            *
+            * @param {boolean} show Whether or not to show the hover-over tooltip.
+            * @return {BarPlot} The calling BarPlot.
+            */
+            // public showTooltip(show: boolean) {
+            //   this._showTooltip = show;
+            //   return this;
+            // }
+            BarPlot.prototype._showTooltip = function () {
+                return this._projectors["tooltip-text"] != null;
             };
 
             /**
@@ -6376,28 +6496,75 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Interaction) {
-        var Mousemove = (function (_super) {
-            __extends(Mousemove, _super);
-            function Mousemove(componentToListenTo) {
+        var Mouse = (function (_super) {
+            __extends(Mouse, _super);
+            function Mouse(componentToListenTo) {
                 _super.call(this, componentToListenTo);
             }
-            Mousemove.prototype._anchor = function (hitBox) {
+            Mouse.prototype._anchor = function (hitBox) {
                 var _this = this;
                 _super.prototype._anchor.call(this, hitBox);
+                hitBox.on("mouseover", function () {
+                    if (_this._mouseover != null) {
+                        var xy = d3.mouse(hitBox.node());
+                        var x = xy[0];
+                        var y = xy[1];
+                        _this._mouseover(x, y);
+                    }
+                });
                 hitBox.on("mousemove", function () {
-                    var xy = d3.mouse(hitBox.node());
-                    var x = xy[0];
-                    var y = xy[1];
-                    _this.mousemove(x, y);
+                    if (_this._mousemove != null) {
+                        var xy = d3.mouse(hitBox.node());
+                        var x = xy[0];
+                        var y = xy[1];
+                        _this._mousemove(x, y);
+                    }
+                });
+                hitBox.on("mouseout", function () {
+                    if (_this._mouseout != null) {
+                        var xy = d3.mouse(hitBox.node());
+                        var x = xy[0];
+                        var y = xy[1];
+                        _this._mouseout(x, y);
+                    }
                 });
             };
 
-            Mousemove.prototype.mousemove = function (x, y) {
-                return;
+            /**
+            * Attaches a callback to be called on mouseover.
+            *
+            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @return {Mouse} The calling Mouse Interaction.
+            */
+            Mouse.prototype.mouseover = function (callback) {
+                this._mouseover = callback;
+                return this;
             };
-            return Mousemove;
+
+            /**
+            * Attaches a callback to be called on mousemove.
+            *
+            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @return {Mouse} The calling Mouse Interaction.
+            */
+            Mouse.prototype.mousemove = function (callback) {
+                this._mousemove = callback;
+                return this;
+            };
+
+            /**
+            * Attaches a callback to be called on mouseout.
+            *
+            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @return {Mouse} The calling Mouse Interaction.
+            */
+            Mouse.prototype.mouseout = function (callback) {
+                this._mouseout = callback;
+                return this;
+            };
+            return Mouse;
         })(Plottable.Abstract.Interaction);
-        Interaction.Mousemove = Mousemove;
+        Interaction.Mouse = Mouse;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
 })(Plottable || (Plottable = {}));

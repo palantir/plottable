@@ -28,7 +28,7 @@ declare module Plottable {
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
             function accessorize(accessor: any): IAccessor;
-            function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
+            function applyAccessor(accessor: any, dataSource: DataSource): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
             /**
             * Creates an array of length `count`, filled with value or (if value is a function), value()
@@ -2207,9 +2207,29 @@ declare module Plottable {
 
 declare module Plottable {
     module Interaction {
-        class Mousemove extends Abstract.Interaction {
+        class Mouse extends Abstract.Interaction {
             constructor(componentToListenTo: Abstract.Component);
-            public mousemove(x: number, y: number): void;
+            /**
+            * Attaches a callback to be called on mouseover.
+            *
+            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @return {Mouse} The calling Mouse Interaction.
+            */
+            public mouseover(callback: (x: number, y: number) => any): Mouse;
+            /**
+            * Attaches a callback to be called on mousemove.
+            *
+            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @return {Mouse} The calling Mouse Interaction.
+            */
+            public mousemove(callback: (x: number, y: number) => any): Mouse;
+            /**
+            * Attaches a callback to be called on mouseout.
+            *
+            * @param {(x: number, y: number) => any} callback A function that takes the x and y pixel positions of the mouse event.
+            * @return {Mouse} The calling Mouse Interaction.
+            */
+            public mouseout(callback: (x: number, y: number) => any): Mouse;
         }
     }
 }
