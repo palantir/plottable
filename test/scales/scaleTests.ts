@@ -309,4 +309,65 @@ describe("Scales", () => {
       assert.equal(scale.domain(), startDomain);
     });
   });
+  describe("Modified Log Scale", () => {
+    var scale: Plottable.Scale.ModifiedLog;
+    var pivot = 10;
+    beforeEach(() => {
+      scale = new Plottable.Scale.ModifiedLog(pivot);
+    });
+
+    it("is an increasing function that can go negative", () => {
+      assert.operator(scale.scale(pivot), "<", scale.scale(pivot * 2));
+      assert.operator(scale.scale(pivot / 2), "<", scale.scale(pivot));
+      assert.operator(scale.scale(0), "<", scale.scale(pivot / 2));
+      assert.operator(scale.scale(-pivot / 2), "<", scale.scale(0));
+      assert.operator(scale.scale(-pivot), "<", scale.scale(-pivot / 2));
+      assert.operator(scale.scale(-pivot * 2), "<", scale.scale(-pivot));
+    });
+
+    it("x = invert(scale(x))", () => {
+      var epsilon = 0.00001;
+      [0, 1, pivot, 100, 0.001, -1, -0.3, -pivot, pivot - 0.001].forEach((x) => {
+        assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
+        assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
+      });
+    });
+
+    it("domain defaults to [0, 1]", () => {
+      scale = new Plottable.Scale.ModifiedLog(pivot);
+      assert.deepEqual(scale.domain(), [0, 1]);
+    });
+
+    it("works with a domainer", () => {
+      scale.updateExtent(1, "x", [0, pivot * 2]);
+      var domain = scale.domain();
+      scale.domainer(new Plottable.Domainer().pad(0.1));
+      assert.operator(scale.domain()[0], "<", domain[0]);
+      assert.operator(domain[1], "<", scale.domain()[1]);
+
+      scale.domainer(new Plottable.Domainer().nice());
+      assert.operator(scale.domain()[0], "<=", domain[0]);
+      assert.operator(domain[1], "<=", scale.domain()[1]);
+
+      scale = new Plottable.Scale.ModifiedLog(pivot);
+      scale.domainer(new Plottable.Domainer());
+      assert.deepEqual(scale.domain(), [0, 1]);
+    });
+
+    it("gives reasonable values for ticks()", () => {
+      scale.updateExtent(1, "x", [0, pivot / 2]);
+      var ticks = scale.ticks();
+      assert.operator(ticks.length, ">", 0);
+
+      scale.updateExtent(1, "x", [-pivot * 2, pivot * 2]);
+      ticks = scale.ticks();
+      var beforePivot = ticks.filter((x) => x <= -pivot);
+      var afterPivot = ticks.filter((x) => pivot <= x);
+      var betweenPivots = ticks.filter((x) => -pivot < x && x < pivot);
+      assert.operator(beforePivot.length, ">", 0, "should be ticks before -pivot");
+      assert.operator(afterPivot.length, ">", 0, "should be ticks after pivot");
+      assert.operator(betweenPivots.length, ">", 0, "should be ticks between -pivot and pivot");
+    });
+  });
+
 });
