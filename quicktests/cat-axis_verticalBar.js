@@ -13,17 +13,15 @@ function run(div, data, Plottable) {
       ];
 
     var ds = new Plottable.DataSource(data);
-    var xScale = new Plottable.Scale.Ordinal().rangeType("bands");
-    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom", function(d) { return d; } );
+    var xScale = new Plottable.Scale.Ordinal();
+    var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 
     var yScale = new Plottable.Scale.Linear();
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-    yAxis.showEndTickLabels(true);
 
     var barPlot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
                             .project("x", "name", xScale)
-                            .project("y", "age", yScale)
-                            .project("fill", function() {return "steelblue"});
+                            .project("y", "age", yScale);
     barPlot.animate(true);
     var chart = new Plottable.Component.Table([[yAxis, barPlot],
                                      [null,  xAxis]]);
