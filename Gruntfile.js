@@ -134,20 +134,14 @@ module.exports = function(grunt) {
 
   var browsers = [{
     browserName: "firefox",
-    version: "30",
-    platform: "WIN7"
+    version: "30"
   }, {
     browserName: "chrome",
-    version: "35",
-    platform: "linux"
+    version: "35"
   }, {
     browserName: "internet explorer",
     version: "10",
     platform: "WIN8"
-  }, {
-    browserName: "internet explorer",
-    version: "9",
-    platform: "WIN7"
   }];
 
   var configJSON = {
