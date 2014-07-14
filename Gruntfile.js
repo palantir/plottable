@@ -137,33 +137,17 @@ module.exports = function(grunt) {
     version: "30",
     platform: "WIN7"
   }, {
-    browserName: "firefox",
-    version: "30",
-    platform: "linux"
-  }, {
-    browserName: "firefox",
-    version: "30",
-    platform: "OS X 10.9"
-  }, {
-    browserName: "chrome",
-    version: "35",
-    platform: "XP"
-  }, {
     browserName: "chrome",
     version: "35",
     platform: "linux"
-  }, {
-    browserName: "chrome",
-    version: "35",
-    platform: "OS X 10.9",
   }, {
     browserName: "internet explorer",
     version: "10",
     platform: "WIN8"
-  // }, {
-  //   browserName: "internet explorer",
-  //   version: "9",
-  //   platform: "WIN7"
+  }, {
+    browserName: "internet explorer",
+    version: "9",
+    platform: "WIN7"
   }];
 
   var configJSON = {

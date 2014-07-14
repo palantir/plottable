@@ -4933,8 +4933,8 @@ var Plottable;
 
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this.measurer(this._text);
-                var desiredWidth = this.orientation === "horizontal" ? desiredWH.width : desiredWH.height;
-                var desiredHeight = this.orientation === "horizontal" ? desiredWH.height : desiredWH.width;
+                var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height) + Label.MARGIN;
+                var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width) + Label.MARGIN;
 
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
@@ -4980,6 +4980,7 @@ var Plottable;
                 this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
                 return this;
             };
+            Label.MARGIN = 5;
             return Label;
         })(Plottable.Abstract.Component);
         Component.Label = Label;
