@@ -1749,7 +1749,6 @@ declare module Plottable {
 declare module Plottable {
     module Component {
         class Label extends Abstract.Component {
-            static MARGIN: number;
             /**
             * Creates a Label.
             *
