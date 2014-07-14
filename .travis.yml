@@ -1,6 +1,8 @@
 language: node_js
 node_js:
 - '0.10'
+notifications: 
+  email: false
 env:
   global:
   - secure: ceGfrFbYcZrI5utXZl/KwQTwnzj+iekhwEa4h2xOSeM26aOHkVSRuDOUqjhvGDQSHRC44ZShZacUpAjf8U9WEYIGmmbjp1FYCygrbJcIvkw5GN4FBe92QIWlyT7T0EC8JIswG0Ps4JpkzI7y4EeD3kcqkCPHb4f9I/YNgHvrKX0=
