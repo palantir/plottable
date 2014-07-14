@@ -19,9 +19,8 @@ export module Abstract {
       super(scale);
     }
 
-    public autoDomain() {
-      this._setDomain(this._domainer.computeDomain(this._getAllExtents(), this));
-      return this;
+    public _getExtent(): any[] {
+      return this._domainer.computeDomain(this._getAllExtents(), this);
     }
 
     /**

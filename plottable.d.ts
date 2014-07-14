@@ -1268,7 +1268,6 @@ declare module Plottable {
             * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
             */
             constructor(scale: D3.Scale.QuantitiveScale);
-            public autoDomain(): QuantitiveScale;
             /**
             * Retrieves the domain value corresponding to a supplied range value.
             *
