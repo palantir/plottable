@@ -47,8 +47,26 @@ svg.plottable {
   font-family: sans-serif;
 }
 
+.plottable .tooltip text {
+  font-size: 10pt;
+  fill: #DDDDDD;
+  font-family: sans-serif;
+}
+
 .plottable .bar-renderer .baseline {
   stroke: #999;
+}
+
+.plottable .bar-renderer rect.hover {
+  opacity: 0.2;
+}
+
+.plottable .bar-renderer rect.selected {
+  opacity: 1;
+}
+
+.plottable .tooltip text {
+  font-size: 12pt;
 }
 
 .plottable .gridlines line {

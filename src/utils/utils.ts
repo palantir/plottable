@@ -57,7 +57,7 @@ export module Util {
       };
     }
 
-    export function applyAccessor(accessor: IAccessor, dataSource: DataSource) {
+    export function applyAccessor(accessor: any, dataSource: DataSource) {
       var activatedAccessor = accessorize(accessor);
       return (d: any, i: number) => activatedAccessor(d, i, dataSource.metadata());
     }
@@ -114,7 +114,7 @@ export module Util {
      * @param {any} a Object to check against b for equality.
      * @param {any} b Object to check against a for equality.
      *
-     * @returns {boolean} whether or not two objects share the same keys, and 
+     * @returns {boolean} whether or not two objects share the same keys, and
      *          values associated with those keys. Values will be compared
      *          with ===.
      */
