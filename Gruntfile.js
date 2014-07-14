@@ -287,6 +287,7 @@ module.exports = function(grunt) {
           urls: ['http://127.0.0.1:9999/test/tests.html'],
           testname: 'Plottable Sauce Unit Tests',
           browsers: browsers,
+          build: process.env.TRAVIS_JOB_ID,
         }
       }
     }
