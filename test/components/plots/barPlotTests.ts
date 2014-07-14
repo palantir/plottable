@@ -191,7 +191,7 @@ describe("Plots", () => {
         dataset = new Plottable.DataSource(data);
 
         renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
-        renderer._animate = false;
+        renderer.animate(false);
         renderer.renderTo(svg);
       });
 
@@ -302,7 +302,7 @@ describe("Plots", () => {
 
         renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
         renderer.baseline(0);
-        renderer._animate = false;
+        renderer.animate(false);
         var yAxis = new Plottable.Axis.Category(yScale, "left");
         var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
         axisWidth = yAxis.availableWidth;
