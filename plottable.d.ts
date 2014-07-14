@@ -1200,6 +1200,13 @@ declare module Plottable {
         *
         * @param {number} [padProportion] Proportionally how much bigger the
         *         new domain should be (0.05 = 5% larger).
+        *
+        *         A domainer will pad equal visual amounts on each side.
+        *         On a linear scale, this means both sides are padded the same
+        *         amount: [10, 20] will be padded to [5, 25].
+        *         On a log scale, the top will be padded more than the bottom, so
+        *         [10, 100] will be padded to [1, 1000].
+        *
         * @return {Domainer} The calling Domainer.
         */
         public pad(padProportion?: number): Domainer;
@@ -1268,7 +1275,6 @@ declare module Plottable {
             * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
             */
             constructor(scale: D3.Scale.QuantitiveScale);
-            public autoDomain(): QuantitiveScale;
             /**
             * Retrieves the domain value corresponding to a supplied range value.
             *
@@ -1545,6 +1551,7 @@ declare module Plottable {
             * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
             */
             public scaleType(scaleType: string): InterpolatedColor;
+            public autoDomain(): InterpolatedColor;
         }
     }
 }

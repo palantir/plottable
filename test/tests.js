@@ -3357,6 +3357,23 @@ describe("Domainer", function () {
         assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
     });
 
+    it("pad() works on log scales", function () {
+        var logScale = new Plottable.Scale.Log();
+        logScale.updateExtent(1, "x", [10, 100]);
+        logScale.range([0, 1]);
+        logScale.domainer(domainer.pad(2.0));
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+        logScale.range([50, 60]);
+        logScale.autoDomain();
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+        logScale.range([-1, -2]);
+        logScale.autoDomain();
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+    });
+
     it("pad() defaults to [v-1, v+1] if there's only one numeric value", function () {
         domainer.pad();
         var domain = domainer.computeDomain([[5, 5]], scale);
@@ -3632,15 +3649,6 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
 
-        it("scales don't allow Infinity", function () {
-            assert.throws(function () {
-                return scale._setDomain([5, Infinity]);
-            }, Error);
-            assert.throws(function () {
-                return scale._setDomain([-Infinity, 6]);
-            }, Error);
-        });
-
         it("should resize when a plot is removed", function () {
             var svg = generateSVG(400, 400);
             var ds1 = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
@@ -3670,6 +3678,29 @@ describe("Scales", function () {
             var d = scale.domain();
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
+        });
+
+        it("autorange defaults to [1, 10] on log scale", function () {
+            var scale = new Plottable.Scale.Log();
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [1, 10]);
+        });
+
+        it("domain can't include NaN or Infinity", function () {
+            var scale = new Plottable.Scale.Linear();
+            var log = console.log;
+            console.log = function () {
+            }; // stop warnings from going to console
+            scale.domain([0, 1]);
+            scale.domain([5, Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
+            scale.domain([5, -Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
+            scale.domain([NaN, 7]);
+            assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
+            scale.domain([-1, 5]);
+            assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+            console.log = log; // reset console.log
         });
     });
 
@@ -3814,6 +3845,14 @@ describe("Scales", function () {
             assert.equal("#000000", scale.scale(0));
             assert.equal("#ffffff", scale.scale(16));
             assert.equal("#e3e3e3", scale.scale(8));
+        });
+
+        it("doesn't use a domainer", function () {
+            var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var startDomain = scale.domain();
+            scale.domainer().pad(1.0);
+            scale.autoDomain();
+            assert.equal(scale.domain(), startDomain);
         });
     });
 });
