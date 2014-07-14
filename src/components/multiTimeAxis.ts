@@ -6,6 +6,7 @@ export module Axis {
       interval: D3.Time.Interval;
       step?: number;
       length?: number;
+      format: string;
   };
 
   export class Multi extends Time {
@@ -13,31 +14,31 @@ export module Axis {
 
     // default intervals
     public static allIntervals: Interval[] = [
-      {interval: d3.time.year, step: 50, length: 1000*60*60*24*365*50},
-      {interval: d3.time.year, step: 10, length: 1000*60*60*24*365*10},
-      {interval: d3.time.year, step: 2, length: 1000*60*60*24*365*2},
-      {interval: d3.time.year, length: 1000*60*60*24*365},
-      {interval: d3.time.month, step: 3, length: 1000*60*60*24*30*3},
-      {interval: d3.time.month, length: 1000*60*60*24*30},
-      {interval: d3.time.day, step: 16, length: 1000*60*60*24*16},
-      {interval: d3.time.day, step: 4, length: 1000*60*60*24*4},
-      {interval: d3.time.day, length: 1000*60*60*24},
-      {interval: d3.time.hour, step: 12, length: 1000*60*60*12},
-      {interval: d3.time.hour, step: 6, length: 1000*60*60*6},
-      {interval: d3.time.hour, step: 3, length: 1000*60*60*3},
-      {interval: d3.time.hour, length: 1000*60*60},
-      {interval: d3.time.minute, step: 30, length: 1000*60*30},
-      {interval: d3.time.minute, step: 15, length: 1000*60*15},
-      {interval: d3.time.minute, step: 5, length: 1000*60*5},
-      {interval: d3.time.minute, length: 1000*60},
-      {interval: d3.time.second, step: 30, length: 1000*30},
-      {interval: d3.time.second, step: 15, length: 1000*15},
-      {interval: d3.time.second, step: 5, length: 1000*5},
-      {interval: d3.time.second, length: 1000}
+      {interval: d3.time.year, step: 50, length: 1000*60*60*24*365*50, format: "%Y"},
+      {interval: d3.time.year, step: 10, length: 1000*60*60*24*365*10, format: "%Y"},
+      {interval: d3.time.year, step: 2, length: 1000*60*60*24*365*2, format: "%Y"},
+      {interval: d3.time.year, length: 1000*60*60*24*365, format: "%Y"},
+      {interval: d3.time.month, step: 3, length: 1000*60*60*24*30*3, format: "%b"},
+      {interval: d3.time.month, length: 1000*60*60*24*30, format: "%b"},
+      {interval: d3.time.day, step: 16, length: 1000*60*60*24*16, format: "%b %d"},
+      {interval: d3.time.day, step: 4, length: 1000*60*60*24*4, format: "%b %d"},
+      {interval: d3.time.day, length: 1000*60*60*24, format: "%b %d"},
+      {interval: d3.time.hour, step: 12, length: 1000*60*60*12, format: "%I %p"},
+      {interval: d3.time.hour, step: 6, length: 1000*60*60*6, format: "%I %p"},
+      {interval: d3.time.hour, step: 3, length: 1000*60*60*3, format: "%I %p"},
+      {interval: d3.time.hour, length: 1000*60*60, format: "%I %p"},
+      {interval: d3.time.minute, step: 30, length: 1000*60*30, format: "%I:%M"},
+      {interval: d3.time.minute, step: 15, length: 1000*60*15, format: "%I:%M"},
+      {interval: d3.time.minute, step: 5, length: 1000*60*5, format: "%I:%M"},
+      {interval: d3.time.minute, length: 1000*60, format: "%I:%M"},
+      {interval: d3.time.second, step: 30, length: 1000*30, format: "%:S"},
+      {interval: d3.time.second, step: 15, length: 1000*15, format: "%:S"},
+      {interval: d3.time.second, step: 5, length: 1000*5, format: "%:S"},
+      {interval: d3.time.second, length: 1000, format: "%S"}
     ];
 
     private layers: number = 3;
-    private ticksOnLowestLevel: number = 25;
+    private ticksOnLowestLevel: number = 15;
 
     /**
      * Creates a MultiTimeAxis
@@ -111,7 +112,7 @@ export module Axis {
           (this.availableHeight - this.tickLength() * this.layers)) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale._d3Scale(d) + ",0)");
-      tickLabels.selectAll("text").text((d: any) => this._formatter.format(d))
+      tickLabels.selectAll("text").text((d: any) => d3.time.format(Multi.allIntervals[top - this.layers + 1].format)(d))
                                   .style("text-anchor", "middle");
       for (var k = top; k > top - this.layers; k--) {
           var v = Multi.allIntervals[k];

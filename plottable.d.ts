@@ -1430,6 +1430,7 @@ declare module Plottable {
             interval: D3.Time.Interval;
             step?: number;
             length?: number;
+            format: string;
         }
         class Multi extends Time {
             static allIntervals: Interval[];
