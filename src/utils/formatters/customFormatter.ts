@@ -3,7 +3,7 @@
 module Plottable {
   export module Formatter {
     export class Custom extends Abstract.Formatter {
-      constructor(precision: number, customFormatFunction: (d: any, formatter: Formatter.Custom) => string) {
+      constructor(customFormatFunction: (d: any, formatter: Formatter.Custom) => string, precision = 0) {
         super(precision);
         if (customFormatFunction == null) {throw new Error("Custom Formatters require a formatting function");}
         this._onlyShowUnchanged = false;

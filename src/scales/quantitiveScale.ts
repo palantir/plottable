@@ -19,9 +19,8 @@ export module Abstract {
       super(scale);
     }
 
-    public autoDomain() {
-      this._setDomain(this._domainer.computeDomain(this._getAllExtents(), this));
-      return this;
+    public _getExtent(): any[] {
+      return this._domainer.computeDomain(this._getAllExtents(), this);
     }
 
     /**
@@ -47,6 +46,15 @@ export module Abstract {
     public domain(values: any[]): QuantitiveScale;
     public domain(values?: any[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
+    }
+
+    public _setDomain(values: any[]) {
+        var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
+        if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
+            console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            return;
+        }
+        super._setDomain(values);
     }
 
     /**
