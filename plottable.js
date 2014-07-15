@@ -1353,6 +1353,16 @@ var Plottable;
     (function (Formatter) {
         var Custom = (function (_super) {
             __extends(Custom, _super);
+            /**
+            * Creates a Custom Formatter.
+            *
+            * @constructor
+            * @param {(d: any, formatter: Formatter.Custom) => string} customFormatFunction A
+            *                           formatting function that is passed a datum
+            *                           and the Custom Formatter itself.
+            * @param {number} precision The precision of the Custom Formatter. The
+            *                           actual behavior will depend on the customFormatFunction.
+            */
             function Custom(customFormatFunction, precision) {
                 if (typeof precision === "undefined") { precision = 0; }
                 _super.call(this, precision);
@@ -4558,25 +4568,25 @@ var Plottable;
                 this.showLastTickLabel = false;
             }
             Numeric.prototype._computeWidth = function () {
-                // generate a test value to measure width
+                var _this = this;
                 var tickValues = this._getTickValues();
-                var valueLength = function (v) {
-                    var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
-                    return (logLength > 0) ? logLength : 1;
-                };
-                var pow10 = Math.max.apply(null, tickValues.map(valueLength));
-                var precision = this._formatter.precision();
-                var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision));
-
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var formattedTestValue = this._formatter.format(testValue);
-                var textLength = testTextEl.text(formattedTestValue).node().getComputedTextLength();
+                var epsilon = Math.pow(10, -this._formatter.precision());
+
+                // create a new text measurerer every time; see issue #643
+                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
+                var textLengths = tickValues.map(function (v) {
+                    var formattedValue = _this._formatter.format(v + epsilon);
+                    return measurer("X" + formattedValue).width;
+                });
                 testTextEl.remove();
 
+                var maxTextLength = Math.max.apply(null, textLengths);
+
                 if (this.tickLabelPositioning === "center") {
-                    this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+                    this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;
                 } else {
-                    this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
+                    this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + maxTextLength);
                 }
 
                 return this._computedWidth;
@@ -4584,7 +4594,10 @@ var Plottable;
 
             Numeric.prototype._computeHeight = function () {
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
+
+                // create a new text measurerer every time; see issue #643
+                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
+                var textHeight = measurer("test").height;
                 testTextEl.remove();
 
                 if (this.tickLabelPositioning === "center") {
