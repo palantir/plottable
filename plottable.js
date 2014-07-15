@@ -5651,12 +5651,12 @@ var Plottable;
                     _this._bars.classed("hover", false);
                     _this.deselectAll();
 
-                    var fullExtent = { min: 0, max: Infinity };
+                    var fullExtent = { min: -Infinity, max: Infinity };
                     var selectX = (_this._isVertical) ? p.x : fullExtent;
                     var selectY = (_this._isVertical) ? fullExtent : p.y;
                     var bar = _this.selectBar(selectX, selectY, true);
                     if (bar != null) {
-                        _this._drawTooltip(_this._getTooltipText(bar), 0, 0);
+                        _this._drawTooltip(_this._getTooltipText(bar.data()[0]), 0, 0);
                         _this._bars.classed("hover", true);
                     }
                 });
@@ -5675,14 +5675,14 @@ var Plottable;
                 return this;
             };
 
-            BarPlot.prototype._getTooltipText = function (bar) {
+            BarPlot.prototype._getTooltipText = function (datum) {
                 var textProjector = this._projectors["tooltip-text"];
                 if (textProjector == null) {
                     return "";
                 }
 
                 var tooltipTextFunction = Plottable.Util.Methods.applyAccessor(textProjector.accessor, this._dataSource);
-                return tooltipTextFunction(bar.data()[0], null);
+                return tooltipTextFunction(datum, null);
             };
 
             BarPlot.prototype._drawTooltip = function (text, rootX, rootY) {
@@ -5715,18 +5715,14 @@ var Plottable;
                 this._tooltip.style("visibility", "hidden");
             };
 
-            BarPlot.prototype._paint = function () {
+            BarPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 var _this = this;
-                _super.prototype._paint.call(this);
-
-                this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
-                this._bars.enter().append("rect");
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
 
                 // adjust space for tooltip, if necessary
                 if (this._showTooltip()) {
-                    var tooltipHeights = this._bars[0].map(function (barEl) {
-                        var bar = d3.select(barEl);
-                        _this._drawTooltip(_this._getTooltipText(bar), 0, 0);
+                    var tooltipHeights = this._dataSource.data().map(function (datum) {
+                        _this._drawTooltip(_this._getTooltipText(datum), 0, 0);
                         var bbox = Plottable.Util.DOM.getBBox(_this._tooltip);
                         return bbox.height;
                     });
@@ -5737,6 +5733,15 @@ var Plottable;
                     yRange[1] = extraSpace;
                     this.yScale.range(yRange);
                 }
+
+                return this;
+            };
+
+            BarPlot.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+
+                this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+                this._bars.enter().append("rect");
 
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);

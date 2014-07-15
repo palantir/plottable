@@ -57,7 +57,7 @@
 
       var yScale2 = new Plottable.Scale.Ordinal().rangeType("bands");
       var yAxis2 = new Plottable.Axis.Category(yScale2, "left");
-      window.yAxis = yAxis2;
+      // window.yAxis = yAxis2;
 
       var horizBarPlot = new Plottable.Plot.HorizontalBar(ds, xScale2, yScale2)
                               .project("x", "age", xScale2)

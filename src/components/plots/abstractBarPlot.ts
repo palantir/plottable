@@ -66,12 +66,12 @@ export module Abstract {
         this._bars.classed("hover", false);
         this.deselectAll();
 
-        var fullExtent: IExtent = { min: 0, max:Infinity };
+        var fullExtent: IExtent = { min: -Infinity, max: Infinity };
         var selectX: any = (this._isVertical) ? p.x : fullExtent;
         var selectY: any = (this._isVertical) ? fullExtent : p.y;
         var bar = this.selectBar(selectX, selectY, true);
         if (bar != null) {
-          this._drawTooltip(this._getTooltipText(bar), 0, 0);
+          this._drawTooltip(this._getTooltipText(bar.data()[0]), 0, 0);
           this._bars.classed("hover", true);
         }
       });
@@ -90,14 +90,14 @@ export module Abstract {
       return this;
     }
 
-    public _getTooltipText(bar: D3.Selection) {
+    public _getTooltipText(datum: any) {
       var textProjector = this._projectors["tooltip-text"];
       if (textProjector == null) {
         return "";
       }
 
       var tooltipTextFunction = Util.Methods.applyAccessor(textProjector.accessor, this._dataSource);
-      return tooltipTextFunction(bar.data()[0], null);
+      return tooltipTextFunction(datum, null);
     }
 
     public _drawTooltip(text: string, rootX: number, rootY: number) {
@@ -133,17 +133,13 @@ export module Abstract {
       this._tooltip.style("visibility", "hidden");
     }
 
-    public _paint() {
-      super._paint();
-
-      this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
-      this._bars.enter().append("rect");
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
 
       // adjust space for tooltip, if necessary
       if (this._showTooltip()) {
-        var tooltipHeights: number[] = this._bars[0].map((barEl: any) => {
-          var bar = d3.select(barEl);
-          this._drawTooltip(this._getTooltipText(bar), 0, 0);
+        var tooltipHeights: number[] = this._dataSource.data().map((datum: any) => {
+          this._drawTooltip(this._getTooltipText(datum), 0, 0);
           var bbox = Util.DOM.getBBox(this._tooltip);
           return bbox.height;
         });
@@ -154,6 +150,15 @@ export module Abstract {
         yRange[1] = extraSpace;
         this.yScale.range(yRange);
       }
+
+      return this;
+    }
+
+    public _paint() {
+      super._paint();
+
+      this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
+      this._bars.enter().append("rect");
 
       var primaryScale = this._isVertical ? this.yScale : this.xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);

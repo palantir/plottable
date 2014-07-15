@@ -19,7 +19,7 @@ export module Interaction {
           var p: Point = {
             x: xy[0],
             y: xy[1]
-          }
+          };
           this._mouseover(p);
         }
       });
@@ -29,7 +29,7 @@ export module Interaction {
           var p: Point = {
             x: xy[0],
             y: xy[1]
-          }
+          };
           this._mousemove(p);
         }
       });
@@ -39,7 +39,7 @@ export module Interaction {
           var p: Point = {
             x: xy[0],
             y: xy[1]
-          }
+          };
           this._mouseout(p);
         }
       });
