@@ -13,7 +13,7 @@
 
     <script>
       var data = [
-          { name: "Supercalifragilisticexpialidocious", age: 8 },
+          { name: "Supercalifragilisticexpialidocious", age: 15 },
           { name: "Poptart", age: 1 },
           { name: "Budoka", age: 3 },
           { name: "Sugar Daddy", age: 14 },
@@ -22,7 +22,7 @@
         ];
 
       var data2 = [
-          { name: "Supercalifragilisticexpialidocious", age: 8 },
+          { name: "Supercalifragilisticexpialidocious", age: 15 },
           { name: "Poptart", age: 1 },
           { name: "Budoka", age: 3 },
           { name: "Long Naaaaaaaaaaaaaaaaaaaaaaaaaaame", age: 4 },
@@ -37,7 +37,7 @@
       var xAxis = new Plottable.Axis.Category(xScale);
 
       var yScale = new Plottable.Scale.Linear();
-      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
       yAxis.showEndTickLabels(true);
 
       var barPlot = new Plottable.Plot.VerticalBar(ds, xScale, yScale)
@@ -45,17 +45,19 @@
                               .project("y", "age", yScale)
                               .project("fill", function() {return "steelblue"; })
                               .animate(true);
+
+      barPlot.project("tooltip-text", "name");
       var chart = new Plottable.Component.Table([
                                   [yAxis, barPlot],
                                   [null,  xAxis]
                                 ]);
 
       var xScale2 = new Plottable.Scale.Linear();
-      var xAxis2 = new Plottable.Axis.XAxis(xScale2, "bottom");
+      var xAxis2 = new Plottable.Axis.Numeric(xScale2, "bottom");
 
       var yScale2 = new Plottable.Scale.Ordinal().rangeType("bands");
       var yAxis2 = new Plottable.Axis.Category(yScale2, "left");
-      window.yAxis = yAxis2;
+      // window.yAxis = yAxis2;
 
       var horizBarPlot = new Plottable.Plot.HorizontalBar(ds, xScale2, yScale2)
                               .project("x", "age", xScale2)
@@ -63,14 +65,15 @@
                               .project("fill", function() {return "steelblue"; })
                               .animate(true);
 
+      horizBarPlot.project("tooltip-text", "name");
       var horizChart = new Plottable.Component.Table([
         [yAxis2, horizBarPlot],
         [null, xAxis2]
       ]);
 
       window.onload = function() {
-        chart.renderTo(svg);
-        horizChart.renderTo(svg);
+        chart.renderTo(d3.select("#meow"));
+        horizChart.renderTo(d3.select("#nya"));
       }
 
       function younger() {
