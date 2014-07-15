@@ -137,15 +137,15 @@ module.exports = function(grunt) {
     bump: bumpJSON,
     concat: {
       header: {
-        src: ["license_header.txt", "dist/plottable.js"],
+        src: ["src/license_header.txt", "dist/plottable.js"],
         dest: "dist/plottable.js",
       },
       plottable_multifile: {
-        src: ["synchronousRequire.js", "src/reference.ts"],
+        src: ["test/synchronousRequire.js", "src/reference.ts"],
         dest: "build/plottable_multifile.js",
       },
       tests_multifile: {
-        src: ["synchronousRequire.js", "test/testReference.ts"],
+        src: ["test/synchronousRequire.js", "test/testReference.ts"],
         dest: "test/tests_multifile.js",
       },
       plottable: {
