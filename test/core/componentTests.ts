@@ -309,7 +309,7 @@ it("components can be offset relative to their alignment, and throw errors if th
     svg.remove();
   });
 
-  it("remove works as expected", () => {
+  it("detach() works as expected", () => {
     var cbCalled = 0;
     var cb = (b: Plottable.Core.IListenable) => cbCalled++;
     var b = new Plottable.Core.Broadcaster(null);
@@ -322,12 +322,21 @@ it("components can be offset relative to their alignment, and throw errors if th
     b.broadcast();
     assert.equal(cbCalled, 1, "the callback was called");
     assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
-    c1.remove();
+    c1.detach();
 
     b.broadcast();
     assert.equal(cbCalled, 2, "the callback is still attached to the component");
     assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
+    svg.remove();
+  });
+
+  it("can't reuse component if it's been remove()-ed", () => {
+    var c1 = new Plottable.Abstract.Component();
+    c1.renderTo(svg);
+    c1.remove();
+
+    assert.throws(() => c1.renderTo(svg), "reuse");
     svg.remove();
   });
 
@@ -345,9 +354,9 @@ it("components can be offset relative to their alignment, and throw errors if th
     svg.remove();
   });
 
-  it("components can be removed even if not anchored", () => {
+  it("components can be detached even if not anchored", () => {
     var c = new Plottable.Abstract.Component();
-    c.remove(); // no error thrown
+    c.detach(); // no error thrown
     svg.remove();
   });
 });

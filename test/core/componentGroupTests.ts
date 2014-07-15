@@ -88,7 +88,7 @@ describe("ComponentGroups", () => {
     svg.remove();
     });
 
-  it("remove() and removeComponent work correctly for componentGroup", () => {
+  it("detach() and _removeComponent work correctly for componentGroup", () => {
     var c1 = new Plottable.Abstract.Component().classed("component-1", true);
     var c2 = new Plottable.Abstract.Component().classed("component-2", true);
     var cg = new Plottable.Component.Group([c1, c2]);
@@ -102,7 +102,7 @@ describe("ComponentGroups", () => {
     assert.isNotNull(c1Node, "component 1 was added to the DOM");
     assert.isNotNull(c2Node, "component 2 was added to the DOM");
 
-    c2.remove();
+    c2.detach();
 
     c1Node = svg.select(".component-1").node();
     c2Node = svg.select(".comopnent-2").node();
@@ -110,7 +110,7 @@ describe("ComponentGroups", () => {
     assert.isNotNull(c1Node, "component 1 is still in the DOM");
     assert.isNull(c2Node, "component 2 was removed from the DOM");
 
-    cg.remove();
+    cg.detach();
     var cgNode = svg.select(".component-group").node();
     c1Node = svg.select(".component-1").node();
 
@@ -127,7 +127,7 @@ describe("ComponentGroups", () => {
     svg.remove();
   });
 
-  it("removeAll() works as expected", () => {
+  it("detachAll() works as expected", () => {
     var cg = new Plottable.Component.Group();
     var c1 = new Plottable.Abstract.Component();
     var c2 = new Plottable.Abstract.Component();
@@ -135,11 +135,11 @@ describe("ComponentGroups", () => {
     assert.isTrue(cg.empty(), "cg initially empty");
     cg.merge(c1).merge(c2).merge(c3);
     assert.isFalse(cg.empty(), "cg not empty after merging components");
-    cg.removeAll();
-    assert.isTrue(cg.empty(), "cg empty after removing components");
-    assert.isFalse(c1._isAnchored, "c1 was removed");
-    assert.isFalse(c2._isAnchored, "c2 was removed");
-    assert.isFalse(c3._isAnchored, "c3 was removed");
+    cg.detachAll();
+    assert.isTrue(cg.empty(), "cg empty after detachAll()");
+    assert.isFalse(c1._isAnchored, "c1 was detached");
+    assert.isFalse(c2._isAnchored, "c2 was detached");
+    assert.isFalse(c3._isAnchored, "c3 was detached");
     assert.lengthOf(cg.components(), 0, "cg has no components");
   });
 

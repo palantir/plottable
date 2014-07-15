@@ -140,7 +140,7 @@ export module Util {
       if (measurer(text).width <= availableWidth) {
         return text;
       } else {
-        return addEllipsesToLine(text, availableWidth, measurer);
+        return _addEllipsesToLine(text, availableWidth, measurer);
       }
     }
 
@@ -169,7 +169,7 @@ export module Util {
      * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
      * shortening the line as required to ensure that it fits within width.
      */
-    export function addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
+    export function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string {
       var mutatedLine = line.trim(); // Leave original around for debugging utility
       var widthMeasure = (s: string) => measureText(s).width;
       var lineWidth = widthMeasure(line);
@@ -184,7 +184,7 @@ export module Util {
         lineWidth = widthMeasure(mutatedLine);
       }
       if (widthMeasure(mutatedLine + "...") > width) {
-        throw new Error("addEllipsesToLine failed :(");
+        throw new Error("_addEllipsesToLine failed :(");
       }
       return mutatedLine + "...";
     }
@@ -308,6 +308,10 @@ export module Util {
       var secondaryDimension = orientHorizontally ? height : width;
       var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
+      if (wrappedText.lines.length === 0) {
+        return {textFits: wrappedText.textFits, usedWidth: 0, usedHeight: 0};
+      }
+
       var usedWidth: number, usedHeight: number;
       if (write == null) {
         var widthFn = orientHorizontally ? d3.max : d3.sum;
@@ -318,17 +322,13 @@ export module Util {
         var innerG = write.g.append("g").classed("writeText-inner-g", true); // unleash your inner G
         // the outerG contains general transforms for positining the whole block, the inner g
         // will contain transforms specific to orienting the text properly within the block.
-        var wTF = orientHorizontally ? writeTextHorizontally : writeTextVertically;
-        var wh = wTF(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
+        var writeTextFn = orientHorizontally ? writeTextHorizontally : writeTextVertically;
+        var wh = writeTextFn(wrappedText.lines, innerG, width, height, write.xAlign, write.yAlign);
         usedWidth = wh.width;
         usedHeight = wh.height;
       }
 
-      return {
-        textFits: wrappedText.textFits,
-        usedWidth: usedWidth,
-        usedHeight: usedHeight
-      };
+      return {textFits: wrappedText.textFits, usedWidth: usedWidth, usedHeight: usedHeight};
     }
   }
 }

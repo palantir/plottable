@@ -235,7 +235,7 @@ describe("NumericAxis", () => {
       }
       return String(d);
     };
-    var formatter = new Plottable.Formatter.Custom(0, customFormatFunction);
+    var formatter = new Plottable.Formatter.Custom(customFormatFunction, 0);
 
     var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
     numericAxis.renderTo(svg);

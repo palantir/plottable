@@ -18,7 +18,7 @@ export module Axis {
      * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
      * @param {Formatter} [formatter] A function to format tick labels.
      */
-    constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: Abstract.Formatter) {
+    constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: any) {
       super(scale, orientation, formatter);
     }
 
@@ -62,7 +62,7 @@ export module Axis {
     }
 
     public _getTickValues(): any[] {
-      return this._scale.ticks(10);
+      return this._scale.ticks();
     }
 
     public _doRender() {

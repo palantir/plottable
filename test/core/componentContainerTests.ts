@@ -50,15 +50,15 @@ describe("ComponentContainer", () => {
     assert.isFalse(container.empty());
   });
 
-  it("removeAll()", () => {
+  it("detachAll()", () => {
     var container = new Plottable.Abstract.ComponentContainer();
     var c1 = new Plottable.Abstract.Component();
     var c2 = new Plottable.Abstract.Component();
     container._addComponent(c1);
     container._addComponent(c2);
-    container.removeAll();
+    container.detachAll();
 
-    assert.deepEqual(container.components(), [], "all components were removed");
+    assert.deepEqual(container.components(), [], "container was cleared of components");
   });
 
   it("components() returns a shallow copy", () => {

@@ -180,352 +180,6 @@ window.report = PerfDiagnostics.logResults;
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 
-describe("Axes", function () {
-    it("Renders ticks", function () {
-        var svg = generateSVG(500, 100);
-        var xScale = new Plottable.Scale.Linear();
-        xScale.domain([0, 10]);
-        xScale.range([0, 500]);
-        var axis = new Plottable.Axis.XAxis(xScale, "bottom");
-        axis.renderTo(svg);
-        var ticks = svg.selectAll(".tick");
-        assert.operator(ticks[0].length, ">=", 2, "There are at least two ticks.");
-
-        var tickTexts = ticks.select("text")[0].map(function (t) {
-            return d3.select(t).text();
-        });
-        var generatedTicks = xScale.ticks().map(axis.tickFormat());
-        assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
-        svg.remove();
-    });
-
-    it("formatter can be changed", function () {
-        var svg = generateSVG(500, 100);
-        var xScale = new Plottable.Scale.Linear();
-        xScale.domain([0, 10]);
-        xScale.range([0, 500]);
-        var axis = new Plottable.Axis.XAxis(xScale, "bottom");
-        axis.renderTo(svg);
-
-        var tickTexts = svg.selectAll(".tick text")[0].map(function (t) {
-            return d3.select(t).text();
-        });
-        var generatedTicks = xScale.ticks().map(axis.tickFormat());
-        assert.deepEqual(tickTexts, generatedTicks, "The correct tick texts are displayed");
-
-        var blarghFormatter = function (d) {
-            return "blargh";
-        };
-        axis.tickFormat(blarghFormatter);
-        tickTexts = svg.selectAll(".tick text")[0].map(function (t) {
-            return d3.select(t).text();
-        });
-        generatedTicks = xScale.ticks().map(axis.tickFormat());
-        assert.deepEqual(tickTexts, generatedTicks, "Tick texts updated based on new formatter");
-
-        svg.remove();
-    });
-
-    it("Still displays tick labels if space is constrained.", function () {
-        var svg = generateSVG(100, 100);
-        var yScale = new Plottable.Scale.Linear().domain([0, 10]).range([0, 100]);
-        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
-        yAxis.renderTo(svg);
-        var tickTexts = svg.selectAll(".tick text");
-        var visibleTickTexts = tickTexts.filter(function () {
-            return d3.select(this).style("visibility") === "visible";
-        });
-        assert.operator(visibleTickTexts[0].length, ">=", 2, "Two tick labels remain visible");
-        yAxis.remove();
-
-        var xScale = new Plottable.Scale.Linear().domain([0, 10]).range([0, 100]);
-        var xAxis = new Plottable.Axis.XAxis(yScale, "bottom");
-        xAxis.renderTo(svg);
-        tickTexts = svg.selectAll(".tick text");
-        visibleTickTexts = tickTexts.filter(function () {
-            return d3.select(this).style("visibility") === "visible";
-        });
-        assert.operator(visibleTickTexts[0].length, ">=", 2, "Two tick labels remain visible");
-        svg.remove();
-    });
-
-    it("XAxis positions tick labels correctly", function () {
-        var svg = generateSVG(500, 100);
-        var xScale = new Plottable.Scale.Linear();
-        xScale.domain([0, 10]);
-        xScale.range([0, 500]);
-        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
-        xAxis.renderTo(svg);
-        var tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
-        var tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
-        for (var i = 0; i < tickMarks.length; i++) {
-            var markRect = tickMarks[i].getBoundingClientRect();
-            var labelRect = tickLabels[i].getBoundingClientRect();
-            assert.isTrue((labelRect.left <= markRect.left && markRect.right <= labelRect.right), "tick label position defaults to centered");
-        }
-
-        xAxis.tickLabelPosition("left");
-        xAxis._render();
-        tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
-        tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
-        for (i = 0; i < tickMarks.length; i++) {
-            markRect = tickMarks[i].getBoundingClientRect();
-            labelRect = tickLabels[i].getBoundingClientRect();
-            assert.operator(labelRect.right, "<=", markRect.left + 1, "tick label is to the left of the mark"); // +1 for off-by-one on some browsers
-        }
-
-        xAxis.tickLabelPosition("right");
-        xAxis._render();
-        tickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
-        tickLabels = xAxis.axisElement.selectAll(".tick").select("text")[0];
-        for (i = 0; i < tickMarks.length; i++) {
-            markRect = tickMarks[i].getBoundingClientRect();
-            labelRect = tickLabels[i].getBoundingClientRect();
-            assert.operator(markRect.right, "<=", labelRect.left + 1, "tick label is to the right of the mark"); // +1 for off-by-one on some browsers
-        }
-        svg.remove();
-    });
-
-    it("X Axis height can be changed", function () {
-        var svg = generateSVG(500, 30);
-        var xScale = new Plottable.Scale.Linear();
-        xScale.domain([0, 10]);
-        xScale.range([0, 500]);
-        var xAxis = new Plottable.Axis.XAxis(xScale, "top");
-        xAxis.renderTo(svg);
-
-        var oldHeight = xAxis._requestedSpace(500, 30).height;
-        var axisBBoxBefore = xAxis.element.node().getBBox();
-        var baselineClientRectBefore = xAxis.element.select("path").node().getBoundingClientRect();
-        assert.equal(axisBBoxBefore.height, oldHeight, "axis height matches minimum height (before)");
-
-        var newHeight = 60;
-        xAxis.height(newHeight);
-        xAxis.renderTo(svg);
-        var axisBBoxAfter = xAxis.element.node().getBBox();
-        var baselineClientRectAfter = xAxis.element.select("path").node().getBoundingClientRect();
-        assert.equal(axisBBoxAfter.height, newHeight, "axis height updated to match new minimum");
-        assert.closeTo((baselineClientRectAfter.bottom - baselineClientRectBefore.bottom), (newHeight - oldHeight), 0.01, "baseline has shifted down as a consequence");
-        svg.remove();
-    });
-
-    it("YAxis positions tick labels correctly", function () {
-        var svg = generateSVG(100, 500);
-        var yScale = new Plottable.Scale.Linear();
-        yScale.domain([0, 10]);
-        yScale.range([500, 0]);
-        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
-        yAxis.renderTo(svg);
-        var tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
-        var tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
-        for (var i = 0; i < tickMarks.length; i++) {
-            var markRect = tickMarks[i].getBoundingClientRect();
-            var labelRect = tickLabels[i].getBoundingClientRect();
-            assert.isTrue((labelRect.top <= markRect.top && markRect.bottom <= labelRect.bottom), "tick label position defaults to middle");
-        }
-
-        yAxis.tickLabelPosition("top");
-        yAxis._render();
-        tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
-        tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
-        for (i = 0; i < tickMarks.length; i++) {
-            markRect = tickMarks[i].getBoundingClientRect();
-            labelRect = tickLabels[i].getBoundingClientRect();
-            assert.operator(labelRect.bottom, "<=", markRect.top + 2, "tick label above the mark"); // +2 for off-by-two on some browsers
-        }
-
-        yAxis.tickLabelPosition("bottom");
-        yAxis._render();
-        tickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
-        tickLabels = yAxis.axisElement.selectAll(".tick").select("text")[0];
-        for (i = 0; i < tickMarks.length; i++) {
-            markRect = tickMarks[i].getBoundingClientRect();
-            labelRect = tickLabels[i].getBoundingClientRect();
-            assert.operator(markRect.bottom, "<=", labelRect.top, "tick label is below the mark");
-        }
-        svg.remove();
-    });
-
-    it("Y Axis width can be changed", function () {
-        var svg = generateSVG(50, 500);
-        var yScale = new Plottable.Scale.Linear();
-        yScale.domain([0, 10]);
-        yScale.range([500, 0]);
-        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
-        yAxis.renderTo(svg);
-
-        var oldWidth = yAxis._requestedSpace(50, 500).width;
-        var axisBBoxBefore = yAxis.element.node().getBBox();
-        var baselineClientRectBefore = yAxis.element.select("path").node().getBoundingClientRect();
-        assert.equal(axisBBoxBefore.width, oldWidth, "axis width matches minimum width (before)");
-
-        var newWidth = 80;
-        yAxis.width(newWidth);
-        yAxis.renderTo(svg);
-        var axisBBoxAfter = yAxis.element.node().getBBox();
-        var baselineClientRectAfter = yAxis.element.select("path").node().getBoundingClientRect();
-        assert.equal(axisBBoxAfter.width, newWidth, "axis width updated to match new minimum");
-        assert.closeTo((baselineClientRectAfter.right - baselineClientRectBefore.right), (newWidth - oldWidth), 0.01, "baseline has shifted over as a consequence");
-        svg.remove();
-    });
-
-    it("generate relative date formatter", function () {
-        var baseDate = new Date(2000, 0, 1);
-        var testDate = new Date(2001, 0, 1);
-        var formatter = Plottable.Util.Axis.generateRelativeDateFormatter(baseDate.valueOf());
-        assert.equal(formatter(testDate), "366"); // leap year
-
-        formatter = Plottable.Util.Axis.generateRelativeDateFormatter(baseDate.valueOf(), Plottable.Util.Axis.ONE_DAY, "d");
-        assert.equal(formatter(testDate), "366d");
-    });
-
-    it("render relative dates", function () {
-        var svg = generateSVG(500, 100);
-        var startDate = new Date(2000, 0, 1);
-        var endDate = new Date(2001, 0, 1);
-        var timeScale = new Plottable.Scale.Linear();
-        timeScale.updateExtent(1, "x", [startDate, endDate]);
-        timeScale.range([0, 500]);
-        timeScale.domainer(new Plottable.Domainer().nice());
-        var xAxis = new Plottable.Axis.XAxis(timeScale, "bottom");
-        var baseDate = d3.min(timeScale.domain());
-
-        var formatter = Plottable.Util.Axis.generateRelativeDateFormatter(baseDate);
-        xAxis.tickFormat(formatter);
-        xAxis.renderTo(svg);
-        var tickLabels = $(".tick").children("text");
-        assert.equal(parseInt(tickLabels.first().text(), 10), 0);
-        assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 365);
-        xAxis.remove();
-        svg.remove();
-
-        svg = generateSVG(100, 500);
-        endDate = new Date(2010, 0, 1);
-        var timescaleY = new Plottable.Scale.Linear().domain([startDate, endDate]).range([0, 500]);
-        var yAxis = new Plottable.Axis.YAxis(timescaleY, "left");
-        var oneYear = 365 * Plottable.Util.Axis.ONE_DAY;
-        baseDate = new Date(1990, 0, 1);
-
-        formatter = Plottable.Util.Axis.generateRelativeDateFormatter(baseDate, oneYear, "y");
-        yAxis.tickFormat(formatter);
-        yAxis.renderTo(svg);
-        tickLabels = $(".tick").children("text");
-        assert.equal(tickLabels.text().slice(-1), "y");
-        assert.isTrue(parseInt(tickLabels.first().text(), 10) <= 10);
-        assert.isTrue(parseInt(tickLabels.last().text(), 10) >= 20);
-        svg.remove();
-    });
-
-    it("XAxis wraps long tick label texts so they don't overlap", function () {
-        var svg = generateSVG(300, 60);
-        var ordinalScale = new Plottable.Scale.Ordinal();
-        ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
-        ordinalScale.range([0, 300]);
-
-        var xAxis = new Plottable.Axis.XAxis(ordinalScale, "bottom");
-        xAxis.height(60);
-        xAxis.renderTo(svg);
-
-        var tickTexts = svg.selectAll(".tick text");
-        assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
-
-        var clientRects = tickTexts[0].map(function (t) {
-            return t.getBoundingClientRect();
-        });
-        var labelsOverlap = false;
-        clientRects.forEach(function (rect, i) {
-            if (i > 0) {
-                if (rect.left < clientRects[i - 1].left) {
-                    labelsOverlap = true;
-                }
-            }
-        });
-        assert.isFalse(labelsOverlap, "labels don't overlap");
-
-        var allTopsEqual = clientRects.map(function (r) {
-            return r.top;
-        }).every(function (t) {
-            return t === clientRects[0].top;
-        });
-        assert.isTrue(allTopsEqual, "tops of labels align");
-
-        assert.isTrue(clientRects.every(function (rect) {
-            return rect.height < xAxis._height - xAxis.tickSize();
-        }), "all labels fit within the available space");
-        svg.remove();
-    });
-
-    it("Yaxis wraps long tick label texts so they don't overlap", function () {
-        var svg = generateSVG(100, 300);
-        var ordinalScale = new Plottable.Scale.Ordinal();
-        ordinalScale.domain(["Aliens", "Time Travellers", "Espers", "Save the World By Overloading It With Fun Brigade"]);
-        ordinalScale.range([0, 300]);
-
-        var yAxis = new Plottable.Axis.YAxis(ordinalScale, "left");
-        yAxis.width(100);
-        yAxis.renderTo(svg);
-
-        var tickTexts = svg.selectAll(".tick text");
-        assert.equal(tickTexts[0].length, 4, "4 ticks were drawn");
-
-        var clientRects = tickTexts[0].map(function (t) {
-            return t.getBoundingClientRect();
-        });
-        var labelsOverlap = false;
-        clientRects.forEach(function (rect, i) {
-            if (i > 0) {
-                if (rect.top < clientRects[i - 1].bottom) {
-                    labelsOverlap = true;
-                }
-            }
-        });
-        assert.isFalse(labelsOverlap, "labels don't overlap");
-
-        var allTopsEqual = clientRects.map(function (r) {
-            return r.right;
-        }).every(function (t) {
-            return t === clientRects[0].right;
-        });
-        assert.isTrue(allTopsEqual, "right edges of labels align");
-
-        assert.isTrue(clientRects.every(function (rect) {
-            return rect.width < yAxis._width - yAxis.tickSize();
-        }), "all labels fit within the available space");
-        svg.remove();
-    });
-
-    describe("Category Axes", function () {
-        it("re-renders appropriately when data is changed", function () {
-            var svg = generateSVG(400, 400);
-            var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
-            var ca = new Plottable.Axis.Category(xScale, "left");
-            ca.renderTo(svg);
-            assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
-            assert.doesNotThrow(function () {
-                return xScale.domain(["bar", "baz", "bam"]);
-            });
-            assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
-            svg.remove();
-        });
-
-        it("requests appropriate space when the scale has no domain", function () {
-            var svg = generateSVG(400, 400);
-            var scale = new Plottable.Scale.Ordinal();
-            var ca = new Plottable.Axis.Category(scale);
-            ca._anchor(svg);
-            var s = ca._requestedSpace(400, 400);
-            assert.operator(s.width, ">=", 0, "it requested 0 or more width");
-            assert.operator(s.height, ">=", 0, "it requested 0 or more height");
-            assert.isFalse(s.wantsWidth, "it doesn't want width");
-            assert.isFalse(s.wantsHeight, "it doesn't want height");
-            svg.remove();
-        });
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
-
 describe("BaseAxis", function () {
     it("orientation", function () {
         var scale = new Plottable.Scale.Linear();
@@ -968,7 +622,7 @@ describe("NumericAxis", function () {
             }
             return String(d);
         };
-        var formatter = new Plottable.Formatter.Custom(0, customFormatFunction);
+        var formatter = new Plottable.Formatter.Custom(customFormatFunction, 0);
 
         var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
         numericAxis.renderTo(svg);
@@ -1015,17 +669,47 @@ describe("NumericAxis", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Category Axes", function () {
+    it("re-renders appropriately when data is changed", function () {
+        var svg = generateSVG(400, 400);
+        var xScale = new Plottable.Scale.Ordinal().domain(["foo", "bar", "baz"]).range([400, 0]);
+        var ca = new Plottable.Axis.Category(xScale, "left");
+        ca.renderTo(svg);
+        assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+        assert.doesNotThrow(function () {
+            return xScale.domain(["bar", "baz", "bam"]);
+        });
+        assert.deepEqual(ca._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
+        svg.remove();
+    });
+
+    it("requests appropriate space when the scale has no domain", function () {
+        var svg = generateSVG(400, 400);
+        var scale = new Plottable.Scale.Ordinal();
+        var ca = new Plottable.Axis.Category(scale);
+        ca._anchor(svg);
+        var s = ca._requestedSpace(400, 400);
+        assert.operator(s.width, ">=", 0, "it requested 0 or more width");
+        assert.operator(s.height, ">=", 0, "it requested 0 or more height");
+        assert.isFalse(s.wantsWidth, "it doesn't want width");
+        assert.isFalse(s.wantsHeight, "it doesn't want height");
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 
 describe("Gridlines", function () {
     it("Gridlines and axis tick marks align", function () {
         var svg = generateSVG(640, 480);
         var xScale = new Plottable.Scale.Linear();
         xScale.domain([0, 10]); // manually set domain since we won't have a renderer
-        var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+        var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
         var yScale = new Plottable.Scale.Linear();
         yScale.domain([0, 10]);
-        var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+        var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
         var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
         var basicTable = new Plottable.Component.Table().addComponent(0, 0, yAxis).addComponent(0, 1, gridlines).addComponent(1, 1, xAxis);
@@ -1036,7 +720,7 @@ describe("Gridlines", function () {
         yScale.range([yAxis.availableHeight, 0]);
         basicTable._render();
 
-        var xAxisTickMarks = xAxis.axisElement.selectAll(".tick").select("line")[0];
+        var xAxisTickMarks = xAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
         var xGridlines = gridlines.element.select(".x-gridlines").selectAll("line")[0];
         assert.equal(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
         for (var i = 0; i < xAxisTickMarks.length; i++) {
@@ -1045,7 +729,7 @@ describe("Gridlines", function () {
             assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
         }
 
-        var yAxisTickMarks = yAxis.axisElement.selectAll(".tick").select("line")[0];
+        var yAxisTickMarks = yAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS)[0];
         var yGridlines = gridlines.element.select(".y-gridlines").selectAll("line")[0];
         assert.equal(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
         for (var j = 0; j < yAxisTickMarks.length; j++) {
@@ -1117,7 +801,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         assert.equal(label.content.select("text").text(), "", "the text defaulted to empty string");
         assert.equal(label.availableHeight, 0, "rowMin is 0 for empty string");
-        label.setText("hello world");
+        label.text("hello world");
         label.renderTo(svg);
         assert.equal(label.content.select("text").text(), "hello world", "the label text updated properly");
         assert.operator(label.availableHeight, ">", 0, "rowMin is > 0 for non-empty string");
@@ -1163,7 +847,7 @@ describe("Labels", function () {
         var svg = generateSVG(400, 400);
         var label = new Plottable.Component.TitleLabel("foo");
         label.renderTo(svg);
-        label.setText("");
+        label.text("");
         assert.equal(label.availableWidth, 0, "width updated to 0");
         svg.remove();
     });
@@ -1816,6 +1500,15 @@ describe("Plots", function () {
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
             svg1.remove();
             svg2.remove();
+        });
+
+        it("remove() disconnects plots from its scales", function () {
+            var r = new Plottable.Abstract.Plot();
+            var s = new Plottable.Scale.Linear();
+            r.project("attr", "a", s);
+            r.remove();
+            var listener2Callback = s.broadcaster.listener2Callback;
+            assert.isUndefined(listener2Callback.get(r), "the plot is no longer attached to the scale");
         });
     });
 });
@@ -2672,15 +2365,15 @@ describe("ComponentContainer", function () {
         assert.isFalse(container.empty());
     });
 
-    it("removeAll()", function () {
+    it("detachAll()", function () {
         var container = new Plottable.Abstract.ComponentContainer();
         var c1 = new Plottable.Abstract.Component();
         var c2 = new Plottable.Abstract.Component();
         container._addComponent(c1);
         container._addComponent(c2);
-        container.removeAll();
+        container.detachAll();
 
-        assert.deepEqual(container.components(), [], "all components were removed");
+        assert.deepEqual(container.components(), [], "container was cleared of components");
     });
 
     it("components() returns a shallow copy", function () {
@@ -2784,7 +2477,7 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
 
-    it("remove() and removeComponent work correctly for componentGroup", function () {
+    it("detach() and _removeComponent work correctly for componentGroup", function () {
         var c1 = new Plottable.Abstract.Component().classed("component-1", true);
         var c2 = new Plottable.Abstract.Component().classed("component-2", true);
         var cg = new Plottable.Component.Group([c1, c2]);
@@ -2798,7 +2491,7 @@ describe("ComponentGroups", function () {
         assert.isNotNull(c1Node, "component 1 was added to the DOM");
         assert.isNotNull(c2Node, "component 2 was added to the DOM");
 
-        c2.remove();
+        c2.detach();
 
         c1Node = svg.select(".component-1").node();
         c2Node = svg.select(".comopnent-2").node();
@@ -2806,7 +2499,7 @@ describe("ComponentGroups", function () {
         assert.isNotNull(c1Node, "component 1 is still in the DOM");
         assert.isNull(c2Node, "component 2 was removed from the DOM");
 
-        cg.remove();
+        cg.detach();
         var cgNode = svg.select(".component-group").node();
         c1Node = svg.select(".component-1").node();
 
@@ -2823,7 +2516,7 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
 
-    it("removeAll() works as expected", function () {
+    it("detachAll() works as expected", function () {
         var cg = new Plottable.Component.Group();
         var c1 = new Plottable.Abstract.Component();
         var c2 = new Plottable.Abstract.Component();
@@ -2831,11 +2524,11 @@ describe("ComponentGroups", function () {
         assert.isTrue(cg.empty(), "cg initially empty");
         cg.merge(c1).merge(c2).merge(c3);
         assert.isFalse(cg.empty(), "cg not empty after merging components");
-        cg.removeAll();
-        assert.isTrue(cg.empty(), "cg empty after removing components");
-        assert.isFalse(c1._isAnchored, "c1 was removed");
-        assert.isFalse(c2._isAnchored, "c2 was removed");
-        assert.isFalse(c3._isAnchored, "c3 was removed");
+        cg.detachAll();
+        assert.isTrue(cg.empty(), "cg empty after detachAll()");
+        assert.isFalse(c1._isAnchored, "c1 was detached");
+        assert.isFalse(c2._isAnchored, "c2 was detached");
+        assert.isFalse(c3._isAnchored, "c3 was detached");
         assert.lengthOf(cg.components(), 0, "cg has no components");
     });
 
@@ -3241,7 +2934,7 @@ describe("Component behavior", function () {
         svg.remove();
     });
 
-    it("remove works as expected", function () {
+    it("detach() works as expected", function () {
         var cbCalled = 0;
         var cb = function (b) {
             return cbCalled++;
@@ -3256,12 +2949,23 @@ describe("Component behavior", function () {
         b.broadcast();
         assert.equal(cbCalled, 1, "the callback was called");
         assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
-        c1.remove();
+        c1.detach();
 
         b.broadcast();
         assert.equal(cbCalled, 2, "the callback is still attached to the component");
         assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
 
+        svg.remove();
+    });
+
+    it("can't reuse component if it's been remove()-ed", function () {
+        var c1 = new Plottable.Abstract.Component();
+        c1.renderTo(svg);
+        c1.remove();
+
+        assert.throws(function () {
+            return c1.renderTo(svg);
+        }, "reuse");
         svg.remove();
     });
 
@@ -3279,9 +2983,9 @@ describe("Component behavior", function () {
         svg.remove();
     });
 
-    it("components can be removed even if not anchored", function () {
+    it("components can be detached even if not anchored", function () {
         var c = new Plottable.Abstract.Component();
-        c.remove(); // no error thrown
+        c.detach(); // no error thrown
         svg.remove();
     });
 });
@@ -3724,6 +3428,23 @@ describe("Domainer", function () {
         assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
     });
 
+    it("pad() works on log scales", function () {
+        var logScale = new Plottable.Scale.Log();
+        logScale.updateExtent(1, "x", [10, 100]);
+        logScale.range([0, 1]);
+        logScale.domainer(domainer.pad(2.0));
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+        logScale.range([50, 60]);
+        logScale.autoDomain();
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+        logScale.range([-1, -2]);
+        logScale.autoDomain();
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+    });
+
     it("pad() defaults to [v-1, v+1] if there's only one numeric value", function () {
         domainer.pad();
         var domain = domainer.computeDomain([[5, 5]], scale);
@@ -3999,15 +3720,6 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
         });
 
-        it("scales don't allow Infinity", function () {
-            assert.throws(function () {
-                return scale._setDomain([5, Infinity]);
-            }, Error);
-            assert.throws(function () {
-                return scale._setDomain([-Infinity, 6]);
-            }, Error);
-        });
-
         it("should resize when a plot is removed", function () {
             var svg = generateSVG(400, 400);
             var ds1 = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
@@ -4015,15 +3727,15 @@ describe("Scales", function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             xScale.domainer(new Plottable.Domainer());
-            var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
-            var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+            var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+            var yAxis = new Plottable.Axis.Numeric(yScale, "left");
             var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
             var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
             var renderAreas = renderAreaD1.merge(renderAreaD2);
             renderAreas.renderTo(svg);
             assert.deepEqual(xScale.domain(), [0, 2]);
-            renderAreaD1.remove();
-            assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+            renderAreaD1.detach();
+            assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
             renderAreas.merge(renderAreaD1);
             assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
             svg.remove();
@@ -4037,6 +3749,29 @@ describe("Scales", function () {
             var d = scale.domain();
             assert.equal(d[0], 0);
             assert.equal(d[1], 1);
+        });
+
+        it("autorange defaults to [1, 10] on log scale", function () {
+            var scale = new Plottable.Scale.Log();
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [1, 10]);
+        });
+
+        it("domain can't include NaN or Infinity", function () {
+            var scale = new Plottable.Scale.Linear();
+            var log = console.log;
+            console.log = function () {
+            }; // stop warnings from going to console
+            scale.domain([0, 1]);
+            scale.domain([5, Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
+            scale.domain([5, -Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
+            scale.domain([NaN, 7]);
+            assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
+            scale.domain([-1, 5]);
+            assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+            console.log = log; // reset console.log
         });
     });
 
@@ -4076,6 +3811,38 @@ describe("Scales", function () {
             scale.rangeType("points");
             assert.isTrue(callbackWasCalled, "The registered callback was called");
         });
+    });
+
+    it("OrdinalScale + BarPlot combo works as expected when the data is swapped", function () {
+        // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
+        var xScale = new Plottable.Scale.Ordinal();
+        var yScale = new Plottable.Scale.Linear();
+        var dA = { x: "A", y: 2 };
+        var dB = { x: "B", y: 2 };
+        var dC = { x: "C", y: 2 };
+        var barPlot = new Plottable.Plot.VerticalBar([dA, dB], xScale, yScale);
+        var svg = generateSVG();
+        assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
+        barPlot.renderTo(svg);
+        assert.deepEqual(xScale.domain(), ["A", "B"], "after anchoring, the bar plot's data is on the scale");
+
+        function iterateDataChanges() {
+            var dataChanges = [];
+            for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                dataChanges[_i] = arguments[_i + 0];
+            }
+            dataChanges.forEach(function (dataChange) {
+                barPlot.dataSource().data(dataChange);
+            });
+        }
+
+        iterateDataChanges([], [dA, dB, dC], []);
+        assert.lengthOf(xScale.domain(), 0);
+
+        iterateDataChanges([dA], [dB]);
+        assert.lengthOf(xScale.domain(), 1);
+        iterateDataChanges([], [dA, dB, dC]);
+        assert.lengthOf(xScale.domain(), 3);
     });
 
     describe("Color Scales", function () {
@@ -4149,6 +3916,14 @@ describe("Scales", function () {
             assert.equal("#000000", scale.scale(0));
             assert.equal("#ffffff", scale.scale(16));
             assert.equal("#e3e3e3", scale.scale(8));
+        });
+
+        it("doesn't use a domainer", function () {
+            var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var startDomain = scale.domain();
+            scale.domainer().pad(1.0);
+            scale.autoDomain();
+            assert.equal(scale.domain(), startDomain);
         });
     });
 });
@@ -4356,7 +4131,7 @@ describe("Formatters", function () {
                 assert.strictEqual(f, customFormatter, "Formatter itself was supplied as second argument");
                 return String(d) + "-blargh";
             };
-            customFormatter = new Plottable.Formatter.Custom(0, blargify);
+            customFormatter = new Plottable.Formatter.Custom(blargify);
             var result = customFormatter.format(1);
             assert.strictEqual(result, "1-blargh", "it uses the custom formatting function");
         });
@@ -4594,7 +4369,7 @@ describe("Util.Text", function () {
         svg.remove();
     });
 
-    describe("addEllipsesToLine", function () {
+    describe("_addEllipsesToLine", function () {
         var svg;
         var measure;
         var e;
@@ -4603,7 +4378,7 @@ describe("Util.Text", function () {
             svg = generateSVG();
             measure = Plottable.Util.Text.getTextMeasure(svg);
             e = function (text, width) {
-                return Plottable.Util.Text.addEllipsesToLine(text, width, measure);
+                return Plottable.Util.Text._addEllipsesToLine(text, width, measure);
             };
         });
         it("works on an empty string", function () {
@@ -4636,6 +4411,46 @@ describe("Util.Text", function () {
 
         after(function () {
             assert.lengthOf(svg.node().childNodes, 0, "this was all without side-effects");
+            svg.remove();
+        });
+    });
+
+    describe("writeText", function () {
+        it("behaves appropriately when there is too little height and width to fit any text", function () {
+            var svg = generateSVG();
+            var width = 1;
+            var height = 1;
+            var measure = Plottable.Util.Text.getTextMeasure(svg);
+            var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
+            assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
+            assert.equal(0, results.usedWidth, "measurement mode: no width used");
+            assert.equal(0, results.usedHeight, "measurement mode: no height used");
+
+            var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
+            results = Plottable.Util.Text.writeText("hello world", width, height, measure, true, writeOptions);
+            assert.isFalse(results.textFits, "write mode: text doesn't fit");
+            assert.equal(0, results.usedWidth, "write mode: no width used");
+            assert.equal(0, results.usedHeight, "write mode: no height used");
+            assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
+            svg.remove();
+        });
+
+        it("behaves appropriately when there is plenty of width but too little height to fit text", function () {
+            var svg = generateSVG();
+            var width = 500;
+            var height = 1;
+            var measure = Plottable.Util.Text.getTextMeasure(svg);
+            var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
+            assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
+            assert.equal(0, results.usedWidth, "measurement mode: no width used");
+            assert.equal(0, results.usedHeight, "measurement mode: no height used");
+
+            var writeOptions = { g: svg, xAlign: "center", yAlign: "center" };
+            results = Plottable.Util.Text.writeText("hello world", width, height, measure, true, writeOptions);
+            assert.isFalse(results.textFits, "write mode: text doesn't fit");
+            assert.equal(0, results.usedWidth, "write mode: no width used");
+            assert.equal(0, results.usedHeight, "write mode: no height used");
+            assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
             svg.remove();
         });
     });

@@ -107,11 +107,6 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [0, 5], "the bar accessor was overwritten");
     });
 
-    it("scales don't allow Infinity", () => {
-      assert.throws(() => scale._setDomain([5, Infinity]), Error);
-      assert.throws(() => scale._setDomain([-Infinity, 6]), Error);
-    });
-
     it("should resize when a plot is removed", () => {
       var svg = generateSVG(400, 400);
       var ds1 = [{x: 0, y: 0}, {x: 1, y: 1}];
@@ -119,15 +114,15 @@ describe("Scales", () => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       xScale.domainer(new Plottable.Domainer());
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
-      var yAxis = new Plottable.Axis.YAxis(yScale, "left");
+      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
       var renderAreaD1 = new Plottable.Plot.Line(ds1, xScale, yScale);
       var renderAreaD2 = new Plottable.Plot.Line(ds2, xScale, yScale);
       var renderAreas = renderAreaD1.merge(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
-      renderAreaD1.remove();
-      assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.remove()");
+      renderAreaD1.detach();
+      assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
       renderAreas.merge(renderAreaD1);
       assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
       svg.remove();
@@ -141,6 +136,29 @@ describe("Scales", () => {
       var d = scale.domain();
       assert.equal(d[0], 0);
       assert.equal(d[1], 1);
+    });
+
+
+    it("autorange defaults to [1, 10] on log scale", () => {
+      var scale = new Plottable.Scale.Log();
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [1, 10]);
+    });
+
+    it("domain can't include NaN or Infinity", () => {
+      var scale = new Plottable.Scale.Linear();
+      var log = console.log;
+      console.log = function() {}; // stop warnings from going to console
+      scale.domain([0, 1]);
+      scale.domain([5, Infinity]);
+      assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
+      scale.domain([5, -Infinity]);
+      assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
+      scale.domain([NaN, 7]);
+      assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
+      scale.domain([-1, 5]);
+      assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+      console.log = log; // reset console.log
     });
   });
 
@@ -180,6 +198,34 @@ describe("Scales", () => {
       scale.rangeType("points");
       assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
+  });
+
+  it("OrdinalScale + BarPlot combo works as expected when the data is swapped", () => {
+    // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
+    var xScale = new Plottable.Scale.Ordinal();
+    var yScale = new Plottable.Scale.Linear();
+    var dA = {x: "A", y: 2};
+    var dB = {x: "B", y: 2};
+    var dC = {x: "C", y: 2};
+    var barPlot = new Plottable.Plot.VerticalBar([dA, dB], xScale, yScale);
+    var svg = generateSVG();
+    assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
+    barPlot.renderTo(svg);
+    assert.deepEqual(xScale.domain(), ["A", "B"], "after anchoring, the bar plot's data is on the scale");
+
+    function iterateDataChanges(...dataChanges: any[]) {
+      dataChanges.forEach((dataChange) => {
+        barPlot.dataSource().data(dataChange);
+      });
+    }
+
+    iterateDataChanges([], [dA, dB, dC], []);
+    assert.lengthOf(xScale.domain(), 0);
+
+    iterateDataChanges([dA], [dB]);
+    assert.lengthOf(xScale.domain(), 1);
+    iterateDataChanges([], [dA, dB, dC]);
+    assert.lengthOf(xScale.domain(), 3);
   });
 
   describe("Color Scales", () => {
@@ -253,6 +299,14 @@ describe("Scales", () => {
       assert.equal("#000000", scale.scale(0));
       assert.equal("#ffffff", scale.scale(16));
       assert.equal("#e3e3e3", scale.scale(8));
+    });
+
+    it("doesn't use a domainer", () => {
+      var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+      var startDomain = scale.domain();
+      scale.domainer().pad(1.0);
+      scale.autoDomain();
+      assert.equal(scale.domain(), startDomain);
     });
   });
 });
