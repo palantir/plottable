@@ -8,7 +8,7 @@
   },
   "author": "Palantir Technologies",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test-travis"
   },
   "devDependencies": {
     "grunt": "~0.4.2",

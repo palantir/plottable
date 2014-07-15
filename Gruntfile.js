@@ -326,8 +326,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test-local", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
-  grunt.registerTask("test", ["test-local", "test-sauce"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
+  grunt.registerTask("test-travis", ["test", "test-sauce"]);
   grunt.registerTask("bm", ["blanket_mocha"]);
 
   grunt.registerTask("sublime", [
