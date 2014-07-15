@@ -1576,7 +1576,7 @@ declare module Plottable {
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
             public axisElement: D3.Selection;
-            constructor(scale: Scale, orientation: string, formatter?: Formatter);
+            constructor(scale: Scale, orientation: string, formatter?: any);
             public remove(): void;
             /**
             * Gets the current width.
@@ -1605,12 +1605,18 @@ declare module Plottable {
             */
             public height(h: any): Axis;
             /**
+            * Get the current formatter on the axis.
+            *
+            * @returns {Abstract.Formatter} the axis formatter
+            */
+            public formatter(): Formatter;
+            /**
             * Sets a new tick formatter.
             *
-            * @param {Abstract.Formatter} formatter
-            * @returns {BaseAxis} The calling BaseAxis.
+            * @param {function | Abstract.Formatter} formatter
+            * @returns {Abstract.Axis} The calling Axis.
             */
-            public formatter(formatter: Formatter): Axis;
+            public formatter(formatter: any): Axis;
             /**
             * Gets the current tick mark length.
             *
@@ -1680,7 +1686,7 @@ declare module Plottable {
             * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
             * @param {Formatter} [formatter] A function to format tick labels.
             */
-            constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: Abstract.Formatter);
+            constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: any);
             /**
             * Gets the tick label position relative to the tick marks.
             *
@@ -1738,7 +1744,7 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
             */
-            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: Formatter.Identity);
+            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: any);
         }
     }
 }
