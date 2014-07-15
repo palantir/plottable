@@ -132,6 +132,18 @@ module.exports = function(grunt) {
   };
   updateTestTsFiles();
 
+  var browsers = [{
+  //   browserName: "firefox",
+  //   version: "30"
+  // }, {
+    browserName: "chrome",
+    version: "35"
+  }, {
+    browserName: "internet explorer",
+    version: "10",
+    platform: "WIN8"
+  }];
+
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpJSON,
@@ -196,7 +208,8 @@ module.exports = function(grunt) {
     connect: {
       server: {
         options: {
-          port: 7007,
+          port: 9999,
+          base: "",
           livereload: true
         }
       }
@@ -247,6 +260,17 @@ module.exports = function(grunt) {
         command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts",
       },
     },
+    'saucelabs-mocha': {
+      all: {
+        options: {
+          urls: ['http://127.0.0.1:9999/test/tests.html'],
+          testname: 'Plottable Sauce Unit Tests',
+          browsers: browsers,
+          build: process.env.TRAVIS_JOB_ID,
+          "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
+        }
+      }
+    }
   };
 
 
@@ -301,11 +325,14 @@ module.exports = function(grunt) {
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
+  grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
+  grunt.registerTask("test-travis", ["test", "test-sauce"]);
   grunt.registerTask("bm", ["blanket_mocha"]);
 
   grunt.registerTask("sublime", [
                                   "shell:sublime",
                                   "sed:sublime",
                                   ]);
+
 };

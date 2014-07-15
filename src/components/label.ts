@@ -47,8 +47,8 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var desiredWH = this.measurer(this._text);
-      var desiredWidth  = this.orientation === "horizontal" ? desiredWH.width : desiredWH.height;
-      var desiredHeight = this.orientation === "horizontal" ? desiredWH.height : desiredWH.width;
+      var desiredWidth  = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
+      var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
 
       return {
         width : Math.min(desiredWidth , offeredWidth),
@@ -104,7 +104,7 @@ export module Component {
       return this;
     }
 
-    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth ?: number, availableHeight?: number) {
+    public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.measurer = Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
       return this;

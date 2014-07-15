@@ -4980,8 +4980,8 @@ var Plottable;
 
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this.measurer(this._text);
-                var desiredWidth = this.orientation === "horizontal" ? desiredWH.width : desiredWH.height;
-                var desiredHeight = this.orientation === "horizontal" ? desiredWH.height : desiredWH.width;
+                var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
+                var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
 
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
@@ -5161,7 +5161,7 @@ var Plottable;
                 });
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
-                var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
+                var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
                     height: rowsICanFit * textHeight,
