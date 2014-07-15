@@ -37,12 +37,7 @@ var data2 = makeRandomData(50);
 function runSingleQuicktest(container, quickTest, data, Plottable) {
   container.append("p").text(quickTest.name);
   var div = container.append("div");
-  try {
-    quickTest.run(div, data, Plottable);
-  } catch (e) {
-    console.log(e.stack);
-    throw e;
-  }
+  quickTest.run(div, data, Plottable);
 }
 
 function runQuicktest(tableSelection, quickTest, Plottable1, Plottable2) {
@@ -133,9 +128,17 @@ function main() {
         });
       })
       .then(function(qts) {
-        qts.forEach(function(q) {
-          runQuicktest(table, q, Plottables[firstBranch], Plottables[secondBranch]);
-        });
+        return Promise.all(qts.map(function(q) {
+          return new Promise(function() {
+            runQuicktest(table, q, Plottables[firstBranch], Plottables[secondBranch]);
+          });
+        }));
+      }).catch(function(error) {
+        // errors in Promises are swallowed into the abyss by default, we must
+        // throw the error in a non-promise callback to get a stack trace
+        setTimeout(function() {
+          throw error;
+        }, 0);
       });
 }
 
