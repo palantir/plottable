@@ -1167,7 +1167,7 @@ declare module Plottable {
             * @returns {any[]} The generated ticks.
             */
             public ticks(count?: number): any[];
-            public tickInterval(interval: D3.Time.Interval, step?: number): any[];
+            public tickInterval(interval: D3.Time.Range, step?: number): any[];
             public domain(): any[];
             public domain(values: any[]): Time;
             /**
@@ -1427,10 +1427,15 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         interface Interval {
-            interval: D3.Time.Interval;
+            interval: D3.Time.Range;
             step?: number;
             length?: number;
-            format: string;
+            formatMajor: string;
+            formatMinor: string;
+        }
+        interface ITimeLabel {
+            labelPos: Date;
+            labelText: Date;
         }
         class Multi extends Time {
             static allIntervals: Interval[];

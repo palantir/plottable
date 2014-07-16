@@ -77,7 +77,7 @@ export module Scale {
       return this._d3Scale.ticks(this.lastRequestedTickCount);
     }
 
-    public tickInterval(interval: D3.Time.Interval, step?: number) {
+    public tickInterval(interval: D3.Time.Range, step?: number) {
       return this._d3Scale.ticks(interval, step);
     }
 

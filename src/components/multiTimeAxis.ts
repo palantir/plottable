@@ -3,42 +3,49 @@
 module Plottable {
 export module Axis {
   export interface Interval {
-      interval: D3.Time.Interval;
+      interval: D3.Time.Range;
       step?: number;
       length?: number;
-      format: string;
+      formatMajor: string;
+      formatMinor: string;
   };
 
+  export interface ITimeLabel {
+    labelPos: Date;
+    labelText: Date;
+  }
+
   export class Multi extends Time {
-    public _intervals: Interval[];
+
+    public _majorTickLabels: D3.Selection;
+    public _minorTickLabels: D3.Selection;
 
     // default intervals
     public static allIntervals: Interval[] = [
-      {interval: d3.time.year, step: 50, length: 1000*60*60*24*365*50, format: "%Y"},
-      {interval: d3.time.year, step: 10, length: 1000*60*60*24*365*10, format: "%Y"},
-      {interval: d3.time.year, step: 2, length: 1000*60*60*24*365*2, format: "%Y"},
-      {interval: d3.time.year, length: 1000*60*60*24*365, format: "%Y"},
-      {interval: d3.time.month, step: 3, length: 1000*60*60*24*30*3, format: "%b"},
-      {interval: d3.time.month, length: 1000*60*60*24*30, format: "%b"},
-      {interval: d3.time.day, step: 16, length: 1000*60*60*24*16, format: "%b %d"},
-      {interval: d3.time.day, step: 4, length: 1000*60*60*24*4, format: "%b %d"},
-      {interval: d3.time.day, length: 1000*60*60*24, format: "%b %d"},
-      {interval: d3.time.hour, step: 12, length: 1000*60*60*12, format: "%I %p"},
-      {interval: d3.time.hour, step: 6, length: 1000*60*60*6, format: "%I %p"},
-      {interval: d3.time.hour, step: 3, length: 1000*60*60*3, format: "%I %p"},
-      {interval: d3.time.hour, length: 1000*60*60, format: "%I %p"},
-      {interval: d3.time.minute, step: 30, length: 1000*60*30, format: "%I:%M"},
-      {interval: d3.time.minute, step: 15, length: 1000*60*15, format: "%I:%M"},
-      {interval: d3.time.minute, step: 5, length: 1000*60*5, format: "%I:%M"},
-      {interval: d3.time.minute, length: 1000*60, format: "%I:%M"},
-      {interval: d3.time.second, step: 30, length: 1000*30, format: "%:S"},
-      {interval: d3.time.second, step: 15, length: 1000*15, format: "%:S"},
-      {interval: d3.time.second, step: 5, length: 1000*5, format: "%:S"},
-      {interval: d3.time.second, length: 1000, format: "%S"}
+      {interval: d3.time.years, step: 50, length: 1000*60*60*24*365*50, formatMajor: "%Y", formatMinor: "%Y"},
+      {interval: d3.time.years, step: 10, length: 1000*60*60*24*365*10, formatMajor: "%Y", formatMinor: "%Y"},
+      {interval: d3.time.years, step: 2, length: 1000*60*60*24*365*2, formatMajor: "%Y", formatMinor: "%Y"},
+      {interval: d3.time.years, length: 1000*60*60*24*365, formatMajor: "%Y", formatMinor: "%Y"},
+      {interval: d3.time.months, step: 3, length: 1000*60*60*24*30*3, formatMajor: "%B %Y", formatMinor: "%b"},
+      {interval: d3.time.months, length: 1000*60*60*24*30, formatMajor: "%B %Y", formatMinor: "%b"},
+      {interval: d3.time.days, step: 16, length: 1000*60*60*24*16, formatMajor: "%B %d, %Y", formatMinor: "%d"},
+      {interval: d3.time.days, length: 1000*60*60*24, formatMajor: "%B %d, %Y", formatMinor: "%d"},
+      {interval: d3.time.hours, step: 12, length: 1000*60*60*12, formatMajor: "%B %d, %Y", formatMinor: "%I %p"},
+      {interval: d3.time.hours, step: 6, length: 1000*60*60*6, formatMajor: "%B %d, %Y", formatMinor: "%I %p"},
+      {interval: d3.time.hours, step: 3, length: 1000*60*60*3, formatMajor: "%B %d, %Y", formatMinor: "%I %p"},
+      {interval: d3.time.hours, length: 1000*60*60, formatMajor: "%B %d, %Y", formatMinor: "%I %p"},
+      {interval: d3.time.minutes, step: 30, length: 1000*60*30, formatMajor: "%B %d, %Y", formatMinor: "%I:%M:%S %p"},
+      {interval: d3.time.minutes, step: 15, length: 1000*60*15, formatMajor: "%B %d, %Y", formatMinor: "%I:%M:%S %p"},
+      {interval: d3.time.minutes, step: 5, length: 1000*60*5, formatMajor: "%B %d, %Y", formatMinor: "%I:%M:%S %p"},
+      {interval: d3.time.minutes, length: 1000*60, formatMajor: "%B %d, %Y", formatMinor: "%I:%M %p"},
+      {interval: d3.time.seconds, step: 30, length: 1000*30, formatMajor: "%B %d, %Y", formatMinor: "%I:%M:%S %p"},
+      {interval: d3.time.seconds, step: 15, length: 1000*15, formatMajor: "%B %d, %Y", formatMinor: "%I:%M:%S %p"},
+      {interval: d3.time.seconds, step: 5, length: 1000*5, formatMajor: "%B %d, %Y", formatMinor: "%I:%M:%S %p"},
+      {interval: d3.time.seconds, length: 1000, formatMajor: "%B %d, %Y", formatMinor: "%I:%M:%S %p"}
     ];
 
-    private layers: number = 3;
-    private ticksOnLowestLevel: number = 15;
+    private layers: number = 2;
+    private ticksOnLowestLevel: number = 3;
 
     /**
      * Creates a MultiTimeAxis
@@ -49,6 +56,8 @@ export module Axis {
      */
     constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter) {
       super(scale, orientation, formatter);
+
+      this.tickLength(20);
      }
 
      public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -67,6 +76,17 @@ export module Axis {
           wantsWidth: false,
           wantsHeight: offeredHeight < requestedHeight
       };
+    }
+
+    public isEnoughSpace(container: D3.Selection, tickLabels: Date[], format: string) {
+      return d3.max(tickLabels, (d: Date) => Util.Text.measureTextWidth(container, d3.time.format(format)(d))) * this.tickLabels.length < this.availableWidth;
+    }
+
+    public _setup() {
+      super._setup();
+      this._majorTickLabels = this.content.append("g").classed("major-tick-labels", true);
+      this._minorTickLabels = this.content.append("g").classed("minor-tick-labels", true);
+      return this;
     }
 
     public getTopLevel(): number {
@@ -92,28 +112,45 @@ export module Axis {
     }
 
     public _measureTextHeight(): number {
-      var fakeTickLabel = this._tickLabelsG.append("g").classed("tick-label", true);
+      var fakeTickLabel = this._majorTickLabels.append("g").classed("major-tick-label", true);
       var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
       fakeTickLabel.remove();
       return textHeight;
     }
 
-    public _doRender() {
-      super._doRender();
+    public _renderTicks(container: D3.Selection, pos: number) {
       var top = this.getTopLevel();
-      var topTicks = this._scale.tickInterval(Multi.allIntervals[top - this.layers + 1].interval,
-                                              Multi.allIntervals[top - this.layers + 1].step);
-      this._tickLabelsG.selectAll(".tick-label").remove();
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(topTicks, (d) => d.valueOf());
+      var tickPos = this._scale.tickInterval(Multi.allIntervals[top - pos].interval,
+                                              Multi.allIntervals[top - pos].step);
+      tickPos.splice(0, 0, this._scale.domain()[0]);
+      tickPos.push(this._scale.domain()[1]);
+      var labelPos: Date[] = [];
+      for (var i = 0; i < tickPos.length - 1; i++) {
+        labelPos.push(new Date((tickPos[i + 1].valueOf() - tickPos[i].valueOf()) / 2 + tickPos[i].valueOf()));
+      }
+
+      container.selectAll(".tick-label").remove();
+
+      var tickLabels = container.selectAll(".tick-label").data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
       tickLabelsEnter.append("text");
       tickLabels.selectAll("text").attr("transform", "translate(0," + (this._orientation === "bottom" ?
-          (this.tickLength() * this.layers + this._measureTextHeight()) :
-          (this.availableHeight - this.tickLength() * this.layers)) + ")");
+          (this.tickLength() * (pos + 1)) :
+          (this.availableHeight - this.tickLength() * (pos + 1))) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale._d3Scale(d) + ",0)");
-      tickLabels.selectAll("text").text((d: any) => d3.time.format(Multi.allIntervals[top - this.layers + 1].format)(d))
+      tickLabels.selectAll("text").text((d: any) => d3.time.format(pos === this.layers - 1 ?
+            Multi.allIntervals[top - pos].formatMajor
+            : Multi.allIntervals[top - pos].formatMinor)(d))
                                   .style("text-anchor", "middle");
+    }
+
+    public _doRender() {
+      super._doRender();
+      this._tickLabelsG.selectAll(".tick-label").remove();
+      this._renderTicks(this._majorTickLabels, this.layers - 1);
+      this._renderTicks(this._minorTickLabels, this.layers - 2);
+      var top = this.getTopLevel();
       for (var k = top; k > top - this.layers; k--) {
           var v = Multi.allIntervals[k];
           var index = top - k;
