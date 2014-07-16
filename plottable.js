@@ -3845,6 +3845,10 @@ var Plottable;
             ModifiedLog.prototype.copy = function () {
                 return new ModifiedLog(this.pivot, this.base);
             };
+
+            ModifiedLog.prototype._niceDomain = function (domain, count) {
+                return domain;
+            };
             return ModifiedLog;
         })(Plottable.Abstract.QuantitiveScale);
         Scale.ModifiedLog = ModifiedLog;

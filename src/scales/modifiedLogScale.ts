@@ -132,6 +132,10 @@ export module Scale {
       return new ModifiedLog(this.pivot, this.base);
     }
 
+    public _niceDomain(domain: any[], count?: number): any[] {
+      return domain;
+    }
+
   }
 }
 }
