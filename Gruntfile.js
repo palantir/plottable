@@ -72,12 +72,12 @@ module.exports = function(grunt) {
     protected_definitions: {
       pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
       replacement: "",
-      path: "plottable.d.ts",
+      path: "dist/plottable.d.ts",
     },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/src/$1.js");',
-      path: "plottable_multifile.js",
+      path: "build/plottable_multifile.js",
     },
     definitions: {
       pattern: '/// *<reference path=".*" */>',
@@ -97,7 +97,7 @@ module.exports = function(grunt) {
     version_number: {
       pattern: "@VERSION",
       replacement: "<%= pkg.version %>",
-      path: "plottable.js"
+      path: "dist/plottable.js"
     }
   };
 
@@ -149,22 +149,22 @@ module.exports = function(grunt) {
     bump: bumpJSON,
     concat: {
       header: {
-        src: ["license_header.txt", "plottable.js"],
-        dest: "plottable.js",
+        src: ["src/license_header.txt", "dist/plottable.js"],
+        dest: "dist/plottable.js",
       },
       plottable_multifile: {
-        src: ["synchronousRequire.js", "src/reference.ts"],
-        dest: "plottable_multifile.js",
+        src: ["test/synchronousRequire.js", "src/reference.ts"],
+        dest: "build/plottable_multifile.js",
       },
       tests_multifile: {
-        src: ["synchronousRequire.js", "test/testReference.ts"],
+        src: ["test/synchronousRequire.js", "test/testReference.ts"],
         dest: "test/tests_multifile.js",
       },
       plottable: {
         src: tsFiles.map(function(s) {
               return "build/src/" + s.replace(".ts", ".js");
           }),
-        dest: "plottable.js",
+        dest: "dist/plottable.js",
       },
       tests: {
         src: testTsFiles.map(function(s) {
@@ -239,20 +239,20 @@ module.exports = function(grunt) {
     compress: {
       main: {
         options: {
-          archive: 'plottable.zip'
+          archive: 'dist/plottable.zip'
         },
         files: [
-        {src: 'plottable.js'  , dest: '.'},
-        {src: 'plottable.min.js', dest: '.'},
-        {src: 'plottable.d.ts', dest: '.'},
-        {src: 'plottable.css' , dest: '.'},
+        {src: 'dist/plottable.js'  , dest: '.'},
+        {src: 'dist/plottable.min.js', dest: '.'},
+        {src: 'dist/plottable.d.ts', dest: '.'},
+        {src: 'dist/plottable.css' , dest: '.'},
         {src: 'README.md'     , dest: '.'},
         {src: 'LICENSE'       , dest: '.'}]
       }
     },
     uglify: {
       main: {
-        files: {'plottable.min.js': ['plottable.js']}
+        files: {'dist/plottable.min.js': ['dist/plottable.js']}
       }
     },
     shell: {
@@ -283,7 +283,7 @@ module.exports = function(grunt) {
   grunt.registerTask("update_ts_files", updateTsFiles);
   grunt.registerTask("update_test_ts_files", updateTestTsFiles);
   grunt.registerTask("definitions_prod", function() {
-    grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
+    grunt.file.copy("build/plottable.d.ts", "dist/plottable.d.ts");
   });
   grunt.registerTask("test-compile", [
                                   "ts:test",
