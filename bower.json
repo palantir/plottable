@@ -2,14 +2,14 @@
   "name": "plottable",
   "description": "A library for creating charts out of D3",
   "version": "0.20.4",
-  "main": ["dist/plottable.js", "dist/plottable.css"],
+  "main": ["plottable.js", "plottable.css"],
   "license": "MIT",
   "ignore": [
     "**/*",
     "!bower.json",
-    "!dist/plottable.js",
-    "!dist/plottable.css",
-    "!dist/plottable.d.ts"
+    "!plottable.js",
+    "!plottable.css",
+    "!plottable.d.ts"
   ],
   "keywords": [
     "plottable",

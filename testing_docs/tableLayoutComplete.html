@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <!-- saved from url=(0044)http://jsfiddle.net/cmorford/5YZ9u/187/show/ -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+  
   <title> - jsFiddle demo by cmorford</title>
-
+  
   <script type="text/javascript" src="./testing_docs/tableLayoutComplete_files/dummy.js"></script>
-
-
-
-
+  
+  
+  
+  
   <link rel="stylesheet" type="text/css" href="./testing_docs/tableLayoutComplete_files/result-light.css">
-
+  
   <style type="text/css">
     </style> <link rel="stylesheet" type="text/css" href="./testing_docs/tableLayoutComplete_files/plottable.css"> <style type="text/css">
 /*-- Add custom styles after this line --*/
@@ -26,10 +26,10 @@
 }
 
   </style>
+  
 
 
-
-<script type="text/javascript">//<![CDATA[
+<script type="text/javascript">//<![CDATA[ 
 
 var renderAreaD1;
 var renderAreaD2;
@@ -71,23 +71,23 @@ window.onload = function () {
     dataseries5.metadata({name: "bananas"});
     dataseries6 = new Plottable.DataSource(makeRandomData(50));
     dataseries6.metadata({name: "grapes"});
-
+    
     colorScale1 = new Plottable.ColorScale("10");
     colorScale1.domain(["series1", "series2", "apples", "oranges", "bananas", "grapes"]);
-
+    
     //Axis
     xScale = new Plottable.LinearScale();
     yScale = new Plottable.LinearScale();
     var xAxis = new Plottable.XAxis(xScale, "bottom");
     var yAxis = new Plottable.YAxis(yScale, "left");
 
-
+        
     var colorProjector = function(d, i, m) {
        return colorScale1.scale(m.name);
     };
-
+    
     //rendering
-    renderAreaD1 = new Plottable.CircleRenderer(dataseries1, xScale, yScale);
+    renderAreaD1 = new Plottable.CircleRenderer(dataseries1, xScale, yScale);   
     renderAreaD2 = new Plottable.LineRenderer(dataseries2, xScale, yScale);
     renderApple = new Plottable.AreaRenderer(dataseries3, xScale, yScale);
     renderBanana = new Plottable.LineRenderer(dataseries4, xScale, yScale);
@@ -100,27 +100,27 @@ window.onload = function () {
     renderBanana.project("stroke", colorProjector);
     renderOrange.project("fill", colorProjector);
     renderGrape.project("fill", colorProjector);
-
+    
     renderArea = renderAreaD1.merge(renderAreaD2);
     button5Callback();
-
+    
     //title + legend
     title1 = new Plottable.TitleLabel( "Two Data Series", "horizontal");
     legend1 = new Plottable.Legend(colorScale1);
     var titleTable = new Plottable.Table().addComponent(0,0, title1)
                                           .addComponent(0,1, legend1);
-
+    
     basicTable = new Plottable.Table().addComponent(0,2, titleTable)
                 .addComponent(1, 1, yAxis)
                 .addComponent(1, 2, renderArea)
                 .addComponent(2, 2, xAxis)
 
 
-
-
+    
+    
     basicTable.renderTo(svg);
 
-
+    
 };
 
 function button1Callback() {
@@ -152,7 +152,7 @@ function button5Callback() {
     renderGrape.remove();
     renderOrange.remove();
     renderBanana.remove();
-
+     
     renderArea
     .merge(renderAreaD1)
     .merge(renderAreaD2);
@@ -170,7 +170,7 @@ function button6Callback() {
     basicTable.renderTo();
 }
 
-//]]>
+//]]>  
 
 </script>
 
@@ -195,7 +195,7 @@ function button6Callback() {
     <button onclick="button5Callback()">short legend</button>
     <button onclick="button6Callback()">tall legend</button>
 <p>
-
+  
 
 
 
