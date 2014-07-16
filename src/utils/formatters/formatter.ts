@@ -8,7 +8,7 @@ export module Abstract {
     public _precision: number;
 
     constructor(precision: number) {
-      this._precision = precision;
+      this.precision(precision);
     }
 
     /**
@@ -47,6 +47,9 @@ export module Abstract {
     public precision(value?: number): any {
       if (value === undefined) {
         return this._precision;
+      }
+      if (value < 0 || value > 20) {
+        throw new RangeError("Formatter precision must be between 0 and 20");
       }
       this._precision = value;
       return this;

@@ -43,13 +43,20 @@ export module Component {
       this.xOffset(5).yOffset(5);
     }
 
+    public remove() {
+      super.remove();
+      if (this.colorScale != null) {
+        this.colorScale.broadcaster.deregisterListener(this);
+      }
+    }
+
     /**
      * Assigns or gets the callback to the Legend
      * This callback is associated with toggle events, which trigger when a legend row is clicked.
      * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
      * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-     * 
+     *
      * @param{ToggleCallback} callback The new callback function
      */
     public toggleCallback(callback: ToggleCallback): Legend;
@@ -69,10 +76,10 @@ export module Component {
     /**
      * Assigns or gets the callback to the Legend
      * This callback is associated with hover events, which trigger when the mouse enters or leaves a legend row
-     * Setting a callback will also set the class "hover" to all legend row, 
+     * Setting a callback will also set the class "hover" to all legend row,
      * as well as the class "focus" to the legend row being hovered over.
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
-     * 
+     *
      * @param{HoverCallback} callback The new callback function
      */
     public hoverCallback(callback: HoverCallback): Legend;
@@ -101,10 +108,10 @@ export module Component {
     public scale(scale?: Scale.Color): any {
       if (scale != null) {
         if (this.colorScale != null) {
-          this._deregisterFromBroadcaster(this.colorScale);
+          this.colorScale.broadcaster.deregisterListener(this);
         }
         this.colorScale = scale;
-        this._registerToBroadcaster(this.colorScale, () => this.updateDomain());
+        this.colorScale.broadcaster.registerListener(this, () => this.updateDomain());
         this.updateDomain();
         return this;
       } else {
@@ -141,7 +148,7 @@ export module Component {
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Util.Text.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
-      var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
+      var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
       return {
         width : Math.min(desiredWidth, offeredWidth),
         height: rowsICanFit * textHeight,
@@ -178,7 +185,10 @@ export module Component {
       legend.attr("transform", (d: string) => "translate(0," + domain.indexOf(d) * textHeight + ")");
       legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
       legend.selectAll("text")
-            .text(function(d: string) {return Util.Text.getTruncatedText(d, availableWidth , d3.select(this));});
+            .text(function(d: string) {
+              var measure = Util.Text.getTextMeasure(d3.select(this));
+              return Util.Text.getTruncatedText(d, availableWidth , measure);
+              });
       this.updateClasses();
       this.updateListeners();
       return this;
@@ -191,7 +201,7 @@ export module Component {
       var dataSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS);
       if (this._hoverCallback != null) {
         // tag the element that is being hovered over with the class "focus"
-        // this callback will trigger with the specific element being hovered over. 
+        // this callback will trigger with the specific element being hovered over.
         var hoverRow = (mouseover: boolean) => (datum: string) => {
           this.datumCurrentlyFocusedOn = mouseover ? datum : undefined;
           this._hoverCallback(this.datumCurrentlyFocusedOn);

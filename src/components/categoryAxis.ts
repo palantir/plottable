@@ -4,30 +4,31 @@ module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
-    public _tickLabelsG: D3.Selection;
+    private measurer: Util.Text.CachingCharacterMeasurer;
 
     /**
      * Creates a CategoryAxis.
      *
-     * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to tyr to
+     * A CategoryAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
      * display the scale as efficiently as possible.
      *
      * @constructor
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom") {
-      super(scale, orientation);
+    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter: any = new Plottable.Formatter.Identity()) {
+      super(scale, orientation, formatter);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
         throw new Error("Only rangeBands category axes are implemented");
       }
-      this._registerToBroadcaster(this._scale, () => this._invalidateLayout());
+      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
     }
 
     public _setup() {
       super._setup();
-      this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
+      this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
       return this;
     }
 
@@ -51,16 +52,14 @@ export module Axis {
           wantsHeight: false
         };
       }
+
+      var fakeScale = this._scale.copy();
       if (this._isHorizontal()) {
-        this._scale.range([0, offeredWidth]);
+        fakeScale.range([0, offeredWidth]);
       } else {
-        this._scale.range([offeredHeight, 0]);
+        fakeScale.range([offeredHeight, 0]);
       }
-      var testG = this._tickLabelsG.append("g");
-      var fakeTicks = testG.selectAll(".tick").data(this._scale.domain());
-      fakeTicks.enter().append("g").classed("tick", true);
-      var textResult = this.writeTextToTicks(offeredWidth, offeredHeight, fakeTicks);
-      testG.remove();
+      var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
 
       return {
         width : textResult.usedWidth  + widthRequiredByTicks,
@@ -74,20 +73,45 @@ export module Axis {
       return this._scale.domain();
     }
 
-    private writeTextToTicks(axisWidth: number, axisHeight: number, ticks: D3.Selection): Util.Text.IWriteTextResult {
+    /**
+     * Measures the size of the ticks without making any (permanent) DOM
+     * changes.
+     *
+     * @param {string[]} data The strings that will be printed on the ticks.
+     */
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, data: string[]): Util.Text.IWriteTextResult;
+    /**
+     * Measures the size of the ticks while also writing them to the DOM.
+     * @param {D3.Selection} ticks The tick elements to be written to.
+     */
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection): Util.Text.IWriteTextResult;
+    private measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, dataOrTicks: any): Util.Text.IWriteTextResult {
+      var draw = typeof dataOrTicks[0] !== "string";
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
-      ticks.each(function (d: string, i: number) {
-        var d3this = d3.select(this);
-        var bandWidth = self._scale.fullBandStartAndWidth(d)[1];
+      var tm = (s: string) => self.measurer.measure(s);
+      var iterator = draw ? (f: Function) => dataOrTicks.each(f) : (f: Function) => dataOrTicks.forEach(f);
+
+      iterator(function (d: string) {
+        var bandWidth = scale.fullBandStartAndWidth(d)[1];
         var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
 
-        var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
-        var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
+        var textWriteResult: Util.Text.IWriteTextResult;
+        var formatter = self._formatter;
+        if (draw) {
+          var d3this = d3.select(this);
+          var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
+          var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
+          textWriteResult = Util.Text.writeText(formatter.format(d), width, height, tm, true, {
+                                                    g: d3this,
+                                                    xAlign: xAlign[self._orientation],
+                                                    yAlign: yAlign[self._orientation]
+          });
+        } else {
+          textWriteResult = Util.Text.writeText(formatter.format(d), width, height, tm, true);
+        }
 
-        var textWriteResult = Util.Text.writeText(d, d3this, width, height,
-                                                  xAlign[self._orientation], yAlign[self._orientation], true);
         textWriteResults.push(textWriteResult);
       });
 
@@ -102,7 +126,7 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), (d) => d);
+      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var startAndWidth = this._scale.fullBandStartAndWidth(d);
@@ -111,19 +135,28 @@ export module Axis {
         var y = this._isHorizontal() ? 0 : bandStartPosition;
         return "translate(" + x + "," + y + ")";
       };
-      var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+      tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this.writeTextToTicks(this.availableWidth, this.availableHeight, tickLabels);
+      this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
-      Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
-      Util.DOM.translate(this._ticksContainer, translate[0], translate[1]);
+      Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+      Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
       return this;
+    }
+
+
+    public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
+      // When anyone calls _invalidateLayout, _computeLayout will be called
+      // on everyone, including this. Since CSS or something might have
+      // affected the size of the characters, clear the cache.
+      this.measurer.clear();
+      return super._computeLayout(xOrigin, yOrigin, availableWidth, availableHeight);
     }
   }
 }

@@ -20,22 +20,12 @@
     <script src="../bower_components/jQuery/dist/jquery.js"></script>
     <script src="../bower_components/jquery.simulate/libs/jquery.simulate.js"></script>
     <script src="../bower_components/jquery.simulate/src/jquery.simulate.ext.js"></script>
-    <script src="blanket_mocha.js"></script>
     <script src="../plottable_multifile.js"></script>
-  </head>
-  <body>
-    <div id="mocha"></div>
     <script>
       mocha.setup({
-        globals: ['LiveReload'],
+        globals: ["LiveReload", "Pixel_CloseTo_Requirement"],
         ui: "bdd"
-      });
-      mocha.checkLeaks();
-      if (window.mochaPhantomJS) {
-        mochaPhantomJS.run();
-      } else {
-        mocha.run();
-      }
+      }).timeout(1500);
     </script>
 
     <script src="../test/tests_multifile.js"></script>
@@ -43,6 +33,42 @@
         if (window.PHANTOMJS) {
             blanket.options("reporter", "../node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
         }
+    </script>
+  </head>
+
+  <body>
+    <div id="mocha"></div>
+    <script>
+      // mocha.checkLeaks();
+    onload=function() {
+      var runner;
+      if (window.mochaPhantomJS) {
+        runner = mochaPhantomJS.run();
+      } else {
+        runner = mocha.run();
+      }
+      var failedTests = [];
+        runner.on('end', function(){
+          window.mochaResults = runner.stats;
+          window.mochaResults.reports = failedTests;
+        });
+
+        runner.on('fail', logFailure);
+
+        function logFailure(test, err){
+
+          var flattenTitles = function(test){
+            var titles = [];
+            while (test.parent.title){
+              titles.push(test.parent.title);
+              test = test.parent;
+            }
+            return titles.reverse();
+          };
+
+          failedTests.push({name: test.title, result: false, message: err.message, stack: err.stack, titles: flattenTitles(test) });
+        };
+      }
     </script>
   </body>
 </html>

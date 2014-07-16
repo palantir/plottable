@@ -13,11 +13,14 @@ export module Util {
     /**
      * Set a new key/value pair in the store.
      *
-     * @param {any} Key to set in the store
-     * @param {any} Value to set in the store
+     * @param {any} key Key to set in the store
+     * @param {any} value Value to set in the store
      * @return {boolean} True if key already in store, false otherwise
      */
     public set(key: any, value: any) {
+      if (key !== key) {
+        throw new Error("NaN may not be used as a key to the StrictEqualityAssociativeArray");
+      }
       for (var i = 0; i < this.keyValuePairs.length; i++) {
         if (this.keyValuePairs[i][0] === key) {
           this.keyValuePairs[i][1] = value;
@@ -28,6 +31,12 @@ export module Util {
       return false;
     }
 
+    /**
+     * Get a value from the store, given a key.
+     *
+     * @param {any} key Key associated with value to retrieve
+     * @return {any} Value if found, undefined otherwise
+     */
     public get(key: any): any {
       for (var i = 0; i<this.keyValuePairs.length; i++) {
         if (this.keyValuePairs[i][0] === key) {
@@ -37,6 +46,15 @@ export module Util {
       return undefined;
     }
 
+    /**
+     * Test whether store has a value associated with given key.
+     *
+     * Will return true if there is a key/value entry,
+     * even if the value is explicitly `undefined`.
+     *
+     * @param {any} key Key to test for presence of an entry
+     * @return {boolean} Whether there was a matching entry for that key
+     */
     public has(key: any): boolean {
       for (var i = 0; i<this.keyValuePairs.length; i++) {
         if (this.keyValuePairs[i][0] === key) {
@@ -46,10 +64,42 @@ export module Util {
       return false;
     }
 
+    /**
+     * Return an array of the values in the key-value store
+     *
+     * @return {any[]} The values in the store
+     */
     public values(): any[] {
       return this.keyValuePairs.map((x) => x[1]);
     }
 
+    /**
+     * Return an array of keys in the key-value store
+     *
+     * @return {any[]} The keys in the store
+     */
+    public keys(): any[] {
+      return this.keyValuePairs.map((x) => x[0]);
+    }
+
+    /**
+     * Execute a callback for each entry in the array.
+     *
+     * @param {(key: any, val?: any, index?: number) => any} callback The callback to eecute
+     * @return {any[]} The results of mapping the callback over the entries
+     */
+     public map(cb: (key?: any, val?: any, index?: number) => any) {
+      return this.keyValuePairs.map((kv: any[], index: number) => {
+        return cb(kv[0], kv[1], index);
+      });
+     }
+
+    /**
+     * Delete a key from the key-value store. Return whether the key was present.
+     *
+     * @param {any} The key to remove
+     * @return {boolean} Whether a matching entry was found and removed
+     */
     public delete(key: any): boolean {
       for (var i = 0; i < this.keyValuePairs.length; i++) {
         if (this.keyValuePairs[i][0] === key) {

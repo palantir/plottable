@@ -13,7 +13,6 @@ export module Abstract {
     public backgroundContainer: D3.Selection;
     public foregroundContainer: D3.Selection;
     public clipPathEnabled = false;
-    private broadcastersCurrentlyListeningTo: {[key: string]: Broadcaster} = {};
 
     private rootSVG: D3.Selection;
     private isTopLevelComponent = false;
@@ -33,6 +32,7 @@ export module Abstract {
     public _isSetup = false;
     public _isAnchored = false;
     public static AUTORESIZE_BY_DEFAULT = true;
+    private removed = false;
 
     /**
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
@@ -41,6 +41,10 @@ export module Abstract {
      * @returns {Component} The calling component.
      */
     public _anchor(element: D3.Selection) {
+      if (this.removed) {
+        throw new Error("Can't reuse remove()-ed components!");
+      }
+
       if (element.node().nodeName === "svg") {
         // svg node gets the "plottable" CSS class
         this.rootSVG = element;
@@ -364,15 +368,6 @@ export module Abstract {
       return this;
     }
 
-    public _registerToBroadcaster(broadcaster: Broadcaster, callback: IBroadcasterCallback) {
-      broadcaster.registerListener(this, callback);
-      this.broadcastersCurrentlyListeningTo[broadcaster._plottableID] = broadcaster;
-    }
-
-    public _deregisterFromBroadcaster(broadcaster: Broadcaster) {
-      broadcaster.deregisterListener(this);
-      delete this.broadcastersCurrentlyListeningTo[broadcaster._plottableID];
-    }
 
     /**
      * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
@@ -461,9 +456,11 @@ export module Abstract {
     }
 
     /**
-     * Removes a Component from the DOM.
+     * Detaches a Component from the DOM. The component can be reused.
+     *
+     * @returns The calling Component.
      */
-    public remove() {
+    public detach() {
       if (this._isAnchored) {
         this.element.remove();
       }
@@ -473,6 +470,16 @@ export module Abstract {
       this._isAnchored = false;
       this._parent = null;
       return this;
+    }
+
+    /**
+     * Removes a Component from the DOM and disconnects it from everything it's
+     * listening to (effectively destroying it).
+     */
+    public remove() {
+      this.removed = true;
+      this.detach();
+      Core.ResizeBroadcaster.deregister(this);
     }
   }
 }

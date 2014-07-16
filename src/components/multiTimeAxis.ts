@@ -79,7 +79,7 @@ export module Axis {
     }
 
     public isEnoughSpace(container: D3.Selection, tickLabels: Date[], format: string) {
-      return d3.max(tickLabels, (d: Date) => Util.Text.measureTextWidth(container, d3.time.format(format)(d))) * this.tickLabels.length < this.availableWidth;
+      return d3.max(tickLabels, (d: Date) => Util.Text.getTextWidth(container, d3.time.format(format)(d))) * tickLabels.length < this.availableWidth;
     }
 
     public _setup() {
@@ -129,10 +129,10 @@ export module Axis {
         labelPos.push(new Date((tickPos[i + 1].valueOf() - tickPos[i].valueOf()) / 2 + tickPos[i].valueOf()));
       }
 
-      container.selectAll(".tick-label").remove();
+      container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
 
-      var tickLabels = container.selectAll(".tick-label").data(labelPos, (d) => d.valueOf());
-      var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+      var tickLabels = container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
+      var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       tickLabels.selectAll("text").attr("transform", "translate(0," + (this._orientation === "bottom" ?
           (this.tickLength() * (pos + 1)) :
@@ -147,7 +147,7 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      this._tickLabelsG.selectAll(".tick-label").remove();
+      this._tickLabelsG.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
       this._renderTicks(this._majorTickLabels, this.layers - 1);
       this._renderTicks(this._minorTickLabels, this.layers - 2);
       var top = this.getTopLevel();
@@ -155,7 +155,7 @@ export module Axis {
           var v = Multi.allIntervals[k];
           var index = top - k;
           var tickValues = this._scale.tickInterval(v.interval, v.step);
-          var selection = this._ticksContainer.selectAll(".tick").filter((d) =>
+          var selection = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).filter((d) =>
               tickValues.map((x) => x.valueOf()).indexOf(d.valueOf()) >= 0
           );
           selection.select("line").attr("y2", this.tickLength() * (index + 1));

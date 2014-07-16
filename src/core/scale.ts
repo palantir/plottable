@@ -2,12 +2,11 @@
 
 module Plottable {
 export module Abstract {
-  export class Scale extends Broadcaster {
+  export class Scale extends PlottableObject implements Core.IListenable {
     public _d3Scale: D3.Scale.Scale;
-    public _autoDomainAutomatically = true;
+    private autoDomainAutomatically = true;
+    public broadcaster = new Plottable.Core.Broadcaster(this);
     public _rendererAttrID2Extent: {[rendererAttrID: string]: any[]} = {};
-    public _autoNice = false;
-    public _autoPad  = false;
     /**
      * Creates a new Scale.
      *
@@ -35,8 +34,15 @@ export module Abstract {
      * represents a view in to the data.
      */
     public autoDomain() {
+      this.autoDomainAutomatically = true;
       this._setDomain(this._getExtent());
       return this;
+    }
+
+    public _autoDomainIfAutomaticMode() {
+      if (this.autoDomainAutomatically) {
+        this.autoDomain();
+      }
     }
 
     /**
@@ -50,21 +56,26 @@ export module Abstract {
     }
 
     /**
-     * Retrieves the current domain, or sets the Scale's domain to the specified values.
+     * Gets the domain.
      *
-     * @param {any[]} [values] The new value for the domain. This array may
+     * @returns {any[]} The current domain.
+     */
+    public domain(): any[];
+    /**
+     * Sets the Scale's domain to the specified values.
+     *
+     * @param {any[]} values The new value for the domain. This array may
      *     contain more than 2 values if the scale type allows it (e.g.
      *     ordinal scales). Other scales such as quantitative scales accept
      *     only a 2-value extent array.
-     * @returns {any[]|Scale} The current domain, or the calling Scale (if values is supplied).
+     * @returns {Scale} The calling Scale.
      */
-    public domain(): any[];
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
         return this._d3Scale.domain();
       } else {
-        this._autoDomainAutomatically = false;
+        this.autoDomainAutomatically = false;
         this._setDomain(values);
         return this;
       }
@@ -72,16 +83,21 @@ export module Abstract {
 
     public _setDomain(values: any[]) {
       this._d3Scale.domain(values);
-      this._broadcast();
+      this.broadcaster.broadcast();
     }
 
     /**
-     * Retrieves the current range, or sets the Scale's range to the specified values.
+     * Gets the range.
      *
-     * @param {any[]} [values] The new value for the range.
-     * @returns {any[]|Scale} The current range, or the calling Scale (if values is supplied).
+     * @returns {any[]} The current range.
      */
     public range(): any[];
+    /**
+     * Sets the Scale's range to the specified values.
+     *
+     * @param {any[]} values The new values for the range.
+     * @returns {Scale} The calling Scale.
+     */
     public range(values: any[]): Scale;
     public range(values?: any[]): any {
       if (values == null) {
@@ -105,7 +121,7 @@ export module Abstract {
      * When a renderer determines that the extent of a projector has changed,
      * it will call this function. This function should ensure that
      * the scale has a domain at least large enough to include extent.
-     * 
+     *
      * @param {number} rendererID A unique indentifier of the renderer sending
      *                 the new extent.
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
@@ -113,17 +129,13 @@ export module Abstract {
      */
     public updateExtent(rendererID: number, attr: string, extent: any[]) {
       this._rendererAttrID2Extent[rendererID + attr] = extent;
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
+      this._autoDomainIfAutomaticMode();
       return this;
     }
 
     public removeExtent(rendererID: number, attr: string) {
       delete this._rendererAttrID2Extent[rendererID + attr];
-      if (this._autoDomainAutomatically) {
-        this.autoDomain();
-      }
+      this._autoDomainIfAutomaticMode();
       return this;
     }
   }

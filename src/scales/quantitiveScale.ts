@@ -6,6 +6,8 @@ export module Abstract {
     public _d3Scale: D3.Scale.QuantitiveScale;
     private lastRequestedTickCount = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
+    public _userSetDomainer: boolean = false;
+    private _domainer: Domainer = new Domainer();
 
     /**
      * Creates a new QuantitiveScale.
@@ -17,24 +19,8 @@ export module Abstract {
       super(scale);
     }
 
-    public _getExtent(): number[] {
-      var extents = this._getAllExtents();
-      if (extents.length > 0) {
-        return [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
-      } else {
-        return [0, 1];
-      }
-    }
-
-    public autoDomain() {
-      super.autoDomain();
-      if (this._autoPad) {
-        this.padDomain();
-      }
-      if (this._autoNice) {
-        this.nice();
-      }
-      return this;
+    public _getExtent(): any[] {
+      return this._domainer.computeDomain(this._getAllExtents(), this);
     }
 
     /**
@@ -60,6 +46,15 @@ export module Abstract {
     public domain(values: any[]): QuantitiveScale;
     public domain(values?: any[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
+    }
+
+    public _setDomain(values: any[]) {
+        var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
+        if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
+            console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            return;
+        }
+        super._setDomain(values);
     }
 
     /**
@@ -89,29 +84,23 @@ export module Abstract {
     }
 
     /**
-     * Gets or sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+     * Gets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
      *
-     * @param {boolean} [clamp] Whether or not to clamp the QuantitiveScale.
-     * @returns {boolean|QuantitiveScale} The current clamp status, or the calling QuantitiveScale.
+     * @returns {boolean} The current clamp status.
      */
     public clamp(): boolean;
+    /**
+     * Sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+     *
+     * @param {boolean} clamp Whether or not to clamp the QuantitiveScale.
+     * @returns {QuantitiveScale} The calling QuantitiveScale.
+     */
     public clamp(clamp: boolean): QuantitiveScale;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
         return this._d3Scale.clamp();
       }
       this._d3Scale.clamp(clamp);
-      return this;
-    }
-
-    /**
-     * Extends the scale's domain so it starts and ends with "nice" values.
-     *
-     * @param {number} [count] The number of ticks that should fit inside the new domain.
-     */
-    public nice(count?: number) {
-      this._d3Scale.nice(count);
-      this._setDomain(this._d3Scale.domain()); // nice() can change the domain, so update all listeners
       return this;
     }
 
@@ -140,30 +129,45 @@ export module Abstract {
     }
 
     /**
-     * Pads out the domain of the scale by a specified ratio.
-     *
-     * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-     * @returns {QuantitiveScale} The calling QuantitiveScale.
+     * Given a domain, expands its domain onto "nice" values, e.g. whole
+     * numbers.
      */
-    public padDomain(padProportion = 0.05): QuantitiveScale {
-      var currentDomain = this.domain();
-      if (currentDomain[0] === currentDomain[1]) {
-        var d = currentDomain[0].valueOf(); // valueOf accounts for dates properly
-        this._setDomain([d - this._PADDING_FOR_IDENTICAL_DOMAIN, d + this._PADDING_FOR_IDENTICAL_DOMAIN]);
+    public _niceDomain(domain: any[], count?: number): any[] {
+      return this._d3Scale.copy().domain(domain).nice(count).domain();
+    }
+
+    /**
+     * Retrieve a Domainer of a scale. A Domainer is responsible for combining
+     * multiple extents into a single domain.
+     *
+     * @return {QuantitiveScale} The scale's current domainer.
+     */
+    public domainer(): Domainer;
+    /**
+     * Sets a Domainer of a scale. A Domainer is responsible for combining
+     * multiple extents into a single domain.
+     *
+     * When you set domainer, we assume that you know what you want the domain
+     * to look like better that we do. Ensuring that the domain is padded,
+     * includes 0, etc., will be the responsability of the new domainer.
+     *
+     * @param {Domainer} domainer The domainer to be set.
+     * @return {QuantitiveScale} The calling scale.
+     */
+    public domainer(domainer: Domainer): QuantitiveScale;
+    public domainer(domainer?: Domainer): any {
+      if (domainer == null) {
+        return this._domainer;
+      } else {
+        this._domainer = domainer;
+        this._userSetDomainer = true;
+        this._autoDomainIfAutomaticMode();
         return this;
       }
+    }
 
-      var extent = currentDomain[1] - currentDomain[0];
-      // currentDomain[1].valueOf() converts date to miliseconds, leaves numbers unchanged. else + attemps string concat.
-      var newDomain = [currentDomain[0] - padProportion/2 * extent, currentDomain[1].valueOf() + padProportion/2 * extent];
-      if (currentDomain[0] === 0) {
-        newDomain[0] = 0;
-      }
-      if (currentDomain[1] === 0) {
-        newDomain[1] = 0;
-      }
-      this._setDomain(newDomain);
-      return this;
+    public _defaultExtent(): any[] {
+      return [0, 1];
     }
   }
 }

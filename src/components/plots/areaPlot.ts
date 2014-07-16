@@ -2,17 +2,8 @@
 
 module Plottable {
 export module Plot {
-  export class Area extends Abstract.XYPlot {
+  export class Area extends Line {
     private areaPath: D3.Selection;
-    private linePath: D3.Selection;
-
-    public _animators: Animator.IPlotAnimatorMap = {
-      "area-reset" : new Animator.Null(),
-      "area"       : new Animator.Default()
-        .duration(600)
-        .easing("exp-in-out")
-    };
-
 
     /**
      * Creates an AreaPlot.
@@ -27,14 +18,58 @@ export module Plot {
       this.classed("area-renderer", true);
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
+      this.project("fill-opacity", () => 0.5); // default
       this.project("stroke", () => "none"); // default
+      this._animators["area-reset"] = new Animator.Null();
+      this._animators["area"]       = new Animator.Default()
+                                        .duration(600)
+                                        .easing("exp-in-out");
     }
 
     public _setup() {
       super._setup();
       this.areaPath = this.renderArea.append("path").classed("area", true);
-      this.linePath = this.renderArea.append("path").classed("line", true);
       return this;
+    }
+
+    public _onDataSourceUpdate() {
+      super._onDataSourceUpdate();
+      if (this.yScale != null) {
+        this._updateYDomainer();
+      }
+    }
+
+    public _updateYDomainer(): Area {
+      super._updateYDomainer();
+      var scale = <Abstract.QuantitiveScale> this.yScale;
+
+      var y0Projector = this._projectors["y0"];
+      var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
+      var extent:  number[] = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
+      var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
+
+      if (!scale._userSetDomainer) {
+        if (constantBaseline != null) {
+          scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+        } else {
+          scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
+        }
+        // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
+        scale._autoDomainIfAutomaticMode();
+      }
+      return this;
+    }
+
+    public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
+      super.project(attrToSet, accessor, scale);
+      if (attrToSet === "y0") {
+        this._updateYDomainer();
+      }
+      return this;
+    }
+
+    public _getResetYFunction() {
+      return this._generateAttrToProjector()["y0"];
     }
 
     public _paint() {
@@ -48,19 +83,13 @@ export module Plot {
       delete attrToProjector["y"];
 
       this.areaPath.datum(this._dataSource.data());
-      this.linePath.datum(this._dataSource.data());
 
       if (this._dataChanged) {
         attrToProjector["d"] = d3.svg.area()
           .x(xFunction)
           .y0(y0Function)
-          .y1(y0Function);
+          .y1(this._getResetYFunction());
         this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
-
-        attrToProjector["d"] = d3.svg.line()
-          .x(xFunction)
-          .y(y0Function);
-        this._applyAnimatedAttributes(this.linePath, "area-reset", attrToProjector);
       }
 
       attrToProjector["d"] = d3.svg.area()
@@ -68,12 +97,6 @@ export module Plot {
         .y0(y0Function)
         .y1(yFunction);
       this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
-
-      attrToProjector["d"] = d3.svg.line()
-        .x(xFunction)
-        .y(yFunction);
-      this._applyAnimatedAttributes(this.linePath, "area", attrToProjector);
-
     }
   }
 }

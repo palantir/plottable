@@ -2,7 +2,7 @@
   <head>
     <title>Horizontal Category Renderer Quicktest</title>
     <link rel="stylesheet" type="text/css" href="../../plottable.css">
-    <script src="../bower_components/d3/d3.js"></script>
+    <script src="../../bower_components/d3/d3.js"></script>
     <script src="../../plottable_multifile.js"></script>
     <script src="../../examples/exampleUtil.js"></script>
 
@@ -21,6 +21,14 @@
 
       var yScale = new Plottable.Scale.Ordinal();
       yAxis = new Plottable.Axis.Category(yScale, "left");
+      var rs = yAxis._requestedSpace;
+      yAxis._requestedSpace = function(oW, oH) {
+        var start = new Date();
+        var retval = rs.call(yAxis, oW, oH);
+        var end = new Date();
+        console.log("Category _requestedSpace: " + (end-start) + " ms");
+        return retval;
+      }
 
       var barPlot = new Plottable.Plot.HorizontalBar(ds, xScale, yScale)
                               .project("x", "age", xScale)
@@ -33,6 +41,7 @@
       ]);
 
       window.onload = function() {
+        var svg = d3.select("#meow");
         chart.renderTo(svg);
       }
 

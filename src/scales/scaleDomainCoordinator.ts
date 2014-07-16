@@ -17,8 +17,9 @@ export module Util {
      * @param {Scale[]} scales A list of scales whose domains should be linked.
      */
     constructor(scales: Abstract.Scale[]) {
+      if (scales == null) {throw new Error("ScaleDomainCoordinator requires scales to coordinate");}
       this.scales = scales;
-      this.scales.forEach((s) => s.registerListener(this, (sx: Abstract.Scale) => this.rescale(sx)));
+      this.scales.forEach((s) => s.broadcaster.registerListener(this, (sx: Abstract.Scale) => this.rescale(sx)));
     }
 
     public rescale(scale: Abstract.Scale) {

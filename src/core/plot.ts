@@ -23,19 +23,7 @@ export module Abstract {
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
-
-
-    public _rerenderUpdateSelection = false;
-    // A perf-efficient manner of rendering would be to calculate attributes only
-    // on new nodes, and assume that old nodes (ie the update selection) can
-    // maintain their current attributes. If we change the metadata or an
-    // accessor function, then this property will not be true, and we will need
-    // to recompute attributes on the entire update selection.
-
-    public _requireRerender = false;
-    // A perf-efficient approach to rendering scale changes would be to transform
-    // the container rather than re-render. In the event that the data is changed,
-    // it will be necessary to do a regular rerender.
+    private animateOnNextRender = true;
 
     /**
      * Creates a Plot.
@@ -66,17 +54,37 @@ export module Abstract {
 
     public _anchor(element: D3.Selection) {
       super._anchor(element);
+      this.animateOnNextRender = true;
       this._dataChanged = true;
+      this.updateAllProjectors();
       return this;
     }
 
+    public remove() {
+      super.remove();
+      this._dataSource.broadcaster.deregisterListener(this);
+      // deregister from all scales
+      var properties = Object.keys(this._projectors);
+      properties.forEach((property) => {
+        var projector = this._projectors[property];
+        if (projector.scale != null) {
+          projector.scale.broadcaster.deregisterListener(this);
+        }
+      });
+    }
+
     /**
-     * Retrieves the current DataSource, or sets a DataSource if the Plot doesn't yet have one.
+     * Gets the Plot's DataSource.
      *
-     * @param {DataSource} [source] The DataSource the Plot should use, if it doesn't yet have one.
-     * @return {DataSource|Plot} The current DataSource or the calling Plot.
+     * @return {DataSource} The current DataSource.
      */
     public dataSource(): DataSource;
+    /**
+     * Sets the Plot's DataSource.
+     *
+     * @param {DataSource} source The DataSource the Plot should use.
+     * @return {Plot} The calling Plot.
+     */
     public dataSource(source: DataSource): Plot;
     public dataSource(source?: DataSource): any {
       if (source == null) {
@@ -84,20 +92,19 @@ export module Abstract {
       }
       var oldSource = this._dataSource;
       if (oldSource != null) {
-        this._deregisterFromBroadcaster(this._dataSource);
-        this._requireRerender = true;
-        this._rerenderUpdateSelection = true;
+        this._dataSource.broadcaster.deregisterListener(this);
       }
       this._dataSource = source;
-      this._registerToBroadcaster(this._dataSource, () => {
-        this.updateAllProjectors();
-        this._dataChanged = true;
-        this._render();
-      });
+      this._dataSource.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
+      this._onDataSourceUpdate();
+      return this;
+    }
+
+    public _onDataSourceUpdate() {
       this.updateAllProjectors();
+      this.animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
-      return this;
     }
 
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
@@ -107,17 +114,16 @@ export module Abstract {
 
       if (existingScale != null) {
         existingScale.removeExtent(this._plottableID, attrToSet);
-        this._deregisterFromBroadcaster(existingScale);
+        existingScale.broadcaster.deregisterListener(this);
       }
 
       if (scale != null) {
-        this._registerToBroadcaster(scale, () => this._render());
+        scale.broadcaster.registerListener(this, () => this._render());
       }
 
       this._projectors[attrToSet] = {accessor: accessor, scale: scale};
-      this._requireRerender = true;
-      this._rerenderUpdateSelection = true;
       this.updateProjector(attrToSet);
+      this._render(); // queue a re-render upon changing projector
       return this;
     }
 
@@ -137,8 +143,7 @@ export module Abstract {
       if (this.element != null) {
         this._paint();
         this._dataChanged = false;
-        this._requireRerender = false;
-        this._rerenderUpdateSelection = false;
+        this.animateOnNextRender = false;
       }
       return this;
     }
@@ -163,6 +168,13 @@ export module Abstract {
       return this;
     }
 
+    public detach() {
+      super.detach();
+      // make the domain resize
+      this.updateAllProjectors();
+      return this;
+    }
+
     /**
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
@@ -176,7 +188,7 @@ export module Abstract {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
-        if (extent.length === 0) {
+        if (extent.length === 0 || !this._isAnchored) {
           projector.scale.removeExtent(this._plottableID, attr);
         } else {
           projector.scale.updateExtent(this._plottableID, attr, extent);
@@ -200,7 +212,7 @@ export module Abstract {
      * @return {D3.Selection} The resulting selection (potentially after the transition)
      */
     public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: Abstract.IAttributeToProjector): any {
-      if (this._animate && this._animators[animatorKey] != null && !Core.ResizeBroadcaster.resizing()) {
+      if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
         return this._animators[animatorKey].animate(selection, attrToProjector, this);
       } else {
         return selection.attr(attrToProjector);
@@ -208,16 +220,20 @@ export module Abstract {
     }
 
     /**
-     * Gets or sets the animator associated with the specified animator key.
+     * Gets the animator associated with the specified Animator key.
      *
-     * @param {string} animatorKey The key for the animator.
-     * @param {Animator.IPlotAnimator} animator If specified, will be stored as the
-     *     animator for the key.
-     * @return {Animator.IPlotAnimator|Plot} If an animator is specified, we return
-     *     this object to enable chaining, otherwise we return the animator
-     *     stored at the specified key.
+     * @param {string} animatorKey The key for the Animator.
+     * @return {Animator.IPlotAnimator} The Animator for the specified key.
      */
     public animator(animatorKey: string): Animator.IPlotAnimator;
+    /**
+     * Sets the animator associated with the specified Animator key.
+     *
+     * @param {string} animatorKey The key for the Animator.
+     * @param {Animator.IPlotAnimator} animator An Animator to be assigned to
+     *                                          the specified key.
+     * @return {Plot} The calling Plot.
+     */
     public animator(animatorKey: string, animator: Animator.IPlotAnimator): Plot;
     public animator(animatorKey: string, animator?: Animator.IPlotAnimator): any {
       if (animator === undefined){

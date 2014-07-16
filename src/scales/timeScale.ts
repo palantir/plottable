@@ -6,15 +6,17 @@ export module Scale {
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
     private lastRequestedTickCount = 10;
     public _d3Scale: D3.Scale.TimeScale;
-
-
     /**
-     * Creates a new Time.
+     * Creates a new Time Scale.
      *
      * @constructor
+     * @param {D3.Scale.Time} [scale] The D3 TimeScale backing the TimeScale. If not supplied, uses a default scale.
      */
-    constructor(scale?: D3.Scale.TimeScale) {
-      super(<any> d3.time.scale());
+    constructor();
+    constructor(scale: D3.Scale.TimeScale);
+    constructor(scale?: any) {
+      // need to cast since d3 time scales do not descend from quantitive scales
+      super(<any>(scale == null ? d3.time.scale() : scale));
     }
 
     public _setDomain(values: any[]) {
@@ -28,14 +30,6 @@ export module Scale {
       } else {
         return [0, 1];
       }
-    }
-
-    public autoDomain() {
-      super.autoDomain();
-      if (this._autoPad) {
-        this.padDomain();
-      }
-      return this;
     }
 
     /**

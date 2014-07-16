@@ -1,34 +1,64 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
+  export interface FilterFormat {
+    format: string;
+    filter: (d: any) => any;
+  }
+
   export module Formatter {
     export class Time extends Abstract.Formatter {
       /**
        * Creates a formatter that displays dates
        * 
        * @constructor
-       * @param {number} [precision] The number of decimal places to display.
        */
-      constructor(precision = 0) {
-        super(precision);
+      constructor() {
+        super(null);
 
         var numFormats = 8;
-        var formats: {[index: number]: string} = {};
-        var filters: {[index: number]: (d: any) => any} = {};
 
-        formats[0] = ".%L"; filters[0] = function(d: any) { return d.getMilliseconds(); };
-        formats[1] = ":%S"; filters[1] = function(d: any) { return d.getSeconds(); };
-        formats[2] = "%I:%M"; filters[2] = function(d: any) { return d.getMinutes(); };
-        formats[3] = "%I %p"; filters[3] = function(d: any) { return d.getHours(); };
-        formats[4] = "%a %d"; filters[4] = function(d: any) { return d.getDay() && d.getDate() !== 1;};
-        formats[5] = "%b %d"; filters[5] = function(d: any) { return d.getDate() !== 1; };
-        formats[6] = "%b"; filters[6] = function(d: any) { return d.getMonth(); };
-        formats[7] = "%Y"; filters[7] = function() { return true; };
+        // these defaults were taken from d3
+        // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
+        var timeFormat: {[index: number]: FilterFormat} = {};
 
-        this._formatFunction = function(d: any) {
+        timeFormat[0] = {
+          format: ".%L",
+          filter: (d: any) => d.getMilliseconds() !== 0
+        };
+        timeFormat[1] = {
+          format: ":%S",
+          filter: (d: any) => d.getSeconds() !== 0
+        };
+        timeFormat[2] = {
+          format: "%I:%M",
+          filter: (d: any) => d.getMinutes() !== 0
+        };
+        timeFormat[3] = {
+          format: "%I %p",
+          filter: (d: any) => d.getHours() !== 0
+        };
+        timeFormat[4] = {
+          format: "%a %d",
+          filter: (d: any) => d.getDay() !== 0 && d.getDate() !== 1
+        };
+        timeFormat[5] = {
+          format: "%b %d",
+          filter: (d: any) => d.getDate() !== 1
+        };
+        timeFormat[6] = {
+          format: "%b",
+          filter: (d: any) => d.getMonth() !== 0
+        };
+        timeFormat[7] = {
+          format: "%Y",
+          filter: () => true
+        };
+
+        this._formatFunction = (d: any) => {
           for (var i = 0; i < numFormats; i++) {
-            if (filters[i](d)) {
-              return d3.time.format(formats[i])(d);
+            if (timeFormat[i].filter(d)) {
+              return d3.time.format(timeFormat[i].format)(d);
             }
           }
         };
