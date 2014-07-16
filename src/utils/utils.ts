@@ -68,6 +68,18 @@ export module Util {
       return d3.keys(seen);
     }
 
+    export function uniqNumbers(a: number[]): number[] {
+      var seen = d3.set();
+      var result: number[] = [];
+      a.forEach((n) =>  {
+        if (!seen.has(n)) {
+          seen.add(n);
+          result.push(n);
+        }
+      });
+      return result;
+    }
+
     /**
      * Creates an array of length `count`, filled with value or (if value is a function), value()
      *

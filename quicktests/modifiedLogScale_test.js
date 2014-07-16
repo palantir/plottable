@@ -1,6 +1,11 @@
 function makeData() {
-  var data = makeRandomData(100, 100);
-  data.push({x: 0, y: 0});
+  var data = makeRandomData(100, 10000);
+  data.forEach(function(d) {
+    if (Math.random() < 0.5) {
+      d.x = -d.x;
+      d.y = -d.y;
+    }
+  });
   return data;
 }
 
@@ -17,14 +22,18 @@ function run(div, data, Plottable) {
   var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
   var yScale = new Plottable.Scale.ModifiedLog();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left", new Plottable.Formatter.SISuffix());
+  yAxis.showEndTickLabel("top", false);
+  yAxis.showEndTickLabel("bottom", false);
 
   circleRenderer = new Plottable.Plot.Scatter(data, xScale, yScale);
   circleRenderer.project("r", 8);
   circleRenderer.project("opacity", 0.75);
   circleRenderer.animate(doAnimate);
 
-  var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer],
+  var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
+
+  var circleChart = new Plottable.Component.Table([[yAxis, circleRenderer.merge(gridlines)],
                                            [null,  xAxis]]);
   circleChart.renderTo(svg);
 

@@ -7,6 +7,8 @@ export module Scale {
     private pivot: number;
     private untransformedDomain: number[];
 
+    private static TICKS_PER_CLUSTER = 10;
+
     /**
      * Creates a new Scale.ModifiedLog.
      *
@@ -40,6 +42,7 @@ export module Scale {
       this.base = base;
       this.pivot = pivot;
       this.untransformedDomain = this._defaultExtent();
+      this._lastRequestedTickCount = 40;
       if (pivot <= 1) {
         throw new Error("ModifiedLogScale: The pivot must be > 1");
       }
@@ -106,27 +109,82 @@ export module Scale {
 
     public ticks(count?: number) {
       if (count != null) {
-        this._lastRequestedTickCount = count;
+        super.ticks(count);
       }
-      if (this.untransformedDomain[0] > 0 || this.untransformedDomain[1] < 0) {
-        return d3.scale.log().domain(this.untransformedDomain).ticks(this._lastRequestedTickCount);
-      } else {
-        var negativeLogTicks = -this.pivot < this.untransformedDomain[0] ? [] :
-                          d3.scale.log()
-                            .domain([this.untransformedDomain[0], -this.pivot])
-                            .ticks(this._lastRequestedTickCount);
-        var positiveLogTicks = this.untransformedDomain[1] < this.pivot ? [] :
-                          d3.scale.log()
-                            .domain([this.pivot, this.untransformedDomain[1]])
-                            .ticks(this._lastRequestedTickCount);
-        var linearTicks = d3.scale.linear()
-                            .domain([Math.max(this.untransformedDomain[0], -this.pivot),
-                                     Math.min(this.untransformedDomain[1], this.pivot)])
-                            .ticks(this._lastRequestedTickCount);
 
-        return negativeLogTicks.concat(positiveLogTicks).concat(linearTicks);
-      }
+      // Say your domain is [-100, 100] and your pivot is 10.
+      // then we're going to draw negative log ticks from -100 to -10,
+      // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
+      var middle = (x: number, y: number, z: number) => Math.max(x, Math.min(y, z));
+      var negativeLower = this.untransformedDomain[0];
+      var negativeUpper = middle(this.untransformedDomain[0], this.untransformedDomain[1], -this.pivot);
+      var positiveLower = middle(this.untransformedDomain[0], this.untransformedDomain[1], this.pivot);
+      var positiveUpper = this.untransformedDomain[1];
+
+      var negativeTickCount = this.howManyTicks(negativeLower, negativeUpper);
+      var positiveTickCount = this.howManyTicks(positiveLower, positiveUpper);
+      var linearTickCount = this.howManyTicks(negativeUpper, positiveLower);
+
+      var negativeLogTicks = this.logTicks(negativeTickCount, -negativeUpper, -negativeLower)
+                                 .map((x) => -x);
+      var positiveLogTicks = this.logTicks(positiveTickCount, positiveLower, positiveUpper);
+      var linearTicks = d3.scale.linear()
+                          .domain([negativeUpper, positiveLower])
+                          .ticks(linearTickCount);
+
+      return negativeLogTicks.concat(positiveLogTicks).concat(linearTicks);
     }
+
+    /**
+     * Return approximately count ticks from lower to upper.
+     *
+     * This will generate ticks in "clusters", e.g. [10, 20, 30, ... 90] would
+     * be a cluster, [100, 200, 300, ... 900] would be another cluster.
+     *
+     * Each cluster will have ModifiedLog.TICKS_PER_CLUSTER ticks.
+     *
+     * This function will generate as many clusters as it can while not
+     * drastically exceeding count.
+     */
+    private logTicks(count: number, lower: number, upper: number): number[] {
+      if (count === 0) {
+        return [];
+      }
+
+      var startLogged = Math.log(lower) / Math.log(this.base);
+      var endLogged = Math.log(upper) / Math.log(this.base);
+      var clusters = count / ModifiedLog.TICKS_PER_CLUSTER;
+      var skip = Math.max(1, Math.floor((endLogged - startLogged) / clusters));
+      var logged = d3.range(1, this.base, this.base / ModifiedLog.TICKS_PER_CLUSTER)
+                     .map((x) => Math.log(x) / Math.log(this.base));
+
+      var bases = d3.range(Math.floor(startLogged), Math.ceil(endLogged), skip);
+      var scaled = bases.map((b) => logged.map((x) => b + x * skip));
+      var flattened = Util.Methods.flatten(scaled);
+      var powed = flattened.map((x) => Math.pow(this.base, x));
+      var rounded = powed.map((x) => Number(x.toPrecision(2)));
+      var unique = Util.Methods.uniqNumbers(rounded);
+      var filtered = unique.filter((x) => lower <= x && x <= upper);
+      return filtered;
+    }
+
+    /**
+     * How many ticks does the range [lower, upper] deserve?
+     *
+     * e.g. if your domain was [10, 1000] and I asked howManyTicks(10, 100),
+     * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
+     * distance when plotted.
+     */
+    private howManyTicks(lower: number, upper: number): number {
+      var min = this.adjustedLog(this.untransformedDomain[0]);
+      var max = this.adjustedLog(this.untransformedDomain[1]);
+      var adjustedLower = this.adjustedLog(lower);
+      var adjustedUpper = this.adjustedLog(upper);
+      var proportion = (adjustedUpper - adjustedLower) / (max - min);
+      var ticks = Math.ceil(proportion * this._lastRequestedTickCount);
+      return ticks;
+    }
+
 
     public copy(): ModifiedLog {
       return new ModifiedLog(this.pivot, this.base);

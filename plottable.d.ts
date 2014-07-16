@@ -30,6 +30,7 @@ declare module Plottable {
             function accessorize(accessor: any): IAccessor;
             function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
+            function uniqNumbers(a: number[]): number[];
             /**
             * Creates an array of length `count`, filled with value or (if value is a function), value()
             *
@@ -1434,7 +1435,7 @@ declare module Plottable {
             constructor(pivot?: number, base?: number);
             public scale(x: number): number;
             public invert(x: number): number;
-            public ticks(count?: number): any[];
+            public ticks(count?: number): number[];
             public copy(): ModifiedLog;
         }
     }
