@@ -1,11 +1,5 @@
 function makeData() {
   var data = makeRandomData(100, 100);
-  data.forEach(function(obj) {
-    if (Math.random() < 0.5) {
-      obj.x = -obj.x;
-      obj.y = -obj.y;
-    }
-  });
   data.push({x: 0, y: 0});
   return data;
 }

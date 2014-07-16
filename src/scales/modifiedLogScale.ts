@@ -111,10 +111,12 @@ export module Scale {
       if (this.untransformedDomain[0] > 0 || this.untransformedDomain[1] < 0) {
         return d3.scale.log().domain(this.untransformedDomain).ticks(this._lastRequestedTickCount);
       } else {
-        var negativeLogTicks = d3.scale.log()
+        var negativeLogTicks = -this.pivot < this.untransformedDomain[0] ? [] :
+                          d3.scale.log()
                             .domain([this.untransformedDomain[0], -this.pivot])
                             .ticks(this._lastRequestedTickCount);
-        var positiveLogTicks = d3.scale.log()
+        var positiveLogTicks = this.untransformedDomain[1] < this.pivot ? [] :
+                          d3.scale.log()
                             .domain([this.pivot, this.untransformedDomain[1]])
                             .ticks(this._lastRequestedTickCount);
         var linearTicks = d3.scale.linear()
