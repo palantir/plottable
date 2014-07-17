@@ -45,7 +45,6 @@
 
 /// <reference path="components/baseAxis.ts" />
 /// <reference path="components/timeAxis.ts" />
-/// <reference path="components/multiTimeAxis.ts" />
 /// <reference path="components/numericAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />

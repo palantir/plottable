@@ -1529,7 +1529,7 @@ declare module Plottable {
             * @returns {any[]} The generated ticks.
             */
             public ticks(count?: number): any[];
-            public tickInterval(interval: D3.Time.Range, step?: number): any[];
+            public tickInterval(interval: D3.Time.Interval, step?: number): any[];
             public domain(): any[];
             public domain(values: any[]): Time;
             /**
@@ -1719,7 +1719,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
+        interface ITimeInterval {
+            timeUnit: D3.Time.Interval;
+            step: number;
+            formatString: string;
+        }
         class Time extends Abstract.Axis {
+            static minorIntervals: ITimeInterval[];
+            static majorIntervals: ITimeInterval[];
+            static minorToMajor: number[];
             /**
             * Creates a TimeAxis
             *
@@ -1728,36 +1736,8 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Axis {
-        interface Interval {
-            interval: D3.Time.Range;
-            step?: number;
-            length?: number;
-            formatMajor: string;
-            formatMinor: string;
-        }
-        interface ITimeLabel {
-            labelPos: Date;
-            labelText: Date;
-        }
-        class Multi extends Time {
-            static allIntervals: Interval[];
-            /**
-            * Creates a MultiTimeAxis
-            *
-            * @constructor
-            * @param {OrdinalScale} scale The scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            */
-            constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
-            public isEnoughSpace(container: D3.Selection, tickLabels: Date[], format: string): boolean;
-            public getTopLevel(): number;
+            public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
+            public getTickLevels(): number[];
         }
     }
 }

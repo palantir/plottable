@@ -19,7 +19,7 @@
     linePlot = new Plottable.Plot.Line(data, xScale, yScale)
     .project("x", function (d) { return d3.time.format("%x").parse(d.x)}, xScale);
 
-    xAxis = new Plottable.Axis.Multi(xScale, "bottom", new Plottable.Formatter.Time());
+    xAxis = new Plottable.Axis.Time(xScale, "bottom");
     // xAxis.addInterval({interval: d3.time.day, step: 16});
     // xAxis.addInterval({interval: d3.time.month});
     // xAxis.addInterval({interval: d3.time.year});
