@@ -4650,7 +4650,6 @@ var Plottable;
 
                 // going to ignore the formatter
                 this.classed("time-axis", true);
-                this.tickLength(40);
                 this.tickLabelPadding(5);
             }
             Time.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -4658,7 +4657,11 @@ var Plottable;
                 var requestedHeight = this._height;
 
                 if (this._computedHeight == null) {
-                    this._computedHeight = this.tickLength() + this._measureTextHeight();
+                    var textHeight = this._measureTextHeight();
+
+                    // make tick lengths double the textHeight plus some padding
+                    this.tickLength((textHeight + this.tickLabelPadding()) * 2);
+                    this._computedHeight = this.tickLength();
                 }
                 requestedWidth = 0;
                 requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
@@ -4742,6 +4745,8 @@ var Plottable;
                 tickPos.splice(0, 0, this._scale.domain()[0]);
                 tickPos.push(this._scale.domain()[1]);
                 var center = interval.step === 1;
+
+                // only center when the label should span the whole interval
                 var labelPos = [];
                 if (center) {
                     for (var i = 0; i < tickPos.length - 1; i++) {
@@ -4750,7 +4755,9 @@ var Plottable;
                 } else {
                     labelPos = tickPos;
                 }
-
+                labelPos = labelPos.filter(function (d) {
+                    return _this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), center);
+                });
                 var tickLabels = container.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(labelPos, function (d) {
                     return d.valueOf();
                 });
@@ -4760,12 +4767,31 @@ var Plottable;
                 tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ? (this.tickLength() / (2 - height + 1)) : (this.availableHeight - this.tickLength() / (2 - height + 1))) + ")");
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d) {
-                    return "translate(" + _this._scale._d3Scale(d) + ",0)";
+                    return "translate(" + _this._scale.scale(d) + ",0)";
                 });
                 var anchor = center ? "middle" : "left";
                 tickLabels.selectAll("text").text(function (d) {
                     return d3.time.format(interval.formatString)(d);
                 }).style("text-anchor", anchor);
+            };
+
+            Time.prototype.canFitLabelFilter = function (container, position, label, isCentered) {
+                var endPosition;
+                var startPosition;
+                var width = Plottable.Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
+                if (isCentered) {
+                    endPosition = this._scale.scale(position) + width / 2;
+                    startPosition = this._scale.scale(position) - width / 2;
+                } else {
+                    endPosition = this._scale.scale(position) + width;
+                    startPosition = this._scale.scale(position);
+                }
+
+                if (endPosition < this.availableWidth && startPosition > 0) {
+                    return true;
+                }
+
+                return false;
             };
 
             Time.prototype._doRender = function () {

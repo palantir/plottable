@@ -1738,6 +1738,7 @@ declare module Plottable {
             constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
             public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
             public getTickLevels(): number[];
+            public canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean;
         }
     }
 }

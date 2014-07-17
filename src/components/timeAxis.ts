@@ -17,30 +17,30 @@ export module Axis {
     // default intervals
     // these are for minor tick labels
     public static minorIntervals: ITimeInterval[] = [
-      {timeUnit: d3.time.second, step: 1, formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 5, formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 1,  formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 5,  formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 10, formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 15, formatString: "%I:%M:%S %p"},
       {timeUnit: d3.time.second, step: 30, formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.minute, step: 1, formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 5, formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 1,  formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 5,  formatString: "%I:%M %p"},
       {timeUnit: d3.time.minute, step: 10, formatString: "%I:%M %p"},
       {timeUnit: d3.time.minute, step: 15, formatString: "%I:%M %p"},
       {timeUnit: d3.time.minute, step: 30, formatString: "%I:%M %p"},
-      {timeUnit: d3.time.hour, step: 1, formatString: "%I %p"},
-      {timeUnit: d3.time.hour, step: 3, formatString: "%I %p"},
-      {timeUnit: d3.time.hour, step: 6, formatString: "%I %p"},
-      {timeUnit: d3.time.hour, step: 12, formatString: "%I %p"},
-      {timeUnit: d3.time.day, step: 1, formatString: "%a %e"},
-      {timeUnit: d3.time.day, step: 1, formatString: "%e"},
-      {timeUnit: d3.time.month, step: 1, formatString: "%B"},
-      {timeUnit: d3.time.month, step: 1, formatString: "%b"},
-      {timeUnit: d3.time.month, step: 3, formatString: "%B"},
-      {timeUnit: d3.time.month, step: 6, formatString: "%B"},
-      {timeUnit: d3.time.year, step: 1, formatString: "%Y"},
-      {timeUnit: d3.time.year, step: 1, formatString: "%y"},
-      {timeUnit: d3.time.year, step: 5, formatString: "%Y"},
-      {timeUnit: d3.time.year, step: 25, formatString: "%Y"},
+      {timeUnit: d3.time.hour,   step: 1,  formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 3,  formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 6,  formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 12, formatString: "%I %p"},
+      {timeUnit: d3.time.day,    step: 1,  formatString: "%a %e"},
+      {timeUnit: d3.time.day,    step: 1,  formatString: "%e"},
+      {timeUnit: d3.time.month,  step: 1,  formatString: "%B"},
+      {timeUnit: d3.time.month,  step: 1,  formatString: "%b"},
+      {timeUnit: d3.time.month,  step: 3,  formatString: "%B"},
+      {timeUnit: d3.time.month,  step: 6,  formatString: "%B"},
+      {timeUnit: d3.time.year,   step: 1,  formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 1,  formatString: "%y"},
+      {timeUnit: d3.time.year,   step: 5,  formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 25, formatString: "%Y"},
     ];
 
     // these are for major tick labels
@@ -51,7 +51,7 @@ export module Axis {
       {timeUnit: d3.time.year, step: 100000, formatString: ""} // this is essentially blank
     ];
 
-    // lowest index in minor that will map to index in major
+    // first index in minor that will not map to index in major
     public static minorToMajor: number[] = [
       14, // [0, 13] -> days
       16, // [14, 15] -> months
@@ -70,7 +70,6 @@ export module Axis {
       super(scale, orientation, formatter);
       // going to ignore the formatter
       this.classed("time-axis", true);
-      this.tickLength(40);
       this.tickLabelPadding(5);
      }
 
@@ -79,7 +78,10 @@ export module Axis {
       var requestedHeight = this._height;
 
       if (this._computedHeight == null) {
-          this._computedHeight = this.tickLength() + this._measureTextHeight();
+        var textHeight = this._measureTextHeight();
+        // make tick lengths double the textHeight plus some padding
+        this.tickLength((textHeight + this.tickLabelPadding()) * 2);
+        this._computedHeight = this.tickLength();
       }
       requestedWidth = 0;
       requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
@@ -160,6 +162,7 @@ export module Axis {
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
       var center = interval.step === 1;
+      // only center when the label should span the whole interval
       var labelPos: Date[] = [];
       if (center) {
         for (var i = 0; i < tickPos.length - 1; i++) {
@@ -168,7 +171,7 @@ export module Axis {
       } else {
         labelPos = tickPos;
       }
-
+      labelPos = labelPos.filter((d: any) => this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), center));
       var tickLabels = container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
@@ -177,10 +180,29 @@ export module Axis {
           (this.tickLength() / (2 - height + 1)) :
           (this.availableHeight - this.tickLength() / (2 - height + 1))) + ")");
       tickLabels.exit().remove();
-      tickLabels.attr("transform", (d: any) => "translate(" + this._scale._d3Scale(d) + ",0)");
+      tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = center ? "middle" : "left";
       tickLabels.selectAll("text").text((d: any) => d3.time.format(interval.formatString)(d))
                                   .style("text-anchor", anchor);
+    }
+
+    public canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean {
+      var endPosition: number;
+      var startPosition: number;
+      var width = Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
+      if (isCentered) {
+          endPosition = this._scale.scale(position) + width / 2;
+          startPosition = this._scale.scale(position) - width / 2;
+      } else {
+          endPosition = this._scale.scale(position) + width;
+          startPosition = this._scale.scale(position);
+      }
+
+      if (endPosition < this.availableWidth && startPosition > 0) {
+          return true;
+      }
+
+      return false;
     }
 
     public _doRender() {
