@@ -7,8 +7,6 @@ export module Scale {
     private pivot: number;
     private untransformedDomain: number[];
 
-    private static TICKS_PER_CLUSTER = 10;
-
     /**
      * Creates a new Scale.ModifiedLog.
      *
@@ -42,7 +40,7 @@ export module Scale {
       this.base = base;
       this.pivot = pivot;
       this.untransformedDomain = this._defaultExtent();
-      this._lastRequestedTickCount = 40;
+      this._lastRequestedTickCount = 10;
       if (pivot <= 1) {
         throw new Error("ModifiedLogScale: The pivot must be > 1");
       }
@@ -115,57 +113,51 @@ export module Scale {
       // Say your domain is [-100, 100] and your pivot is 10.
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
-      var middle = (x: number, y: number, z: number) => Math.max(x, Math.min(y, z));
-      var negativeLower = this.untransformedDomain[0];
-      var negativeUpper = middle(this.untransformedDomain[0], this.untransformedDomain[1], -this.pivot);
-      var positiveLower = middle(this.untransformedDomain[0], this.untransformedDomain[1], this.pivot);
-      var positiveUpper = this.untransformedDomain[1];
+      var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
+      var min = d3.min(this.untransformedDomain);
+      var max = d3.max(this.untransformedDomain);
+      var negativeLower = min;
+      var negativeUpper = middle(min, max, -this.pivot);
+      var positiveLower = middle(min, max, this.pivot);
+      var positiveUpper = max;
 
-      var negativeTickCount = this.howManyTicks(negativeLower, negativeUpper);
-      var positiveTickCount = this.howManyTicks(positiveLower, positiveUpper);
-      var linearTickCount = this.howManyTicks(negativeUpper, positiveLower);
+      var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
+      var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
+      var linearTicks = d3.scale.linear().domain([negativeUpper, positiveLower])
+                                         .ticks(this.howManyTicks(negativeUpper, positiveLower));
 
-      var negativeLogTicks = this.logTicks(negativeTickCount, -negativeUpper, -negativeLower)
-                                 .map((x) => -x);
-      var positiveLogTicks = this.logTicks(positiveTickCount, positiveLower, positiveUpper);
-      var linearTicks = d3.scale.linear()
-                          .domain([negativeUpper, positiveLower])
-                          .ticks(linearTickCount);
-
-      return negativeLogTicks.concat(positiveLogTicks).concat(linearTicks);
+      return negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
     }
 
     /**
-     * Return approximately count ticks from lower to upper.
+     * Return an appropriate number of ticks from lower to upper.
      *
-     * This will generate ticks in "clusters", e.g. [10, 20, 30, ... 90] would
-     * be a cluster, [100, 200, 300, ... 900] would be another cluster.
+     * This will first try to fit as many powers of this.base as it can from
+     * lower to upper.
      *
-     * Each cluster will have ModifiedLog.TICKS_PER_CLUSTER ticks.
+     * If it still has ticks after that, it will generate ticks in "clusters",
+     * e.g. [20, 30, ... 90, 100] would be a cluster, [200, 300, ... 900, 1000]
+     * would be another cluster.
      *
-     * This function will generate as many clusters as it can while not
-     * drastically exceeding count.
+     * This function will generate clusters as large as it can while not
+     * drastically exceeding its number of ticks.
      */
-    private logTicks(count: number, lower: number, upper: number): number[] {
-      if (count === 0) {
+    private logTicks(lower: number, upper: number): number[] {
+      var nTicks = this.howManyTicks(lower, upper);
+      if (nTicks === 0) {
         return [];
       }
-
-      var startLogged = Math.log(lower) / Math.log(this.base);
-      var endLogged = Math.log(upper) / Math.log(this.base);
-      var clusters = count / ModifiedLog.TICKS_PER_CLUSTER;
-      var skip = Math.max(1, Math.floor((endLogged - startLogged) / clusters));
-      var logged = d3.range(1, this.base, this.base / ModifiedLog.TICKS_PER_CLUSTER)
-                     .map((x) => Math.log(x) / Math.log(this.base));
-
-      var bases = d3.range(Math.floor(startLogged), Math.ceil(endLogged), skip);
-      var scaled = bases.map((b) => logged.map((x) => b + x * skip));
-      var flattened = Util.Methods.flatten(scaled);
-      var powed = flattened.map((x) => Math.pow(this.base, x));
-      var rounded = powed.map((x) => Number(x.toPrecision(2)));
-      var unique = Util.Methods.uniqNumbers(rounded);
-      var filtered = unique.filter((x) => lower <= x && x <= upper);
-      return filtered;
+      var startLogged = Math.floor(Math.log(lower) / Math.log(this.base));
+      var endLogged = Math.ceil(Math.log(upper) / Math.log(this.base));
+      var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
+      var nMultiples = Math.floor(nTicks / bases.length);
+      var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
+      var uniqMultiples = Util.Methods.uniqNumbers(multiples);
+      var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this.base, b - 1) * x));
+      var flattened = Util.Methods.flatten(clusters);
+      var filtered = flattened.filter((x) => lower <= x && x <= upper);
+      var sorted = filtered.sort((x, y) => x - y);
+      return sorted;
     }
 
     /**
@@ -176,15 +168,14 @@ export module Scale {
      * distance when plotted.
      */
     private howManyTicks(lower: number, upper: number): number {
-      var min = this.adjustedLog(this.untransformedDomain[0]);
-      var max = this.adjustedLog(this.untransformedDomain[1]);
+      var adjustedMin = this.adjustedLog(d3.min(this.untransformedDomain));
+      var adjustedMax = this.adjustedLog(d3.max(this.untransformedDomain));
       var adjustedLower = this.adjustedLog(lower);
       var adjustedUpper = this.adjustedLog(upper);
-      var proportion = (adjustedUpper - adjustedLower) / (max - min);
+      var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
       var ticks = Math.ceil(proportion * this._lastRequestedTickCount);
       return ticks;
     }
-
 
     public copy(): ModifiedLog {
       return new ModifiedLog(this.pivot, this.base);

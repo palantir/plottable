@@ -312,6 +312,7 @@ describe("Scales", () => {
   describe("Modified Log Scale", () => {
     var scale: Plottable.Scale.ModifiedLog;
     var pivot = 10;
+    var epsilon = 0.00001;
     beforeEach(() => {
       scale = new Plottable.Scale.ModifiedLog(pivot);
     });
@@ -326,7 +327,6 @@ describe("Scales", () => {
     });
 
     it("x = invert(scale(x))", () => {
-      var epsilon = 0.00001;
       [0, 1, pivot, 100, 0.001, -1, -0.3, -pivot, pivot - 0.001].forEach((x) => {
         assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
         assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
@@ -361,6 +361,27 @@ describe("Scales", () => {
 
       scale.updateExtent(1, "x", [-pivot * 2, pivot * 2]);
       ticks = scale.ticks();
+      var beforePivot = ticks.filter((x) => x <= -pivot);
+      var afterPivot = ticks.filter((x) => pivot <= x);
+      var betweenPivots = ticks.filter((x) => -pivot < x && x < pivot);
+      assert.operator(beforePivot.length, ">", 0, "should be ticks before -pivot");
+      assert.operator(afterPivot.length, ">", 0, "should be ticks after pivot");
+      assert.operator(betweenPivots.length, ">", 0, "should be ticks between -pivot and pivot");
+    });
+
+    it("works on inverted domain", () => {
+      scale.updateExtent(1, "x", [200, -100]);
+      var range = scale.range();
+      assert.closeTo(scale.scale(-100), range[1], epsilon);
+      assert.closeTo(scale.scale(200), range[0], epsilon);
+      var a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
+      var b = a.map((x) => scale.scale(x));
+      // should be decreasing function; reverse is sorted
+      assert.deepEqual(b.slice().reverse(), b.slice().sort((x, y) => x - y));
+
+      var ticks = scale.ticks();
+      assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
+      assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
       var beforePivot = ticks.filter((x) => x <= -pivot);
       var afterPivot = ticks.filter((x) => pivot <= x);
       var betweenPivots = ticks.filter((x) => -pivot < x && x < pivot);

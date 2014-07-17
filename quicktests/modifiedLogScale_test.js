@@ -1,11 +1,6 @@
 function makeData() {
-  var data = makeRandomData(100, 10000);
-  data.forEach(function(d) {
-    if (Math.random() < 0.5) {
-      d.x = -d.x;
-      d.y = -d.y;
-    }
-  });
+  var data = makeRandomData(100, 1e15);
+  // data.push({x: 0, y: 0});
   return data;
 }
 
