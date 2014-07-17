@@ -122,15 +122,15 @@ export module Axis {
     // returns a pair of indices [minor, major] to index into the arrays
     public getTickLevels(): number[] {
       // could also probably cache this
-      var i = 0;
+      var i = 0, j = 0;
       for(; i < Time.minorIntervals.length; i++) {
-        if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])) {
+        while (Time.minorToMajor[j] <= i) {
+          j++;
+        }
+        if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
+            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[j])) {
           break;
         }
-      }
-      var j = 0;
-      while (Time.minorToMajor[j] <= i) {
-        j++;
       }
 
       return [i, j];
