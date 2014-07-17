@@ -6,7 +6,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="shortcut icon" href="/favicon.ico" sizes="16x16 32x32" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ site.baseurl }}/favicon.ico" sizes="16x16 32x32" type="image/x-icon">
   {% unless page.title %}
   <title>Plottable.js | Palantir</title>
   {% else %}
@@ -40,7 +40,9 @@
     {% include nav.html %}
   </header><!-- /header -->
 
-  {{ content }}
+  <div id="page-content">
+    {{ content }}
+  </div>
 
   <!-- Footer -->
   <footer role="contentinfo">

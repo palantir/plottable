@@ -6,7 +6,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="shortcut icon" href="/favicon.ico" sizes="16x16 32x32" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ site.baseurl }}/favicon.ico" sizes="16x16 32x32" type="image/x-icon">
   {% unless page.title %}
   <title>Plottable.js | Palantir</title>
   {% else %}
@@ -15,13 +15,13 @@
   <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="description" content="Flexible, interactive, performant charts for the web made easy">
-  <link rel="stylesheet" href="../build/css/style.css" media="screen">
+  <link rel="stylesheet" href="{{ site.baseurl }}/build/css/style.css" media="screen">
   <!-- Modernizr -->
-  <script src="../build/js/modernizr-custom-2.8.2.min.js"></script>
+  <script src="{{ site.baseurl }}/build/js/modernizr-custom-2.8.2.min.js"></script>
 
   <!--[if lt IE 9]>
-  <script src="../build/js/respond-1.4.2.min.js"></script>
-  <link rel="stylesheet" href="../build/css/ie.css" media="screen, projection" type="text/css">
+  <script src="{{ site.baseurl }}/build/js/respond-1.4.2.min.js"></script>
+  <link rel="stylesheet" href="{{ site.baseurl }}/build/css/ie.css" media="screen, projection" type="text/css">
   <![endif]-->
 
   <!-- OpenGraph -->
@@ -36,7 +36,20 @@
     {% include nav.html %}
   </header><!-- /header -->
 
-  {{ content }}
+  <div id="page-content">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <h1>{{ page.title }}</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          {{ content }}
+        </div><!-- /.col-sm-12 -->
+      </div><!-- /.row -->
+    </div><!-- /.container -->
+  </div>
 
   <!-- Footer -->
   <footer role="contentinfo">
@@ -55,6 +68,6 @@
   </script>
   {% endif %}
 
-  <script src="../build/js/compiled.min.js"></script>
+  <script src="{{ site.baseurl }}/build/js/compiled.min.js"></script>
 </body>
 </html>
