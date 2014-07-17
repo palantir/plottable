@@ -196,7 +196,7 @@ module.exports = function(grunt) {
       },
       "tests": {
         "tasks": ["test-compile"],
-        "files": ["test/**.ts"]
+        "files": ["test/**/*.ts"]
       }
     },
     blanket_mocha: {
