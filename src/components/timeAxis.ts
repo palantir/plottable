@@ -45,10 +45,10 @@ export module Axis {
 
     // these are for major tick labels
     public static majorIntervals: ITimeInterval[] = [
-      {timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.month, step: 1, formatString: "%B %Y"},
-      {timeUnit: d3.time.year, step: 1, formatString: "%Y"}, 
-      {timeUnit: d3.time.year, step: 100000, formatString: ""} // this is essentially blank
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.month, step: 1,      formatString: "%B %Y"},
+      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"}, 
+      {timeUnit: d3.time.year,  step: 100000, formatString: ""} // this is essentially blank
     ];
 
     // first index in minor that will not map to index in major
@@ -66,9 +66,11 @@ export module Axis {
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      */
-    constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter) {
-      super(scale, orientation, formatter);
-      // going to ignore the formatter
+    constructor(scale: Scale.Time, orientation: string) {
+      if (orientation !== "top" && orientation !== "bottom") {
+        throw new Error ("Time axis is only supported for horizontal axis");
+      }
+      super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
      }
@@ -176,7 +178,7 @@ export module Axis {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = center ? 0 : this.tickLabelPadding();
-      tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ?
+      tickLabels.selectAll("text").attr("transform", "translati(" + xTranslate + "," + (this._orientation === "bottom" ?
           (this.tickLength() / (2 - height + 1)) :
           (this.availableHeight - this.tickLength() / (2 - height + 1))) + ")");
       tickLabels.exit().remove();

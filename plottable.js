@@ -4645,10 +4645,11 @@ var Plottable;
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
-            function Time(scale, orientation, formatter) {
-                _super.call(this, scale, orientation, formatter);
-
-                // going to ignore the formatter
+            function Time(scale, orientation) {
+                if (orientation !== "top" && orientation !== "bottom") {
+                    throw new Error("Time axis is only supported for horizontal axis");
+                }
+                _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
@@ -4764,7 +4765,7 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = center ? 0 : this.tickLabelPadding();
-                tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ? (this.tickLength() / (2 - height + 1)) : (this.availableHeight - this.tickLength() / (2 - height + 1))) + ")");
+                tickLabels.selectAll("text").attr("transform", "translati(" + xTranslate + "," + (this._orientation === "bottom" ? (this.tickLength() / (2 - height + 1)) : (this.availableHeight - this.tickLength() / (2 - height + 1))) + ")");
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d) {
                     return "translate(" + _this._scale.scale(d) + ",0)";

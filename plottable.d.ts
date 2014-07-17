@@ -1735,7 +1735,7 @@ declare module Plottable {
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
-            constructor(scale: Scale.Time, orientation: string, formatter?: Abstract.Formatter);
+            constructor(scale: Scale.Time, orientation: string);
             public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
             public getTickLevels(): number[];
             public canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean;
