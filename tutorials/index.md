@@ -52,12 +52,6 @@ plot. Cell (1,0) is empty.
 In JavaScript, we represent this table as an array of arrays of
 components like, `[[yAxis, line], [null, xAxis]]`.
 
-If we wanted to add another data set with its own y-axis, we simply add
-another column to the table and merge that data into a component group.
-Cell (0,2) now holds the other y-axis and cell (1,2) is empty.
-
-![]({{ site.baseurl }}/build/images/tutorials/tablePlotConcept2.png)
-
 Because you can nest tables within other tables, you can imagine that
 there are many ways to layout a complicated chart. For example, you can
 have four tables nested inside one larger table. In this case, cell
@@ -137,16 +131,11 @@ our script that draws the chart.
     {% endhighlight %}
 
 2.  Once we've specified the Scale, we need to set the axes' locations.
-    Again, we need two variables, an `xAxis` and a `yAxis` and we set
-    each of those equal to `XAxis` and `YAxis` objects.
-    1.  The `XAxis` class creates a horizontal Axis. Its constructor
-        requires a Scale (in this case we use the xScale variable that
-        we just created) and a String denoting the orientation. In this
-        case, we will use a standard bottom orientation for the x-axis.
-    2.  The `YAxis` class creates a vertical Axis. Its constructor
-        requires a Scale (in this case we use the yScale variable that
-        we just created) and a String denoting the orientation. In this
-        case, we will use a standard left orientation for the y-axis.
+    Again, we need two variables, an `xAxis` and a `yAxis`.
+    The `Axis.Numeric` class creates an axis for displaying numeric data. Its constructor
+    requires a Scale (in this case we use the xScale variable that
+    we just created) and a String denoting the orientation. In this
+    case, we will use a standard bottom orientation for the x-axis.
 
         {% highlight javascript %}
         function makeBasicChart() {
@@ -603,14 +592,14 @@ x-axis for each subplot.
     {% highlight javascript %}
     function makeChartWithSubplots() {
       var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
       var lineYScale = new Plottable.Scale.Linear();
-      var lineYAxis = new Plottable.Axis.YAxis(lineYScale, "left");
+      var lineYAxis = new Plottable.Axis.Numeric(lineYScale, "left");
       var linePlot = new Plottable.Plot.Line(gitData, xScale, lineYScale);
 
       var circleYScale = new Plottable.Scale.Linear();
-      var circleYAxis = new Plottable.Axis.YAxis(circleYScale, "left");
+      var circleYAxis = new Plottable.Axis.Numeric(circleYScale, "left");
       var circlePlot = new Plottable.Plot.Scatter(gitData, xScale, circleYScale);
 
       function getDayValue(d) {
