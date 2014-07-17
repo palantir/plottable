@@ -3,8 +3,8 @@
 module Plottable {
 export module Template {
   export class StandardChart extends Component.Table {
-      private _xAxis: Axis.XAxis;
-      private _yAxis: Axis.YAxis;
+      private _xAxis: Abstract.Axis;
+      private _yAxis: Abstract.Axis;
       private _xLabel: Component.AxisLabel;
       private _yLabel: Component.AxisLabel;
       private centerComponent: Abstract.Component;
@@ -26,9 +26,9 @@ export module Template {
       }
 
 
-      public yAxis(y: Axis.YAxis): StandardChart;
-      public yAxis(): Axis.YAxis;
-      public yAxis(y?: any): any {
+      public yAxis(y: Abstract.Axis): StandardChart;
+      public yAxis(): Abstract.Axis;
+      public yAxis(y?: Abstract.Axis): any {
         if (y != null) {
           if (this._yAxis != null) {
             throw new Error("yAxis already assigned!");
@@ -41,9 +41,9 @@ export module Template {
         }
       }
 
-      public xAxis(x: Axis.XAxis): StandardChart;
-      public xAxis(): Axis.XAxis;
-      public xAxis(x?: any): any {
+      public xAxis(x: Abstract.Axis): StandardChart;
+      public xAxis(): Abstract.Axis;
+      public xAxis(x?: Abstract.Axis): any {
         if (x != null) {
           if (this._xAxis != null) {
             throw new Error("xAxis already assigned!");
@@ -63,7 +63,7 @@ export module Template {
       if (y != null) {
         if (this._yLabel != null) {
           if (typeof(y) === "string") {
-            this._yLabel.setText(y);
+            this._yLabel.text(y);
             return this;
           } else {
             throw new Error("yLabel already assigned!");
@@ -87,7 +87,7 @@ export module Template {
       if (x != null) {
         if (this._xLabel != null) {
           if (typeof(x) === "string") {
-            this._xLabel.setText(x);
+            this._xLabel.text(x);
             return this;
           } else {
             throw new Error("xLabel already assigned!");
@@ -111,7 +111,7 @@ export module Template {
       if (x != null) {
         if (this._titleLabel != null) {
           if (typeof(x) === "string") {
-            this._titleLabel.setText(x);
+            this._titleLabel.text(x);
             return this;
           } else {
             throw new Error("titleLabel already assigned!");

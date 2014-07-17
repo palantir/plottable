@@ -4,8 +4,6 @@ module Plottable {
 export module Plot {
   export class Area extends Line {
     private areaPath: D3.Selection;
-    private constantBaseline: number = null;
-    private previousBaseline: number = null;
 
     /**
      * Creates an AreaPlot.
@@ -20,6 +18,7 @@ export module Plot {
       this.classed("area-renderer", true);
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
+      this.project("fill-opacity", () => 0.5); // default
       this.project("stroke", () => "none"); // default
       this._animators["area-reset"] = new Animator.Null();
       this._animators["area"]       = new Animator.Default()
@@ -47,21 +46,15 @@ export module Plot {
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;
       var extent:  number[] = y0Accessor != null ? this.dataSource()._getExtent(y0Accessor) : [];
-      if (extent.length === 2 && extent[0] === extent[1]) {
-        this.constantBaseline = extent[0];
-      } else {
-        this.constantBaseline = null;
-      }
+      var constantBaseline = (extent.length === 2 && extent[0] === extent[1]) ? extent[0] : null;
 
-      if (!scale._userSetDomainer && this.constantBaseline !== this.previousBaseline) {
-        if (this.previousBaseline != null) {
-          scale.domainer().paddingException(this.previousBaseline, false);
-          this.previousBaseline = null;
+      if (!scale._userSetDomainer) {
+        if (constantBaseline != null) {
+          scale.domainer().addPaddingException(constantBaseline, "AREA_PLOT+" + this._plottableID);
+        } else {
+          scale.domainer().removePaddingException("AREA_PLOT+" + this._plottableID);
         }
-        if (this.constantBaseline != null) {
-          scale.domainer().paddingException(this.constantBaseline, true);
-          this.previousBaseline = this.constantBaseline;
-        }
+        // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         scale._autoDomainIfAutomaticMode();
       }
       return this;
@@ -73,6 +66,10 @@ export module Plot {
         this._updateYDomainer();
       }
       return this;
+    }
+
+    public _getResetYFunction() {
+      return this._generateAttrToProjector()["y0"];
     }
 
     public _paint() {
@@ -91,7 +88,7 @@ export module Plot {
         attrToProjector["d"] = d3.svg.area()
           .x(xFunction)
           .y0(y0Function)
-          .y1(y0Function);
+          .y1(this._getResetYFunction());
         this._applyAnimatedAttributes(this.areaPath, "area-reset", attrToProjector);
       }
 

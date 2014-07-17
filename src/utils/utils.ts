@@ -109,6 +109,25 @@ export module Util {
       }
       return true;
     }
+
+    /**
+     * @param {any} a Object to check against b for equality.
+     * @param {any} b Object to check against a for equality.
+     *
+     * @returns {boolean} whether or not two objects share the same keys, and 
+     *          values associated with those keys. Values will be compared
+     *          with ===.
+     */
+    export function objEq(a: any, b: any): boolean {
+      if (a == null || b == null) {
+        return a === b;
+      }
+      var keysA = Object.keys(a).sort();
+      var keysB = Object.keys(b).sort();
+      var valuesA = keysA.map((k) => a[k]);
+      var valuesB = keysB.map((k) => b[k]);
+      return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+    }
   }
 }
 }

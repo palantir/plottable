@@ -1,10 +1,10 @@
 function makeBarChart() {
-  var xScale = new Plottable.Scale.Ordinal().rangeType("bands");
+  var xScale = new Plottable.Scale.Ordinal();
   var yScale = new Plottable.Scale.Linear();
 
-  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", function(d) { return d; });
-  var yAxis = new Plottable.Axis.YAxis(yScale, "left");
-  var renderer = new Plottable.Plot.Bar(barData, xScale, yScale)
+  var xAxis = new Plottable.Axis.Category(xScale, "bottom", function(d) { return d; });
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var renderer = new Plottable.Plot.VerticalBar(barData, xScale, yScale)
                               .project("x", "category", xScale)
                               .project("y", "value", yScale)
                               .project("fill", function() { return "steelblue"; } );

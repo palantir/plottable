@@ -24,6 +24,10 @@ export module Scale {
     public copy(): Log {
       return new Log(this._d3Scale.copy());
     }
+
+    public _defaultExtent(): number[] {
+      return [1, 10];
+    }
   }
 }
 }

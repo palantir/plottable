@@ -17,6 +17,7 @@ export module Component {
      */
     constructor(xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale) {
       super();
+      if (xScale == null && yScale == null) {throw new Error("Gridlines must have at least one scale");}
       this.classed("gridlines", true);
       this.xScale = xScale;
       this.yScale = yScale;
@@ -26,6 +27,17 @@ export module Component {
       if (this.yScale != null) {
         this.yScale.broadcaster.registerListener(this, () => this._render());
       }
+    }
+
+    public remove() {
+      super.remove();
+      if (this.xScale != null) {
+        this.xScale.broadcaster.deregisterListener(this);
+      }
+      if (this.yScale != null) {
+        this.yScale.broadcaster.deregisterListener(this);
+      }
+      return this;
     }
 
     public _setup() {
