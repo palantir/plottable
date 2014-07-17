@@ -34,7 +34,7 @@ Plottable Concepts
 
 Each Plottable chart consists of three main pieces:
 
--   SVG element - an HTML5 scalable vector graphic tag that Plottable
+-   [SVG](http://en.wikipedia.org/wiki/Scalable_vector_Graphics) element - an HTML5 scalable vector graphic tag that Plottable
     draws the chart into.
 -   Table - a grid-based layout engine that handles positioning, sizing,
     and alignment of components.
@@ -122,13 +122,12 @@ our script that draws the chart.
 
 1.  First we need to specify the scales. Plottable uses Scales to
     determine how to draw things to the screen. A Scale takes the data
-    values (the domain) and maps them to visual properties, such as
+    values (which determine the domain) and maps them to
     pixel values (the range). This is important because certain objects,
     such as axes and plots, need to be drawn to the same scale in order
-    to provide meaning to the chart.  
-    To specify a Scale in this example, we create two variables, an
-    `xScale` and a `yScale` and set each of them to a linear scale
-    (Linear is a Plottable object). Your code should look like:
+    to provide meaning to the chart.
+    To specify a Scale in this example, we create two linear scales, named `xScale` and `yScale`.
+    Your code should look like:
 
     {% highlight javascript %}
     function makeBasicChart() {
@@ -161,8 +160,7 @@ our script that draws the chart.
 
 3.  Next we need to create the plot. In this case we want a line chart
     so we'll need the Line class. Line requires the following
-    parameters: the dataset to plot, an x scale and a y scale. Scales
-    show the pixel value that each piece of data corresponds to.
+    parameters: the dataset to plot, an x scale and a y scale.
 
     {% highlight javascript %}
     function makeBasicChart() {
@@ -259,7 +257,7 @@ Tutorial 2 - Customization with Projectors
 Plots work by taking each point of data and determining what it needs to
 do to draw that piece of data. Each type of plot has a specific set of
 visual properties, or **attributes**. For example, a Scatterplot has
-attributes, x, y, fill, and radius. A Line plot has x and y.
+attributes, x, y, fill, and radius. A Line plot has x, y, and stroke, which determines the color.
 
 If your JavaScript data object already has the correct property names,
 then you do not need to specify the data; Plottable picks it up
@@ -339,7 +337,7 @@ that while the code is slightly different, we are really just accessing
 data in a different way, so the resulting chart will look the same as
 the one we previously created.
 
-1.  As in the BasicChart example above, we start with the hmtl file. The
+1.  As in the BasicChart example above, we start with the html file. The
     only difference from the previous example is that we are using a
     different data file and the name of our javascript file is specific
     to this example.
@@ -677,12 +675,7 @@ tutorials. We create axes, scales, plots, and projectors before putting
 everything into a table to create the chart. The new piece for this
 example are nested tables, and use of the Label class.
 
-The Label constructor requires a string for the title, and offers an
-optional parameter for the title's orientation. Options for orientation
-include horizontal, vertical-left, which indicates that the title is
-rotated counterclockwise, meaning it is oriented such that the bottom of
-the word is facing right, and vertical-right, which indicates the word
-is rotated clockwise.
+The Label constructor requires a string for the title, and offers an optional parameter for the title's orientation. Options for orientation include horizontal, vertical-left, which indicates that the title is rotated counterclockwise 90 degrees, and vertical-right, which indicates the word is rotated clockwise 90 degrees.
 
 For this tutorial we will create a title, centered over the chart.
 
@@ -864,7 +857,7 @@ wordWrapData = [
   {
     y: "United States of America",
     x: 313
-  },  
+  },
   {
     y: "Indonesia",
     x: 247
@@ -899,7 +892,7 @@ As always, we start with the html code:
 
 The majority of the code in `makeBarChart.js` follows what we did in
 previous tutorials. We create axes, scales, plots, and projectors before
-putting everything into a table to create the chart. The new pieces for
+putting everything into a table to create the chart. The new classes used in
 this example are Ordinal scales and HorizontalBar.
 
 As always, we start by defining our scales. Here, since this is a
