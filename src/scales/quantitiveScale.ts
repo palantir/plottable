@@ -51,7 +51,7 @@ export module Abstract {
     public _setDomain(values: any[]) {
         var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
         if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-            console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            Utils.Methods.warn("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
             return;
         }
         super._setDomain(values);

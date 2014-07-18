@@ -22,6 +22,19 @@ var Plottable;
             }
             Methods.inRange = inRange;
 
+            /** Print a warning message to the console, if it is available.
+            *
+            * @params {any} The warnings to print
+            */
+            function warn(warning) {
+                /* tslint:disable:no-console */
+                if (window.console) {
+                    console.log(warning);
+                }
+                /* tslint:enable:no-console */
+            }
+            Methods.warn = warn;
+
             /**
             * Takes two arrays of numbers and adds them together
             *

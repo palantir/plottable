@@ -16,6 +16,18 @@ export module Util {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
     }
 
+    /** Print a warning message to the console, if it is available.
+     *
+     * @params {any} The warnings to print
+     */
+    export function warn(warning: string) {
+      /* tslint:disable:no-console */
+      if ((<any> window).console != null) {
+        console.log(warning);
+      }
+      /* tslint:enable:no-console */
+    }
+
     /**
      * Takes two arrays of numbers and adds them together
      *
@@ -114,7 +126,7 @@ export module Util {
      * @param {any} a Object to check against b for equality.
      * @param {any} b Object to check against a for equality.
      *
-     * @returns {boolean} whether or not two objects share the same keys, and 
+     * @returns {boolean} whether or not two objects share the same keys, and
      *          values associated with those keys. Values will be compared
      *          with ===.
      */
