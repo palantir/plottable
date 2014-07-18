@@ -3359,22 +3359,23 @@ describe("Domainer", function () {
         assert.deepEqual(scale.domain(), [90, 210]);
     });
 
-    // it("pad() works for date scales", () => {
-    //   var timeScale = new Plottable.Scale.Time();
-    //   var f = d3.time.format("%x");
-    //   var d1 = f.parse("06/02/2014");
-    //   var d2 = f.parse("06/03/2014");
-    //   timeScale.updateExtent(1, "x", [d1, d2]);
-    //   timeScale.domainer(new Plottable.Domainer().pad());
-    //   var dd1 = timeScale.domain()[0];
-    //   var dd2 = timeScale.domain()[1];
-    //   assert.isDefined(dd1.toDateString, "padDomain produced dates");
-    //   assert.isNotNull(dd1.toDateString, "padDomain produced dates");
-    //   assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
-    //   assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-    //   assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-    //   assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
-    // });
+    it("pad() works for date scales", function () {
+        var timeScale = new Plottable.Scale.Time();
+        var f = d3.time.format("%x");
+        var d1 = f.parse("06/02/2014");
+        var d2 = f.parse("06/03/2014");
+        timeScale.updateExtent(1, "x", [d1, d2]);
+        timeScale.domainer(new Plottable.Domainer().pad());
+        var dd1 = timeScale.domain()[0];
+        var dd2 = timeScale.domain()[1];
+        assert.isDefined(dd1.toDateString, "padDomain produced dates");
+        assert.isNotNull(dd1.toDateString, "padDomain produced dates");
+        assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
+        assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
+        assert.equal(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
+        assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
+    });
+
     it("pad() works on log scales", function () {
         var logScale = new Plottable.Scale.Log();
         logScale.updateExtent(1, "x", [10, 100]);
@@ -3398,18 +3399,20 @@ describe("Domainer", function () {
         assert.deepEqual(domain, [4, 6]);
     });
 
-    // it("pad() defaults to [v-1 day, v+1 day] if there's only one date value", () => {
-    //   var d = new Date(2000, 5, 5);
-    //   var dayBefore = new Date(2000, 5, 4);
-    //   var dayAfter = new Date(2000, 5, 6);
-    //   var timeScale = new Plottable.Scale.Time();
-    //   // the result of computeDomain() will be number[], but when it
-    //   // gets fed back into timeScale, it will be adjusted back to a Date.
-    //   // That's why I'm using updateExtent() instead of domainer.computeDomain()
-    //   timeScale.updateExtent(1, "x", [d, d]);
-    //   timeScale.domainer(new Plottable.Domainer().pad());
-    //   assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
-    // });
+    it("pad() defaults to [v-1 day, v+1 day] if there's only one date value", function () {
+        var d = new Date(2000, 5, 5);
+        var dayBefore = new Date(2000, 5, 4);
+        var dayAfter = new Date(2000, 5, 6);
+        var timeScale = new Plottable.Scale.Time();
+
+        // the result of computeDomain() will be number[], but when it
+        // gets fed back into timeScale, it will be adjusted back to a Date.
+        // That's why I'm using updateExtent() instead of domainer.computeDomain()
+        timeScale.updateExtent(1, "x", [d, d]);
+        timeScale.domainer(new Plottable.Domainer().pad());
+        assert.deepEqual(timeScale.domain(), [dayBefore, dayAfter]);
+    });
+
     it("pad() only takes the last value", function () {
         domainer.pad(1000).pad(4).pad(0.1);
         var domain = domainer.computeDomain([[100, 200]], scale);
@@ -3438,17 +3441,18 @@ describe("Domainer", function () {
         assert.notEqual(domain[1], 200, "unregistered paddingExceptions can be removed using boolean argument");
     });
 
-    // it("paddingException(n) works on dates", () => {
-    //   var a = new Date(2000, 5, 5);
-    //   var b = new Date(2003, 0, 1);
-    //   domainer.pad().addPaddingException(a);
-    //   var timeScale = new Plottable.Scale.Time();
-    //   timeScale.updateExtent(1, "x", [a, b]);
-    //   timeScale.domainer(domainer);
-    //   var domain = timeScale.domain();
-    //   assert.deepEqual(domain[0], a);
-    //   assert.isTrue(b < domain[1]);
-    // });
+    it("paddingException(n) works on dates", function () {
+        var a = new Date(2000, 5, 5);
+        var b = new Date(2003, 0, 1);
+        domainer.pad().addPaddingException(a);
+        var timeScale = new Plottable.Scale.Time();
+        timeScale.updateExtent(1, "x", [a, b]);
+        timeScale.domainer(domainer);
+        var domain = timeScale.domain();
+        assert.deepEqual(domain[0], a);
+        assert.isTrue(b < domain[1]);
+    });
+
     it("include(n) works an expected", function () {
         domainer.addIncludedValue(5);
         var domain = domainer.computeDomain([[0, 10]], scale);
@@ -3478,17 +3482,18 @@ describe("Domainer", function () {
         assert.deepEqual(domain, [-100, 5], "unregistered includedValues can be removed with addOrRemove argument");
     });
 
-    // it("include(n) works on dates", () => {
-    //   var a = new Date(2000, 5, 4);
-    //   var b = new Date(2000, 5, 5);
-    //   var c = new Date(2000, 5, 6);
-    //   var d = new Date(2003, 0, 1);
-    //   domainer.addIncludedValue(b);
-    //   var timeScale = new Plottable.Scale.Time();
-    //   timeScale.updateExtent(1, "x", [c, d]);
-    //   timeScale.domainer(domainer);
-    //   assert.deepEqual(timeScale.domain(), [b, d]);
-    // });
+    it("include(n) works on dates", function () {
+        var a = new Date(2000, 5, 4);
+        var b = new Date(2000, 5, 5);
+        var c = new Date(2000, 5, 6);
+        var d = new Date(2003, 0, 1);
+        domainer.addIncludedValue(b);
+        var timeScale = new Plottable.Scale.Time();
+        timeScale.updateExtent(1, "x", [c, d]);
+        timeScale.domainer(domainer);
+        assert.deepEqual(timeScale.domain(), [b, d]);
+    });
+
     it("exceptions are setup properly on an area plot", function () {
         var xScale = new Plottable.Scale.Linear();
         var yScale = new Plottable.Scale.Linear();
