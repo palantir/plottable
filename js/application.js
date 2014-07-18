@@ -15,6 +15,7 @@ Modernizr.addTest('retina', function() {
 
 (function(window, document, undefined) {
   'use strict';
-
-
+  $(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
 })(window, window.document);

@@ -13,6 +13,8 @@ module.exports = function(grunt) {
           'js/bootstrap/transition.js',
           'js/bootstrap/collapse.js',
           'js/bootstrap/dropdown.js',
+          'js/bootstrap/tooltip.js',
+          'js/bootstrap/scrollspy.js',
           // include our application.js
           'js/application.js'
         ],

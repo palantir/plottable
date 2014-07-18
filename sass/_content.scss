@@ -2,51 +2,15 @@
 // Content: Page styles should be defined here
 // -------------------------------------------
 
-/*
- * Header
- */
+div#example-chart-1-source-wrapper {
+  margin-top: 4em;
+}
+
 header {
-  .no-retina & { background: $COLOR_BLUE2 repeat url(../images/background-pattern.png) center top; }
-  .retina & { background: $COLOR_BLUE2 repeat url(../images/background-pattern@2x.png) center top; }
-  padding-top: 1em;
-  color: $COLOR_BLUE1;
-
-  h1.logo {
-    text-align: center;
-    margin: 0 auto;
-    width: 119px;
-    height: 31px;
-
-    a {
-      @include transition-property(opacity);
-      @include transition-duration($transition-duration);
-      @include opacity(1);
-
-      display: block;
-      text-indent: 9999px;
-      overflow: hidden;
-      background-repeat: no-repeat;
-      .no-svg & { background-image: url(../images/palantir-logo.png); }
-      .svg & { background-image: url(../images/palantir-logo.svg); }
-
-      .no-touch &:hover {
-        @include opacity(0.4);
-      }
-    }
-  }
-
-  div.navbar-collapse {
-    border: none;
-    text-align: center;
-
-    @media (min-width: $screen-md-min) {
-      margin-top: 10px;
-    }
-  }
-
   .navbar {
     background: transparent;
     border: none;
+    text-align: center;
 
     button.navbar-toggle {
       margin-top: -2em;
@@ -73,25 +37,32 @@ header {
     color: $COLOR_WHITE1;
 
     a {
-      padding: 4px;
-      @include transition-property(opacity);
+      display: inline-block;
+      border-top: 2px solid transparent;
+      padding: 4px 0;
+      margin: 0 8px;
+      @include transition-property(color, border-color);
       @include transition-duration($transition-duration);
       @include opacity(1);
-      color: $COLOR_GRAY1;
+      color: $COLOR_ORANGE1;
 
       .no-touch &:hover {
-        color: $COLOR_GRAY1;
-        @include opacity(0.4);
+        border-color: $COLOR_ORANGE2;
+        color: $COLOR_ORANGE2;
       }
+
+
     }
 
-    &.separator {
-      display: none;
-      color: $COLOR_WHITE1;
+    &.active a,
+    &.active a:hover {
+      color: $COLOR_ORANGE1;
+      border-color: $COLOR_ORANGE1;
+      background: transparent;
     }
   }
 
-  @media (min-width: $screen-md-min) {
+  @media (min-width: $screen-sm-min) {
     .navbar .nav,
     .navbar .nav > li {
       float: none;
@@ -107,148 +78,223 @@ header {
       text-align: center;
     }
   }
-
-  h1 {
-    text-align: center;
-    font-weight: $font-weight-bold;
-    @include rem(font-size, 36px);
-
-    small {
-      margin-top: 1em;
-      @include rem(font-size, 10px);
-      color: $COLOR_BLUE1;
-      text-transform: none;
-      font-family: $font-body;
-      display: block;
-      text-align: center;
-    }
-
-    @media (min-width: $screen-md-min) {
-      margin-top: 60px;
-      @include rem(font-size, 72px);
-
-      small {
-        @include rem(font-size, 20px);
-      }
-    }
-  }
-
-  div#global-download, p {
-    position: relative;
-    z-index: 100;
-    text-align: center;
-  }
-
-  div#global-download {
-    margin-top: 4em;
-    > a:hover {
-      color: $COLOR_BLUE1;
-      border-color: $COLOR_BLUE1;
-      @include opacity(0.4);
-    }
-  }
-
-  p {
-    color: $COLOR_BLUE1;
-    margin-top: 2em;
-
-    > a {
-      font-weight: $font-weight-bold;
-      color: $COLOR_BLUE1;
-      @include transition-property(opacity);
-      @include transition-duration($transition-duration);
-      @include opacity(1);
-
-      .no-touch &:hover {
-        @include opacity(0.4);
-        color: $COLOR_BLUE1;
-      }
-    }
-  }
-
 }
-
-
-div#chart-separator {
-  position: relative;
-  z-index: 0;
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-size: cover;
-  background-color: transparent;
-  width: 100%;
-  margin-top: -10%;
-  .no-svg & { background-image: url(../images/plot-background.png); }
-  .svg & { background-image: url(../images/plot-background.svg); }
-
-  img {
-    width: 100%;
-
-    .no-svg &.svg { display: none; }
-    .svg &.no-svg { display: none; }
-  }
-}
-
 
 /*
- * Section
+ * Homepage
  */
-section {
-  text-align: center;
-  width: 100%;
-  margin: 4em 0;
+body#page-index {
 
-  div.content {
-    max-width: 586px;
-    margin: 0 auto 4em auto;
-    h2 {
-      @include rem(font-size, 32px);
-      font-weight: $font-weight-normal;
+  header {
+    height: 100%;
+    background: $COLOR_BLUE2;
+    color: $COLOR_BLUE1;
+
+    h1 {
+      text-align: center;
+      font-weight: $font-weight-bold;
+      @include rem(font-size, 36px);
+
+      small {
+        margin-top: 1em;
+        @include rem(font-size, 10px);
+        color: $COLOR_WHITE1;
+        text-transform: none;
+        font-family: $font-body;
+        display: block;
+        text-align: center;
+      }
+
+      @media (min-width: $screen-md-min) {
+        margin-top: 60px;
+        @include rem(font-size, 72px);
+
+        small {
+          @include rem(font-size, 20px);
+        }
+      }
     }
 
     p {
       margin: 2em 0;
+      color: $COLOR_BLUE1;
+      font-weight: $font-weight-normal;
+
+      a {
+        color: $COLOR_BLUE1;
+        font-weight: $font-weight-bold;
+
+        .no-touch &:hover {
+          @include opacity(0.6);
+        }
+      }
     }
-  }
 
-  &#section-built-on-d3 {
-    background-color: $COLOR_BLUE3;
-    color: $COLOR_WHITE1;
-    padding-bottom: 1em;
-    margin: 0;
+    div#nav-content {
+      position: relative;
+      z-index: 1;
+    }
 
-    h2 {
-      margin-top: 0;
+    div#chart-separator {
+      position: absolute;
+      z-index: 0;
       background-repeat: no-repeat;
-      padding-top: 64px;
-      background-position: center top;
-      background-size: 46px 44px;
+      background-position: top center;
+      background-size: 100%;
+      background-color: $COLOR_BLUE3;
+      width: 100%;
+      bottom: 0;
+      height: 600px;
+      padding-bottom: 200px;
 
-      .no-retina & { background-image: url(../images/d3-logo.png); }
-      .retina & { background-image: url(../images/d3-logo@2x.png); }
-    }
+      .no-svg & { background-image: url(../images/plot-background.png); }
+      .svg & { background-image: url(../images/plot-background.svg); }
 
-    p {
-      color: $COLOR_WHITE1;
-      @include rem(font-size, 24px);
-    }
-  }
+      div#global-download {
+        margin-top: 4em;
+        width: 100%;
+        position: absolute;
+        text-align: center;
+        bottom: 50px;
 
-  &#section-easier-more-usable {
-    div#plot-separator {
-      margin: 1em 0;
-      img {
-        max-width: 100%;
-        .no-svg &.svg { display: none; }
-        .svg &.no-svg { display: none; }
+        & > a {
+          color: $COLOR_WHITE1;
+          border-color: $COLOR_WHITE1;
+
+          .no-touch &:hover {
+            @include opacity(0.6);
+          }
+        }
+
       }
     }
   }
+
+  section {
+    width: 100%;
+    height: 100%;
+    display: table;
+
+    > div.content {
+      display: table-cell;
+      height: 100%;
+      vertical-align: middle;
+    }
+
+
+    &#section-built-on-d3 {
+      background: $COLOR_BLUE2;
+      color: $COLOR_BLACK1;
+      h2 {
+        margin-top: 0;
+        background-repeat: no-repeat;
+        padding-top: 64px;
+        background-position: left top;
+        background-size: 46px 44px;
+
+        .no-retina & { background-image: url(../images/d3-logo.png); }
+        .retina & { background-image: url(../images/d3-logo@2x.png); }
+      }
+    }
+
+    &#section-easier-more-usable {
+      background: $COLOR_BLUE3;
+      color: $COLOR_WHITE1;
+
+      h2 {
+        text-align: center;
+        margin-bottom: 1em;
+      }
+
+      p {
+        color: $COLOR_WHITE1;
+      }
+
+      div#plot-separator {
+        margin: 4em 0;
+        img {
+          max-width: 100%;
+          .no-svg &.svg { display: none; }
+          .svg &.no-svg { display: none; }
+        }
+      }
+    }
+
+  }
+
 }
 
 
-div#example-chart-1-source-wrapper {
-  margin-top: 4em;
+/*
+ * Sticky nav for homepage
+ */
+div#page-nav {
+  position: fixed;
+  top: 0;
+  right: 20px;
+  display: none;
+  height: 100%;
+
+  @media (min-width: $screen-sm-min) {
+    display: table;
+  }
+
+  nav {
+    display: table-cell;
+    vertical-align: middle;
+    height: 100%;
+
+    ul.nav {
+      list-style: none;
+
+      li {
+        margin-top: 10px;
+
+        &:first-child {
+          margin-top: 0;
+        }
+
+        a {
+          @include transition-property(background, border);
+          @include transition-duration(200ms, 200ms);
+          display: block;
+          width:  14px;
+          height: 14px;
+          @include border-radius(2px);
+          text-indent: -9999px;
+          overflow: hidden;
+          background: #4BB5E2;
+          border: 1px solid rgba(255,255,255,0.54);
+          padding: 0;
+        }
+
+        .no-touch a:hover,
+        &.active a {
+          /* Rectangle 11: */
+          background: #FF9E1B;
+          border: 1px solid #FFFFFF;
+        }
+
+        div.tooltip {
+          white-space: nowrap;
+          div.tooltip-arrow {
+            border-left-color: $COLOR_ORANGE1;
+          }
+          div.tooltip-inner {
+            background-color: $COLOR_ORANGE1;
+            text-transform: uppercase;
+            font-family: $font-headers;
+            color: $COLOR_ORANGE2;
+            font-weight: $font-weight-bold;
+            box-shadow: 0 1px 0 $COLOR_ORANGE2;
+            @include rem(font-size, 14px);
+            padding: 4px 8px;
+          }
+        }
+      }
+    }
+
+  }
 }
 
 
@@ -275,3 +321,8 @@ footer {
     }
   }
 }
+
+
+/*
+ * Generic page
+ */

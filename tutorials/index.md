@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Tutorials
+page_id: page-tutorials
 ---
 Get started with the Plottable Tutorial: Download the packaged tutorial
 files at <https://palantir.github.io/plottable/tutorials.zip>; extract
@@ -10,24 +11,14 @@ associated \`.js\` files with your favorite text editor. Alternatively,
 you can clone the entire repository from
 <https://github.com/palantir/plottable>.
 
-[Plottable Concepts](#Plottable-PlottableConcepts)
-
-[Using Plottable](#Plottable-UsingPlottable)
-
-[Tutorial 1 - Creating a Basic
-Chart](#Plottable-Tutorial1CreatingaBasicChart)
-
-[Tutorial 2 - Customization with
-Projectors](#Plottable-Tutorial2CustomizationwithProjectors)
-
--   [Projection and Accessors](#Plottable-ProjectionandAccessors)
-
-[Tutorial 3 - Flexible Layout](#Plottable-Tutorial3FlexibleLayout)
-
-[Tutorial 4 - Labels and Nested
-Tables](#Plottable-Tutorial4LabelsandNestedTables)
-
-[Tutorial 5 - Bars](#Plottable-Tutorial5Bars)
+- [Plottable Concepts](#plottable-concepts)
+- [Using Plottable](#using-plottable)
+  - [Tutorial 1 - Creating a Basic Chart](#tutorial-1---creating-a-basic-chart)
+  - [Tutorial 2 - Customization with Projectors](#Plottable-Tutorial2CustomizationwithProjectors)
+    - [Projection and Accessors](#Plottable-ProjectionandAccessors)
+  - [Tutorial 3 - Flexible Layout](#Plottable-Tutorial3FlexibleLayout)
+  - [Tutorial 4 - Labels and Nested Tables](#Plottable-Tutorial4LabelsandNestedTables)
+  - [Tutorial 5 - Bars](#Plottable-Tutorial5Bars)
 
 Plottable Concepts
 ==================

@@ -3,31 +3,14 @@
   <div class="container-fluid">
 
     <div>
-      <!-- Logo -->
-      <h1 id="site-name" class="logo">
-        <a id="logo-svg" href="https://palantir.com/" title="Palantir Technologies">Palantir</a>
-      </h1>
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-    </div>
-
-    <div class="collapse navbar-collapse" id="main-navbar">
       <ul class="nav navbar-nav">
-        <li><a href="{{ site.baseurl }}/">Overview</a></li>
-        <li class="separator">•</li>
-        <li><a href="#">API</a></li>
-        <li class="separator">•</li>
-        <li><a href="#">Documentation</a></li>
-        <li class="separator">•</li>
-        <li><a href="{{ site.baseurl }}/tutorials/">Tutorials</a></li>
-        <li class="separator">•</li>
-        <li><a href="{{ site.baseurl }}/examples/">Examples</a></li>
+        <li{% if page.page_id == 'page-overview' %} class="active"{% endif %}><a href="{{ site.baseurl }}/">Overview</a></li>
+        <li{% if page.page_id == 'page-api' %} class="active"{% endif %}><a href="#">API</a></li>
+        <li{% if page.page_id == 'page-doc' %} class="active"{% endif %}><a href="#">Documentation</a></li>
+        <li{% if page.page_id == 'page-tutorials' %} class="active"{% endif %}><a href="{{ site.baseurl }}/tutorials/">Tutorials</a></li>
+        <li{% if page.page_id == 'page-examples' %} class="active"{% endif %}><a href="{{ site.baseurl }}/examples/">Examples</a></li>
       </ul>
-    </div><!-- /.navbar-collapse -->
+    </div>
 
   </div><!-- /.container-fluid -->
 </nav>

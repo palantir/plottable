@@ -12,6 +12,7 @@ html, body {
 html { font-size: 62.5%; } // base font is 10px
 
 body {
+  position: relative;
   @include rem(font-size, $font-size-base);
   @include relative-line-height($line-height-base-px, $font-size-base);
 
@@ -34,8 +35,8 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-  @include rem(font-size, 32px);
-  @include relative-line-height(30px, 32px);
+  @include rem(font-size, 24px);
+  @include relative-line-height(22px, 24px);
 }
 
 h2 {
