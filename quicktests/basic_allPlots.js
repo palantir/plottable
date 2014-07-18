@@ -5,48 +5,42 @@ function makeData() {
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
 
-    //data
-    var dataseries1 = new Plottable.DataSource(boringData());
-    dataseries1.metadata({name: "series1"});
-    var dataseries2 = new Plottable.DataSource(boringData());
-    dataseries2.metadata({name: "series2"});
-    var colorScale1 = new Plottable.Scale.Color("10");
-    colorScale1.domain(["series1", "series2"]);
-    
+    d = data[0].slice(0, 8);
+
+
     //Axis
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();
-    var xScale2 = new Plottable.Scale.Linear();
-    var yScale2 = new Plottable.Scale.Linear(); 
-    var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-    var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-    var xAxis2 = new Plottable.Axis.Numeric(xScale2, "bottom");
-    var yAxis2 = new Plottable.Axis.Numeric(yScale2, "left");
-        
-    var colorProjector = function(d, i, m) {
-       return colorScale1.scale(m.name);
-    };
-    
-    //rendering
-    var renderAreaD1 = new Plottable.Plot.Scatter(dataseries1, xScale, yScale);   
-    var renderAreaD2 = new Plottable.Plot.Line(dataseries2, xScale2, yScale2);
-    renderAreaD1.project("fill", colorProjector);
-    renderAreaD2.project("stroke", colorProjector);
-    var grid1 = new Plottable.Component.Gridlines(xScale, yScale);
-    var grid2 = new Plottable.Component.Gridlines(xScale2, yScale2);
 
-    
+    var axis_array = [];
+    for(var i = 0; i < 5; i++){
+        axis_array.push(new Plottable.Axis.Numeric(xScale, "bottom"));
+        axis_array.push(new Plottable.Axis.Numeric(yScale, "left"));
+    }
+
+    //rendering
+    var scatterPlot = new Plottable.Plot.Scatter(d, xScale, yScale);   
+    var linePlot = new Plottable.Plot.Line(d, xScale, yScale);
+    var areaPlot = new Plottable.Plot.Area(d, xScale, yScale);   
+    var vbarPlot = new Plottable.Plot.VerticalBar(d, xScale, yScale);
+    var hbarPlot = new Plottable.Plot.HorizontalBar(d, xScale, yScale);   
+
     //title + legend
     
-    var basicTable = new Plottable.Component.Table()
-                .addComponent(2, 0, yAxis2)
-                .addComponent(2, 1, renderAreaD2.merge(grid2))
-                .addComponent(2, 2, yAxis)
-                .addComponent(2, 3, renderAreaD1.merge(grid1))
-                .addComponent(3, 3, xAxis)
-                .addComponent(3, 1, xAxis2);
+    var scatterTable = new Plottable.Component.Table([[axis_array[1], scatterPlot],
+                                                     [null, axis_array[0]]]);
+    var lineTable = new Plottable.Component.Table([[axis_array[3], linePlot],
+                                                     [null, axis_array[2]]]);
+    var areaTable = new Plottable.Component.Table([[axis_array[5], areaPlot],
+                                                     [null, axis_array[4]]]);
+    var vbarTable = new Plottable.Component.Table([[axis_array[7], vbarPlot],
+                                                     [null, axis_array[6]]]);
+    var hbarTable = new Plottable.Component.Table([[axis_array[9], hbarPlot],
+                                                     [null, axis_array[8]]]);
+    var bigTable = new Plottable.Component.Table([[scatterTable, lineTable],
+                                                  [areaTable, vbarTable],
+                                                  [hbarTable, null]]);
 
-    var bigTable = new Plottable.Component.Table()
-               .addComponent(1,0, basicTable);
+    bigTable.renderTo(svg);
     
 }

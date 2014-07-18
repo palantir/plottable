@@ -28,6 +28,7 @@ function run(div, data, Plottable) {
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
         
     var plot = new Plottable.Plot.Line(dataseries1, xScale, yScale);
+    
     var IdTitle = new Plottable.Component.Label("Identity");
     var GenTitle = new Plottable.Component.Label("General");
     var FixTitle = new Plottable.Component.Label("Fixed");
@@ -37,7 +38,7 @@ function run(div, data, Plottable) {
     var CustTitle = new Plottable.Component.Label("Custom");
         
     var basicTable = new Plottable.Component.Table([[yAxis, plot], [null, xAxis]])
-	var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);                
+	  var formatChoices = new Plottable.Component.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);                
     var bigTable = new Plottable.Component.Table([[basicTable],[formatChoices]]);
     formatChoices.xAlign("center");
     bigTable.renderTo(svg);
