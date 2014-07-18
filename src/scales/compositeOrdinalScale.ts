@@ -16,12 +16,6 @@ export module Scale {
       return this;
     }
 
-    public rangeBand(): number {
-      // (bdwyer) This is necessary to override because vertical bars does not allow us
-      // to override width. Once that issue is fixed, we can remove this
-      return this.smallestRangeBand();
-    }
-
     public smallestRangeBand(): number {
       if (this._subScales.length > 0) {
         return this._subScales[this._subScales.length - 1].rangeBand();
@@ -62,8 +56,7 @@ export module Scale {
 
       // Hierarchically apply range to children
       if (!(values === undefined)) {
-        // (bdwyer) this can be change back to this.rangeBand() when we fix the above rangeBand issue
-        var parentBand = super.rangeBand();
+        var parentBand = this.rangeBand();
         this._subScales.forEach((subScale) => {
           subScale.range([0, parentBand]);
           parentBand = subScale.rangeBand();
@@ -96,7 +89,7 @@ export module Scale {
       return ret;
     }
 
-    public getLevels(): number{ 
+    public getLevels(): number{
       return this._subScales.length + 1;
     }
 
@@ -136,7 +129,7 @@ export module Scale {
 
       // MORE LODASH.
       //var mainDomain = _(data).map(keys[0]).sortBy().uniq().value()
-      
+
       return this;
     }
   }

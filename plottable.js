@@ -3696,12 +3696,6 @@ var Plottable;
                 return this;
             };
 
-            CompositeOrdinal.prototype.rangeBand = function () {
-                // (bdwyer) This is necessary to override because vertical bars does not allow us
-                // to override width. Once that issue is fixed, we can remove this
-                return this.smallestRangeBand();
-            };
-
             CompositeOrdinal.prototype.smallestRangeBand = function () {
                 if (this._subScales.length > 0) {
                     return this._subScales[this._subScales.length - 1].rangeBand();
@@ -3741,8 +3735,7 @@ var Plottable;
 
                 // Hierarchically apply range to children
                 if (!(values === undefined)) {
-                    // (bdwyer) this can be change back to this.rangeBand() when we fix the above rangeBand issue
-                    var parentBand = _super.prototype.rangeBand.call(this);
+                    var parentBand = this.rangeBand();
                     this._subScales.forEach(function (subScale) {
                         subScale.range([0, parentBand]);
                         parentBand = subScale.rangeBand();

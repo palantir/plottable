@@ -1419,7 +1419,6 @@ declare module Plottable {
         class CompositeOrdinal extends Ordinal {
             constructor();
             public addSubscale(scale: Ordinal): CompositeOrdinal;
-            public rangeBand(): number;
             public smallestRangeBand(): number;
             public rangeBandLevel(n: number): number;
             public innerPaddingLevel(n: number): number;
