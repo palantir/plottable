@@ -1434,6 +1434,20 @@ declare module Plottable {
             public invert(x: number): number;
             public ticks(count?: number): number[];
             public copy(): ModifiedLog;
+            /**
+            * @returns {boolean}
+            * Whether or not to return tick values other than powers of base.
+            *
+            * This defaults to false, so you'll normally only see ticks like
+            * [10, 100, 1000]. If you turn it on, you might see ticks values
+            * like [10, 50, 100, 500, 1000].
+            */
+            public showIntermediateTicks(): boolean;
+            /**
+            * @param {boolean} show
+            * Whether or not to return ticks values other than powers of the base.
+            */
+            public showIntermediateTicks(show: boolean): ModifiedLog;
         }
     }
 }

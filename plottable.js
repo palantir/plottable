@@ -3768,6 +3768,7 @@ var Plottable;
             function ModifiedLog(base) {
                 if (typeof base === "undefined") { base = 10; }
                 _super.call(this, d3.scale.linear());
+                this._showIntermediateTicks = false;
                 this.base = base;
                 this.pivot = this.base;
                 this.untransformedDomain = this._defaultExtent();
@@ -3883,7 +3884,7 @@ var Plottable;
                 var startLogged = Math.floor(Math.log(lower) / Math.log(this.base));
                 var endLogged = Math.ceil(Math.log(upper) / Math.log(this.base));
                 var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
-                var nMultiples = Math.floor(nTicks / bases.length);
+                var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
                 var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
                 var uniqMultiples = Plottable.Util.Methods.uniqNumbers(multiples);
                 var clusters = bases.map(function (b) {
@@ -3924,6 +3925,14 @@ var Plottable;
 
             ModifiedLog.prototype._niceDomain = function (domain, count) {
                 return domain;
+            };
+
+            ModifiedLog.prototype.showIntermediateTicks = function (show) {
+                if (show == null) {
+                    return this._showIntermediateTicks;
+                } else {
+                    this._showIntermediateTicks = show;
+                }
             };
             return ModifiedLog;
         })(Plottable.Abstract.QuantitiveScale);

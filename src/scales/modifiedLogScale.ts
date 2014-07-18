@@ -6,6 +6,7 @@ export module Scale {
     private base: number;
     private pivot: number;
     private untransformedDomain: number[];
+    private _showIntermediateTicks = false;
 
     /**
      * Creates a new Scale.ModifiedLog.
@@ -144,7 +145,7 @@ export module Scale {
       var startLogged = Math.floor(Math.log(lower) / Math.log(this.base));
       var endLogged = Math.ceil(Math.log(upper) / Math.log(this.base));
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
-      var nMultiples = Math.floor(nTicks / bases.length);
+      var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
       var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
       var uniqMultiples = Util.Methods.uniqNumbers(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this.base, b - 1) * x));
@@ -177,6 +178,28 @@ export module Scale {
 
     public _niceDomain(domain: any[], count?: number): any[] {
       return domain;
+    }
+
+    /**
+     * @returns {boolean}
+     * Whether or not to return tick values other than powers of base.
+     *
+     * This defaults to false, so you'll normally only see ticks like
+     * [10, 100, 1000]. If you turn it on, you might see ticks values
+     * like [10, 50, 100, 500, 1000].
+     */
+    public showIntermediateTicks(): boolean;
+    /**
+     * @param {boolean} show
+     * Whether or not to return ticks values other than powers of the base.
+     */
+    public showIntermediateTicks(show: boolean): ModifiedLog;
+    public showIntermediateTicks(show?: boolean): any {
+      if (show == null) {
+        return this._showIntermediateTicks;
+      } else {
+        this._showIntermediateTicks = show;
+      }
     }
 
   }
