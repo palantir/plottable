@@ -130,6 +130,7 @@ export module Axis {
       var worst = this.calculateWorstWidth(container, interval.formatString);
       var testDate = this._scale.domain()[0]; // any date could go here
       var stepLength = this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate);
+      stepLength = Math.min(stepLength, this.availableWidth);
       return worst < stepLength;
     }
 
@@ -143,12 +144,16 @@ export module Axis {
     // returns a number to index into the major/minor intervals
     public getTickLevel(): number {
       // could also probably cache this
-      var i = 0;
-      for(; i < Time.minorIntervals.length; i++) {
+      for(var i = 0; i < Time.minorIntervals.length; i++) {
         if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
             && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
           break;
         }
+      }
+      if (i == Time.minorIntervals.length) {
+        i--;
+        // we can either fail now, or display ticks at highest granularity available even if it will be ugly
+        //throw new Error ("could not find suitable interval to display labels");
       }
 
       return i;
@@ -194,8 +199,8 @@ export module Axis {
       tickLabelsEnter.append("text");
       var xTranslate = center ? 0 : this.tickLabelPadding();
       tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ?
-          (this.tickLength() / (2 - height + 1)) :
-          (this.availableHeight - this.tickLength() / (2 - height + 1))) + ")");
+          (this.tickLength() / 2 * height) :
+          (this.availableHeight - this.tickLength() / 2 * height)) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = center ? "middle" : "left";
