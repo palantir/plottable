@@ -365,6 +365,25 @@ describe("BaseAxis", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 
+describe("TimeAxis", function () {
+    it("can not initialize vertical time axis", function () {
+        var scale = new Plottable.Scale.Time();
+        assert.throws(function () {
+            return new Plottable.Axis.Time(scale, "left");
+        }, "unsupported");
+        assert.throws(function () {
+            return new Plottable.Axis.Time(scale, "right");
+        }, "unsupported");
+    });
+
+    it("major and minor intervals are the same length", function () {
+        assert.equal(Plottable.Axis.Time.majorIntervals.length, Plottable.Axis.Time.minorIntervals.length, "major and minor interval arrays must be same size");
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+
 describe("NumericAxis", function () {
     it("tickLabelPosition() input validation", function () {
         var scale = new Plottable.Scale.Linear();

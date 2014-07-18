@@ -4697,7 +4697,7 @@ var Plottable;
                         break;
                     }
                 }
-                if (i == Time.minorIntervals.length) {
+                if (i === Time.minorIntervals.length) {
                     i--;
                     // we can either fail now, or display ticks at highest granularity available even if it will be ugly
                     //throw new Error ("could not find suitable interval to display labels");

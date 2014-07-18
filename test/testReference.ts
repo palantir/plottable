@@ -10,6 +10,7 @@
 ///<reference path="perfdiagnostics.ts" />
 
 ///<reference path="components/baseAxisTests.ts" />
+///<reference path="components/timeAxisTests.ts" />
 ///<reference path="components/numericAxisTests.ts" />
 ///<reference path="components/categoryAxisTests.ts" />
 ///<reference path="components/gridlinesTests.ts" />
