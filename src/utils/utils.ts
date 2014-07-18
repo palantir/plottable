@@ -23,7 +23,11 @@ export module Util {
     export function warn(warning: string) {
       /* tslint:disable:no-console */
       if ((<any> window).console != null) {
-        console.log(warning);
+        if ((<any> window).console.warn != null) {
+          console.warn(warning);
+        } else if ((<any> window).console.log != null) {
+          console.log(warning);
+        }
       }
       /* tslint:enable:no-console */
     }

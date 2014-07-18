@@ -13,7 +13,7 @@ declare module Plottable {
             function inRange(x: number, a: number, b: number): boolean;
             /** Print a warning message to the console, if it is available.
             *
-            * @params {any} The warnings to print
+            * @param {string} The warnings to print
             */
             function warn(warning: string): void;
             /**
