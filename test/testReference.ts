@@ -7,7 +7,6 @@
 ///<reference path="../build/plottable.d.ts" />
 
 ///<reference path="globalInitialization.ts" />
-///<reference path="perfdiagnostics.ts" />
 
 ///<reference path="components/baseAxisTests.ts" />
 ///<reference path="components/numericAxisTests.ts" />

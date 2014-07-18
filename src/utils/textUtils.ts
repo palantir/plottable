@@ -204,7 +204,7 @@ export module Util {
       var h = bb.height;
       var w = bb.width;
       if (w > width || h > height) {
-        console.log("Insufficient space to fit text");
+        Util.Methods.warn("Insufficient space to fit text");
         return {width: 0, height: 0};
       }
       var anchorConverter: {[s: string]: string} = {left: "start", center: "middle", right: "end"};
