@@ -1417,22 +1417,19 @@ declare module Plottable {
             * an ordinary Scale.Log instead.
             *
             * @constructor
-            * @param {number} [pivot]
-            *        For pivot <= x, scale(x) = log(x).
+            * @param {number} [base]
+            *        The base of the log. Defaults to 10, and must be > 1.
             *
-            *        For 0 < x < pivot, scale(x) will become more and more
+            *        For base <= x, scale(x) = log(x).
+            *
+            *        For 0 < x < base, scale(x) will become more and more
             *        linear as it approaches 0.
             *
             *        At x == 0, scale(x) == 0.
             *
             *        For negative values, scale(-x) = -scale(x).
-            *
-            *        Defaults to 10, and must be > 1.
-            *
-            * @param {number} [base]
-            *        The base of the log. Defaults to 10, and must be > 0.
             */
-            constructor(pivot?: number, base?: number);
+            constructor(base?: number);
             public scale(x: number): number;
             public invert(x: number): number;
             public ticks(count?: number): number[];

@@ -20,32 +20,26 @@ export module Scale {
      * an ordinary Scale.Log instead.
      *
      * @constructor
-     * @param {number} [pivot]
-     *        For pivot <= x, scale(x) = log(x).
+     * @param {number} [base]
+     *        The base of the log. Defaults to 10, and must be > 1.
      *
-     *        For 0 < x < pivot, scale(x) will become more and more
+     *        For base <= x, scale(x) = log(x).
+     *
+     *        For 0 < x < base, scale(x) will become more and more
      *        linear as it approaches 0.
      *
      *        At x == 0, scale(x) == 0.
      *
      *        For negative values, scale(-x) = -scale(x).
-     *
-     *        Defaults to 10, and must be > 1.
-     *
-     * @param {number} [base]
-     *        The base of the log. Defaults to 10, and must be > 0.
      */
-    constructor(pivot = 10, base = 10) {
+    constructor(base = 10) {
       super(d3.scale.linear());
       this.base = base;
-      this.pivot = pivot;
+      this.pivot = this.base;
       this.untransformedDomain = this._defaultExtent();
       this._lastRequestedTickCount = 10;
-      if (pivot <= 1) {
-        throw new Error("ModifiedLogScale: The pivot must be > 1");
-      }
-      if (base <= 0) {
-        throw new Error("ModifiedLogScale: The base must be > 0");
+      if (base <= 1) {
+        throw new Error("ModifiedLogScale: The base must be > 1");
       }
     }
 
@@ -178,7 +172,7 @@ export module Scale {
     }
 
     public copy(): ModifiedLog {
-      return new ModifiedLog(this.pivot, this.base);
+      return new ModifiedLog(this.base);
     }
 
     public _niceDomain(domain: any[], count?: number): any[] {
