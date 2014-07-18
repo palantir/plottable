@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Tutorials
+page_id: page-tutorial
 ---
 Get started with the Plottable Tutorial: Download the packaged tutorial
 files at <https://palantir.github.io/plottable/tutorials.zip>; extract
@@ -10,27 +11,20 @@ associated \`.js\` files with your favorite text editor. Alternatively,
 you can clone the entire repository from
 <https://github.com/palantir/plottable>.
 
-[Plottable Concepts](#Plottable-PlottableConcepts)
+<nav markdown="1">
+- [Plottable Concepts](#plottable-concepts)
+- [Using Plottable](#using-plottable)
+  - [Tutorial 1 - Creating a Basic Chart](#tutorial-1---creating-a-basic-chart)
+  - [Tutorial 2 - Customization with Projectors](#tutorial-2---customization-with-projectors)
+    - [Projection and Accessors](#projection-and-accessors)
+  - [Tutorial 3 - Flexible Layout](#tutorial-3---flexible-layout)
+  - [Tutorial 4 - Labels and Nested Tables](#tutorial-4---labels-and-nested-tables)
+  - [Tutorial 5 - Bars](#tutorial-5---bars)
+</nav>
 
-[Using Plottable](#Plottable-UsingPlottable)
-
-[Tutorial 1 - Creating a Basic
-Chart](#Plottable-Tutorial1CreatingaBasicChart)
-
-[Tutorial 2 - Customization with
-Projectors](#Plottable-Tutorial2CustomizationwithProjectors)
-
--   [Projection and Accessors](#Plottable-ProjectionandAccessors)
-
-[Tutorial 3 - Flexible Layout](#Plottable-Tutorial3FlexibleLayout)
-
-[Tutorial 4 - Labels and Nested
-Tables](#Plottable-Tutorial4LabelsandNestedTables)
-
-[Tutorial 5 - Bars](#Plottable-Tutorial5Bars)
 
 Plottable Concepts
-==================
+------------------
 
 Each Plottable chart consists of three main pieces:
 
@@ -62,21 +56,20 @@ have four tables nested inside one larger table. In this case, cell
 Technically, you can create the same visualization without nesting,
 however, nesting makes things cleaner and more modular.
 
+
 Using Plottable
-===============
+---------------
 
 While Plottable.js is developed in Typescript, it is released in
 JavaScript.
 
-Tutorial 1 - Creating a Basic Chart
------------------------------------
+### Tutorial 1 - Creating a Basic Chart
 
 In the following tutorial we will create a basic chart by plotting a
 numerical (x,y) data.
 
 The following is the html code that you'll need to run Plottable.
 
-```
 {% highlight xml %}
 <html>
   <head>
@@ -105,134 +98,137 @@ The following is the html code that you'll need to run Plottable.
     <svg id="basicChart" width="640" height="480"/>
   </body>
 
-    <!-- ensure that this script will not run until the window has loaded -->
-    <script> window.onload = makeBasicChart; </script>
-
+  <!-- ensure that this script will not run until the window has loaded -->
+  <script> window.onload = makeBasicChart; </script>
 </html>
 {% endhighlight %}
-```
 
 Now for the Plottable code. Before we get started, you need to create a
 new JavaScript file called `basicChart.js`. This is where we will write
 our script that draws the chart.
 
-1.  First we need to specify the scales. Plottable uses Scales to
-    determine how to draw things to the screen. A Scale takes the data
-    values (which determine the domain) and maps them to
-    pixel values (the range). This is important because certain objects,
-    such as axes and plots, need to be drawn to the same scale in order
-    to provide meaning to the chart.
-    To specify a Scale in this example, we create two linear scales, named `xScale` and `yScale`.
-    Your code should look like:
 
-    ```
+**Step 1**
+First we need to specify the scales. Plottable uses Scales to
+determine how to draw things to the screen. A Scale takes the data
+values (which determine the domain) and maps them to
+pixel values (the range). This is important because certain objects,
+such as axes and plots, need to be drawn to the same scale in order
+to provide meaning to the chart.
+To specify a Scale in this example, we create two linear scales, named `xScale` and `yScale`.
+Your code should look like:
+
 {% highlight javascript %}
-    function makeBasicChart() {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
-    }
-    {% endhighlight %}
-```
+function makeBasicChart() {
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
+}
+{% endhighlight %}
 
-2.  Once we've specified the Scale, we need to set the axes' locations.
-    Again, we need two variables, an `xAxis` and a `yAxis`.
-    The `Axis.Numeric` class creates an axis for displaying numeric data. Its constructor
-    requires a Scale (in this case we use the xScale variable that
-    we just created) and a String denoting the orientation. In this
-    case, we will use a standard bottom orientation for the x-axis.
 
-        ```
+**Step 2**
+Once we've specified the Scale, we need to set the axes' locations.
+Again, we need two variables, an `xAxis` and a `yAxis`.
+The `Axis.Numeric` class creates an axis for displaying numeric data. Its constructor
+requires a Scale (in this case we use the xScale variable that
+we just created) and a String denoting the orientation. In this
+case, we will use a standard bottom orientation for the x-axis.
+
 {% highlight javascript %}
-        function makeBasicChart() {
-          var xScale = new Plottable.Scale.Linear();
-          var yScale = new Plottable.Scale.Linear();
+function makeBasicChart() {
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
 
-          var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-          var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-        }
-        {% endhighlight %}
-```
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+}
+{% endhighlight %}
 
-3.  Next we need to create the plot. In this case we want a line chart
-    so we'll need the Line class. Line requires the following
-    parameters: the dataset to plot, an x scale and a y scale.
 
-    ```
+**Step 3**
+Next we need to create the plot. In this case we want a line chart
+so we'll need the Line class. Line requires the following
+parameters: the dataset to plot, an x scale and a y scale.
+
 {% highlight javascript %}
-    function makeBasicChart() {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+function makeBasicChart() {
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
 
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-      var plot = new Plottable.Plot.Line(xyData, xScale, yScale);
-    }
-    {% endhighlight %}
-```
+  var plot = new Plottable.Plot.Line(xyData, xScale, yScale);
+}
+{% endhighlight %}
 
-4.  Finally, we need to put all the pieces together to create a chart.
-    To do this we will create a Table. (Check out [Concept of
-    Tables](#Plottable-ConceptofTables) to learn more about tables.) We
-    want to create a basic chart, with a y-axis on the left side, an
-    x-axis on the bottom, and the time series plotted within those
-    boundaries. With this in mind, the first row of our Table is [
-    yAxis, plot] (the yAxis is on the left and the plot is next to it).
-    The second row of our table [ null, xAxis]. Note that we need a null
-    in the first column because otherwise the xAxis would not align
-    underneath our plot.
 
-    ![]({{ site.baseurl }}/build/images/tutorials/alignment.png)
+**Step 4**
+Finally, we need to put all the pieces together to create a chart.
+To do this we will create a Table. (Check out [Concept of
+Tables](#Plottable-ConceptofTables) to learn more about tables.) We
+want to create a basic chart, with a y-axis on the left side, an
+x-axis on the bottom, and the time series plotted within those
+boundaries. With this in mind, the first row of our Table is [
+yAxis, plot] (the yAxis is on the left and the plot is next to it).
+The second row of our table [ null, xAxis]. Note that we need a null
+in the first column because otherwise the xAxis would not align
+underneath our plot.
 
-    ```
+![]({{ site.baseurl }}/build/images/tutorials/alignment.png)
+
 {% highlight javascript %}
-    function makeBasicChart() {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+function makeBasicChart() {
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
 
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-      var plot = new Plottable.Plot.Line(xyData, xScale, yScale);
+  var plot = new Plottable.Plot.Line(xyData, xScale, yScale);
 
-      var chart = new Plottable.Component.Table([
-                        [yAxis, plot],
-                        [null,  xAxis]
-                      ]);
-    }
-    {% endhighlight %}
-```
+  var chart = new Plottable.Component.Table([
+                    [yAxis, plot],
+                    [null,  xAxis]
+                  ]);
+}
+{% endhighlight %}
 
-5.  We now have a table graphing our chart. The final step is drawing
-    that chart on your screen. To do this we use the line
-    `chart.renderTo("#basicChart")`. "\#basicChart" says to look for the
-    svg with the ID equal to "basicChart" and to draw the chart in that
-    svg. If you look back at our original html code, you see that our
-    svg has the ID "basicChart".
-6.  The final code:
 
-    ```
+**Step 5**
+We now have a table graphing our chart. The final step is drawing
+that chart on your screen. To do this we use the line
+`chart.renderTo("#basicChart")`. "\#basicChart" says to look for the
+svg with the ID equal to "basicChart" and to draw the chart in that
+svg. If you look back at our original html code, you see that our
+svg has the ID "basicChart".
+
+
+**Step 6**
+The final code:
+
 {% highlight javascript %}
-    function makeBasicChart() {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+function makeBasicChart() {
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
 
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-      var plot = new Plottable.Plot.Line(xyData, xScale, yScale);
+  var plot = new Plottable.Plot.Line(xyData, xScale, yScale);
 
-      var chart = new Plottable.Component.Table([
-                        [yAxis, plot],
-                        [null,  xAxis]
-                      ]);
+  var chart = new Plottable.Component.Table([
+                    [yAxis, plot],
+                    [null,  xAxis]
+                  ]);
 
-      chart.renderTo("#basicChart");
-    }
-    {% endhighlight %}
-```
+  chart.renderTo("#basicChart");
+}
+{% endhighlight %}
 
-7.  You can now load the basicChart tutorial and see your chart.
+
+**Step 7**
+You can now load the basicChart tutorial and see your chart.
 
 ![]({{ site.baseurl }}/build/images/tutorials/basicChart.png)
 
@@ -250,6 +246,7 @@ chart will now display the data in circles rather than as a line.
 
 ![]({{ site.baseurl }}/build/images/tutorials/basicChartCircle.png)
 
+
 Tutorial 2 - Customization with Projectors
 ------------------------------------------
 
@@ -265,7 +262,6 @@ then you do not need to specify the data; Plottable picks it up
 automatically. For instance, the basicChart example above had data that
 was an array of {x,y} pairs:
 
-```
 {% highlight javascript %}
 var xyData = [
   {"x": 0, "y": 1},
@@ -278,7 +274,6 @@ var xyData = [
 ...
 ]
 {% endhighlight %}
-```
 
 The name of the property is already `x`, which directly maps to the x
 values of a Line plot and the same is true of the y values.
@@ -288,7 +283,6 @@ data is an object with the properties {committer, days, total\_commits,
 additions, deletions}, Plottable cannot automatically determine the
 property for x and y.
 
-```
 {% highlight javascript %}
 gitData = [
   {
@@ -315,7 +309,6 @@ gitData = [
 ...
 ]
 {% endhighlight %}
-```
 
 We thus need a way to select which pieces of the data we want to use for
 each attribute.
@@ -342,164 +335,156 @@ that while the code is slightly different, we are really just accessing
 data in a different way, so the resulting chart will look the same as
 the one we previously created.
 
-1.  As in the BasicChart example above, we start with the html file. The
-    only difference from the previous example is that we are using a
-    different data file and the name of our javascript file is specific
-    to this example.
+**Step 1**
+As in the BasicChart example above, we start with the html file. The
+only difference from the previous example is that we are using a
+different data file and the name of our javascript file is specific
+to this example.
 
-    ```
 {% highlight xml %}
-    <html>
-      <head>
-        <title>Plottable Tutorial 2: Projectors</title>
+<html>
+  <head>
+    <title>Plottable Tutorial 2: Projectors</title>
 
-        <link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css" />
+    <link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css" />
 
-        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-        <script src="http://palantir.github.io/plottable/plottable.js"></script>
-        <script src="gitData.js"></script>
-        <script src="customProjectors.js"></script>
-      </head>
-      <body>
-        <svg id="customProjectorChart" width="640" height="480"/>
-      </body>
-      <script> window.onload = makeCustomProjectorChart; </script>
-    </html>
-    {% endhighlight %}
-```
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://palantir.github.io/plottable/plottable.js"></script>
+    <script src="gitData.js"></script>
+    <script src="customProjectors.js"></script>
+  </head>
+  <body>
+    <svg id="customProjectorChart" width="640" height="480"/>
+  </body>
+  <script> window.onload = makeCustomProjectorChart; </script>
+</html>
+{% endhighlight %}
 
-2.  Create a new JavaScript file called `customProjectors.js`. The first
-    several lines of our code are exactly the same as in the previous
-    example: we specify a linear scale, and denote where to place the
-    axes.
+**Step 2**
+Create a new JavaScript file called `customProjectors.js`. The first
+several lines of our code are exactly the same as in the previous
+example: we specify a linear scale, and denote where to place the
+axes.
 
-    ```
 {% highlight javascript %}
-    function makeCustomProjectorChart() {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+function makeCustomProjectorChart() {
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
 
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-    }
-    {% endhighlight %}
-```
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+}
+{% endhighlight %}
 
-3.  We now have enough information to evoke the Line class. Recall that
-    the Line plot requires the following parameters: the dataset, an x
-    scale and a y scale.
+**Step 3**
+We now have enough information to evoke the Line class. Recall that
+the Line plot requires the following parameters: the dataset, an x
+scale and a y scale.
 
-    ```
 {% highlight javascript %}
-    function makeCustomProjectorChart() {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+function makeCustomProjectorChart() {
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
 
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-      var plot = new Plottable.Plot.Line(gitData, xScale, yScale);
-    }
-    {% endhighlight %}
-```
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var plot = new Plottable.Plot.Line(gitData, xScale, yScale);
+}
+{% endhighlight %}
 
-4.  Since our data is not obviously mapped to x and y values, we need a
-    function to define how to assign a piece of our data to a specific
-    attribute. In other words, we need an accessor.
+**Step 4**
+Since our data is not obviously mapped to x and y values, we need a
+function to define how to assign a piece of our data to a specific
+attribute. In other words, we need an accessor.
 
-    ```
 {% highlight javascript %}
-    function getXDataValue(d) {
-        return d.day;
-      }
-    {% endhighlight %}
-```
+function getXDataValue(d) {
+    return d.day;
+  }
+{% endhighlight %}
 
-    The above function says that for every data point d, return the
-    "day" value from that data point. So if we look at the first item in
-    our dataset
+The above function says that for every data point d, return the
+"day" value from that data point. So if we look at the first item in
+our dataset
 
-    ```
 {% highlight javascript %}
-      {
-        "committer": "derek",
-        "day": 0,
-        "total_commits": 0,
-        "additions": 204,
-        "deletions": 0
-      },
-    {% endhighlight %}
-```
+{
+  "committer": "derek",
+  "day": 0,
+  "total_commits": 0,
+  "additions": 204,
+  "deletions": 0
+},
+{% endhighlight %}
 
-    The accessor function would return 0 since that first data object
-    has 0 as the day value.
+The accessor function would return 0 since that first data object
+has 0 as the day value.
 
-5.  An accessor is just a way to assign a piece of data to an attribute.
-    We still need to do that mapping from data to visualization. For
-    this we need a projector.
+**Step 5**
+An accessor is just a way to assign a piece of data to an attribute.
+We still need to do that mapping from data to visualization. For
+this we need a projector.
 
-    ```
 {% highlight javascript %}
-     plot.project("x", getXDataValue, xScale);
-    {% endhighlight %}
-```
+plot.project("x", getXDataValue, xScale);
+{% endhighlight %}
 
-    In the above line, plot is the plot we created above and it's
-    calling the project function. Plot.project needs parameters to tell
-    it the attribute, how to get that attribute, and the scale to use.
-    In this case, we want to assign a value for x. The code therefore
-    reads that for each datapoint given to the plot, assign x as the day
-    value and use the xScale we defined previously.
+In the above line, plot is the plot we created above and it's
+calling the project function. Plot.project needs parameters to tell
+it the attribute, how to get that attribute, and the scale to use.
+In this case, we want to assign a value for x. The code therefore
+reads that for each datapoint given to the plot, assign x as the day
+value and use the xScale we defined previously.
 
-6.  We need another accessor that will determine the y attribute. By
-    similar logic, we do the following:
+We need another accessor that will determine the y attribute. By
+similar logic, we do the following:
 
-    ```
 {% highlight javascript %}
-      function getYDataValue(d) {
-        return d.total_commits;
-      }
+function getYDataValue(d) {
+  return d.total_commits;
+}
 
-    plot.project("y", getYDataValue, yScale);
-    {% endhighlight %}
-```
+plot.project("y", getYDataValue, yScale);
+{% endhighlight %}
 
-7.  Now that we have a map from the data to our linear chart, we can add
-    in the rest of the code to build the chart. Notice it is the same as
-    in the previous example.
+**Step 7**
+Now that we have a map from the data to our linear chart, we can add
+in the rest of the code to build the chart. Notice it is the same as
+in the previous example.
 
-8.  Our final code looks like the following:
+**Step 8**
+Our final code looks like the following:
 
-    ```
 {% highlight javascript %}
-    function makeCustomProjectorChart() {
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
+function makeCustomProjectorChart() {
+  var xScale = new Plottable.Scale.Linear();
+  var yScale = new Plottable.Scale.Linear();
 
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-      var plot = new Plottable.Plot.Line(gitData, xScale, yScale);
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var plot = new Plottable.Plot.Line(gitData, xScale, yScale);
 
-      function getXDataValue(d) {
-        return d.day;
-      }
-      plot.project("x", getXDataValue, xScale);
+  function getXDataValue(d) {
+    return d.day;
+  }
+  plot.project("x", getXDataValue, xScale);
 
-      function getYDataValue(d) {
-        return d.total_commits;
-      }
-      plot.project("y", getYDataValue, yScale);
+  function getYDataValue(d) {
+    return d.total_commits;
+  }
+  plot.project("y", getYDataValue, yScale);
 
-      var chart = new Plottable.Component.Table([
-                        [yAxis, plot],
-                        [null,  xAxis   ]
-                      ]);
+  var chart = new Plottable.Component.Table([
+                    [yAxis, plot],
+                    [null,  xAxis   ]
+                  ]);
 
-      chart.renderTo("#customProjectorChart");
-    }
-    {% endhighlight %}
-```
+  chart.renderTo("#customProjectorChart");
+}
+{% endhighlight %}
 
 ![]({{ site.baseurl }}/build/images/tutorials/customProj.png)
+
 
 Tutorial 3 - Flexible Layout
 ----------------------------
@@ -513,170 +498,163 @@ x-axis for each subplot.
 
 ![]({{ site.baseurl }}/build/images/tutorials/tableSubplotConcept.png)
 
-1.  First we need the html file. Notice that the data is the same as was
-    used in the previous tutorial.
+**Step 1**
+First we need the html file. Notice that the data is the same as was
+used in the previous tutorial.
 
-    ```
 {% highlight xml %}
-    <html>
-      <head>
-        <title>Plottable Tutorial 3: Layout</title>
+<html>
+  <head>
+    <title>Plottable Tutorial 3: Layout</title>
 
-        <link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css" />
+    <link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css" />
 
-        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-        <script src="http://palantir.github.io/plottable/plottable.js"></script>
-        <script src="gitData.js"></script>
-        <script src="subplots.js"></script>
-      </head>
-      <body>
-        <svg id="chart" width="640" height="480"/>
-      </body>
-      <script> window.onload = makeChartWithSubplots; </script>
-    </html>
-    {% endhighlight %}
-```
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://palantir.github.io/plottable/plottable.js"></script>
+    <script src="gitData.js"></script>
+    <script src="subplots.js"></script>
+  </head>
+  <body>
+    <svg id="chart" width="640" height="480"/>
+  </body>
+  <script> window.onload = makeChartWithSubplots; </script>
+</html>
+{% endhighlight %}
 
-2.  Create a new JavaScript file called `subplots.js`. Since each
-    subplot relies on the same x-axis, we start by creating the xScale
-    and xAxis.
+**Step 2**
+Create a new JavaScript file called `subplots.js`. Since each
+subplot relies on the same x-axis, we start by creating the xScale
+and xAxis.
 
-    ```
 {% highlight javascript %}
-    function makeChartWithSubplots() {
-      var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-    }
-    {% endhighlight %}
-```
+function makeChartWithSubplots() {
+  var xScale = new Plottable.Scale.Linear();
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+}
+{% endhighlight %}
 
-3.  Since we want two subplots, we need two y-axes and two y scales. The
-    first subplot uses a Line plot and the second a Scatterplot. Notice
-    that the same data and the same xScale are passed to each plot.
+**Step 3**
+Since we want two subplots, we need two y-axes and two y scales. The
+first subplot uses a Line plot and the second a Scatterplot. Notice
+that the same data and the same xScale are passed to each plot.
 
-    ```
 {% highlight javascript %}
-    function makeChartWithSubplots() {
-      var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+function makeChartWithSubplots() {
+  var xScale = new Plottable.Scale.Linear();
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
-      var lineYScale = new Plottable.Scale.Linear();
-      var lineYAxis = new Plottable.Axis.Numeric(lineYScale, "left");
-      var linePlot = new Plottable.Plot.Line(gitData, xScale, lineYScale);
+  var lineYScale = new Plottable.Scale.Linear();
+  var lineYAxis = new Plottable.Axis.Numeric(lineYScale, "left");
+  var linePlot = new Plottable.Plot.Line(gitData, xScale, lineYScale);
 
-      var circleYScale = new Plottable.Scale.Linear();
-      var circleYAxis = new Plottable.Axis.Numeric(circleYScale, "left");
-      var circlePlot = new Plottable.Plot.Scatter(gitData, xScale, circleYScale);
-    {% endhighlight %}
-```
+  var circleYScale = new Plottable.Scale.Linear();
+  var circleYAxis = new Plottable.Axis.Numeric(circleYScale, "left");
+  var circlePlot = new Plottable.Plot.Scatter(gitData, xScale, circleYScale);
+{% endhighlight %}
 
-4.  As per the previous tutorial, we use projectors to choose the
-    information to plot. The x-axis accessor is the same as in the
-    previous tutorial because we again want days on the x-axis.
+**Step 4**
+As per the previous tutorial, we use projectors to choose the
+information to plot. The x-axis accessor is the same as in the
+previous tutorial because we again want days on the x-axis.
 
-    ```
 {% highlight javascript %}
-      function getDayValue(d) {
-        return d.day;
-      }
-      linePlot.project("x", getDayValue, xScale);
-      circlePlot.project("x", getDayValue, xScale);
-    {% endhighlight %}
-```
+function getDayValue(d) {
+  return d.day;
+}
+linePlot.project("x", getDayValue, xScale);
+circlePlot.project("x", getDayValue, xScale);
+{% endhighlight %}
 
-    Both the linePlot and the circlePlot use the same x-axis, which
-    corresponds to the fact that they have the same scale. Additionally,
-    in this case, since they both are using the same data, their
-    projectors can use the same accessor.
+Both the linePlot and the circlePlot use the same x-axis, which
+corresponds to the fact that they have the same scale. Additionally,
+in this case, since they both are using the same data, their
+projectors can use the same accessor.
 
-5.  Next we need projectors for each y-axis. As in the previous example,
-    the first y accessor returns total commits.
+**Step 5**
+Next we need projectors for each y-axis. As in the previous example,
+the first y accessor returns total commits.
 
-    ```
 {% highlight javascript %}
-      function getTotalCommits(d) {
-        return d.total_commits;
-      }
-      linePlot.project("y", getTotalCommits, lineYScale);
-    {% endhighlight %}
-```
+function getTotalCommits(d) {
+  return d.total_commits;
+}
+linePlot.project("y", getTotalCommits, lineYScale);
+{% endhighlight %}
 
-    Only the linePlot needs access to the totalCommits data.
+Only the linePlot needs access to the totalCommits data.
 
-6.  For the second subplot, we want to display the commit size (i.e. the
-    number of additions in the commit minus the deletions for a specific
-    data point). Accessors can grab data or compute/derive it on the
-    fly.
+**Step 6**
+For the second subplot, we want to display the commit size (i.e. the
+number of additions in the commit minus the deletions for a specific
+data point). Accessors can grab data or compute/derive it on the
+fly.
 
-    ```
 {% highlight javascript %}
-      function getNetCommitSize(d) {
-        return d.additions - d.deletions;
-      }
-      circlePlot.project("y", getNetCommitSize, circleYScale);
-    {% endhighlight %}
-```
+function getNetCommitSize(d) {
+  return d.additions - d.deletions;
+}
+circlePlot.project("y", getNetCommitSize, circleYScale);
+{% endhighlight %}
 
-7.  The last thing we need is to put the pieces together - i.e add each
-    subplot to a single chart. Unlike in the previous examples where the
-    table only had two rows (one for the y-axis and plot, and one for
-    the x-axis), in this example we need a table with three rows - one
-    for each y-axis and plot, and one for the x-axis.
+**Step 7**
+The last thing we need is to put the pieces together - i.e add each
+subplot to a single chart. Unlike in the previous examples where the
+table only had two rows (one for the y-axis and plot, and one for
+the x-axis), in this example we need a table with three rows - one
+for each y-axis and plot, and one for the x-axis.
 
-    ```
 {% highlight javascript %}
-      var chart = new Plottable.Component.Table([
-                        [lineYAxis,   linePlot],
-                        [circleYAxis, circlePlot],
-                        [null,        xAxis   ]
-                      ]);
-    {% endhighlight %}
-```
+var chart = new Plottable.Component.Table([
+                  [lineYAxis,   linePlot],
+                  [circleYAxis, circlePlot],
+                  [null,        xAxis   ]
+                ]);
+{% endhighlight %}
 
-8.  Your final code should look like the following:
+**Step 8**
+Your final code should look like the following:
 
-    ```
 {% highlight javascript %}
-    function makeChartWithSubplots() {
-      var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+function makeChartWithSubplots() {
+  var xScale = new Plottable.Scale.Linear();
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
-      var lineYScale = new Plottable.Scale.Linear();
-      var lineYAxis = new Plottable.Axis.Numeric(lineYScale, "left");
-      var linePlot = new Plottable.Plot.Line(gitData, xScale, lineYScale);
+  var lineYScale = new Plottable.Scale.Linear();
+  var lineYAxis = new Plottable.Axis.Numeric(lineYScale, "left");
+  var linePlot = new Plottable.Plot.Line(gitData, xScale, lineYScale);
 
-      var circleYScale = new Plottable.Scale.Linear();
-      var circleYAxis = new Plottable.Axis.Numeric(circleYScale, "left");
-      var circlePlot = new Plottable.Plot.Scatter(gitData, xScale, circleYScale);
+  var circleYScale = new Plottable.Scale.Linear();
+  var circleYAxis = new Plottable.Axis.Numeric(circleYScale, "left");
+  var circlePlot = new Plottable.Plot.Scatter(gitData, xScale, circleYScale);
 
-      function getDayValue(d) {
-        return d.day;
-      }
-      linePlot.project("x", getDayValue, xScale);
-      circlePlot.project("x", getDayValue, xScale);
+  function getDayValue(d) {
+    return d.day;
+  }
+  linePlot.project("x", getDayValue, xScale);
+  circlePlot.project("x", getDayValue, xScale);
 
-      function getTotalCommits(d) {
-        return d.total_commits;
-      }
-      linePlot.project("y", getTotalCommits, lineYScale);
+  function getTotalCommits(d) {
+    return d.total_commits;
+  }
+  linePlot.project("y", getTotalCommits, lineYScale);
 
-      function getNetCommitSize(d) {
-        return d.additions - d.deletions;
-      }
-      circlePlot.project("y", getNetCommitSize, circleYScale);
+  function getNetCommitSize(d) {
+    return d.additions - d.deletions;
+  }
+  circlePlot.project("y", getNetCommitSize, circleYScale);
 
-      var chart = new Plottable.Component.Table([
-                        [lineYAxis,   linePlot],
-                        [circleYAxis, circlePlot],
-                        [null,        xAxis   ]
-                      ]);
+  var chart = new Plottable.Component.Table([
+                    [lineYAxis,   linePlot],
+                    [circleYAxis, circlePlot],
+                    [null,        xAxis   ]
+                  ]);
 
-      chart.renderTo("#chart");
-    }
-    {% endhighlight %}
-```
+  chart.renderTo("#chart");
+}
+{% endhighlight %}
 
 ![]({{ site.baseurl }}/build/images/tutorials/subplot.png)
+
 
 Tutorial 4 - Labels and Nested Tables
 -------------------------------------
@@ -686,28 +664,26 @@ information that describes the data, such as a title.
 
 ![]({{ site.baseurl }}/build/images/tutorials/nestedTitleGeneric.png)
 
-1.  As in the previous tutorials, we start with html code:
+As in the previous tutorials, we start with html code:
 
-    ```
 {% highlight xml %}
-    <html>
-      <head>
-        <title>Plottable Tutorial 4: Advanced Layout and Labels</title>
+<html>
+  <head>
+    <title>Plottable Tutorial 4: Advanced Layout and Labels</title>
 
-        <link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css" />
+    <link rel="stylesheet" type="text/css" href="http://palantir.github.io/plottable/plottable.css" />
 
-        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-        <script src="http://palantir.github.io/plottable/plottable.js"></script>
-        <script src="gitData.js"></script>
-        <script src="labels.js"></script>
-      </head>
-      <body>
-        <svg id="chart" width="640" height="480"/>
-      </body>
-      <script> window.onload = makeNestedTables; </script>
-    </html>
-    {% endhighlight %}
-```
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://palantir.github.io/plottable/plottable.js"></script>
+    <script src="gitData.js"></script>
+    <script src="labels.js"></script>
+  </head>
+  <body>
+    <svg id="chart" width="640" height="480"/>
+  </body>
+  <script> window.onload = makeNestedTables; </script>
+</html>
+{% endhighlight %}
 
 The majority of the code in `labels.js` follows what we did in previous
 tutorials. We create axes, scales, plots, and projectors before putting
@@ -718,149 +694,142 @@ The Label constructor requires a string for the title, and offers an optional pa
 
 For this tutorial we will create a title, centered over the chart.
 
-1.  The first part of `labels.js` should look like the following:
+**Step 1**
+The first part of `labels.js` should look like the following:
 
-    ```
 {% highlight javascript %}
-    function makeNestedTables() {
+function makeNestedTables() {
 
-      var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scale.Linear();
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
-      var yScale = new Plottable.Scale.Linear();
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scale.Linear();
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-      var linePlot = new Plottable.Plot.Line(gitData, xScale, yScale);
-    {% endhighlight %}
-```
+  var linePlot = new Plottable.Plot.Line(gitData, xScale, yScale);
+{% endhighlight %}
 
-2.  We can use the same projectors as in the previous tutorial:
+**Step 2**
+We can use the same projectors as in the previous tutorial:
 
-    ```
 {% highlight javascript %}
-      function getDayValue(d) {
-        return d.day;
-      }
-      linePlot.project("x", getDayValue, xScale);
+function getDayValue(d) {
+  return d.day;
+}
+linePlot.project("x", getDayValue, xScale);
 
-      function getTotalCommits(d) {
-        return d.total_commits;
-      }
-      linePlot.project("y", getTotalCommits, yScale);
-    {% endhighlight %}
-```
+function getTotalCommits(d) {
+  return d.total_commits;
+}
+linePlot.project("y", getTotalCommits, yScale);
+{% endhighlight %}
 
-3.  We still need to create the actual labels. We want a title for our
-    chart, as well as a subtitle giving more detail.
+**Step 3**
+We still need to create the actual labels. We want a title for our
+chart, as well as a subtitle giving more detail.
 
-    ```
 {% highlight javascript %}
+var title = new Plottable.Component.TitleLabel("Plottable Git Data");
+var subtitle = new Plottable.Component.Label("Total Commits, by day, to the Plottable repo");
+{% endhighlight %}
 
-      var title = new Plottable.Component.TitleLabel("Plottable Git Data");
-      var subtitle = new Plottable.Component.Label("Total Commits, by day, to the Plottable repo");
-    {% endhighlight %}
-```
+**Step 4**
+Next we need to create the subtables to nest in the main table. We
+want one table to contain the title and subtitle for the chart, and
+the other table to contain the axes and plot. For the title table,
+we need one column with two rows (one row for the title and one for
+the subtitle).
 
-4.  Next we need to create the subtables to nest in the main table. We
-    want one table to contain the title and subtitle for the chart, and
-    the other table to contain the axes and plot. For the title table,
-    we need one column with two rows (one row for the title and one for
-    the subtitle).
-
-    ```
 {% highlight javascript %}
-      var titleTable = new Plottable.Component.Table([
-                        [title],
-                        [subtitle]
-                      ]);
-      titleTable.xAlign("center");
-    {% endhighlight %}
-```
+var titleTable = new Plottable.Component.Table([
+                  [title],
+                  [subtitle]
+                ]);
+titleTable.xAlign("center");
+{% endhighlight %}
 
-    The chart we are building is a larger table, with cells containing
-    the smaller, nested tables. The `titleTable.xAlign("center");` line
-    ensures that the titleTable is centered in the cell of that larger
-    table. Without specifying the alignment, it will align to the left
-    side by default.
+The chart we are building is a larger table, with cells containing
+the smaller, nested tables. The `titleTable.xAlign("center");` line
+ensures that the titleTable is centered in the cell of that larger
+table. Without specifying the alignment, it will align to the left
+side by default.
 
-5.  Our other table contains the axes and plot - just like in previous
-    tutorials we create the table by placing the y-axis in cell (0,0),
-    the plot in (0,1), null in (1,0) and the x-axis in (1,1).
+**Step 5**
+Our other table contains the axes and plot - just like in previous
+tutorials we create the table by placing the y-axis in cell (0,0),
+the plot in (0,1), null in (1,0) and the x-axis in (1,1).
 
-    ```
 {% highlight javascript %}
-      var dataTable = new Plottable.Component.Table([
-                        [yAxis, linePlot],
-                        [null, xAxis]
-                      ]);
-    {% endhighlight %}
-```
+var dataTable = new Plottable.Component.Table([
+                  [yAxis, linePlot],
+                  [null, xAxis]
+                ]);
+{% endhighlight %}
 
-6.  Finally, we can embed the tables. Here instead of placing components
-    in each cell, we place the two tables we just created. So in cell
-    (0,0), we put titleTable, and in cell (1,0), we put the dataTable.
+**Step 6**
+Finally, we can embed the tables. Here instead of placing components
+in each cell, we place the two tables we just created. So in cell
+(0,0), we put titleTable, and in cell (1,0), we put the dataTable.
 
-    ```
 {% highlight javascript %}
-      var chart = new Plottable.Component.Table([
-                        [titleTable],
-                        [dataTable]
-                      ]);
-    {% endhighlight %}
-```
+var chart = new Plottable.Component.Table([
+                  [titleTable],
+                  [dataTable]
+                ]);
+{% endhighlight %}
 
-    We now have a table with two subtables: one displaying the title and
-    subtitle, and the other displaying the axes and plot.
+We now have a table with two subtables: one displaying the title and
+subtitle, and the other displaying the axes and plot.
 
-7.  Your final code should look like:
+**Step 7**
+Your final code should look like:
 
-    ```
 {% highlight javascript %}
-    function makeNestedTables() {
+function makeNestedTables() {
 
-      var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scale.Linear();
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
-      var yScale = new Plottable.Scale.Linear();
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scale.Linear();
+  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
-      var linePlot = new Plottable.Plot.Line(gitData, xScale, yScale);
+  var linePlot = new Plottable.Plot.Line(gitData, xScale, yScale);
 
 
-      function getDayValue(d) {
-        return d.day;
-      }
-      linePlot.project("x", getDayValue, xScale);
+  function getDayValue(d) {
+    return d.day;
+  }
+  linePlot.project("x", getDayValue, xScale);
 
-      function getTotalCommits(d) {
-        return d.total_commits;
-      }
-      linePlot.project("y", getTotalCommits, yScale);
+  function getTotalCommits(d) {
+    return d.total_commits;
+  }
+  linePlot.project("y", getTotalCommits, yScale);
 
-      var title = new Plottable.Component.TitleLabel("Plottable Git Data");
-      var subtitle = new Plottable.Component.Label("Total Commits, by day, to the Plottable repo");
-      var titleTable = new Plottable.Component.Table([
-                        [title],
-                        [subtitle]
-                      ]);
-      titleTable.xAlign("center");
+  var title = new Plottable.Component.TitleLabel("Plottable Git Data");
+  var subtitle = new Plottable.Component.Label("Total Commits, by day, to the Plottable repo");
+  var titleTable = new Plottable.Component.Table([
+                    [title],
+                    [subtitle]
+                  ]);
+  titleTable.xAlign("center");
 
-      var dataTable = new Plottable.Component.Table([
-                        [yAxis, linePlot],
-                        [null, xAxis]
-                      ]);
+  var dataTable = new Plottable.Component.Table([
+                    [yAxis, linePlot],
+                    [null, xAxis]
+                  ]);
 
-      var chart = new Plottable.Component.Table([
-                        [titleTable],
-                        [dataTable]
-                      ]);
+  var chart = new Plottable.Component.Table([
+                    [titleTable],
+                    [dataTable]
+                  ]);
 
-      chart.renderTo("#chart");
-    }
-    {% endhighlight %}
-```
+  chart.renderTo("#chart");
+}
+{% endhighlight %}
 
 ![]({{ site.baseurl }}/build/images/tutorials/nestedTitle.png)
+
 
 Tutorial 5 - Bars
 -----------------
@@ -896,7 +865,6 @@ The following example will walk you through the creation of a bar chart.
 Here we are using a simple data set just to introduce the topic of bar
 charts:
 
-```
 {% highlight javascript %}
 //population, in millions
 wordWrapData = [
@@ -922,11 +890,9 @@ wordWrapData = [
   }
 ];
 {% endhighlight %}
-```
 
 As always, we start with the html code:
 
-```
 {% highlight xml %}
 <html>
   <head>
@@ -945,7 +911,6 @@ As always, we start with the html code:
   <script> window.onload = makeBarChart; </script>
 </html>
 {% endhighlight %}
-```
 
 The majority of the code in `makeBarChart.js` follows what we did in
 previous tutorials. We create axes, scales, plots, and projectors before
@@ -956,39 +921,32 @@ As always, we start by defining our scales. Here, since this is a
 horizontal bar chart, we want the y scale to be ordinal, the x scale can
 remain linear.
 
-```
 {% highlight javascript %}
 var xScale = new Plottable.Scale.Linear();
 var yScale = new Plottable.Scale.Ordinal();
 {% endhighlight %}
-```
 
 Next we create the axes, which are very similar to the other axes we
 have seen. However, this time, since we want to use Strings instead of
 Numbers for the y-axis, we use Category, instead of Numeric.
 
-```
 {% highlight javascript %}
 var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 var yAxis = new Plottable.Axis.Category(yScale, "left");
 {% endhighlight %}
-```
 
 Now we need to create the actual bar plot. As with previous plots, we
 need to specify the data to use, and the scales. The only difference is
 that now are going to make a HorizontalBar plot.
 
-```
 {% highlight javascript %}
 var barPlot = new Plottable.Plot.HorizontalBar(wordWrapData, xScale, yScale);
 {% endhighlight %}
-```
 
 Finally, we put everything in a table to create the chart. This looks
 exactly the same as in previous examples. Your final code should look
 like the following:
 
-```
 {% highlight javascript %}
 function makeBarChart() {
 
@@ -1021,4 +979,3 @@ function makeBarChart() {
   chart.renderTo("#chart");
 }
 {% endhighlight %}
-```

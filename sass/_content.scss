@@ -275,3 +275,26 @@ footer {
     }
   }
 }
+
+/*
+ * Tutorial/Generic Page
+ */
+div#page-content {
+
+  h1 {
+    color: $COLOR_ORANGE1;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+  }
+
+  p strong {
+    font-family: $font-headers;
+    font-weight: $font-weight-normal;
+    text-transform: uppercase;
+  }
+
+}
