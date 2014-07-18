@@ -3857,7 +3857,9 @@ var Plottable;
                     return -x;
                 }).reverse();
                 var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
-                var linearTicks = d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower));
+                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) {
+                    return min <= x && x <= max;
+                });
 
                 return negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
             };
