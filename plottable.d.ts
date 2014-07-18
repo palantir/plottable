@@ -1499,46 +1499,22 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Time extends Abstract.Scale {
+        class Time extends Abstract.QuantitiveScale {
             /**
             * Creates a new Time Scale.
             *
             * @constructor
-            * @param {D3.Scale.Time} [scale] The D3 TimeScale backing the TimeScale. If not supplied, uses a default scale.
+            * @param {D3.Scale.Time} [scale] The D3 LinearScale backing the LinearScale. If not supplied, uses a default scale.
             */
             constructor();
-            constructor(scale: D3.Scale.TimeScale);
-            /**
-            * Sets the range of the Time and sets the interpolator to d3.interpolateRound.
-            *
-            * @param {number[]} values The new range value for the range.
-            */
-            public rangeRound(values: number[]): Time;
-            /**
-            * Gets or sets the clamp status of the Time (whether to cut off values outside the ouput range).
-            *
-            * @param {boolean} [clamp] Whether or not to clamp the Time.
-            * @returns {boolean|Time} The current clamp status, or the calling Time.
-            */
-            public clamp(): boolean;
-            public clamp(clamp: boolean): Time;
-            /**
-            * Generates tick values.
-            *
-            * @param {number} [count] The number of ticks to generate.
-            * @returns {any[]} The generated ticks.
-            */
-            public ticks(count?: number): any[];
+            constructor(scale: D3.Scale.LinearScale);
             public tickInterval(interval: D3.Time.Interval, step?: number): any[];
-            public domain(): any[];
-            public domain(values: any[]): Time;
             /**
-            * Pads out the domain of the scale by a specified ratio.
+            * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
             *
-            * @param {number} [padProportion] Proportionally how much bigger the new domain should be (0.05 = 5% larger)
-            * @returns {Time} The calling Time.
+            * @returns {LinearScale} A copy of the calling LinearScale.
             */
-            public padDomain(padProportion?: number): Time;
+            public copy(): Time;
         }
     }
 }
