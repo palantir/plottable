@@ -317,13 +317,16 @@ describe("Scales", () => {
       scale = new Plottable.Scale.ModifiedLog(pivot);
     });
 
-    it("is an increasing function that can go negative", () => {
-      assert.operator(scale.scale(pivot), "<", scale.scale(pivot * 2));
-      assert.operator(scale.scale(pivot / 2), "<", scale.scale(pivot));
-      assert.operator(scale.scale(0), "<", scale.scale(pivot / 2));
-      assert.operator(scale.scale(-pivot / 2), "<", scale.scale(0));
-      assert.operator(scale.scale(-pivot), "<", scale.scale(-pivot / 2));
-      assert.operator(scale.scale(-pivot * 2), "<", scale.scale(-pivot));
+    it("is an increasing, continuous function that can go negative", () => {
+      d3.range(-pivot * 2, pivot * 2, pivot / 20).forEach((x: number) => {
+        // increasing
+        assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
+        assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
+        // continuous
+        assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
+        assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
+      });
+      assert.closeTo(scale.scale(0), 0, epsilon);
     });
 
     it("x = invert(scale(x))", () => {
