@@ -1735,6 +1735,7 @@ declare module Plottable {
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             constructor(scale: Scale.Time, orientation: string);
+            public calculateWorstWidth(container: D3.Selection, format: string): number;
             public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
             public getTickLevel(): number;
             public canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean;
