@@ -74,11 +74,6 @@ module.exports = function(grunt) {
       replacement: "",
       path: "plottable.d.ts",
     },
-    header: {
-      pattern: "VERSION",
-      replacement: "<%= pkg.version %>",
-      path: "license_header.tmp",
-    },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/src/$1.js");',
@@ -98,6 +93,11 @@ module.exports = function(grunt) {
       pattern: "(.*\\.ts)",
       replacement: '/// <reference path="../$1" />',
       path: "build/sublime.d.ts",
+    },
+    version_number: {
+      pattern: "@VERSION",
+      replacement: "<%= pkg.version %>",
+      path: "plottable.js"
     }
   };
 
@@ -132,12 +132,24 @@ module.exports = function(grunt) {
   };
   updateTestTsFiles();
 
+  var browsers = [{
+  //   browserName: "firefox",
+  //   version: "30"
+  // }, {
+    browserName: "chrome",
+    version: "35"
+  }, {
+    browserName: "internet explorer",
+    version: "10",
+    platform: "WIN8"
+  }];
+
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpJSON,
     concat: {
       header: {
-        src: ["license_header.tmp", "plottable.js"],
+        src: ["license_header.txt", "plottable.js"],
         dest: "plottable.js",
       },
       plottable_multifile: {
@@ -180,7 +192,7 @@ module.exports = function(grunt) {
       },
       "rebuild": {
         "tasks": ["dev-compile"],
-        "files": ["src/**/*.ts"]
+        "files": ["src/**/*.ts", "examples/**/*.ts"]
       },
       "tests": {
         "tasks": ["test-compile"],
@@ -196,18 +208,16 @@ module.exports = function(grunt) {
     connect: {
       server: {
         options: {
-          port: 7007,
+          port: 9999,
+          base: "",
           livereload: true
         }
       }
     },
-    clean: {tscommand: ["tscommand*.tmp.txt"], header: ["license_header.tmp"]},
-    sed: sedJSON,
-    copy: {
-      header: {
-        files: [{src: "license_header.txt", dest: "license_header.tmp"}]
-      }
+    clean: {
+      tscommand: ["tscommand*.tmp.txt"]
     },
+    sed: sedJSON,
     gitcommit: {
       version: {
         options: {
@@ -250,6 +260,17 @@ module.exports = function(grunt) {
         command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts",
       },
     },
+    'saucelabs-mocha': {
+      all: {
+        options: {
+          urls: ['http://127.0.0.1:9999/test/tests.html'],
+          testname: 'Plottable Sauce Unit Tests',
+          browsers: browsers,
+          build: process.env.TRAVIS_JOB_ID,
+          "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
+        }
+      }
+    }
   };
 
 
@@ -259,8 +280,6 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   // default task (this is what runs when a task isn't specified)
-  grunt.registerTask("handle-header",
-            ["copy:header", "sed:header", "concat:header", "clean:header"]);
   grunt.registerTask("update_ts_files", updateTsFiles);
   grunt.registerTask("update_test_ts_files", updateTestTsFiles);
   grunt.registerTask("definitions_prod", function() {
@@ -281,9 +300,10 @@ module.exports = function(grunt) {
                                   "concat:definitions",
                                   "sed:definitions",
                                   "sed:private_definitions",
+                                  "concat:header",
+                                  "sed:version_number",
                                   "definitions_prod",
                                   "test-compile",
-                                  "handle-header",
                                   "sed:protected_definitions",
                                   "concat:plottable_multifile",
                                   "sed:plottable_multifile",
@@ -305,11 +325,14 @@ module.exports = function(grunt) {
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
+  grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
   grunt.registerTask("test", ["dev-compile", "blanket_mocha", "tslint", "ts:verify_d_ts"]);
+  grunt.registerTask("test-travis", ["test", "test-sauce"]);
   grunt.registerTask("bm", ["blanket_mocha"]);
 
   grunt.registerTask("sublime", [
                                   "shell:sublime",
                                   "sed:sublime",
                                   ]);
+
 };

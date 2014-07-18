@@ -16,6 +16,7 @@
 /// <reference path="utils/formatters/customFormatter.ts" />
 /// <reference path="utils/formatters/timeFormatter.ts" />
 
+/// <reference path="core/version.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
@@ -42,7 +43,6 @@
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
-/// <reference path="components/axis.ts" />
 /// <reference path="components/baseAxis.ts" />
 /// <reference path="components/numericAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />

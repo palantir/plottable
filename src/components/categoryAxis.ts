@@ -4,7 +4,6 @@ module Plottable {
 export module Axis {
   export class Category extends Abstract.Axis {
     public _scale: Scale.Ordinal;
-    public _tickLabelsG: D3.Selection;
     private measurer: Util.Text.CachingCharacterMeasurer;
 
     /**
@@ -16,9 +15,10 @@ export module Axis {
      * @constructor
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+     * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom") {
-      super(scale, orientation);
+    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter: any = new Plottable.Formatter.Identity()) {
+      super(scale, orientation, formatter);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
         throw new Error("Only rangeBands category axes are implemented");
@@ -28,8 +28,7 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this._tickLabelsG = this.content.append("g").classed("tick-labels", true);
-      this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelsG);
+      this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
       return this;
     }
 
@@ -87,7 +86,7 @@ export module Axis {
      */
     public _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, ticks: D3.Selection): Util.Text.IWriteTextResult;
     public _measureTicks(axisWidth: number, axisHeight: number, scale: Scale.Ordinal, dataOrTicks: any): Util.Text.IWriteTextResult {
-      var draw = dataOrTicks instanceof d3.selection;
+      var draw = typeof dataOrTicks[0] !== "string";
       var self = this;
       var textWriteResults: Util.Text.IWriteTextResult[] = [];
       var tm = (s: string) => self.measurer.measure(s);
@@ -127,7 +126,7 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(this._scale.domain(), (d) => d);
+      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       var getTickLabelTransform = (d: string, i: number) => {
         var startAndWidth = this._scale.fullBandStartAndWidth(d);
@@ -136,7 +135,7 @@ export module Axis {
         var y = this._isHorizontal() ? 0 : bandStartPosition;
         return "translate(" + x + "," + y + ")";
       };
-      var tickLabelsEnter = tickLabels.enter().append("g").classed("tick-label", true);
+      tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
@@ -146,7 +145,7 @@ export module Axis {
 
       var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
       var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
-      Util.DOM.translate(this._tickLabelsG, xTranslate, yTranslate);
+      Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
       return this;
     }

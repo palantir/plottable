@@ -17,6 +17,7 @@ export module Interaction {
      */
     constructor(componentToListenTo: Abstract.Component, xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale) {
       super(componentToListenTo);
+      if (xScale == null || yScale == null) {throw new Error("panZoomInteractions require an xScale and yScale");}
       this.xScale = xScale;
       this.yScale = yScale;
       this.zoom = d3.behavior.zoom();

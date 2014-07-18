@@ -6,11 +6,12 @@ module Plottable {
     private doNice = false;
     private niceCount: number;
     private padProportion = 0.0;
-    private paddingExceptions: D3.Set = d3.set([]);
+    private paddingExceptions: D3.Map = d3.map();
+    private unregisteredPaddingExceptions: D3.Set = d3.set();
+    private includedValues: D3.Map = d3.map();
+    // includedValues needs to be a map, even unregistered, to support getting un-stringified values back out
+    private unregisteredIncludedValues: D3.Map = d3.map();
     private combineExtents: (extents: any[][]) => any[];
-    // This must be a map rather than a set so we can get the original values
-    // back out, rather than their stringified versions.
-    private includedValues: D3.Map = d3.map([]);
     private static PADDING_FOR_IDENTICAL_DOMAIN = 1;
     private static ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -25,7 +26,7 @@ module Plottable {
      *        merging them all into one [min, max] pair. It defaults to taking
      *        the min of the first elements and the max of the second arguments.
      */
-    constructor(combineExtents: (extents: any[][]) => any[] = Domainer.defaultCombineExtents) {
+    constructor(combineExtents?: (extents: any[][]) => any[]) {
       this.combineExtents = combineExtents;
     }
 
@@ -40,9 +41,15 @@ module Plottable {
      */
     public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[] {
       var domain: any[];
-      domain = this.combineExtents(extents);
+      if (this.combineExtents != null) {
+        domain = this.combineExtents(extents);
+      } else if (extents.length === 0) {
+        domain = scale._defaultExtent();
+      } else {
+        domain = [d3.min(extents, (e) => e[0]), d3.max(extents, (e) => e[1])];
+      }
       domain = this.includeDomain(domain);
-      domain = this.padDomain(domain);
+      domain = this.padDomain(scale, domain);
       domain = this.niceDomain(scale, domain);
       return domain;
     }
@@ -50,8 +57,15 @@ module Plottable {
     /**
      * Sets the Domainer to pad by a given ratio.
      *
-     * @param {number} [padProportion] Proportionally how much bigger the 
+     * @param {number} [padProportion] Proportionally how much bigger the
      *         new domain should be (0.05 = 5% larger).
+     *
+     *         A domainer will pad equal visual amounts on each side.
+     *         On a linear scale, this means both sides are padded the same
+     *         amount: [10, 20] will be padded to [5, 25].
+     *         On a log scale, the top will be padded more than the bottom, so
+     *         [10, 100] will be padded to [1, 1000].
+     *
      * @return {Domainer} The calling Domainer.
      */
     public pad(padProportion = 0.05): Domainer {
@@ -60,20 +74,78 @@ module Plottable {
     }
 
     /**
-     * Adds a value that will not be padded if either end of the domain.
-     * For example, after paddingException(0), a domainer will pad
-     * [0, 100] to [0, 102.5].
+     * Add a padding exception, a value that will not be padded at either end of the domain.
      *
-     * @param {any} exception The value that will not be padded.
-     * @param {boolean} add Defaults to true. If true, add the exception,
-     *                  if false, removes the exception.
-     * @return {Domainer} The calling Domainer.
+     * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
+     * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+     * If a key is not provided, it will be added with set semantics (Can be removed by value)
+     *
+     * @param {any} exception The padding exception to add.
+     * @param string [key] The key to register the exception under.
+     * @return Domainer The calling domainer
      */
-    public paddingException(exception: any, add = true): Domainer {
-      if (add) {
-        this.paddingExceptions.add(exception);
+    public addPaddingException(exception: any, key?: string): Domainer {
+      if (key != null) {
+        this.paddingExceptions.set(key, exception);
       } else {
-        this.paddingExceptions.remove(exception);
+        this.unregisteredPaddingExceptions.add(exception);
+      }
+      return this;
+    }
+
+
+    /**
+     * Remove a padding exception, allowing the domain to pad out that value again.
+     *
+     * If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
+     * If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.
+     *
+     * @param {any} keyOrException The key for the value to remove, or the value to remove
+     * @return Domainer The calling domainer
+     */
+    public removePaddingException(keyOrException: any): Domainer {
+      if (typeof(keyOrException) === "string") {
+        this.paddingExceptions.remove(keyOrException);
+      } else {
+        this.unregisteredPaddingExceptions.remove(keyOrException);
+      }
+      return this;
+    }
+
+    /**
+     * Add an included value, a value that must be included inside the domain.
+     *
+     * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
+     * If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+     * If a key is not provided, it will be added with set semantics (Can be removed by value)
+     *
+     * @param {any} value The included value to add.
+     * @param string [key] The key to register the value under.
+     * @return Domainer The calling domainer
+     */
+    public addIncludedValue(value: any, key?: string): Domainer {
+      if (key != null) {
+        this.includedValues.set(key, value);
+      } else {
+        this.unregisteredIncludedValues.set(value, value);
+      }
+      return this;
+    }
+
+    /**
+     * Remove an included value, allowing the domain to not include that value gain again.
+     *
+     * If a string is provided, it is assumed to be a key and the value associated with that key is removed.
+     * If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.
+     *
+     * @param {any} keyOrException The key for the value to remove, or the value to remove
+     * @return Domainer The calling domainer
+     */
+    public removeIncludedValue(valueOrKey: any) {
+      if (typeof(valueOrKey) === "string") {
+        this.includedValues.remove(valueOrKey);
+      } else {
+        this.unregisteredIncludedValues.remove(valueOrKey);
       }
       return this;
     }
@@ -90,27 +162,6 @@ module Plottable {
       return this;
     }
 
-    /**
-     * Ensure that the domain produced includes value.
-     *
-     * For example, after include(0), the domain [3, 5] will become [0, 5],
-     * and the domain [-9, -8] will become [-9, 0].
-     *
-     * @param {any} value The value that will be included.
-     * @param {boolean} include Defaults to true. If true, this value will
-     *                  always be included, if false, this value will not
-     *                  necessarily be included.
-     * @return {Domainer} The calling Domainer.
-     */
-    public include(value: any, include = true): Domainer {
-      if (include) {
-        this.includedValues.set(value, value);
-      } else {
-        this.includedValues.remove(value);
-      }
-      return this;
-    }
-
     private static defaultCombineExtents(extents: any[][]): any[] {
       if (extents.length === 0) {
         return [0, 1];
@@ -119,26 +170,34 @@ module Plottable {
       }
     }
 
-    private padDomain(domain: any[]): any[] {
-      if (domain[0] === domain[1] && this.padProportion > 0.0) {
-        var d = domain[0].valueOf(); // valueOf accounts for dates properly
-        if (domain[0] instanceof Date) {
+    private padDomain(scale: Abstract.QuantitiveScale, domain: any[]): any[] {
+      var min = domain[0];
+      var max = domain[1];
+      if (min === max && this.padProportion > 0.0) {
+        var d = min.valueOf(); // valueOf accounts for dates properly
+        if (min instanceof Date) {
           return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
         } else {
           return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN,
                   d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
         }
       }
-      var extent = domain[1] - domain[0];
-      var newDomain = [domain[0].valueOf() - this.padProportion/2 * extent,
-                       domain[1].valueOf() + this.padProportion/2 * extent];
-      if (this.paddingExceptions.has(domain[0])) {
-        newDomain[0] = domain[0];
+      var p = this.padProportion / 2;
+      // This scaling is done to account for log scales and other non-linear
+      // scales. A log scale should be padded more on the max than on the min.
+      var newMin = scale._d3Scale.invert(scale.scale(min) -
+                                        (scale.scale(max) - scale.scale(min)) * p);
+      var newMax = scale._d3Scale.invert(scale.scale(max) +
+                                        (scale.scale(max) - scale.scale(min)) * p);
+      var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
+      var exceptionSet = d3.set(exceptionValues);
+      if (exceptionSet.has(min)) {
+        newMin = min;
       }
-      if (this.paddingExceptions.has(domain[1])) {
-        newDomain[1] = domain[1];
+      if (exceptionSet.has(max)) {
+        newMax = max;
       }
-      return newDomain;
+      return [newMin, newMax];
     }
 
     private niceDomain(scale: Abstract.QuantitiveScale, domain: any[]): any[] {
@@ -150,7 +209,8 @@ module Plottable {
     }
 
     private includeDomain(domain: any[]): any[] {
-      return this.includedValues.values().reduce(
+      var includedValues = this.includedValues.values().concat(this.unregisteredIncludedValues.values());
+      return includedValues.reduce(
         (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],
         domain
       );

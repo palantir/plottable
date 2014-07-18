@@ -18,7 +18,7 @@ export module Axis {
     constructor(scale: Scale.CompositeOrdinal, orientation = "bottom") {
       super(scale, orientation);
       this.tickLength(120);
-      this.formatter(new Plottable.Formatter.Custom(null, (d: string[], formatter: Formatter.Custom) => d[d.length - 1]));
+      this.formatter(new Plottable.Formatter.Custom((d: string[]) => d[d.length - 1]));
     }
 
     public _generateTickMarkAttrHash() {
@@ -65,10 +65,8 @@ export module Axis {
       var labels = this._getAllLabels();
       var k = this._scale.getLevels();
 
-      // remove all the translation from tickLabels
-      Util.DOM.translate(this._tickLabelsG, 0, 0);
-
-      var tickLabels = this._tickLabelsG.selectAll(".tick-label").data(labels, (d) => d);
+      var tickLabels = tickLabels.selectAll(".tick-label").data(labels, (d: string) => d);
+      Util.DOM.translate(tickLabels, 0, 0);
       var getTickLabelTransform = (d: string, i: number) => {
         var startAndWidth = this._scale.fullBandStartAndWidth(d);
         var bandStartPosition = startAndWidth[0];
