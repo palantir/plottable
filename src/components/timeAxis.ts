@@ -17,68 +17,68 @@ export module Axis {
     // default intervals
     // these are for minor tick labels
     public static minorIntervals: ITimeInterval[] = [
-      {timeUnit: d3.time.second, step: 1,  formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 5,  formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 10, formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 15, formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 30, formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.minute, step: 1,  formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 5,  formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 10, formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 15, formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 30, formatString: "%I:%M %p"},
-      {timeUnit: d3.time.hour,   step: 1,  formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 3,  formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 6,  formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 12, formatString: "%I %p"},
-      {timeUnit: d3.time.day,    step: 1,  formatString: "%a %e"},
-      {timeUnit: d3.time.day,    step: 1,  formatString: "%e"},
-      {timeUnit: d3.time.month,  step: 1,  formatString: "%B"},
-      {timeUnit: d3.time.month,  step: 1,  formatString: "%b"},
-      {timeUnit: d3.time.month,  step: 3,  formatString: "%B"},
-      {timeUnit: d3.time.month,  step: 6,  formatString: "%B"},
-      {timeUnit: d3.time.year,   step: 1,  formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,  formatString: "%y"},
-      {timeUnit: d3.time.year,   step: 5,  formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 25, formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 50, formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 100, formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 200, formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 500, formatString: "%Y"},
+      {timeUnit: d3.time.second, step: 1,    formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 5,    formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 10,   formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 15,   formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 30,   formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.minute, step: 1,    formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 5,    formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 10,   formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 15,   formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 30,   formatString: "%I:%M %p"},
+      {timeUnit: d3.time.hour,   step: 1,    formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 3,    formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 6,    formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 12,   formatString: "%I %p"},
+      {timeUnit: d3.time.day,    step: 1,    formatString: "%a %e"},
+      {timeUnit: d3.time.day,    step: 1,    formatString: "%e"},
+      {timeUnit: d3.time.month,  step: 1,    formatString: "%B"},
+      {timeUnit: d3.time.month,  step: 1,    formatString: "%b"},
+      {timeUnit: d3.time.month,  step: 3,    formatString: "%B"},
+      {timeUnit: d3.time.month,  step: 6,    formatString: "%B"},
+      {timeUnit: d3.time.year,   step: 1,    formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 1,    formatString: "%y"},
+      {timeUnit: d3.time.year,   step: 5,    formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 25,   formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 50,   formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 100,  formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 200,  formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 500,  formatString: "%Y"},
       {timeUnit: d3.time.year,   step: 1000, formatString: "%Y"}
     ];
 
     // these are for major tick labels
     public static majorIntervals: ITimeInterval[] = [
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
-      {timeUnit: d3.time.month, step: 1,      formatString: "%B %Y"},
-      {timeUnit: d3.time.month, step: 1,      formatString: "%B %Y"},
-      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"},
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""}, // this is essentially blank
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""}
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.month,  step: 1,      formatString: "%B %Y"},
+      {timeUnit: d3.time.month,  step: 1,      formatString: "%B %Y"},
+      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""}, // this is essentially blank
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,   step: 100000, formatString: ""}
     ];
 
     /**
@@ -89,55 +89,47 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      */
     constructor(scale: Scale.Time, orientation: string) {
+      orientation = orientation.toLowerCase();
       if (orientation !== "top" && orientation !== "bottom") {
-        throw new Error ("Time axis is only supported for horizontal axis");
+        throw new Error ("Only horizontal axis are supported");
       }
       super(scale, orientation);
       this.classed("time-axis", true);
       this.tickLabelPadding(5);
-     }
+    }
 
-     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var requestedWidth = this._width;
-      var requestedHeight = this._height;
-
-      if (this._computedHeight == null) {
-        var textHeight = this._measureTextHeight();
-        // make tick lengths double the textHeight plus some padding
-        this.tickLength((textHeight + this.tickLabelPadding()) * 2);
-        this._computedHeight = this.tickLength() + 2 * this.tickLabelPadding();
+    public _computeHeight() {
+      if (this._computedHeight !== null) {
+        return this._computedHeight;
       }
-      requestedWidth = 0;
-      requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
-
-      return {
-          width: Math.min(offeredWidth, requestedWidth),
-          height: Math.min(offeredHeight, requestedHeight),
-          wantsWidth: false,
-          wantsHeight: offeredHeight < requestedHeight
-      };
+      var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
+      var setTickLength = textHeight;
+      this.tickLength(setTickLength);
+      this._computedHeight = setTickLength + 2 * this.tickLabelPadding();
+      return this._computedHeight;
     }
 
     public calculateWorstWidth(container: D3.Selection, format: string): number {
       // returns the worst case width for a format
       // September 29, 9999 at 12:59.9999 PM Wednesday
       var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-      return Util.Text.getTextWidth(container, d3.time.format(format)(longDate)) + 2 * this.tickLabelPadding();
+      return Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
     }
 
     public isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
       // do a simple heuristic that sees if worst width will fit within spaces between two ticks
-      var worst = this.calculateWorstWidth(container, interval.formatString);
+      var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
       var testDate = this._scale.domain()[0]; // any date could go here
-      var stepLength = this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate);
+      // meausre how much space one date can get
+      var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
       stepLength = Math.min(stepLength, this.availableWidth);
       return worst < stepLength;
     }
 
     public _setup() {
       super._setup();
-      this._majorTickLabels = this.content.append("g").classed("major-tick-labels", true);
-      this._minorTickLabels = this.content.append("g").classed("minor-tick-labels", true);
+      this._majorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
+      this._minorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       return this;
     }
 
@@ -170,8 +162,8 @@ export module Axis {
       return minorTicks.concat(majorTicks);
     }
 
-    public _measureTextHeight(): number {
-      var fakeTickLabel = this._majorTickLabels.append("g").classed("major-tick-label", true);
+    public _measureTextHeight(container: D3.Selection): number {
+      var fakeTickLabel = container.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       var textHeight = Util.Text.getTextHeight(fakeTickLabel.append("text"));
       fakeTickLabel.remove();
       return textHeight;
@@ -200,7 +192,7 @@ export module Axis {
       var xTranslate = center ? 0 : this.tickLabelPadding();
       tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ?
           (this.tickLength() / 2 * height) :
-          (this.availableHeight - this.tickLength() / 2 * height)) + ")");
+          (this.availableHeight - this.tickLength() / 2 * height + 2 * this.tickLabelPadding())) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = center ? "middle" : "left";
@@ -232,6 +224,9 @@ export module Axis {
       var selection = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).filter((d: Date) =>
           tickValues.map((x: Date) => x.valueOf()).indexOf(d.valueOf()) >= 0
       );
+      if (this._orientation === "top") {
+        height = this.availableHeight - height;
+      }
       selection.attr("y2", height);
     }
 

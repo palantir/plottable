@@ -4646,55 +4646,47 @@ var Plottable;
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
             */
             function Time(scale, orientation) {
+                orientation = orientation.toLowerCase();
                 if (orientation !== "top" && orientation !== "bottom") {
-                    throw new Error("Time axis is only supported for horizontal axis");
+                    throw new Error("Only horizontal axis are supported");
                 }
                 _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
                 this.tickLabelPadding(5);
             }
-            Time.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var requestedWidth = this._width;
-                var requestedHeight = this._height;
-
-                if (this._computedHeight == null) {
-                    var textHeight = this._measureTextHeight();
-
-                    // make tick lengths double the textHeight plus some padding
-                    this.tickLength((textHeight + this.tickLabelPadding()) * 2);
-                    this._computedHeight = this.tickLength() + 2 * this.tickLabelPadding();
+            Time.prototype._computeHeight = function () {
+                if (this._computedHeight !== null) {
+                    return this._computedHeight;
                 }
-                requestedWidth = 0;
-                requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
-
-                return {
-                    width: Math.min(offeredWidth, requestedWidth),
-                    height: Math.min(offeredHeight, requestedHeight),
-                    wantsWidth: false,
-                    wantsHeight: offeredHeight < requestedHeight
-                };
+                var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
+                var setTickLength = textHeight;
+                this.tickLength(setTickLength);
+                this._computedHeight = setTickLength + 2 * this.tickLabelPadding();
+                return this._computedHeight;
             };
 
             Time.prototype.calculateWorstWidth = function (container, format) {
                 // returns the worst case width for a format
                 // September 29, 9999 at 12:59.9999 PM Wednesday
                 var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-                return Plottable.Util.Text.getTextWidth(container, d3.time.format(format)(longDate)) + 2 * this.tickLabelPadding();
+                return Plottable.Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
             };
 
             Time.prototype.isEnoughSpace = function (container, interval) {
                 // do a simple heuristic that sees if worst width will fit within spaces between two ticks
-                var worst = this.calculateWorstWidth(container, interval.formatString);
+                var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
                 var testDate = this._scale.domain()[0];
-                var stepLength = this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate);
+
+                // meausre how much space one date can get
+                var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
                 stepLength = Math.min(stepLength, this.availableWidth);
                 return worst < stepLength;
             };
 
             Time.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._majorTickLabels = this.content.append("g").classed("major-tick-labels", true);
-                this._minorTickLabels = this.content.append("g").classed("minor-tick-labels", true);
+                this._majorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                this._minorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 return this;
             };
 
@@ -4725,8 +4717,8 @@ var Plottable;
                 return minorTicks.concat(majorTicks);
             };
 
-            Time.prototype._measureTextHeight = function () {
-                var fakeTickLabel = this._majorTickLabels.append("g").classed("major-tick-label", true);
+            Time.prototype._measureTextHeight = function (container) {
+                var fakeTickLabel = container.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
                 fakeTickLabel.remove();
                 return textHeight;
@@ -4758,7 +4750,7 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = center ? 0 : this.tickLabelPadding();
-                tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ? (this.tickLength() / 2 * height) : (this.availableHeight - this.tickLength() / 2 * height)) + ")");
+                tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ? (this.tickLength() / 2 * height) : (this.availableHeight - this.tickLength() / 2 * height + 2 * this.tickLabelPadding())) + ")");
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d) {
                     return "translate(" + _this._scale.scale(d) + ",0)";
@@ -4795,6 +4787,9 @@ var Plottable;
                         return x.valueOf();
                     }).indexOf(d.valueOf()) >= 0;
                 });
+                if (this._orientation === "top") {
+                    height = this.availableHeight - height;
+                }
                 selection.attr("y2", height);
             };
 
