@@ -4987,7 +4987,7 @@ var Plottable;
             };
 
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
-                var draw = typeof dataOrTicks[0] !== "string";
+                var draw = dataOrTicks.node != null;
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) {
@@ -5160,10 +5160,10 @@ var Plottable;
                 var labels = this._getAllLabels();
                 var k = this._scale.getLevels();
 
-                var tickLabels = tickLabels.selectAll(".tick-label").data(labels, function (d) {
+                Plottable.Util.DOM.translate(this._tickLabelContainer, 0, 0);
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(labels, function (d) {
                     return d;
                 });
-                Plottable.Util.DOM.translate(tickLabels, 0, 0);
                 var getTickLabelTransform = function (d, i) {
                     var startAndWidth = _this._scale.fullBandStartAndWidth(d);
                     var bandStartPosition = startAndWidth[0];

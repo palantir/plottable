@@ -65,8 +65,8 @@ export module Axis {
       var labels = this._getAllLabels();
       var k = this._scale.getLevels();
 
-      var tickLabels = tickLabels.selectAll(".tick-label").data(labels, (d: string) => d);
-      Util.DOM.translate(tickLabels, 0, 0);
+      Util.DOM.translate(this._tickLabelContainer, 0, 0);
+      var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(labels, (d) => d);
       var getTickLabelTransform = (d: string, i: number) => {
         var startAndWidth = this._scale.fullBandStartAndWidth(d);
         var bandStartPosition = startAndWidth[0];
