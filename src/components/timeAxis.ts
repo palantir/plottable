@@ -91,7 +91,7 @@ export module Axis {
     constructor(scale: Scale.Time, orientation: string) {
       orientation = orientation.toLowerCase();
       if (orientation !== "top" && orientation !== "bottom") {
-        throw new Error ("Only horizontal axis are supported");
+        throw new Error ("unsupported orientation");
       }
       super(scale, orientation);
       this.classed("time-axis", true);

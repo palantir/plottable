@@ -4648,7 +4648,7 @@ var Plottable;
             function Time(scale, orientation) {
                 orientation = orientation.toLowerCase();
                 if (orientation !== "top" && orientation !== "bottom") {
-                    throw new Error("Only horizontal axis are supported");
+                    throw new Error("unsupported orientation");
                 }
                 _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
