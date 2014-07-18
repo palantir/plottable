@@ -3875,8 +3875,9 @@ var Plottable;
 
             CompositeOrdinal.prototype.stepLevel = function (n) {
                 var d = this.domain();
-                for (var i = 0; i <= n - 1; i++)
+                for (var i = 0; i <= n - 1; i++) {
                     d = this.product(d, this._subScales[i].domain());
+                }
                 if (d.length < 2) {
                     return 0;
                 }
@@ -3946,7 +3947,7 @@ var Plottable;
                 var init = [[]];
                 var dom = [];
                 for (var j = 0; j < data.length; j++) {
-                    if (dom.indexOf(data[j][keys[0]]) == -1) {
+                    if (dom.indexOf(data[j][keys[0]]) === -1) {
                         dom.push(data[j][keys[0]]);
                     }
                 }
@@ -3961,7 +3962,7 @@ var Plottable;
                     // var subDomain = _(data).map(keys[i + 1]).sortBy().uniq().value();
                     var dom = [];
                     for (var j = 0; j < data.length; j++) {
-                        if (dom.indexOf(data[j][keys[i + 1]]) == -1) {
+                        if (dom.indexOf(data[j][keys[i + 1]]) === -1) {
                             dom.push(data[j][keys[i + 1]]);
                         }
                     }
@@ -5125,7 +5126,6 @@ var Plottable;
                     tickMarkAttrHash["y1"] = startPosition;
                     tickMarkAttrHash["y2"] = startPosition;
                 }
-
                 return tickMarkAttrHash;
             };
 

@@ -32,7 +32,6 @@ export module Axis {
         tickMarkAttrHash["y1"] = startPosition;
         tickMarkAttrHash["y2"] = startPosition;
       }
-
       return tickMarkAttrHash;
     }
 
