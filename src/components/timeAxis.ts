@@ -46,17 +46,29 @@ export module Axis {
     // these are for major tick labels
     public static majorIntervals: ITimeInterval[] = [
       {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
+      {timeUnit: d3.time.day,   step: 1,      formatString: "%B %e, %Y"},
       {timeUnit: d3.time.month, step: 1,      formatString: "%B %Y"},
-      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"}, 
-      {timeUnit: d3.time.year,  step: 100000, formatString: ""} // this is essentially blank
-    ];
-
-    // first index in minor that will not map to index in major
-    public static minorToMajor: number[] = [
-      14, // [0, 13] -> days
-      16, // [14, 15] -> months
-      20, // [16, 19] -> years
-      1000000, // [20, infinity) -> blank
+      {timeUnit: d3.time.month, step: 1,      formatString: "%B %Y"},
+      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,  step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,  step: 100000, formatString: ""}, // this is essentially blank
+      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,  step: 100000, formatString: ""},
+      {timeUnit: d3.time.year,  step: 100000, formatString: ""}
     ];
 
     /**
@@ -83,7 +95,7 @@ export module Axis {
         var textHeight = this._measureTextHeight();
         // make tick lengths double the textHeight plus some padding
         this.tickLength((textHeight + this.tickLabelPadding()) * 2);
-        this._computedHeight = this.tickLength();
+        this._computedHeight = this.tickLength() + 2 * this.tickLabelPadding();
       }
       requestedWidth = 0;
       requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
@@ -111,7 +123,7 @@ export module Axis {
       tickLabels.push(domain[0]);
       tickLabels.push(domain[1]);
       var formatter = d3.time.format(interval.formatString);
-      var maxLabelWidth = d3.max(tickLabels, (d: Date) => 
+      var maxLabelWidth = d3.max(tickLabels, (d: Date) =>
         Util.Text.getTextWidth(container, formatter(d)));
       return (2 * this.tickLabelPadding() + maxLabelWidth) * (tickLabels.length + 1) < this.availableWidth;
     }
@@ -123,30 +135,27 @@ export module Axis {
       return this;
     }
 
-    // returns a pair of indices [minor, major] to index into the arrays
-    public getTickLevels(): number[] {
+    // returns a number to index into the major/minor intervals
+    public getTickLevel(): number {
       // could also probably cache this
-      var i = 0, j = 0;
+      var i = 0;
       for(; i < Time.minorIntervals.length; i++) {
-        while (Time.minorToMajor[j] <= i) {
-          j++;
-        }
         if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
-            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[j])) {
+            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
           break;
         }
       }
 
-      return [i, j];
+      return i;
     }
 
     public _getTickValues(): any[] {
-      var levels = this.getTickLevels();
+      var index = this.getTickLevel();
       var set = d3.set();
       set = Util.Methods.union(set, d3.set(this._scale.tickInterval
-        (Time.minorIntervals[levels[0]].timeUnit, Time.minorIntervals[levels[0]].step)));
+        (Time.minorIntervals[index].timeUnit, Time.minorIntervals[index].step)));
       set = Util.Methods.union(set, d3.set(this._scale.tickInterval
-        (Time.majorIntervals[levels[1]].timeUnit, Time.majorIntervals[levels[1]].step)));
+        (Time.majorIntervals[index].timeUnit, Time.majorIntervals[index].step)));
       return set.values().map((d) => new Date(d));
     }
 
@@ -209,11 +218,11 @@ export module Axis {
 
     public _doRender() {
       super._doRender();
-      var levels = this.getTickLevels();
-      this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[levels[0]], 1);
-      this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[levels[1]], 2);
+      var level = this.getTickLevel();
+      this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[level], 1);
+      this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[level], 2);
       for (var index = 0; index < 2; index++) {
-          var v = index == 0 ? Time.minorIntervals[levels[index]] : Time.majorIntervals[levels[index]];
+          var v = index === 0 ? Time.minorIntervals[level] : Time.majorIntervals[level];
           var tickValues = this._scale.tickInterval(v.timeUnit, v.step);
           var selection = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).filter((d) =>
               tickValues.map((x) => x.valueOf()).indexOf(d.valueOf()) >= 0

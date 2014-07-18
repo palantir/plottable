@@ -1727,7 +1727,6 @@ declare module Plottable {
         class Time extends Abstract.Axis {
             static minorIntervals: ITimeInterval[];
             static majorIntervals: ITimeInterval[];
-            static minorToMajor: number[];
             /**
             * Creates a TimeAxis
             *
@@ -1737,7 +1736,7 @@ declare module Plottable {
             */
             constructor(scale: Scale.Time, orientation: string);
             public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
-            public getTickLevels(): number[];
+            public getTickLevel(): number;
             public canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean;
         }
     }

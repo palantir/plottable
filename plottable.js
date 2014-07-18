@@ -4662,7 +4662,7 @@ var Plottable;
 
                     // make tick lengths double the textHeight plus some padding
                     this.tickLength((textHeight + this.tickLabelPadding()) * 2);
-                    this._computedHeight = this.tickLength();
+                    this._computedHeight = this.tickLength() + 2 * this.tickLabelPadding();
                 }
                 requestedWidth = 0;
                 requestedHeight = (this._height === "auto") ? this._computedHeight : this._height;
@@ -4706,27 +4706,24 @@ var Plottable;
                 return this;
             };
 
-            // returns a pair of indices [minor, major] to index into the arrays
-            Time.prototype.getTickLevels = function () {
+            // returns a number to index into the major/minor intervals
+            Time.prototype.getTickLevel = function () {
                 // could also probably cache this
-                var i = 0, j = 0;
+                var i = 0;
                 for (; i < Time.minorIntervals.length; i++) {
-                    while (Time.minorToMajor[j] <= i) {
-                        j++;
-                    }
-                    if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[j])) {
+                    if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
                         break;
                     }
                 }
 
-                return [i, j];
+                return i;
             };
 
             Time.prototype._getTickValues = function () {
-                var levels = this.getTickLevels();
+                var index = this.getTickLevel();
                 var set = d3.set();
-                set = Plottable.Util.Methods.union(set, d3.set(this._scale.tickInterval(Time.minorIntervals[levels[0]].timeUnit, Time.minorIntervals[levels[0]].step)));
-                set = Plottable.Util.Methods.union(set, d3.set(this._scale.tickInterval(Time.majorIntervals[levels[1]].timeUnit, Time.majorIntervals[levels[1]].step)));
+                set = Plottable.Util.Methods.union(set, d3.set(this._scale.tickInterval(Time.minorIntervals[index].timeUnit, Time.minorIntervals[index].step)));
+                set = Plottable.Util.Methods.union(set, d3.set(this._scale.tickInterval(Time.majorIntervals[index].timeUnit, Time.majorIntervals[index].step)));
                 return set.values().map(function (d) {
                     return new Date(d);
                 });
@@ -4797,11 +4794,11 @@ var Plottable;
 
             Time.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
-                var levels = this.getTickLevels();
-                this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[levels[0]], 1);
-                this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[levels[1]], 2);
+                var level = this.getTickLevel();
+                this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[level], 1);
+                this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[level], 2);
                 for (var index = 0; index < 2; index++) {
-                    var v = index == 0 ? Time.minorIntervals[levels[index]] : Time.majorIntervals[levels[index]];
+                    var v = index === 0 ? Time.minorIntervals[level] : Time.majorIntervals[level];
                     var tickValues = this._scale.tickInterval(v.timeUnit, v.step);
                     var selection = this._tickMarkContainer.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS).filter(function (d) {
                         return tickValues.map(function (x) {
@@ -4841,16 +4838,29 @@ var Plottable;
 
             Time.majorIntervals = [
                 { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.month, step: 1, formatString: "%B %Y" },
                 { timeUnit: d3.time.month, step: 1, formatString: "%B %Y" },
                 { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
                 { timeUnit: d3.time.year, step: 100000, formatString: "" }
-            ];
-
-            Time.minorToMajor = [
-                14,
-                16,
-                20,
-                1000000
             ];
             return Time;
         })(Plottable.Abstract.Axis);
