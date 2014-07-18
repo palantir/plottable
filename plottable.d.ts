@@ -1504,15 +1504,15 @@ declare module Plottable {
             * Creates a new Time Scale.
             *
             * @constructor
-            * @param {D3.Scale.Time} [scale] The D3 LinearScale backing the LinearScale. If not supplied, uses a default scale.
+            * @param {D3.Scale.Time} [scale] The D3 LinearScale backing the TimeScale. If not supplied, uses a default scale.
             */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             public tickInterval(interval: D3.Time.Interval, step?: number): any[];
             /**
-            * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
+            * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
             *
-            * @returns {LinearScale} A copy of the calling LinearScale.
+            * @returns {TimeScale} A copy of the calling TimeScale.
             */
             public copy(): Time;
         }
@@ -1707,8 +1707,8 @@ declare module Plottable {
             * Creates a TimeAxis
             *
             * @constructor
-            * @param {OrdinalScale} scale The scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            * @param {TimeScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom)
             */
             constructor(scale: Scale.Time, orientation: string);
             public calculateWorstWidth(container: D3.Selection, format: string): number;

@@ -3937,9 +3937,9 @@ var Plottable;
             };
 
             /**
-            * Creates a copy of the LinearScale with the same domain and range but without any registered listeners.
+            * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
             *
-            * @returns {LinearScale} A copy of the calling LinearScale.
+            * @returns {TimeScale} A copy of the calling TimeScale.
             */
             Time.prototype.copy = function () {
                 return new Time(this._d3Scale.copy());
@@ -4577,8 +4577,8 @@ var Plottable;
             * Creates a TimeAxis
             *
             * @constructor
-            * @param {OrdinalScale} scale The scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            * @param {TimeScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom)
             */
             function Time(scale, orientation) {
                 orientation = orientation.toLowerCase();
