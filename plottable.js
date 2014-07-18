@@ -4652,6 +4652,8 @@ var Plottable;
                 }
                 _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
+                this.previousSpan = 0;
+                this.previousIndex = Time.minorIntervals.length - 1;
                 this.tickLabelPadding(5);
             }
             Time.prototype._computeHeight = function () {
@@ -4672,14 +4674,19 @@ var Plottable;
                 return Plottable.Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
             };
 
-            Time.prototype.isEnoughSpace = function (container, interval) {
-                // do a simple heuristic that sees if worst width will fit within spaces between two ticks
-                var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
+            Time.prototype.getIntervalLength = function (interval) {
                 var testDate = this._scale.domain()[0];
 
                 // meausre how much space one date can get
                 var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
-                stepLength = Math.min(stepLength, this.availableWidth);
+                return stepLength;
+            };
+
+            Time.prototype.isEnoughSpace = function (container, interval) {
+                // compute number of ticks
+                // if less than a certain threshold
+                var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
+                var stepLength = Math.min(this.getIntervalLength(interval), this.availableWidth);
                 return worst < stepLength;
             };
 
@@ -4692,16 +4699,26 @@ var Plottable;
 
             // returns a number to index into the major/minor intervals
             Time.prototype.getTickLevel = function () {
-                for (var i = 0; i < Time.minorIntervals.length; i++) {
-                    if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
+                // for zooming, don't start search all the way from beginning.
+                var startingPoint = Time.minorIntervals.length - 1;
+                var curSpan = Math.abs(this._scale.domain()[1] - this._scale.domain()[0]);
+                if (curSpan <= this.previousSpan + 1) {
+                    startingPoint = this.previousIndex;
+                }
+
+                for (var i = startingPoint; i >= 0; i--) {
+                    if (!(this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i]))) {
+                        i++;
                         break;
                     }
                 }
-                if (i === Time.minorIntervals.length) {
-                    i--;
+                if (i < 0) {
+                    i = 0;
                     // we can either fail now, or display ticks at highest granularity available even if it will be ugly
                     //throw new Error ("could not find suitable interval to display labels");
                 }
+                this.previousIndex = i - 1;
+                this.previousSpan = curSpan;
 
                 return i;
             };
@@ -4793,11 +4810,31 @@ var Plottable;
                 selection.attr("y2", height);
             };
 
+            Time.prototype._generateLabellessTicks = function (index) {
+                if (index < 0) {
+                    return;
+                }
+
+                var smallTicks = this._getTickIntervalValues(Time.minorIntervals[index]);
+                var allTicks = this._getTickValues().concat(smallTicks);
+
+                var tickMarks = this._tickMarkContainer.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS).data(allTicks);
+                tickMarks.enter().append("line").classed(Plottable.Abstract.Axis.TICK_MARK_CLASS, true);
+                tickMarks.attr(this._generateTickMarkAttrHash());
+                tickMarks.exit().remove();
+                this._adjustTickLength(this.tickLabelPadding(), Time.minorIntervals[index]);
+            };
+
             Time.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
                 var index = this.getTickLevel();
                 this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
                 this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
+                var domain = this._scale.domain();
+                var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
+                if (this.getIntervalLength(Time.minorIntervals[index]) * 1.5 >= totalLength) {
+                    this._generateLabellessTicks(index - 1);
+                }
 
                 // make minor ticks shorter
                 this._adjustTickLength(this.tickLength() / 2, Time.minorIntervals[index]);

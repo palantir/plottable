@@ -17,35 +17,35 @@ export module Axis {
     // default intervals
     // these are for minor tick labels
     public static minorIntervals: ITimeInterval[] = [
-      {timeUnit: d3.time.second, step: 1,    formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 5,    formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 10,   formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 15,   formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.second, step: 30,   formatString: "%I:%M:%S %p"},
-      {timeUnit: d3.time.minute, step: 1,    formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 5,    formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 10,   formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 15,   formatString: "%I:%M %p"},
-      {timeUnit: d3.time.minute, step: 30,   formatString: "%I:%M %p"},
-      {timeUnit: d3.time.hour,   step: 1,    formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 3,    formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 6,    formatString: "%I %p"},
-      {timeUnit: d3.time.hour,   step: 12,   formatString: "%I %p"},
-      {timeUnit: d3.time.day,    step: 1,    formatString: "%a %e"},
-      {timeUnit: d3.time.day,    step: 1,    formatString: "%e"},
-      {timeUnit: d3.time.month,  step: 1,    formatString: "%B"},
-      {timeUnit: d3.time.month,  step: 1,    formatString: "%b"},
-      {timeUnit: d3.time.month,  step: 3,    formatString: "%B"},
-      {timeUnit: d3.time.month,  step: 6,    formatString: "%B"},
-      {timeUnit: d3.time.year,   step: 1,    formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1,    formatString: "%y"},
-      {timeUnit: d3.time.year,   step: 5,    formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 25,   formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 50,   formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 100,  formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 200,  formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 500,  formatString: "%Y"},
-      {timeUnit: d3.time.year,   step: 1000, formatString: "%Y"}
+      {timeUnit: d3.time.second, step: 1,      formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 5,      formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 10,     formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 15,     formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.second, step: 30,     formatString: "%I:%M:%S %p"},
+      {timeUnit: d3.time.minute, step: 1,      formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 5,      formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 10,     formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 15,     formatString: "%I:%M %p"},
+      {timeUnit: d3.time.minute, step: 30,     formatString: "%I:%M %p"},
+      {timeUnit: d3.time.hour,   step: 1,      formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 3,      formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 6,      formatString: "%I %p"},
+      {timeUnit: d3.time.hour,   step: 12,     formatString: "%I %p"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%a %e"},
+      {timeUnit: d3.time.day,    step: 1,      formatString: "%e"},
+      {timeUnit: d3.time.month,  step: 1,      formatString: "%B"},
+      {timeUnit: d3.time.month,  step: 1,      formatString: "%b"},
+      {timeUnit: d3.time.month,  step: 3,      formatString: "%B"},
+      {timeUnit: d3.time.month,  step: 6,      formatString: "%B"},
+      {timeUnit: d3.time.year,   step: 1,      formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 1,      formatString: "%y"},
+      {timeUnit: d3.time.year,   step: 5,      formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 25,     formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 50,     formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 100,    formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 200,    formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 500,    formatString: "%Y"},
+      {timeUnit: d3.time.year,   step: 1000,   formatString: "%Y"}
     ];
 
     // these are for major tick labels
@@ -81,6 +81,9 @@ export module Axis {
       {timeUnit: d3.time.year,   step: 100000, formatString: ""}
     ];
 
+    private previousSpan: number;
+    private previousIndex: number;
+
     /**
      * Creates a TimeAxis
      * 
@@ -95,6 +98,8 @@ export module Axis {
       }
       super(scale, orientation);
       this.classed("time-axis", true);
+      this.previousSpan = 0;
+      this.previousIndex = Time.minorIntervals.length - 1;
       this.tickLabelPadding(5);
     }
 
@@ -116,13 +121,18 @@ export module Axis {
       return Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
     }
 
-    public isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
-      // do a simple heuristic that sees if worst width will fit within spaces between two ticks
-      var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
+    public getIntervalLength(interval: ITimeInterval) {
       var testDate = this._scale.domain()[0]; // any date could go here
       // meausre how much space one date can get
       var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
-      stepLength = Math.min(stepLength, this.availableWidth);
+      return stepLength;
+    }
+
+    public isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
+      // compute number of ticks
+      // if less than a certain threshold 
+      var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
+      var stepLength = Math.min(this.getIntervalLength(interval), this.availableWidth);
       return worst < stepLength;
     }
 
@@ -135,18 +145,27 @@ export module Axis {
 
     // returns a number to index into the major/minor intervals
     public getTickLevel(): number {
-      // could also probably cache this
-      for(var i = 0; i < Time.minorIntervals.length; i++) {
-        if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
-            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
+      // for zooming, don't start search all the way from beginning.
+      var startingPoint = Time.minorIntervals.length - 1;
+      var curSpan = Math.abs(this._scale.domain()[1] - this._scale.domain()[0]);
+      if (curSpan <= this.previousSpan + 1) {
+        startingPoint = this.previousIndex;
+      }
+      // find lowest granularity that will fit
+      for (var i = startingPoint; i >= 0; i--) {
+        if (!(this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
+            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i]))) {
+          i++;
           break;
         }
       }
-      if (i === Time.minorIntervals.length) {
-        i--;
+      if (i < 0) {
+        i = 0;
         // we can either fail now, or display ticks at highest granularity available even if it will be ugly
         //throw new Error ("could not find suitable interval to display labels");
       }
+      this.previousIndex = i - 1;
+      this.previousSpan = curSpan;
 
       return i;
     }
@@ -230,11 +249,31 @@ export module Axis {
       selection.attr("y2", height);
     }
 
+    public _generateLabellessTicks(index: number) {
+      if (index < 0) {
+        return;
+      }
+
+      var smallTicks = this._getTickIntervalValues(Time.minorIntervals[index]);
+      var allTicks = this._getTickValues().concat(smallTicks);
+
+      var tickMarks = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).data(allTicks);
+      tickMarks.enter().append("line").classed(Abstract.Axis.TICK_MARK_CLASS, true);
+      tickMarks.attr(this._generateTickMarkAttrHash());
+      tickMarks.exit().remove();
+      this._adjustTickLength(this.tickLabelPadding(), Time.minorIntervals[index]);
+    }
+
     public _doRender() {
       super._doRender();
       var index = this.getTickLevel();
       this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
       this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
+      var domain = this._scale.domain();
+      var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
+      if (this.getIntervalLength(Time.minorIntervals[index]) * 1.5 >= totalLength) {
+        this._generateLabellessTicks(index - 1);
+      }
       // make minor ticks shorter
       this._adjustTickLength(this.tickLength() / 2, Time.minorIntervals[index]);
       // however, we need to make major ticks longer, since they may have overlapped with some minor ticks

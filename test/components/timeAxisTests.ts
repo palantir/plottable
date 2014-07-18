@@ -9,7 +9,7 @@ describe("TimeAxis", () => {
         assert.throws(() => new Plottable.Axis.Time(scale, "right"), "unsupported");
     });
 
-    it("major and minor intervals are the same length", () => {
+    it("major and minor intervals arrays are the same length", () => {
         assert.equal(Plottable.Axis.Time.majorIntervals.length, Plottable.Axis.Time.minorIntervals.length,
                 "major and minor interval arrays must be same size");
     });

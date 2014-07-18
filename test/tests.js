@@ -376,7 +376,7 @@ describe("TimeAxis", function () {
         }, "unsupported");
     });
 
-    it("major and minor intervals are the same length", function () {
+    it("major and minor intervals arrays are the same length", function () {
         assert.equal(Plottable.Axis.Time.majorIntervals.length, Plottable.Axis.Time.minorIntervals.length, "major and minor interval arrays must be same size");
     });
 });
