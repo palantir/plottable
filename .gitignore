@@ -11,3 +11,4 @@ node_modules
 # ignore _site by Jekyll
 _site
 .sass-cache
+.ruby-version
