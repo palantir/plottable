@@ -19,8 +19,8 @@ function run(div, data, Plottable) {
         var yScale = new Plottable.Scale.Linear();
 
         for (var i=0; i<numRenderers; i++) {
-            var data = makeRandomData(20); //won't let me do data[0].slice(), splice, etc
-            var renderer = new Plottable.Plot.Line(data, xScale, yScale);
+            var data2 = data[0].slice(i*5, i*5 + 5); //won't let me do data[0].slice(), splice, etc
+            var renderer = new Plottable.Plot.Line(data2, xScale, yScale);
                 renderers.push(renderer);
         }
 
