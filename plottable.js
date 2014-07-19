@@ -1,5 +1,5 @@
 /*!
-Plottable 0.20.4 (https://github.com/palantir/plottable)
+Plottable 0.20.5 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -21,6 +21,23 @@ var Plottable;
                 return (Math.min(a, b) <= x && x <= Math.max(a, b));
             }
             Methods.inRange = inRange;
+
+            /** Print a warning message to the console, if it is available.
+            *
+            * @param {string} The warnings to print
+            */
+            function warn(warning) {
+                /* tslint:disable:no-console */
+                if (window.console != null) {
+                    if (window.console.warn != null) {
+                        console.warn(warning);
+                    } else if (window.console.log != null) {
+                        console.log(warning);
+                    }
+                }
+                /* tslint:enable:no-console */
+            }
+            Methods.warn = warn;
 
             /**
             * Takes two arrays of numbers and adds them together
@@ -649,7 +666,7 @@ var Plottable;
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
-                    console.log("Insufficient space to fit text");
+                    Util.Methods.warn("Insufficient space to fit text");
                     return { width: 0, height: 0 };
                 }
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
@@ -1484,7 +1501,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.20.4";
+    Plottable.version = "0.20.5";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2562,7 +2579,7 @@ var Plottable;
                         };
 
                         if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
-                            console.log("Invariant Violation: Abstract.Component cannot request more space than is offered");
+                            Plottable.Util.Methods.warn("Invariant Violation: Abstract.Component cannot request more space than is offered");
                         }
 
                         requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], spaceRequest.width);
@@ -3581,7 +3598,7 @@ var Plottable;
                     return x !== x || x === Infinity || x === -Infinity;
                 };
                 if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-                    console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+                    Plottable.Util.Methods.warn("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
                     return;
                 }
                 _super.prototype._setDomain.call(this, values);

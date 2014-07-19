@@ -11,6 +11,11 @@ declare module Plottable {
             * @return {boolean} Whether x is in [a, b]
             */
             function inRange(x: number, a: number, b: number): boolean;
+            /** Print a warning message to the console, if it is available.
+            *
+            * @param {string} The warnings to print
+            */
+            function warn(warning: string): void;
             /**
             * Takes two arrays of numbers and adds them together
             *
