@@ -3857,12 +3857,6 @@ var Plottable;
                 return this;
             };
 
-            CompositeOrdinal.prototype.rangeBand = function () {
-                // (bdwyer) This is necessary to override because vertical bars does not allow us
-                // to override width. Once that issue is fixed, we can remove this
-                return this.smallestRangeBand();
-            };
-
             CompositeOrdinal.prototype.smallestRangeBand = function () {
                 if (this._subScales.length > 0) {
                     return this._subScales[this._subScales.length - 1].rangeBand();
@@ -3881,8 +3875,9 @@ var Plottable;
 
             CompositeOrdinal.prototype.stepLevel = function (n) {
                 var d = this.domain();
-                for (var i = 0; i <= n - 1; i++)
+                for (var i = 0; i <= n - 1; i++) {
                     d = this.product(d, this._subScales[i].domain());
+                }
                 if (d.length < 2) {
                     return 0;
                 }
@@ -3902,8 +3897,7 @@ var Plottable;
 
                 // Hierarchically apply range to children
                 if (!(values === undefined)) {
-                    // (bdwyer) this can be change back to this.rangeBand() when we fix the above rangeBand issue
-                    var parentBand = _super.prototype.rangeBand.call(this);
+                    var parentBand = this.rangeBand();
                     this._subScales.forEach(function (subScale) {
                         subScale.range([0, parentBand]);
                         parentBand = subScale.rangeBand();
@@ -3953,7 +3947,7 @@ var Plottable;
                 var init = [[]];
                 var dom = [];
                 for (var j = 0; j < data.length; j++) {
-                    if (dom.indexOf(data[j][keys[0]]) == -1) {
+                    if (dom.indexOf(data[j][keys[0]]) === -1) {
                         dom.push(data[j][keys[0]]);
                     }
                 }
@@ -3968,7 +3962,7 @@ var Plottable;
                     // var subDomain = _(data).map(keys[i + 1]).sortBy().uniq().value();
                     var dom = [];
                     for (var j = 0; j < data.length; j++) {
-                        if (dom.indexOf(data[j][keys[i + 1]]) == -1) {
+                        if (dom.indexOf(data[j][keys[i + 1]]) === -1) {
                             dom.push(data[j][keys[i + 1]]);
                         }
                     }
@@ -4328,6 +4322,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+<<<<<<< HEAD
 <<<<<<< HEAD
     (function (_Axis) {
         var Axis = (function (_super) {
@@ -4850,6 +4845,8 @@ var Plottable;
 (function (Plottable) {
 =======
 >>>>>>> master
+=======
+>>>>>>> 44f81c800e54d28eb684302901bf1b1966dcd448
     (function (Abstract) {
         var Axis = (function (_super) {
             __extends(Axis, _super);
@@ -5516,12 +5513,17 @@ var Plottable;
             };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
                 var draw = dataOrTicks instanceof d3.selection;
 =======
             Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
                 var draw = typeof dataOrTicks[0] !== "string";
 >>>>>>> master
+=======
+            Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
+                var draw = dataOrTicks.node != null;
+>>>>>>> 44f81c800e54d28eb684302901bf1b1966dcd448
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) {
@@ -5641,7 +5643,11 @@ var Plottable;
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 _super.call(this, scale, orientation);
                 this.tickLength(120);
+<<<<<<< HEAD
                 this.formatter(new Plottable.Formatter.Custom(null, function (d) {
+=======
+                this.formatter(new Plottable.Formatter.Custom(function (d) {
+>>>>>>> 44f81c800e54d28eb684302901bf1b1966dcd448
                     return d[d.length - 1];
                 }));
             }
@@ -5659,7 +5665,6 @@ var Plottable;
                     tickMarkAttrHash["y1"] = startPosition;
                     tickMarkAttrHash["y2"] = startPosition;
                 }
-
                 return tickMarkAttrHash;
             };
 
@@ -5694,10 +5699,15 @@ var Plottable;
                 var labels = this._getAllLabels();
                 var k = this._scale.getLevels();
 
+<<<<<<< HEAD
                 // remove all the translation from tickLabels
                 Plottable.Util.DOM.translate(this._tickLabelsG, 0, 0);
 
                 var tickLabels = this._tickLabelsG.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(labels, function (d) {
+=======
+                Plottable.Util.DOM.translate(this._tickLabelContainer, 0, 0);
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(labels, function (d) {
+>>>>>>> 44f81c800e54d28eb684302901bf1b1966dcd448
                     return d;
                 });
                 var getTickLabelTransform = function (d, i) {

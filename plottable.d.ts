@@ -1479,7 +1479,6 @@ declare module Plottable {
         class CompositeOrdinal extends Ordinal {
             constructor();
             public addSubscale(scale: Ordinal): CompositeOrdinal;
-            public rangeBand(): number;
             public smallestRangeBand(): number;
             public rangeBandLevel(n: number): number;
             public innerPaddingLevel(n: number): number;
@@ -1599,6 +1598,7 @@ declare module Plottable {
 
 declare module Plottable {
 <<<<<<< HEAD
+<<<<<<< HEAD
     module Axis {
         class Axis extends Abstract.Component {
             public axisElement: D3.Selection;
@@ -1700,6 +1700,8 @@ declare module Plottable {
 declare module Plottable {
 =======
 >>>>>>> master
+=======
+>>>>>>> 44f81c800e54d28eb684302901bf1b1966dcd448
     module Abstract {
         class Axis extends Component {
             static TICK_MARK_CLASS: string;

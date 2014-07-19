@@ -16,12 +16,6 @@ export module Scale {
       return this;
     }
 
-    public rangeBand(): number {
-      // (bdwyer) This is necessary to override because vertical bars does not allow us
-      // to override width. Once that issue is fixed, we can remove this
-      return this.smallestRangeBand();
-    }
-
     public smallestRangeBand(): number {
       if (this._subScales.length > 0) {
         return this._subScales[this._subScales.length - 1].rangeBand();
@@ -40,8 +34,9 @@ export module Scale {
 
     public stepLevel(n: number): number {
       var d = this.domain();
-      for (var i = 0; i <= n - 1; i++)
+      for (var i = 0; i <= n - 1; i++) {
         d = this.product(d, this._subScales[i].domain());
+      }
       if (d.length < 2) {return 0;}
       return Math.abs(this.scale(d[1]) - this.scale(d[0]));
     }
@@ -62,8 +57,7 @@ export module Scale {
 
       // Hierarchically apply range to children
       if (!(values === undefined)) {
-        // (bdwyer) this can be change back to this.rangeBand() when we fix the above rangeBand issue
-        var parentBand = super.rangeBand();
+        var parentBand = this.rangeBand();
         this._subScales.forEach((subScale) => {
           subScale.range([0, parentBand]);
           parentBand = subScale.rangeBand();
@@ -96,7 +90,7 @@ export module Scale {
       return ret;
     }
 
-    public getLevels(): number{ 
+    public getLevels(): number{
       return this._subScales.length + 1;
     }
 
@@ -112,7 +106,7 @@ export module Scale {
       var init: any[][] = [[]];
       var dom: any[] = [];
       for (var j = 0; j < data.length; j++) {
-        if (dom.indexOf(data[j][keys[0]]) == -1) {
+        if (dom.indexOf(data[j][keys[0]]) === -1) {
           dom.push(data[j][keys[0]]);
         }
       }
@@ -126,7 +120,7 @@ export module Scale {
         // var subDomain = _(data).map(keys[i + 1]).sortBy().uniq().value();
         var dom: any[] = [];
         for (var j = 0; j < data.length; j++) {
-          if (dom.indexOf(data[j][keys[i + 1]]) == -1) {
+          if (dom.indexOf(data[j][keys[i + 1]]) === -1) {
             dom.push(data[j][keys[i + 1]]);
           }
         }
@@ -136,7 +130,7 @@ export module Scale {
 
       // MORE LODASH.
       //var mainDomain = _(data).map(keys[0]).sortBy().uniq().value()
-      
+
       return this;
     }
   }
