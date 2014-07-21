@@ -417,6 +417,9 @@ export module Abstract {
       };
 
       var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
+      if (tickLabels[0].length === 0) {
+        return;
+      }
       var firstTickLabel = tickLabels[0][0];
       if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
         d3.select(firstTickLabel).style("visibility", "hidden");

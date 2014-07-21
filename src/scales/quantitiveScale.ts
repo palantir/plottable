@@ -4,7 +4,7 @@ module Plottable {
 export module Abstract {
   export class QuantitiveScale extends Scale {
     public _d3Scale: D3.Scale.QuantitiveScale;
-    private lastRequestedTickCount = 10;
+    public _lastRequestedTickCount = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
@@ -112,9 +112,9 @@ export module Abstract {
      */
     public ticks(count?: number) {
       if (count != null) {
-        this.lastRequestedTickCount = count;
+        this._lastRequestedTickCount = count;
       }
-      return this._d3Scale.ticks(this.lastRequestedTickCount);
+      return this._d3Scale.ticks(this._lastRequestedTickCount);
     }
 
     /**
