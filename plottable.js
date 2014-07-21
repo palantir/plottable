@@ -1658,6 +1658,9 @@ var Plottable;
         DataSource.prototype.computeExtent = function (accessor) {
             var appliedAccessor = Plottable.Util.Methods.applyAccessor(accessor, this);
             var mappedData = this._data.map(appliedAccessor);
+            if (mappedData.indexOf(null) >= 0 || mappedData.indexOf(undefined) >= 0) {
+                Plottable.Util.Methods.warn("Data has contains null or undefined elements. This could mean data was not parsed correctly");
+            }
             if (mappedData.length === 0) {
                 return [];
             } else if (typeof (mappedData[0]) === "string") {
