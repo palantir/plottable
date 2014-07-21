@@ -11,12 +11,12 @@ export module Scale {
       super();
     }
 
-    public addSubscale(scale: Ordinal): CompositeOrdinal {
+    private addSubscale(scale: Ordinal): CompositeOrdinal {
       this._subScales.push(scale);
       return this;
     }
 
-    public smallestRangeBand(): number {
+    private smallestRangeBand(): number {
       if (this._subScales.length > 0) {
         return this._subScales[this._subScales.length - 1].rangeBand();
       } else {
@@ -24,18 +24,18 @@ export module Scale {
       }
     }
 
-    public rangeBandLevel(n: number): number {
+    private rangeBandLevel(n: number): number {
       return n === 0 ? super.rangeBand() : this._subScales[n - 1].rangeBand();
     }
 
-    public innerPaddingLevel(n: number): number {
+    private innerPaddingLevel(n: number): number {
       return this.stepLevel(n) - this.rangeBandLevel(n);
     }
 
-    public stepLevel(n: number): number {
+    private stepLevel(n: number): number {
       var d = this.domain();
       for (var i = 0; i <= n - 1; i++) {
-        d = this.product(d, this._subScales[i].domain());
+        d = Util.Methods.product(d, this._subScales[i].domain());
       }
       if (d.length < 2) {return 0;}
       return Math.abs(this.scale(d[1]) - this.scale(d[0]));
@@ -76,14 +76,6 @@ export module Scale {
         }
       });
       return result;
-    }
-
-    public product(d1: any[][], d2: any[]): any[][] {
-      return d1.slice().map((d: any[]) => d2.slice().map((datum: any) => {
-        var ret = d.slice();
-        ret.push(datum);
-        return ret;
-      })).reduce((a: any[], b: any[]) => a.concat(b), []);
     }
 
     public getLevels(): number{

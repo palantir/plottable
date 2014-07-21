@@ -57,6 +57,26 @@ var Plottable;
             }
             Methods.intersection = intersection;
 
+            /**
+            * Returns the cartesian product between two sets.
+            * Each element in set2 will be appeneded to each element in set1
+            *
+            * @param {any[][]} set1, A set of sets
+            * @param {any[]} set2, A set
+            */
+            function product(set1, set2) {
+                return set1.slice().map(function (d) {
+                    return set2.slice().map(function (datum) {
+                        var ret = d.slice();
+                        ret.push(datum);
+                        return ret;
+                    });
+                }).reduce(function (a, b) {
+                    return a.concat(b);
+                }, []);
+            }
+            Methods.product = product;
+
             function accessorize(accessor) {
                 if (typeof (accessor) === "function") {
                     return accessor;
@@ -3876,7 +3896,7 @@ var Plottable;
             CompositeOrdinal.prototype.stepLevel = function (n) {
                 var d = this.domain();
                 for (var i = 0; i <= n - 1; i++) {
-                    d = this.product(d, this._subScales[i].domain());
+                    d = Plottable.Util.Methods.product(d, this._subScales[i].domain());
                 }
                 if (d.length < 2) {
                     return 0;
@@ -3916,18 +3936,6 @@ var Plottable;
                     }
                 });
                 return result;
-            };
-
-            CompositeOrdinal.prototype.product = function (d1, d2) {
-                return d1.slice().map(function (d) {
-                    return d2.slice().map(function (datum) {
-                        var ret = d.slice();
-                        ret.push(datum);
-                        return ret;
-                    });
-                }).reduce(function (a, b) {
-                    return a.concat(b);
-                }, []);
             };
 
             CompositeOrdinal.prototype.getLevels = function () {
@@ -5125,8 +5133,8 @@ var Plottable;
                 var ret = this._scale.domain().slice(1);
                 var start = this._scale.domain();
                 for (var i = 1; i < k; i++) {
-                    ret = ret.concat(this._scale.product(start, this._scale.domainLevel(i).slice(1)));
-                    start = this._scale.product(start, this._scale.domainLevel(i));
+                    ret = ret.concat(Plottable.Util.Methods.product(start, this._scale.domainLevel(i).slice(1)));
+                    start = Plottable.Util.Methods.product(start, this._scale.domainLevel(i));
                 }
                 return ret;
             };
@@ -5136,7 +5144,7 @@ var Plottable;
                 var ret = this._scale.domain();
                 var start = this._scale.domain();
                 for (var i = 1; i < k; i++) {
-                    start = this._scale.product(start, this._scale.domainLevel(i));
+                    start = Plottable.Util.Methods.product(start, this._scale.domainLevel(i));
                     ret = ret.concat(start);
                 }
                 return ret;
@@ -6109,8 +6117,8 @@ var Plottable;
                 } else {
                     var bandWidth = secondaryScale.rangeBand();
                     attrToProjector[secondaryAttr] = function (d, i) {
-                        return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
-                    };
+                        return positionF(d, i);
+                    }; // - widthF(d, i) / 2;// + bandWidth / 2;
                 }
 
                 var originalPositionFn = attrToProjector[primaryAttr];

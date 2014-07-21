@@ -27,6 +27,14 @@ declare module Plottable {
             * @return {D3.Set} A set that contains elements that appear in both set1 and set2
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
+            /**
+            * Returns the cartesian product between two sets.
+            * Each element in set2 will be appeneded to each element in set1
+            *
+            * @param {any[][]} set1, A set of sets
+            * @param {any[]} set2, A set
+            */
+            function product(set1: any[][], set2: any[]): any[][];
             function accessorize(accessor: any): IAccessor;
             function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
@@ -1478,16 +1486,10 @@ declare module Plottable {
     module Scale {
         class CompositeOrdinal extends Ordinal {
             constructor();
-            public addSubscale(scale: Ordinal): CompositeOrdinal;
-            public smallestRangeBand(): number;
-            public rangeBandLevel(n: number): number;
-            public innerPaddingLevel(n: number): number;
-            public stepLevel(n: number): number;
             public fullBandStartAndWidth(v: any): number[];
             public range(): any[];
             public range(values: number[]): CompositeOrdinal;
             public scale(args: any[]): any;
-            public product(d1: any[][], d2: any[]): any[][];
             public getLevels(): number;
             public domainLevel(n: number): any[];
             public updateDomains(ds: DataSource, accessors: any[]): CompositeOrdinal;

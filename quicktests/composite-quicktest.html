@@ -61,8 +61,7 @@
         }
         return x;
       }, xScale);
-      plot.barAlignment("left");
-      // plot.project("width", 10); // needed for now until we refactor the automatic calculation
+      plot.project("width", 10); // needed for now until we refactor the automatic calculation
 
       var chart = new Plottable.Component.Table([
                                   [yAxis, plot],

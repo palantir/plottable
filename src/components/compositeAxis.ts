@@ -41,8 +41,8 @@ export module Axis {
       var ret: any[][] = this._scale.domain().slice(1);
       var start: any[][] = this._scale.domain();
       for (var i = 1; i < k; i++) {
-        ret = ret.concat(this._scale.product(start, this._scale.domainLevel(i).slice(1)));
-        start = this._scale.product(start, this._scale.domainLevel(i));
+        ret = ret.concat(Util.Methods.product(start, this._scale.domainLevel(i).slice(1)));
+        start = Util.Methods.product(start, this._scale.domainLevel(i));
       }
       return ret;
     }
@@ -52,7 +52,7 @@ export module Axis {
       var ret: any[][] = this._scale.domain();
       var start: any[][] = this._scale.domain();
       for (var i = 1; i < k; i++) {
-        start = this._scale.product(start, this._scale.domainLevel(i));
+        start = Util.Methods.product(start, this._scale.domainLevel(i));
         ret = ret.concat(start);
       }
       return ret;
