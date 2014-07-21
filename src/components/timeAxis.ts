@@ -162,7 +162,7 @@ export module Axis {
       if (i < 0) {
         i = 0;
         // we can either fail now, or display ticks at highest granularity available even if it will be ugly
-        //throw new Error ("could not find suitable interval to display labels");
+        Util.Methods.warn("could not find suitable interval to display labels");
       }
       this.previousIndex = i - 1;
       this.previousSpan = curSpan;
@@ -188,7 +188,7 @@ export module Axis {
       return textHeight;
     }
 
-    public _renderTickLabels(container: D3.Selection, interval: ITimeInterval, height: number) {
+    public _generateAndRenderTickLabels(container: D3.Selection, interval: ITimeInterval, height: number) {
       container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
       var tickPos = this._scale.tickInterval(interval.timeUnit,
                                               interval.step);
@@ -267,8 +267,8 @@ export module Axis {
     public _doRender() {
       super._doRender();
       var index = this.getTickLevel();
-      this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
-      this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
+      this._generateAndRenderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
+      this._generateAndRenderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
       var domain = this._scale.domain();
       var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
       if (this.getIntervalLength(Time.minorIntervals[index]) * 1.5 >= totalLength) {
