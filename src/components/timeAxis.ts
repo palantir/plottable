@@ -161,7 +161,6 @@ export module Axis {
       }
       if (i < 0) {
         i = 0;
-        // we can either fail now, or display ticks at highest granularity available even if it will be ugly
         Util.Methods.warn("could not find suitable interval to display labels");
       }
       this.previousIndex = i - 1;
@@ -188,33 +187,33 @@ export module Axis {
       return textHeight;
     }
 
-    public _generateAndRenderTickLabels(container: D3.Selection, interval: ITimeInterval, height: number) {
+    public _renderTickLabels(container: D3.Selection, interval: ITimeInterval, height: number) {
       container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
       var tickPos = this._scale.tickInterval(interval.timeUnit,
                                               interval.step);
       tickPos.splice(0, 0, this._scale.domain()[0]);
       tickPos.push(this._scale.domain()[1]);
-      var center = interval.step === 1;
+      var shouldCenterText = interval.step === 1;
       // only center when the label should span the whole interval
       var labelPos: Date[] = [];
-      if (center) {
+      if (shouldCenterText) {
         for (var i = 0; i < tickPos.length - 1; i++) {
           labelPos.push(new Date((tickPos[i + 1].valueOf() - tickPos[i].valueOf()) / 2 + tickPos[i].valueOf()));
         }
       } else {
         labelPos = tickPos;
       }
-      labelPos = labelPos.filter((d: any) => this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), center));
+      labelPos = labelPos.filter((d: any) => this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), shouldCenterText));
       var tickLabels = container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
-      var xTranslate = center ? 0 : this.tickLabelPadding();
+      var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
       tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ?
           (this.tickLength() / 2 * height) :
           (this.availableHeight - this.tickLength() / 2 * height + 2 * this.tickLabelPadding())) + ")");
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
-      var anchor = center ? "middle" : "left";
+      var anchor = shouldCenterText ? "middle" : "left";
       tickLabels.selectAll("text").text((d: any) => d3.time.format(interval.formatString)(d))
                                   .style("text-anchor", anchor);
     }
@@ -267,8 +266,8 @@ export module Axis {
     public _doRender() {
       super._doRender();
       var index = this.getTickLevel();
-      this._generateAndRenderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
-      this._generateAndRenderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
+      this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
+      this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
       var domain = this._scale.domain();
       var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
       if (this.getIntervalLength(Time.minorIntervals[index]) * 1.5 >= totalLength) {
