@@ -329,6 +329,12 @@ describe("Scales", () => {
       assert.closeTo(scale.scale(0), 0, epsilon);
     });
 
+    it("is close to log() for large values", () => {
+      [10, 100, 23103.4, 5].forEach((x) => {
+        assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
+      });
+    });
+
     it("x = invert(scale(x))", () => {
       [0, 1, base, 100, 0.001, -1, -0.3, -base, base - 0.001].forEach((x) => {
         assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
