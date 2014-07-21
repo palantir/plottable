@@ -1719,8 +1719,6 @@ declare module Plottable {
             public calculateWorstWidth(container: D3.Selection, format: string): number;
             public getIntervalLength(interval: ITimeInterval): number;
             public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
-            public getTickLevel(): number;
-            public canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean;
         }
     }
 }

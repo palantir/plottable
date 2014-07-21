@@ -94,7 +94,7 @@ export module Axis {
     constructor(scale: Scale.Time, orientation: string) {
       orientation = orientation.toLowerCase();
       if (orientation !== "top" && orientation !== "bottom") {
-        throw new Error ("unsupported orientation");
+        throw new Error ("unsupported orientation: " + orientation);
       }
       super(scale, orientation);
       this.classed("time-axis", true);
@@ -144,7 +144,7 @@ export module Axis {
     }
 
     // returns a number to index into the major/minor intervals
-    public getTickLevel(): number {
+    private getTickLevel(): number {
       // for zooming, don't start search all the way from beginning.
       var startingPoint = Time.minorIntervals.length - 1;
       var curSpan = Math.abs(this._scale.domain()[1] - this._scale.domain()[0]);
@@ -152,18 +152,21 @@ export module Axis {
         startingPoint = this.previousIndex;
       }
       // find lowest granularity that will fit
-      for (var i = startingPoint; i >= 0; i--) {
+      var i = startingPoint;
+      while (i >= 0) {
         if (!(this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
             && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i]))) {
           i++;
           break;
         }
+        i--;
       }
+      i = Math.min(i, Time.minorIntervals.length - 1);
       if (i < 0) {
         i = 0;
         Util.Methods.warn("could not find suitable interval to display labels");
       }
-      this.previousIndex = i - 1;
+      this.previousIndex = Math.max(0, i - 1);
       this.previousSpan = curSpan;
 
       return i;
@@ -187,7 +190,7 @@ export module Axis {
       return textHeight;
     }
 
-    public _renderTickLabels(container: D3.Selection, interval: ITimeInterval, height: number) {
+    private renderTickLabels(container: D3.Selection, interval: ITimeInterval, height: number) {
       container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).remove();
       var tickPos = this._scale.tickInterval(interval.timeUnit,
                                               interval.step);
@@ -197,9 +200,12 @@ export module Axis {
       // only center when the label should span the whole interval
       var labelPos: Date[] = [];
       if (shouldCenterText) {
-        for (var i = 0; i < tickPos.length - 1; i++) {
-          labelPos.push(new Date((tickPos[i + 1].valueOf() - tickPos[i].valueOf()) / 2 + tickPos[i].valueOf()));
-        }
+        tickPos.map((datum: any, index: any) => {
+          if (index + 1 >= tickPos.length) {
+            return;
+          }
+          labelPos.push(new Date((tickPos[index + 1].valueOf() - tickPos[index].valueOf()) / 2 + tickPos[index].valueOf()));
+        });
       } else {
         labelPos = tickPos;
       }
@@ -209,9 +215,12 @@ export module Axis {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-      tickLabels.selectAll("text").attr("transform", "translate(" + xTranslate + "," + (this._orientation === "bottom" ?
-          (this.tickLength() / 2 * height) :
-          (this.availableHeight - this.tickLength() / 2 * height + 2 * this.tickLabelPadding())) + ")");
+      var yTranslate = (this._orientation === "bottom" ? (this.tickLength() / 2 * height) :
+          (this.availableHeight - this.tickLength() / 2 * height + 2 * this.tickLabelPadding()));
+      var textSelection = tickLabels.selectAll("text");
+      if (textSelection.size() > 0) {
+        Util.DOM.translate(textSelection, xTranslate, yTranslate);
+      }
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
       var anchor = shouldCenterText ? "middle" : "left";
@@ -219,7 +228,7 @@ export module Axis {
                                   .style("text-anchor", anchor);
     }
 
-    public canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean {
+    private canFitLabelFilter(container: D3.Selection, position: Date, label: string, isCentered: boolean): boolean {
       var endPosition: number;
       var startPosition: number;
       var width = Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
@@ -231,16 +240,15 @@ export module Axis {
           startPosition = this._scale.scale(position);
       }
 
-      if (endPosition < this.availableWidth && startPosition > 0) {
-          return true;
-      }
-
-      return false;
+      return endPosition < this.availableWidth && startPosition > 0;
     }
 
-    public _adjustTickLength(height: number, interval: ITimeInterval) {
+    private adjustTickLength(height: number, interval: ITimeInterval) {
       var tickValues = this._getTickIntervalValues(interval);
       var selection = this._tickMarkContainer.selectAll("." + Abstract.Axis.TICK_MARK_CLASS).filter((d: Date) =>
+        // we want to check if d is in tickValues
+        // however, if two dates a, b, have the same date, it may not be true that a === b.
+        // thus, we convert them to values first, then do the comparison
           tickValues.map((x: Date) => x.valueOf()).indexOf(d.valueOf()) >= 0
       );
       if (this._orientation === "top") {
@@ -249,7 +257,7 @@ export module Axis {
       selection.attr("y2", height);
     }
 
-    public _generateLabellessTicks(index: number) {
+    private generateLabellessTicks(index: number) {
       if (index < 0) {
         return;
       }
@@ -261,23 +269,23 @@ export module Axis {
       tickMarks.enter().append("line").classed(Abstract.Axis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
       tickMarks.exit().remove();
-      this._adjustTickLength(this.tickLabelPadding(), Time.minorIntervals[index]);
+      this.adjustTickLength(this.tickLabelPadding(), Time.minorIntervals[index]);
     }
 
     public _doRender() {
       super._doRender();
       var index = this.getTickLevel();
-      this._renderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
-      this._renderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
+      this.renderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
+      this.renderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
       var domain = this._scale.domain();
       var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
       if (this.getIntervalLength(Time.minorIntervals[index]) * 1.5 >= totalLength) {
-        this._generateLabellessTicks(index - 1);
+        this.generateLabellessTicks(index - 1);
       }
       // make minor ticks shorter
-      this._adjustTickLength(this.tickLength() / 2, Time.minorIntervals[index]);
+      this.adjustTickLength(this.tickLength() / 2, Time.minorIntervals[index]);
       // however, we need to make major ticks longer, since they may have overlapped with some minor ticks
-      this._adjustTickLength(this.tickLength(), Time.majorIntervals[index]);
+      this.adjustTickLength(this.tickLength(), Time.majorIntervals[index]);
       return this;
     }
   }

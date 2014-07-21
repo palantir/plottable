@@ -19,10 +19,10 @@ export module Scale {
     }
 
     public tickInterval(interval: D3.Time.Interval, step?: number): any[] {
-      // temporarily converts our linear scale into a time scale so we can call tickInterval
+      // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
       var tempScale = d3.time.scale();
-      tempScale.domain(this._d3Scale.domain());
-      tempScale.range(this._d3Scale.range());
+      tempScale.domain(this.domain());
+      tempScale.range(this.range());
       return tempScale.ticks(interval, step);
     }
 
