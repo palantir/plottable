@@ -6117,8 +6117,8 @@ var Plottable;
                 } else {
                     var bandWidth = secondaryScale.rangeBand();
                     attrToProjector[secondaryAttr] = function (d, i) {
-                        return positionF(d, i);
-                    }; // - widthF(d, i) / 2;// + bandWidth / 2;
+                        return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
+                    };
                 }
 
                 var originalPositionFn = attrToProjector[primaryAttr];
