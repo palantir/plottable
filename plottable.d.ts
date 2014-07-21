@@ -32,8 +32,14 @@ declare module Plottable {
             * @return {D3.Set} A set that contains elements that appear in both set1 and set2
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
-            function accessorize(accessor: any): IAccessor;
-            function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
+            /**
+            * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
+            * and "activate" it by turning it into a function in (datum, index, metadata)
+            */
+            function _accessorize(accessor: any): IAccessor;
+            /** Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
+            */
+            function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
             function uniqNumbers(a: number[]): number[];
             /**

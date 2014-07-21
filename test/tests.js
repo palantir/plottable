@@ -1292,8 +1292,12 @@ describe("Plots", function () {
             var yScaleCalls = 0;
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
+            var metadataProjector = function (d, i, m) {
+                return m.cssClass;
+            };
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
+            r.project("meta", metadataProjector);
             xScale.broadcaster.registerListener(null, function (listenable) {
                 assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
@@ -1310,6 +1314,9 @@ describe("Plots", function () {
             assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
+            var metaProjector = r._generateAttrToProjector()["meta"];
+            assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
+
             var d2 = new Plottable.DataSource([{ x: 7, y: 8 }], { cssClass: "boo" });
             r.dataSource(d2);
             assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
@@ -1322,6 +1329,9 @@ describe("Plots", function () {
             d2.broadcaster.broadcast();
             assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
             assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
+
+            metaProjector = r._generateAttrToProjector()["meta"];
+            assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
         });
 
         it("Plot automatically generates a DataSource if only data is provided", function () {
@@ -2895,20 +2905,24 @@ describe("DataSource", function () {
         var data = [1, 2, 3, 4, 1];
         var metadata = { foo: 11 };
         var dataSource = new Plottable.DataSource(data, metadata);
+        var plot = new Plottable.Abstract.Plot(dataSource);
+        var accessorize = function (a) {
+            return Plottable.Util.Methods._applyAccessor(a, plot);
+        };
         var a1 = function (d, i, m) {
             return d + i - 2;
         };
-        assert.deepEqual(dataSource._getExtent(a1), [-1, 5], "extent for numerical data works properly");
+        assert.deepEqual(dataSource._getExtent(accessorize(a1)), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) {
             return d + m.foo;
         };
-        assert.deepEqual(dataSource._getExtent(a2), [12, 15], "extent uses metadata appropriately");
+        assert.deepEqual(dataSource._getExtent(accessorize(a2)), [12, 15], "extent uses metadata appropriately");
         dataSource.metadata({ foo: -1 });
-        assert.deepEqual(dataSource._getExtent(a2), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataSource._getExtent(accessorize(a2)), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) {
             return "_" + d;
         };
-        assert.deepEqual(dataSource._getExtent(a3), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        assert.deepEqual(dataSource._getExtent(accessorize(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
     });
 });
 
@@ -4616,19 +4630,19 @@ describe("Util.s", function () {
         var f = function (d, i, m) {
             return d + i;
         };
-        var a1 = Plottable.Util.Methods.accessorize(f);
+        var a1 = Plottable.Util.Methods._accessorize(f);
         assert.equal(f, a1, "function passes through accessorize unchanged");
 
-        var a2 = Plottable.Util.Methods.accessorize("key");
+        var a2 = Plottable.Util.Methods._accessorize("key");
         assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
 
-        var a3 = Plottable.Util.Methods.accessorize("#aaaa");
+        var a3 = Plottable.Util.Methods._accessorize("#aaaa");
         assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
 
-        var a4 = Plottable.Util.Methods.accessorize(33);
+        var a4 = Plottable.Util.Methods._accessorize(33);
         assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
 
-        var a5 = Plottable.Util.Methods.accessorize(datum);
+        var a5 = Plottable.Util.Methods._accessorize(datum);
         assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
     });
 
