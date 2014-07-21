@@ -79,15 +79,11 @@ export module Scale {
     }
 
     public product(d1: any[][], d2: any[]): any[][] {
-      var ret: any[][] = [];
-      for (var i = 0; i < d1.length; i++) {
-        for (var j = 0; j < d2.length; j++) {
-          var add: any[] = d1[i].slice();
-          add.push(d2[j]);
-          ret.push(add);
-        }
-      }
-      return ret;
+      return d1.slice().map((d: any[]) => d2.slice().map((datum: any) => {
+        var ret = d.slice();
+        ret.push(datum);
+        return ret;
+      })).reduce((a: any[], b: any[]) => a.concat(b), []);
     }
 
     public getLevels(): number{
@@ -102,30 +98,16 @@ export module Scale {
     // assumptions about the layout of data and how it is mapped to the sub
     // scales. Deserves some more thought depending on how the domainers are
     // going to work.
-    public updateDomains(data: any[], keys: any[]): CompositeOrdinal {
-      var init: any[][] = [[]];
-      var dom: any[] = [];
-      for (var j = 0; j < data.length; j++) {
-        if (dom.indexOf(data[j][keys[0]]) === -1) {
-          dom.push(data[j][keys[0]]);
-        }
-      }
-      init = this.product(init, dom);
-      this.domain(init);
+    public updateDomains(ds: DataSource, accessors: any[]): CompositeOrdinal {
+      var funs = accessors.map((a: any) => Util.Methods.applyAccessor(a, ds));
+      this.domain(Util.Methods.uniq(ds.data().slice().map(funs[0])).map((d: string) => [d]));
       this._subScales.forEach((subScale, i) => {
-        if (keys[i + 1] === undefined) {
+        if (funs[i + 1] === undefined) {
           return;
         }
         // (bdwyer) - THIS USES LODASH. Re-implmementing this functionality may be anoying.
         // var subDomain = _(data).map(keys[i + 1]).sortBy().uniq().value();
-        var dom: any[] = [];
-        for (var j = 0; j < data.length; j++) {
-          if (dom.indexOf(data[j][keys[i + 1]]) === -1) {
-            dom.push(data[j][keys[i + 1]]);
-          }
-        }
-        init = this.product(init, dom);
-        subScale.domain(dom);
+        subScale.domain(Util.Methods.uniq(ds.data().slice().map(funs[i + 1])));
       });
 
       // MORE LODASH.
