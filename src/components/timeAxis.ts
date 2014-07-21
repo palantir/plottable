@@ -203,7 +203,8 @@ export module Axis {
       } else {
         labelPos = tickPos;
       }
-      labelPos = labelPos.filter((d: any) => this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), shouldCenterText));
+      labelPos = labelPos.filter((d: any) =>
+        this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), shouldCenterText));
       var tickLabels = container.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
       var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
