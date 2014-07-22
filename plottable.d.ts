@@ -2214,7 +2214,7 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         interface IKeyEventListenerCallback {
-            (e: D3.Event): any;
+            (e: D3.D3Event): any;
         }
         module KeyEventListener {
             function initialize(): void;
