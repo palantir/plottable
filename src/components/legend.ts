@@ -140,14 +140,6 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredY: number): ISpaceRequest {
       var textHeight = this.measureTextHeight();
-      if (textHeight === 0) {
-          return {
-              width: 0,
-              height: 0,
-              wantsWidth: false,
-              wantsHeight: false
-          };
-      }
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
@@ -169,6 +161,10 @@ export module Component {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var textHeight = Util.Text.getTextHeight(fakeLegendEl.append("text"));
+      // HACKHACK
+      if (textHeight === 0) {
+        textHeight = 1;
+      }
       fakeLegendEl.remove();
       return textHeight;
     }
