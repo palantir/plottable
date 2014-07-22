@@ -39,7 +39,7 @@ To start building pages using Jekyll and compiling assets with Grunt, run these 
 
 To run Jekyll:
 
-    jekyll serve --watch
+    bundle exec jekyll serve --watch
 
 To run Grunt then watch:
 

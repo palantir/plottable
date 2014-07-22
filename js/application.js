@@ -22,6 +22,7 @@ Modernizr.addTest('retina', function() {
     this.$sections = $sections;
     this.$currentSection = null;
     this.isPaging = false;
+    this.pageDelay = 1200;
   };
   VerticalPager.prototype = {
 
@@ -29,13 +30,18 @@ Modernizr.addTest('retina', function() {
       if (typeof this.initialized === 'undefined') {
         this.initialized = true;
         this.$currentSection = this.getCurrentSection();
+        this.$lastSection = this.$sections.last();
 
         $window.on('mousewheel', $.proxy(function(event) {
+          var $currentSection = this.getCurrentSection();
+
+          if ($currentSection == null) {
+            return;
+          }
+
           if (!this.isPaging) {
-            var $currentSection = this.getCurrentSection();
-            var direction = (event.originalEvent.wheelDelta < 0) ? 'up' : 'down';
             var pageIndex = this.$sections.index($currentSection);
-            if (direction == 'up') {
+            if (event.originalEvent.wheelDelta < 0) {
               pageIndex++;
             } else {
               pageIndex--;
@@ -44,14 +50,11 @@ Modernizr.addTest('retina', function() {
               this.gotoSection(this.$sections.eq(pageIndex));
             }
           }
-
-          event.preventDefault();
-          event.stopPropagation();
+          return false;
         }, this));
       } else {
         console.log('Already initialized VerticalPager.');
       }
-
     },
 
     gotoSection: function($section) {
@@ -60,7 +63,7 @@ Modernizr.addTest('retina', function() {
         $('html body').animate({ scrollTop: $section.offset().top }, $.proxy(function() {
           window.setTimeout($.proxy(function() {
             this.isPaging = false;
-          }, this), 800);
+          }, this), this.pageDelay);
           this.$currentSection = $section;
         }, this));
       }

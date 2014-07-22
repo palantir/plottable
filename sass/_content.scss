@@ -69,10 +69,15 @@ header {
     }
 
     &.active a,
-    &.active a:hover {
+    .no-touch &.active a:hover {
       color: $COLOR_ORANGE1;
       border-color: $COLOR_ORANGE1;
       background: transparent;
+    }
+
+    .touch &.active a {
+      border-color: transparent;
+      font-weight: $font-weight-bold;
     }
   }
 
