@@ -4,6 +4,7 @@ function makeData() {
 
 function run(div, data, Plottable) {
   var svg = div.append("svg").attr("height", 500);
+  data = _.cloneDeep(data);
 
     var large_x = function(d){
          d.x = d.x*100000000;   
