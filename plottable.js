@@ -1,5 +1,5 @@
 /*!
-Plottable 0.20.5 (https://github.com/palantir/plottable)
+Plottable 0.21.0 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -125,6 +125,19 @@ var Plottable;
                 return d3.keys(seen);
             }
             Methods.uniq = uniq;
+
+            function uniqNumbers(a) {
+                var seen = d3.set();
+                var result = [];
+                a.forEach(function (n) {
+                    if (!seen.has(n)) {
+                        seen.add(n);
+                        result.push(n);
+                    }
+                });
+                return result;
+            }
+            Methods.uniqNumbers = uniqNumbers;
 
             /**
             * Creates an array of length `count`, filled with value or (if value is a function), value()
@@ -1501,7 +1514,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.20.5";
+    Plottable.version = "0.21.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2816,12 +2829,16 @@ var Plottable;
 
             Scale.prototype.domain = function (values) {
                 if (values == null) {
-                    return this._d3Scale.domain();
+                    return this._getDomain();
                 } else {
                     this.autoDomainAutomatically = false;
                     this._setDomain(values);
                     return this;
                 }
+            };
+
+            Scale.prototype._getDomain = function () {
+                return this._d3Scale.domain();
             };
 
             Scale.prototype._setDomain = function (values) {
@@ -3510,8 +3527,8 @@ var Plottable;
 
             // This scaling is done to account for log scales and other non-linear
             // scales. A log scale should be padded more on the max than on the min.
-            var newMin = scale._d3Scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
-            var newMax = scale._d3Scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
+            var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
+            var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
             var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
             var exceptionSet = d3.set(exceptionValues);
             if (exceptionSet.has(min)) {
@@ -3564,7 +3581,7 @@ var Plottable;
             */
             function QuantitiveScale(scale) {
                 _super.call(this, scale);
-                this.lastRequestedTickCount = 10;
+                this._lastRequestedTickCount = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
@@ -3641,9 +3658,9 @@ var Plottable;
             */
             QuantitiveScale.prototype.ticks = function (count) {
                 if (count != null) {
-                    this.lastRequestedTickCount = count;
+                    this._lastRequestedTickCount = count;
                 }
-                return this._d3Scale.ticks(this.lastRequestedTickCount);
+                return this._d3Scale.ticks(this._lastRequestedTickCount);
             };
 
             /**
@@ -3746,6 +3763,221 @@ var Plottable;
             return Log;
         })(Plottable.Abstract.QuantitiveScale);
         Scale.Log = Log;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Scale) {
+        var ModifiedLog = (function (_super) {
+            __extends(ModifiedLog, _super);
+            /**
+            * Creates a new Scale.ModifiedLog.
+            *
+            * A ModifiedLog scale acts as a regular log scale for large numbers.
+            * As it approaches 0, it gradually becomes linear. This means that the
+            * scale won't freak out if you give it 0 or a negative number, where an
+            * ordinary Log scale would.
+            *
+            * However, it does mean that scale will be effectively linear as values
+            * approach 0. If you want very small values on a log scale, you should use
+            * an ordinary Scale.Log instead.
+            *
+            * @constructor
+            * @param {number} [base]
+            *        The base of the log. Defaults to 10, and must be > 1.
+            *
+            *        For base <= x, scale(x) = log(x).
+            *
+            *        For 0 < x < base, scale(x) will become more and more
+            *        linear as it approaches 0.
+            *
+            *        At x == 0, scale(x) == 0.
+            *
+            *        For negative values, scale(-x) = -scale(x).
+            */
+            function ModifiedLog(base) {
+                if (typeof base === "undefined") { base = 10; }
+                _super.call(this, d3.scale.linear());
+                this._showIntermediateTicks = false;
+                this.base = base;
+                this.pivot = this.base;
+                this.untransformedDomain = this._defaultExtent();
+                this._lastRequestedTickCount = 10;
+                if (base <= 1) {
+                    throw new Error("ModifiedLogScale: The base must be > 1");
+                }
+            }
+            /**
+            * Returns an adjusted log10 value for graphing purposes.  The first
+            * adjustment is that negative values are changed to positive during
+            * the calculations, and then the answer is negated at the end.  The
+            * second is that, for values less than 10, an increasingly large
+            * (0 to 1) scaling factor is added such that at 0 the value is
+            * adjusted to 1, resulting in a returned result of 0.
+            */
+            ModifiedLog.prototype.adjustedLog = function (x) {
+                var negationFactor = x < 0 ? -1 : 1;
+                x *= negationFactor;
+
+                if (x < this.pivot) {
+                    x += (this.pivot - x) / this.pivot;
+                }
+
+                x = Math.log(x) / Math.log(this.base);
+
+                x *= negationFactor;
+                return x;
+            };
+
+            ModifiedLog.prototype.invertedAdjustedLog = function (x) {
+                var negationFactor = x < 0 ? -1 : 1;
+                x *= negationFactor;
+
+                x = Math.pow(this.base, x);
+
+                if (x < this.pivot) {
+                    x = (this.pivot * (x - 1)) / (this.pivot - 1);
+                }
+
+                x *= negationFactor;
+                return x;
+            };
+
+            ModifiedLog.prototype.scale = function (x) {
+                return this._d3Scale(this.adjustedLog(x));
+            };
+
+            ModifiedLog.prototype.invert = function (x) {
+                return this.invertedAdjustedLog(this._d3Scale.invert(x));
+            };
+
+            ModifiedLog.prototype._getDomain = function () {
+                return this.untransformedDomain;
+            };
+
+            ModifiedLog.prototype._setDomain = function (values) {
+                this.untransformedDomain = values;
+                var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
+                this._d3Scale.domain(transformedDomain);
+                this.broadcaster.broadcast();
+                return this;
+            };
+
+            ModifiedLog.prototype.ticks = function (count) {
+                if (count != null) {
+                    _super.prototype.ticks.call(this, count);
+                }
+
+                // Say your domain is [-100, 100] and your pivot is 10.
+                // then we're going to draw negative log ticks from -100 to -10,
+                // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
+                var middle = function (x, y, z) {
+                    return [x, y, z].sort(function (a, b) {
+                        return a - b;
+                    })[1];
+                };
+                var min = d3.min(this.untransformedDomain);
+                var max = d3.max(this.untransformedDomain);
+                var negativeLower = min;
+                var negativeUpper = middle(min, max, -this.pivot);
+                var positiveLower = middle(min, max, this.pivot);
+                var positiveUpper = max;
+
+                var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) {
+                    return -x;
+                }).reverse();
+                var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
+                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) {
+                    return min <= x && x <= max;
+                });
+
+                return negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+            };
+
+            /**
+            * Return an appropriate number of ticks from lower to upper.
+            *
+            * This will first try to fit as many powers of this.base as it can from
+            * lower to upper.
+            *
+            * If it still has ticks after that, it will generate ticks in "clusters",
+            * e.g. [20, 30, ... 90, 100] would be a cluster, [200, 300, ... 900, 1000]
+            * would be another cluster.
+            *
+            * This function will generate clusters as large as it can while not
+            * drastically exceeding its number of ticks.
+            */
+            ModifiedLog.prototype.logTicks = function (lower, upper) {
+                var _this = this;
+                var nTicks = this.howManyTicks(lower, upper);
+                if (nTicks === 0) {
+                    return [];
+                }
+                var startLogged = Math.floor(Math.log(lower) / Math.log(this.base));
+                var endLogged = Math.ceil(Math.log(upper) / Math.log(this.base));
+                var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
+                var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
+                var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
+                var uniqMultiples = Plottable.Util.Methods.uniqNumbers(multiples);
+                var clusters = bases.map(function (b) {
+                    return uniqMultiples.map(function (x) {
+                        return Math.pow(_this.base, b - 1) * x;
+                    });
+                });
+                var flattened = Plottable.Util.Methods.flatten(clusters);
+                var filtered = flattened.filter(function (x) {
+                    return lower <= x && x <= upper;
+                });
+                var sorted = filtered.sort(function (x, y) {
+                    return x - y;
+                });
+                return sorted;
+            };
+
+            /**
+            * How many ticks does the range [lower, upper] deserve?
+            *
+            * e.g. if your domain was [10, 1000] and I asked howManyTicks(10, 100),
+            * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
+            * distance when plotted.
+            */
+            ModifiedLog.prototype.howManyTicks = function (lower, upper) {
+                var adjustedMin = this.adjustedLog(d3.min(this.untransformedDomain));
+                var adjustedMax = this.adjustedLog(d3.max(this.untransformedDomain));
+                var adjustedLower = this.adjustedLog(lower);
+                var adjustedUpper = this.adjustedLog(upper);
+                var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
+                var ticks = Math.ceil(proportion * this._lastRequestedTickCount);
+                return ticks;
+            };
+
+            ModifiedLog.prototype.copy = function () {
+                return new ModifiedLog(this.base);
+            };
+
+            ModifiedLog.prototype._niceDomain = function (domain, count) {
+                return domain;
+            };
+
+            ModifiedLog.prototype.showIntermediateTicks = function (show) {
+                if (show == null) {
+                    return this._showIntermediateTicks;
+                } else {
+                    this._showIntermediateTicks = show;
+                }
+            };
+            return ModifiedLog;
+        })(Plottable.Abstract.QuantitiveScale);
+        Scale.ModifiedLog = ModifiedLog;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
@@ -4527,6 +4759,9 @@ var Plottable;
                 };
 
                 var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
+                if (tickLabels[0].length === 0) {
+                    return;
+                }
                 var firstTickLabel = tickLabels[0][0];
                 if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
                     d3.select(firstTickLabel).style("visibility", "hidden");

@@ -10,5 +10,6 @@
   {"name":"scale_interactive", "categories":["scale", "interaction", "scatter", "gridlines"]},
   {"name":"scale_date", "categories":["scale", "date", "line"]},
   {"name":"basic_area", "categories":["area", "basic", "gridlines"]},
-  {"name":"cat-axis_verticalBar", "categories":["verticalbar", "cat-axis", "animate"]}
+  {"name":"cat-axis_verticalBar", "categories":["verticalbar", "cat-axis", "animate"]},
+  {"name":"modifiedLogScale_test", "categories":["scale", "modified-log"]}
 ]

@@ -185,9 +185,9 @@ module Plottable {
       var p = this.padProportion / 2;
       // This scaling is done to account for log scales and other non-linear
       // scales. A log scale should be padded more on the max than on the min.
-      var newMin = scale._d3Scale.invert(scale.scale(min) -
+      var newMin = scale.invert(scale.scale(min) -
                                         (scale.scale(max) - scale.scale(min)) * p);
-      var newMax = scale._d3Scale.invert(scale.scale(max) +
+      var newMax = scale.invert(scale.scale(max) +
                                         (scale.scale(max) - scale.scale(min)) * p);
       var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
       var exceptionSet = d3.set(exceptionValues);

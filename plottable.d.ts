@@ -43,6 +43,7 @@ declare module Plottable {
             function accessorize(accessor: any): IAccessor;
             function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
+            function uniqNumbers(a: number[]): number[];
             /**
             * Creates an array of length `count`, filled with value or (if value is a function), value()
             *
@@ -1408,6 +1409,58 @@ declare module Plottable {
             * @returns {Scale.Log} A copy of the calling Scale.Log.
             */
             public copy(): Log;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Scale {
+        class ModifiedLog extends Abstract.QuantitiveScale {
+            /**
+            * Creates a new Scale.ModifiedLog.
+            *
+            * A ModifiedLog scale acts as a regular log scale for large numbers.
+            * As it approaches 0, it gradually becomes linear. This means that the
+            * scale won't freak out if you give it 0 or a negative number, where an
+            * ordinary Log scale would.
+            *
+            * However, it does mean that scale will be effectively linear as values
+            * approach 0. If you want very small values on a log scale, you should use
+            * an ordinary Scale.Log instead.
+            *
+            * @constructor
+            * @param {number} [base]
+            *        The base of the log. Defaults to 10, and must be > 1.
+            *
+            *        For base <= x, scale(x) = log(x).
+            *
+            *        For 0 < x < base, scale(x) will become more and more
+            *        linear as it approaches 0.
+            *
+            *        At x == 0, scale(x) == 0.
+            *
+            *        For negative values, scale(-x) = -scale(x).
+            */
+            constructor(base?: number);
+            public scale(x: number): number;
+            public invert(x: number): number;
+            public ticks(count?: number): number[];
+            public copy(): ModifiedLog;
+            /**
+            * @returns {boolean}
+            * Whether or not to return tick values other than powers of base.
+            *
+            * This defaults to false, so you'll normally only see ticks like
+            * [10, 100, 1000]. If you turn it on, you might see ticks values
+            * like [10, 50, 100, 500, 1000].
+            */
+            public showIntermediateTicks(): boolean;
+            /**
+            * @param {boolean} show
+            * Whether or not to return ticks values other than powers of the base.
+            */
+            public showIntermediateTicks(show: boolean): ModifiedLog;
         }
     }
 }
