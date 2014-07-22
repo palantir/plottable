@@ -363,6 +363,17 @@ footer {
  */
 div#page-content {
 
+  > * {
+    width: 100%;
+    max-width: 800px;
+    margin: 1em auto;
+
+    @media (max-width: 800px) {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+
   h1, h2, h3, h4 {
     color: $COLOR_ORANGE1;
   }
@@ -384,12 +395,32 @@ div#page-content {
   }
 
   p {
-    margin: 1em 0;
+    margin: 1em auto;
 
     strong {
       font-family: $font-headers;
       font-weight: $font-weight-normal;
       text-transform: uppercase;
+    }
+  }
+
+  div.highlight {
+    max-width: 100%;
+    margin-top: 20px;
+    border-top:    2px solid $COLOR_ORANGE4;
+    border-bottom: 2px solid $COLOR_ORANGE4;
+    background-color: $COLOR_ORANGE3;
+    padding: 20px 0;
+
+    pre {
+      background-color: transparent;
+      border: none;
+
+      & > code {
+        max-width: 800px;
+        margin: 0 auto;
+        display: block;
+      }
     }
   }
 
