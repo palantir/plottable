@@ -1018,7 +1018,7 @@ var Plottable;
             function _getParsedStyleValue(style, prop) {
                 var value = style.getPropertyValue(prop);
                 var parsedValue = parseFloat(value);
-                if (parsedValue != parsedValue) {
+                if (parsedValue !== parsedValue) {
                     return 0;
                 }
                 return parsedValue;

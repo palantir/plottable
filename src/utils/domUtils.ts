@@ -23,7 +23,7 @@ export module Util {
     function _getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
       var value: any = style.getPropertyValue(prop);
       var parsedValue = parseFloat(value);
-      if (parsedValue != parsedValue) {
+      if (parsedValue !== parsedValue) {
           return 0;
       }
       return parsedValue;
