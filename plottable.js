@@ -1648,10 +1648,10 @@ var Plottable;
         };
 
         DataSource.prototype._getExtent = function (accessor) {
-            var cachedExtent = this.accessor2cachedExtent.get(accessor);
+            var cachedExtent = this.accessor2cachedExtent.get(String(accessor));
             if (cachedExtent === undefined) {
                 cachedExtent = this.computeExtent(accessor);
-                this.accessor2cachedExtent.set(accessor, cachedExtent);
+                this.accessor2cachedExtent.set(String(accessor), cachedExtent);
             }
             return cachedExtent;
         };
@@ -3886,6 +3886,10 @@ var Plottable;
                 return flat;
             };
 
+            CompositeOrdinal.prototype.rangeBand = function () {
+                return this.smallestRangeBand();
+            };
+
             CompositeOrdinal.prototype.addSubscale = function (scale) {
                 this._subScales.push(scale);
                 return this;
@@ -3934,7 +3938,7 @@ var Plottable;
             };
 
             CompositeOrdinal.prototype._setDomain = function (values) {
-                if (values.length == 0) {
+                if (values.length === 0) {
                     _super.prototype._setDomain.call(this, values);
                     return;
                 }
@@ -3960,7 +3964,7 @@ var Plottable;
 
                 // Hierarchically apply range to children
                 if (!(values === undefined)) {
-                    var parentBand = this.rangeBand();
+                    var parentBand = _super.prototype.rangeBand.call(this);
                     this._subScales.forEach(function (subScale) {
                         subScale.range([0, parentBand]);
                         parentBand = subScale.rangeBand();
@@ -6026,6 +6030,7 @@ var Plottable;
             BarPlot.prototype.barAlignment = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
                 var align2factor = this.constructor._BarAlignmentToFactor;
+                console.log(align2factor);
                 if (align2factor[alignmentLC] === undefined) {
                     throw new Error("unsupported bar alignment");
                 }
@@ -6127,9 +6132,16 @@ var Plottable;
 
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
-                attrToProjector[secondaryAttr] = function (d, i) {
-                    return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor;
-                };
+                if (!bandsMode) {
+                    attrToProjector[secondaryAttr] = function (d, i) {
+                        return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor;
+                    };
+                } else {
+                    var bandWidth = secondaryScale.rangeBand();
+                    attrToProjector[secondaryAttr] = function (d, i) {
+                        return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
+                    };
+                }
 
                 var originalPositionFn = attrToProjector[primaryAttr];
                 attrToProjector[primaryAttr] = function (d, i) {

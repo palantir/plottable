@@ -73,10 +73,10 @@ module Plottable {
     }
 
     public _getExtent(accessor: IAccessor): any[] {
-      var cachedExtent = this.accessor2cachedExtent.get(accessor);
+      var cachedExtent = this.accessor2cachedExtent.get(String(accessor));
       if (cachedExtent === undefined) {
         cachedExtent = this.computeExtent(accessor);
-        this.accessor2cachedExtent.set(accessor, cachedExtent);
+        this.accessor2cachedExtent.set(String(accessor), cachedExtent);
       }
       return cachedExtent;
     }

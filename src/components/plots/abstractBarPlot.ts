@@ -103,6 +103,7 @@ export module Abstract {
      public barAlignment(alignment: string) {
        var alignmentLC = alignment.toLowerCase();
        var align2factor = (<typeof BarPlot> this.constructor)._BarAlignmentToFactor;
+       console.log(align2factor);
        if (align2factor[alignmentLC] === undefined) {
          throw new Error("unsupported bar alignment");
        }
@@ -221,7 +222,12 @@ export module Abstract {
 
       var positionF = attrToProjector[secondaryAttr];
       var widthF = attrToProjector["width"];
-      attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
+      if (!bandsMode) {
+        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
+      } else {
+        var bandWidth = (<Plottable.Scale.Ordinal> secondaryScale).rangeBand();
+        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
+      }
 
       var originalPositionFn = attrToProjector[primaryAttr];
       attrToProjector[primaryAttr] = (d: any, i: number) => {

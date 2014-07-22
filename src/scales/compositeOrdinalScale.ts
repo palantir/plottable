@@ -17,6 +17,10 @@ export module Scale {
       return flat;
     }
 
+    public rangeBand(): number {
+      return this.smallestRangeBand();
+    }
+
     private addSubscale(scale: Ordinal): CompositeOrdinal {
       this._subScales.push(scale);
       return this;
@@ -63,7 +67,7 @@ export module Scale {
     }
 
     public _setDomain(values: any[]) {
-      if (values.length == 0) {
+      if (values.length === 0) {
         super._setDomain(values);
         return;
       }
@@ -84,7 +88,7 @@ export module Scale {
 
       // Hierarchically apply range to children
       if (!(values === undefined)) {
-        var parentBand = this.rangeBand();
+        var parentBand = super.rangeBand();
         this._subScales.forEach((subScale) => {
           subScale.range([0, parentBand]);
           parentBand = subScale.rangeBand();
@@ -98,7 +102,7 @@ export module Scale {
     public scale(args: any[]) {
       var result = super.scale(args[0]);
       this._subScales.forEach((subScale, i) => {
-        if (!(args[i + 1] === undefined)){
+        if (!(args[i + 1] === undefined)) {
           result += subScale.scale(args[i + 1]);
         }
       });

@@ -69,7 +69,7 @@ export module Util {
         return (d: any, i: number, s: any) => d[accessor];
       } else if (Array.isArray(accessor)) {
         return (d: any, i: number, s: any) => accessor.map((element: any) => accessorize(element)(d, i, s));
-      }else {
+      } else {
         return (d: any, i: number, s: any) => accessor;
       };
     }

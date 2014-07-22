@@ -1486,6 +1486,7 @@ declare module Plottable {
     module Scale {
         class CompositeOrdinal extends Ordinal {
             constructor();
+            public rangeBand(): number;
             public fullBandStartAndWidth(v: any): number[];
             public range(): any[];
             public range(values: number[]): CompositeOrdinal;
