@@ -221,12 +221,7 @@ export module Abstract {
 
       var positionF = attrToProjector[secondaryAttr];
       var widthF = attrToProjector["width"];
-      if (!bandsMode) {
-        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
-      } else {
-        var bandWidth = (<Plottable.Scale.Ordinal> secondaryScale).rangeBand();
-        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
-      }
+      attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
 
       var originalPositionFn = attrToProjector[primaryAttr];
       attrToProjector[primaryAttr] = (d: any, i: number) => {

@@ -97,14 +97,9 @@ export module Scale {
         if (funs[i + 1] === undefined) {
           return;
         }
-        // (bdwyer) - THIS USES LODASH. Re-implmementing this functionality may be anoying.
-        // var subDomain = _(data).map(keys[i + 1]).sortBy().uniq().value();
         subScale.domain(Util.Methods.uniq(ds.data().slice().map(funs[i + 1])));
       });
-
-      // MORE LODASH.
-      //var mainDomain = _(data).map(keys[0]).sortBy().uniq().value()
-
+      
       return this;
     }
   }

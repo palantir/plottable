@@ -3961,14 +3961,9 @@ var Plottable;
                     if (funs[i + 1] === undefined) {
                         return;
                     }
-
-                    // (bdwyer) - THIS USES LODASH. Re-implmementing this functionality may be anoying.
-                    // var subDomain = _(data).map(keys[i + 1]).sortBy().uniq().value();
                     subScale.domain(Plottable.Util.Methods.uniq(ds.data().slice().map(funs[i + 1])));
                 });
 
-                // MORE LODASH.
-                //var mainDomain = _(data).map(keys[0]).sortBy().uniq().value()
                 return this;
             };
             return CompositeOrdinal;
@@ -5094,17 +5089,17 @@ var Plottable;
             /**
             * Creates a CompositeAxis
             *
-            * A CompositeAxis takes an OrdinalScale and includes word-wrapping algorithms and advanced layout logic to try to
+            * A CompositeAxis takes an CompositeOrdinal and includes word-wrapping algorithms and advanced layout logic to try to
             * display the scale as efficiently as possible.
             *
             * @constructor
-            * @param {OrdinalScale} scale The scale to base the Axis on.
-            * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
+            * @param {CompositeOrdinal} scale The scale to base the Axis on.
+            * @param {string} [orientation] The orientation of the Axis (top/bottom/left/right)
             */
             function Composite(scale, orientation) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
                 _super.call(this, scale, orientation);
-                this.tickLength(120);
+                this.tickLength(80);
                 this.formatter(new Plottable.Formatter.Custom(function (d) {
                     return d[d.length - 1];
                 }));
@@ -6110,16 +6105,9 @@ var Plottable;
 
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
-                if (!bandsMode) {
-                    attrToProjector[secondaryAttr] = function (d, i) {
-                        return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor;
-                    };
-                } else {
-                    var bandWidth = secondaryScale.rangeBand();
-                    attrToProjector[secondaryAttr] = function (d, i) {
-                        return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
-                    };
-                }
+                attrToProjector[secondaryAttr] = function (d, i) {
+                    return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor;
+                };
 
                 var originalPositionFn = attrToProjector[primaryAttr];
                 attrToProjector[primaryAttr] = function (d, i) {
