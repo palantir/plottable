@@ -67,7 +67,9 @@ export module Util {
         return (<IAccessor> accessor);
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
         return (d: any, i: number, s: any) => d[accessor];
-      } else {
+      } else if (Array.isArray(accessor)) {
+        return (d: any, i: number, s: any) => accessor.map((element: any) => accessorize(element)(d, i, s));
+      }else {
         return (d: any, i: number, s: any) => accessor;
       };
     }

@@ -88,6 +88,8 @@ module Plottable {
         return [];
       } else if (typeof(mappedData[0]) === "string") {
         return Util.Methods.uniq(mappedData);
+      } else if (Array.isArray(mappedData[0])) {
+        return mappedData;
       } else {
         var extent = d3.extent(mappedData);
         if (extent[0] == null || extent[1] == null) {

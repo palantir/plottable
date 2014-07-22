@@ -84,6 +84,12 @@ var Plottable;
                     return function (d, i, s) {
                         return d[accessor];
                     };
+                } else if (Array.isArray(accessor)) {
+                    return function (d, i, s) {
+                        return accessor.map(function (element) {
+                            return accessorize(element)(d, i, s);
+                        });
+                    };
                 } else {
                     return function (d, i, s) {
                         return accessor;
@@ -1657,6 +1663,8 @@ var Plottable;
                 return [];
             } else if (typeof (mappedData[0]) === "string") {
                 return Plottable.Util.Methods.uniq(mappedData);
+            } else if (Array.isArray(mappedData[0])) {
+                return mappedData;
             } else {
                 var extent = d3.extent(mappedData);
                 if (extent[0] == null || extent[1] == null) {
@@ -3871,9 +3879,23 @@ var Plottable;
             function CompositeOrdinal() {
                 _super.call(this);
                 this._subScales = [];
+                this.rangeType("bands", .05, .1);
             }
+            CompositeOrdinal.prototype._getExtent = function () {
+                var flat = Plottable.Util.Methods.flatten(this._getAllExtents());
+                return flat;
+            };
+
             CompositeOrdinal.prototype.addSubscale = function (scale) {
                 this._subScales.push(scale);
+                return this;
+            };
+
+            CompositeOrdinal.prototype.makeSubScales = function (levels) {
+                this._subScales = [];
+                while (levels-- > 0) {
+                    this.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
+                }
                 return this;
             };
 
@@ -3911,6 +3933,27 @@ var Plottable;
                 return [start, width];
             };
 
+            CompositeOrdinal.prototype._setDomain = function (values) {
+                if (values.length == 0) {
+                    _super.prototype._setDomain.call(this, values);
+                    return;
+                }
+                _super.prototype._setDomain.call(this, Plottable.Util.Methods.uniq(values.map(function (d) {
+                    return d[0];
+                })).map(function (d) {
+                    return [d];
+                }));
+                this.makeSubScales(values[0].length - 1);
+                this._subScales.forEach(function (subScale, i) {
+                    var dom = Plottable.Util.Methods.uniq(values.map(function (d) {
+                        return d[i + 1];
+                    }));
+                    subScale._setDomain(Plottable.Util.Methods.uniq(values.map(function (d) {
+                        return d[i + 1];
+                    })));
+                });
+            };
+
             CompositeOrdinal.prototype.range = function (values) {
                 // Store result of super call so we can return it
                 var val = _super.prototype.range.call(this, values);
@@ -3944,27 +3987,6 @@ var Plottable;
 
             CompositeOrdinal.prototype.domainLevel = function (n) {
                 return n === 0 ? this.domain() : this._subScales[n - 1].domain();
-            };
-
-            // (bdwyer) - to be updated once we have custom domainers? This makes
-            // assumptions about the layout of data and how it is mapped to the sub
-            // scales. Deserves some more thought depending on how the domainers are
-            // going to work.
-            CompositeOrdinal.prototype.updateDomains = function (ds, accessors) {
-                var funs = accessors.map(function (a) {
-                    return Plottable.Util.Methods.applyAccessor(a, ds);
-                });
-                this.domain(Plottable.Util.Methods.uniq(ds.data().slice().map(funs[0])).map(function (d) {
-                    return [d];
-                }));
-                this._subScales.forEach(function (subScale, i) {
-                    if (funs[i + 1] === undefined) {
-                        return;
-                    }
-                    subScale.domain(Plottable.Util.Methods.uniq(ds.data().slice().map(funs[i + 1])));
-                });
-
-                return this;
             };
             return CompositeOrdinal;
         })(Scale.Ordinal);

@@ -9,10 +9,24 @@ export module Scale {
 
     constructor() {
       super();
+      this.rangeType("bands", .05, .1);
+    }
+
+    public _getExtent(): any[] {
+      var flat = Util.Methods.flatten(this._getAllExtents());
+      return flat;
     }
 
     private addSubscale(scale: Ordinal): CompositeOrdinal {
       this._subScales.push(scale);
+      return this;
+    }
+
+    private makeSubScales(levels: number): CompositeOrdinal {
+      this._subScales = [];
+      while (levels-->0) {
+        this.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
+      }
       return this;
     }
 
@@ -46,6 +60,19 @@ export module Scale {
       var start = (this.scale(v) - this.innerPaddingLevel(n) / 2);
       var width = this.rangeBandLevel(n) + this.innerPaddingLevel(n);
       return [start, width];
+    }
+
+    public _setDomain(values: any[]) {
+      if (values.length == 0) {
+        super._setDomain(values);
+        return;
+      }
+      super._setDomain(Util.Methods.uniq(values.map((d: string[]) => d[0])).map((d: string) => [d]));
+      this.makeSubScales(values[0].length - 1);
+      this._subScales.forEach((subScale, i) => {
+        var dom = Util.Methods.uniq(values.map((d: string[]) => d[i + 1]));
+        subScale._setDomain(Util.Methods.uniq(values.map((d: string[]) => d[i + 1])));
+      });
     }
 
     // This is the magic that hierarchically updates the range bands
@@ -84,23 +111,6 @@ export module Scale {
 
     public domainLevel(n: number): any[] {
       return n === 0 ? this.domain() : this._subScales[n - 1].domain();
-    }
-
-    // (bdwyer) - to be updated once we have custom domainers? This makes
-    // assumptions about the layout of data and how it is mapped to the sub
-    // scales. Deserves some more thought depending on how the domainers are
-    // going to work.
-    public updateDomains(ds: DataSource, accessors: any[]): CompositeOrdinal {
-      var funs = accessors.map((a: any) => Util.Methods.applyAccessor(a, ds));
-      this.domain(Util.Methods.uniq(ds.data().slice().map(funs[0])).map((d: string) => [d]));
-      this._subScales.forEach((subScale, i) => {
-        if (funs[i + 1] === undefined) {
-          return;
-        }
-        subScale.domain(Util.Methods.uniq(ds.data().slice().map(funs[i + 1])));
-      });
-      
-      return this;
     }
   }
 }

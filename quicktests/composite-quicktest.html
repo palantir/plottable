@@ -38,29 +38,20 @@
     var order;
     var xScale;
     var ds;
+    var plot;
     window.onload = function() {
       makeTieredData(0, []);
       ds = new Plottable.DataSource(data);
 
-      xScale = new Plottable.Scale.CompositeOrdinal().rangeType("bands", .05, .1);
-      xScale.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
-      xScale.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
-      xScale.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
+      xScale = new Plottable.Scale.CompositeOrdinal();
       var xAxis = new Plottable.Axis.Composite(xScale, "bottom");
 
       order = ["key1", "key2", "key3", "key4"];
-      xScale.updateDomains(ds, order);
       var yScale = new Plottable.Scale.Linear();
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
       var plot = new Plottable.Plot.VerticalBar(ds, xScale, yScale);
-      plot.project("x", function(d) {
-        var x = [];
-        for (var i = 0; i < order.length; i++) {
-          x.push(d[order[i]]);
-        }
-        return x;
-      }, xScale);
+      plot.project("x", order, xScale);
       plot.project("width", 10); // needed for now until we refactor the automatic calculation
 
       var chart = new Plottable.Component.Table([
@@ -73,26 +64,26 @@
     function oneFront() {
       order.splice(order.indexOf("key1"), 1);
       order.push("key1");
-      xScale.updateDomains(ds, order);
+      plot.project("x", order, xScale);
     }
 
     function twoFront() {
       order.splice(order.indexOf("key2"), 1);
       order.push("key2");
-      xScale.updateDomains(ds, order);
+      plot.project("x", order, xScale);
     }
 
     function threeFront() {
       order.splice(order.indexOf("key3"), 1);
       order.push("key3");
-      xScale.updateDomains(ds, order);
+      plot.project("x", order, xScale);
     }
 
 
     function fourFront() {
       order.splice(order.indexOf("key4"), 1);
       order.push("key4");
-      xScale.updateDomains(ds, order);
+      plot.project("x", order, xScale);
     }
 
     </script>

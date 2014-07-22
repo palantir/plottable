@@ -1492,7 +1492,6 @@ declare module Plottable {
             public scale(args: any[]): any;
             public getLevels(): number;
             public domainLevel(n: number): any[];
-            public updateDomains(ds: DataSource, accessors: any[]): CompositeOrdinal;
         }
     }
 }
