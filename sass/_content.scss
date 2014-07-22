@@ -1,11 +1,6 @@
 // -------------------------------------------
 // Content: Page styles should be defined here
 // -------------------------------------------
-
-div#example-chart-1-source-wrapper {
-  margin-top: 4em;
-}
-
 header {
   .navbar {
     background: transparent;
@@ -33,25 +28,44 @@ header {
 
   .navbar .nav,
   .navbar .nav > li {
-    @include rem(font-size, 16px);
-    color: $COLOR_WHITE1;
+    @include rem(font-size, 13px);
+    @include relative-line-height(14px, 13px);
+
+    @media (min-width: $screen-md-min) {
+      @include rem(font-size, 16px);
+    }
 
     a {
       display: inline-block;
       border-top: 2px solid transparent;
-      padding: 4px 0;
       margin: 0 8px;
       @include transition-property(color, border-color);
       @include transition-duration($transition-duration);
       @include opacity(1);
       color: $COLOR_ORANGE1;
+      padding: 0;
+
+      @media (min-width: $screen-md-min) {
+        padding: 4px 0;
+      }
 
       .no-touch &:hover {
         border-color: $COLOR_ORANGE2;
         color: $COLOR_ORANGE2;
       }
 
+      &#plottable-logo {
+        @include rem(font-size, 20px);
+        font-family: $font-headers;
+        text-transform: uppercase;
+        font-weight: $font-weight-bold;
+        color: $COLOR_BLUE1;
 
+        .no-touch &:hover {
+          border-color: transparent;
+          color: $COLOR_BLUE2;
+        }
+      }
     }
 
     &.active a,
@@ -234,6 +248,7 @@ div#page-nav {
   right: 20px;
   display: none;
   height: 100%;
+  z-index: 100;
 
   @media (min-width: $screen-sm-min) {
     display: table;
@@ -297,13 +312,34 @@ div#page-nav {
   }
 }
 
+/* Example */
+#section-example-1 {
+  padding: 40px 0;
+}
 
 /*
  * Code
  */
-div.highlight pre {
-  background-color: $COLOR_WHITE1;
+
+div.source-code {
+  margin-top: 20px;
+  border-top:    2px solid $COLOR_ORANGE4;
+  border-bottom: 2px solid $COLOR_ORANGE4;
+  background-color: $COLOR_ORANGE3;
+  padding: 20px 0;
+
+
+  div.highlight {
+    background-color: transparent;
+    pre {
+      border: none;
+      background-color: transparent;
+      @include rem(font-size, 12px);
+    }
+  }
+
 }
+
 
 /*
  * Footer
@@ -322,19 +358,23 @@ footer {
   }
 }
 
-<<<<<<< HEAD
-
-/*
- * Generic page
- */
-=======
 /*
  * Tutorial/Generic Page
  */
 div#page-content {
 
-  h1 {
+  h1, h2, h3, h4 {
     color: $COLOR_ORANGE1;
+  }
+
+  nav {
+    ul {
+      li {
+        a {
+          color: $COLOR_ORANGE1;
+        }
+      }
+    }
   }
 
   img {
@@ -343,11 +383,14 @@ div#page-content {
     margin: 0 auto;
   }
 
-  p strong {
-    font-family: $font-headers;
-    font-weight: $font-weight-normal;
-    text-transform: uppercase;
+  p {
+    margin: 1em 0;
+
+    strong {
+      font-family: $font-headers;
+      font-weight: $font-weight-normal;
+      text-transform: uppercase;
+    }
   }
 
 }
->>>>>>> tokamoto/gh-page-update

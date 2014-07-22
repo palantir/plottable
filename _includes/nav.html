@@ -4,7 +4,11 @@
 
     <div>
       <ul class="nav navbar-nav">
-        <li{% if page.page_id == 'page-overview' %} class="active"{% endif %}><a href="{{ site.baseurl }}/">Overview</a></li>
+        {% if page.page_id == 'page-overview' %}
+        <li class="active"><a href="{{ site.baseurl }}/">Overview</a></li>
+        {% else %}
+        <li><a id="plottable-logo" href="{{ site.baseurl }}/">Plottable.JS</a></li>
+        {% endif %}
         <li{% if page.page_id == 'page-api' %} class="active"{% endif %}><a href="#">API</a></li>
         <li{% if page.page_id == 'page-doc' %} class="active"{% endif %}><a href="#">Documentation</a></li>
         <li{% if page.page_id == 'page-tutorials' %} class="active"{% endif %}><a href="{{ site.baseurl }}/tutorials/">Tutorials</a></li>

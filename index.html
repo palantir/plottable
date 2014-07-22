@@ -44,7 +44,7 @@ page_id: page-overview
 
     <div id="chart-separator">
       <div id="global-download">
-        <a href="https://github.com/palantir/plottable/archive/master.zip" class="button icon-download no-arrow">Download <span id="version-tag">(0.19.3)</span></a>
+        <a href="https://github.com/palantir/plottable/archive/master.zip" class="button icon-download no-arrow">Download <span id="version-tag">({{ site.plottable_version }})</span></a>
         <p>
           Follow our development on <a href="https://github.com/palantir/plottable" title="Plottable on Github.">Github</a>
         </p>
@@ -101,7 +101,7 @@ page_id: page-overview
     </div>
   </section>
 
-  <section id="section-example-1">
+  <div id="section-example-1">
     <div class="content">
       <div class="container">
         <div class="row">
@@ -120,9 +120,13 @@ page_id: page-overview
           </div>
 
         </div>
+      </div>
+    </div>
 
-        <div id="example-chart-1-source-wrapper" class="row">
-          <div id="example-chart-1-source" style="display: none;" class="col-md-10 col-md-offset-1">
+    <div id="example-chart-1-source-wrapper" class="source-code" style="display: none;">
+      <div class="container">
+        <div class="row">
+          <div id="example-chart-1-source" class="col-sm-8 col-md-offset-2">
 {% highlight javascript %}
 function makeCommiterChart(svg, commitData, contributorData) {
   var xScale = new Plottable.Scale.Time();
@@ -194,9 +198,10 @@ window.onload = function() {
 {% endhighlight %}
           </div>
         </div>
-      </div>
+      </div><!-- container -->
     </div>
-  </section>
+
+  </div><!-- /#section-example-1 -->
 
   <!-- Footer -->
   <footer role="contentinfo">
@@ -288,6 +293,9 @@ window.onload = function() {
   </script>
   <script>
     (function() {
+      var $window = $(window),
+          $document = $(document);
+
       $(function() {
         $('a#button-show-source-example-1-source').on('click', function(event) {
           var $this = $(this);
@@ -299,20 +307,37 @@ window.onload = function() {
             $this.text('Hide Source');
           }
 
-          var $source = $('#example-chart-1-source').show();
+          var $sourceWrapper = $('#example-chart-1-source-wrapper').show(),
+              $source = $('#example-chart-1-source');
           if ($this.data('showing-source')) {
             if (!$source.length) {
               $source = $("<div/>").attr('id', 'example-chart-1-source').html('<pre>' + $('#example-1-source').html() + '</pre>');
             }
-            $('#example-chart-1-source-wrapper').append($source);
+            $sourceWrapper.find('div.container > div.row').append($source);
             $('html, body').animate({ scrollTop: $source.offset().top });
           } else {
-            $source.hide();
+            $sourceWrapper.hide();
           }
 
           event.preventDefault();
         });
-      });
+
+        if (!Modernizr.touch) {
+          // disable scrolling and implement paging
+          var pager = new VerticalPager($('#section-overview, section, #section-example-1'));
+
+          window.setTimeout(function() {
+            pager.init();
+            console.log(pager.getCurrentSection());
+          }, 100);
+
+          $('#page-nav a').on('click', function(event) {
+            event.preventDefault();
+            var $this = $(this);
+            pager.gotoSection($($this.attr('href')));
+          });
+        }
+      }); // ready
     })(window, window.document);
   </script>
 </body>

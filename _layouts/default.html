@@ -36,19 +36,18 @@
     {% include nav.html %}
   </header><!-- /header -->
 
-  <div id="page-content">
+  <div id="page-content-container">
     <div class="container">
       <div class="row">
         <div class="col-sm-8 col-sm-offset-2">
           <h1>{{ page.title }}</h1>
         </div>
       </div>
-      <div class="row">
-        <div class="col-sm-8 col-sm-offset-2">
-          {{ content }}
-        </div><!-- /.col-sm-12 -->
-      </div><!-- /.row -->
     </div><!-- /.container -->
+
+    <div id="page-content">
+      {{ content }}
+    </div><!-- /.row -->
   </div>
 
   <!-- Footer -->

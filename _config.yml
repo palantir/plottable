@@ -6,3 +6,5 @@ company: 'Palantir'
 title: 'Palantir'
 google_analytics: ''
 baseurl: /plottable
+
+plottable_version: 0.19.3

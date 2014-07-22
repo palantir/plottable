@@ -15,6 +15,71 @@ Modernizr.addTest('retina', function() {
 
 (function(window, document, undefined) {
   'use strict';
+  var $window = $(window)
+
+  // vertical pager
+  var VerticalPager = function($sections) {
+    this.$sections = $sections;
+    this.$currentSection = null;
+    this.isPaging = false;
+  };
+  VerticalPager.prototype = {
+
+    init: function() {
+      if (typeof this.initialized === 'undefined') {
+        this.initialized = true;
+        this.$currentSection = this.getCurrentSection();
+
+        $window.on('mousewheel', $.proxy(function(event) {
+          if (!this.isPaging) {
+            var $currentSection = this.getCurrentSection();
+            var direction = (event.originalEvent.wheelDelta < 0) ? 'up' : 'down';
+            var pageIndex = this.$sections.index($currentSection);
+            if (direction == 'up') {
+              pageIndex++;
+            } else {
+              pageIndex--;
+            }
+            if (pageIndex < this.$sections.length && pageIndex > -1) {
+              this.gotoSection(this.$sections.eq(pageIndex));
+            }
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+        }, this));
+      } else {
+        console.log('Already initialized VerticalPager.');
+      }
+
+    },
+
+    gotoSection: function($section) {
+      if ($section != this.$currentSection && !this.isPaging) {
+        this.isPaging = true;
+        $('html body').animate({ scrollTop: $section.offset().top }, $.proxy(function() {
+          window.setTimeout($.proxy(function() {
+            this.isPaging = false;
+          }, this), 800);
+          this.$currentSection = $section;
+        }, this));
+      }
+    },
+
+    getCurrentSection: function() {
+      for (var i = 0, len = this.$sections.length; i < len; ++i) {
+        var elem = this.$sections.get(i),
+            $elem = $(elem);
+        if ($window.scrollTop() <= $elem.offset().top) {
+          return $elem;
+        }
+      }
+      return null;
+    }
+  };
+  window.VerticalPager = VerticalPager;
+
+
   $(function() {
     $('[data-toggle="tooltip"]').tooltip();
   });
