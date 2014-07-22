@@ -1017,10 +1017,11 @@ var Plottable;
 
             function _getParsedStyleValue(style, prop) {
                 var value = style.getPropertyValue(prop);
-                if (value == null) {
+                var parsedValue = parseFloat(value);
+                if (parsedValue != parsedValue) {
                     return 0;
                 }
-                return parseFloat(value);
+                return parsedValue;
             }
 
             //
@@ -5403,6 +5404,14 @@ var Plottable;
 
             Legend.prototype._requestedSpace = function (offeredWidth, offeredY) {
                 var textHeight = this.measureTextHeight();
+                if (textHeight === 0) {
+                    return {
+                        width: 0,
+                        height: 0,
+                        wantsWidth: false,
+                        wantsHeight: false
+                    };
+                }
                 var totalNumRows = this.colorScale.domain().length;
                 var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 

@@ -22,10 +22,11 @@ export module Util {
 
     function _getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
       var value: any = style.getPropertyValue(prop);
-      if (value == null){
-        return 0;
+      var parsedValue = parseFloat(value);
+      if (parsedValue != parsedValue) {
+          return 0;
       }
-      return parseFloat(value);
+      return parsedValue;
     }
 
     //

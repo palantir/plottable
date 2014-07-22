@@ -140,6 +140,14 @@ export module Component {
 
     public _requestedSpace(offeredWidth: number, offeredY: number): ISpaceRequest {
       var textHeight = this.measureTextHeight();
+      if (textHeight === 0) {
+          return {
+              width: 0,
+              height: 0,
+              wantsWidth: false,
+              wantsHeight: false
+          };
+      }
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
