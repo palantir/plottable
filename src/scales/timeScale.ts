@@ -26,6 +26,21 @@ export module Scale {
       return tempScale.ticks(interval, step);
     }
 
+    public domain(): any[];
+    public domain(values: any[]): Time;
+    public domain(values?: any[]): any {
+      if (values == null) {
+        return super.domain();
+      } else {
+        // attempt to parse dates
+        if (typeof(values[0]) === "string") {
+          values = values.map((d: any) => new Date(d));
+        }
+        return super.domain(values);
+      }
+    }
+
+
     /**
      * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
      *

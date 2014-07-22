@@ -31,6 +31,7 @@
 
 ///<reference path="scales/coordinatorTests.ts" />
 ///<reference path="scales/scaleTests.ts" />
+///<reference path="scales/timeScaleTests.ts" />
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formatterTests.ts" />

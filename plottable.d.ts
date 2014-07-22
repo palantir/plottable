@@ -1567,6 +1567,8 @@ declare module Plottable {
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             public tickInterval(interval: D3.Time.Interval, step?: number): any[];
+            public domain(): any[];
+            public domain(values: any[]): Time;
             /**
             * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
             *

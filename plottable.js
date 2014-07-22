@@ -4188,6 +4188,20 @@ var Plottable;
                 return tempScale.ticks(interval, step);
             };
 
+            Time.prototype.domain = function (values) {
+                if (values == null) {
+                    return _super.prototype.domain.call(this);
+                } else {
+                    // attempt to parse dates
+                    if (typeof (values[0]) === "string") {
+                        values = values.map(function (d) {
+                            return new Date(d);
+                        });
+                    }
+                    return _super.prototype.domain.call(this, values);
+                }
+            };
+
             /**
             * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
             *
