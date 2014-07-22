@@ -23,7 +23,7 @@ export module Scale {
       var tempScale = d3.time.scale();
       tempScale.domain(this.domain());
       tempScale.range(this.range());
-      return tempScale.ticks(interval, step);
+      return tempScale.ticks(interval.range, step);
     }
 
     public domain(): any[];

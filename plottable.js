@@ -1,5 +1,5 @@
 /*!
-Plottable 0.21.0 (https://github.com/palantir/plottable)
+Plottable 0.21.2 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1036,10 +1036,11 @@ var Plottable;
 
             function _getParsedStyleValue(style, prop) {
                 var value = style.getPropertyValue(prop);
-                if (value == null) {
+                var parsedValue = parseFloat(value);
+                if (parsedValue !== parsedValue) {
                     return 0;
                 }
-                return parseFloat(value);
+                return parsedValue;
             }
 
             //
@@ -1514,7 +1515,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.21.0";
+    Plottable.version = "0.21.2";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4185,7 +4186,7 @@ var Plottable;
                 var tempScale = d3.time.scale();
                 tempScale.domain(this.domain());
                 tempScale.range(this.range());
-                return tempScale.ticks(interval, step);
+                return tempScale.ticks(interval.range, step);
             };
 
             Time.prototype.domain = function (values) {
@@ -5768,6 +5769,11 @@ var Plottable;
                 // note: can't be called before anchoring atm
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var textHeight = Plottable.Util.Text.getTextHeight(fakeLegendEl.append("text"));
+
+                // HACKHACK
+                if (textHeight === 0) {
+                    textHeight = 1;
+                }
                 fakeLegendEl.remove();
                 return textHeight;
             };
