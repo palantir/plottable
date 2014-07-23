@@ -4867,9 +4867,8 @@ var Plottable;
                     return this._computedHeight;
                 }
                 var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
-                var setTickLength = textHeight;
-                this.tickLength(setTickLength);
-                this._computedHeight = setTickLength + 2 * this.tickLabelPadding();
+                this.tickLength(textHeight);
+                this._computedHeight = textHeight + 2 * this.tickLabelPadding();
                 return this._computedHeight;
             };
 

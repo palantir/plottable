@@ -86,7 +86,7 @@ export module Axis {
 
     /**
      * Creates a TimeAxis
-     * 
+     *
      * @constructor
      * @param {TimeScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom)
@@ -108,9 +108,8 @@ export module Axis {
         return this._computedHeight;
       }
       var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
-      var setTickLength = textHeight;
-      this.tickLength(setTickLength);
-      this._computedHeight = setTickLength + 2 * this.tickLabelPadding();
+      this.tickLength(textHeight);
+      this._computedHeight = textHeight + 2 * this.tickLabelPadding();
       return this._computedHeight;
     }
 
@@ -130,7 +129,7 @@ export module Axis {
 
     public isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
       // compute number of ticks
-      // if less than a certain threshold 
+      // if less than a certain threshold
       var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
       var stepLength = Math.min(this.getIntervalLength(interval), this.availableWidth);
       return worst < stepLength;
