@@ -1102,6 +1102,23 @@ var Plottable;
                 }
             }
             DOM.translate = translate;
+
+            function boxesOverlap(boxA, boxB) {
+                if (boxA.right < boxB.left) {
+                    return false;
+                }
+                if (boxA.left > boxB.right) {
+                    return false;
+                }
+                if (boxA.bottom < boxB.top) {
+                    return false;
+                }
+                if (boxA.top > boxB.bottom) {
+                    return false;
+                }
+                return true;
+            }
+            DOM.boxesOverlap = boxesOverlap;
         })(Util.DOM || (Util.DOM = {}));
         var DOM = Util.DOM;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -4793,26 +4810,10 @@ var Plottable;
                 });
                 var lastLabelClientRect;
 
-                function boxesOverlap(boxA, boxB) {
-                    if (boxA.right < boxB.left) {
-                        return false;
-                    }
-                    if (boxA.left > boxB.right) {
-                        return false;
-                    }
-                    if (boxA.bottom < boxB.top) {
-                        return false;
-                    }
-                    if (boxA.top > boxB.bottom) {
-                        return false;
-                    }
-                    return true;
-                }
-
                 visibleTickLabels.each(function (d) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
-                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+                    if (lastLabelClientRect != null && Plottable.Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
                         tickLabel.style("visibility", "hidden");
                     } else {
                         lastLabelClientRect = clientRect;

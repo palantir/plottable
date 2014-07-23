@@ -438,18 +438,10 @@ export module Abstract {
                                     });
       var lastLabelClientRect: ClientRect;
 
-      function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-        if (boxA.right < boxB.left) { return false; }
-        if (boxA.left > boxB.right) { return false; }
-        if (boxA.bottom < boxB.top) { return false; }
-        if (boxA.top > boxB.bottom) { return false; }
-        return true;
-      }
-
       visibleTickLabels.each(function (d: any) {
         var clientRect = this.getBoundingClientRect();
         var tickLabel = d3.select(this);
-        if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+        if (lastLabelClientRect != null && Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;

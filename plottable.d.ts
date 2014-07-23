@@ -378,6 +378,7 @@ declare module Plottable {
             function getElementHeight(elem: HTMLScriptElement): number;
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
+            function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
         }
     }
 }

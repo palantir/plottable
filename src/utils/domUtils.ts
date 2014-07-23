@@ -91,6 +91,14 @@ export module Util {
         return s;
       }
     }
+
+    export function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
+      if (boxA.right < boxB.left) { return false; }
+      if (boxA.left > boxB.right) { return false; }
+      if (boxA.bottom < boxB.top) { return false; }
+      if (boxA.top > boxB.bottom) { return false; }
+      return true;
+    }
   }
 }
 }
