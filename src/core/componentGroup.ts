@@ -19,11 +19,9 @@ export module Component {
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var requests = this._components.map((c: Abstract.Component) => c._requestedSpace(offeredWidth, offeredHeight));
       var isEmpty = this.empty();
-      var desiredWidth  = isEmpty ? 0 : d3.max(requests, (l: ISpaceRequest) => l.width );
-      var desiredHeight = isEmpty ? 0 : d3.max(requests, (l: ISpaceRequest) => l.height);
       return {
-        width : Math.min(desiredWidth , offeredWidth ),
-        height: Math.min(desiredHeight, offeredHeight),
+        width : isEmpty ? 0 : d3.max(requests, (l: ISpaceRequest) => l.width ),
+        height: isEmpty ? 0 : d3.max(requests, (l: ISpaceRequest) => l.height),
         wantsWidth : isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsWidth ).some((x: boolean) => x),
         wantsHeight: isEmpty ? false : requests.map((r: ISpaceRequest) => r.wantsHeight).some((x: boolean) => x)
       };

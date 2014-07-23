@@ -2294,15 +2294,13 @@ var Plottable;
                     return c._requestedSpace(offeredWidth, offeredHeight);
                 });
                 var isEmpty = this.empty();
-                var desiredWidth = isEmpty ? 0 : d3.max(requests, function (l) {
-                    return l.width;
-                });
-                var desiredHeight = isEmpty ? 0 : d3.max(requests, function (l) {
-                    return l.height;
-                });
                 return {
-                    width: Math.min(desiredWidth, offeredWidth),
-                    height: Math.min(desiredHeight, offeredHeight),
+                    width: isEmpty ? 0 : d3.max(requests, function (l) {
+                        return l.width;
+                    }),
+                    height: isEmpty ? 0 : d3.max(requests, function (l) {
+                        return l.height;
+                    }),
                     wantsWidth: isEmpty ? false : requests.map(function (r) {
                         return r.wantsWidth;
                     }).some(function (x) {
@@ -2568,17 +2566,11 @@ var Plottable;
                             spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                         }
 
-                        var epsilon = 0.001;
-                        var epsilonGT = function (a, b) {
-                            return a - b - epsilon > 0;
-                        };
+                        var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
+                        var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
 
-                        if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
-                            Plottable.Util.Methods.warn("Invariant Violation: Abstract.Component cannot request more space than is offered");
-                        }
-
-                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], spaceRequest.width);
-                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], spaceRequest.height);
+                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
+                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
                         layoutWantsWidth[colIndex] = layoutWantsWidth[colIndex] || spaceRequest.wantsWidth;
                         layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
                     });
@@ -4494,8 +4486,8 @@ var Plottable;
                 }
 
                 return {
-                    width: Math.min(offeredWidth, requestedWidth),
-                    height: Math.min(offeredHeight, requestedHeight),
+                    width: requestedWidth,
+                    height: requestedHeight,
                     wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
                     wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
                 };
@@ -5237,8 +5229,8 @@ var Plottable;
                 var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
 
                 return {
-                    width: Math.min(desiredWidth, offeredWidth),
-                    height: Math.min(desiredHeight, offeredHeight),
+                    width: desiredWidth,
+                    height: desiredHeight,
                     wantsWidth: desiredWidth > offeredWidth,
                     wantsHeight: desiredHeight > offeredHeight
                 };
@@ -5405,7 +5397,6 @@ var Plottable;
             Legend.prototype._requestedSpace = function (offeredWidth, offeredY) {
                 var textHeight = this.measureTextHeight();
                 var totalNumRows = this.colorScale.domain().length;
-                var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var fakeText = fakeLegendEl.append("text");
@@ -5416,10 +5407,10 @@ var Plottable;
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
                 var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
                 return {
-                    width: Math.min(desiredWidth, offeredWidth),
-                    height: rowsICanFit * textHeight,
+                    width: desiredWidth,
+                    height: totalNumRows * textHeight,
                     wantsWidth: offeredWidth < desiredWidth,
-                    wantsHeight: rowsICanFit < totalNumRows
+                    wantsHeight: offeredY < totalNumRows * textHeight
                 };
             };
 

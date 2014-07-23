@@ -51,8 +51,8 @@ export module Component {
       var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
 
       return {
-        width : Math.min(desiredWidth , offeredWidth),
-        height: Math.min(desiredHeight, offeredHeight),
+        width : desiredWidth,
+        height: desiredHeight,
         wantsWidth : desiredWidth  > offeredWidth,
         wantsHeight: desiredHeight > offeredHeight
       };
