@@ -93,6 +93,14 @@ export module Abstract {
       };
     }
 
+    public _isFixedHeight() {
+      return this._isHorizontal();
+    }
+
+    public _isFixedWidth() {
+      return !this._isHorizontal();
+    }
+
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       if (this._isHorizontal()) {

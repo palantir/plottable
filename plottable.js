@@ -1735,6 +1735,8 @@ var Plottable;
                 this._yOffset = 0;
                 this._xAlignProportion = 0;
                 this._yAlignProportion = 0;
+                this.__isFixedHeight = false;
+                this.__isFixedWidth = false;
                 this.cssClasses = ["component"];
                 this._isSetup = false;
                 this._isAnchored = false;
@@ -2117,11 +2119,7 @@ var Plottable;
             * @return {boolean} Whether the component has a fixed width.
             */
             Component.prototype._isFixedWidth = function () {
-                // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
-                // some fixed size you aspire to.
-                // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
-                // For example a label with an empty string.
-                return this._requestedSpace(-1, -1).wantsWidth;
+                return this.__isFixedWidth;
             };
 
             /**
@@ -2131,7 +2129,7 @@ var Plottable;
             * @return {boolean} Whether the component has a fixed height.
             */
             Component.prototype._isFixedHeight = function () {
-                return this._requestedSpace(-1, -1).wantsHeight;
+                return this.__isFixedHeight;
             };
 
             /**
@@ -4560,6 +4558,14 @@ var Plottable;
                 };
             };
 
+            Axis.prototype._isFixedHeight = function () {
+                return this._isHorizontal();
+            };
+
+            Axis.prototype._isFixedWidth = function () {
+                return !this._isHorizontal();
+            };
+
             Axis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 if (this._isHorizontal()) {
@@ -5384,21 +5390,8 @@ var Plottable;
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this.tickLength() + this.tickLabelPadding();
                 var heightRequiredByTicks = this._isHorizontal() ? this.tickLength() + this.tickLabelPadding() : 0;
 
-                if (offeredWidth < 0 || offeredHeight < 0) {
-                    return {
-                        width: offeredWidth,
-                        height: offeredHeight,
-                        wantsWidth: !this._isHorizontal(),
-                        wantsHeight: this._isHorizontal()
-                    };
-                }
                 if (this._scale.domain().length === 0) {
-                    return {
-                        width: 0,
-                        height: 0,
-                        wantsWidth: false,
-                        wantsHeight: false
-                    };
+                    return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
 
                 var fakeScale = this._scale.copy();
@@ -5554,6 +5547,8 @@ var Plottable;
                     throw new Error(orientation + " is not a valid orientation for LabelComponent");
                 }
                 this.xAlign("center").yAlign("center");
+                this.__isFixedHeight = true;
+                this.__isFixedWidth = true;
             }
             Label.prototype.xAlign = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
@@ -5672,6 +5667,8 @@ var Plottable;
                 this.scale(colorScale);
                 this.xAlign("RIGHT").yAlign("TOP");
                 this.xOffset(5).yOffset(5);
+                this.__isFixedWidth = true;
+                this.__isFixedHeight = true;
             }
             Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
