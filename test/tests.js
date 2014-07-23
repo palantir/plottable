@@ -27,12 +27,14 @@ function verifySpaceRequest(sr, w, h, ww, wh, id) {
 function fixComponentSize(c, fixedWidth, fixedHeight) {
     c._requestedSpace = function (w, h) {
         return {
-            width: fixedWidth == null ? 0 : Math.min(w, fixedWidth),
-            height: fixedHeight == null ? 0 : Math.min(h, fixedHeight),
+            width: fixedWidth == null ? 0 : fixedWidth,
+            height: fixedHeight == null ? 0 : fixedHeight,
             wantsWidth: fixedWidth == null ? false : w < fixedWidth,
             wantsHeight: fixedHeight == null ? false : h < fixedHeight
         };
     };
+    c.__isFixedWidth = fixedWidth == null ? false : true;
+    c.__isFixedHeight = fixedHeight == null ? false : true;
     return c;
 }
 
@@ -2420,7 +2422,7 @@ describe("ComponentGroups", function () {
             fixComponentSize(c1, null, 10);
             fixComponentSize(c2, null, 50);
             var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 10, false, true, "");
+            verifySpaceRequest(request, 0, 50, false, true, "");
         });
     });
 

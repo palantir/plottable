@@ -26,6 +26,8 @@ export module Abstract {
     private _yOffset = 0;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     public _yAlignProportion = 0;
+    public __isFixedHeight = false;
+    public __isFixedWidth = false;
 
     private cssClasses: string[] = ["component"];
 
@@ -412,11 +414,7 @@ export module Abstract {
      * @return {boolean} Whether the component has a fixed width.
      */
     public _isFixedWidth(): boolean {
-      // If you are given -1 pixels and you're happy, clearly you are not fixed size. If you want more, then there is
-      // some fixed size you aspire to.
-      // Putting 0 doesn't work because sometimes a fixed-size component will still have dimension 0
-      // For example a label with an empty string.
-      return this._requestedSpace(-1, -1).wantsWidth;
+      return this.__isFixedWidth;
     }
 
     /**
@@ -426,7 +424,7 @@ export module Abstract {
      * @return {boolean} Whether the component has a fixed height.
      */
     public _isFixedHeight(): boolean {
-      return this._requestedSpace(-1, -1).wantsHeight;
+      return this.__isFixedHeight;
     }
 
     /**
