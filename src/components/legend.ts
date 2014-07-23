@@ -141,7 +141,6 @@ export module Component {
     public _requestedSpace(offeredWidth: number, offeredY: number): ISpaceRequest {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
 
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
@@ -150,10 +149,10 @@ export module Component {
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
       return {
-        width : Math.min(desiredWidth, offeredWidth),
-        height: rowsICanFit * textHeight,
+        width : desiredWidth,
+        height: totalNumRows * textHeight,
         wantsWidth: offeredWidth < desiredWidth,
-        wantsHeight: rowsICanFit < totalNumRows
+        wantsHeight: offeredY < totalNumRows * textHeight
       };
     }
 
