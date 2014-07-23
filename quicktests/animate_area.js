@@ -20,7 +20,7 @@ function run(div, data, Plottable) {
                                            [null,  xAxis]]);
   areaChart.renderTo(svg);
 
-    cb = function(x, y){
+  cb = function(x, y){
     d = areaRenderer.dataSource().data();
     areaRenderer.dataSource().data(d);
   }  
