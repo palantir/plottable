@@ -148,7 +148,7 @@ export module Component {
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Util.Text.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
-      var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
+      var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
       return {
         width : Math.min(desiredWidth, offeredWidth),
         height: rowsICanFit * textHeight,
@@ -161,6 +161,10 @@ export module Component {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var textHeight = Util.Text.getTextHeight(fakeLegendEl.append("text"));
+      // HACKHACK
+      if (textHeight === 0) {
+        textHeight = 1;
+      }
       fakeLegendEl.remove();
       return textHeight;
     }

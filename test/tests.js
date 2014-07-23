@@ -111,72 +111,6 @@ before(function () {
     window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
 
-var PerfDiagnostics;
-(function (_PerfDiagnostics) {
-    var PerfDiagnostics = (function () {
-        function PerfDiagnostics() {
-            this.total = 0;
-            this.numCalls = 0;
-            this.start = null;
-        }
-        PerfDiagnostics.toggle = function (measurementName) {
-            var diagnostic;
-            ;
-            if (PerfDiagnostics.diagnostics[measurementName] != null) {
-                diagnostic = PerfDiagnostics.diagnostics[measurementName];
-            } else {
-                diagnostic = new PerfDiagnostics();
-                PerfDiagnostics.diagnostics[measurementName] = diagnostic;
-            }
-            diagnostic.toggle();
-        };
-
-        PerfDiagnostics.getTime = function () {
-            if (false && performance.now) {
-                return performance.now();
-            } else {
-                return Date.now();
-            }
-        };
-
-        PerfDiagnostics.logResults = function () {
-            var grandTotal = PerfDiagnostics.diagnostics["total"] ? PerfDiagnostics.diagnostics["total"].total : null;
-            var measurementNames = Object.keys(PerfDiagnostics.diagnostics);
-            measurementNames.forEach(function (measurementName) {
-                var result = PerfDiagnostics.diagnostics[measurementName].total;
-                console.log(measurementName);
-                console.group();
-                console.log("Time:", result);
-                (grandTotal && measurementName !== "total") ? console.log("%   :", Math.round(result / grandTotal * 10000) / 100) : null;
-                console.groupEnd();
-            });
-        };
-
-        PerfDiagnostics.prototype.toggle = function () {
-            if (this.start == null) {
-                this.start = PerfDiagnostics.getTime();
-            } else {
-                this.total += PerfDiagnostics.getTime() - this.start;
-                this.numCalls++;
-                this.start = null;
-            }
-        };
-        PerfDiagnostics.diagnostics = {};
-        return PerfDiagnostics;
-    })();
-    function toggle(measurementName) {
-        return PerfDiagnostics.toggle(measurementName);
-    }
-    _PerfDiagnostics.toggle = toggle;
-    ;
-    function logResults() {
-        return PerfDiagnostics.logResults();
-    }
-    _PerfDiagnostics.logResults = logResults;
-    ;
-})(PerfDiagnostics || (PerfDiagnostics = {}));
-window.report = PerfDiagnostics.logResults;
-
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 
@@ -1455,6 +1389,11 @@ describe("Plots", function () {
         var renderArea;
         var verifier;
 
+        // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
+        var normalizePath = function (s) {
+            return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+        };
+
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -1487,13 +1426,13 @@ describe("Plots", function () {
 
         it("draws area and line correctly", function () {
             var areaPath = renderArea.select(".area");
-            assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+            assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
             assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
             var areaComputedStyle = window.getComputedStyle(areaPath.node());
             assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
 
             var linePath = renderArea.select(".line");
-            assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+            assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
             assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
             var lineComputedStyle = window.getComputedStyle(linePath.node());
             assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
@@ -1525,7 +1464,7 @@ describe("Plots", function () {
             areaPlot.renderTo(svg);
             renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
-            assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
+            assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             verifier.end();
         });
 
@@ -1738,7 +1677,7 @@ describe("Plots", function () {
                 dataset = new Plottable.DataSource(data);
 
                 renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
-                renderer._animate = false;
+                renderer.animate(false);
                 renderer.renderTo(svg);
             });
 
@@ -1856,7 +1795,7 @@ describe("Plots", function () {
 
                 renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
                 renderer.baseline(0);
-                renderer._animate = false;
+                renderer.animate(false);
                 var yAxis = new Plottable.Axis.Category(yScale, "left");
                 var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
                 axisWidth = yAxis.availableWidth;
@@ -1880,12 +1819,12 @@ describe("Plots", function () {
                 var bar1y = bar1.data()[0].y;
                 assert.closeTo(numAttr(bar0, "height"), 104, 2);
                 assert.closeTo(numAttr(bar1, "height"), 104, 2);
-                assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "width is correct for bar0");
-                assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "width is correct for bar1");
+                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
+                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
 
                 // check that bar is aligned on the center of the scale
-                assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "y pos correct for bar0");
-                assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "y pos correct for bar1");
+                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "y pos correct for bar0");
+                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "y pos correct for bar1");
                 verifier.end();
             });
 
@@ -1896,12 +1835,12 @@ describe("Plots", function () {
                 var bar0y = bar0.data()[0].y;
                 var bar1y = bar1.data()[0].y;
                 renderer.project("width", 10);
-                assert.equal(numAttr(bar0, "height"), 10, "bar0 height");
-                assert.equal(numAttr(bar1, "height"), 10, "bar1 height");
-                assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "bar0 width");
-                assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "bar1 width");
-                assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "bar0 ypos");
-                assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "bar1 ypos");
+                assert.closeTo(numAttr(bar0, "height"), 10, 0.01, "bar0 height");
+                assert.closeTo(numAttr(bar1, "height"), 10, 0.01, "bar1 height");
+                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "bar0 width");
+                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "bar1 width");
+                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
+                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
                 verifier.end();
             });
         });
@@ -2100,8 +2039,8 @@ describe("Plots", function () {
                     var y = +selection.attr("cy") * scale[1] + translate[1] + elementTranslate[1];
                     if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
                         circlesInArea++;
-                        assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
-                        assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+                        assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
+                        assert.closeTo(y, yScale.scale(datum.y), 0.01, "the scaled/translated y is correct");
                         assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
                     }
                     ;
@@ -3352,6 +3291,23 @@ describe("Domainer", function () {
         assert.equal(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
     });
 
+    it("pad() works on log scales", function () {
+        var logScale = new Plottable.Scale.Log();
+        logScale.updateExtent(1, "x", [10, 100]);
+        logScale.range([0, 1]);
+        logScale.domainer(domainer.pad(2.0));
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+        logScale.range([50, 60]);
+        logScale.autoDomain();
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+        logScale.range([-1, -2]);
+        logScale.autoDomain();
+        assert.closeTo(logScale.domain()[0], 1, 0.001);
+        assert.closeTo(logScale.domain()[1], 1000, 0.001);
+    });
+
     it("pad() defaults to [v-1, v+1] if there's only one numeric value", function () {
         domainer.pad();
         var domain = domainer.computeDomain([[5, 5]], scale);
@@ -3658,6 +3614,12 @@ describe("Scales", function () {
             assert.equal(d[1], 1);
         });
 
+        it("autorange defaults to [1, 10] on log scale", function () {
+            var scale = new Plottable.Scale.Log();
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [1, 10]);
+        });
+
         it("domain can't include NaN or Infinity", function () {
             var scale = new Plottable.Scale.Linear();
             var log = console.log;
@@ -3817,6 +3779,124 @@ describe("Scales", function () {
             assert.equal("#000000", scale.scale(0));
             assert.equal("#ffffff", scale.scale(16));
             assert.equal("#e3e3e3", scale.scale(8));
+        });
+
+        it("doesn't use a domainer", function () {
+            var scale = new Plottable.Scale.InterpolatedColor(["black", "white"]);
+            var startDomain = scale.domain();
+            scale.domainer().pad(1.0);
+            scale.autoDomain();
+            assert.equal(scale.domain(), startDomain);
+        });
+    });
+    describe("Modified Log Scale", function () {
+        var scale;
+        var base = 10;
+        var epsilon = 0.00001;
+        beforeEach(function () {
+            scale = new Plottable.Scale.ModifiedLog(base);
+        });
+
+        it("is an increasing, continuous function that can go negative", function () {
+            d3.range(-base * 2, base * 2, base / 20).forEach(function (x) {
+                // increasing
+                assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
+                assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
+
+                // continuous
+                assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
+                assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
+            });
+            assert.closeTo(scale.scale(0), 0, epsilon);
+        });
+
+        it("is close to log() for large values", function () {
+            [10, 100, 23103.4, 5].forEach(function (x) {
+                assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
+            });
+        });
+
+        it("x = invert(scale(x))", function () {
+            [0, 1, base, 100, 0.001, -1, -0.3, -base, base - 0.001].forEach(function (x) {
+                assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
+                assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
+            });
+        });
+
+        it("domain defaults to [0, 1]", function () {
+            scale = new Plottable.Scale.ModifiedLog(base);
+            assert.deepEqual(scale.domain(), [0, 1]);
+        });
+
+        it("works with a domainer", function () {
+            scale.updateExtent(1, "x", [0, base * 2]);
+            var domain = scale.domain();
+            scale.domainer(new Plottable.Domainer().pad(0.1));
+            assert.operator(scale.domain()[0], "<", domain[0]);
+            assert.operator(domain[1], "<", scale.domain()[1]);
+
+            scale.domainer(new Plottable.Domainer().nice());
+            assert.operator(scale.domain()[0], "<=", domain[0]);
+            assert.operator(domain[1], "<=", scale.domain()[1]);
+
+            scale = new Plottable.Scale.ModifiedLog(base);
+            scale.domainer(new Plottable.Domainer());
+            assert.deepEqual(scale.domain(), [0, 1]);
+        });
+
+        it("gives reasonable values for ticks()", function () {
+            scale.updateExtent(1, "x", [0, base / 2]);
+            var ticks = scale.ticks();
+            assert.operator(ticks.length, ">", 0);
+
+            scale.updateExtent(1, "x", [-base * 2, base * 2]);
+            ticks = scale.ticks();
+            var beforePivot = ticks.filter(function (x) {
+                return x <= -base;
+            });
+            var afterPivot = ticks.filter(function (x) {
+                return base <= x;
+            });
+            var betweenPivots = ticks.filter(function (x) {
+                return -base < x && x < base;
+            });
+            assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
+            assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
+            assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+        });
+
+        it("works on inverted domain", function () {
+            scale.updateExtent(1, "x", [200, -100]);
+            var range = scale.range();
+            assert.closeTo(scale.scale(-100), range[1], epsilon);
+            assert.closeTo(scale.scale(200), range[0], epsilon);
+            var a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
+            var b = a.map(function (x) {
+                return scale.scale(x);
+            });
+
+            // should be decreasing function; reverse is sorted
+            assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) {
+                return x - y;
+            }));
+
+            var ticks = scale.ticks();
+            assert.deepEqual(ticks, ticks.slice().sort(function (x, y) {
+                return x - y;
+            }), "ticks should be sorted");
+            assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+            var beforePivot = ticks.filter(function (x) {
+                return x <= -base;
+            });
+            var afterPivot = ticks.filter(function (x) {
+                return base <= x;
+            });
+            var betweenPivots = ticks.filter(function (x) {
+                return -base < x && x < base;
+            });
+            assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
+            assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
+            assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
         });
     });
 });

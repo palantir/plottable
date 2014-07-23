@@ -78,8 +78,8 @@ describe("Plots", () => {
           var y = +selection.attr("cy") * scale[1] + translate[1] + elementTranslate[1];
           if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
             circlesInArea++;
-            assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
-            assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+            assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
+            assert.closeTo(y, yScale.scale(datum.y), 0.01, "the scaled/translated y is correct");
             assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
           };
         };

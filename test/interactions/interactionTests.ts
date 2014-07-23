@@ -3,8 +3,8 @@
 var assert = chai.assert;
 
 
-function makeFakeEvent(x: number, y: number): D3.Event {
-  return {
+function makeFakeEvent(x: number, y: number): D3.D3Event {
+  return <D3.D3Event> <any> {
       dx: 0,
       dy: 0,
       clientX: x,

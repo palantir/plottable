@@ -1,5 +1,5 @@
 /*!
-Plottable 0.20.4 (https://github.com/palantir/plottable)
+Plottable 0.21.2 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -21,6 +21,23 @@ var Plottable;
                 return (Math.min(a, b) <= x && x <= Math.max(a, b));
             }
             Methods.inRange = inRange;
+
+            /** Print a warning message to the console, if it is available.
+            *
+            * @param {string} The warnings to print
+            */
+            function warn(warning) {
+                /* tslint:disable:no-console */
+                if (window.console != null) {
+                    if (window.console.warn != null) {
+                        console.warn(warning);
+                    } else if (window.console.log != null) {
+                        console.log(warning);
+                    }
+                }
+                /* tslint:enable:no-console */
+            }
+            Methods.warn = warn;
 
             /**
             * Takes two arrays of numbers and adds them together
@@ -89,6 +106,19 @@ var Plottable;
                 return d3.keys(seen);
             }
             Methods.uniq = uniq;
+
+            function uniqNumbers(a) {
+                var seen = d3.set();
+                var result = [];
+                a.forEach(function (n) {
+                    if (!seen.has(n)) {
+                        seen.add(n);
+                        result.push(n);
+                    }
+                });
+                return result;
+            }
+            Methods.uniqNumbers = uniqNumbers;
 
             /**
             * Creates an array of length `count`, filled with value or (if value is a function), value()
@@ -630,7 +660,7 @@ var Plottable;
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
-                    console.log("Insufficient space to fit text");
+                    Util.Methods.warn("Insufficient space to fit text");
                     return { width: 0, height: 0 };
                 }
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
@@ -987,10 +1017,11 @@ var Plottable;
 
             function _getParsedStyleValue(style, prop) {
                 var value = style.getPropertyValue(prop);
-                if (value == null) {
+                var parsedValue = parseFloat(value);
+                if (parsedValue !== parsedValue) {
                     return 0;
                 }
-                return parseFloat(value);
+                return parsedValue;
             }
 
             //
@@ -1465,7 +1496,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.20.4";
+    Plottable.version = "0.21.2";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2543,7 +2574,7 @@ var Plottable;
                         };
 
                         if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
-                            console.log("Invariant Violation: Abstract.Component cannot request more space than is offered");
+                            Plottable.Util.Methods.warn("Invariant Violation: Abstract.Component cannot request more space than is offered");
                         }
 
                         requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], spaceRequest.width);
@@ -2777,12 +2808,16 @@ var Plottable;
 
             Scale.prototype.domain = function (values) {
                 if (values == null) {
-                    return this._d3Scale.domain();
+                    return this._getDomain();
                 } else {
                     this.autoDomainAutomatically = false;
                     this._setDomain(values);
                     return this;
                 }
+            };
+
+            Scale.prototype._getDomain = function () {
+                return this._d3Scale.domain();
             };
 
             Scale.prototype._setDomain = function (values) {
@@ -3297,7 +3332,6 @@ var Plottable;
         *        the min of the first elements and the max of the second arguments.
         */
         function Domainer(combineExtents) {
-            if (typeof combineExtents === "undefined") { combineExtents = Domainer.defaultCombineExtents; }
             this.doNice = false;
             this.padProportion = 0.0;
             this.paddingExceptions = d3.map();
@@ -3318,9 +3352,19 @@ var Plottable;
         */
         Domainer.prototype.computeDomain = function (extents, scale) {
             var domain;
-            domain = this.combineExtents(extents);
+            if (this.combineExtents != null) {
+                domain = this.combineExtents(extents);
+            } else if (extents.length === 0) {
+                domain = scale._defaultExtent();
+            } else {
+                domain = [d3.min(extents, function (e) {
+                        return e[0];
+                    }), d3.max(extents, function (e) {
+                        return e[1];
+                    })];
+            }
             domain = this.includeDomain(domain);
-            domain = this.padDomain(domain);
+            domain = this.padDomain(scale, domain);
             domain = this.niceDomain(scale, domain);
             return domain;
         };
@@ -3330,6 +3374,13 @@ var Plottable;
         *
         * @param {number} [padProportion] Proportionally how much bigger the
         *         new domain should be (0.05 = 5% larger).
+        *
+        *         A domainer will pad equal visual amounts on each side.
+        *         On a linear scale, this means both sides are padded the same
+        *         amount: [10, 20] will be padded to [5, 25].
+        *         On a log scale, the top will be padded more than the bottom, so
+        *         [10, 100] will be padded to [1, 1000].
+        *
         * @return {Domainer} The calling Domainer.
         */
         Domainer.prototype.pad = function (padProportion) {
@@ -3438,10 +3489,12 @@ var Plottable;
             }
         };
 
-        Domainer.prototype.padDomain = function (domain) {
-            if (domain[0] === domain[1] && this.padProportion > 0.0) {
-                var d = domain[0].valueOf();
-                if (domain[0] instanceof Date) {
+        Domainer.prototype.padDomain = function (scale, domain) {
+            var min = domain[0];
+            var max = domain[1];
+            if (min === max && this.padProportion > 0.0) {
+                var d = min.valueOf();
+                if (min instanceof Date) {
                     return [d - Domainer.ONE_DAY, d + Domainer.ONE_DAY];
                 } else {
                     return [
@@ -3449,20 +3502,21 @@ var Plottable;
                         d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
-            var extent = domain[1] - domain[0];
-            var newDomain = [
-                domain[0].valueOf() - this.padProportion / 2 * extent,
-                domain[1].valueOf() + this.padProportion / 2 * extent];
+            var p = this.padProportion / 2;
 
+            // This scaling is done to account for log scales and other non-linear
+            // scales. A log scale should be padded more on the max than on the min.
+            var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
+            var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
             var exceptionValues = this.paddingExceptions.values().concat(this.unregisteredPaddingExceptions.values());
             var exceptionSet = d3.set(exceptionValues);
-            if (exceptionSet.has(domain[0])) {
-                newDomain[0] = domain[0];
+            if (exceptionSet.has(min)) {
+                newMin = min;
             }
-            if (exceptionSet.has(domain[1])) {
-                newDomain[1] = domain[1];
+            if (exceptionSet.has(max)) {
+                newMax = max;
             }
-            return newDomain;
+            return [newMin, newMax];
         };
 
         Domainer.prototype.niceDomain = function (scale, domain) {
@@ -3506,7 +3560,7 @@ var Plottable;
             */
             function QuantitiveScale(scale) {
                 _super.call(this, scale);
-                this.lastRequestedTickCount = 10;
+                this._lastRequestedTickCount = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
@@ -3543,7 +3597,7 @@ var Plottable;
                     return x !== x || x === Infinity || x === -Infinity;
                 };
                 if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-                    console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+                    Plottable.Util.Methods.warn("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
                     return;
                 }
                 _super.prototype._setDomain.call(this, values);
@@ -3583,9 +3637,9 @@ var Plottable;
             */
             QuantitiveScale.prototype.ticks = function (count) {
                 if (count != null) {
-                    this.lastRequestedTickCount = count;
+                    this._lastRequestedTickCount = count;
                 }
-                return this._d3Scale.ticks(this.lastRequestedTickCount);
+                return this._d3Scale.ticks(this._lastRequestedTickCount);
             };
 
             /**
@@ -3616,6 +3670,10 @@ var Plottable;
                     this._autoDomainIfAutomaticMode();
                     return this;
                 }
+            };
+
+            QuantitiveScale.prototype._defaultExtent = function () {
+                return [0, 1];
             };
             return QuantitiveScale;
         })(Abstract.Scale);
@@ -3677,9 +3735,228 @@ var Plottable;
             Log.prototype.copy = function () {
                 return new Log(this._d3Scale.copy());
             };
+
+            Log.prototype._defaultExtent = function () {
+                return [1, 10];
+            };
             return Log;
         })(Plottable.Abstract.QuantitiveScale);
         Scale.Log = Log;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Scale) {
+        var ModifiedLog = (function (_super) {
+            __extends(ModifiedLog, _super);
+            /**
+            * Creates a new Scale.ModifiedLog.
+            *
+            * A ModifiedLog scale acts as a regular log scale for large numbers.
+            * As it approaches 0, it gradually becomes linear. This means that the
+            * scale won't freak out if you give it 0 or a negative number, where an
+            * ordinary Log scale would.
+            *
+            * However, it does mean that scale will be effectively linear as values
+            * approach 0. If you want very small values on a log scale, you should use
+            * an ordinary Scale.Log instead.
+            *
+            * @constructor
+            * @param {number} [base]
+            *        The base of the log. Defaults to 10, and must be > 1.
+            *
+            *        For base <= x, scale(x) = log(x).
+            *
+            *        For 0 < x < base, scale(x) will become more and more
+            *        linear as it approaches 0.
+            *
+            *        At x == 0, scale(x) == 0.
+            *
+            *        For negative values, scale(-x) = -scale(x).
+            */
+            function ModifiedLog(base) {
+                if (typeof base === "undefined") { base = 10; }
+                _super.call(this, d3.scale.linear());
+                this._showIntermediateTicks = false;
+                this.base = base;
+                this.pivot = this.base;
+                this.untransformedDomain = this._defaultExtent();
+                this._lastRequestedTickCount = 10;
+                if (base <= 1) {
+                    throw new Error("ModifiedLogScale: The base must be > 1");
+                }
+            }
+            /**
+            * Returns an adjusted log10 value for graphing purposes.  The first
+            * adjustment is that negative values are changed to positive during
+            * the calculations, and then the answer is negated at the end.  The
+            * second is that, for values less than 10, an increasingly large
+            * (0 to 1) scaling factor is added such that at 0 the value is
+            * adjusted to 1, resulting in a returned result of 0.
+            */
+            ModifiedLog.prototype.adjustedLog = function (x) {
+                var negationFactor = x < 0 ? -1 : 1;
+                x *= negationFactor;
+
+                if (x < this.pivot) {
+                    x += (this.pivot - x) / this.pivot;
+                }
+
+                x = Math.log(x) / Math.log(this.base);
+
+                x *= negationFactor;
+                return x;
+            };
+
+            ModifiedLog.prototype.invertedAdjustedLog = function (x) {
+                var negationFactor = x < 0 ? -1 : 1;
+                x *= negationFactor;
+
+                x = Math.pow(this.base, x);
+
+                if (x < this.pivot) {
+                    x = (this.pivot * (x - 1)) / (this.pivot - 1);
+                }
+
+                x *= negationFactor;
+                return x;
+            };
+
+            ModifiedLog.prototype.scale = function (x) {
+                return this._d3Scale(this.adjustedLog(x));
+            };
+
+            ModifiedLog.prototype.invert = function (x) {
+                return this.invertedAdjustedLog(this._d3Scale.invert(x));
+            };
+
+            ModifiedLog.prototype._getDomain = function () {
+                return this.untransformedDomain;
+            };
+
+            ModifiedLog.prototype._setDomain = function (values) {
+                this.untransformedDomain = values;
+                var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
+                this._d3Scale.domain(transformedDomain);
+                this.broadcaster.broadcast();
+                return this;
+            };
+
+            ModifiedLog.prototype.ticks = function (count) {
+                if (count != null) {
+                    _super.prototype.ticks.call(this, count);
+                }
+
+                // Say your domain is [-100, 100] and your pivot is 10.
+                // then we're going to draw negative log ticks from -100 to -10,
+                // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
+                var middle = function (x, y, z) {
+                    return [x, y, z].sort(function (a, b) {
+                        return a - b;
+                    })[1];
+                };
+                var min = d3.min(this.untransformedDomain);
+                var max = d3.max(this.untransformedDomain);
+                var negativeLower = min;
+                var negativeUpper = middle(min, max, -this.pivot);
+                var positiveLower = middle(min, max, this.pivot);
+                var positiveUpper = max;
+
+                var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) {
+                    return -x;
+                }).reverse();
+                var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
+                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) {
+                    return min <= x && x <= max;
+                });
+
+                return negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+            };
+
+            /**
+            * Return an appropriate number of ticks from lower to upper.
+            *
+            * This will first try to fit as many powers of this.base as it can from
+            * lower to upper.
+            *
+            * If it still has ticks after that, it will generate ticks in "clusters",
+            * e.g. [20, 30, ... 90, 100] would be a cluster, [200, 300, ... 900, 1000]
+            * would be another cluster.
+            *
+            * This function will generate clusters as large as it can while not
+            * drastically exceeding its number of ticks.
+            */
+            ModifiedLog.prototype.logTicks = function (lower, upper) {
+                var _this = this;
+                var nTicks = this.howManyTicks(lower, upper);
+                if (nTicks === 0) {
+                    return [];
+                }
+                var startLogged = Math.floor(Math.log(lower) / Math.log(this.base));
+                var endLogged = Math.ceil(Math.log(upper) / Math.log(this.base));
+                var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
+                var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
+                var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
+                var uniqMultiples = Plottable.Util.Methods.uniqNumbers(multiples);
+                var clusters = bases.map(function (b) {
+                    return uniqMultiples.map(function (x) {
+                        return Math.pow(_this.base, b - 1) * x;
+                    });
+                });
+                var flattened = Plottable.Util.Methods.flatten(clusters);
+                var filtered = flattened.filter(function (x) {
+                    return lower <= x && x <= upper;
+                });
+                var sorted = filtered.sort(function (x, y) {
+                    return x - y;
+                });
+                return sorted;
+            };
+
+            /**
+            * How many ticks does the range [lower, upper] deserve?
+            *
+            * e.g. if your domain was [10, 1000] and I asked howManyTicks(10, 100),
+            * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
+            * distance when plotted.
+            */
+            ModifiedLog.prototype.howManyTicks = function (lower, upper) {
+                var adjustedMin = this.adjustedLog(d3.min(this.untransformedDomain));
+                var adjustedMax = this.adjustedLog(d3.max(this.untransformedDomain));
+                var adjustedLower = this.adjustedLog(lower);
+                var adjustedUpper = this.adjustedLog(upper);
+                var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
+                var ticks = Math.ceil(proportion * this._lastRequestedTickCount);
+                return ticks;
+            };
+
+            ModifiedLog.prototype.copy = function () {
+                return new ModifiedLog(this.base);
+            };
+
+            ModifiedLog.prototype._niceDomain = function (domain, count) {
+                return domain;
+            };
+
+            ModifiedLog.prototype.showIntermediateTicks = function (show) {
+                if (show == null) {
+                    return this._showIntermediateTicks;
+                } else {
+                    this._showIntermediateTicks = show;
+                }
+            };
+            return ModifiedLog;
+        })(Plottable.Abstract.QuantitiveScale);
+        Scale.ModifiedLog = ModifiedLog;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
@@ -4020,6 +4297,19 @@ var Plottable;
                 } else {
                     return InterpolatedColor.COLOR_SCALES["reds"];
                 }
+            };
+
+            InterpolatedColor.prototype.autoDomain = function () {
+                // unlike other QuantitiveScales, interpolatedColorScale ignores its domainer
+                var extents = this._getAllExtents();
+                if (extents.length > 0) {
+                    this._setDomain([d3.min(extents, function (x) {
+                            return x[0];
+                        }), d3.max(extents, function (x) {
+                            return x[1];
+                        })]);
+                }
+                return this;
             };
             InterpolatedColor.COLOR_SCALES = {
                 reds: [
@@ -4437,6 +4727,9 @@ var Plottable;
                 };
 
                 var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
+                if (tickLabels[0].length === 0) {
+                    return;
+                }
                 var firstTickLabel = tickLabels[0][0];
                 if (!isInsideBBox(firstTickLabel.getBoundingClientRect())) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
@@ -4940,8 +5233,8 @@ var Plottable;
 
             Label.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this.measurer(this._text);
-                var desiredWidth = this.orientation === "horizontal" ? desiredWH.width : desiredWH.height;
-                var desiredHeight = this.orientation === "horizontal" ? desiredWH.height : desiredWH.width;
+                var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
+                var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
 
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
@@ -5121,7 +5414,7 @@ var Plottable;
                 });
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
-                var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
+                var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
                     height: rowsICanFit * textHeight,
@@ -5134,6 +5427,11 @@ var Plottable;
                 // note: can't be called before anchoring atm
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var textHeight = Plottable.Util.Text.getTextHeight(fakeLegendEl.append("text"));
+
+                // HACKHACK
+                if (textHeight === 0) {
+                    textHeight = 1;
+                }
                 fakeLegendEl.remove();
                 return textHeight;
             };

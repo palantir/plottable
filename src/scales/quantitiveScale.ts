@@ -4,7 +4,7 @@ module Plottable {
 export module Abstract {
   export class QuantitiveScale extends Scale {
     public _d3Scale: D3.Scale.QuantitiveScale;
-    private lastRequestedTickCount = 10;
+    public _lastRequestedTickCount = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
@@ -51,7 +51,7 @@ export module Abstract {
     public _setDomain(values: any[]) {
         var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
         if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-            console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            Util.Methods.warn("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
             return;
         }
         super._setDomain(values);
@@ -112,9 +112,9 @@ export module Abstract {
      */
     public ticks(count?: number) {
       if (count != null) {
-        this.lastRequestedTickCount = count;
+        this._lastRequestedTickCount = count;
       }
-      return this._d3Scale.ticks(this.lastRequestedTickCount);
+      return this._d3Scale.ticks(this._lastRequestedTickCount);
     }
 
     /**
@@ -164,6 +164,10 @@ export module Abstract {
         this._autoDomainIfAutomaticMode();
         return this;
       }
+    }
+
+    public _defaultExtent(): any[] {
+      return [0, 1];
     }
   }
 }

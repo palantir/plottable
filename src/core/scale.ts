@@ -73,12 +73,16 @@ export module Abstract {
     public domain(values: any[]): Scale;
     public domain(values?: any[]): any {
       if (values == null) {
-        return this._d3Scale.domain();
+        return this._getDomain();
       } else {
         this.autoDomainAutomatically = false;
         this._setDomain(values);
         return this;
       }
+    }
+
+    public _getDomain() {
+      return this._d3Scale.domain();
     }
 
     public _setDomain(values: any[]) {

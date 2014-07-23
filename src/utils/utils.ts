@@ -16,6 +16,22 @@ export module Util {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
     }
 
+    /** Print a warning message to the console, if it is available.
+     *
+     * @param {string} The warnings to print
+     */
+    export function warn(warning: string) {
+      /* tslint:disable:no-console */
+      if ((<any> window).console != null) {
+        if ((<any> window).console.warn != null) {
+          console.warn(warning);
+        } else if ((<any> window).console.log != null) {
+          console.log(warning);
+        }
+      }
+      /* tslint:enable:no-console */
+    }
+
     /**
      * Takes two arrays of numbers and adds them together
      *
@@ -68,6 +84,18 @@ export module Util {
       return d3.keys(seen);
     }
 
+    export function uniqNumbers(a: number[]): number[] {
+      var seen = d3.set();
+      var result: number[] = [];
+      a.forEach((n) =>  {
+        if (!seen.has(n)) {
+          seen.add(n);
+          result.push(n);
+        }
+      });
+      return result;
+    }
+
     /**
      * Creates an array of length `count`, filled with value or (if value is a function), value()
      *
@@ -114,7 +142,7 @@ export module Util {
      * @param {any} a Object to check against b for equality.
      * @param {any} b Object to check against a for equality.
      *
-     * @returns {boolean} whether or not two objects share the same keys, and 
+     * @returns {boolean} whether or not two objects share the same keys, and
      *          values associated with those keys. Values will be compared
      *          with ===.
      */
