@@ -17,7 +17,7 @@
 
       var ds = new Plottable.DataSource(data);
       var xScale = new Plottable.Scale.Linear();
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom");
+      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
 
       var yScale = new Plottable.Scale.Ordinal();
       yAxis = new Plottable.Axis.Category(yScale, "left");

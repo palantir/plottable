@@ -16,7 +16,6 @@
 /// <reference path="utils/formatters/customFormatter.ts" />
 /// <reference path="utils/formatters/timeFormatter.ts" />
 
-
 /// <reference path="core/version.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
@@ -39,6 +38,7 @@
 /// <reference path="scales/logScale.ts" />
 /// <reference path="scales/modifiedLogScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
+/// <reference path="scales/compositeOrdinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
@@ -47,6 +47,7 @@
 /// <reference path="components/baseAxis.ts" />
 /// <reference path="components/numericAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />
+/// <reference path="components/compositeAxis.ts" />
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
 /// <reference path="components/gridlines.ts" />

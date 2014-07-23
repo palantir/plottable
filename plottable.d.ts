@@ -32,6 +32,14 @@ declare module Plottable {
             * @return {D3.Set} A set that contains elements that appear in both set1 and set2
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
+            /**
+            * Returns the cartesian product between two sets.
+            * Each element in set2 will be appeneded to each element in set1
+            *
+            * @param {any[][]} set1, A set of sets
+            * @param {any[]} set2, A set
+            */
+            function product(set1: any[][], set2: any[]): any[][];
             function accessorize(accessor: any): IAccessor;
             function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
@@ -369,6 +377,8 @@ declare module Plottable {
             function getElementWidth(elem: HTMLScriptElement): number;
             function getElementHeight(elem: HTMLScriptElement): number;
             function getSVGPixelWidth(svg: D3.Selection): number;
+            function isInsideBBox(boundingBox: ClientRect, testBox: ClientRect): boolean;
+            function isOverlapBBox(boundingBox: ClientRect, testBox: ClientRect): boolean;
             function translate(s: D3.Selection, x?: number, y?: number): any;
         }
     }
@@ -1530,6 +1540,21 @@ declare module Plottable {
     }
 }
 
+declare module Plottable {
+    module Scale {
+        class CompositeOrdinal extends Ordinal {
+            constructor();
+            public rangeBand(): number;
+            public fullBandStartAndWidth(v: any): number[];
+            public range(): any[];
+            public range(values: number[]): CompositeOrdinal;
+            public scale(args: any[]): any;
+            public getLevels(): number;
+            public domainLevel(n: number): any[];
+        }
+    }
+}
+
 
 declare module Plottable {
     module Scale {
@@ -1806,6 +1831,25 @@ declare module Plottable {
             * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
             */
             constructor(scale: Scale.Ordinal, orientation?: string, formatter?: any);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
+        class Composite extends Category {
+            /**
+            * Creates a CompositeAxis
+            *
+            * A CompositeAxis takes an CompositeOrdinal and includes word-wrapping algorithms and advanced layout logic to try to
+            * display the scale as efficiently as possible.
+            *
+            * @constructor
+            * @param {CompositeOrdinal} scale The scale to base the Axis on.
+            * @param {string} [orientation] The orientation of the Axis (top/bottom/left/right)
+            */
+            constructor(scale: Scale.CompositeOrdinal, orientation?: string);
         }
     }
 }

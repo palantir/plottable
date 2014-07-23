@@ -63,11 +63,28 @@ export module Util {
       return set;
     }
 
+    /**
+     * Returns the cartesian product between two sets. 
+     * Each element in set2 will be appeneded to each element in set1
+     * 
+     * @param {any[][]} set1, A set of sets
+     * @param {any[]} set2, A set
+     */
+    export function product(set1: any[][], set2: any[]): any[][] {
+      return set1.slice().map((d: any[]) => set2.slice().map((datum: any) => {
+        var ret = d.slice();
+        ret.push(datum);
+        return ret;
+      })).reduce((a: any[], b: any[]) => a.concat(b), []);
+    }
+
     export function accessorize(accessor: any): IAccessor {
       if (typeof(accessor) === "function") {
         return (<IAccessor> accessor);
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
         return (d: any, i: number, s: any) => d[accessor];
+      } else if (Array.isArray(accessor)) {
+        return (d: any, i: number, s: any) => accessor.map((element: any) => accessorize(element)(d, i, s));
       } else {
         return (d: any, i: number, s: any) => accessor;
       };

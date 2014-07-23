@@ -74,12 +74,38 @@ var Plottable;
             }
             Methods.intersection = intersection;
 
+            /**
+            * Returns the cartesian product between two sets.
+            * Each element in set2 will be appeneded to each element in set1
+            *
+            * @param {any[][]} set1, A set of sets
+            * @param {any[]} set2, A set
+            */
+            function product(set1, set2) {
+                return set1.slice().map(function (d) {
+                    return set2.slice().map(function (datum) {
+                        var ret = d.slice();
+                        ret.push(datum);
+                        return ret;
+                    });
+                }).reduce(function (a, b) {
+                    return a.concat(b);
+                }, []);
+            }
+            Methods.product = product;
+
             function accessorize(accessor) {
                 if (typeof (accessor) === "function") {
                     return accessor;
                 } else if (typeof (accessor) === "string" && accessor[0] !== "#") {
                     return function (d, i, s) {
                         return d[accessor];
+                    };
+                } else if (Array.isArray(accessor)) {
+                    return function (d, i, s) {
+                        return accessor.map(function (element) {
+                            return accessorize(element)(d, i, s);
+                        });
                     };
                 } else {
                     return function (d, i, s) {
@@ -1070,6 +1096,17 @@ var Plottable;
             }
             DOM.getSVGPixelWidth = getSVGPixelWidth;
 
+            function isInsideBBox(boundingBox, testBox) {
+                return (Math.floor(boundingBox.left) <= Math.ceil(testBox.left) && Math.floor(boundingBox.top) <= Math.ceil(testBox.top) && Math.floor(testBox.right) <= Math.ceil(boundingBox.left + this.availableWidth) && Math.floor(testBox.bottom) <= Math.ceil(boundingBox.top + this.availableHeight));
+            }
+            DOM.isInsideBBox = isInsideBBox;
+            ;
+
+            function isOverlapBBox(boundingBox, testBox) {
+                return !(boundingBox.right < testBox.left || boundingBox.left > testBox.right || boundingBox.bottom < testBox.top || boundingBox.top > testBox.bottom);
+            }
+            DOM.isOverlapBBox = isOverlapBBox;
+
             function translate(s, x, y) {
                 var xform = d3.transform(s.attr("transform"));
                 if (x == null) {
@@ -1642,10 +1679,10 @@ var Plottable;
         };
 
         DataSource.prototype._getExtent = function (accessor) {
-            var cachedExtent = this.accessor2cachedExtent.get(accessor);
+            var cachedExtent = this.accessor2cachedExtent.get(String(accessor));
             if (cachedExtent === undefined) {
                 cachedExtent = this.computeExtent(accessor);
-                this.accessor2cachedExtent.set(accessor, cachedExtent);
+                this.accessor2cachedExtent.set(String(accessor), cachedExtent);
             }
             return cachedExtent;
         };
@@ -1657,6 +1694,8 @@ var Plottable;
                 return [];
             } else if (typeof (mappedData[0]) === "string") {
                 return Plottable.Util.Methods.uniq(mappedData);
+            } else if (Array.isArray(mappedData[0])) {
+                return mappedData;
             } else {
                 var extent = d3.extent(mappedData);
                 if (extent[0] == null || extent[1] == null) {
@@ -4075,6 +4114,141 @@ var Plottable;
     var Scale = Plottable.Scale;
 })(Plottable || (Plottable = {}));
 
+//<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Scale) {
+        var CompositeOrdinal = (function (_super) {
+            __extends(CompositeOrdinal, _super);
+            function CompositeOrdinal() {
+                _super.call(this);
+                this._subScales = [];
+                this.rangeType("bands", .05, .1);
+            }
+            CompositeOrdinal.prototype._getExtent = function () {
+                var flat = Plottable.Util.Methods.flatten(this._getAllExtents());
+                return flat;
+            };
+
+            CompositeOrdinal.prototype.rangeBand = function () {
+                return this.smallestRangeBand();
+            };
+
+            CompositeOrdinal.prototype.addSubscale = function (scale) {
+                this._subScales.push(scale);
+                return this;
+            };
+
+            CompositeOrdinal.prototype.makeSubScales = function (levels) {
+                this._subScales = [];
+                while (levels-- > 0) {
+                    this.addSubscale(new Plottable.Scale.Ordinal().rangeType("bands", 0, .1));
+                }
+                return this;
+            };
+
+            CompositeOrdinal.prototype.smallestRangeBand = function () {
+                if (this._subScales.length > 0) {
+                    return this._subScales[this._subScales.length - 1].rangeBand();
+                } else {
+                    return _super.prototype.rangeBand.call(this);
+                }
+            };
+
+            CompositeOrdinal.prototype.rangeBandLevel = function (n) {
+                return n === 0 ? _super.prototype.rangeBand.call(this) : this._subScales[n - 1].rangeBand();
+            };
+
+            CompositeOrdinal.prototype.innerPaddingLevel = function (n) {
+                return this.stepLevel(n) - this.rangeBandLevel(n);
+            };
+
+            CompositeOrdinal.prototype.stepLevel = function (n) {
+                var d = this.domain();
+                for (var i = 0; i <= n - 1; i++) {
+                    d = Plottable.Util.Methods.product(d, this._subScales[i].domain());
+                }
+                if (d.length < 2) {
+                    return 0;
+                }
+                return Math.abs(this.scale(d[1]) - this.scale(d[0]));
+            };
+
+            CompositeOrdinal.prototype.fullBandStartAndWidth = function (v) {
+                var n = v.length - 1;
+                var start = (this.scale(v) - this.innerPaddingLevel(n) / 2);
+                var width = this.rangeBandLevel(n) + this.innerPaddingLevel(n);
+                return [start, width];
+            };
+
+            CompositeOrdinal.prototype._setDomain = function (values) {
+                if (values.length === 0) {
+                    _super.prototype._setDomain.call(this, values);
+                    return;
+                }
+                _super.prototype._setDomain.call(this, Plottable.Util.Methods.uniq(values.map(function (d) {
+                    return d[0];
+                })).map(function (d) {
+                    return [d];
+                }));
+                this.makeSubScales(values[0].length - 1);
+                this._subScales.forEach(function (subScale, i) {
+                    var dom = Plottable.Util.Methods.uniq(values.map(function (d) {
+                        return d[i + 1];
+                    }));
+                    subScale._setDomain(Plottable.Util.Methods.uniq(values.map(function (d) {
+                        return d[i + 1];
+                    })));
+                });
+            };
+
+            CompositeOrdinal.prototype.range = function (values) {
+                // Store result of super call so we can return it
+                var val = _super.prototype.range.call(this, values);
+
+                // Hierarchically apply range to children
+                if (!(values === undefined)) {
+                    var parentBand = _super.prototype.rangeBand.call(this);
+                    this._subScales.forEach(function (subScale) {
+                        subScale.range([0, parentBand]);
+                        parentBand = subScale.rangeBand();
+                    });
+                }
+                return val;
+            };
+
+            // Here we composite the scaling from our _subscales using variable arguments
+            // So, usage is like .project('x', (d) -> xScale.scale(d.primary, d.secondary, d.tertiary))
+            CompositeOrdinal.prototype.scale = function (args) {
+                var result = _super.prototype.scale.call(this, args[0]);
+                this._subScales.forEach(function (subScale, i) {
+                    if (!(args[i + 1] === undefined)) {
+                        result += subScale.scale(args[i + 1]);
+                    }
+                });
+                return result;
+            };
+
+            CompositeOrdinal.prototype.getLevels = function () {
+                return this._subScales.length + 1;
+            };
+
+            CompositeOrdinal.prototype.domainLevel = function (n) {
+                return n === 0 ? this.domain() : this._subScales[n - 1].domain();
+            };
+            return CompositeOrdinal;
+        })(Scale.Ordinal);
+        Scale.CompositeOrdinal = CompositeOrdinal;
+    })(Plottable.Scale || (Plottable.Scale = {}));
+    var Scale = Plottable.Scale;
+})(Plottable || (Plottable = {}));
+
 ///<reference path="../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5070,7 +5244,7 @@ var Plottable;
                 } else {
                     fakeScale.range([offeredHeight, 0]);
                 }
-                var textResult = this.measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
+                var textResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, this._scale.domain());
 
                 return {
                     width: textResult.usedWidth + widthRequiredByTicks,
@@ -5084,8 +5258,8 @@ var Plottable;
                 return this._scale.domain();
             };
 
-            Category.prototype.measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
-                var draw = typeof dataOrTicks[0] !== "string";
+            Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, dataOrTicks) {
+                var draw = dataOrTicks.node != null;
                 var self = this;
                 var textWriteResults = [];
                 var tm = function (s) {
@@ -5155,7 +5329,7 @@ var Plottable;
 
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
+                this._measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
                 var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
@@ -5175,6 +5349,121 @@ var Plottable;
             return Category;
         })(Plottable.Abstract.Axis);
         Axis.Category = Category;
+    })(Plottable.Axis || (Plottable.Axis = {}));
+    var Axis = Plottable.Axis;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Axis) {
+        var Composite = (function (_super) {
+            __extends(Composite, _super);
+            /**
+            * Creates a CompositeAxis
+            *
+            * A CompositeAxis takes an CompositeOrdinal and includes word-wrapping algorithms and advanced layout logic to try to
+            * display the scale as efficiently as possible.
+            *
+            * @constructor
+            * @param {CompositeOrdinal} scale The scale to base the Axis on.
+            * @param {string} [orientation] The orientation of the Axis (top/bottom/left/right)
+            */
+            function Composite(scale, orientation) {
+                if (typeof orientation === "undefined") { orientation = "bottom"; }
+                _super.call(this, scale, orientation);
+                this.tickLength(80);
+                this.formatter(new Plottable.Formatter.Custom(function (d) {
+                    return d[d.length - 1];
+                }));
+            }
+            Composite.prototype._generateTickMarkAttrHash = function () {
+                var _this = this;
+                var tickMarkAttrHash = _super.prototype._generateTickMarkAttrHash.call(this);
+
+                var startPosition = function (d) {
+                    return _this._scale.fullBandStartAndWidth(d)[0];
+                };
+                if (this._isHorizontal()) {
+                    tickMarkAttrHash["x1"] = startPosition;
+                    tickMarkAttrHash["x2"] = startPosition;
+                } else {
+                    tickMarkAttrHash["y1"] = startPosition;
+                    tickMarkAttrHash["y2"] = startPosition;
+                }
+                return tickMarkAttrHash;
+            };
+
+            Composite.prototype._getTickValues = function () {
+                var k = this._scale.getLevels();
+
+                // don't show first mark of each level
+                var ret = this._scale.domain().slice(1);
+                var start = this._scale.domain();
+                for (var i = 1; i < k; i++) {
+                    ret = ret.concat(Plottable.Util.Methods.product(start, this._scale.domainLevel(i).slice(1)));
+                    start = Plottable.Util.Methods.product(start, this._scale.domainLevel(i));
+                }
+                return ret;
+            };
+
+            Composite.prototype._getAllLabels = function () {
+                var k = this._scale.getLevels();
+                var ret = this._scale.domain();
+                var start = this._scale.domain();
+                for (var i = 1; i < k; i++) {
+                    start = Plottable.Util.Methods.product(start, this._scale.domainLevel(i));
+                    ret = ret.concat(start);
+                }
+                return ret;
+            };
+
+            Composite.prototype._doRender = function () {
+                var _this = this;
+                _super.prototype._doRender.call(this);
+
+                var labels = this._getAllLabels();
+                var k = this._scale.getLevels();
+
+                Plottable.Util.DOM.translate(this._tickLabelContainer, 0, 0);
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(labels, function (d) {
+                    return d;
+                });
+                var getTickLabelTransform = function (d, i) {
+                    var startAndWidth = _this._scale.fullBandStartAndWidth(d);
+                    var bandStartPosition = startAndWidth[0];
+                    var offset = (k - d.length + .5) * _this.tickLength() / k;
+                    var x = _this._isHorizontal() ? bandStartPosition : offset;
+                    var y = _this._isHorizontal() ? offset : bandStartPosition;
+                    return "translate(" + x + "," + y + ")";
+                };
+                var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                tickLabels.exit().remove();
+                tickLabels.attr("transform", getTickLabelTransform);
+
+                // erase all text first, then rewrite
+                tickLabels.text("");
+                this._measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
+
+                // remove all the translation from tickMarks
+                Plottable.Util.DOM.translate(this._tickMarkContainer, 0, 0);
+
+                // make tick length variable depending on level
+                var tickMarks = this._tickMarkContainer.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS).data(this._getTickValues());
+                tickMarks.attr("y2", function (d) {
+                    return (k - d.length + 1) * _this.tickLength() / k;
+                });
+                return this;
+            };
+            return Composite;
+        })(Axis.Category);
+        Axis.Composite = Composite;
     })(Plottable.Axis || (Plottable.Axis = {}));
     var Axis = Plottable.Axis;
 })(Plottable || (Plottable = {}));
@@ -5999,6 +6288,7 @@ var Plottable;
             BarPlot.prototype.barAlignment = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
                 var align2factor = this.constructor._BarAlignmentToFactor;
+                console.log(align2factor);
                 if (align2factor[alignmentLC] === undefined) {
                     throw new Error("unsupported bar alignment");
                 }

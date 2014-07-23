@@ -103,6 +103,7 @@ export module Abstract {
      public barAlignment(alignment: string) {
        var alignmentLC = alignment.toLowerCase();
        var align2factor = (<typeof BarPlot> this.constructor)._BarAlignmentToFactor;
+       console.log(align2factor);
        if (align2factor[alignmentLC] === undefined) {
          throw new Error("unsupported bar alignment");
        }
