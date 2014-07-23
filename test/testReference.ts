@@ -42,3 +42,4 @@
 
 ///<reference path="interactions/interactionTests.ts" />
 
+///<reference path="dispatchers/dispatcherTests.ts" />

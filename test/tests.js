@@ -103,6 +103,21 @@ var MultiTestVerifier = (function () {
     return MultiTestVerifier;
 })();
 
+function triggerFakeUIEvent(type, target) {
+    var e = document.createEvent("UIEvents");
+    e.initUIEvent(type, true, true, window, 1);
+    target.node().dispatchEvent(e);
+}
+
+function triggerFakeMouseEvent(type, target, relativeX, relativeY) {
+    var clientRect = target.node().getBoundingClientRect();
+    var xPos = clientRect.left + relativeX;
+    var yPos = clientRect.top + relativeY;
+    var e = document.createEvent("MouseEvents");
+    e.initMouseEvent(type, true, true, window, 1, xPos, yPos, xPos, yPos, false, false, false, false, 1, null);
+    target.node().dispatchEvent(e);
+}
+
 ///<reference path="testReference.ts" />
 
 before(function () {
@@ -4919,6 +4934,143 @@ describe("Interactions", function () {
             assert.isFalse(callbackCalled, "callback is not called if component does not have mouse focus (after mouseout)");
 
             svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+
+describe("Dispatchers", function () {
+    it("correctly registers for and deregisters from events", function () {
+        var target = generateSVG();
+
+        var dispatcher = new Plottable.Abstract.Dispatcher(target);
+        var callbackWasCalled = false;
+        dispatcher._event2Callback["click"] = function () {
+            callbackWasCalled = true;
+        };
+
+        triggerFakeUIEvent("click", target);
+        assert.isFalse(callbackWasCalled, "The callback is not called before the dispatcher connect()s");
+
+        dispatcher.connect();
+        triggerFakeUIEvent("click", target);
+        assert.isTrue(callbackWasCalled, "The dispatcher called its callback");
+
+        callbackWasCalled = false;
+        dispatcher.disconnect();
+        triggerFakeUIEvent("click", target);
+        assert.isFalse(callbackWasCalled, "The callback is not called after the dispatcher disconnect()s");
+
+        target.remove();
+    });
+
+    it("target can be changed", function () {
+        var target1 = generateSVG();
+        var target2 = generateSVG();
+
+        var dispatcher = new Plottable.Abstract.Dispatcher(target1);
+        var callbackWasCalled = false;
+        dispatcher._event2Callback["click"] = function () {
+            callbackWasCalled = true;
+        };
+
+        dispatcher.connect();
+        triggerFakeUIEvent("click", target1);
+        assert.isTrue(callbackWasCalled, "The dispatcher received the event on the target");
+
+        dispatcher.target(target2);
+        callbackWasCalled = false;
+
+        triggerFakeUIEvent("click", target1);
+        assert.isFalse(callbackWasCalled, "The dispatcher did not receive the event on the old target");
+        triggerFakeUIEvent("click", target2);
+        assert.isTrue(callbackWasCalled, "The dispatcher received the event on the new target");
+
+        target1.remove();
+        target2.remove();
+    });
+
+    it("multiple dispatchers can be attached to the same target", function () {
+        var target = generateSVG();
+
+        var dispatcher1 = new Plottable.Abstract.Dispatcher(target);
+        var called1 = false;
+        dispatcher1._event2Callback["click"] = function () {
+            called1 = true;
+        };
+        dispatcher1.connect();
+
+        var dispatcher2 = new Plottable.Abstract.Dispatcher(target);
+        var called2 = false;
+        dispatcher2._event2Callback["click"] = function () {
+            called2 = true;
+        };
+        dispatcher2.connect();
+
+        triggerFakeUIEvent("click", target);
+        assert.isTrue(called1, "The first dispatcher called its callback");
+        assert.isTrue(called2, "The second dispatcher also called its callback");
+
+        target.remove();
+    });
+
+    it("can't double-connect", function () {
+        var target = generateSVG();
+
+        var dispatcher = new Plottable.Abstract.Dispatcher(target);
+        dispatcher.connect();
+        assert.throws(function () {
+            return dispatcher.connect();
+        }, "connect");
+
+        target.remove();
+    });
+
+    describe("Mouse Dispatcher", function () {
+        it("passes event position to mouseover, mousemove, and mouseout callbacks", function () {
+            var target = generateSVG();
+
+            var targetX = 17;
+            var targetY = 76;
+            var expectedPoint = {
+                x: targetX,
+                y: targetY
+            };
+
+            function assertPointsClose(actual, expected, epsilon, message) {
+                assert.closeTo(actual.x, expected.x, epsilon, message + " (x)");
+                assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
+            }
+            ;
+
+            var md = new Plottable.Dispatcher.Mouse(target);
+            var mouseoverCalled = false;
+            md.mouseover(function (p) {
+                mouseoverCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
+            });
+            var mousemoveCalled = false;
+            md.mousemove(function (p) {
+                mousemoveCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
+            });
+            var mouseoutCalled = false;
+            md.mouseout(function (p) {
+                mouseoutCalled = true;
+                assertPointsClose(p, expectedPoint, 0.5, "the mouse position was passed to the callback");
+            });
+
+            md.connect();
+            triggerFakeMouseEvent("mouseover", target, targetX, targetY);
+            assert.isTrue(mouseoverCalled, "mouseover callback was called");
+            triggerFakeMouseEvent("mousemove", target, targetX, targetY);
+            assert.isTrue(mousemoveCalled, "mousemove callback was called");
+            triggerFakeMouseEvent("mouseout", target, targetX, targetY);
+            assert.isTrue(mouseoutCalled, "mouseout callback was called");
+
+            target.remove();
         });
     });
 });

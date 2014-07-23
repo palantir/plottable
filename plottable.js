@@ -7148,6 +7148,175 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    (function (Abstract) {
+        var Dispatcher = (function (_super) {
+            __extends(Dispatcher, _super);
+            /**
+            * Creates a Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
+            function Dispatcher(target) {
+                _super.call(this);
+                this._event2Callback = {};
+                this.connected = false;
+                this._target = target;
+            }
+            Dispatcher.prototype.target = function (targetElement) {
+                if (targetElement == null) {
+                    return this._target;
+                }
+                var wasConnected = this.connected;
+                this.disconnect();
+                this._target = targetElement;
+                if (wasConnected) {
+                    // re-connect to the new target
+                    this.connect();
+                }
+                return this;
+            };
+
+            /**
+            * Gets a namespaced version of the event name.
+            */
+            Dispatcher.prototype.getEventString = function (eventName) {
+                return eventName + ".dispatcher" + this._plottableID;
+            };
+
+            /**
+            * Attaches the Dispatcher's listeners to the Dispatcher's target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            Dispatcher.prototype.connect = function () {
+                var _this = this;
+                if (this.connected) {
+                    throw new Error("Can't connect dispatcher twice!");
+                }
+                this.connected = true;
+                Object.keys(this._event2Callback).forEach(function (event) {
+                    var callback = _this._event2Callback[event];
+                    _this._target.on(_this.getEventString(event), callback);
+                });
+
+                return this;
+            };
+
+            /**
+            * Detaches the Dispatcher's listeners from the Dispatchers' target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            Dispatcher.prototype.disconnect = function () {
+                var _this = this;
+                this.connected = false;
+                Object.keys(this._event2Callback).forEach(function (event) {
+                    _this._target.on(_this.getEventString(event), null);
+                });
+                return this;
+            };
+            return Dispatcher;
+        })(Abstract.PlottableObject);
+        Abstract.Dispatcher = Dispatcher;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Dispatcher) {
+        var Mouse = (function (_super) {
+            __extends(Mouse, _super);
+            /**
+            * Creates a Mouse Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
+            function Mouse(target) {
+                var _this = this;
+                _super.call(this, target);
+
+                this._event2Callback["mouseover"] = function () {
+                    if (_this._mouseover != null) {
+                        _this._mouseover(_this.getMousePosition());
+                    }
+                };
+
+                this._event2Callback["mousemove"] = function () {
+                    if (_this._mousemove != null) {
+                        _this._mousemove(_this.getMousePosition());
+                    }
+                };
+
+                this._event2Callback["mouseout"] = function () {
+                    if (_this._mouseout != null) {
+                        _this._mouseout(_this.getMousePosition());
+                    }
+                };
+            }
+            Mouse.prototype.getMousePosition = function () {
+                var xy = d3.mouse(this._target.node());
+                return {
+                    x: xy[0],
+                    y: xy[1]
+                };
+            };
+
+            /**
+            * Attaches a callback to be called on mouseover.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            Mouse.prototype.mouseover = function (callback) {
+                this._mouseover = callback;
+                return this;
+            };
+
+            /**
+            * Attaches a callback to be called on mousemove.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            Mouse.prototype.mousemove = function (callback) {
+                this._mousemove = callback;
+                return this;
+            };
+
+            /**
+            * Attaches a callback to be called on mouseout.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            Mouse.prototype.mouseout = function (callback) {
+                this._mouseout = callback;
+                return this;
+            };
+            return Mouse;
+        })(Plottable.Abstract.Dispatcher);
+        Dispatcher.Mouse = Mouse;
+    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+    var Dispatcher = Plottable.Dispatcher;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     (function (Template) {
         var StandardChart = (function (_super) {
             __extends(StandardChart, _super);

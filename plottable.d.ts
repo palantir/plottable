@@ -1174,6 +1174,10 @@ declare module Plottable {
         min: number;
         max: number;
     }
+    interface Point {
+        x: number;
+        y: number;
+    }
 }
 
 
@@ -2391,6 +2395,80 @@ declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
             public setBox(y0: number, y1: number): YDragBox;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Dispatcher extends PlottableObject {
+            /**
+            * Creates a Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
+            constructor(target: D3.Selection);
+            /**
+            * Gets the target of the Dispatcher.
+            *
+            * @returns {D3.Selection} The Dispatcher's current target.
+            */
+            public target(): D3.Selection;
+            /**
+            * Sets the target of the Dispatcher.
+            *
+            * @param {D3.Selection} target The element to listen for updates on.
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public target(targetElement: D3.Selection): Dispatcher;
+            /**
+            * Attaches the Dispatcher's listeners to the Dispatcher's target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public connect(): Dispatcher;
+            /**
+            * Detaches the Dispatcher's listeners from the Dispatchers' target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public disconnect(): Dispatcher;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Dispatcher {
+        class Mouse extends Abstract.Dispatcher {
+            /**
+            * Creates a Mouse Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
+            constructor(target: D3.Selection);
+            /**
+            * Attaches a callback to be called on mouseover.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mouseover(callback: (location: Point) => any): Mouse;
+            /**
+            * Attaches a callback to be called on mousemove.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mousemove(callback: (location: Point) => any): Mouse;
+            /**
+            * Attaches a callback to be called on mouseout.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mouseout(callback: (location: Point) => any): Mouse;
         }
     }
 }

@@ -77,4 +77,7 @@
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
 
+/// <reference path="dispatchers/dispatcher.ts" />
+/// <reference path="dispatchers/mouseDispatcher.ts" />
+
 /// <reference path="templates/standardChart.ts" />
