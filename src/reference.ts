@@ -45,6 +45,7 @@
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
 /// <reference path="components/baseAxis.ts" />
+/// <reference path="components/timeAxis.ts" />
 /// <reference path="components/numericAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />

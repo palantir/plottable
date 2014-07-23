@@ -74,6 +74,25 @@ var Plottable;
             }
             Methods.intersection = intersection;
 
+            /**
+            * Takes two sets and returns the union
+            *
+            * @param{D3.Set} set1 The first set
+            * @param{D3.Set} set2 The second set
+            * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+            */
+            function union(set1, set2) {
+                var set = d3.set();
+                set1.forEach(function (v) {
+                    return set.add(v);
+                });
+                set2.forEach(function (v) {
+                    return set.add(v);
+                });
+                return set;
+            }
+            Methods.union = union;
+
             function accessorize(accessor) {
                 if (typeof (accessor) === "function") {
                     return accessor;
@@ -1083,6 +1102,23 @@ var Plottable;
                 }
             }
             DOM.translate = translate;
+
+            function boxesOverlap(boxA, boxB) {
+                if (boxA.right < boxB.left) {
+                    return false;
+                }
+                if (boxA.left > boxB.right) {
+                    return false;
+                }
+                if (boxA.bottom < boxB.top) {
+                    return false;
+                }
+                if (boxA.top > boxB.bottom) {
+                    return false;
+                }
+                return true;
+            }
+            DOM.boxesOverlap = boxesOverlap;
         })(Util.DOM || (Util.DOM = {}));
         var DOM = Util.DOM;
     })(Plottable.Util || (Plottable.Util = {}));
@@ -1653,6 +1689,9 @@ var Plottable;
         DataSource.prototype.computeExtent = function (accessor) {
             var appliedAccessor = Plottable.Util.Methods.applyAccessor(accessor, this);
             var mappedData = this._data.map(appliedAccessor);
+            if (mappedData.indexOf(null) >= 0 || mappedData.indexOf(undefined) >= 0) {
+                Plottable.Util.Methods.warn("Data has contains null or undefined elements. This could mean data was not parsed correctly");
+            }
             if (mappedData.length === 0) {
                 return [];
             } else if (typeof (mappedData[0]) === "string") {
@@ -4156,13 +4195,38 @@ var Plottable;
             __extends(Time, _super);
             function Time(scale) {
                 // need to cast since d3 time scales do not descend from quantitive scales
-                _super.call(this, (scale == null ? d3.time.scale() : scale));
+                _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }
-            Time.prototype._setDomain = function (values) {
-                _super.prototype._setDomain.call(this, values.map(function (d) {
-                    return new Date(d);
-                }));
+            Time.prototype.tickInterval = function (interval, step) {
+                // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
+                var tempScale = d3.time.scale();
+                tempScale.domain(this.domain());
+                tempScale.range(this.range());
+                return tempScale.ticks(interval.range, step);
+            };
+
+            Time.prototype.domain = function (values) {
+                if (values == null) {
+                    return _super.prototype.domain.call(this);
+                } else {
+                    // attempt to parse dates
+                    if (typeof (values[0]) === "string") {
+                        values = values.map(function (d) {
+                            return new Date(d);
+                        });
+                    }
+                    return _super.prototype.domain.call(this, values);
+                }
+            };
+
+            /**
+            * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
+            *
+            * @returns {TimeScale} A copy of the calling TimeScale.
+            */
+            Time.prototype.copy = function () {
+                return new Time(this._d3Scale.copy());
             };
             return Time;
         })(Plottable.Abstract.QuantitiveScale);
@@ -4746,26 +4810,10 @@ var Plottable;
                 });
                 var lastLabelClientRect;
 
-                function boxesOverlap(boxA, boxB) {
-                    if (boxA.right < boxB.left) {
-                        return false;
-                    }
-                    if (boxA.left > boxB.right) {
-                        return false;
-                    }
-                    if (boxA.bottom < boxB.top) {
-                        return false;
-                    }
-                    if (boxA.top > boxB.bottom) {
-                        return false;
-                    }
-                    return true;
-                }
-
                 visibleTickLabels.each(function (d) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
-                    if (lastLabelClientRect != null && boxesOverlap(clientRect, lastLabelClientRect)) {
+                    if (lastLabelClientRect != null && Plottable.Util.DOM.boxesOverlap(clientRect, lastLabelClientRect)) {
                         tickLabel.style("visibility", "hidden");
                     } else {
                         lastLabelClientRect = clientRect;
@@ -4780,6 +4828,300 @@ var Plottable;
         Abstract.Axis = Axis;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Axis) {
+        ;
+
+        var Time = (function (_super) {
+            __extends(Time, _super);
+            /**
+            * Creates a TimeAxis
+            *
+            * @constructor
+            * @param {TimeScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom)
+            */
+            function Time(scale, orientation) {
+                orientation = orientation.toLowerCase();
+                if (orientation !== "top" && orientation !== "bottom") {
+                    throw new Error("unsupported orientation: " + orientation);
+                }
+                _super.call(this, scale, orientation);
+                this.classed("time-axis", true);
+                this.previousSpan = 0;
+                this.previousIndex = Time.minorIntervals.length - 1;
+                this.tickLabelPadding(5);
+            }
+            Time.prototype._computeHeight = function () {
+                if (this._computedHeight !== null) {
+                    return this._computedHeight;
+                }
+                var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
+                this.tickLength(textHeight);
+                this._computedHeight = textHeight + 2 * this.tickLabelPadding();
+                return this._computedHeight;
+            };
+
+            Time.prototype.calculateWorstWidth = function (container, format) {
+                // returns the worst case width for a format
+                // September 29, 9999 at 12:59.9999 PM Wednesday
+                var longDate = new Date(9999, 8, 29, 12, 59, 9999);
+                return Plottable.Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
+            };
+
+            Time.prototype.getIntervalLength = function (interval) {
+                var testDate = this._scale.domain()[0];
+
+                // meausre how much space one date can get
+                var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
+                return stepLength;
+            };
+
+            Time.prototype.isEnoughSpace = function (container, interval) {
+                // compute number of ticks
+                // if less than a certain threshold
+                var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
+                var stepLength = Math.min(this.getIntervalLength(interval), this.availableWidth);
+                return worst < stepLength;
+            };
+
+            Time.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._majorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                this._minorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                return this;
+            };
+
+            // returns a number to index into the major/minor intervals
+            Time.prototype.getTickLevel = function () {
+                // for zooming, don't start search all the way from beginning.
+                var startingPoint = Time.minorIntervals.length - 1;
+                var curSpan = Math.abs(this._scale.domain()[1] - this._scale.domain()[0]);
+                if (curSpan <= this.previousSpan + 1) {
+                    startingPoint = this.previousIndex;
+                }
+
+                // find lowest granularity that will fit
+                var i = startingPoint;
+                while (i >= 0) {
+                    if (!(this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i]))) {
+                        i++;
+                        break;
+                    }
+                    i--;
+                }
+                i = Math.min(i, Time.minorIntervals.length - 1);
+                if (i < 0) {
+                    i = 0;
+                    Plottable.Util.Methods.warn("could not find suitable interval to display labels");
+                }
+                this.previousIndex = Math.max(0, i - 1);
+                this.previousSpan = curSpan;
+
+                return i;
+            };
+
+            Time.prototype._getTickIntervalValues = function (interval) {
+                return this._scale.tickInterval(interval.timeUnit, interval.step);
+            };
+
+            Time.prototype._getTickValues = function () {
+                var index = this.getTickLevel();
+                var minorTicks = this._getTickIntervalValues(Time.minorIntervals[index]);
+                var majorTicks = this._getTickIntervalValues(Time.majorIntervals[index]);
+                return minorTicks.concat(majorTicks);
+            };
+
+            Time.prototype._measureTextHeight = function (container) {
+                var fakeTickLabel = container.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
+                fakeTickLabel.remove();
+                return textHeight;
+            };
+
+            Time.prototype.renderTickLabels = function (container, interval, height) {
+                var _this = this;
+                container.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).remove();
+                var tickPos = this._scale.tickInterval(interval.timeUnit, interval.step);
+                tickPos.splice(0, 0, this._scale.domain()[0]);
+                tickPos.push(this._scale.domain()[1]);
+                var shouldCenterText = interval.step === 1;
+
+                // only center when the label should span the whole interval
+                var labelPos = [];
+                if (shouldCenterText) {
+                    tickPos.map(function (datum, index) {
+                        if (index + 1 >= tickPos.length) {
+                            return;
+                        }
+                        labelPos.push(new Date((tickPos[index + 1].valueOf() - tickPos[index].valueOf()) / 2 + tickPos[index].valueOf()));
+                    });
+                } else {
+                    labelPos = tickPos;
+                }
+                labelPos = labelPos.filter(function (d) {
+                    return _this.canFitLabelFilter(container, d, d3.time.format(interval.formatString)(d), shouldCenterText);
+                });
+                var tickLabels = container.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(labelPos, function (d) {
+                    return d.valueOf();
+                });
+                var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                tickLabelsEnter.append("text");
+                var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
+                var yTranslate = (this._orientation === "bottom" ? (this.tickLength() / 2 * height) : (this.availableHeight - this.tickLength() / 2 * height + 2 * this.tickLabelPadding()));
+                var textSelection = tickLabels.selectAll("text");
+                if (textSelection.size() > 0) {
+                    Plottable.Util.DOM.translate(textSelection, xTranslate, yTranslate);
+                }
+                tickLabels.exit().remove();
+                tickLabels.attr("transform", function (d) {
+                    return "translate(" + _this._scale.scale(d) + ",0)";
+                });
+                var anchor = shouldCenterText ? "middle" : "left";
+                tickLabels.selectAll("text").text(function (d) {
+                    return d3.time.format(interval.formatString)(d);
+                }).style("text-anchor", anchor);
+            };
+
+            Time.prototype.canFitLabelFilter = function (container, position, label, isCentered) {
+                var endPosition;
+                var startPosition;
+                var width = Plottable.Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
+                if (isCentered) {
+                    endPosition = this._scale.scale(position) + width / 2;
+                    startPosition = this._scale.scale(position) - width / 2;
+                } else {
+                    endPosition = this._scale.scale(position) + width;
+                    startPosition = this._scale.scale(position);
+                }
+
+                return endPosition < this.availableWidth && startPosition > 0;
+            };
+
+            Time.prototype.adjustTickLength = function (height, interval) {
+                var tickValues = this._getTickIntervalValues(interval);
+                var selection = this._tickMarkContainer.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS).filter(function (d) {
+                    return tickValues.map(function (x) {
+                        return x.valueOf();
+                    }).indexOf(d.valueOf()) >= 0;
+                });
+                if (this._orientation === "top") {
+                    height = this.availableHeight - height;
+                }
+                selection.attr("y2", height);
+            };
+
+            Time.prototype.generateLabellessTicks = function (index) {
+                if (index < 0) {
+                    return;
+                }
+
+                var smallTicks = this._getTickIntervalValues(Time.minorIntervals[index]);
+                var allTicks = this._getTickValues().concat(smallTicks);
+
+                var tickMarks = this._tickMarkContainer.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS).data(allTicks);
+                tickMarks.enter().append("line").classed(Plottable.Abstract.Axis.TICK_MARK_CLASS, true);
+                tickMarks.attr(this._generateTickMarkAttrHash());
+                tickMarks.exit().remove();
+                this.adjustTickLength(this.tickLabelPadding(), Time.minorIntervals[index]);
+            };
+
+            Time.prototype._doRender = function () {
+                _super.prototype._doRender.call(this);
+                var index = this.getTickLevel();
+                this.renderTickLabels(this._minorTickLabels, Time.minorIntervals[index], 1);
+                this.renderTickLabels(this._majorTickLabels, Time.majorIntervals[index], 2);
+                var domain = this._scale.domain();
+                var totalLength = this._scale.scale(domain[1]) - this._scale.scale(domain[0]);
+                if (this.getIntervalLength(Time.minorIntervals[index]) * 1.5 >= totalLength) {
+                    this.generateLabellessTicks(index - 1);
+                }
+
+                // make minor ticks shorter
+                this.adjustTickLength(this.tickLength() / 2, Time.minorIntervals[index]);
+
+                // however, we need to make major ticks longer, since they may have overlapped with some minor ticks
+                this.adjustTickLength(this.tickLength(), Time.majorIntervals[index]);
+                return this;
+            };
+            Time.minorIntervals = [
+                { timeUnit: d3.time.second, step: 1, formatString: "%I:%M:%S %p" },
+                { timeUnit: d3.time.second, step: 5, formatString: "%I:%M:%S %p" },
+                { timeUnit: d3.time.second, step: 10, formatString: "%I:%M:%S %p" },
+                { timeUnit: d3.time.second, step: 15, formatString: "%I:%M:%S %p" },
+                { timeUnit: d3.time.second, step: 30, formatString: "%I:%M:%S %p" },
+                { timeUnit: d3.time.minute, step: 1, formatString: "%I:%M %p" },
+                { timeUnit: d3.time.minute, step: 5, formatString: "%I:%M %p" },
+                { timeUnit: d3.time.minute, step: 10, formatString: "%I:%M %p" },
+                { timeUnit: d3.time.minute, step: 15, formatString: "%I:%M %p" },
+                { timeUnit: d3.time.minute, step: 30, formatString: "%I:%M %p" },
+                { timeUnit: d3.time.hour, step: 1, formatString: "%I %p" },
+                { timeUnit: d3.time.hour, step: 3, formatString: "%I %p" },
+                { timeUnit: d3.time.hour, step: 6, formatString: "%I %p" },
+                { timeUnit: d3.time.hour, step: 12, formatString: "%I %p" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%a %e" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%e" },
+                { timeUnit: d3.time.month, step: 1, formatString: "%B" },
+                { timeUnit: d3.time.month, step: 1, formatString: "%b" },
+                { timeUnit: d3.time.month, step: 3, formatString: "%B" },
+                { timeUnit: d3.time.month, step: 6, formatString: "%B" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%y" },
+                { timeUnit: d3.time.year, step: 5, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 25, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 50, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 100, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 200, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 500, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 1000, formatString: "%Y" }
+            ];
+
+            Time.majorIntervals = [
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.day, step: 1, formatString: "%B %e, %Y" },
+                { timeUnit: d3.time.month, step: 1, formatString: "%B %Y" },
+                { timeUnit: d3.time.month, step: 1, formatString: "%B %Y" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 1, formatString: "%Y" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" },
+                { timeUnit: d3.time.year, step: 100000, formatString: "" }
+            ];
+            return Time;
+        })(Plottable.Abstract.Axis);
+        Axis.Time = Time;
+    })(Plottable.Axis || (Plottable.Axis = {}));
+    var Axis = Plottable.Axis;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

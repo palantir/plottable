@@ -32,6 +32,14 @@ declare module Plottable {
             * @return {D3.Set} A set that contains elements that appear in both set1 and set2
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
+            /**
+            * Takes two sets and returns the union
+            *
+            * @param{D3.Set} set1 The first set
+            * @param{D3.Set} set2 The second set
+            * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+            */
+            function union(set1: D3.Set, set2: D3.Set): D3.Set;
             function accessorize(accessor: any): IAccessor;
             function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
@@ -370,6 +378,7 @@ declare module Plottable {
             function getElementHeight(elem: HTMLScriptElement): number;
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
+            function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
         }
     }
 }
@@ -1554,10 +1563,19 @@ declare module Plottable {
             * Creates a new Time Scale.
             *
             * @constructor
-            * @param {D3.Scale.Time} [scale] The D3 TimeScale backing the TimeScale. If not supplied, uses a default scale.
+            * @param {D3.Scale.Time} [scale] The D3 LinearScale backing the TimeScale. If not supplied, uses a default scale.
             */
             constructor();
-            constructor(scale: D3.Scale.TimeScale);
+            constructor(scale: D3.Scale.LinearScale);
+            public tickInterval(interval: D3.Time.Interval, step?: number): any[];
+            public domain(): any[];
+            public domain(values: any[]): Time;
+            /**
+            * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
+            *
+            * @returns {TimeScale} A copy of the calling TimeScale.
+            */
+            public copy(): Time;
         }
     }
 }
@@ -1731,6 +1749,32 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public showEndTickLabels(show: boolean): Axis;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
+        interface ITimeInterval {
+            timeUnit: D3.Time.Interval;
+            step: number;
+            formatString: string;
+        }
+        class Time extends Abstract.Axis {
+            static minorIntervals: ITimeInterval[];
+            static majorIntervals: ITimeInterval[];
+            /**
+            * Creates a TimeAxis
+            *
+            * @constructor
+            * @param {TimeScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom)
+            */
+            constructor(scale: Scale.Time, orientation: string);
+            public calculateWorstWidth(container: D3.Selection, format: string): number;
+            public getIntervalLength(interval: ITimeInterval): number;
+            public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
         }
     }
 }
