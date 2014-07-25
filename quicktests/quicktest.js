@@ -81,10 +81,16 @@ function loadTheQuicktests(quicktestsJSONArray) {
     quicktestsJSONArray.forEach(function(q) {
       var name = q.name;
       d3.text("/quicktests/" + name + ".js", function(error, text) {
+        if (error !== null) {
+          console.warn("Tried to load nonexistant quicktest " + name);
+          if (++numLoaded === numToLoad) f();
+          return;
+        }
         text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
           "\n////# sourceURL=" + name + ".js\n";
+
         var result = eval(text);
         q.makeData = result.makeData;
         q.run = result.run;
