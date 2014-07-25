@@ -117,6 +117,17 @@ function main() {
   var secondBranch = $('#featureBranch').val();
   if (secondBranch === "") {secondBranch = "#local"};
   var quicktestCategory = $('#filterWord').val();
+  if (quicktestCategory == null || quicktestCategory === "") {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    vars.forEach(function(v) {
+      v = v.split("=");
+      if (v[0] === "filterWord") {
+        quicktestCategory = v[1];
+      }
+    })
+  }
+  console.log(quicktestCategory);
   initializeByLoadingAllQuicktests()
       .then(function() {
         return loadPlottable(firstBranch);
@@ -129,7 +140,7 @@ function main() {
           if (quicktestCategory === "" || quicktestCategory === undefined) {
             return true;
           } else {
-            return q.categories.indexOf(quicktestCategory) !== -1
+            return q.categories.map(function(s) {return s.toLowerCase()}).indexOf(quicktestCategory.toLowerCase()) !== -1
           };
         });
       })
