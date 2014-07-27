@@ -183,24 +183,26 @@ export module Abstract {
       return this;
     }
 
-    public _updateDomainer(scale: Scale) {
+    public _getDomainer(scale: Scale): Domainer {
       if (scale instanceof Abstract.QuantitiveScale) {
         var qscale = <Abstract.QuantitiveScale> scale;
         if (!qscale._userSetDomainer) {
-          if (this._baselineValue != null) {
-            qscale.domainer()
-              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
-              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-          } else {
-            qscale.domainer()
-              .removePaddingException("BAR_PLOT+" + this._plottableID)
-              .removeIncludedValue("BAR_PLOT+" + this._plottableID);
-          }
+          return qscale.domainer();
         }
-            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        qscale._autoDomainIfAutomaticMode();
       }
-      return this;
+      return null;
+    }
+
+    public _addBaseline(domainer: Domainer) {
+      if (this._baselineValue != null) {
+        domainer
+          .addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
+          .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+      } else {
+        domainer
+          .removePaddingException("BAR_PLOT+" + this._plottableID)
+          .removeIncludedValue("BAR_PLOT+" + this._plottableID);
+      }
     }
 
     public _generateAttrToProjector() {

@@ -19,7 +19,13 @@ export module Plot {
 
 
     public _updateXDomainer() {
-      this._updateDomainer(this.xScale);
+      super._updateXDomainer();
+      var domainer = this._getDomainer(this.xScale);
+      if (domainer != null) {
+        this._addBaseline(domainer);
+        this.xScale._autoDomainIfAutomaticMode();
+        domainer.pad(0);
+      }
       return this;
     }
 
