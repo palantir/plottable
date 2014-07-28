@@ -34,7 +34,7 @@
 /// <reference path="core/interfaces.ts" />
 /// <reference path="core/domainer.ts" />
 
-/// <reference path="scales/quantitiveScale.ts" />
+/// <reference path="scales/quantitativeScale.ts" />
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/logScale.ts" />
 /// <reference path="scales/modifiedLogScale.ts" />

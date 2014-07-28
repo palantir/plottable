@@ -184,8 +184,8 @@ export module Abstract {
     }
 
     public _updateDomainer(scale: Scale) {
-      if (scale instanceof Abstract.QuantitiveScale) {
-        var qscale = <Abstract.QuantitiveScale> scale;
+      if (scale instanceof Abstract.QuantitativeScale) {
+        var qscale = <Abstract.QuantitativeScale> scale;
         if (!qscale._userSetDomainer) {
           if (this._baselineValue != null) {
             qscale.domainer()

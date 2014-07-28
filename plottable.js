@@ -493,12 +493,12 @@ var Plottable;
                     if (selection.node().nodeName === "text") {
                         var originalText = selection.text();
                         selection.text(s);
-                        bb = Util.DOM.getBBox(selection);
+                        bb = Plottable.Util.DOM.getBBox(selection);
                         selection.text(originalText);
                         return { width: bb.width, height: bb.height };
                     } else {
                         var t = selection.append("text").text(s);
-                        bb = Util.DOM.getBBox(t);
+                        bb = Plottable.Util.DOM.getBBox(t);
                         t.remove();
                         return { width: bb.width, height: bb.height };
                     }
@@ -582,7 +582,7 @@ var Plottable;
                 */
                 function CachingCharacterMeasurer(g) {
                     var _this = this;
-                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.objEq);
+                    this.cache = new Plottable.Util.Cache(getTextMeasure(g), CANONICAL_CHR, Plottable.Util.Methods.objEq);
                     this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) {
                         return _this.cache.get(s);
                     })));
@@ -675,11 +675,11 @@ var Plottable;
                 var innerG = g.append("g");
                 var textEl = innerG.append("text");
                 textEl.text(line);
-                var bb = Util.DOM.getBBox(textEl);
+                var bb = Plottable.Util.DOM.getBBox(textEl);
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
-                    Util.Methods.warn("Insufficient space to fit text");
+                    Plottable.Util.Methods.warn("Insufficient space to fit text");
                     return { width: 0, height: 0 };
                 }
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
@@ -688,7 +688,7 @@ var Plottable;
                 var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
                 var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
-                Util.DOM.translate(innerG, xOff, yOff);
+                Plottable.Util.DOM.translate(innerG, xOff, yOff);
                 return { width: w, height: h };
             }
             Text.writeLineHorizontally = writeLineHorizontally;
@@ -723,7 +723,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Util.DOM.translate(innerG, 0, i * h);
+                    Plottable.Util.DOM.translate(innerG, 0, i * h);
                     var wh = writeLineHorizontally(line, innerG, width, h, xAlign, yAlign);
                     if (wh.width > maxWidth) {
                         maxWidth = wh.width;
@@ -732,7 +732,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = height - usedSpace;
                 var translator = { center: 0.5, top: 0, bottom: 1 };
-                Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
+                Plottable.Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
                 return { width: maxWidth, height: usedSpace };
             }
             Text.writeTextHorizontally = writeTextHorizontally;
@@ -746,7 +746,7 @@ var Plottable;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
                     var innerG = blockG.append("g");
-                    Util.DOM.translate(innerG, i * h, 0);
+                    Plottable.Util.DOM.translate(innerG, i * h, 0);
                     var wh = writeLineVertically(line, innerG, h, height, xAlign, yAlign, rotation);
                     if (wh.height > maxHeight) {
                         maxHeight = wh.height;
@@ -755,7 +755,7 @@ var Plottable;
                 var usedSpace = h * brokenText.length;
                 var freeSpace = width - usedSpace;
                 var translator = { center: 0.5, left: 0, right: 1 };
-                Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
+                Plottable.Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
 
                 return { width: usedSpace, height: maxHeight };
             }
@@ -773,7 +773,7 @@ var Plottable;
                 var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
                 var primaryDimension = orientHorizontally ? width : height;
                 var secondaryDimension = orientHorizontally ? height : width;
-                var wrappedText = Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
+                var wrappedText = Plottable.Util.WordWrap.breakTextToFitRect(text, primaryDimension, secondaryDimension, tm);
 
                 if (wrappedText.lines.length === 0) {
                     return { textFits: wrappedText.textFits, usedWidth: 0, usedHeight: 0 };
@@ -836,7 +836,7 @@ var Plottable;
                     lines = lines.splice(0, nLinesThatFit);
                     if (nLinesThatFit > 0) {
                         // Overwrite the last line to one that has had a ... appended to the end
-                        lines[nLinesThatFit - 1] = Util.Text._addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
+                        lines[nLinesThatFit - 1] = Plottable.Util.Text._addEllipsesToLine(lines[nLinesThatFit - 1], width, measureText);
                     }
                 }
                 return { originalText: text, lines: lines, textFits: textFit };
@@ -1330,7 +1330,7 @@ var Plottable;
                 return formattedValue;
             };
             return Currency;
-        })(Formatter.Fixed);
+        })(Plottable.Formatter.Fixed);
         Formatter.Currency = Currency;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
@@ -1367,7 +1367,7 @@ var Plottable;
                 return formattedValue;
             };
             return Percentage;
-        })(Formatter.Fixed);
+        })(Plottable.Formatter.Fixed);
         Formatter.Percentage = Percentage;
     })(Plottable.Formatter || (Plottable.Formatter = {}));
     var Formatter = Plottable.Formatter;
@@ -2185,7 +2185,7 @@ var Plottable;
             };
             Component.AUTORESIZE_BY_DEFAULT = true;
             return Component;
-        })(Abstract.PlottableObject);
+        })(Plottable.Abstract.PlottableObject);
         Abstract.Component = Component;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2295,7 +2295,7 @@ var Plottable;
                 });
             };
             return ComponentContainer;
-        })(Abstract.Component);
+        })(Plottable.Abstract.Component);
         Abstract.ComponentContainer = ComponentContainer;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -2904,7 +2904,7 @@ var Plottable;
                 return this;
             };
             return Scale;
-        })(Abstract.PlottableObject);
+        })(Plottable.Abstract.PlottableObject);
         Abstract.Scale = Scale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -3123,7 +3123,7 @@ var Plottable;
                 }
             };
             return Plot;
-        })(Abstract.Component);
+        })(Plottable.Abstract.Component);
         Abstract.Plot = Plot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -3139,7 +3139,7 @@ var Plottable;
                     function Immediate() {
                     }
                     Immediate.prototype.render = function () {
-                        RenderController.flush();
+                        Plottable.Core.RenderController.flush();
                     };
                     return Immediate;
                 })();
@@ -3149,7 +3149,7 @@ var Plottable;
                     function AnimationFrame() {
                     }
                     AnimationFrame.prototype.render = function () {
-                        Plottable.Util.DOM.requestAnimationFramePolyfill(RenderController.flush);
+                        Plottable.Util.DOM.requestAnimationFramePolyfill(Plottable.Core.RenderController.flush);
                     };
                     return AnimationFrame;
                 })();
@@ -3160,7 +3160,7 @@ var Plottable;
                         this._timeoutMsec = Plottable.Util.DOM.POLYFILL_TIMEOUT_MSEC;
                     }
                     Timeout.prototype.render = function () {
-                        setTimeout(RenderController.flush, this._timeoutMsec);
+                        setTimeout(Plottable.Core.RenderController.flush, this._timeoutMsec);
                     };
                     return Timeout;
                 })();
@@ -3191,7 +3191,7 @@ var Plottable;
             var _componentsNeedingRender = {};
             var _componentsNeedingComputeLayout = {};
             var _animationRequested = false;
-            RenderController._renderPolicy = new RenderController.RenderPolicy.AnimationFrame();
+            RenderController._renderPolicy = new Plottable.Core.RenderController.RenderPolicy.AnimationFrame();
 
             function setRenderPolicy(policy) {
                 RenderController._renderPolicy = policy;
@@ -3259,7 +3259,7 @@ var Plottable;
                 }
 
                 // Reset resize flag regardless of queue'd components
-                Core.ResizeBroadcaster.clearResizing();
+                Plottable.Core.ResizeBroadcaster.clearResizing();
             }
             RenderController.flush = flush;
         })(Core.RenderController || (Core.RenderController = {}));
@@ -3288,7 +3288,7 @@ var Plottable;
 
             function _lazyInitialize() {
                 if (broadcaster === undefined) {
-                    broadcaster = new Core.Broadcaster(ResizeBroadcaster);
+                    broadcaster = new Plottable.Core.Broadcaster(ResizeBroadcaster);
                     window.addEventListener("resize", _onResize);
                 }
             }
@@ -3383,7 +3383,7 @@ var Plottable;
         /**
         * @param {any[][]} extents The list of extents to be reduced to a single
         *        extent.
-        * @param {Abstract.QuantitiveScale} scale
+        * @param {Abstract.QuantitativeScale} scale
         *        Since nice() must do different things depending on Linear, Log,
         *        or Time scale, the scale must be passed in for nice() to work.
         * @return {any[]} The domain, as a merging of all exents, as a [min, max]
@@ -3589,22 +3589,22 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
-        var QuantitiveScale = (function (_super) {
-            __extends(QuantitiveScale, _super);
+        var QuantitativeScale = (function (_super) {
+            __extends(QuantitativeScale, _super);
             /**
-            * Creates a new QuantitiveScale.
+            * Creates a new QuantitativeScale.
             *
             * @constructor
-            * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
+            * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitativeScale backing the QuantitativeScale.
             */
-            function QuantitiveScale(scale) {
+            function QuantitativeScale(scale) {
                 _super.call(this, scale);
                 this._lastRequestedTickCount = 10;
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1;
                 this._userSetDomainer = false;
                 this._domainer = new Plottable.Domainer();
             }
-            QuantitiveScale.prototype._getExtent = function () {
+            QuantitativeScale.prototype._getExtent = function () {
                 return this._domainer.computeDomain(this._getAllExtents(), this);
             };
 
@@ -3614,35 +3614,35 @@ var Plottable;
             * @param {number} value: A value from the Scale's range.
             * @returns {number} The domain value corresponding to the supplied range value.
             */
-            QuantitiveScale.prototype.invert = function (value) {
+            QuantitativeScale.prototype.invert = function (value) {
                 return this._d3Scale.invert(value);
             };
 
             /**
-            * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
+            * Creates a copy of the QuantitativeScale with the same domain and range but without any registered listeners.
             *
-            * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
+            * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
             */
-            QuantitiveScale.prototype.copy = function () {
-                return new QuantitiveScale(this._d3Scale.copy());
+            QuantitativeScale.prototype.copy = function () {
+                return new QuantitativeScale(this._d3Scale.copy());
             };
 
-            QuantitiveScale.prototype.domain = function (values) {
+            QuantitativeScale.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
 
-            QuantitiveScale.prototype._setDomain = function (values) {
+            QuantitativeScale.prototype._setDomain = function (values) {
                 var isNaNOrInfinity = function (x) {
                     return x !== x || x === Infinity || x === -Infinity;
                 };
                 if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-                    Plottable.Util.Methods.warn("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+                    Plottable.Util.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
                     return;
                 }
                 _super.prototype._setDomain.call(this, values);
             };
 
-            QuantitiveScale.prototype.interpolate = function (factory) {
+            QuantitativeScale.prototype.interpolate = function (factory) {
                 if (factory == null) {
                     return this._d3Scale.interpolate();
                 }
@@ -3651,16 +3651,16 @@ var Plottable;
             };
 
             /**
-            * Sets the range of the QuantitiveScale and sets the interpolator to d3.interpolateRound.
+            * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
             *
             * @param {number[]} values The new range value for the range.
             */
-            QuantitiveScale.prototype.rangeRound = function (values) {
+            QuantitativeScale.prototype.rangeRound = function (values) {
                 this._d3Scale.rangeRound(values);
                 return this;
             };
 
-            QuantitiveScale.prototype.clamp = function (clamp) {
+            QuantitativeScale.prototype.clamp = function (clamp) {
                 if (clamp == null) {
                     return this._d3Scale.clamp();
                 }
@@ -3674,7 +3674,7 @@ var Plottable;
             * @param {number} [count] The number of ticks to generate.
             * @returns {any[]} The generated ticks.
             */
-            QuantitiveScale.prototype.ticks = function (count) {
+            QuantitativeScale.prototype.ticks = function (count) {
                 if (count != null) {
                     this._lastRequestedTickCount = count;
                 }
@@ -3688,7 +3688,7 @@ var Plottable;
             * @param {string} [format] A format specifier string.
             * @returns {(n: number) => string} A formatting function.
             */
-            QuantitiveScale.prototype.tickFormat = function (count, format) {
+            QuantitativeScale.prototype.tickFormat = function (count, format) {
                 return this._d3Scale.tickFormat(count, format);
             };
 
@@ -3696,11 +3696,11 @@ var Plottable;
             * Given a domain, expands its domain onto "nice" values, e.g. whole
             * numbers.
             */
-            QuantitiveScale.prototype._niceDomain = function (domain, count) {
+            QuantitativeScale.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
             };
 
-            QuantitiveScale.prototype.domainer = function (domainer) {
+            QuantitativeScale.prototype.domainer = function (domainer) {
                 if (domainer == null) {
                     return this._domainer;
                 } else {
@@ -3711,12 +3711,12 @@ var Plottable;
                 }
             };
 
-            QuantitiveScale.prototype._defaultExtent = function () {
+            QuantitativeScale.prototype._defaultExtent = function () {
                 return [0, 1];
             };
-            return QuantitiveScale;
-        })(Abstract.Scale);
-        Abstract.QuantitiveScale = QuantitiveScale;
+            return QuantitativeScale;
+        })(Plottable.Abstract.Scale);
+        Abstract.QuantitativeScale = QuantitativeScale;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
@@ -3745,7 +3745,7 @@ var Plottable;
                 return new Linear(this._d3Scale.copy());
             };
             return Linear;
-        })(Plottable.Abstract.QuantitiveScale);
+        })(Plottable.Abstract.QuantitativeScale);
         Scale.Linear = Linear;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
@@ -3779,7 +3779,7 @@ var Plottable;
                 return [1, 10];
             };
             return Log;
-        })(Plottable.Abstract.QuantitiveScale);
+        })(Plottable.Abstract.QuantitativeScale);
         Scale.Log = Log;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
@@ -3994,7 +3994,7 @@ var Plottable;
                 }
             };
             return ModifiedLog;
-        })(Plottable.Abstract.QuantitiveScale);
+        })(Plottable.Abstract.QuantitativeScale);
         Scale.ModifiedLog = ModifiedLog;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
@@ -4194,7 +4194,7 @@ var Plottable;
         var Time = (function (_super) {
             __extends(Time, _super);
             function Time(scale) {
-                // need to cast since d3 time scales do not descend from quantitive scales
+                // need to cast since d3 time scales do not descend from Quantitative scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
                 this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }
@@ -4229,7 +4229,7 @@ var Plottable;
                 return new Time(this._d3Scale.copy());
             };
             return Time;
-        })(Plottable.Abstract.QuantitiveScale);
+        })(Plottable.Abstract.QuantitativeScale);
         Scale.Time = Time;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
@@ -4274,7 +4274,7 @@ var Plottable;
             *     values in hex ("#FFFFFF") or keywords ("white").
             * @param {string} scaleType a string representing the underlying scale
             *     type (linear/log/sqrt/pow)
-            * @returns a quantitive d3 scale.
+            * @returns a Quantitative d3 scale.
             */
             InterpolatedColor.getD3InterpolatedScale = function (colors, scaleType) {
                 var scale;
@@ -4293,7 +4293,7 @@ var Plottable;
                         break;
                 }
                 if (scale == null) {
-                    throw new Error("unknown quantitive scale type " + scaleType);
+                    throw new Error("unknown Quantitative scale type " + scaleType);
                 }
                 return scale.range([0, 1]).interpolate(InterpolatedColor.interpolateColors(colors));
             };
@@ -4364,7 +4364,7 @@ var Plottable;
             };
 
             InterpolatedColor.prototype.autoDomain = function () {
-                // unlike other QuantitiveScales, interpolatedColorScale ignores its domainer
+                // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
                 var extents = this._getAllExtents();
                 if (extents.length > 0) {
                     this._setDomain([d3.min(extents, function (x) {
@@ -4419,7 +4419,7 @@ var Plottable;
                 ]
             };
             return InterpolatedColor;
-        })(Plottable.Abstract.QuantitiveScale);
+        })(Plottable.Abstract.QuantitativeScale);
         Scale.InterpolatedColor = InterpolatedColor;
     })(Plottable.Scale || (Plottable.Scale = {}));
     var Scale = Plottable.Scale;
@@ -4790,7 +4790,7 @@ var Plottable;
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.availableWidth) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.availableHeight));
                 };
 
-                var tickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS);
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS);
                 if (tickLabels[0].length === 0) {
                     return;
                 }
@@ -4805,7 +4805,7 @@ var Plottable;
             };
 
             Axis.prototype._hideOverlappingTickLabels = function () {
-                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+                var visibleTickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var lastLabelClientRect;
@@ -4824,7 +4824,7 @@ var Plottable;
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
-        })(Abstract.Component);
+        })(Plottable.Abstract.Component);
         Abstract.Axis = Axis;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -5140,8 +5140,8 @@ var Plottable;
             * Creates a NumericAxis.
             *
             * @constructor
-            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumericAxis on.
-            * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
+            * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
+            * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
             * @param {Formatter} [formatter] A function to format tick labels.
             */
             function Numeric(scale, orientation, formatter) {
@@ -5897,8 +5897,8 @@ var Plottable;
             * Creates a set of Gridlines.
             * @constructor
             *
-            * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-            * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+            * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+            * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
             */
             function Gridlines(xScale, yScale) {
                 var _this = this;
@@ -6065,7 +6065,7 @@ var Plottable;
             };
 
             XYPlot.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Abstract.QuantitiveScale) {
+                if (this.xScale instanceof Plottable.Abstract.QuantitativeScale) {
                     var scale = this.xScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
@@ -6075,7 +6075,7 @@ var Plottable;
             };
 
             XYPlot.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Abstract.QuantitiveScale) {
+                if (this.yScale instanceof Plottable.Abstract.QuantitativeScale) {
                     var scale = this.yScale;
                     if (!scale._userSetDomainer) {
                         scale.domainer().pad().nice();
@@ -6084,7 +6084,7 @@ var Plottable;
                 return this;
             };
             return XYPlot;
-        })(Abstract.Plot);
+        })(Plottable.Abstract.Plot);
         Abstract.XYPlot = XYPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -6406,7 +6406,7 @@ var Plottable;
             };
 
             BarPlot.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Abstract.QuantitiveScale) {
+                if (scale instanceof Plottable.Abstract.QuantitativeScale) {
                     var qscale = scale;
                     if (!qscale._userSetDomainer) {
                         if (this._baselineValue != null) {
@@ -6473,7 +6473,7 @@ var Plottable;
 
             BarPlot._BarAlignmentToFactor = {};
             return BarPlot;
-        })(Abstract.XYPlot);
+        })(Plottable.Abstract.XYPlot);
         Abstract.BarPlot = BarPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
@@ -6497,7 +6497,7 @@ var Plottable;
             * @constructor
             * @param {IDataset} dataset The dataset to render.
             * @param {Scale} xScale The x scale to use.
-            * @param {QuantitiveScale} yScale The y scale to use.
+            * @param {QuantitativeScale} yScale The y scale to use.
             */
             function VerticalBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
@@ -6532,7 +6532,7 @@ var Plottable;
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
-            * @param {QuantitiveScale} xScale The x scale to use.
+            * @param {QuantitativeScale} xScale The x scale to use.
             * @param {Scale} yScale The y scale to use.
             */
             function HorizontalBar(dataset, xScale, yScale) {
@@ -6751,7 +6751,7 @@ var Plottable;
                 this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
             };
             return Area;
-        })(Plot.Line);
+        })(Plottable.Plot.Line);
         Plot.Area = Area;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
@@ -6857,7 +6857,7 @@ var Plottable;
                 }).attr(attrToProjector);
             };
             return IterativeDelay;
-        })(Animator.Default);
+        })(Plottable.Animator.Default);
         Animator.IterativeDelay = IterativeDelay;
     })(Plottable.Animator || (Plottable.Animator = {}));
     var Animator = Plottable.Animator;
@@ -7124,8 +7124,8 @@ var Plottable;
             *
             * @constructor
             * @param {Component} componentToListenTo The component to listen for interactions on.
-            * @param {QuantitiveScale} xScale The X scale to update on panning/zooming.
-            * @param {QuantitiveScale} yScale The Y scale to update on panning/zooming.
+            * @param {QuantitativeScale} xScale The X scale to update on panning/zooming.
+            * @param {QuantitativeScale} yScale The Y scale to update on panning/zooming.
             */
             function PanZoom(componentToListenTo, xScale, yScale) {
                 var _this = this;
@@ -7361,7 +7361,7 @@ var Plottable;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
             return DragBox;
-        })(Interaction.Drag);
+        })(Plottable.Interaction.Drag);
         Interaction.DragBox = DragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -7402,7 +7402,7 @@ var Plottable;
                 return this;
             };
             return XDragBox;
-        })(Interaction.DragBox);
+        })(Plottable.Interaction.DragBox);
         Interaction.XDragBox = XDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -7440,7 +7440,7 @@ var Plottable;
                 this.callbackToCall(pixelArea);
             };
             return XYDragBox;
-        })(Interaction.DragBox);
+        })(Plottable.Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
@@ -7481,7 +7481,7 @@ var Plottable;
                 return this;
             };
             return YDragBox;
-        })(Interaction.DragBox);
+        })(Plottable.Interaction.DragBox);
         Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;

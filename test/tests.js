@@ -3685,7 +3685,7 @@ describe("Scales", function () {
         });
     });
 
-    describe("Quantitive Scales", function () {
+    describe("Quantitative Scales", function () {
         it("autorange defaults to [0, 1] if no perspectives set", function () {
             var scale = new Plottable.Scale.Linear();
             scale.autoDomain();
