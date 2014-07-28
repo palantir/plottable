@@ -2,8 +2,8 @@
 
 var ordinalDomain: string[] = ["a", "b", "c", "d", "e"];
 var ordinalData = [{x: "a", y: 3}, {x: "b", y: -2}, {x: "c", y: 4}, {x: "d", y: -3}, {x: "e", y: 5}];
-var quantitiveData = [{x: -2, y: 15}, {x: 1, y: 20}, {x: 4, y: -3}, {x: 8, y: 0}, {x: 10, y: -10}];
-var quantitiveData2 = [{x: -2, y: 20}, {x: 5, y: -10}, {x: 7, y: 10}, {x: 10, y: 7}];
+var quantitativeData = [{x: -2, y: 15}, {x: 1, y: 20}, {x: 4, y: -3}, {x: 8, y: 0}, {x: 10, y: -10}];
+var quantitativeData2 = [{x: -2, y: 20}, {x: 5, y: -10}, {x: 7, y: 10}, {x: 10, y: 7}];
 var colors = new Plottable.Scale.Color("Category10").range();
 
 function generateSVG(width = 400, height = 400): D3.Selection {
@@ -111,7 +111,7 @@ function getXYPlot(type: string, data: any[]): Plottable.Abstract.Plot {
 function makeXYPlot(type: string) {
 	var svg = generateSVG();
 
-	var plot = getXYPlot(type, quantitiveData);
+	var plot = getXYPlot(type, quantitativeData);
 	plot.renderTo(svg);
 }
 
@@ -119,8 +119,8 @@ function makeXYPlotMulti(type: string) {
 	var svg = generateSVG();
 
 
-	var plot = getXYPlot(type, quantitiveData);
-	var plot2 = getXYPlot(type, quantitiveData2);
+	var plot = getXYPlot(type, quantitativeData);
+	var plot2 = getXYPlot(type, quantitativeData2);
 	if (type === "line") {
 		plot.project("stroke", colors[0]);
 		plot2.project("stroke", colors[1]);
@@ -136,7 +136,7 @@ function makeAreaStroke() {
 	var svg = generateSVG();
 	var xScale = new Plottable.Scale.Linear();
 	var yScale = new Plottable.Scale.Linear();
-	var ds = new Plottable.DataSource(quantitiveData);
+	var ds = new Plottable.DataSource(quantitativeData);
 
 	var plot = new Plottable.Plot.Area(ds, xScale, yScale);
 	plot.project("stroke", colors[0]);
@@ -175,7 +175,7 @@ function xydrag() {
 	var svg = generateSVG();
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();
-    var plot = new Plottable.Plot.Scatter(quantitiveData, xScale, yScale);
+    var plot = new Plottable.Plot.Scatter(quantitativeData, xScale, yScale);
 
     plot.renderTo(svg);
     new Plottable.Interaction.XYDragBox(plot).callback(() => {return;}).registerWithComponent();
@@ -185,7 +185,7 @@ function xdrag() {
 	var svg = generateSVG();
     var xScale = new Plottable.Scale.Linear();
     var yScale = new Plottable.Scale.Linear();
-    var plot = new Plottable.Plot.Area(quantitiveData, xScale, yScale);
+    var plot = new Plottable.Plot.Area(quantitativeData, xScale, yScale);
 
     plot.renderTo(svg);
     new Plottable.Interaction.XDragBox(plot).callback(() => {return;}).registerWithComponent();
@@ -213,8 +213,8 @@ function animate1() {
 	var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
 	var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-	var plot1 = new Plottable.Plot.Line(quantitiveData, xScale, yScale).animate(true);
-	var plot2 = new Plottable.Plot.Line(quantitiveData2, xScale, yScale).animate(true);
+	var plot1 = new Plottable.Plot.Line(quantitativeData, xScale, yScale).animate(true);
+	var plot2 = new Plottable.Plot.Line(quantitativeData2, xScale, yScale).animate(true);
 
 	plot1.project("stroke", colors[0]);
 	plot2.project("stroke", colors[1]);
@@ -233,8 +233,8 @@ function animate2() {
 	var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
 	var gridlines = new Plottable.Component.Gridlines(xScale, yScale);
-	var plot1 = new Plottable.Plot.Area(quantitiveData, xScale, yScale).animate(true);
-	var plot2 = new Plottable.Plot.Area(quantitiveData2, xScale, yScale).animate(true);
+	var plot1 = new Plottable.Plot.Area(quantitativeData, xScale, yScale).animate(true);
+	var plot2 = new Plottable.Plot.Area(quantitativeData2, xScale, yScale).animate(true);
 
 	plot1.project("fill", colors[0]);
 	plot2.project("fill", colors[1]);

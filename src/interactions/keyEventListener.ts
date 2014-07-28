@@ -3,7 +3,7 @@
 module Plottable {
 export module Core {
   export interface IKeyEventListenerCallback {
-    (e: D3.Event): any
+    (e: D3.D3Event): any
   }
 
   export module KeyEventListener {

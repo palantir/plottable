@@ -161,6 +161,10 @@ export module Component {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var textHeight = Util.Text.getTextHeight(fakeLegendEl.append("text"));
+      // HACKHACK
+      if (textHeight === 0) {
+        textHeight = 1;
+      }
       fakeLegendEl.remove();
       return textHeight;
     }

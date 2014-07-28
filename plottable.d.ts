@@ -32,6 +32,7 @@ declare module Plottable {
             * @return {D3.Set} A set that contains elements that appear in both set1 and set2
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
+<<<<<<< HEAD
             /**
             * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
             * and "activate" it by turning it into a function in (datum, index, metadata)
@@ -40,6 +41,21 @@ declare module Plottable {
             /** Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
             */
             function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot): (d: any, i: number) => any;
+||||||| merged common ancestors
+            function accessorize(accessor: any): IAccessor;
+            function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
+=======
+            /**
+            * Takes two sets and returns the union
+            *
+            * @param{D3.Set} set1 The first set
+            * @param{D3.Set} set2 The second set
+            * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+            */
+            function union(set1: D3.Set, set2: D3.Set): D3.Set;
+            function accessorize(accessor: any): IAccessor;
+            function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
+>>>>>>> master
             function uniq(strings: string[]): string[];
             function uniqNumbers(a: number[]): number[];
             /**
@@ -376,6 +392,7 @@ declare module Plottable {
             function getElementHeight(elem: HTMLScriptElement): number;
             function getSVGPixelWidth(svg: D3.Selection): number;
             function translate(s: D3.Selection, x?: number, y?: number): any;
+            function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
         }
     }
 }
@@ -1200,13 +1217,13 @@ declare module Plottable {
         /**
         * @param {any[][]} extents The list of extents to be reduced to a single
         *        extent.
-        * @param {Abstract.QuantitiveScale} scale
+        * @param {Abstract.QuantitativeScale} scale
         *        Since nice() must do different things depending on Linear, Log,
         *        or Time scale, the scale must be passed in for nice() to work.
         * @return {any[]} The domain, as a merging of all exents, as a [min, max]
         *                 pair.
         */
-        public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[];
+        public computeDomain(extents: any[][], scale: Abstract.QuantitativeScale): any[];
         /**
         * Sets the Domainer to pad by a given ratio.
         *
@@ -1279,12 +1296,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class QuantitiveScale extends Scale {
+        class QuantitativeScale extends Scale {
             /**
-            * Creates a new QuantitiveScale.
+            * Creates a new QuantitativeScale.
             *
             * @constructor
-            * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
+            * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitativeScale backing the QuantitativeScale.
             */
             constructor(scale: D3.Scale.QuantitiveScale);
             /**
@@ -1295,40 +1312,40 @@ declare module Plottable {
             */
             public invert(value: number): number;
             /**
-            * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
+            * Creates a copy of the QuantitativeScale with the same domain and range but without any registered listeners.
             *
-            * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
+            * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
             */
-            public copy(): QuantitiveScale;
+            public copy(): QuantitativeScale;
             public domain(): any[];
-            public domain(values: any[]): QuantitiveScale;
+            public domain(values: any[]): QuantitativeScale;
             /**
-            * Sets or gets the QuantitiveScale's output interpolator
+            * Sets or gets the QuantitativeScale's output interpolator
             *
             * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-            * @returns {D3.Transition.Interpolate|QuantitiveScale} The current output interpolator, or the calling QuantitiveScale.
+            * @returns {D3.Transition.Interpolate|QuantitativeScale} The current output interpolator, or the calling QuantitativeScale.
             */
             public interpolate(): D3.Transition.Interpolate;
-            public interpolate(factory: D3.Transition.Interpolate): QuantitiveScale;
+            public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale;
             /**
-            * Sets the range of the QuantitiveScale and sets the interpolator to d3.interpolateRound.
+            * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
             *
             * @param {number[]} values The new range value for the range.
             */
-            public rangeRound(values: number[]): QuantitiveScale;
+            public rangeRound(values: number[]): QuantitativeScale;
             /**
-            * Gets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+            * Gets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
             *
             * @returns {boolean} The current clamp status.
             */
             public clamp(): boolean;
             /**
-            * Sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+            * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
             *
-            * @param {boolean} clamp Whether or not to clamp the QuantitiveScale.
-            * @returns {QuantitiveScale} The calling QuantitiveScale.
+            * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
+            * @returns {QuantitativeScale} The calling QuantitativeScale.
             */
-            public clamp(clamp: boolean): QuantitiveScale;
+            public clamp(clamp: boolean): QuantitativeScale;
             /**
             * Generates tick values.
             *
@@ -1348,7 +1365,7 @@ declare module Plottable {
             * Retrieve a Domainer of a scale. A Domainer is responsible for combining
             * multiple extents into a single domain.
             *
-            * @return {QuantitiveScale} The scale's current domainer.
+            * @return {QuantitativeScale} The scale's current domainer.
             */
             public domainer(): Domainer;
             /**
@@ -1360,9 +1377,9 @@ declare module Plottable {
             * includes 0, etc., will be the responsability of the new domainer.
             *
             * @param {Domainer} domainer The domainer to be set.
-            * @return {QuantitiveScale} The calling scale.
+            * @return {QuantitativeScale} The calling scale.
             */
-            public domainer(domainer: Domainer): QuantitiveScale;
+            public domainer(domainer: Domainer): QuantitativeScale;
         }
     }
 }
@@ -1370,7 +1387,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Linear extends Abstract.QuantitiveScale {
+        class Linear extends Abstract.QuantitativeScale {
             /**
             * Creates a new LinearScale.
             *
@@ -1392,7 +1409,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Log extends Abstract.QuantitiveScale {
+        class Log extends Abstract.QuantitativeScale {
             /**
             * Creates a new Scale.Log.
             *
@@ -1414,7 +1431,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class ModifiedLog extends Abstract.QuantitiveScale {
+        class ModifiedLog extends Abstract.QuantitativeScale {
             /**
             * Creates a new Scale.ModifiedLog.
             *
@@ -1555,15 +1572,24 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class Time extends Abstract.QuantitiveScale {
+        class Time extends Abstract.QuantitativeScale {
             /**
             * Creates a new Time Scale.
             *
             * @constructor
-            * @param {D3.Scale.Time} [scale] The D3 TimeScale backing the TimeScale. If not supplied, uses a default scale.
+            * @param {D3.Scale.Time} [scale] The D3 LinearScale backing the TimeScale. If not supplied, uses a default scale.
             */
             constructor();
-            constructor(scale: D3.Scale.TimeScale);
+            constructor(scale: D3.Scale.LinearScale);
+            public tickInterval(interval: D3.Time.Interval, step?: number): any[];
+            public domain(): any[];
+            public domain(values: any[]): Time;
+            /**
+            * Creates a copy of the TimeScale with the same domain and range but without any registered listeners.
+            *
+            * @returns {TimeScale} A copy of the calling TimeScale.
+            */
+            public copy(): Time;
         }
     }
 }
@@ -1571,7 +1597,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
-        class InterpolatedColor extends Abstract.QuantitiveScale {
+        class InterpolatedColor extends Abstract.QuantitativeScale {
             /**
             * Creates a InterpolatedColorScale.
             *
@@ -1744,16 +1770,42 @@ declare module Plottable {
 
 declare module Plottable {
     module Axis {
+        interface ITimeInterval {
+            timeUnit: D3.Time.Interval;
+            step: number;
+            formatString: string;
+        }
+        class Time extends Abstract.Axis {
+            static minorIntervals: ITimeInterval[];
+            static majorIntervals: ITimeInterval[];
+            /**
+            * Creates a TimeAxis
+            *
+            * @constructor
+            * @param {TimeScale} scale The scale to base the Axis on.
+            * @param {string} orientation The orientation of the Axis (top/bottom)
+            */
+            constructor(scale: Scale.Time, orientation: string);
+            public calculateWorstWidth(container: D3.Selection, format: string): number;
+            public getIntervalLength(interval: ITimeInterval): number;
+            public isEnoughSpace(container: D3.Selection, interval: ITimeInterval): boolean;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axis {
         class Numeric extends Abstract.Axis {
             /**
             * Creates a NumericAxis.
             *
             * @constructor
-            * @param {QuantitiveScale} scale The QuantitiveScale to base the NumericAxis on.
-            * @param {string} orientation The orientation of the QuantitiveScale (top/bottom/left/right)
+            * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
+            * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
             * @param {Formatter} [formatter] A function to format tick labels.
             */
-            constructor(scale: Abstract.QuantitiveScale, orientation: string, formatter?: any);
+            constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: any);
             /**
             * Gets the tick label position relative to the tick marks.
             *
@@ -1917,10 +1969,10 @@ declare module Plottable {
             * Creates a set of Gridlines.
             * @constructor
             *
-            * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-            * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+            * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+            * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
             */
-            constructor(xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale);
+            constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale);
             public remove(): Gridlines;
         }
     }
@@ -2074,9 +2126,9 @@ declare module Plottable {
             * @constructor
             * @param {IDataset} dataset The dataset to render.
             * @param {Scale} xScale The x scale to use.
-            * @param {QuantitiveScale} yScale The y scale to use.
+            * @param {QuantitativeScale} yScale The y scale to use.
             */
-            constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitiveScale);
+            constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale);
         }
     }
 }
@@ -2094,10 +2146,10 @@ declare module Plottable {
             *
             * @constructor
             * @param {IDataset} dataset The dataset to render.
-            * @param {QuantitiveScale} xScale The x scale to use.
+            * @param {QuantitativeScale} xScale The x scale to use.
             * @param {Scale} yScale The y scale to use.
             */
-            constructor(dataset: any, xScale: Abstract.QuantitiveScale, yScale: Abstract.Scale);
+            constructor(dataset: any, xScale: Abstract.QuantitativeScale, yScale: Abstract.Scale);
         }
     }
 }
@@ -2220,7 +2272,7 @@ declare module Plottable {
 declare module Plottable {
     module Core {
         interface IKeyEventListenerCallback {
-            (e: D3.Event): any;
+            (e: D3.D3Event): any;
         }
         module KeyEventListener {
             function initialize(): void;
@@ -2317,17 +2369,17 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class PanZoom extends Abstract.Interaction {
-            public xScale: Abstract.QuantitiveScale;
-            public yScale: Abstract.QuantitiveScale;
+            public xScale: Abstract.QuantitativeScale;
+            public yScale: Abstract.QuantitativeScale;
             /**
             * Creates a PanZoomInteraction.
             *
             * @constructor
             * @param {Component} componentToListenTo The component to listen for interactions on.
-            * @param {QuantitiveScale} xScale The X scale to update on panning/zooming.
-            * @param {QuantitiveScale} yScale The Y scale to update on panning/zooming.
+            * @param {QuantitativeScale} xScale The X scale to update on panning/zooming.
+            * @param {QuantitativeScale} yScale The Y scale to update on panning/zooming.
             */
-            constructor(componentToListenTo: Abstract.Component, xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale);
+            constructor(componentToListenTo: Abstract.Component, xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale);
             public resetZoom(): void;
         }
     }
@@ -2353,7 +2405,7 @@ declare module Plottable {
             * @returns {AreaInteraction} The calling AreaInteraction.
             */
             public callback(cb?: (a: any) => any): Drag;
-            public setupZoomCallback(xScale?: Abstract.QuantitiveScale, yScale?: Abstract.QuantitiveScale): Drag;
+            public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale): Drag;
         }
     }
 }

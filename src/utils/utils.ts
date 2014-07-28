@@ -62,6 +62,7 @@ export module Util {
       });
       return set;
     }
+
     /**
      * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
      * and "activate" it by turning it into a function in (datum, index, metadata)
@@ -75,6 +76,20 @@ export module Util {
         return (d: any, i: number, s: any) => accessor;
       };
     }
+
+    /**
+     * Takes two sets and returns the union
+     *
+     * @param{D3.Set} set1 The first set
+     * @param{D3.Set} set2 The second set
+     * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+     */
+     export function union(set1: D3.Set, set2: D3.Set) {
+      var set = d3.set();
+      set1.forEach((v) => set.add(v));
+      set2.forEach((v) => set.add(v));
+      return set;
+     }
 
     /**
      * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata

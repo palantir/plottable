@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A library for creating charts out of D3",
-  "version": "0.21.0",
+  "version": "0.23.0",
   "main": ["plottable.js", "plottable.css"],
   "license": "MIT",
   "ignore": [

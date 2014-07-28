@@ -169,13 +169,6 @@ describe("NumericAxis", () => {
     numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
     numericAxis.renderTo(svg);
 
-    function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-      if (boxA.right < boxB.left) { return false; }
-      if (boxA.left > boxB.right) { return false; }
-      if (boxA.bottom < boxB.top) { return false; }
-      if (boxA.top > boxB.bottom) { return false; }
-      return true;
-    }
     var visibleTickLabels = numericAxis.element
                               .selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS)
                               .filter(function(d: any, i: number) {
@@ -189,7 +182,7 @@ describe("NumericAxis", () => {
         box1 = visibleTickLabels[0][i].getBoundingClientRect();
         box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-        assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+        assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
       }
     }
 
@@ -205,7 +198,7 @@ describe("NumericAxis", () => {
         box1 = visibleTickLabels[0][i].getBoundingClientRect();
         box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-        assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+        assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
       }
     }
 
