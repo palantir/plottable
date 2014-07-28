@@ -679,7 +679,8 @@ var Plottable;
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
-                    Plottable.Util.Methods.warn("Insufficient space to fit text");
+                    Plottable.Util.Methods.warn("Insufficient space to fit text: " + line);
+                    textEl.text("");
                     return { width: 0, height: 0 };
                 }
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
