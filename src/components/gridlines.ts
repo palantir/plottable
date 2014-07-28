@@ -64,7 +64,7 @@ export module Component {
               .attr("y1", 0)
               .attr("x2", getScaledXValue)
               .attr("y2", this.availableHeight)
-             .classed("baseline", (t: number) => t === 0);
+             .classed("zeroline", (t: number) => t === 0);
         xLines.exit().remove();
       }
     }
@@ -79,7 +79,7 @@ export module Component {
               .attr("y1", getScaledYValue)
               .attr("x2", this.availableWidth)
               .attr("y2", getScaledYValue)
-              .classed("baseline", (t: number) => t === 0);
+              .classed("zeroline", (t: number) => t === 0);
         yLines.exit().remove();
       }
     }
