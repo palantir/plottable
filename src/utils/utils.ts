@@ -76,7 +76,8 @@ export module Util {
       };
     }
 
-    /** Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
+    /**
+     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
      */
     export function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot) {
       var activatedAccessor = _accessorize(accessor);
