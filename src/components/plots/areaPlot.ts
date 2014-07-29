@@ -41,7 +41,7 @@ export module Plot {
 
     public _updateYDomainer(): Area {
       super._updateYDomainer();
-      var scale = <Abstract.QuantitiveScale> this.yScale;
+      var scale = <Abstract.QuantitativeScale> this.yScale;
 
       var y0Projector = this._projectors["y0"];
       var y0Accessor = y0Projector != null ? y0Projector.accessor : null;

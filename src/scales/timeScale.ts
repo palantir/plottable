@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scale {
-  export class Time extends Abstract.QuantitiveScale {
+  export class Time extends Abstract.QuantitativeScale {
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
 
     /**
@@ -14,7 +14,7 @@ export module Scale {
     constructor();
     constructor(scale: D3.Scale.LinearScale);
     constructor(scale?: any) {
-      // need to cast since d3 time scales do not descend from quantitive scales
+      // need to cast since d3 time scales do not descend from Quantitative scales
       super(scale == null ? (<any>d3.time.scale()) : scale);
     }
 
