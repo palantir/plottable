@@ -9,7 +9,9 @@ export module Interaction {
     public location = [0,0];
     private constrainX: (n: number) => number;
     private constrainY: (n: number) => number;
-    public callbackToCall: (dragInfo: any) => any;
+    public ondragstart: (dragInfo: any) => any;
+    public ondrag: (dragInfo: any) => any;
+    public ondragend: (dragInfo: any) => any;
 
     /**
      * Creates a Drag.
@@ -25,13 +27,35 @@ export module Interaction {
     }
 
     /**
-     * Adds a callback to be called when the AreaInteraction triggers.
+     * Adds a callback to be caleld when dragging starts.
+     *
+     * @param {(a: SelectionArea) => any} cb The function to be called.
+     * @returns {AreaInteraction}
+     */
+    public dragstart(cb?: (a: any) => any) {
+      this.ondragstart = cb;
+      return this;
+    }
+
+    /**
+     * Adds a callback to be called during dragging.
+     *
+     * @param {(a: SelectionArea) => any} cb The function to be called.
+     * @returns {AreaInteraction}
+     */
+    public drag(cb?: (a: any) => any) {
+      this.ondrag = cb;
+      return this;
+    }
+
+    /**
+     * Adds a callback to be called when the dragging ends.
      *
      * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
      * @returns {AreaInteraction} The calling AreaInteraction.
      */
-    public callback(cb?: (a: any) => any) {
-      this.callbackToCall = cb;
+    public dragend(cb?: (a: any) => any) {
+      this.ondragend = cb;
       return this;
     }
 
@@ -44,13 +68,27 @@ export module Interaction {
       this.constrainY = constraintFunction(0, availableHeight);
     }
 
+    public _doDragstart() {
+      if (this.ondragstart != null) {
+        this.ondragstart(this.origin);
+      }
+    }
+
     public _drag(){
       if (!this.dragInitialized) {
         this.origin = [d3.event.x, d3.event.y];
         this.dragInitialized = true;
+        this._doDragstart();
       }
 
       this.location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+      this._doDrag();
+    }
+
+    public _doDrag() {
+      if (this.ondrag != null) {
+        this.ondrag([this.origin, this.location]);
+      }
     }
 
     public _dragend(){
@@ -64,8 +102,8 @@ export module Interaction {
     public _doDragend() {
       // seperated out so it can be over-ridden by dragInteractions that want to pass out diff information
       // eg just x values for an xSelectionInteraction
-      if (this.callbackToCall != null) {
-        this.callbackToCall([this.origin, this.location]);
+      if (this.ondragend != null) {
+        this.ondragend([this.origin, this.location]);
       }
     }
 
@@ -102,7 +140,8 @@ export module Interaction {
         this.clearBox();
         return;
       }
-      this.callback(callback);
+      this.drag(callback);
+      this.dragend(callback);
       return this;
     }
   }

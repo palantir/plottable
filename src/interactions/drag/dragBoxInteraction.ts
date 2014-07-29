@@ -9,10 +9,26 @@ export module Interaction {
 
     public _dragstart() {
       super._dragstart();
-      if (this.callbackToCall != null) {
-        this.callbackToCall(null);
-      }
       this.clearBox();
+    }
+
+    public _getPixelArea(): any {
+      // Should be overwritten.
+      return {};
+    }
+
+    public _doDrag() {
+      if (this.ondrag == null) {
+        return;
+      }
+      this.ondrag(this._getPixelArea());
+    }
+
+    public _doDragend(){
+      if (this.ondragend == null) {
+        return;
+      }
+      this.ondragend(this._getPixelArea());
     }
 
     /**

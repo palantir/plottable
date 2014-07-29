@@ -8,14 +8,17 @@ export module Interaction {
       this.setBox(this.origin[1], this.location[1]);
     }
 
-    public _doDragend(){
-      if (this.callbackToCall == null) {
+    public _doDragstart() {
+      if (this.ondragstart == null) {
         return;
       }
+      this.ondragstart({y: this.origin[1]});
+    }
+
+    public _getPixelArea(): any {
       var yMin = Math.min(this.origin[1], this.location[1]);
       var yMax = Math.max(this.origin[1], this.location[1]);
-      var pixelArea = {yMin: yMin, yMax: yMax};
-      this.callbackToCall(pixelArea);
+      return {yMin: yMin, yMax: yMax};
     }
 
     public setBox(y0: number, y1: number) {

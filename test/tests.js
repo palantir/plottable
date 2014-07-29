@@ -4915,34 +4915,34 @@ describe("Interactions", function () {
         });
 
         afterEach(function () {
-            interaction.callback();
+            interaction.dragstart();
+            interaction.drag();
+            interaction.dragend();
             interaction.clearBox();
         });
 
-        it("All callbacks are notified with appropriate data when a drag finishes", function () {
+        it("All callbacks are notified with appropriate data on drag", function () {
             var timesCalled = 0;
-            var areaCallback = function (a) {
+            interaction.dragstart(function (a) {
                 timesCalled++;
-                if (timesCalled === 1) {
-                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
-                }
-                if (timesCalled === 2) {
-                    var expectedPixelArea = {
-                        xMin: dragstartX,
-                        xMax: dragendX,
-                        yMin: dragstartY,
-                        yMax: dragendY
-                    };
-                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
-                }
-            };
-
-            interaction.callback(areaCallback);
+                var expectedPixelArea = { x: dragstartX, y: dragstartY };
+                assert.deepEqual(a, expectedPixelArea, "areaCallback called with null arg on dragstart");
+            });
+            interaction.dragend(function (a) {
+                timesCalled++;
+                var expectedPixelArea = {
+                    xMin: dragstartX,
+                    xMax: dragendX,
+                    yMin: dragstartY,
+                    yMax: dragendY
+                };
+                assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
+            });
 
             // fake a drag event
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
 
-            assert.equal(timesCalled, 2, "areaCallback was called twice");
+            assert.equal(timesCalled, 2, "drag callbacks are called twice");
         });
 
         it("Highlights and un-highlights areas appropriately", function () {
@@ -4993,32 +4993,32 @@ describe("Interactions", function () {
         });
 
         afterEach(function () {
-            interaction.callback();
+            interaction.dragstart();
+            interaction.drag();
+            interaction.dragend();
             interaction.clearBox();
         });
 
         it("All callbacks are notified with appropriate data when a drag finishes", function () {
             var timesCalled = 0;
-            var areaCallback = function (a) {
+            interaction.dragstart(function (a) {
                 timesCalled++;
-                if (timesCalled === 1) {
-                    assert.deepEqual(a, null, "areaCallback called with null arg on dragstart");
-                }
-                if (timesCalled === 2) {
-                    var expectedPixelArea = {
-                        yMin: dragstartY,
-                        yMax: dragendY
-                    };
-                    assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
-                }
-            };
-
-            interaction.callback(areaCallback);
+                var expectedPixelArea = { y: dragstartY };
+                assert.deepEqual(a, expectedPixelArea, "areaCallback called with null arg on dragstart");
+            });
+            interaction.dragend(function (a) {
+                timesCalled++;
+                var expectedPixelArea = {
+                    yMin: dragstartY,
+                    yMax: dragendY
+                };
+                assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
+            });
 
             // fake a drag event
             fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
 
-            assert.equal(timesCalled, 2, "areaCallback was called twice");
+            assert.equal(timesCalled, 2, "drag callbacks area called twice");
         });
 
         it("Highlights and un-highlights areas appropriately", function () {
