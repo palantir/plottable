@@ -7209,13 +7209,35 @@ var Plottable;
                 });
             }
             /**
-            * Adds a callback to be called when the AreaInteraction triggers.
+            * Adds a callback to be caleld when dragging starts.
+            *
+            * @param {(a: SelectionArea) => any} cb The function to be called.
+            * @returns {AreaInteraction}
+            */
+            Drag.prototype.dragstart = function (cb) {
+                this.ondragstart = cb;
+                return this;
+            };
+
+            /**
+            * Adds a callback to be called during dragging.
+            *
+            * @param {(a: SelectionArea) => any} cb The function to be called.
+            * @returns {AreaInteraction}
+            */
+            Drag.prototype.drag = function (cb) {
+                this.ondrag = cb;
+                return this;
+            };
+
+            /**
+            * Adds a callback to be called when the dragging ends.
             *
             * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
             * @returns {AreaInteraction} The calling AreaInteraction.
             */
-            Drag.prototype.callback = function (cb) {
-                this.callbackToCall = cb;
+            Drag.prototype.dragend = function (cb) {
+                this.ondragend = cb;
                 return this;
             };
 
@@ -7233,13 +7255,27 @@ var Plottable;
                 this.constrainY = constraintFunction(0, availableHeight);
             };
 
+            Drag.prototype._doDragstart = function () {
+                if (this.ondragstart != null) {
+                    this.ondragstart(this.origin);
+                }
+            };
+
             Drag.prototype._drag = function () {
                 if (!this.dragInitialized) {
                     this.origin = [d3.event.x, d3.event.y];
                     this.dragInitialized = true;
+                    this._doDragstart();
                 }
 
                 this.location = [this.constrainX(d3.event.x), this.constrainY(d3.event.y)];
+                this._doDrag();
+            };
+
+            Drag.prototype._doDrag = function () {
+                if (this.ondrag != null) {
+                    this.ondrag([this.origin, this.location]);
+                }
             };
 
             Drag.prototype._dragend = function () {
@@ -7253,8 +7289,8 @@ var Plottable;
             Drag.prototype._doDragend = function () {
                 // seperated out so it can be over-ridden by dragInteractions that want to pass out diff information
                 // eg just x values for an xSelectionInteraction
-                if (this.callbackToCall != null) {
-                    this.callbackToCall([this.origin, this.location]);
+                if (this.ondragend != null) {
+                    this.ondragend([this.origin, this.location]);
                 }
             };
 
@@ -7291,7 +7327,8 @@ var Plottable;
                     this.clearBox();
                     return;
                 }
-                this.callback(callback);
+                this.drag(callback);
+                this.dragend(callback);
                 return this;
             };
             return Drag;
@@ -7319,10 +7356,26 @@ var Plottable;
             }
             DragBox.prototype._dragstart = function () {
                 _super.prototype._dragstart.call(this);
-                if (this.callbackToCall != null) {
-                    this.callbackToCall(null);
-                }
                 this.clearBox();
+            };
+
+            DragBox.prototype._getPixelArea = function () {
+                // Should be overwritten.
+                return {};
+            };
+
+            DragBox.prototype._doDrag = function () {
+                if (this.ondrag == null) {
+                    return;
+                }
+                this.ondrag(this._getPixelArea());
+            };
+
+            DragBox.prototype._doDragend = function () {
+                if (this.ondragend == null) {
+                    return;
+                }
+                this.ondragend(this._getPixelArea());
             };
 
             /**
@@ -7387,14 +7440,17 @@ var Plottable;
                 this.setBox(this.origin[0], this.location[0]);
             };
 
-            XDragBox.prototype._doDragend = function () {
-                if (this.callbackToCall == null) {
+            XDragBox.prototype._doDragstart = function () {
+                if (this.ondragstart == null) {
                     return;
                 }
+                this.ondragstart({ x: this.origin[0] });
+            };
+
+            XDragBox.prototype._getPixelArea = function () {
                 var xMin = Math.min(this.origin[0], this.location[0]);
                 var xMax = Math.max(this.origin[0], this.location[0]);
-                var pixelArea = { xMin: xMin, xMax: xMax };
-                this.callbackToCall(pixelArea);
+                return { xMin: xMin, xMax: xMax };
             };
 
             XDragBox.prototype.setBox = function (x0, x1) {
@@ -7428,16 +7484,19 @@ var Plottable;
                 this.setBox(this.origin[0], this.location[0], this.origin[1], this.location[1]);
             };
 
-            XYDragBox.prototype._doDragend = function () {
-                if (this.callbackToCall == null) {
+            XYDragBox.prototype._doDragstart = function () {
+                if (this.ondragstart == null) {
                     return;
                 }
+                this.ondragstart({ x: this.origin[0], y: this.origin[1] });
+            };
+
+            XYDragBox.prototype._getPixelArea = function () {
                 var xMin = Math.min(this.origin[0], this.location[0]);
                 var xMax = Math.max(this.origin[0], this.location[0]);
                 var yMin = Math.min(this.origin[1], this.location[1]);
                 var yMax = Math.max(this.origin[1], this.location[1]);
-                var pixelArea = { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
-                this.callbackToCall(pixelArea);
+                return { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
             };
             return XYDragBox;
         })(Interaction.DragBox);
@@ -7466,14 +7525,17 @@ var Plottable;
                 this.setBox(this.origin[1], this.location[1]);
             };
 
-            YDragBox.prototype._doDragend = function () {
-                if (this.callbackToCall == null) {
+            YDragBox.prototype._doDragstart = function () {
+                if (this.ondragstart == null) {
                     return;
                 }
+                this.ondragstart({ y: this.origin[1] });
+            };
+
+            YDragBox.prototype._getPixelArea = function () {
                 var yMin = Math.min(this.origin[1], this.location[1]);
                 var yMax = Math.max(this.origin[1], this.location[1]);
-                var pixelArea = { yMin: yMin, yMax: yMax };
-                this.callbackToCall(pixelArea);
+                return { yMin: yMin, yMax: yMax };
             };
 
             YDragBox.prototype.setBox = function (y0, y1) {

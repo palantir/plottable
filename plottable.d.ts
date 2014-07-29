@@ -2377,7 +2377,9 @@ declare module Plottable {
         class Drag extends Abstract.Interaction {
             public origin: number[];
             public location: number[];
-            public callbackToCall: (dragInfo: any) => any;
+            public ondragstart: (dragInfo: any) => any;
+            public ondrag: (dragInfo: any) => any;
+            public ondragend: (dragInfo: any) => any;
             /**
             * Creates a Drag.
             *
@@ -2385,12 +2387,26 @@ declare module Plottable {
             */
             constructor(componentToListenTo: Abstract.Component);
             /**
-            * Adds a callback to be called when the AreaInteraction triggers.
+            * Adds a callback to be caleld when dragging starts.
+            *
+            * @param {(a: SelectionArea) => any} cb The function to be called.
+            * @returns {AreaInteraction}
+            */
+            public dragstart(cb?: (a: any) => any): Drag;
+            /**
+            * Adds a callback to be called during dragging.
+            *
+            * @param {(a: SelectionArea) => any} cb The function to be called.
+            * @returns {AreaInteraction}
+            */
+            public drag(cb?: (a: any) => any): Drag;
+            /**
+            * Adds a callback to be called when the dragging ends.
             *
             * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
             * @returns {AreaInteraction} The calling AreaInteraction.
             */
-            public callback(cb?: (a: any) => any): Drag;
+            public dragend(cb?: (a: any) => any): Drag;
             public setupZoomCallback(xScale?: Abstract.QuantitiveScale, yScale?: Abstract.QuantitiveScale): Drag;
         }
     }
