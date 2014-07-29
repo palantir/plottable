@@ -81,10 +81,16 @@ function loadTheQuicktests(quicktestsJSONArray) {
     quicktestsJSONArray.forEach(function(q) {
       var name = q.name;
       d3.text("/quicktests/" + name + ".js", function(error, text) {
+        if (error !== null) {
+          console.warn("Tried to load nonexistant quicktest " + name);
+          if (++numLoaded === numToLoad) f();
+          return;
+        }
         text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
           "\n////# sourceURL=" + name + ".js\n";
+
         var result = eval(text);
         q.makeData = result.makeData;
         q.run = result.run;
@@ -111,6 +117,17 @@ function main() {
   var secondBranch = $('#featureBranch').val();
   if (secondBranch === "") {secondBranch = "#local"};
   var quicktestCategory = $('#filterWord').val();
+  if (quicktestCategory == null || quicktestCategory === "") {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    vars.forEach(function(v) {
+      v = v.split("=");
+      if (v[0] === "filterWord") {
+        quicktestCategory = v[1];
+      }
+    })
+  }
+  console.log(quicktestCategory);
   initializeByLoadingAllQuicktests()
       .then(function() {
         return loadPlottable(firstBranch);
@@ -123,7 +140,7 @@ function main() {
           if (quicktestCategory === "" || quicktestCategory === undefined) {
             return true;
           } else {
-            return q.categories.indexOf(quicktestCategory) !== -1
+            return q.categories.map(function(s) {return s.toLowerCase()}).indexOf(quicktestCategory.toLowerCase()) !== -1
           };
         });
       })

@@ -22,10 +22,11 @@ export module Util {
 
     function _getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
       var value: any = style.getPropertyValue(prop);
-      if (value == null){
-        return 0;
+      var parsedValue = parseFloat(value);
+      if (parsedValue !== parsedValue) {
+          return 0;
       }
-      return parseFloat(value);
+      return parsedValue;
     }
 
     //
@@ -89,6 +90,14 @@ export module Util {
         s.attr("transform", xform.toString());
         return s;
       }
+    }
+
+    export function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
+      if (boxA.right < boxB.left) { return false; }
+      if (boxA.left > boxB.right) { return false; }
+      if (boxA.bottom < boxB.top) { return false; }
+      if (boxA.top > boxB.bottom) { return false; }
+      return true;
     }
   }
 }

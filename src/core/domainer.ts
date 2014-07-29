@@ -33,13 +33,13 @@ module Plottable {
     /**
      * @param {any[][]} extents The list of extents to be reduced to a single
      *        extent.
-     * @param {Abstract.QuantitiveScale} scale
+     * @param {Abstract.QuantitativeScale} scale
      *        Since nice() must do different things depending on Linear, Log,
      *        or Time scale, the scale must be passed in for nice() to work.
      * @return {any[]} The domain, as a merging of all exents, as a [min, max]
      *                 pair.
      */
-    public computeDomain(extents: any[][], scale: Abstract.QuantitiveScale): any[] {
+    public computeDomain(extents: any[][], scale: Abstract.QuantitativeScale): any[] {
       var domain: any[];
       if (this.combineExtents != null) {
         domain = this.combineExtents(extents);
@@ -170,7 +170,7 @@ module Plottable {
       }
     }
 
-    private padDomain(scale: Abstract.QuantitiveScale, domain: any[]): any[] {
+    private padDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
       var min = domain[0];
       var max = domain[1];
       if (min === max && this.padProportion > 0.0) {
@@ -200,7 +200,7 @@ module Plottable {
       return [newMin, newMax];
     }
 
-    private niceDomain(scale: Abstract.QuantitiveScale, domain: any[]): any[] {
+    private niceDomain(scale: Abstract.QuantitativeScale, domain: any[]): any[] {
       if (this.doNice) {
         return scale._niceDomain(domain, this.niceCount);
       } else {

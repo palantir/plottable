@@ -9,6 +9,7 @@
 ///<reference path="globalInitialization.ts" />
 
 ///<reference path="components/baseAxisTests.ts" />
+///<reference path="components/timeAxisTests.ts" />
 ///<reference path="components/numericAxisTests.ts" />
 ///<reference path="components/categoryAxisTests.ts" />
 ///<reference path="components/gridlinesTests.ts" />
@@ -30,6 +31,7 @@
 
 ///<reference path="scales/coordinatorTests.ts" />
 ///<reference path="scales/scaleTests.ts" />
+///<reference path="scales/timeScaleTests.ts" />
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/formatterTests.ts" />

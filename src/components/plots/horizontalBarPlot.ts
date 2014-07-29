@@ -10,10 +10,10 @@ export module Plot {
      *
      * @constructor
      * @param {IDataset} dataset The dataset to render.
-     * @param {QuantitiveScale} xScale The x scale to use.
+     * @param {QuantitativeScale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.QuantitiveScale, yScale: Abstract.Scale) {
+    constructor(dataset: any, xScale: Abstract.QuantitativeScale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
     }
 

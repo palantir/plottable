@@ -314,6 +314,101 @@ describe("BaseAxis", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 
+describe("TimeAxis", function () {
+    it("can not initialize vertical time axis", function () {
+        var scale = new Plottable.Scale.Time();
+        assert.throws(function () {
+            return new Plottable.Axis.Time(scale, "left");
+        }, "unsupported");
+        assert.throws(function () {
+            return new Plottable.Axis.Time(scale, "right");
+        }, "unsupported");
+    });
+
+    it("major and minor intervals arrays are the same length", function () {
+        assert.equal(Plottable.Axis.Time.majorIntervals.length, Plottable.Axis.Time.minorIntervals.length, "major and minor interval arrays must be same size");
+    });
+
+    it("Computing the default ticks doesn't error out for edge cases", function () {
+        var svg = generateSVG(400, 100);
+        var scale = new Plottable.Scale.Time();
+        var axis = new Plottable.Axis.Time(scale, "bottom");
+        scale.range([0, 400]);
+
+        // very large time span
+        assert.doesNotThrow(function () {
+            return scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(50000, 0, 1, 0, 0, 0, 0)]);
+        });
+        axis.renderTo(svg);
+
+        // very small time span
+        assert.doesNotThrow(function () {
+            return scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(0, 0, 1, 0, 0, 0, 100)]);
+        });
+        axis.renderTo(svg);
+
+        svg.remove();
+    });
+
+    it("Tick labels don't overlap", function () {
+        var svg = generateSVG(400, 100);
+        var scale = new Plottable.Scale.Time();
+        scale.range([0, 400]);
+        var axis = new Plottable.Axis.Time(scale, "bottom");
+
+        function checkDomain(domain) {
+            scale.domain(domain);
+            axis.renderTo(svg);
+
+            function checkLabelsForContainer(container) {
+                var visibleTickLabels = container.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                var numLabels = visibleTickLabels[0].length;
+                var box1;
+                var box2;
+                for (var i = 0; i < numLabels; i++) {
+                    for (var j = i + 1; j < numLabels; j++) {
+                        box1 = visibleTickLabels[0][i].getBoundingClientRect();
+                        box2 = visibleTickLabels[0][j].getBoundingClientRect();
+
+                        assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+                    }
+                }
+            }
+
+            checkLabelsForContainer(axis._minorTickLabels);
+            checkLabelsForContainer(axis._majorTickLabels);
+        }
+
+        // 100 year span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
+
+        // 1 year span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
+
+        // 1 month span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
+
+        // 1 day span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
+
+        // 1 hour span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
+
+        // 1 minute span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
+
+        // 1 second span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]);
+
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+
 describe("NumericAxis", function () {
     it("tickLabelPosition() input validation", function () {
         var scale = new Plottable.Scale.Linear();
@@ -492,21 +587,6 @@ describe("NumericAxis", function () {
         numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
         numericAxis.renderTo(svg);
 
-        function boxesOverlap(boxA, boxB) {
-            if (boxA.right < boxB.left) {
-                return false;
-            }
-            if (boxA.left > boxB.right) {
-                return false;
-            }
-            if (boxA.bottom < boxB.top) {
-                return false;
-            }
-            if (boxA.top > boxB.bottom) {
-                return false;
-            }
-            return true;
-        }
         var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
@@ -518,7 +598,7 @@ describe("NumericAxis", function () {
                 box1 = visibleTickLabels[0][i].getBoundingClientRect();
                 box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-                assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+                assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
             }
         }
 
@@ -532,7 +612,7 @@ describe("NumericAxis", function () {
                 box1 = visibleTickLabels[0][i].getBoundingClientRect();
                 box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-                assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+                assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
             }
         }
 
@@ -3620,7 +3700,7 @@ describe("Scales", function () {
         });
     });
 
-    describe("Quantitive Scales", function () {
+    describe("Quantitative Scales", function () {
         it("autorange defaults to [0, 1] if no perspectives set", function () {
             var scale = new Plottable.Scale.Linear();
             scale.autoDomain();
@@ -3919,6 +3999,66 @@ describe("Scales", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 
+describe("TimeScale tests", function () {
+    it("parses reasonable formats for dates", function () {
+        var scale = new Plottable.Scale.Time();
+        var firstDate = new Date(2014, 9, 1, 0, 0, 0, 0).valueOf();
+        var secondDate = new Date(2014, 10, 1, 0, 0, 0).valueOf();
+
+        function checkDomain(domain) {
+            scale.domain(domain);
+            var time1 = scale.domain()[0].valueOf();
+            assert.equal(time1, firstDate, "first value of domain set correctly");
+            var time2 = scale.domain()[1].valueOf();
+            assert.equal(time2, secondDate, "first value of domain set correctly");
+        }
+        checkDomain(["10/1/2014", "11/1/2014"]);
+        checkDomain(["October 1, 2014", "November 1, 2014"]);
+        checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
+    });
+
+    it("tickInterval produces correct number of ticks", function () {
+        var scale = new Plottable.Scale.Time();
+
+        // 100 year span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
+        var ticks = scale.tickInterval(d3.time.year);
+        assert.equal(ticks.length, 101, "generated correct number of ticks");
+
+        // 1 year span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.month);
+        assert.equal(ticks.length, 12, "generated correct number of ticks");
+        ticks = scale.tickInterval(d3.time.month, 3);
+        assert.equal(ticks.length, 4, "generated correct number of ticks");
+
+        // 1 month span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.day);
+        assert.equal(ticks.length, 32, "generated correct number of ticks");
+
+        // 1 day span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.hour);
+        assert.equal(ticks.length, 24, "generated correct number of ticks");
+
+        // 1 hour span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.minute);
+        assert.equal(ticks.length, 61, "generated correct number of ticks");
+        ticks = scale.tickInterval(d3.time.minute, 10);
+        assert.equal(ticks.length, 7, "generated correct number of ticks");
+
+        // 1 minute span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.second);
+        assert.equal(ticks.length, 61, "generated correct number of ticks");
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+
 describe("Util.DOM", function () {
     it("getBBox works properly", function () {
         var svg = generateSVG();
@@ -4109,6 +4249,28 @@ describe("Formatters", function () {
             var percentFormatter = new Plottable.Formatter.Percentage();
             var result = percentFormatter.format(1);
             assert.strictEqual(result, "100%", "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
+        });
+    });
+
+    describe("time", function () {
+        it("uses reasonable defaults", function () {
+            var timeFormatter = new Plottable.Formatter.Time();
+
+            // year, month, day, hours, minutes, seconds, milliseconds
+            var result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 0));
+            assert.strictEqual(result, "2000", "only the year was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 0, 0, 0, 0));
+            assert.strictEqual(result, "Mar", "only the month was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 2, 0, 0, 0, 0));
+            assert.strictEqual(result, "Thu 02", "month and date displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 0, 0, 0));
+            assert.strictEqual(result, "08 PM", "only hour was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 0, 0));
+            assert.strictEqual(result, "08:34", "hour and minute was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 53, 0));
+            assert.strictEqual(result, ":53", "seconds was displayed");
+            result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 950));
+            assert.strictEqual(result, ".950", "milliseconds was displayed");
         });
     });
 
