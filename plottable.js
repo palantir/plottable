@@ -1,5 +1,5 @@
 /*!
-Plottable 0.23.0 (https://github.com/palantir/plottable)
+Plottable 0.23.2 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1539,7 +1539,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.23.0";
+    Plottable.version = "0.23.2";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1695,9 +1695,6 @@ var Plottable;
 
         DataSource.prototype.computeExtent = function (accessor) {
             var mappedData = this._data.map(accessor);
-            if (mappedData.indexOf(null) >= 0 || mappedData.indexOf(undefined) >= 0) {
-                Plottable.Util.Methods.warn("Data has contains null or undefined elements. This could mean data was not parsed correctly");
-            }
             if (mappedData.length === 0) {
                 return [];
             } else if (typeof (mappedData[0]) === "string") {
@@ -5789,12 +5786,12 @@ var Plottable;
                 var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
                 var textHeight = this.measureTextHeight();
                 var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
-                var r = textHeight - Legend.MARGIN * 2 - 2;
+                var r = textHeight / 2 - Legend.MARGIN;
                 var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) {
                     return d;
                 });
                 var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                legendEnter.append("circle").attr("cx", Legend.MARGIN + r / 2).attr("cy", Legend.MARGIN + r / 2).attr("r", r);
+                legendEnter.append("circle").attr("cx", Legend.MARGIN + r).attr("cy", Legend.MARGIN + r).attr("r", r);
                 legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
                 legend.exit().remove();
                 legend.attr("transform", function (d) {
