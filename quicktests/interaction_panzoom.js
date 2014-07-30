@@ -10,7 +10,6 @@ function run(div, data, Plottable) {
 
   var yScale = new Plottable.Scale.Linear();
   var yAxis = new Plottable.Axis.Numeric(yScale, "left").tickLabelPosition("bottom");
-  yAxis.formatter().format(d3.format("g"));
 
   var renderAreaD1 = new Plottable.Plot.Scatter(data[0].slice(0, 21), xScale, yScale);
   var gridlines = new Plottable.Component.Gridlines(xScale, yScale);

@@ -1,14 +1,72 @@
 [
-  {"name":"animate_area", "categories":["area", "animate"]},
-  {"name":"animate_horizontalBar", "categories":["horizontalbar", "animate"]},
-  {"name":"animate_scatter", "categories":["scatter", "animate"]},
-  {"name":"animate_line", "categories":["animate", "line"]},
-  {"name":"animate_verticalBar", "categories":["verticalbar", "animate"]},
-  {"name":"interaction_dragzoomx", "categories":["area", "interaction", "gridlines"]},
-  {"name":"interaction_panzoom", "categories":["scatter", "gridlines", "interaction"]},
-  {"name":"legend_basic", "categories":["layout", "legend", "scatter", "line", "title"]},
-  {"name":"scale_interactive", "categories":["scale", "interaction", "scatter", "gridlines"]},
-  {"name":"scale_date", "categories":["scale", "date", "line"]},
-  {"name":"basic_area", "categories":["area", "basic", "gridlines"]},
-  {"name":"cat-axis_verticalBar", "categories":["verticalbar", "cat-axis", "animate"]}
+  {
+    "name":"animate_area",
+    "categories":["LinearScale", "NumericAxis", "Area", "Project", "Animate", "Click"]
+  },  {
+    "name":"animate_horizontalBar",
+    "categories":["LinearScale", "NumericAxis", "HorizBar", "Project", "Animate", "Click"]
+  },  {
+    "name":"animate_line",
+    "categories":["LinearScale", "NumericAxis", "Line", "Project", "Animate", "Click"]
+  },  {
+    "name":"animate_scatter",
+    "categories":["LinearScale", "NumericAxis", "Scatter", "Project", "Animate", "Click"]
+  },  {
+      "name":"animate_verticalBar",
+      "categories":["LinearScale", "NumericAxis", "VertBar", "Project", "Animate", "Click"]
+  },  {
+    "name":"basic_allPlots",
+    "categories":["LinearScale", "NumericAxis", "Area", "Scatter", "VertBar", "HorizBar", "Line", "Table", "Layout"]
+  },  {
+    "name":"basic_area",
+    "categories":["Accessor", "Data", "LinearScale", "NumericAxis", "Project", "Area", "Gridlines", "Group", "Merge", "StandardChart"]
+  },  {
+    "name":"basic_moveToFront",
+    "categories":["Accessor", "Datasource", "LinearScale", "NumericAxis", "Project", "Area", "Scatter", "Line", "Group", "Merge", "Click"]
+  },  {
+    "name":"category_horizontalBar",
+    "categories":["Data", "Datasource", "OrdinalScale", "CategoryAxis", "LinearScale", "NumericAxis", "HorizBar", "Project", "Animate"]
+  },  {
+    "name":"category_project",
+    "categories":["Data", "Datasource", "OrdinalScale", "CategoryAxis", "LinearScale", "NumericAxis", "VertBar", "Project", "Animate", "Title", "Label"]
+  },  {
+    "name":"category_verticalBar",
+    "categories":["Data", "Datasource", "OrdinalScale", "CategoryAxis", "LinearScale", "NumericAxis", "VertBar", "Project", "Animate"]
+  },  {
+    "name":"changeData_onClick",
+    "categories":["Data", "Datasource", "LinearScale", "NumericAxis", "VertBar", "Scatter", "Animate", "Merge", "Click"]
+  },  {
+    "name":"formatter",
+    "categories":["LinearScale", "NumericAxis", "Line", "Formatter", "Click", "Layout", "Data"]
+  },  {
+    "name":"interaction_dragzoomx",
+    "categories":["Data", "LinearScale", "NumericAxis", "Accessor", "Project", "Area", "Gridlines", "Merge", "Group"]
+  },  {
+    "name":"interaction_panzoom",
+    "categories":["LinearScale", "NumericAxis", "Scatter", "Gridlines", "Merge", "PanZoom"]
+  },  {
+    "name":"layout_tables",
+    "categories":["LinearScale", "NumericAxis", "Line", "Area", "Layout", "Label", "Table", "Project"]
+  },  {
+    "name":"legend_basic",
+    "categories":["Legend", "Title", "Gridlines", "ColorScale", "Scatter", "Line", "NumericAxis", "Metadata", "Project", "Merge", "LinearScale"]
+  },  {
+    "name":"no_data",
+    "categories":[ "LinearScale", "NumericAxis", "Area", "Scatter", "VertBar", "HorizBar", "Line", "Table", "Layout"]
+  },  {
+    "name":"no_renderer",
+    "categories":[ "LinearScale", "NumericAxis", "Area", "Scatter", "VertBar", "HorizBar", "Line", "Table", "Layout"]
+  }, {
+    "name":"project_scatter",
+    "categories":["LinearScale", "NumericAxis", "Project", "Accessor", "Scatter", "Title"]
+  },  {
+    "name":"scale_date",
+    "categories":["Data", "TimeScale", "LinearScale", "NumericAxis", "Project", "Accessor", "Line"]
+  },  {
+    "name":"scale_interactive",
+    "categories":["LinearScale", "NumericAxis", "Scatter", "Gridlines", "Merge", "Table", "Layout", "PanZoom"]
+  },  {
+    "name":"select_zoom",
+    "categories":["LinearScale", "NumericAxis", "Scatter", "Merge", "Title", "Legend", "XYDragBox"]
+  }
 ]

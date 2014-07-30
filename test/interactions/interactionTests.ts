@@ -3,8 +3,8 @@
 var assert = chai.assert;
 
 
-function makeFakeEvent(x: number, y: number): D3.Event {
-  return {
+function makeFakeEvent(x: number, y: number): D3.D3Event {
+  return <D3.D3Event> <any> {
       dx: 0,
       dy: 0,
       clientX: x,
@@ -83,8 +83,8 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.DataSource;
-    var xScale: Plottable.Abstract.QuantitiveScale;
-    var yScale: Plottable.Abstract.QuantitiveScale;
+    var xScale: Plottable.Abstract.QuantitativeScale;
+    var yScale: Plottable.Abstract.QuantitativeScale;
     var renderer: Plottable.Abstract.XYPlot;
     var interaction: Plottable.Interaction.XYDragBox;
 
@@ -162,8 +162,8 @@ describe("Interactions", () => {
     var svgHeight = 400;
     var svg: D3.Selection;
     var dataset: Plottable.DataSource;
-    var xScale: Plottable.Abstract.QuantitiveScale;
-    var yScale: Plottable.Abstract.QuantitiveScale;
+    var xScale: Plottable.Abstract.QuantitativeScale;
+    var yScale: Plottable.Abstract.QuantitativeScale;
     var renderer: Plottable.Abstract.XYPlot;
     var interaction: Plottable.Interaction.XYDragBox;
 

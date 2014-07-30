@@ -34,9 +34,10 @@
 /// <reference path="core/interfaces.ts" />
 /// <reference path="core/domainer.ts" />
 
-/// <reference path="scales/quantitiveScale.ts" />
+/// <reference path="scales/quantitativeScale.ts" />
 /// <reference path="scales/linearScale.ts" />
 /// <reference path="scales/logScale.ts" />
+/// <reference path="scales/modifiedLogScale.ts" />
 /// <reference path="scales/ordinalScale.ts" />
 /// <reference path="scales/colorScale.ts" />
 /// <reference path="scales/timeScale.ts" />
@@ -44,6 +45,7 @@
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
 /// <reference path="components/baseAxis.ts" />
+/// <reference path="components/timeAxis.ts" />
 /// <reference path="components/numericAxis.ts" />
 /// <reference path="components/categoryAxis.ts" />
 /// <reference path="components/label.ts" />

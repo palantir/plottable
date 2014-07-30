@@ -148,7 +148,7 @@ export module Component {
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Util.Text.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
-      var desiredWidth = maxWidth + textHeight + Legend.MARGIN;
+      var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
       return {
         width : Math.min(desiredWidth, offeredWidth),
         height: rowsICanFit * textHeight,
@@ -161,6 +161,10 @@ export module Component {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var textHeight = Util.Text.getTextHeight(fakeLegendEl.append("text"));
+      // HACKHACK
+      if (textHeight === 0) {
+        textHeight = 1;
+      }
       fakeLegendEl.remove();
       return textHeight;
     }
@@ -170,13 +174,13 @@ export module Component {
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
       var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
-      var r = textHeight - Legend.MARGIN * 2 - 2;
+      var r = textHeight / 2 - Legend.MARGIN;
       var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true);
       legendEnter.append("circle")
-          .attr("cx", Legend.MARGIN + r/2)
-          .attr("cy", Legend.MARGIN + r/2)
+          .attr("cx", Legend.MARGIN + r)
+          .attr("cy", Legend.MARGIN + r)
           .attr("r",  r);
       legendEnter.append("text")
           .attr("x", textHeight)

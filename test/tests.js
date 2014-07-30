@@ -111,72 +111,6 @@ before(function () {
     window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
 
-var PerfDiagnostics;
-(function (_PerfDiagnostics) {
-    var PerfDiagnostics = (function () {
-        function PerfDiagnostics() {
-            this.total = 0;
-            this.numCalls = 0;
-            this.start = null;
-        }
-        PerfDiagnostics.toggle = function (measurementName) {
-            var diagnostic;
-            ;
-            if (PerfDiagnostics.diagnostics[measurementName] != null) {
-                diagnostic = PerfDiagnostics.diagnostics[measurementName];
-            } else {
-                diagnostic = new PerfDiagnostics();
-                PerfDiagnostics.diagnostics[measurementName] = diagnostic;
-            }
-            diagnostic.toggle();
-        };
-
-        PerfDiagnostics.getTime = function () {
-            if (false && performance.now) {
-                return performance.now();
-            } else {
-                return Date.now();
-            }
-        };
-
-        PerfDiagnostics.logResults = function () {
-            var grandTotal = PerfDiagnostics.diagnostics["total"] ? PerfDiagnostics.diagnostics["total"].total : null;
-            var measurementNames = Object.keys(PerfDiagnostics.diagnostics);
-            measurementNames.forEach(function (measurementName) {
-                var result = PerfDiagnostics.diagnostics[measurementName].total;
-                console.log(measurementName);
-                console.group();
-                console.log("Time:", result);
-                (grandTotal && measurementName !== "total") ? console.log("%   :", Math.round(result / grandTotal * 10000) / 100) : null;
-                console.groupEnd();
-            });
-        };
-
-        PerfDiagnostics.prototype.toggle = function () {
-            if (this.start == null) {
-                this.start = PerfDiagnostics.getTime();
-            } else {
-                this.total += PerfDiagnostics.getTime() - this.start;
-                this.numCalls++;
-                this.start = null;
-            }
-        };
-        PerfDiagnostics.diagnostics = {};
-        return PerfDiagnostics;
-    })();
-    function toggle(measurementName) {
-        return PerfDiagnostics.toggle(measurementName);
-    }
-    _PerfDiagnostics.toggle = toggle;
-    ;
-    function logResults() {
-        return PerfDiagnostics.logResults();
-    }
-    _PerfDiagnostics.logResults = logResults;
-    ;
-})(PerfDiagnostics || (PerfDiagnostics = {}));
-window.report = PerfDiagnostics.logResults;
-
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 
@@ -357,6 +291,101 @@ describe("BaseAxis", function () {
         assert.throws(function () {
             return baseAxis.tickLength(-1);
         }, "must be positive");
+
+        svg.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+
+describe("TimeAxis", function () {
+    it("can not initialize vertical time axis", function () {
+        var scale = new Plottable.Scale.Time();
+        assert.throws(function () {
+            return new Plottable.Axis.Time(scale, "left");
+        }, "unsupported");
+        assert.throws(function () {
+            return new Plottable.Axis.Time(scale, "right");
+        }, "unsupported");
+    });
+
+    it("major and minor intervals arrays are the same length", function () {
+        assert.equal(Plottable.Axis.Time.majorIntervals.length, Plottable.Axis.Time.minorIntervals.length, "major and minor interval arrays must be same size");
+    });
+
+    it("Computing the default ticks doesn't error out for edge cases", function () {
+        var svg = generateSVG(400, 100);
+        var scale = new Plottable.Scale.Time();
+        var axis = new Plottable.Axis.Time(scale, "bottom");
+        scale.range([0, 400]);
+
+        // very large time span
+        assert.doesNotThrow(function () {
+            return scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(50000, 0, 1, 0, 0, 0, 0)]);
+        });
+        axis.renderTo(svg);
+
+        // very small time span
+        assert.doesNotThrow(function () {
+            return scale.domain([new Date(0, 0, 1, 0, 0, 0, 0), new Date(0, 0, 1, 0, 0, 0, 100)]);
+        });
+        axis.renderTo(svg);
+
+        svg.remove();
+    });
+
+    it("Tick labels don't overlap", function () {
+        var svg = generateSVG(400, 100);
+        var scale = new Plottable.Scale.Time();
+        scale.range([0, 400]);
+        var axis = new Plottable.Axis.Time(scale, "bottom");
+
+        function checkDomain(domain) {
+            scale.domain(domain);
+            axis.renderTo(svg);
+
+            function checkLabelsForContainer(container) {
+                var visibleTickLabels = container.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+                    return d3.select(this).style("visibility") === "visible";
+                });
+                var numLabels = visibleTickLabels[0].length;
+                var box1;
+                var box2;
+                for (var i = 0; i < numLabels; i++) {
+                    for (var j = i + 1; j < numLabels; j++) {
+                        box1 = visibleTickLabels[0][i].getBoundingClientRect();
+                        box2 = visibleTickLabels[0][j].getBoundingClientRect();
+
+                        assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+                    }
+                }
+            }
+
+            checkLabelsForContainer(axis._minorTickLabels);
+            checkLabelsForContainer(axis._majorTickLabels);
+        }
+
+        // 100 year span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
+
+        // 1 year span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
+
+        // 1 month span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
+
+        // 1 day span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
+
+        // 1 hour span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
+
+        // 1 minute span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
+
+        // 1 second span
+        checkDomain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]);
 
         svg.remove();
     });
@@ -587,7 +616,7 @@ describe("NumericAxis", function () {
                 box1 = visibleTickLabels[0][i].getBoundingClientRect();
                 box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-                assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+                assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
             }
         }
 
@@ -601,7 +630,7 @@ describe("NumericAxis", function () {
                 box1 = visibleTickLabels[0][i].getBoundingClientRect();
                 box2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-                assert.isFalse(boxesOverlap(box1, box2), "tick labels don't overlap");
+                assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
             }
         }
 
@@ -1434,8 +1463,12 @@ describe("Plots", function () {
             var yScaleCalls = 0;
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
+            var metadataProjector = function (d, i, m) {
+                return m.cssClass;
+            };
             r.project("x", "x", xScale);
             r.project("y", "y", yScale);
+            r.project("meta", metadataProjector);
             xScale.broadcaster.registerListener(null, function (listenable) {
                 assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
@@ -1452,6 +1485,9 @@ describe("Plots", function () {
             assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
             assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
+            var metaProjector = r._generateAttrToProjector()["meta"];
+            assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
+
             var d2 = new Plottable.DataSource([{ x: 7, y: 8 }], { cssClass: "boo" });
             r.dataSource(d2);
             assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
@@ -1464,6 +1500,9 @@ describe("Plots", function () {
             d2.broadcaster.broadcast();
             assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
             assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
+
+            metaProjector = r._generateAttrToProjector()["meta"];
+            assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
         });
 
         it("Plot automatically generates a DataSource if only data is provided", function () {
@@ -1531,6 +1570,11 @@ describe("Plots", function () {
         var renderArea;
         var verifier;
 
+        // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
+        var normalizePath = function (s) {
+            return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+        };
+
         before(function () {
             svg = generateSVG(500, 500);
             verifier = new MultiTestVerifier();
@@ -1563,13 +1607,13 @@ describe("Plots", function () {
 
         it("draws area and line correctly", function () {
             var areaPath = renderArea.select(".area");
-            assert.strictEqual(areaPath.attr("d"), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+            assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
             assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
             var areaComputedStyle = window.getComputedStyle(areaPath.node());
             assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
 
             var linePath = renderArea.select(".line");
-            assert.strictEqual(linePath.attr("d"), "M0,500L500,0", "line d was set correctly");
+            assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
             assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
             var lineComputedStyle = window.getComputedStyle(linePath.node());
             assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
@@ -1601,7 +1645,7 @@ describe("Plots", function () {
             areaPlot.renderTo(svg);
             renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
-            assert.equal(areaPath.attr("d"), "M0,500L500,0L500,250L0,500Z");
+            assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             verifier.end();
         });
 
@@ -1814,7 +1858,7 @@ describe("Plots", function () {
                 dataset = new Plottable.DataSource(data);
 
                 renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
-                renderer._animate = false;
+                renderer.animate(false);
                 renderer.renderTo(svg);
             });
 
@@ -1932,7 +1976,7 @@ describe("Plots", function () {
 
                 renderer = new Plottable.Plot.HorizontalBar(dataset, xScale, yScale);
                 renderer.baseline(0);
-                renderer._animate = false;
+                renderer.animate(false);
                 var yAxis = new Plottable.Axis.Category(yScale, "left");
                 var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
                 axisWidth = yAxis.availableWidth;
@@ -1956,12 +2000,12 @@ describe("Plots", function () {
                 var bar1y = bar1.data()[0].y;
                 assert.closeTo(numAttr(bar0, "height"), 104, 2);
                 assert.closeTo(numAttr(bar1, "height"), 104, 2);
-                assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "width is correct for bar0");
-                assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "width is correct for bar1");
+                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
+                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
 
                 // check that bar is aligned on the center of the scale
-                assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "y pos correct for bar0");
-                assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "y pos correct for bar1");
+                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "y pos correct for bar0");
+                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "y pos correct for bar1");
                 verifier.end();
             });
 
@@ -1972,12 +2016,12 @@ describe("Plots", function () {
                 var bar0y = bar0.data()[0].y;
                 var bar1y = bar1.data()[0].y;
                 renderer.project("width", 10);
-                assert.equal(numAttr(bar0, "height"), 10, "bar0 height");
-                assert.equal(numAttr(bar1, "height"), 10, "bar1 height");
-                assert.equal(numAttr(bar0, "width"), (600 - axisWidth) / 2, "bar0 width");
-                assert.equal(numAttr(bar1, "width"), 600 - axisWidth, "bar1 width");
-                assert.equal(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, "bar0 ypos");
-                assert.equal(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, "bar1 ypos");
+                assert.closeTo(numAttr(bar0, "height"), 10, 0.01, "bar0 height");
+                assert.closeTo(numAttr(bar1, "height"), 10, 0.01, "bar1 height");
+                assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "bar0 width");
+                assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "bar1 width");
+                assert.closeTo(numAttr(bar0, "y") + numAttr(bar0, "height") / 2, yScale.scale(bar0y) + bandWidth / 2, 0.01, "bar0 ypos");
+                assert.closeTo(numAttr(bar1, "y") + numAttr(bar1, "height") / 2, yScale.scale(bar1y) + bandWidth / 2, 0.01, "bar1 ypos");
                 verifier.end();
             });
         });
@@ -2176,8 +2220,8 @@ describe("Plots", function () {
                     var y = +selection.attr("cy") * scale[1] + translate[1] + elementTranslate[1];
                     if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
                         circlesInArea++;
-                        assert.equal(x, xScale.scale(datum.x), "the scaled/translated x is correct");
-                        assert.equal(y, yScale.scale(datum.y), "the scaled/translated y is correct");
+                        assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
+                        assert.closeTo(y, yScale.scale(datum.y), 0.01, "the scaled/translated y is correct");
                         assert.equal(selection.attr("fill"), colorAccessor(datum, index, null), "fill is correct");
                     }
                     ;
@@ -3032,20 +3076,24 @@ describe("DataSource", function () {
         var data = [1, 2, 3, 4, 1];
         var metadata = { foo: 11 };
         var dataSource = new Plottable.DataSource(data, metadata);
+        var plot = new Plottable.Abstract.Plot(dataSource);
+        var apply = function (a) {
+            return Plottable.Util.Methods._applyAccessor(a, plot);
+        };
         var a1 = function (d, i, m) {
             return d + i - 2;
         };
-        assert.deepEqual(dataSource._getExtent(a1), [-1, 5], "extent for numerical data works properly");
+        assert.deepEqual(dataSource._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) {
             return d + m.foo;
         };
-        assert.deepEqual(dataSource._getExtent(a2), [12, 15], "extent uses metadata appropriately");
+        assert.deepEqual(dataSource._getExtent(apply(a2)), [12, 15], "extent uses metadata appropriately");
         dataSource.metadata({ foo: -1 });
-        assert.deepEqual(dataSource._getExtent(a2), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataSource._getExtent(apply(a2)), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) {
             return "_" + d;
         };
-        assert.deepEqual(dataSource._getExtent(a3), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        assert.deepEqual(dataSource._getExtent(apply(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
     });
 });
 
@@ -3742,7 +3790,7 @@ describe("Scales", function () {
         });
     });
 
-    describe("Quantitive Scales", function () {
+    describe("Quantitative Scales", function () {
         it("autorange defaults to [0, 1] if no perspectives set", function () {
             var scale = new Plottable.Scale.Linear();
             scale.autoDomain();
@@ -3925,6 +3973,176 @@ describe("Scales", function () {
             scale.autoDomain();
             assert.equal(scale.domain(), startDomain);
         });
+    });
+    describe("Modified Log Scale", function () {
+        var scale;
+        var base = 10;
+        var epsilon = 0.00001;
+        beforeEach(function () {
+            scale = new Plottable.Scale.ModifiedLog(base);
+        });
+
+        it("is an increasing, continuous function that can go negative", function () {
+            d3.range(-base * 2, base * 2, base / 20).forEach(function (x) {
+                // increasing
+                assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
+                assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
+
+                // continuous
+                assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
+                assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
+            });
+            assert.closeTo(scale.scale(0), 0, epsilon);
+        });
+
+        it("is close to log() for large values", function () {
+            [10, 100, 23103.4, 5].forEach(function (x) {
+                assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
+            });
+        });
+
+        it("x = invert(scale(x))", function () {
+            [0, 1, base, 100, 0.001, -1, -0.3, -base, base - 0.001].forEach(function (x) {
+                assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
+                assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
+            });
+        });
+
+        it("domain defaults to [0, 1]", function () {
+            scale = new Plottable.Scale.ModifiedLog(base);
+            assert.deepEqual(scale.domain(), [0, 1]);
+        });
+
+        it("works with a domainer", function () {
+            scale.updateExtent(1, "x", [0, base * 2]);
+            var domain = scale.domain();
+            scale.domainer(new Plottable.Domainer().pad(0.1));
+            assert.operator(scale.domain()[0], "<", domain[0]);
+            assert.operator(domain[1], "<", scale.domain()[1]);
+
+            scale.domainer(new Plottable.Domainer().nice());
+            assert.operator(scale.domain()[0], "<=", domain[0]);
+            assert.operator(domain[1], "<=", scale.domain()[1]);
+
+            scale = new Plottable.Scale.ModifiedLog(base);
+            scale.domainer(new Plottable.Domainer());
+            assert.deepEqual(scale.domain(), [0, 1]);
+        });
+
+        it("gives reasonable values for ticks()", function () {
+            scale.updateExtent(1, "x", [0, base / 2]);
+            var ticks = scale.ticks();
+            assert.operator(ticks.length, ">", 0);
+
+            scale.updateExtent(1, "x", [-base * 2, base * 2]);
+            ticks = scale.ticks();
+            var beforePivot = ticks.filter(function (x) {
+                return x <= -base;
+            });
+            var afterPivot = ticks.filter(function (x) {
+                return base <= x;
+            });
+            var betweenPivots = ticks.filter(function (x) {
+                return -base < x && x < base;
+            });
+            assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
+            assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
+            assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+        });
+
+        it("works on inverted domain", function () {
+            scale.updateExtent(1, "x", [200, -100]);
+            var range = scale.range();
+            assert.closeTo(scale.scale(-100), range[1], epsilon);
+            assert.closeTo(scale.scale(200), range[0], epsilon);
+            var a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
+            var b = a.map(function (x) {
+                return scale.scale(x);
+            });
+
+            // should be decreasing function; reverse is sorted
+            assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) {
+                return x - y;
+            }));
+
+            var ticks = scale.ticks();
+            assert.deepEqual(ticks, ticks.slice().sort(function (x, y) {
+                return x - y;
+            }), "ticks should be sorted");
+            assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+            var beforePivot = ticks.filter(function (x) {
+                return x <= -base;
+            });
+            var afterPivot = ticks.filter(function (x) {
+                return base <= x;
+            });
+            var betweenPivots = ticks.filter(function (x) {
+                return -base < x && x < base;
+            });
+            assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
+            assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
+            assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+
+describe("TimeScale tests", function () {
+    it("parses reasonable formats for dates", function () {
+        var scale = new Plottable.Scale.Time();
+        var firstDate = new Date(2014, 9, 1, 0, 0, 0, 0).valueOf();
+        var secondDate = new Date(2014, 10, 1, 0, 0, 0).valueOf();
+
+        function checkDomain(domain) {
+            scale.domain(domain);
+            var time1 = scale.domain()[0].valueOf();
+            assert.equal(time1, firstDate, "first value of domain set correctly");
+            var time2 = scale.domain()[1].valueOf();
+            assert.equal(time2, secondDate, "first value of domain set correctly");
+        }
+        checkDomain(["10/1/2014", "11/1/2014"]);
+        checkDomain(["October 1, 2014", "November 1, 2014"]);
+        checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
+    });
+
+    it("tickInterval produces correct number of ticks", function () {
+        var scale = new Plottable.Scale.Time();
+
+        // 100 year span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
+        var ticks = scale.tickInterval(d3.time.year);
+        assert.equal(ticks.length, 101, "generated correct number of ticks");
+
+        // 1 year span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.month);
+        assert.equal(ticks.length, 12, "generated correct number of ticks");
+        ticks = scale.tickInterval(d3.time.month, 3);
+        assert.equal(ticks.length, 4, "generated correct number of ticks");
+
+        // 1 month span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.day);
+        assert.equal(ticks.length, 32, "generated correct number of ticks");
+
+        // 1 day span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.hour);
+        assert.equal(ticks.length, 24, "generated correct number of ticks");
+
+        // 1 hour span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.minute);
+        assert.equal(ticks.length, 61, "generated correct number of ticks");
+        ticks = scale.tickInterval(d3.time.minute, 10);
+        assert.equal(ticks.length, 7, "generated correct number of ticks");
+
+        // 1 minute span
+        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
+        ticks = scale.tickInterval(d3.time.second);
+        assert.equal(ticks.length, 61, "generated correct number of ticks");
     });
 });
 
@@ -4121,6 +4339,28 @@ describe("Formatters", function () {
             var percentFormatter = new Plottable.Formatter.Percentage();
             var result = percentFormatter.format(1);
             assert.strictEqual(result, "100%", "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
+        });
+    });
+
+    describe("time", function () {
+        it("uses reasonable defaults", function () {
+            var timeFormatter = new Plottable.Formatter.Time();
+
+            // year, month, day, hours, minutes, seconds, milliseconds
+            var result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 0));
+            assert.strictEqual(result, "2000", "only the year was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 0, 0, 0, 0));
+            assert.strictEqual(result, "Mar", "only the month was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 2, 0, 0, 0, 0));
+            assert.strictEqual(result, "Thu 02", "month and date displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 0, 0, 0));
+            assert.strictEqual(result, "08 PM", "only hour was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 0, 0));
+            assert.strictEqual(result, "08:34", "hour and minute was displayed");
+            result = timeFormatter.format(new Date(2000, 2, 1, 20, 34, 53, 0));
+            assert.strictEqual(result, ":53", "seconds was displayed");
+            result = timeFormatter.format(new Date(2000, 0, 1, 0, 0, 0, 950));
+            assert.strictEqual(result, ".950", "milliseconds was displayed");
         });
     });
 
@@ -4643,19 +4883,19 @@ describe("Util.s", function () {
         var f = function (d, i, m) {
             return d + i;
         };
-        var a1 = Plottable.Util.Methods.accessorize(f);
+        var a1 = Plottable.Util.Methods._accessorize(f);
         assert.equal(f, a1, "function passes through accessorize unchanged");
 
-        var a2 = Plottable.Util.Methods.accessorize("key");
+        var a2 = Plottable.Util.Methods._accessorize("key");
         assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
 
-        var a3 = Plottable.Util.Methods.accessorize("#aaaa");
+        var a3 = Plottable.Util.Methods._accessorize("#aaaa");
         assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
 
-        var a4 = Plottable.Util.Methods.accessorize(33);
+        var a4 = Plottable.Util.Methods._accessorize(33);
         assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
 
-        var a5 = Plottable.Util.Methods.accessorize(datum);
+        var a5 = Plottable.Util.Methods._accessorize(datum);
         assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
     });
 

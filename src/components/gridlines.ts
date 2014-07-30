@@ -3,8 +3,8 @@
 module Plottable {
 export module Component {
   export class Gridlines extends Abstract.Component {
-    private xScale: Abstract.QuantitiveScale;
-    private yScale: Abstract.QuantitiveScale;
+    private xScale: Abstract.QuantitativeScale;
+    private yScale: Abstract.QuantitativeScale;
     private xLinesContainer: D3.Selection;
     private yLinesContainer: D3.Selection;
 
@@ -12,10 +12,10 @@ export module Component {
      * Creates a set of Gridlines.
      * @constructor
      *
-     * @param {QuantitiveScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-     * @param {QuantitiveScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+     * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+     * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
-    constructor(xScale: Abstract.QuantitiveScale, yScale: Abstract.QuantitiveScale) {
+    constructor(xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale) {
       super();
       if (xScale == null && yScale == null) {throw new Error("Gridlines must have at least one scale");}
       this.classed("gridlines", true);
@@ -63,7 +63,8 @@ export module Component {
         xLines.attr("x1", getScaledXValue)
               .attr("y1", 0)
               .attr("x2", getScaledXValue)
-              .attr("y2", this.availableHeight);
+              .attr("y2", this.availableHeight)
+             .classed("zeroline", (t: number) => t === 0);
         xLines.exit().remove();
       }
     }
@@ -77,7 +78,8 @@ export module Component {
         yLines.attr("x1", 0)
               .attr("y1", getScaledYValue)
               .attr("x2", this.availableWidth)
-              .attr("y2", getScaledYValue);
+              .attr("y2", getScaledYValue)
+              .classed("zeroline", (t: number) => t === 0);
         yLines.exit().remove();
       }
     }

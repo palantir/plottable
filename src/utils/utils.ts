@@ -16,6 +16,22 @@ export module Util {
       return (Math.min(a,b) <= x && x <= Math.max(a,b));
     }
 
+    /** Print a warning message to the console, if it is available.
+     *
+     * @param {string} The warnings to print
+     */
+    export function warn(warning: string) {
+      /* tslint:disable:no-console */
+      if ((<any> window).console != null) {
+        if ((<any> window).console.warn != null) {
+          console.warn(warning);
+        } else if ((<any> window).console.log != null) {
+          console.log(warning);
+        }
+      }
+      /* tslint:enable:no-console */
+    }
+
     /**
      * Takes two arrays of numbers and adds them together
      *
@@ -47,7 +63,11 @@ export module Util {
       return set;
     }
 
-    export function accessorize(accessor: any): IAccessor {
+    /**
+     * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
+     * and "activate" it by turning it into a function in (datum, index, metadata)
+     */
+    export function _accessorize(accessor: any): IAccessor {
       if (typeof(accessor) === "function") {
         return (<IAccessor> accessor);
       } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
@@ -57,15 +77,44 @@ export module Util {
       };
     }
 
-    export function applyAccessor(accessor: IAccessor, dataSource: DataSource) {
-      var activatedAccessor = accessorize(accessor);
-      return (d: any, i: number) => activatedAccessor(d, i, dataSource.metadata());
+    /**
+     * Takes two sets and returns the union
+     *
+     * @param{D3.Set} set1 The first set
+     * @param{D3.Set} set2 The second set
+     * @return{D3.Set} A set that contains elements that appear in either set1 or set2
+     */
+     export function union(set1: D3.Set, set2: D3.Set) {
+      var set = d3.set();
+      set1.forEach((v) => set.add(v));
+      set2.forEach((v) => set.add(v));
+      return set;
+     }
+
+    /**
+     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
+     */
+    export function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot) {
+      var activatedAccessor = _accessorize(accessor);
+      return (d: any, i: number) => activatedAccessor(d, i, plot.dataSource().metadata());
     }
 
     export function uniq(strings: string[]): string[] {
       var seen: {[s: string]: boolean} = {};
       strings.forEach((s) => seen[s] = true);
       return d3.keys(seen);
+    }
+
+    export function uniqNumbers(a: number[]): number[] {
+      var seen = d3.set();
+      var result: number[] = [];
+      a.forEach((n) =>  {
+        if (!seen.has(n)) {
+          seen.add(n);
+          result.push(n);
+        }
+      });
+      return result;
     }
 
     /**
@@ -114,7 +163,7 @@ export module Util {
      * @param {any} a Object to check against b for equality.
      * @param {any} b Object to check against a for equality.
      *
-     * @returns {boolean} whether or not two objects share the same keys, and 
+     * @returns {boolean} whether or not two objects share the same keys, and
      *          values associated with those keys. Values will be compared
      *          with ===.
      */

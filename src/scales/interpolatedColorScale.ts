@@ -6,7 +6,7 @@ export module Scale {
     [key: string]: string[];
   };
 
-  export class InterpolatedColor extends Abstract.QuantitiveScale {
+  export class InterpolatedColor extends Abstract.QuantitativeScale {
     private static COLOR_SCALES: ColorGroups = {
       reds : [
         "#FFFFFF", // white
@@ -58,7 +58,7 @@ export module Scale {
      *     values in hex ("#FFFFFF") or keywords ("white").
      * @param {string} scaleType a string representing the underlying scale
      *     type (linear/log/sqrt/pow)
-     * @returns a quantitive d3 scale.
+     * @returns a Quantitative d3 scale.
      */
     private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitiveScale {
       var scale: D3.Scale.QuantitiveScale;
@@ -77,7 +77,7 @@ export module Scale {
           break;
       }
       if (scale == null){
-        throw new Error("unknown quantitive scale type " + scaleType);
+        throw new Error("unknown Quantitative scale type " + scaleType);
       }
       return scale
                   .range([0, 1])
@@ -200,7 +200,7 @@ export module Scale {
     }
 
     public autoDomain() {
-      // unlike other QuantitiveScales, interpolatedColorScale ignores its domainer
+      // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
       var extents = this._getAllExtents();
       if (extents.length > 0) {
         this._setDomain([d3.min(extents, (x) => x[0]), d3.max(extents, (x) => x[1])]);

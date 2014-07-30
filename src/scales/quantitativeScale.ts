@@ -2,18 +2,18 @@
 
 module Plottable {
 export module Abstract {
-  export class QuantitiveScale extends Scale {
+  export class QuantitativeScale extends Scale {
     public _d3Scale: D3.Scale.QuantitiveScale;
-    private lastRequestedTickCount = 10;
+    public _lastRequestedTickCount = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
     private _domainer: Domainer = new Domainer();
 
     /**
-     * Creates a new QuantitiveScale.
+     * Creates a new QuantitativeScale.
      *
      * @constructor
-     * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitiveScale backing the QuantitiveScale.
+     * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitativeScale backing the QuantitativeScale.
      */
     constructor(scale: D3.Scale.QuantitiveScale) {
       super(scale);
@@ -34,16 +34,16 @@ export module Abstract {
     }
 
     /**
-     * Creates a copy of the QuantitiveScale with the same domain and range but without any registered listeners.
+     * Creates a copy of the QuantitativeScale with the same domain and range but without any registered listeners.
      *
-     * @returns {QuantitiveScale} A copy of the calling QuantitiveScale.
+     * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
      */
-    public copy(): QuantitiveScale {
-      return new QuantitiveScale(this._d3Scale.copy());
+    public copy(): QuantitativeScale {
+      return new QuantitativeScale(this._d3Scale.copy());
     }
 
     public domain(): any[];
-    public domain(values: any[]): QuantitiveScale;
+    public domain(values: any[]): QuantitativeScale;
     public domain(values?: any[]): any {
       return super.domain(values); // need to override type sig to enable method chaining :/
     }
@@ -51,20 +51,20 @@ export module Abstract {
     public _setDomain(values: any[]) {
         var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
         if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-            console.log("Warning: QuantitiveScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            Util.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
             return;
         }
         super._setDomain(values);
     }
 
     /**
-     * Sets or gets the QuantitiveScale's output interpolator
+     * Sets or gets the QuantitativeScale's output interpolator
      *
      * @param {D3.Transition.Interpolate} [factory] The output interpolator to use.
-     * @returns {D3.Transition.Interpolate|QuantitiveScale} The current output interpolator, or the calling QuantitiveScale.
+     * @returns {D3.Transition.Interpolate|QuantitativeScale} The current output interpolator, or the calling QuantitativeScale.
      */
     public interpolate(): D3.Transition.Interpolate;
-    public interpolate(factory: D3.Transition.Interpolate): QuantitiveScale;
+    public interpolate(factory: D3.Transition.Interpolate): QuantitativeScale;
     public interpolate(factory?: D3.Transition.Interpolate): any {
       if (factory == null) {
         return this._d3Scale.interpolate();
@@ -74,7 +74,7 @@ export module Abstract {
     }
 
     /**
-     * Sets the range of the QuantitiveScale and sets the interpolator to d3.interpolateRound.
+     * Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.
      *
      * @param {number[]} values The new range value for the range.
      */
@@ -84,18 +84,18 @@ export module Abstract {
     }
 
     /**
-     * Gets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+     * Gets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
      *
      * @returns {boolean} The current clamp status.
      */
     public clamp(): boolean;
     /**
-     * Sets the clamp status of the QuantitiveScale (whether to cut off values outside the ouput range).
+     * Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).
      *
-     * @param {boolean} clamp Whether or not to clamp the QuantitiveScale.
-     * @returns {QuantitiveScale} The calling QuantitiveScale.
+     * @param {boolean} clamp Whether or not to clamp the QuantitativeScale.
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
-    public clamp(clamp: boolean): QuantitiveScale;
+    public clamp(clamp: boolean): QuantitativeScale;
     public clamp(clamp?: boolean): any {
       if (clamp == null) {
         return this._d3Scale.clamp();
@@ -112,9 +112,9 @@ export module Abstract {
      */
     public ticks(count?: number) {
       if (count != null) {
-        this.lastRequestedTickCount = count;
+        this._lastRequestedTickCount = count;
       }
-      return this._d3Scale.ticks(this.lastRequestedTickCount);
+      return this._d3Scale.ticks(this._lastRequestedTickCount);
     }
 
     /**
@@ -140,7 +140,7 @@ export module Abstract {
      * Retrieve a Domainer of a scale. A Domainer is responsible for combining
      * multiple extents into a single domain.
      *
-     * @return {QuantitiveScale} The scale's current domainer.
+     * @return {QuantitativeScale} The scale's current domainer.
      */
     public domainer(): Domainer;
     /**
@@ -152,9 +152,9 @@ export module Abstract {
      * includes 0, etc., will be the responsability of the new domainer.
      *
      * @param {Domainer} domainer The domainer to be set.
-     * @return {QuantitiveScale} The calling scale.
+     * @return {QuantitativeScale} The calling scale.
      */
-    public domainer(domainer: Domainer): QuantitiveScale;
+    public domainer(domainer: Domainer): QuantitativeScale;
     public domainer(domainer?: Domainer): any {
       if (domainer == null) {
         return this._domainer;

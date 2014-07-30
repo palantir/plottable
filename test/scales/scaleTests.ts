@@ -129,7 +129,7 @@ describe("Scales", () => {
     });
   });
 
-  describe("Quantitive Scales", () => {
+  describe("Quantitative Scales", () => {
     it("autorange defaults to [0, 1] if no perspectives set", () => {
       var scale = new Plottable.Scale.Linear();
       scale.autoDomain();
@@ -309,4 +309,95 @@ describe("Scales", () => {
       assert.equal(scale.domain(), startDomain);
     });
   });
+  describe("Modified Log Scale", () => {
+    var scale: Plottable.Scale.ModifiedLog;
+    var base = 10;
+    var epsilon = 0.00001;
+    beforeEach(() => {
+      scale = new Plottable.Scale.ModifiedLog(base);
+    });
+
+    it("is an increasing, continuous function that can go negative", () => {
+      d3.range(-base * 2, base * 2, base / 20).forEach((x: number) => {
+        // increasing
+        assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
+        assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
+        // continuous
+        assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
+        assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
+      });
+      assert.closeTo(scale.scale(0), 0, epsilon);
+    });
+
+    it("is close to log() for large values", () => {
+      [10, 100, 23103.4, 5].forEach((x) => {
+        assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
+      });
+    });
+
+    it("x = invert(scale(x))", () => {
+      [0, 1, base, 100, 0.001, -1, -0.3, -base, base - 0.001].forEach((x) => {
+        assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
+        assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
+      });
+    });
+
+    it("domain defaults to [0, 1]", () => {
+      scale = new Plottable.Scale.ModifiedLog(base);
+      assert.deepEqual(scale.domain(), [0, 1]);
+    });
+
+    it("works with a domainer", () => {
+      scale.updateExtent(1, "x", [0, base * 2]);
+      var domain = scale.domain();
+      scale.domainer(new Plottable.Domainer().pad(0.1));
+      assert.operator(scale.domain()[0], "<", domain[0]);
+      assert.operator(domain[1], "<", scale.domain()[1]);
+
+      scale.domainer(new Plottable.Domainer().nice());
+      assert.operator(scale.domain()[0], "<=", domain[0]);
+      assert.operator(domain[1], "<=", scale.domain()[1]);
+
+      scale = new Plottable.Scale.ModifiedLog(base);
+      scale.domainer(new Plottable.Domainer());
+      assert.deepEqual(scale.domain(), [0, 1]);
+    });
+
+    it("gives reasonable values for ticks()", () => {
+      scale.updateExtent(1, "x", [0, base / 2]);
+      var ticks = scale.ticks();
+      assert.operator(ticks.length, ">", 0);
+
+      scale.updateExtent(1, "x", [-base * 2, base * 2]);
+      ticks = scale.ticks();
+      var beforePivot = ticks.filter((x) => x <= -base);
+      var afterPivot = ticks.filter((x) => base <= x);
+      var betweenPivots = ticks.filter((x) => -base < x && x < base);
+      assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
+      assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
+      assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+    });
+
+    it("works on inverted domain", () => {
+      scale.updateExtent(1, "x", [200, -100]);
+      var range = scale.range();
+      assert.closeTo(scale.scale(-100), range[1], epsilon);
+      assert.closeTo(scale.scale(200), range[0], epsilon);
+      var a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
+      var b = a.map((x) => scale.scale(x));
+      // should be decreasing function; reverse is sorted
+      assert.deepEqual(b.slice().reverse(), b.slice().sort((x, y) => x - y));
+
+      var ticks = scale.ticks();
+      assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
+      assert.deepEqual(ticks, Plottable.Util.Methods.uniqNumbers(ticks), "ticks should not be repeated");
+      var beforePivot = ticks.filter((x) => x <= -base);
+      var afterPivot = ticks.filter((x) => base <= x);
+      var betweenPivots = ticks.filter((x) => -base < x && x < base);
+      assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
+      assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
+      assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+    });
+  });
+
 });

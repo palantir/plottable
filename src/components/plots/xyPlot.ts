@@ -48,8 +48,8 @@ export module Abstract {
     }
 
     public _updateXDomainer(): XYPlot {
-      if (this.xScale instanceof QuantitiveScale) {
-        var scale = <QuantitiveScale> this.xScale;
+      if (this.xScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale> this.xScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -58,8 +58,8 @@ export module Abstract {
     }
 
     public _updateYDomainer(): XYPlot {
-      if (this.yScale instanceof QuantitiveScale) {
-        var scale = <QuantitiveScale> this.yScale;
+      if (this.yScale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale> this.yScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
