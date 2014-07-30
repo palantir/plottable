@@ -75,6 +75,26 @@ var Plottable;
             Methods.intersection = intersection;
 
             /**
+            * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
+            * and "activate" it by turning it into a function in (datum, index, metadata)
+            */
+            function _accessorize(accessor) {
+                if (typeof (accessor) === "function") {
+                    return accessor;
+                } else if (typeof (accessor) === "string" && accessor[0] !== "#") {
+                    return function (d, i, s) {
+                        return d[accessor];
+                    };
+                } else {
+                    return function (d, i, s) {
+                        return accessor;
+                    };
+                }
+                ;
+            }
+            Methods._accessorize = _accessorize;
+
+            /**
             * Takes two sets and returns the union
             *
             * @param{D3.Set} set1 The first set
@@ -93,29 +113,16 @@ var Plottable;
             }
             Methods.union = union;
 
-            function accessorize(accessor) {
-                if (typeof (accessor) === "function") {
-                    return accessor;
-                } else if (typeof (accessor) === "string" && accessor[0] !== "#") {
-                    return function (d, i, s) {
-                        return d[accessor];
-                    };
-                } else {
-                    return function (d, i, s) {
-                        return accessor;
-                    };
-                }
-                ;
-            }
-            Methods.accessorize = accessorize;
-
-            function applyAccessor(accessor, dataSource) {
-                var activatedAccessor = accessorize(accessor);
+            /**
+            * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
+            */
+            function _applyAccessor(accessor, plot) {
+                var activatedAccessor = _accessorize(accessor);
                 return function (d, i) {
-                    return activatedAccessor(d, i, dataSource.metadata());
+                    return activatedAccessor(d, i, plot.dataSource().metadata());
                 };
             }
-            Methods.applyAccessor = applyAccessor;
+            Methods._applyAccessor = _applyAccessor;
 
             function uniq(strings) {
                 var seen = {};
@@ -1687,8 +1694,7 @@ var Plottable;
         };
 
         DataSource.prototype.computeExtent = function (accessor) {
-            var appliedAccessor = Plottable.Util.Methods.applyAccessor(accessor, this);
-            var mappedData = this._data.map(appliedAccessor);
+            var mappedData = this._data.map(accessor);
             if (mappedData.length === 0) {
                 return [];
             } else if (typeof (mappedData[0]) === "string") {
@@ -3005,8 +3011,8 @@ var Plottable;
                         return _this._render();
                     });
                 }
-
-                this._projectors[attrToSet] = { accessor: accessor, scale: scale };
+                var activatedAccessor = Plottable.Util.Methods._applyAccessor(accessor, this);
+                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale };
                 this.updateProjector(attrToSet);
                 this._render(); // queue a re-render upon changing projector
                 return this;
@@ -3017,7 +3023,7 @@ var Plottable;
                 var h = {};
                 d3.keys(this._projectors).forEach(function (a) {
                     var projector = _this._projectors[a];
-                    var accessor = Plottable.Util.Methods.applyAccessor(projector.accessor, _this.dataSource());
+                    var accessor = projector.accessor;
                     var scale = projector.scale;
                     var fn = scale == null ? accessor : function (d, i) {
                         return scale.scale(accessor(d, i));
