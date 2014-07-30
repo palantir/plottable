@@ -74,15 +74,26 @@ var Plottable;
             }
             Methods.intersection = intersection;
 
-<<<<<<< HEAD
             /**
             * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
             * and "activate" it by turning it into a function in (datum, index, metadata)
             */
             function _accessorize(accessor) {
-||||||| merged common ancestors
-            function accessorize(accessor) {
-=======
+                if (typeof (accessor) === "function") {
+                    return accessor;
+                } else if (typeof (accessor) === "string" && accessor[0] !== "#") {
+                    return function (d, i, s) {
+                        return d[accessor];
+                    };
+                } else {
+                    return function (d, i, s) {
+                        return accessor;
+                    };
+                }
+                ;
+            }
+            Methods._accessorize = _accessorize;
+
             /**
             * Takes two sets and returns the union
             *
@@ -102,24 +113,8 @@ var Plottable;
             }
             Methods.union = union;
 
-            function accessorize(accessor) {
->>>>>>> master
-                if (typeof (accessor) === "function") {
-                    return accessor;
-                } else if (typeof (accessor) === "string" && accessor[0] !== "#") {
-                    return function (d, i, s) {
-                        return d[accessor];
-                    };
-                } else {
-                    return function (d, i, s) {
-                        return accessor;
-                    };
-                }
-                ;
-            }
-            Methods._accessorize = _accessorize;
-
-            /** Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
+            /**
+            * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
             */
             function _applyAccessor(accessor, plot) {
                 var activatedAccessor = _accessorize(accessor);
@@ -1699,18 +1694,10 @@ var Plottable;
         };
 
         DataSource.prototype.computeExtent = function (accessor) {
-<<<<<<< HEAD
             var mappedData = this._data.map(accessor);
-||||||| merged common ancestors
-            var appliedAccessor = Plottable.Util.Methods.applyAccessor(accessor, this);
-            var mappedData = this._data.map(appliedAccessor);
-=======
-            var appliedAccessor = Plottable.Util.Methods.applyAccessor(accessor, this);
-            var mappedData = this._data.map(appliedAccessor);
             if (mappedData.indexOf(null) >= 0 || mappedData.indexOf(undefined) >= 0) {
                 Plottable.Util.Methods.warn("Data has contains null or undefined elements. This could mean data was not parsed correctly");
             }
->>>>>>> master
             if (mappedData.length === 0) {
                 return [];
             } else if (typeof (mappedData[0]) === "string") {

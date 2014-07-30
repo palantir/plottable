@@ -2986,23 +2986,23 @@ describe("DataSource", function () {
         var metadata = { foo: 11 };
         var dataSource = new Plottable.DataSource(data, metadata);
         var plot = new Plottable.Abstract.Plot(dataSource);
-        var accessorize = function (a) {
+        var apply = function (a) {
             return Plottable.Util.Methods._applyAccessor(a, plot);
         };
         var a1 = function (d, i, m) {
             return d + i - 2;
         };
-        assert.deepEqual(dataSource._getExtent(accessorize(a1)), [-1, 5], "extent for numerical data works properly");
+        assert.deepEqual(dataSource._getExtent(apply(a1)), [-1, 5], "extent for numerical data works properly");
         var a2 = function (d, i, m) {
             return d + m.foo;
         };
-        assert.deepEqual(dataSource._getExtent(accessorize(a2)), [12, 15], "extent uses metadata appropriately");
+        assert.deepEqual(dataSource._getExtent(apply(a2)), [12, 15], "extent uses metadata appropriately");
         dataSource.metadata({ foo: -1 });
-        assert.deepEqual(dataSource._getExtent(accessorize(a2)), [0, 3], "metadata change is reflected in extent results");
+        assert.deepEqual(dataSource._getExtent(apply(a2)), [0, 3], "metadata change is reflected in extent results");
         var a3 = function (d, i, m) {
             return "_" + d;
         };
-        assert.deepEqual(dataSource._getExtent(accessorize(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
+        assert.deepEqual(dataSource._getExtent(apply(a3)), ["_1", "_2", "_3", "_4"], "extent works properly on string domains (no repeats)");
     });
 });
 
