@@ -41,7 +41,7 @@ Each Plottable chart consists of three main pieces:
 -   Components - objects that requires visual space and can be placed on
     a table (axes, labels, legends, gridlines, plots).
 
-Think of Plottable as a table within a svg element, where each cell in
+Think of Plottable as a table within an `svg` element, where each cell in
 the table can draw a component or another table. For example, in the
 screenshot below, there is one table with 2 columns and 2 rows. Cell
 (0,0) holds a y-axis, cell (1,1) holds an x-axis, cell (0,1) holds the
@@ -55,7 +55,7 @@ components like, `[[yAxis, line], [null, xAxis]]`.
 Because you can nest tables within other tables, you can imagine that
 there are many ways to layout a complicated chart. For example, you can
 have four tables nested inside one larger table. In this case, cell
-(0,0) is another table, with its own x and y-axes and data.
+`(0,0)` is another table, with its own axes and plots.
 
 ![]({{ site.baseurl }}/build/images/tutorials/tablePlotConceptNested.png)
 
@@ -71,10 +71,10 @@ JavaScript.
 Tutorial 1 - Creating a Basic Chart
 -----------------------------------
 
-In the following tutorial we will create a basic chart by plotting a
-numerical (x,y) data.
+In the following tutorial we will create a basic chart by plotting
+numerical `(x,y)` coordinate data.
 
-The following is the html code that you'll need to run Plottable.
+The following is the html that you'll need to run Plottable.
 
 
 {% highlight xml %}
@@ -281,12 +281,12 @@ var xyData = [
 
 
 The name of the property is already `x`, which directly maps to the x
-values of a Line plot and the same is true of the y values.
+values of a Line Plot and the same is true of the y values.
 
 However, data is not usually that neatly formatted. For example, if your
-data is an object with the properties {committer, days, total\_commits,
-additions, deletions}, Plottable cannot automatically determine the
-property for x and y.
+data is an object with the properties `{committer, days, total\_commits,
+additions, deletions}`, Plottable cannot automatically determine the
+property for `x` and `y`.
 
 
 {% highlight javascript %}
@@ -321,9 +321,9 @@ We thus need a way to select which pieces of the data we want to use for
 each attribute.
 
 An **accessor** is a function that defines how to assign a piece of the
-data to a specific attribute. For example, if you want numbersOfCommits
+data to a specific attribute. For example, if you want `numbersOfCommits`
 to be your y-axis, your accessor would be a function that takes each
-data point (or each object in the array) and returns the numberOfCommits
+data point (or each object in the array) and returns the `numberOfCommits`
 for each point and uses that for the y values.
 
 A **perspective** is a view of the data. A perspective is essentially
@@ -444,11 +444,11 @@ the one we previously created.
 
 
     In the above line, plot is the plot we created above and it's
-    calling the project function. Plot.project needs parameters to tell
+    calling the project function. `Plot.project` needs parameters to tell
     it the attribute, how to get that attribute, and the scale to use.
-    In this case, we want to assign a value for x. The code therefore
-    reads that for each datapoint given to the plot, assign x as the day
-    value and use the xScale we defined previously.
+    In this case, we want to assign a value for `x`. The code therefore
+    reads that for each datapoint given to the plot, assign `x` as the day
+    value and use the `xScale` we defined previously.
 
 6.  We need another accessor that will determine the y attribute. By
     similar logic, we do the following:
@@ -552,7 +552,7 @@ x-axis for each subplot.
 
 3.  Since we want two subplots, we need two y-axes and two y scales. The
     first subplot uses a Line plot and the second a Scatterplot. Notice
-    that the same data and the same xScale are passed to each plot.
+    that the same data and the same `xScale` are passed to each plot.
 
 
 {% highlight javascript %}
@@ -571,7 +571,7 @@ x-axis for each subplot.
 
 
 4.  As per the previous tutorial, we use projectors to choose the
-    information to plot. The x-axis accessor is the same as in the
+    information to plot. The x accessor is the same as in the
     previous tutorial because we again want days on the x-axis.
 
 
@@ -584,9 +584,9 @@ x-axis for each subplot.
     {% endhighlight %}
 
 
-    Both the linePlot and the circlePlot use the same x-axis, which
+    Both the `linePlot` and the `circlePlot` share the same x-axis, which
     corresponds to the fact that they have the same scale. Additionally,
-    in this case, since they both are using the same data, their
+    in this case, since they both are using the same data format (the same data, in this case), their
     projectors can use the same accessor.
 
 5.  Next we need projectors for each y-axis. As in the previous example,
