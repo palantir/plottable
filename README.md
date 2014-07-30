@@ -1,4 +1,4 @@
-Plottable.js[![Builds](https://api.travis-ci.org/repositories/palantir/plottable.png?branch=master)](https://travis-ci.org/palantir/plottable)
+Plottable.js [![Builds](https://api.travis-ci.org/repositories/palantir/plottable.png?branch=master)](https://travis-ci.org/palantir/plottable)
 ============
 
 Plottable.js is a library for easily creating flexible, interactive, and performant charts for the web. It is built on top of D3 and provides higher-level pieces, like plots, gridlines, and axes. As such, it's easier to quickly build charts
@@ -12,21 +12,26 @@ By virtue of being higher-level than D3, it is often much easier to create chart
 
 Plottable.js is being developed by Palantir Technologies. It's developed in Typescript, and released in Javascript. Plottable's API is not yet stable.
 
-=========
-Setup Instructions for Development:
+Quick Start
+---
 
-    npm install
-    (if new to nodejs:)
-    sudo npm install grunt -g
-    sudo npm install grunt-cli -g
-    run `grunt` and it will spin up a server (pointed at localhost:9999) and begin compiling the typescript code
-    for local experimentation, the source files are individually compiled to their own javascript files, with `plottable_multifile.js` responsible for loading them together
-    when ready
+- Download [plottable.zip](plottable.zip) or get it via Bower: `bower install --save plottable`
+- Read the [docs](http://palantir.github.io/plottable/)
 
-=========
-Contributing Instructions:
+Development
+---
+
+- Clone the repo
+- Install global dependencies `sudo npm install grunt grunt-cli typescript -g`
+- Install local dependencies `npm install`
+- Run `grunt` and it will spin up a server (pointed at localhost:9999) and begin compiling the typescript code
+- For local experimentation, the source files are individually compiled to their own javascript files, with `plottable_multifile.js` responsible for loading them together when ready
+
+Contributing
+---
+
 - Write your code
 - Add tests for new functionality
 - Run `grunt test` and verify it completes with no warnings or failures
 - Commit new files, including the updated built files like `plottable.js` and `plottable.d.ts`
-- Submit a pull request.
+- Submit a pull request
