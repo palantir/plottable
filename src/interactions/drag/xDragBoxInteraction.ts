@@ -8,7 +8,12 @@ export module Interaction {
       this.setBox(this.origin[0], this.location[0]);
     }
 
+    public _isResizeStart(): boolean {
+      return this._isResizeStartAttr(0, "x", "width");
+    }
+
     public _doDragstart() {
+      super._doDragstart();
       if (this.ondragstart == null) {
         return;
       }

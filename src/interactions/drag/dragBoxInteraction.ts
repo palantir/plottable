@@ -6,10 +6,41 @@ export module Interaction {
     private static CLASS_DRAG_BOX = "drag-box";
     public dragBox: D3.Selection;
     public boxIsDrawn = false;
+    public resizeEnabled = false;
+    public resizePadding = 10;
 
-    public _dragstart() {
-      super._dragstart();
-      this.clearBox();
+    public _isCloseEnough(val: number, t: number): boolean {
+      return t - this.resizePadding <= val && val <= t + this.resizePadding;
+    }
+
+    public enableResize() {
+      this.resizeEnabled = true;
+      return this;
+    }
+
+    public _isResizeStartAttr(i: number, attr1: string, attr2: string): boolean {
+      var origin = this.origin[i];
+      var c1 = parseInt(this.dragBox.attr(attr1), 10);
+      var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
+      var result1 = this._isCloseEnough(origin, c1);
+      if (result1) {
+        this.origin[i] = c2;
+      }
+      var result2 = this._isCloseEnough(origin, c2);
+      if (result2) {
+        this.origin[i] = c1;
+      }
+      return result1 || result2;
+    }
+
+    public _isResizeStart(): boolean {
+      return false;
+    }
+
+    public _doDragstart() {
+      if (this.boxIsDrawn && (!this.resizeEnabled || !this._isResizeStart())) {
+        this.clearBox();
+      }
     }
 
     public _getPixelArea(): any {
