@@ -92,6 +92,8 @@ describe("Interactions", () => {
     var dragstartY = svgHeight-100;
     var dragendX = 100;
     var dragendY = svgHeight-20;
+    var draghalfwidth = ~~((dragendX - dragstartX) / 2);
+    var draghalfheight = ~~((dragendY - dragstartY) / 2)
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
@@ -151,6 +153,99 @@ describe("Interactions", () => {
       assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
     });
 
+    describe("resize enabled", () => {
+      var dragmidX = dragstartX + draghalfwidth;
+      var dragmidY = dragstartY + draghalfheight;
+      function test(dragstartX2: number, dragstartY2: number, expectedPixelArea: Plottable.SelectionArea) {
+        var timesCalled = 0;
+
+        // fake a drag event
+        fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
+
+        interaction.dragend(function(a: Plottable.SelectionArea) {
+          timesCalled++;
+          assert.deepEqual(a, expectedPixelArea)
+        });
+
+        // fake another drag event to resize the box.
+        interaction.enableResize();
+        fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragmidX, dragmidY)
+        assert.equal(timesCalled, 1, "drag callback not called");
+      }
+
+      it("from the top left", () => {
+        test(dragstartX, dragendY, {
+          xMin: dragmidX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragmidY
+        });
+      });
+
+      it("from the top", () => {
+        test(dragmidX, dragendY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragmidY
+        });
+      });
+
+      it("from the top right", () => {
+        test(dragendX, dragendY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragmidX,
+          yMax: dragmidY
+        });
+      });
+
+      it("from the right", () => {
+        test(dragendX, dragmidY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragmidX,
+          yMax: dragendY
+        });
+      });
+
+      it("from the bottom right", () => {
+        test(dragendX, dragstartY, {
+          xMin: dragstartX,
+          yMin: dragmidY,
+          xMax: dragmidX,
+          yMax: dragendY
+        });
+      });
+
+      it("from the bottom", () => {
+        test(dragmidX, dragstartY, {
+          xMin: dragstartX,
+          yMin: dragmidY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
+      });
+
+      it("from the bottom left", () => {
+        test(dragstartX, dragstartY, {
+          xMin: dragmidX,
+          yMin: dragmidY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
+      });
+
+      it("from the left", () => {
+        test(dragstartX, dragmidY, {
+          xMin: dragmidX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
+      });
+    });
+
     after(() => {
       svg.remove();
     });
@@ -170,6 +265,8 @@ describe("Interactions", () => {
     var dragstartY = svgHeight-100;
     var dragendX = 100;
     var dragendY = svgHeight-20;
+    var dragwidth = dragendX - dragstartX;
+    var dragheight = dragendY - dragstartY;
 
     before(() => {
       svg = generateSVG(svgWidth, svgHeight);
@@ -225,6 +322,60 @@ describe("Interactions", () => {
       interaction.clearBox();
       var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
       assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
+    });
+
+    describe("resizing enabled", () => {
+      it("from the top", () => {
+        var timesCalled = 0;
+
+        // fake a drag event
+        fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
+
+        var dragstartX2 = dragstartX + ~~(dragwidth / 2);
+        var dragstartY2 = dragstartY;
+        var dragendX2 = dragstartX2;
+        var dragendY2 = dragstartY + ~~(dragheight / 2);
+
+        interaction.dragend(function(a: Plottable.SelectionArea) {
+          timesCalled++;
+          var expectedPixelArea = {
+            yMin: dragendY2,
+            yMax: dragendY
+          };
+          assert.deepEqual(a, expectedPixelArea)
+        });
+
+        // fake another drag event to resize the box.
+        interaction.enableResize();
+        fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragendX2, dragendY2)
+        assert.equal(timesCalled, 1, "drag callback not called");
+      });
+
+      it("from the bottom", () => {
+        var timesCalled = 0;
+
+        // fake a drag event
+        fakeDragSequence((<any> interaction), dragstartX, dragstartY, dragendX, dragendY);
+
+        var dragstartX2 = dragstartX + ~~(dragwidth / 2);
+        var dragstartY2 = dragendY;
+        var dragendX2 = dragstartX2;
+        var dragendY2 = dragstartY2 - ~~(dragheight / 2);
+
+        interaction.dragend(function(a: Plottable.SelectionArea) {
+          timesCalled++;
+          var expectedPixelArea = {
+            yMin: dragstartY,
+            yMax: dragendY2
+          };
+          assert.deepEqual(a, expectedPixelArea)
+        });
+
+        // fake another drag event to resize the box.
+        interaction.enableResize();
+        fakeDragSequence((<any> interaction), dragstartX2, dragstartY2, dragendX2, dragendY2)
+        assert.equal(timesCalled, 1, "drag callback not called");
+      });
     });
 
     after(() => {

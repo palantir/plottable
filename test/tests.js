@@ -4902,6 +4902,8 @@ describe("Interactions", function () {
         var dragstartY = svgHeight - 100;
         var dragendX = 100;
         var dragendY = svgHeight - 20;
+        var draghalfwidth = ~~((dragendX - dragstartX) / 2);
+        var draghalfheight = ~~((dragendY - dragstartY) / 2);
 
         before(function () {
             svg = generateSVG(svgWidth, svgHeight);
@@ -4961,6 +4963,99 @@ describe("Interactions", function () {
             assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
         });
 
+        describe("resize enabled", function () {
+            var dragmidX = dragstartX + draghalfwidth;
+            var dragmidY = dragstartY + draghalfheight;
+            function test(dragstartX2, dragstartY2, expectedPixelArea) {
+                var timesCalled = 0;
+
+                // fake a drag event
+                fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+
+                interaction.dragend(function (a) {
+                    timesCalled++;
+                    assert.deepEqual(a, expectedPixelArea);
+                });
+
+                // fake another drag event to resize the box.
+                interaction.enableResize();
+                fakeDragSequence(interaction, dragstartX2, dragstartY2, dragmidX, dragmidY);
+                assert.equal(timesCalled, 1, "drag callback not called");
+            }
+
+            it("from the top left", function () {
+                test(dragstartX, dragendY, {
+                    xMin: dragmidX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragmidY
+                });
+            });
+
+            it("from the top", function () {
+                test(dragmidX, dragendY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragmidY
+                });
+            });
+
+            it("from the top right", function () {
+                test(dragendX, dragendY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragmidX,
+                    yMax: dragmidY
+                });
+            });
+
+            it("from the right", function () {
+                test(dragendX, dragmidY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragmidX,
+                    yMax: dragendY
+                });
+            });
+
+            it("from the bottom right", function () {
+                test(dragendX, dragstartY, {
+                    xMin: dragstartX,
+                    yMin: dragmidY,
+                    xMax: dragmidX,
+                    yMax: dragendY
+                });
+            });
+
+            it("from the bottom", function () {
+                test(dragmidX, dragstartY, {
+                    xMin: dragstartX,
+                    yMin: dragmidY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
+            });
+
+            it("from the bottom left", function () {
+                test(dragstartX, dragstartY, {
+                    xMin: dragmidX,
+                    yMin: dragmidY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
+            });
+
+            it("from the left", function () {
+                test(dragstartX, dragmidY, {
+                    xMin: dragmidX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
+            });
+        });
+
         after(function () {
             svg.remove();
         });
@@ -4980,6 +5075,8 @@ describe("Interactions", function () {
         var dragstartY = svgHeight - 100;
         var dragendX = 100;
         var dragendY = svgHeight - 20;
+        var dragwidth = dragendX - dragstartX;
+        var dragheight = dragendY - dragstartY;
 
         before(function () {
             svg = generateSVG(svgWidth, svgHeight);
@@ -5035,6 +5132,60 @@ describe("Interactions", function () {
             interaction.clearBox();
             var boxGone = dragBox.attr("width") === "0" && dragBox.attr("height") === "0";
             assert.isTrue(boxGone, "highlighted box disappears when clearBox is called");
+        });
+
+        describe("resizing enabled", function () {
+            it("from the top", function () {
+                var timesCalled = 0;
+
+                // fake a drag event
+                fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+
+                var dragstartX2 = dragstartX + ~~(dragwidth / 2);
+                var dragstartY2 = dragstartY;
+                var dragendX2 = dragstartX2;
+                var dragendY2 = dragstartY + ~~(dragheight / 2);
+
+                interaction.dragend(function (a) {
+                    timesCalled++;
+                    var expectedPixelArea = {
+                        yMin: dragendY2,
+                        yMax: dragendY
+                    };
+                    assert.deepEqual(a, expectedPixelArea);
+                });
+
+                // fake another drag event to resize the box.
+                interaction.enableResize();
+                fakeDragSequence(interaction, dragstartX2, dragstartY2, dragendX2, dragendY2);
+                assert.equal(timesCalled, 1, "drag callback not called");
+            });
+
+            it("from the bottom", function () {
+                var timesCalled = 0;
+
+                // fake a drag event
+                fakeDragSequence(interaction, dragstartX, dragstartY, dragendX, dragendY);
+
+                var dragstartX2 = dragstartX + ~~(dragwidth / 2);
+                var dragstartY2 = dragendY;
+                var dragendX2 = dragstartX2;
+                var dragendY2 = dragstartY2 - ~~(dragheight / 2);
+
+                interaction.dragend(function (a) {
+                    timesCalled++;
+                    var expectedPixelArea = {
+                        yMin: dragstartY,
+                        yMax: dragendY2
+                    };
+                    assert.deepEqual(a, expectedPixelArea);
+                });
+
+                // fake another drag event to resize the box.
+                interaction.enableResize();
+                fakeDragSequence(interaction, dragstartX2, dragstartY2, dragendX2, dragendY2);
+                assert.equal(timesCalled, 1, "drag callback not called");
+            });
         });
 
         after(function () {
