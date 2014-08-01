@@ -35,7 +35,7 @@ Each Plottable chart consists of three main pieces:
 -   Components - objects that requires visual space and can be placed on
     a table (axes, labels, legends, gridlines, plots).
 
-Think of Plottable as a table within a svg element, where each cell in
+Think of Plottable as a table within an `svg` element, where each cell in
 the table can draw a component or another table. For example, in the
 screenshot below, there is one table with 2 columns and 2 rows. Cell
 (0,0) holds a y-axis, cell (1,1) holds an x-axis, cell (0,1) holds the
@@ -49,7 +49,7 @@ components like, `[[yAxis, line], [null, xAxis]]`.
 Because you can nest tables within other tables, you can imagine that
 there are many ways to layout a complicated chart. For example, you can
 have four tables nested inside one larger table. In this case, cell
-(0,0) is another table, with its own x and y-axes and data.
+`(0,0)` is another table, with its own axes and plots.
 
 ![]({{ site.baseurl }}/build/images/tutorials/tablePlotConceptNested.png)
 
@@ -65,10 +65,11 @@ JavaScript.
 
 ### Tutorial 1 - Creating a Basic Chart
 
-In the following tutorial we will create a basic chart by plotting a
-numerical (x,y) data.
+In the following tutorial we will create a basic chart by plotting
+numerical `(x,y)` coordinate data.
 
-The following is the html code that you'll need to run Plottable.
+The following is the html that you'll need to run Plottable.
+
 
 {% highlight xml %}
 <html>
@@ -276,12 +277,13 @@ var xyData = [
 {% endhighlight %}
 
 The name of the property is already `x`, which directly maps to the x
-values of a Line plot and the same is true of the y values.
+values of a Line Plot and the same is true of the y values.
 
 However, data is not usually that neatly formatted. For example, if your
-data is an object with the properties {committer, days, total\_commits,
-additions, deletions}, Plottable cannot automatically determine the
-property for x and y.
+data is an object with the properties `{committer, days, total\_commits,
+additions, deletions}`, Plottable cannot automatically determine the
+property for `x` and `y`.
+
 
 {% highlight javascript %}
 gitData = [
@@ -314,9 +316,9 @@ We thus need a way to select which pieces of the data we want to use for
 each attribute.
 
 An **accessor** is a function that defines how to assign a piece of the
-data to a specific attribute. For example, if you want numbersOfCommits
+data to a specific attribute. For example, if you want `numbersOfCommits`
 to be your y-axis, your accessor would be a function that takes each
-data point (or each object in the array) and returns the numberOfCommits
+data point (or each object in the array) and returns the `numberOfCommits`
 for each point and uses that for the y values.
 
 A **perspective** is a view of the data. A perspective is essentially
@@ -366,6 +368,7 @@ several lines of our code are exactly the same as in the previous
 example: we specify a linear scale, and denote where to place the
 axes.
 
+
 {% highlight javascript %}
 function makeCustomProjectorChart() {
   var xScale = new Plottable.Scale.Linear();
@@ -375,6 +378,7 @@ function makeCustomProjectorChart() {
   var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 }
 {% endhighlight %}
+
 
 **Step 3**
 We now have enough information to evoke the Line class. Recall that
@@ -823,7 +827,6 @@ function makeNestedTables() {
                     [titleTable],
                     [dataTable]
                   ]);
-
   chart.renderTo("#chart");
 }
 {% endhighlight %}
