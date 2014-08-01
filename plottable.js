@@ -7524,7 +7524,7 @@ var Plottable;
                 var c1 = parseInt(this.dragBox.attr("x"), 10);
                 var c2 = parseInt(this.dragBox.attr("width")) + c1;
                 if (this._isCloseEnough(x, c1) || this._isCloseEnough(x, c2)) {
-                    return "ns-resize";
+                    return "ew-resize";
                 } else {
                     return "";
                 }
@@ -7696,7 +7696,7 @@ var Plottable;
                 var c1 = parseInt(this.dragBox.attr("y"), 10);
                 var c2 = parseInt(this.dragBox.attr("height")) + c1;
                 if (this._isCloseEnough(y, c1) || this._isCloseEnough(y, c2)) {
-                    return "ew-resize";
+                    return "ns-resize";
                 } else {
                     return "";
                 }
