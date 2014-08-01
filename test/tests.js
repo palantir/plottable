@@ -5012,7 +5012,8 @@ describe("Interactions", function () {
                     yMin: dragstartY,
                     yMax: dragendY
                 };
-                assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
+                assert.deepEqual(a.yMin, expectedPixelArea.yMin);
+                assert.deepEqual(a.yMax, expectedPixelArea.yMax);
             });
 
             // fake a drag event

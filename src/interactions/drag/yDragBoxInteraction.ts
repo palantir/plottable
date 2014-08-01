@@ -15,12 +15,6 @@ export module Interaction {
       this.ondragstart({y: this.origin[1]});
     }
 
-    public _getPixelArea(): any {
-      var yMin = Math.min(this.origin[1], this.location[1]);
-      var yMax = Math.max(this.origin[1], this.location[1]);
-      return {yMin: yMin, yMax: yMax};
-    }
-
     public setBox(y0: number, y1: number) {
       super.setBox(0, this.componentToListenTo.availableWidth, y0, y1);
       return this;

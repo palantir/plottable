@@ -12,23 +12,26 @@ export module Interaction {
       this.clearBox();
     }
 
-    public _getPixelArea(): any {
-      // Should be overwritten.
-      return {};
+    private getPixelArea(): IPixelArea {
+      var xMin = Math.min(this.origin[0], this.location[0]);
+      var xMax = Math.max(this.origin[0], this.location[0]);
+      var yMin = Math.min(this.origin[1], this.location[1]);
+      var yMax = Math.max(this.origin[1], this.location[1]);
+      return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
     }
 
     public _doDrag() {
       if (this.ondrag == null) {
         return;
       }
-      this.ondrag(this._getPixelArea());
+      this.ondrag(this.getPixelArea());
     }
 
     public _doDragend(){
       if (this.ondragend == null) {
         return;
       }
-      this.ondragend(this._getPixelArea());
+      this.ondragend(this.getPixelArea());
     }
 
     /**
