@@ -18,6 +18,11 @@ export module Interaction {
       return this;
     }
 
+    public disableResize() {
+      this.resizeEnabled = false;
+      return this;
+    }
+
     public _isResizeStartAttr(i: number, attr1: string, attr2: string): boolean {
       var origin = this.origin[i];
       var c1 = parseInt(this.dragBox.attr(attr1), 10);
@@ -90,7 +95,25 @@ export module Interaction {
       var cname = DragBox.CLASS_DRAG_BOX;
       var foreground = this.componentToListenTo.foregroundContainer;
       this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+      hitBox.on("mousemove", () => this._hover());
       return this;
+    }
+
+    public _hover() {
+      if (this.resizeEnabled) {
+        var cursorStyle: string;
+        if (this.boxIsDrawn) {
+          var position = d3.mouse(this.hitBox[0][0].parentNode);
+          cursorStyle = this._cursorStyle(position[0], position[1]);
+        } else {
+          cursorStyle = "";
+        }
+        this.hitBox.style("cursor", cursorStyle);
+      }
+    }
+
+    public _cursorStyle(x: number, y: number): string {
+      return "";
     }
   }
 }

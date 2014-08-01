@@ -30,6 +30,16 @@ export module Interaction {
       super.setBox(0, this.componentToListenTo.availableWidth, y0, y1);
       return this;
     }
+
+    public _cursorStyle(x: number, y: number): string {
+      var c1 = parseInt(this.dragBox.attr("y"), 10);
+      var c2 = parseInt(this.dragBox.attr("height")) + c1;
+      if (this._isCloseEnough(y, c1) || this._isCloseEnough(y, c2)) {
+        return "ew-resize";
+      } else {
+        return "";
+      }
+    }
   }
 }
 }
