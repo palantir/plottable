@@ -7353,10 +7353,46 @@ var Plottable;
             function DragBox() {
                 _super.apply(this, arguments);
                 this.boxIsDrawn = false;
+                this.resizeEnabled = false;
+                this.resizePadding = 10;
             }
-            DragBox.prototype._dragstart = function () {
-                _super.prototype._dragstart.call(this);
-                this.clearBox();
+            DragBox.prototype._isCloseEnough = function (val, t) {
+                return t - this.resizePadding <= val && val <= t + this.resizePadding;
+            };
+
+            DragBox.prototype.enableResize = function () {
+                this.resizeEnabled = true;
+                return this;
+            };
+
+            DragBox.prototype.disableResize = function () {
+                this.resizeEnabled = false;
+                return this;
+            };
+
+            DragBox.prototype._isResizeStartAttr = function (i, attr1, attr2) {
+                var origin = this.origin[i];
+                var c1 = parseInt(this.dragBox.attr(attr1), 10);
+                var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
+                var result1 = this._isCloseEnough(origin, c1);
+                if (result1) {
+                    this.origin[i] = c2;
+                }
+                var result2 = this._isCloseEnough(origin, c2);
+                if (result2) {
+                    this.origin[i] = c1;
+                }
+                return result1 || result2;
+            };
+
+            DragBox.prototype._isResizeStart = function () {
+                return false;
+            };
+
+            DragBox.prototype._doDragstart = function () {
+                if (this.boxIsDrawn && (!this.resizeEnabled || !this._isResizeStart())) {
+                    this.clearBox();
+                }
             };
 
             DragBox.prototype._getPixelArea = function () {
@@ -7406,11 +7442,32 @@ var Plottable;
             };
 
             DragBox.prototype._anchor = function (hitBox) {
+                var _this = this;
                 _super.prototype._anchor.call(this, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
                 var foreground = this.componentToListenTo.foregroundContainer;
                 this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+                hitBox.on("mousemove", function () {
+                    return _this._hover();
+                });
                 return this;
+            };
+
+            DragBox.prototype._hover = function () {
+                if (this.resizeEnabled) {
+                    var cursorStyle;
+                    if (this.boxIsDrawn) {
+                        var position = d3.mouse(this.hitBox[0][0].parentNode);
+                        cursorStyle = this._cursorStyle(position[0], position[1]);
+                    } else {
+                        cursorStyle = "";
+                    }
+                    this.hitBox.style("cursor", cursorStyle);
+                }
+            };
+
+            DragBox.prototype._cursorStyle = function (x, y) {
+                return "";
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";
             return DragBox;
@@ -7440,7 +7497,12 @@ var Plottable;
                 this.setBox(this.origin[0], this.location[0]);
             };
 
+            XDragBox.prototype._isResizeStart = function () {
+                return this._isResizeStartAttr(0, "x", "width");
+            };
+
             XDragBox.prototype._doDragstart = function () {
+                _super.prototype._doDragstart.call(this);
                 if (this.ondragstart == null) {
                     return;
                 }
@@ -7456,6 +7518,16 @@ var Plottable;
             XDragBox.prototype.setBox = function (x0, x1) {
                 _super.prototype.setBox.call(this, x0, x1, 0, this.componentToListenTo.availableHeight);
                 return this;
+            };
+
+            XDragBox.prototype._cursorStyle = function (x, y) {
+                var c1 = parseInt(this.dragBox.attr("x"), 10);
+                var c2 = parseInt(this.dragBox.attr("width")) + c1;
+                if (this._isCloseEnough(x, c1) || this._isCloseEnough(x, c2)) {
+                    return "ns-resize";
+                } else {
+                    return "";
+                }
             };
             return XDragBox;
         })(Interaction.DragBox);
@@ -7478,13 +7550,50 @@ var Plottable;
             __extends(XYDragBox, _super);
             function XYDragBox() {
                 _super.apply(this, arguments);
+                this.isResizingX = false;
+                this.isResizingY = false;
             }
             XYDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);
                 this.setBox(this.origin[0], this.location[0], this.origin[1], this.location[1]);
             };
 
+            XYDragBox.prototype.setBox = function (x0, x1, y0, y1) {
+                if (this.dragBox == null) {
+                    return;
+                }
+                var attrs = {};
+                var drawnX = true;
+                var drawnY = true;
+                if (!this.resizeEnabled || this.isResizingX || !this.isResizingY) {
+                    attrs.width = Math.abs(x0 - x1);
+                    attrs.x = Math.min(x0, x1);
+                    drawnX = attrs.width > 0;
+                }
+                if (!this.resizeEnabled || this.isResizingY || !this.isResizingX) {
+                    attrs.height = Math.abs(y0 - y1);
+                    attrs.y = Math.min(y0, y1);
+                    drawnY = attrs.height > 0;
+                }
+                this.dragBox.attr(attrs);
+                this.boxIsDrawn = drawnX && drawnY;
+                return this;
+            };
+
+            XYDragBox.prototype._doDragend = function () {
+                this.isResizingX = false;
+                this.isResizingY = false;
+                _super.prototype._doDragend.call(this);
+            };
+
+            XYDragBox.prototype._isResizeStart = function () {
+                this.isResizingX = this._isResizeStartAttr(0, "x", "width");
+                this.isResizingY = this._isResizeStartAttr(1, "y", "height");
+                return this.isResizingX || this.isResizingY;
+            };
+
             XYDragBox.prototype._doDragstart = function () {
+                _super.prototype._doDragstart.call(this);
                 if (this.ondragstart == null) {
                     return;
                 }
@@ -7492,11 +7601,46 @@ var Plottable;
             };
 
             XYDragBox.prototype._getPixelArea = function () {
-                var xMin = Math.min(this.origin[0], this.location[0]);
-                var xMax = Math.max(this.origin[0], this.location[0]);
-                var yMin = Math.min(this.origin[1], this.location[1]);
-                var yMax = Math.max(this.origin[1], this.location[1]);
+                var xMin, xMax, yMin, yMax;
+                if (this.resizeEnabled) {
+                    xMin = parseInt(this.dragBox.attr("x"), 10);
+                    xMax = parseInt(this.dragBox.attr("width"), 10) + xMin;
+                    yMin = parseInt(this.dragBox.attr("y"), 10);
+                    yMax = parseInt(this.dragBox.attr("height"), 10) + yMin;
+                } else {
+                    xMin = Math.min(this.origin[0], this.location[0]);
+                    xMax = Math.max(this.origin[0], this.location[0]);
+                    yMin = Math.min(this.origin[1], this.location[1]);
+                    yMax = Math.max(this.origin[1], this.location[1]);
+                }
                 return { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
+            };
+
+            XYDragBox.prototype._cursorStyle = function (x, y) {
+                var x1 = parseInt(this.dragBox.attr("x"), 10);
+                var x2 = parseInt(this.dragBox.attr("width")) + x1;
+                var y1 = parseInt(this.dragBox.attr("y"), 10);
+                var y2 = parseInt(this.dragBox.attr("height")) + y1;
+                var hovering = y1 - this.resizePadding <= y && y <= y2 + this.resizePadding && x1 - this.resizePadding <= x && x <= x2 + this.resizePadding;
+                if (!hovering) {
+                    return "";
+                }
+                var left = this._isCloseEnough(x, x1);
+                var top = this._isCloseEnough(y, y1);
+                var right = this._isCloseEnough(x, x2);
+                var bottom = this._isCloseEnough(y, y2);
+
+                if (left && top || bottom && right) {
+                    return "nwse-resize";
+                } else if (top && right || bottom && left) {
+                    return "nesw-resize";
+                } else if (left || right) {
+                    return "ew-resize";
+                } else if (top || bottom) {
+                    return "ns-resize";
+                } else {
+                    return "";
+                }
             };
             return XYDragBox;
         })(Interaction.DragBox);
@@ -7525,7 +7669,12 @@ var Plottable;
                 this.setBox(this.origin[1], this.location[1]);
             };
 
+            YDragBox.prototype._isResizeStart = function () {
+                return this._isResizeStartAttr(1, "y", "height");
+            };
+
             YDragBox.prototype._doDragstart = function () {
+                _super.prototype._doDragstart.call(this);
                 if (this.ondragstart == null) {
                     return;
                 }
@@ -7541,6 +7690,16 @@ var Plottable;
             YDragBox.prototype.setBox = function (y0, y1) {
                 _super.prototype.setBox.call(this, 0, this.componentToListenTo.availableWidth, y0, y1);
                 return this;
+            };
+
+            YDragBox.prototype._cursorStyle = function (x, y) {
+                var c1 = parseInt(this.dragBox.attr("y"), 10);
+                var c2 = parseInt(this.dragBox.attr("height")) + c1;
+                if (this._isCloseEnough(y, c1) || this._isCloseEnough(y, c2)) {
+                    return "ew-resize";
+                } else {
+                    return "";
+                }
             };
             return YDragBox;
         })(Interaction.DragBox);

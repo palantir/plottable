@@ -2418,6 +2418,10 @@ declare module Plottable {
         class DragBox extends Drag {
             public dragBox: D3.Selection;
             public boxIsDrawn: boolean;
+            public resizeEnabled: boolean;
+            public resizePadding: number;
+            public enableResize(): DragBox;
+            public disableResize(): DragBox;
             /**
             * Clears the highlighted drag-selection box drawn by the AreaInteraction.
             *
@@ -2442,6 +2446,7 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
+            public setBox(x0: number, x1: number, y0: number, y1: number): XYDragBox;
         }
     }
 }
