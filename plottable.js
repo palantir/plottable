@@ -7359,23 +7359,26 @@ var Plottable;
                 this.clearBox();
             };
 
-            DragBox.prototype._getPixelArea = function () {
-                // Should be overwritten.
-                return {};
+            DragBox.prototype.getPixelArea = function () {
+                var xMin = Math.min(this.origin[0], this.location[0]);
+                var xMax = Math.max(this.origin[0], this.location[0]);
+                var yMin = Math.min(this.origin[1], this.location[1]);
+                var yMax = Math.max(this.origin[1], this.location[1]);
+                return { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
             };
 
             DragBox.prototype._doDrag = function () {
                 if (this.ondrag == null) {
                     return;
                 }
-                this.ondrag(this._getPixelArea());
+                this.ondrag(this.getPixelArea());
             };
 
             DragBox.prototype._doDragend = function () {
                 if (this.ondragend == null) {
                     return;
                 }
-                this.ondragend(this._getPixelArea());
+                this.ondragend(this.getPixelArea());
             };
 
             /**
@@ -7447,12 +7450,6 @@ var Plottable;
                 this.ondragstart({ x: this.origin[0] });
             };
 
-            XDragBox.prototype._getPixelArea = function () {
-                var xMin = Math.min(this.origin[0], this.location[0]);
-                var xMax = Math.max(this.origin[0], this.location[0]);
-                return { xMin: xMin, xMax: xMax };
-            };
-
             XDragBox.prototype.setBox = function (x0, x1) {
                 _super.prototype.setBox.call(this, x0, x1, 0, this.componentToListenTo.availableHeight);
                 return this;
@@ -7490,14 +7487,6 @@ var Plottable;
                 }
                 this.ondragstart({ x: this.origin[0], y: this.origin[1] });
             };
-
-            XYDragBox.prototype._getPixelArea = function () {
-                var xMin = Math.min(this.origin[0], this.location[0]);
-                var xMax = Math.max(this.origin[0], this.location[0]);
-                var yMin = Math.min(this.origin[1], this.location[1]);
-                var yMax = Math.max(this.origin[1], this.location[1]);
-                return { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
-            };
             return XYDragBox;
         })(Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
@@ -7530,12 +7519,6 @@ var Plottable;
                     return;
                 }
                 this.ondragstart({ y: this.origin[1] });
-            };
-
-            YDragBox.prototype._getPixelArea = function () {
-                var yMin = Math.min(this.origin[1], this.location[1]);
-                var yMax = Math.max(this.origin[1], this.location[1]);
-                return { yMin: yMin, yMax: yMax };
             };
 
             YDragBox.prototype.setBox = function (y0, y1) {
