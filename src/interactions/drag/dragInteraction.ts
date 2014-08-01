@@ -10,8 +10,8 @@ export module Interaction {
     private constrainX: (n: number) => number;
     private constrainY: (n: number) => number;
     public ondragstart: (dragInfo: any) => any;
-    public ondrag: (dragInfo: any) => any;
-    public ondragend: (dragInfo: any) => any;
+    public ondrag     : (dragInfo: any) => any;
+    public ondragend  : (dragInfo: any) => any;
 
     /**
      * Creates a Drag.
