@@ -3606,6 +3606,7 @@ describe("Scales", function () {
         scale.domainer(new Plottable.Domainer().pad());
         assert.isTrue(callbackWasCalled, "The registered callback was called when padDomain() is used to set the domain");
     });
+
     describe("autoranging behavior", function () {
         var data;
         var dataSource;
@@ -3716,9 +3717,6 @@ describe("Scales", function () {
 
         it("domain can't include NaN or Infinity", function () {
             var scale = new Plottable.Scale.Linear();
-            var log = console.log;
-            console.log = function () {
-            }; // stop warnings from going to console
             scale.domain([0, 1]);
             scale.domain([5, Infinity]);
             assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
@@ -3728,7 +3726,6 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
             scale.domain([-1, 5]);
             assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
-            console.log = log; // reset console.log
         });
     });
 
@@ -3800,6 +3797,7 @@ describe("Scales", function () {
         assert.lengthOf(xScale.domain(), 1);
         iterateDataChanges([], [dA, dB, dC]);
         assert.lengthOf(xScale.domain(), 3);
+        svg.remove();
     });
 
     describe("Color Scales", function () {

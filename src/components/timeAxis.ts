@@ -222,7 +222,7 @@ export module Axis {
       }
       tickLabels.exit().remove();
       tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
-      var anchor = shouldCenterText ? "middle" : "left";
+      var anchor = shouldCenterText ? "middle" : "start";
       tickLabels.selectAll("text").text((d: any) => d3.time.format(interval.formatString)(d))
                                   .style("text-anchor", anchor);
     }
