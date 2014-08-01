@@ -35,7 +35,7 @@ export module Interaction {
       var c1 = parseInt(this.dragBox.attr("x"), 10);
       var c2 = parseInt(this.dragBox.attr("width")) + c1;
       if (this._isCloseEnough(x, c1) || this._isCloseEnough(x, c2)) {
-        return "ns-resize";
+        return "ew-resize";
       } else {
         return "";
       }
