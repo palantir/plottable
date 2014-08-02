@@ -1568,26 +1568,42 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Core) {
+        
+
+        
+
+        /**
+        * The Broadcaster class is owned by an IListenable. Third parties can register and deregister listeners
+        * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
+        * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
+        * to, along with optional arguments passed to the `broadcast` method.
+        *
+        * The listeners are called synchronously.
+        */
         var Broadcaster = (function (_super) {
             __extends(Broadcaster, _super);
+            /**
+            * Construct a broadcaster, taking the listenable that the broadcaster will be attached to.
+            *
+            * @constructor
+            * @param {IListenable} listenable The listenable-object that this broadcaster is attached to.
+            */
             function Broadcaster(listenable) {
                 _super.call(this);
-                this.listener2Callback = new Plottable.Util.StrictEqualityAssociativeArray();
+                this.key2callback = new Plottable.Util.StrictEqualityAssociativeArray();
                 this.listenable = listenable;
             }
             /**
-            * Registers a callback to be called when the broadcast method is called. Also takes a listener which
-            * is used to support deregistering the same callback later, by passing in the same listener.
-            * If there is already a callback associated with that listener, then the callback will be replaced.
+            * Registers a callback to be called when the broadcast method is called. Also takes a key which
+            * is used to support deregistering the same callback later, by passing in the same key.
+            * If there is already a callback associated with that key, then the callback will be replaced.
             *
-            * This should NOT be called directly by a Component; registerToBroadcaster should be used instead.
-            *
-            * @param listener The listener associated with the callback.
+            * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
             * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
             * @returns {Broadcaster} this object
             */
-            Broadcaster.prototype.registerListener = function (listener, callback) {
-                this.listener2Callback.set(listener, callback);
+            Broadcaster.prototype.registerListener = function (key, callback) {
+                this.key2callback.set(key, callback);
                 return this;
             };
 
@@ -1603,20 +1619,20 @@ var Plottable;
                 for (var _i = 0; _i < (arguments.length - 0); _i++) {
                     args[_i] = arguments[_i + 0];
                 }
-                this.listener2Callback.values().forEach(function (callback) {
+                this.key2callback.values().forEach(function (callback) {
                     return callback(_this.listenable, args);
                 });
                 return this;
             };
 
             /**
-            * Deregisters the callback associated with a listener.
+            * Deregisters the callback associated with a key.
             *
-            * @param listener The listener to deregister.
+            * @param key The key to deregister.
             * @returns {Broadcaster} this object
             */
-            Broadcaster.prototype.deregisterListener = function (listener) {
-                this.listener2Callback.delete(listener);
+            Broadcaster.prototype.deregisterListener = function (key) {
+                this.key2callback.delete(key);
                 return this;
             };
 
@@ -1626,7 +1642,7 @@ var Plottable;
             * @returns {Broadcaster} this object
             */
             Broadcaster.prototype.deregisterAllListeners = function () {
-                this.listener2Callback = new Plottable.Util.StrictEqualityAssociativeArray();
+                this.key2callback = new Plottable.Util.StrictEqualityAssociativeArray();
             };
             return Broadcaster;
         })(Plottable.Abstract.PlottableObject);
@@ -4135,6 +4151,7 @@ var Plottable;
             * @constructor
             * @param {string} [scaleType] the type of color scale to create
             *     (Category10/Category20/Category20b/Category20c).
+            * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
             */
             function Color(scaleType) {
                 var scale;
@@ -4250,6 +4267,13 @@ var Plottable;
     (function (Scale) {
         ;
 
+        /**
+        * This class implements a colorScale that takes quantitive input and
+        * interpolates between a list of color values. It returns a hex string
+        * representing the interpolated color.
+        *
+        * By default it generates a linear scale internally.
+        */
         var InterpolatedColor = (function (_super) {
             __extends(InterpolatedColor, _super);
             /**
@@ -4276,7 +4300,7 @@ var Plottable;
             * @param {string[]} colors an array of strings representing color
             *     values in hex ("#FFFFFF") or keywords ("white").
             * @param {string} scaleType a string representing the underlying scale
-            *     type (linear/log/sqrt/pow)
+            *     type ("linear"/"log"/"sqrt"/"pow")
             * @returns a Quantitative d3 scale.
             */
             InterpolatedColor.getD3InterpolatedScale = function (colors, scaleType) {
@@ -4825,6 +4849,7 @@ var Plottable;
                 });
             };
             Axis.TICK_MARK_CLASS = "tick-mark";
+
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;
         })(Abstract.Component);
@@ -5666,13 +5691,14 @@ var Plottable;
             __extends(Legend, _super);
             /**
             * Creates a Legend.
-            * A legend consists of a series of legend rows, each with a color and label taken from the colorScale.
-            * The rows will be displayed in the order of the colorScale domain.
-            * This legend also allows interactions, through the functions "toggleCallback" and "hoverCallback"
+            *
+            * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
+            * The rows will be displayed in the order of the `colorScale` domain.
+            * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
             * Setting a callback will also put classes on the individual rows.
             *
             * @constructor
-            * @param {ColorScale} colorScale
+            * @param {Scale.Color} colorScale
             */
             function Legend(colorScale) {
                 _super.call(this);
@@ -6248,6 +6274,10 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
+        /*
+        * An Abstract.BarPlot is the base implementation for HorizontalBarPlot and
+        * VerticalBarPlot. It should not be used on its own.
+        */
         var BarPlot = (function (_super) {
             __extends(BarPlot, _super);
             /**
@@ -6496,6 +6526,15 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
+        /**
+        * A VerticalBarPlot draws bars vertically.
+        * Key projected attributes:
+        *  - "width" - the horizontal width of a bar.
+        *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
+        *      - if a quantitative scale is attached, this defaults to 10
+        *  - "x" - the horizontal position of a bar
+        *  - "y" - the vertical height of a bar
+        */
         var VerticalBar = (function (_super) {
             __extends(VerticalBar, _super);
             /**
@@ -6532,6 +6571,15 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
+        /**
+        * A HorizontalBarPlot draws bars horizontally.
+        * Key projected attributes:
+        *  - "width" - the vertical height of a bar (since the bar is rotated horizontally)
+        *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
+        *      - if a quantitative scale is attached, this defaults to 10
+        *  - "x" - the horizontal length of a bar
+        *  - "y" - the vertical position of a bar
+        */
         var HorizontalBar = (function (_super) {
             __extends(HorizontalBar, _super);
             /**
@@ -6664,6 +6712,9 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
+        /**
+        * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
+        */
         var Area = (function (_super) {
             __extends(Area, _super);
             /**

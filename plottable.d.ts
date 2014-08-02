@@ -588,27 +588,57 @@ declare module Plottable {
 
 declare module Plottable {
     module Core {
+        /**
+        * This interface represents anything in Plottable which can have a listener attached.
+        * Listeners attach by referencing the Listenable's broadcaster, and calling registerListener
+        * on it.
+        *
+        * e.g.:
+        * listenable: Plottable.IListenable;
+        * listenable.broadcaster.registerListener(callbackToCallOnBroadcast)
+        */
         interface IListenable {
             broadcaster: Broadcaster;
         }
+        /**
+        * This interface represents the callback that should be passed to the Broadcaster on a Listenable.
+        *
+        * The callback will be called with the attached listenable as the first object, and optional arguments
+        * as the subsequent arguments.
+        *
+        * The listenable is passed as the first argument so that it is easy for the callback to reference the
+        * current state of the listenable in the resolution logic.
+        */
         interface IBroadcasterCallback {
             (listenable: IListenable, ...args: any[]): any;
         }
+        /**
+        * The Broadcaster class is owned by an IListenable. Third parties can register and deregister listeners
+        * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
+        * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
+        * to, along with optional arguments passed to the `broadcast` method.
+        *
+        * The listeners are called synchronously.
+        */
         class Broadcaster extends Abstract.PlottableObject {
             public listenable: IListenable;
+            /**
+            * Construct a broadcaster, taking the listenable that the broadcaster will be attached to.
+            *
+            * @constructor
+            * @param {IListenable} listenable The listenable-object that this broadcaster is attached to.
+            */
             constructor(listenable: IListenable);
             /**
-            * Registers a callback to be called when the broadcast method is called. Also takes a listener which
-            * is used to support deregistering the same callback later, by passing in the same listener.
-            * If there is already a callback associated with that listener, then the callback will be replaced.
+            * Registers a callback to be called when the broadcast method is called. Also takes a key which
+            * is used to support deregistering the same callback later, by passing in the same key.
+            * If there is already a callback associated with that key, then the callback will be replaced.
             *
-            * This should NOT be called directly by a Component; registerToBroadcaster should be used instead.
-            *
-            * @param listener The listener associated with the callback.
+            * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
             * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
             * @returns {Broadcaster} this object
             */
-            public registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
+            public registerListener(key: any, callback: IBroadcasterCallback): Broadcaster;
             /**
             * Call all listening callbacks, optionally with arguments passed through.
             *
@@ -617,12 +647,12 @@ declare module Plottable {
             */
             public broadcast(...args: any[]): Broadcaster;
             /**
-            * Deregisters the callback associated with a listener.
+            * Deregisters the callback associated with a key.
             *
-            * @param listener The listener to deregister.
+            * @param key The key to deregister.
             * @returns {Broadcaster} this object
             */
-            public deregisterListener(listener: any): Broadcaster;
+            public deregisterListener(key: any): Broadcaster;
             /**
             * Deregisters all listeners and callbacks associated with the broadcaster.
             *
@@ -1556,6 +1586,7 @@ declare module Plottable {
             * @constructor
             * @param {string} [scaleType] the type of color scale to create
             *     (Category10/Category20/Category20b/Category20c).
+            * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
             */
             constructor(scaleType?: string);
         }
@@ -1590,6 +1621,13 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
+        /**
+        * This class implements a colorScale that takes quantitive input and
+        * interpolates between a list of color values. It returns a hex string
+        * representing the interpolated color.
+        *
+        * By default it generates a linear scale internally.
+        */
         class InterpolatedColor extends Abstract.QuantitativeScale {
             /**
             * Creates a InterpolatedColorScale.
@@ -1659,9 +1697,14 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
+            /**
+            * The css class applied to each tick mark (the line on the tick).
+            */
             static TICK_MARK_CLASS: string;
+            /**
+            * The css class applied to each tick label (the text associated with the tick).
+            */
             static TICK_LABEL_CLASS: string;
-            public axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: any);
             public remove(): void;
             /**
@@ -1909,25 +1952,31 @@ declare module Plottable {
         }
         class Legend extends Abstract.Component {
             /**
+            * The css class applied to each legend row
+            */
+            static SUBELEMENT_CLASS: string;
+            /**
             * Creates a Legend.
-            * A legend consists of a series of legend rows, each with a color and label taken from the colorScale.
-            * The rows will be displayed in the order of the colorScale domain.
-            * This legend also allows interactions, through the functions "toggleCallback" and "hoverCallback"
+            *
+            * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
+            * The rows will be displayed in the order of the `colorScale` domain.
+            * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
             * Setting a callback will also put classes on the individual rows.
             *
             * @constructor
-            * @param {ColorScale} colorScale
+            * @param {Scale.Color} colorScale
             */
             constructor(colorScale?: Scale.Color);
             public remove(): void;
             /**
             * Assigns or gets the callback to the Legend
+            *
             * This callback is associated with toggle events, which trigger when a legend row is clicked.
             * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
             * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
             * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
             *
-            * @param{ToggleCallback} callback The new callback function
+            * @param {ToggleCallback} callback The new callback function
             */
             public toggleCallback(callback: ToggleCallback): Legend;
             public toggleCallback(): ToggleCallback;
@@ -2053,7 +2102,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-            static DEFAULT_WIDTH: number;
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
@@ -2109,6 +2157,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+        * A VerticalBarPlot draws bars vertically.
+        * Key projected attributes:
+        *  - "width" - the horizontal width of a bar.
+        *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
+        *      - if a quantitative scale is attached, this defaults to 10
+        *  - "x" - the horizontal position of a bar
+        *  - "y" - the vertical height of a bar
+        */
         class VerticalBar extends Abstract.BarPlot {
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
@@ -2129,6 +2186,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+        * A HorizontalBarPlot draws bars horizontally.
+        * Key projected attributes:
+        *  - "width" - the vertical height of a bar (since the bar is rotated horizontally)
+        *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
+        *      - if a quantitative scale is attached, this defaults to 10
+        *  - "x" - the horizontal length of a bar
+        *  - "y" - the vertical position of a bar
+        */
         class HorizontalBar extends Abstract.BarPlot {
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
@@ -2167,6 +2233,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+        * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
+        */
         class Area extends Line {
             /**
             * Creates an AreaPlot.

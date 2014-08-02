@@ -1455,8 +1455,8 @@ describe("Plots", function () {
             var s = new Plottable.Scale.Linear();
             r.project("attr", "a", s);
             r.remove();
-            var listener2Callback = s.broadcaster.listener2Callback;
-            assert.isUndefined(listener2Callback.get(r), "the plot is no longer attached to the scale");
+            var key2callback = s.broadcaster.key2callback;
+            assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
         });
     });
 });
