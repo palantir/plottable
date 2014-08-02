@@ -12,28 +12,6 @@ export module Interaction {
       this.clearBox();
     }
 
-    private getPixelArea(): IPixelArea {
-      var xMin = Math.min(this.origin[0], this.location[0]);
-      var xMax = Math.max(this.origin[0], this.location[0]);
-      var yMin = Math.min(this.origin[1], this.location[1]);
-      var yMax = Math.max(this.origin[1], this.location[1]);
-      return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
-    }
-
-    public _doDrag() {
-      if (this.ondrag == null) {
-        return;
-      }
-      this.ondrag(this.getPixelArea());
-    }
-
-    public _doDragend(){
-      if (this.ondragend == null) {
-        return;
-      }
-      this.ondragend(this.getPixelArea());
-    }
-
     /**
      * Clears the highlighted drag-selection box drawn by the AreaInteraction.
      *

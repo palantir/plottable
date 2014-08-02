@@ -7257,7 +7257,7 @@ var Plottable;
 
             Drag.prototype._doDragstart = function () {
                 if (this.ondragstart != null) {
-                    this.ondragstart(this.origin);
+                    this.ondragstart({ x: this.origin[0], y: this.origin[1] });
                 }
             };
 
@@ -7274,7 +7274,7 @@ var Plottable;
 
             Drag.prototype._doDrag = function () {
                 if (this.ondrag != null) {
-                    this.ondrag([this.origin, this.location]);
+                    this.ondrag(this.getTopLeft(), this.getBottomRight());
                 }
             };
 
@@ -7287,11 +7287,21 @@ var Plottable;
             };
 
             Drag.prototype._doDragend = function () {
-                // seperated out so it can be over-ridden by dragInteractions that want to pass out diff information
-                // eg just x values for an xSelectionInteraction
                 if (this.ondragend != null) {
-                    this.ondragend([this.origin, this.location]);
+                    this.ondragend(this.getTopLeft(), this.getBottomRight());
                 }
+            };
+
+            Drag.prototype.getTopLeft = function () {
+                var x = Math.min(this.origin[0], this.location[0]);
+                var y = Math.min(this.origin[1], this.location[1]);
+                return { x: x, y: y };
+            };
+
+            Drag.prototype.getBottomRight = function () {
+                var x = Math.max(this.origin[0], this.location[0]);
+                var y = Math.max(this.origin[1], this.location[1]);
+                return { x: x, y: y };
             };
 
             Drag.prototype._anchor = function (hitBox) {
@@ -7304,8 +7314,8 @@ var Plottable;
                 var xDomainOriginal = xScale != null ? xScale.domain() : null;
                 var yDomainOriginal = yScale != null ? yScale.domain() : null;
                 var resetOnNextClick = false;
-                function callback(pixelArea) {
-                    if (pixelArea == null) {
+                function callback(upperLeft, lowerRight) {
+                    if (upperLeft == null || lowerRight == null) {
                         if (resetOnNextClick) {
                             if (xScale != null) {
                                 xScale.domain(xDomainOriginal);
@@ -7319,10 +7329,10 @@ var Plottable;
                     }
                     resetOnNextClick = false;
                     if (xScale != null) {
-                        xScale.domain([xScale.invert(pixelArea.xMin), xScale.invert(pixelArea.xMax)]);
+                        xScale.domain([xScale.invert(upperLeft.x), xScale.invert(lowerRight.x)]);
                     }
                     if (yScale != null) {
-                        yScale.domain([yScale.invert(pixelArea.yMax), yScale.invert(pixelArea.yMin)]);
+                        yScale.domain([yScale.invert(lowerRight.y), yScale.invert(upperLeft.y)]);
                     }
                     this.clearBox();
                     return;
@@ -7357,28 +7367,6 @@ var Plottable;
             DragBox.prototype._dragstart = function () {
                 _super.prototype._dragstart.call(this);
                 this.clearBox();
-            };
-
-            DragBox.prototype.getPixelArea = function () {
-                var xMin = Math.min(this.origin[0], this.location[0]);
-                var xMax = Math.max(this.origin[0], this.location[0]);
-                var yMin = Math.min(this.origin[1], this.location[1]);
-                var yMax = Math.max(this.origin[1], this.location[1]);
-                return { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax };
-            };
-
-            DragBox.prototype._doDrag = function () {
-                if (this.ondrag == null) {
-                    return;
-                }
-                this.ondrag(this.getPixelArea());
-            };
-
-            DragBox.prototype._doDragend = function () {
-                if (this.ondragend == null) {
-                    return;
-                }
-                this.ondragend(this.getPixelArea());
             };
 
             /**
@@ -7443,13 +7431,6 @@ var Plottable;
                 this.setBox(this.origin[0], this.location[0]);
             };
 
-            XDragBox.prototype._doDragstart = function () {
-                if (this.ondragstart == null) {
-                    return;
-                }
-                this.ondragstart({ x: this.origin[0] });
-            };
-
             XDragBox.prototype.setBox = function (x0, x1) {
                 _super.prototype.setBox.call(this, x0, x1, 0, this.componentToListenTo.availableHeight);
                 return this;
@@ -7480,13 +7461,6 @@ var Plottable;
                 _super.prototype._drag.call(this);
                 this.setBox(this.origin[0], this.location[0], this.origin[1], this.location[1]);
             };
-
-            XYDragBox.prototype._doDragstart = function () {
-                if (this.ondragstart == null) {
-                    return;
-                }
-                this.ondragstart({ x: this.origin[0], y: this.origin[1] });
-            };
             return XYDragBox;
         })(Interaction.DragBox);
         Interaction.XYDragBox = XYDragBox;
@@ -7512,13 +7486,6 @@ var Plottable;
             YDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);
                 this.setBox(this.origin[1], this.location[1]);
-            };
-
-            YDragBox.prototype._doDragstart = function () {
-                if (this.ondragstart == null) {
-                    return;
-                }
-                this.ondragstart({ y: this.origin[1] });
             };
 
             YDragBox.prototype.setBox = function (y0, y1) {

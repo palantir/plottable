@@ -8,13 +8,6 @@ export module Interaction {
       this.setBox(this.origin[0], this.location[0]);
     }
 
-    public _doDragstart() {
-      if (this.ondragstart == null) {
-        return;
-      }
-      this.ondragstart({x: this.origin[0]});
-    }
-
     public setBox(x0: number, x1: number) {
       super.setBox(x0, x1, 0, this.componentToListenTo.availableHeight);
       return this;

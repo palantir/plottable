@@ -4925,18 +4925,21 @@ describe("Interactions", function () {
             var timesCalled = 0;
             interaction.dragstart(function (a) {
                 timesCalled++;
-                var expectedPixelArea = { x: dragstartX, y: dragstartY };
-                assert.deepEqual(a, expectedPixelArea, "areaCallback called with null arg on dragstart");
+                var expectedOrigin = { x: dragstartX, y: dragstartY };
+                assert.deepEqual(a, expectedOrigin, "areaCallback called with null arg on dragstart");
             });
-            interaction.dragend(function (a) {
+            interaction.dragend(function (a, b) {
                 timesCalled++;
-                var expectedPixelArea = {
-                    xMin: dragstartX,
-                    xMax: dragendX,
-                    yMin: dragstartY,
-                    yMax: dragendY
+                var expectedUpperLeft = {
+                    x: dragstartX,
+                    y: dragstartY
                 };
-                assert.deepEqual(a, expectedPixelArea, "areaCallback was passed the correct pixel area");
+                var expectedLowerRight = {
+                    x: dragendX,
+                    y: dragendY
+                };
+                assert.deepEqual(a, expectedUpperLeft, "areaCallback was passed the correct upper left corner");
+                assert.deepEqual(b, expectedLowerRight, "areaCallback was passed the correct lower right corner");
             });
 
             // fake a drag event
@@ -5003,17 +5006,15 @@ describe("Interactions", function () {
             var timesCalled = 0;
             interaction.dragstart(function (a) {
                 timesCalled++;
-                var expectedPixelArea = { y: dragstartY };
-                assert.deepEqual(a, expectedPixelArea, "areaCallback called with null arg on dragstart");
+                var expectedY = dragstartY;
+                assert.deepEqual(a.y, expectedY, "areaCallback called with null arg on dragstart");
             });
-            interaction.dragend(function (a) {
+            interaction.dragend(function (a, b) {
                 timesCalled++;
-                var expectedPixelArea = {
-                    yMin: dragstartY,
-                    yMax: dragendY
-                };
-                assert.deepEqual(a.yMin, expectedPixelArea.yMin);
-                assert.deepEqual(a.yMax, expectedPixelArea.yMax);
+                var expectedUpperLeftY = dragstartY;
+                var expectedLowerRightY = dragendY;
+                assert.deepEqual(a.y, expectedUpperLeftY);
+                assert.deepEqual(b.y, expectedLowerRightY);
             });
 
             // fake a drag event

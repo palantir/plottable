@@ -9,9 +9,9 @@ export module Interaction {
     public location = [0,0];
     private constrainX: (n: number) => number;
     private constrainY: (n: number) => number;
-    public ondragstart: (dragInfo: any) => any;
-    public      ondrag: (dragInfo: any) => any;
-    public   ondragend: (dragInfo: any) => any;
+    public ondragstart: (origin: ICoord) => void;
+    public      ondrag: (upperLeft: ICoord, lowerRight: ICoord) => void;
+    public   ondragend: (upperLeft: ICoord, lowerRight: ICoord) => void;
 
     /**
      * Creates a Drag.
@@ -32,7 +32,7 @@ export module Interaction {
      * @param {(a: SelectionArea) => any} cb The function to be called.
      * @returns {AreaInteraction}
      */
-    public dragstart(cb?: (a: any) => any) {
+    public dragstart(cb?: (a: ICoord) => any) {
       this.ondragstart = cb;
       return this;
     }
@@ -43,7 +43,7 @@ export module Interaction {
      * @param {(a: SelectionArea) => any} cb The function to be called.
      * @returns {AreaInteraction}
      */
-    public drag(cb?: (a: any) => any) {
+    public drag(cb?: (a: ICoord, b: ICoord) => any) {
       this.ondrag = cb;
       return this;
     }
@@ -54,7 +54,7 @@ export module Interaction {
      * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
      * @returns {AreaInteraction} The calling AreaInteraction.
      */
-    public dragend(cb?: (a: any) => any) {
+    public dragend(cb?: (a: ICoord, b: ICoord) => any) {
       this.ondragend = cb;
       return this;
     }
@@ -70,7 +70,7 @@ export module Interaction {
 
     public _doDragstart() {
       if (this.ondragstart != null) {
-        this.ondragstart(this.origin);
+        this.ondragstart({x: this.origin[0], y: this.origin[1]});
       }
     }
 
@@ -87,7 +87,7 @@ export module Interaction {
 
     public _doDrag() {
       if (this.ondrag != null) {
-        this.ondrag([this.origin, this.location]);
+        this.ondrag(this.getTopLeft(), this.getBottomRight());
       }
     }
 
@@ -100,11 +100,21 @@ export module Interaction {
     }
 
     public _doDragend() {
-      // seperated out so it can be over-ridden by dragInteractions that want to pass out diff information
-      // eg just x values for an xSelectionInteraction
       if (this.ondragend != null) {
-        this.ondragend([this.origin, this.location]);
+        this.ondragend(this.getTopLeft(), this.getBottomRight());
       }
+    }
+
+    private getTopLeft(): ICoord {
+      var x = Math.min(this.origin[0], this.location[0]);
+      var y = Math.min(this.origin[1], this.location[1]);
+      return {x: x, y: y};
+    }
+
+    private getBottomRight(): ICoord {
+      var x = Math.max(this.origin[0], this.location[0]);
+      var y = Math.max(this.origin[1], this.location[1]);
+      return {x: x, y: y};
     }
 
     public _anchor(hitBox: D3.Selection) {
@@ -117,8 +127,8 @@ export module Interaction {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;
-      function callback(pixelArea: IPixelArea) {
-        if (pixelArea == null) {
+      function callback(upperLeft: ICoord, lowerRight: ICoord) {
+        if (upperLeft == null || lowerRight == null) {
           if (resetOnNextClick) {
             if (xScale != null) {
               xScale.domain(xDomainOriginal);
@@ -132,10 +142,10 @@ export module Interaction {
         }
         resetOnNextClick = false;
         if (xScale != null) {
-          xScale.domain([xScale.invert(pixelArea.xMin), xScale.invert(pixelArea.xMax)]);
+          xScale.domain([xScale.invert(upperLeft.x), xScale.invert(lowerRight.x)]);
         }
         if (yScale != null) {
-          yScale.domain([yScale.invert(pixelArea.yMax), yScale.invert(pixelArea.yMin)]);
+          yScale.domain([yScale.invert(lowerRight.y), yScale.invert(upperLeft.y)]);
         }
         this.clearBox();
         return;
