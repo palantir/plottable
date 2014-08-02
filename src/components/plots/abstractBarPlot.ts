@@ -52,6 +52,7 @@ export module Abstract {
       var positionAttr = this._isVertical ? "y" : "x";
       var dimensionAttr = this._isVertical ? "height" : "width";
 
+
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector[positionAttr] = () => scaledBaseline;
