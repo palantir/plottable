@@ -7209,7 +7209,7 @@ var Plottable;
                 });
             }
             /**
-            * Adds a callback to be caleld when dragging starts.
+            * Adds a callback to be called when dragging starts.
             *
             * @param {(a: SelectionArea) => any} cb The function to be called.
             * @returns {AreaInteraction}
