@@ -40,14 +40,26 @@ page_id: page-overview
         Plottable.js
         <small>Flexible, interactive, performant charts<br>for the web made easy</small>
       </h1>
-    </div>
-
-    <div id="chart-separator">
-      <div id="global-download">
-        <a href="https://github.com/palantir/plottable/archive/master.zip" class="button icon-download no-arrow">Download <span id="version-tag">({{ site.plottable_version }})</span></a>
+      <div id="download-container">
+        <p>
+          <a href="https://github.com/palantir/plottable/archive/master.zip" class="button icon-download no-arrow">Download <span id="version-tag">({{ site.plottable_version }})</span></a>
+        </p>
         <p>
           Follow our development on <a href="https://github.com/palantir/plottable" title="Plottable on Github.">Github</a>
         </p>
+      </div>
+    </div>
+
+    <div id="home-bottom">
+      <div class="content">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-offset-3 col-sm-6">
+              <h2>Built On Top Of D3</h2>
+              <p><strong>Plottable.js</strong> consists of pluggable set of Components which encapsulate rendering logic, and a layout engine that is responsible for positioning them.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header><!-- /header -->
@@ -56,50 +68,11 @@ page_id: page-overview
     <nav class="navbar-page">
       <ul class="nav" role="tablist">
         <li><a href="#section-overview" data-toggle="tooltip" data-placement="left" title="Overview">Overview</a></li>
-        <li><a href="#section-built-on-d3" data-toggle="tooltip" data-placement="left" title="Built on top of D3" style="white-space: nowrap;">Built on top of D3</a></li>
+        <li><a href="#section-example-1" data-toggle="tooltip" data-placement="left" title="Example">Example</a></li>
         <li><a href="#section-easier-more-usable" data-toggle="tooltip" data-placement="left" title="Easier, More Usable">Easier, More Usable</a></li>
-        <li><a href="#section-example-1" data-toggle="tooltip" data-placement="left" title="Example - 1">Example - 1</a></li>
       </ul>
     </nav>
   </div>
-
-  <section id="section-built-on-d3">
-    <div class="content">
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-offset-3 col-sm-6">
-            <h2>Built On Top Of D3</h2>
-            <p><strong>Plottable.js</strong> consists of pluggable set of Components which encapsulate rendering logic, and a layout engine that is responsible for positioning them.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="section-easier-more-usable">
-    <div class="content">
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-offset-3 col-sm-6">
-            <h2>Easier, More Usable</h2>
-
-            <div id="plot-separator">
-              <img class="no-svg" src="{{ site.baseurl }}/build/images/plots.png">
-              <img class="svg" src="{{ site.baseurl }}/build/images/plots.svg">
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-6">
-            <p>Because Plottable handles layout, sizing, and positioning, Plottable charts are easier to create and more reusable than charts built only with D3. And, since Plottable Components are powered by D3, the full flexibility of D3 is still available.</p>
-          </div>
-          <div class="col-sm-6">
-            <p>Plottable currently includes components like <strong>LinePlots</strong>, <strong>AreaPlots</strong>, <strong>BarPlots</strong>, <strong>CategoryAxes</strong> (with automatic word-wrapping), <strong>interactive Legends</strong>, and <strong>Labels</strong>. Plottable is open-sourced under the MIT license, and is under active development by <strong>Palantir Technologies</strong>.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <div id="section-example-1">
     <div class="content">
@@ -202,6 +175,31 @@ window.onload = function() {
     </div>
 
   </div><!-- /#section-example-1 -->
+
+  <section id="section-easier-more-usable">
+    <div class="content">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-offset-3 col-sm-6">
+            <h2>Easier, More Usable</h2>
+
+            <div id="plot-separator">
+              <img class="no-svg" src="{{ site.baseurl }}/build/images/plots.png">
+              <img class="svg" src="{{ site.baseurl }}/build/images/plots.svg">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <p>Because Plottable handles layout, sizing, and positioning, Plottable charts are easier to create and more reusable than charts built only with D3. And, since Plottable Components are powered by D3, the full flexibility of D3 is still available.</p>
+          </div>
+          <div class="col-sm-6">
+            <p>Plottable currently includes components like <strong>LinePlots</strong>, <strong>AreaPlots</strong>, <strong>BarPlots</strong>, <strong>CategoryAxes</strong> (with automatic word-wrapping), <strong>interactive Legends</strong>, and <strong>Labels</strong>. Plottable is open-sourced under the MIT license, and is under active development by <strong>Palantir Technologies</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Footer -->
   <footer role="contentinfo">

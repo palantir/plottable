@@ -1,8 +1,12 @@
 ---
-layout: default
+layout: subpage
 title: Tutorials
 page_id: page-tutorials
 ---
+
+Plottable Tutorials
+===================
+
 Get started with the Plottable Tutorial: Download the packaged tutorial
 files at <https://palantir.github.io/plottable/tutorials.zip>; extract
 it, and each subdirectory corresponds to a different tutorial. You can
@@ -280,7 +284,7 @@ The name of the property is already `x`, which directly maps to the x
 values of a Line Plot and the same is true of the y values.
 
 However, data is not usually that neatly formatted. For example, if your
-data is an object with the properties `{committer, days, total\_commits,
+data is an object with the properties `{committer, days, total_commits,
 additions, deletions}`, Plottable cannot automatically determine the
 property for `x` and `y`.
 

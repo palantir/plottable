@@ -108,8 +108,7 @@ a, button, input[type="submit"] {
 
     .no-touch &:hover,
     .touch &:active {
-      border-color: $COLOR_BLACK1;
-      color: $COLOR_BLACK1;
+      @include opacity(0.6);
       text-decoration: none;
     }
 

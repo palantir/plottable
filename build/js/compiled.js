@@ -11316,27 +11316,6 @@ Modernizr.addTest('retina', function() {
         this.initialized = true;
         this.$currentSection = this.getCurrentSection();
         this.$lastSection = this.$sections.last();
-
-        $window.on('mousewheel', $.proxy(function(event) {
-          var $currentSection = this.getCurrentSection();
-
-          if ($currentSection == null) {
-            return;
-          }
-
-          if (!this.isPaging) {
-            var pageIndex = this.$sections.index($currentSection);
-            if (event.originalEvent.wheelDelta < 0) {
-              pageIndex++;
-            } else {
-              pageIndex--;
-            }
-            if (pageIndex < this.$sections.length && pageIndex > -1) {
-              this.gotoSection(this.$sections.eq(pageIndex));
-            }
-          }
-          return false;
-        }, this));
       } else {
         console.log('Already initialized VerticalPager.');
       }

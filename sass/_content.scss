@@ -81,7 +81,7 @@ header {
     }
   }
 
-  @media (min-width: $screen-sm-min) {
+  //@media (min-width: $screen-sm-min) {
     .navbar .nav,
     .navbar .nav > li {
       float: none;
@@ -96,7 +96,7 @@ header {
     .container-fluid {
       text-align: center;
     }
-  }
+  //}
 }
 
 /*
@@ -105,19 +105,26 @@ header {
 body#page-index {
 
   header {
+    position: relative;
     height: 100%;
-    background: $COLOR_BLUE2;
+    min-height: 620px;
+
+    @media (min-width: $screen-md-min) {
+      min-height: 800px;
+    }
+
     color: $COLOR_BLUE1;
+    background-color: $COLOR_BLUE3;
 
     h1 {
-      text-align: center;
+      margin-bottom: 20px;
       font-weight: $font-weight-bold;
       @include rem(font-size, 36px);
 
       small {
         margin-top: 1em;
         @include rem(font-size, 10px);
-        color: $COLOR_WHITE1;
+        color: $COLOR_BLUE1;
         text-transform: none;
         font-family: $font-body;
         display: block;
@@ -150,42 +157,77 @@ body#page-index {
     }
 
     div#nav-content {
-      position: relative;
-      z-index: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 550px;
+      background-repeat: repeat;
+      background-size: 24px 24px;
+      text-align: center;
+
+      .no-retina & { background-image: url(../images/background-pattern.png); }
+      .retina & { background-image: url(../images/background-pattern@2x.png); }
     }
 
-    div#chart-separator {
+    div#home-bottom {
       position: absolute;
-      z-index: 0;
-      background-repeat: no-repeat;
-      background-position: top center;
-      background-size: 100%;
-      background-color: $COLOR_BLUE3;
+      z-index: 2;
+      top: 250px;
+      bottom: 50px;
       width: 100%;
-      bottom: 0;
-      height: 600px;
-      padding-bottom: 200px;
+      text-align: center;
+
+      background-size: 1500px 212px;
+      background-position: center top;
+      background-repeat: no-repeat;
+
+      margin-bottom: 20px;
+
+      @media (min-width: $screen-lg-min) {
+        background-size: 3005px 424px;
+      }
 
       .no-svg & { background-image: url(../images/plot-background.png); }
       .svg & { background-image: url(../images/plot-background.svg); }
 
-      div#global-download {
-        margin-top: 4em;
-        width: 100%;
-        position: absolute;
-        text-align: center;
-        bottom: 50px;
+      div.content {
+        background: $COLOR_BLUE3;
+        margin-top: 155px;
 
-        & > a {
-          color: $COLOR_WHITE1;
-          border-color: $COLOR_WHITE1;
-
-          .no-touch &:hover {
-            @include opacity(0.6);
-          }
+        @media (min-width: $screen-md-min) {
+          margin-top: 200px;
         }
 
+        @media (min-width: $screen-lg-min) {
+          margin-top: 400px;
+        }
       }
+
+      p {
+        color: $COLOR_BLUE4;
+      }
+
+      h2 {
+        color: $COLOR_BLUE4;
+        margin-top: 0;
+        background-repeat: no-repeat;
+        padding-top: 64px;
+        background-position: center top;
+        background-size: 46px 44px;
+
+        .no-retina & { background-image: url(../images/d3-logo.png); }
+        .retina & { background-image: url(../images/d3-logo@2x.png); }
+      }
+
+      @media (min-width: $screen-md-min) {
+        top: 350px;
+      }
+
+      @media (min-width: $screen-lg-min) {
+        top: 250px;
+      }
+
     }
   }
 
@@ -200,24 +242,8 @@ body#page-index {
       vertical-align: middle;
     }
 
-
-    &#section-built-on-d3 {
-      background: $COLOR_BLUE2;
-      color: $COLOR_BLACK1;
-      h2 {
-        margin-top: 0;
-        background-repeat: no-repeat;
-        padding-top: 64px;
-        background-position: left top;
-        background-size: 46px 44px;
-
-        .no-retina & { background-image: url(../images/d3-logo.png); }
-        .retina & { background-image: url(../images/d3-logo@2x.png); }
-      }
-    }
-
     &#section-easier-more-usable {
-      background: $COLOR_BLUE3;
+      background: $COLOR_BLUE4;
       color: $COLOR_WHITE1;
 
       h2 {
@@ -320,6 +346,7 @@ div#page-nav {
 /* Example */
 #section-example-1 {
   padding: 40px 0;
+  height: 100%;
 }
 
 /*
@@ -425,6 +452,10 @@ div#page-content {
         max-width: 800px;
         margin: 0 auto;
         display: block;
+
+        @media (max-width: $screen-xs-min) {
+          @include rem(font-size, 10px);
+        }
       }
     }
   }
