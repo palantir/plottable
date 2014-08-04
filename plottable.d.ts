@@ -603,11 +603,11 @@ declare module Plottable {
         /**
         * This interface represents the callback that should be passed to the Broadcaster on a Listenable.
         *
-        * The callback will be called with the attached listenable as the first object, and optional arguments
+        * The callback will be called with the attached Listenable as the first object, and optional arguments
         * as the subsequent arguments.
         *
-        * The listenable is passed as the first argument so that it is easy for the callback to reference the
-        * current state of the listenable in the resolution logic.
+        * The Listenable is passed as the first argument so that it is easy for the callback to reference the
+        * current state of the Listenable in the resolution logic.
         */
         interface IBroadcasterCallback {
             (listenable: IListenable, ...args: any[]): any;
@@ -623,10 +623,10 @@ declare module Plottable {
         class Broadcaster extends Abstract.PlottableObject {
             public listenable: IListenable;
             /**
-            * Construct a broadcaster, taking the listenable that the broadcaster will be attached to.
+            * Construct a broadcaster, taking the Listenable that the broadcaster will be attached to.
             *
             * @constructor
-            * @param {IListenable} listenable The listenable-object that this broadcaster is attached to.
+            * @param {IListenable} Listenable The Listenable-object that this broadcaster is attached to.
             */
             constructor(listenable: IListenable);
             /**
@@ -1622,7 +1622,7 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         /**
-        * This class implements a colorScale that takes quantitive input and
+        * This class implements a color scale that takes quantitive input and
         * interpolates between a list of color values. It returns a hex string
         * representing the interpolated color.
         *

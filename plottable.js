@@ -1583,10 +1583,10 @@ var Plottable;
         var Broadcaster = (function (_super) {
             __extends(Broadcaster, _super);
             /**
-            * Construct a broadcaster, taking the listenable that the broadcaster will be attached to.
+            * Construct a broadcaster, taking the Listenable that the broadcaster will be attached to.
             *
             * @constructor
-            * @param {IListenable} listenable The listenable-object that this broadcaster is attached to.
+            * @param {IListenable} Listenable The Listenable-object that this broadcaster is attached to.
             */
             function Broadcaster(listenable) {
                 _super.call(this);
@@ -4268,7 +4268,7 @@ var Plottable;
         ;
 
         /**
-        * This class implements a colorScale that takes quantitive input and
+        * This class implements a color scale that takes quantitive input and
         * interpolates between a list of color values. It returns a hex string
         * representing the interpolated color.
         *

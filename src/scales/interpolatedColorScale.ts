@@ -7,7 +7,7 @@ export module Scale {
   };
 
   /**
-   * This class implements a colorScale that takes quantitive input and
+   * This class implements a color scale that takes quantitive input and
    * interpolates between a list of color values. It returns a hex string
    * representing the interpolated color.
    *
