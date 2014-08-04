@@ -21,7 +21,7 @@ export module Plot {
      */
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
-      this.classed("circle-renderer", true);
+      this.classed("circle-plot", true);
       this.project("r", 3); // default
       this.project("fill", () => "steelblue"); // default
     }
