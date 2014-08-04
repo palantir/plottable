@@ -323,6 +323,9 @@ describe("Plots", () => {
         var bar1y = bar1.data()[0].y;
         assert.closeTo(numAttr(bar0, "height"), 104, 2);
         assert.closeTo(numAttr(bar1, "height"), 104, 2);
+
+        // This is necessary in order to have the arithmetic below work out.
+        xScale.domainer(xScale.domainer().pad(0));
         assert.closeTo(numAttr(bar0, "width"), (600 - axisWidth) / 2, 0.01, "width is correct for bar0");
         assert.closeTo(numAttr(bar1, "width"), 600 - axisWidth, 0.01, "width is correct for bar1");
         // check that bar is aligned on the center of the scale

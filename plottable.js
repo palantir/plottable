@@ -6162,7 +6162,6 @@ var Plottable;
                 if (domainer != null) {
                     this._addBaseline(domainer);
                     this.xScale._autoDomainIfAutomaticMode();
-                    domainer.pad(0);
                 }
                 return this;
             };
@@ -6204,7 +6203,6 @@ var Plottable;
                 if (domainer != null) {
                     this._addBaseline(domainer);
                     this.xScale._autoDomainIfAutomaticMode();
-                    domainer.pad(0);
                 }
                 return this;
             };

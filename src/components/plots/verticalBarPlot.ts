@@ -23,7 +23,6 @@ export module Plot {
       if (domainer != null) {
         this._addBaseline(domainer);
         this.xScale._autoDomainIfAutomaticMode();
-        domainer.pad(0);
       }
       return this;
     }
