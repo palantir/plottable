@@ -6123,7 +6123,7 @@ var Plottable;
                     "circles-reset": new Plottable.Animator.Null(),
                     "circles": new Plottable.Animator.IterativeDelay().duration(250).delay(5)
                 };
-                this.classed("circle-plot", true);
+                this.classed("scatter-plot", true);
                 this.project("r", 3); // default
                 this.project("fill", function () {
                     return "steelblue";
