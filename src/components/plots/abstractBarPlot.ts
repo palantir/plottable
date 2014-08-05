@@ -27,7 +27,7 @@ export module Abstract {
      */
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
-      this.classed("bar-renderer", true);
+      this.classed("bar-plot", true);
       this.project("fill", () => "steelblue");
       // because this._baselineValue was not initialized during the super()
       // call, we must call this in order to get this._baselineValue

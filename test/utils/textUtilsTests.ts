@@ -167,6 +167,18 @@ describe("Util.Text", () => {
     var hideResults = true;
 
     describe("writeLineHorizontally", () => {
+
+      it("writes no text if there is insufficient space", () => {
+        svg = generateSVG(20, 20);
+        g = svg.append("g");
+        var wh = Plottable.Util.Text.writeLineHorizontally(text, g, 20, 20);
+        assert.equal(wh.width, 0, "no width used");
+        assert.equal(wh.height, 0, "no height used");
+        var textEl = g.select("text");
+        assert.equal(g.text(), "", "no text written");
+        svg.remove();
+      });
+
       it("performs basic functionality and defaults to left, top", () => {
         svg = generateSVG(400, 400);
         g = svg.append("g");
