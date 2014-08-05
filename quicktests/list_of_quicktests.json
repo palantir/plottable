@@ -79,6 +79,6 @@
     "categories":["linearscale", "numericaxis", "vertbar", "gridlines", "merge", "click", "xydragbox", "title"]
   },  {    
     "name":"select_zoom",
-    "categories":["linearscale", "numericaxis", "scatter", "merge", "title", "legend", "xydragbox"]
+    "categories":["linearscale", "numericaxis", "scatter", "merge", "title", "legend", "xydragbox", "doubleclick"]
   }
 ]
