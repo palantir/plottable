@@ -955,7 +955,7 @@ describe("Legends", function () {
             var textHeight = Plottable.Util.DOM.getBBox(text).height;
             var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
             assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
-            assert.operator(circleHeight, ">", textHeight / 2, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
+            assert.operator(circleHeight, ">", textHeight / 2, "icons are too small. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
         }
 
         verifyCircleHeight();
