@@ -91,7 +91,7 @@ export module Component {
 
     public _doRender() {
       super._doRender();
-      this.textContainer.html("");
+      this.textContainer.text("");
       var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
       var truncatedText = Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {
