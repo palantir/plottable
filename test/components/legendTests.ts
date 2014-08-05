@@ -144,6 +144,35 @@ describe("Legends", () => {
     svg.remove();
   });
 
+  it("icon radius is not too small or too big", () => {
+    color.domain(["foo"]);
+    legend.renderTo(svg);
+    var style = legend.element.append("style");
+    style.attr("type", "text/css");
+
+    function verifyCircleHeight() {
+      var d3this = d3.select(this);
+      var text = legend.content.select("text");
+      var circle = legend.content.select("circle");
+      var textHeight = Plottable.Util.DOM.getBBox(text).height;
+      var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+      assert.isTrue(circleHeight < textHeight);
+      assert.isTrue(circleHeight > textHeight / 2);
+    }
+
+    verifyCircleHeight();
+
+    style.text(".plottable .legend text { font-size: 60px; }");
+    legend._computeLayout()._render();
+    verifyCircleHeight();
+
+    style.text(".plottable .legend text { font-size: 10px; }");
+    legend._computeLayout()._render();
+    verifyCircleHeight();
+
+    svg.remove();
+  });
+
   describe("Legend toggle tests", () => {
     var toggleLegend: Plottable.Component.Legend;
 

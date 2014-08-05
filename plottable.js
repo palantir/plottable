@@ -692,8 +692,8 @@ var Plottable;
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
                 var anchor = anchorConverter[xAlign];
                 var xOff = width * xOffsetFactor[xAlign];
-                var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
-                var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
+                var yOff = height * yOffsetFactor[yAlign];
+                var ems = 0.85 - yOffsetFactor[yAlign];
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
                 Util.DOM.translate(innerG, xOff, yOff);
                 return { width: w, height: h };
@@ -5747,10 +5747,10 @@ var Plottable;
                 return this;
             };
 
-            Legend.prototype._requestedSpace = function (offeredWidth, offeredY) {
+            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var textHeight = this.measureTextHeight();
                 var totalNumRows = this.colorScale.domain().length;
-                var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
+                var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
 
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var fakeText = fakeLegendEl.append("text");
@@ -5762,7 +5762,7 @@ var Plottable;
                 var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
                 return {
                     width: Math.min(desiredWidth, offeredWidth),
-                    height: rowsICanFit * textHeight,
+                    height: rowsICanFit === 0 ? 0 : rowsICanFit * textHeight + 2 * Legend.MARGIN,
                     wantsWidth: offeredWidth < desiredWidth,
                     wantsHeight: rowsICanFit < totalNumRows
                 };
@@ -5786,22 +5786,30 @@ var Plottable;
                 var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
                 var textHeight = this.measureTextHeight();
                 var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
-                var r = textHeight / 2 - Legend.MARGIN;
+                var r = textHeight * 0.3;
                 var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) {
                     return d;
                 });
                 var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                legendEnter.append("circle").attr("cx", Legend.MARGIN + r).attr("cy", Legend.MARGIN + r).attr("r", r);
-                legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
+
+                legendEnter.append("circle");
+                legendEnter.append("g").classed("text-container", true);
+
                 legend.exit().remove();
+
+                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this.colorScale._d3Scale);
+                legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
+                    var d3this = d3.select(this);
+                    var measure = Plottable.Util.Text.getTextMeasure(d3this);
+                    var writeLine = Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
+                    var writeLineMeasure = measure(writeLine);
+                    Plottable.Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
+                });
+
                 legend.attr("transform", function (d) {
-                    return "translate(0," + domain.indexOf(d) * textHeight + ")";
+                    return "translate(" + Legend.MARGIN + "," + (domain.indexOf(d) * textHeight + Legend.MARGIN) + ")";
                 });
-                legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
-                legend.selectAll("text").text(function (d) {
-                    var measure = Plottable.Util.Text.getTextMeasure(d3.select(this));
-                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
-                });
+
                 this.updateClasses();
                 this.updateListeners();
                 return this;
