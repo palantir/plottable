@@ -39,6 +39,9 @@
     "name":"formatter",
     "categories":["LinearScale", "NumericAxis", "Line", "Formatter", "Click", "Layout", "Data"]
   },  {
+    "name":"heightWeight_project",
+    "categories":["LinearScale", "NumericAxis", "Scatter", "Accessor", "Project"]   
+  },  {    
     "name":"interaction_dragzoomx",
     "categories":["Data", "LinearScale", "NumericAxis", "Accessor", "Project", "Area", "Gridlines", "Merge", "Group"]
   },  {
@@ -50,6 +53,9 @@
   },  {
     "name":"legend_basic",
     "categories":["Legend", "Title", "Gridlines", "ColorScale", "Scatter", "Line", "NumericAxis", "Metadata", "Project", "Merge", "LinearScale"]
+  },  {
+    "name":"modifiedLog",
+    "categories":["Datasource", "Metadata", "ModifiedLogScale", "ColorScale", "ColorScale", "Line", "NumericAxis", "Accessor", "Project", "Merge", "Detach"]
   },  {
     "name":"no_data",
     "categories":[ "LinearScale", "NumericAxis", "Area", "Scatter", "VertBar", "HorizBar", "Line", "Table", "Layout"]
@@ -66,6 +72,9 @@
     "name":"scale_interactive",
     "categories":["LinearScale", "NumericAxis", "Scatter", "Gridlines", "Merge", "Table", "Layout", "PanZoom"]
   },  {
+    "name":"select_bars",
+    "categories":["LinearScale", "NumericAxis", "VertBar", "Gridlines", "Merge", "Click", "XYDragBox", "Title"]
+  },  {    
     "name":"select_zoom",
     "categories":["LinearScale", "NumericAxis", "Scatter", "Merge", "Title", "Legend", "XYDragBox"]
   }
