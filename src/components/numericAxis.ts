@@ -29,8 +29,9 @@ export module Axis {
       // create a new text measurerer every time; see issue #643
       var measurer = Util.Text.getTextMeasure(testTextEl);
       var textLengths = tickValues.map((v: any) => {
-        var formattedValue = this._formatter.format(v + epsilon);
-        return measurer("X" + formattedValue).width; // extra character of padding
+        var formattedValue = this._formatter.format(v);
+        return measurer(formattedValue).width;
+        // return measurer("X" + formattedValue).width; // extra character of padding
       });
       testTextEl.remove();
 

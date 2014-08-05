@@ -131,7 +131,16 @@ describe("BaseAxis", function () {
         }, "must be positive");
     });
 
-    it("width()", function () {
+    it("gutter() rejects negative values", function () {
+        var scale = new Plottable.Scale.Linear();
+        var axis = new Plottable.Abstract.Axis(scale, "right");
+
+        assert.throws(function () {
+            return axis.gutter(-1);
+        }, "must be positive");
+    });
+
+    it("width() + gutter()", function () {
         var SVG_WIDTH = 100;
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -139,8 +148,12 @@ describe("BaseAxis", function () {
         var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
         verticalAxis.renderTo(svg);
 
-        var expectedWidth = verticalAxis.tickLength();
+        var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
         assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
+
+        verticalAxis.gutter(20);
+        expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
+        assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the gutter size updates the width");
 
         verticalAxis.width(20);
         assert.strictEqual(verticalAxis.width(), 20, "width was set to user-specified value");
@@ -163,7 +176,7 @@ describe("BaseAxis", function () {
         svg.remove();
     });
 
-    it("height()", function () {
+    it("height() + gutter()", function () {
         var SVG_WIDTH = 500;
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -171,8 +184,12 @@ describe("BaseAxis", function () {
         var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
         horizontalAxis.renderTo(svg);
 
-        var expectedHeight = horizontalAxis.tickLength();
+        var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
         assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
+
+        horizontalAxis.gutter(20);
+        expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
+        assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the gutter size updates the height");
 
         horizontalAxis.height(20);
         assert.strictEqual(horizontalAxis.height(), 20, "height was set to user-specified value");

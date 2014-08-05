@@ -1740,6 +1740,19 @@ declare module Plottable {
             */
             public tickLabelPadding(padding: number): Axis;
             /**
+            * Gets the size of the gutter (the extra space beyond the tick labels).
+            *
+            * @returns {number} The current size of the gutter, in pixels.
+            */
+            public gutter(): number;
+            /**
+            * Sets the size of the gutter (the extra space beyond the tick labels).
+            *
+            * @param {number} size The desired size of the gutter, in pixels.
+            * @returns {Axis} The calling Axis.
+            */
+            public gutter(size: number): Axis;
+            /**
             * Gets the orientation of the Axis.
             *
             * @returns {string} The current orientation.

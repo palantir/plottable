@@ -4503,6 +4503,7 @@ var Plottable;
                 this._height = "auto";
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
+                this._gutter = 10;
                 this._showEndTickLabels = false;
                 if (scale == null || orientation == null) {
                     throw new Error("Axis requires a scale and orientation");
@@ -4557,7 +4558,7 @@ var Plottable;
                         if (this._computedHeight == null) {
                             this._computeHeight();
                         }
-                        requestedHeight = this._computedHeight;
+                        requestedHeight = this._computedHeight + this._gutter;
                     }
                     requestedWidth = 0;
                 } else {
@@ -4565,7 +4566,7 @@ var Plottable;
                         if (this._computedWidth == null) {
                             this._computeWidth();
                         }
-                        requestedWidth = this._computedWidth;
+                        requestedWidth = this._computedWidth + this._gutter;
                     }
                     requestedHeight = 0;
                 }
@@ -4767,6 +4768,19 @@ var Plottable;
                         throw new Error("tick label padding must be positive");
                     }
                     this._tickLabelPadding = padding;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+
+            Axis.prototype.gutter = function (size) {
+                if (size == null) {
+                    return this._gutter;
+                } else {
+                    if (size < 0) {
+                        throw new Error("gutter size must be positive");
+                    }
+                    this._gutter = size;
                     this._invalidateLayout();
                     return this;
                 }
@@ -5174,8 +5188,9 @@ var Plottable;
                 // create a new text measurerer every time; see issue #643
                 var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textLengths = tickValues.map(function (v) {
-                    var formattedValue = _this._formatter.format(v + epsilon);
-                    return measurer("X" + formattedValue).width;
+                    var formattedValue = _this._formatter.format(v);
+                    return measurer(formattedValue).width;
+                    // return measurer("X" + formattedValue).width; // extra character of padding
                 });
                 testTextEl.remove();
 
