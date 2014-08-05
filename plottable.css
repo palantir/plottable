@@ -67,7 +67,7 @@ svg.plottable {
 .plottable .legend text {
   font-family: sans-serif;
   fill: #979797;
-  font-size: 10px;
+  font-size: 14pt;
 }
 
 .plottable .line-renderer path.line {
