@@ -5581,14 +5581,23 @@ var Plottable;
                 };
             };
             Mouse.prototype.mouseover = function (callback) {
+                if (callback === undefined) {
+                    return this._mouseover;
+                }
                 this._mouseover = callback;
                 return this;
             };
             Mouse.prototype.mousemove = function (callback) {
+                if (callback === undefined) {
+                    return this._mousemove;
+                }
                 this._mousemove = callback;
                 return this;
             };
             Mouse.prototype.mouseout = function (callback) {
+                if (callback === undefined) {
+                    return this._mouseout;
+                }
                 this._mouseout = callback;
                 return this;
             };

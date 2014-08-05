@@ -43,34 +43,67 @@ export module Dispatcher {
     }
 
     /**
+     * Gets the current callback to be called on mouseover.
+     *
+     * @return {(location: Point) => any} The current mouseover callback.
+     */
+    public mouseover(): (location: Point) => any;
+    /**
      * Attaches a callback to be called on mouseover.
      *
      * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+     *                                            Pass in null to remove the callback.
      * @return {Mouse} The calling Mouse Handler.
      */
-    public mouseover(callback: (location: Point) => any) {
+    public mouseover(callback: (location: Point) => any): Mouse;
+    public mouseover(callback?: (location: Point) => any): any {
+      if (callback === undefined) {
+        return this._mouseover;
+      }
       this._mouseover = callback;
       return this;
     }
 
     /**
+     * Gets the current callback to be called on mousemove.
+     *
+     * @return {(location: Point) => any} The current mousemove callback.
+     */
+    public mousemove(): (location: Point) => any;
+    /**
      * Attaches a callback to be called on mousemove.
      *
      * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+     *                                            Pass in null to remove the callback.
      * @return {Mouse} The calling Mouse Handler.
      */
-    public mousemove(callback: (location: Point) => any) {
+    public mousemove(callback: (location: Point) => any): Mouse;
+    public mousemove(callback?: (location: Point) => any): any {
+      if (callback === undefined) {
+        return this._mousemove;
+      }
       this._mousemove = callback;
       return this;
     }
 
     /**
+     * Gets the current callback to be called on mouseout.
+     *
+     * @return {(location: Point) => any} The current mouseout callback.
+     */
+    public mouseout(): (location: Point) => any;
+    /**
      * Attaches a callback to be called on mouseout.
      *
      * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+     *                                            Pass in null to remove the callback.
      * @return {Mouse} The calling Mouse Handler.
      */
-    public mouseout(callback: (location: Point) => any) {
+    public mouseout(callback: (location: Point) => any): Mouse;
+    public mouseout(callback?: (location: Point) => any): any {
+      if (callback === undefined) {
+        return this._mouseout;
+      }
       this._mouseout = callback;
       return this;
     }

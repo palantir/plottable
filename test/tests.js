@@ -4176,9 +4176,7 @@ describe("Dispatchers", function () {
         var target2 = generateSVG();
         var dispatcher = new Plottable.Abstract.Dispatcher(target1);
         var callbackWasCalled = false;
-        dispatcher._event2Callback["click"] = function () {
-            callbackWasCalled = true;
-        };
+        dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
         dispatcher.connect();
         triggerFakeUIEvent("click", target1);
         assert.isTrue(callbackWasCalled, "The dispatcher received the event on the target");
@@ -4195,15 +4193,11 @@ describe("Dispatchers", function () {
         var target = generateSVG();
         var dispatcher1 = new Plottable.Abstract.Dispatcher(target);
         var called1 = false;
-        dispatcher1._event2Callback["click"] = function () {
-            called1 = true;
-        };
+        dispatcher1._event2Callback["click"] = function () { return called1 = true; };
         dispatcher1.connect();
         var dispatcher2 = new Plottable.Abstract.Dispatcher(target);
         var called2 = false;
-        dispatcher2._event2Callback["click"] = function () {
-            called2 = true;
-        };
+        dispatcher2._event2Callback["click"] = function () { return called2 = true; };
         dispatcher2.connect();
         triggerFakeUIEvent("click", target);
         assert.isTrue(called1, "The first dispatcher called its callback");

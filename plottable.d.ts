@@ -1055,8 +1055,11 @@ declare module Plottable {
     module Dispatcher {
         class Mouse extends Plottable.Abstract.Dispatcher {
             constructor(target: D3.Selection);
+            mouseover(): (location: Point) => any;
             mouseover(callback: (location: Point) => any): Mouse;
+            mousemove(): (location: Point) => any;
             mousemove(callback: (location: Point) => any): Mouse;
+            mouseout(): (location: Point) => any;
             mouseout(callback: (location: Point) => any): Mouse;
         }
     }
