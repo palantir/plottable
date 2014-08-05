@@ -3503,7 +3503,7 @@ var Plottable;
                 }
                 tickLabels.exit().remove();
                 tickLabels.attr("transform", function (d) { return "translate(" + _this._scale.scale(d) + ",0)"; });
-                var anchor = shouldCenterText ? "middle" : "left";
+                var anchor = shouldCenterText ? "middle" : "start";
                 tickLabels.selectAll("text").text(function (d) { return d3.time.format(interval.formatString)(d); }).style("text-anchor", anchor);
             };
             Time.prototype.canFitLabelFilter = function (container, position, label, isCentered) {

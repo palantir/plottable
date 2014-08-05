@@ -2982,9 +2982,6 @@ describe("Scales", function () {
         });
         it("domain can't include NaN or Infinity", function () {
             var scale = new Plottable.Scale.Linear();
-            var log = console.log;
-            console.log = function () {
-            };
             scale.domain([0, 1]);
             scale.domain([5, Infinity]);
             assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
@@ -2994,7 +2991,6 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
             scale.domain([-1, 5]);
             assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
-            console.log = log;
         });
     });
     describe("Ordinal Scales", function () {
@@ -3055,6 +3051,7 @@ describe("Scales", function () {
         assert.lengthOf(xScale.domain(), 1);
         iterateDataChanges([], [dA, dB, dC]);
         assert.lengthOf(xScale.domain(), 3);
+        svg.remove();
     });
     describe("Color Scales", function () {
         it("accepts categorical string types and ordinal domain", function () {
