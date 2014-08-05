@@ -13,6 +13,7 @@ module.exports = function(grunt) {
         noImplicitAny: true,
         sourceMap: false,
         declaration: true,
+        compiler: "./node_modules/grunt-ts/customcompiler/tsc",
         removeComments: false
       }
     },
@@ -25,6 +26,7 @@ module.exports = function(grunt) {
         sourceMap: false,
         noImplicitAny: true,
         declaration: false,
+        compiler: "./node_modules/grunt-ts/customcompiler/tsc",
         removeComments: false
       }
     },
@@ -32,6 +34,16 @@ module.exports = function(grunt) {
       src: ["typings/d3/d3.d.ts", "plottable.d.ts"]
     }
   };
+
+  // poor man's deep copy
+  var deepCopy = function(x) {
+    return JSON.parse(JSON.stringify(x));
+  };
+
+  tsJSON.dev_release = deepCopy(tsJSON.dev);
+  delete tsJSON.dev_release.options.compiler;
+  tsJSON.test_release = deepCopy(tsJSON.test);
+  delete tsJSON.test_release.options.compiler;
 
   var bumpJSON = {
     options: {
@@ -69,8 +81,13 @@ module.exports = function(grunt) {
       replacement: "",
       path: "build/plottable.d.ts",
     },
-    protected_definitions: {
+    public_protected_definitions: {
       pattern: jsdoc + prefixMatch + "public _" + varNameMatch + finalMatch,
+      replacement: "",
+      path: "plottable.d.ts",
+    },
+    protected_definitions: {
+      pattern: jsdoc + prefixMatch + "_" + varNameMatch + finalMatch,
       replacement: "",
       path: "plottable.d.ts",
     },
@@ -80,7 +97,7 @@ module.exports = function(grunt) {
       path: "plottable_multifile.js",
     },
     definitions: {
-      pattern: '/// *<reference path=".*" */>',
+      pattern: '/// *<reference path=[\'"].*[\'"] */>',
       replacement: "",
       path: "build/plottable.d.ts",
     },
@@ -293,29 +310,36 @@ module.exports = function(grunt) {
                                   "concat:tests",
                                   ]);
   grunt.registerTask("default", "launch");
-  grunt.registerTask("dev-compile", [
-                                  "update_ts_files",
-                                  "update_test_ts_files",
-                                  "ts:dev",
-                                  "concat:plottable",
-                                  "concat:definitions",
-                                  "sed:definitions",
-                                  "sed:private_definitions",
-                                  "concat:header",
-                                  "sed:version_number",
-                                  "definitions_prod",
-                                  "test-compile",
-                                  "sed:protected_definitions",
-                                  "concat:plottable_multifile",
-                                  "sed:plottable_multifile",
-                                  "clean:tscommand"]);
+  function makeDevCompile(release) {
+    return [
+      "update_ts_files",
+      "update_test_ts_files",
+      release ? "ts:dev_release" : "ts:dev",
+      "concat:plottable",
+      "concat:definitions",
+      "sed:definitions",
+      "sed:private_definitions",
+      "concat:header",
+      "sed:version_number",
+      "definitions_prod",
+      "test-compile",
+      "sed:public_protected_definitions",
+      "sed:protected_definitions",
+      "concat:plottable_multifile",
+      "sed:plottable_multifile",
+      "clean:tscommand"
+    ];
+  }
+
+  grunt.registerTask("dev-compile", makeDevCompile(false));
+  grunt.registerTask("release-compile", makeDevCompile(true));
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", [
-                                  "dev-compile",
+                                  "release-compile",
                                   "blanket_mocha",
                                   "tslint",
                                   "ts:verify_d_ts",

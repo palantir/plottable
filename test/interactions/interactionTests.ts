@@ -11,7 +11,7 @@ function makeFakeEvent(x: number, y: number): D3.D3Event {
       clientY: y,
       translate: [x, y],
       scale: 1,
-      sourceEvent: null,
+      sourceEvent: <any> null,
       x: x,
       y: y,
       keyCode: 0,
