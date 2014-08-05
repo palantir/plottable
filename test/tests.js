@@ -3519,11 +3519,13 @@ describe("CachingCharacterMeasurer", function () {
         g = svg.append("g");
         measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g);
     });
+    afterEach(function () {
+        svg.remove();
+    });
     it("empty string has non-zero size", function () {
         var a = measurer.measure("x x").width;
         var b = measurer.measure("xx").width;
         assert.operator(a, ">", b, "'x x' is longer than 'xx'");
-        svg.remove();
     });
     it("should repopulate cache if it changes size and clear() is called", function () {
         var a = measurer.measure("x").width;
@@ -3533,7 +3535,6 @@ describe("CachingCharacterMeasurer", function () {
         measurer.clear();
         var c = measurer.measure("x").width;
         assert.operator(a, "<", c, "cache reset after font size changed");
-        svg.remove();
     });
     it("multiple spaces take up same area as one space", function () {
         var a = measurer.measure("x x").width;
