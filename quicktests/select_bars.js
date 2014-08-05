@@ -38,6 +38,7 @@ function run(div, data, Plottable) {
                 renderAreaD1.selectBar({min: xy.xMin, max: xy.xMax}, 
                                        {min: xy.yMin, max: xy.yMax}, 
                                        true);
+                drag_interaction.clearBox();
             }
             
             cb_click = function(x, y) {
