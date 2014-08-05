@@ -151,7 +151,6 @@ describe("Legends", () => {
     style.attr("type", "text/css");
 
     function verifyCircleHeight() {
-      var d3this = d3.select(this);
       var text = legend.content.select("text");
       var circle = legend.content.select("circle");
       var textHeight = Plottable.Util.DOM.getBBox(text).height;
