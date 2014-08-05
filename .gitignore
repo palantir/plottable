@@ -5,6 +5,7 @@ build
 plottable_multifile.js
 test/tests_multifile.js
 local/
+.tscache/
 
 # Emacs
 .#*

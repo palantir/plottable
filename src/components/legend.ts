@@ -174,13 +174,13 @@ export module Component {
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
       var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
-      var r = textHeight - Legend.MARGIN * 2 - 2;
+      var r = textHeight / 2 - Legend.MARGIN;
       var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true);
       legendEnter.append("circle")
-          .attr("cx", Legend.MARGIN + r/2)
-          .attr("cy", Legend.MARGIN + r/2)
+          .attr("cx", Legend.MARGIN + r)
+          .attr("cy", Legend.MARGIN + r)
           .attr("r",  r);
       legendEnter.append("text")
           .attr("x", textHeight)
