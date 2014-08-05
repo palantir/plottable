@@ -64,8 +64,22 @@ export module Util {
     }
 
     /**
+     * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
+     * and "activate" it by turning it into a function in (datum, index, metadata)
+     */
+    export function _accessorize(accessor: any): IAccessor {
+      if (typeof(accessor) === "function") {
+        return (<IAccessor> accessor);
+      } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
+        return (d: any, i: number, s: any) => d[accessor];
+      } else {
+        return (d: any, i: number, s: any) => accessor;
+      };
+    }
+
+    /**
      * Takes two sets and returns the union
-     * 
+     *
      * @param{D3.Set} set1 The first set
      * @param{D3.Set} set2 The second set
      * @return{D3.Set} A set that contains elements that appear in either set1 or set2
@@ -77,19 +91,12 @@ export module Util {
       return set;
      }
 
-    export function accessorize(accessor: any): IAccessor {
-      if (typeof(accessor) === "function") {
-        return (<IAccessor> accessor);
-      } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
-        return (d: any, i: number, s: any) => d[accessor];
-      } else {
-        return (d: any, i: number, s: any) => accessor;
-      };
-    }
-
-    export function applyAccessor(accessor: IAccessor, dataSource: DataSource) {
-      var activatedAccessor = accessorize(accessor);
-      return (d: any, i: number) => activatedAccessor(d, i, dataSource.metadata());
+    /**
+     * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
+     */
+    export function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot) {
+      var activatedAccessor = _accessorize(accessor);
+      return (d: any, i: number) => activatedAccessor(d, i, plot.dataSource().metadata());
     }
 
     export function uniq(strings: string[]): string[] {
