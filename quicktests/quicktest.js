@@ -111,6 +111,22 @@ function reporter(n, v) {
 
 
 function main() {
+  
+  var branchOptions = {};
+  $.get("https://api.github.com/repos/palantir/plottable/branches",function(data,status){
+      for(var i = 0; i < data.length; i++){
+        branchOptions["val" + i] = data[i].name;
+      }
+      var branchDropdown = $('#featureBranch');
+        $.each(branchOptions, function(val, text) {
+          branchDropdown.append(
+              $('<option></option>').val(text).html(text)
+          );
+      });
+    });
+
+
+
   var table = d3.select("table");
   table.selectAll(".quicktest-row").remove();
   var firstBranch = "master";
