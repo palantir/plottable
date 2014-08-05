@@ -3081,6 +3081,7 @@ var Plottable;
                 var _this = this;
                 this._width = "auto";
                 this._height = "auto";
+                this._endTickLength = 5;
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
                 this._showEndTickLabels = false;
@@ -3171,6 +3172,8 @@ var Plottable;
                 var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
                 tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
                 tickMarks.attr(this._generateTickMarkAttrHash());
+                d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
+                d3.select(tickMarks[0][tickMarks[0].length - 1]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
                 tickMarks.exit().remove();
                 this._baseline.attr(this._generateBaselineAttrHash());
                 return this;
@@ -3202,8 +3205,9 @@ var Plottable;
                 }
                 return baselineAttrHash;
             };
-            Axis.prototype._generateTickMarkAttrHash = function () {
+            Axis.prototype._generateTickMarkAttrHash = function (isEndTickMark) {
                 var _this = this;
+                if (isEndTickMark === void 0) { isEndTickMark = false; }
                 var tickMarkAttrHash = {
                     x1: 0,
                     y1: 0,
@@ -3219,20 +3223,21 @@ var Plottable;
                     tickMarkAttrHash["y1"] = scalingFunction;
                     tickMarkAttrHash["y2"] = scalingFunction;
                 }
+                var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
                 switch (this._orientation) {
                     case "bottom":
-                        tickMarkAttrHash["y2"] = this._tickLength;
+                        tickMarkAttrHash["y2"] = tickLength;
                         break;
                     case "top":
                         tickMarkAttrHash["y1"] = this.availableHeight;
-                        tickMarkAttrHash["y2"] = this.availableHeight - this._tickLength;
+                        tickMarkAttrHash["y2"] = this.availableHeight - tickLength;
                         break;
                     case "left":
                         tickMarkAttrHash["x1"] = this.availableWidth;
-                        tickMarkAttrHash["x2"] = this.availableWidth - this._tickLength;
+                        tickMarkAttrHash["x2"] = this.availableWidth - tickLength;
                         break;
                     case "right":
-                        tickMarkAttrHash["x2"] = this._tickLength;
+                        tickMarkAttrHash["x2"] = tickLength;
                         break;
                 }
                 return tickMarkAttrHash;
@@ -3298,6 +3303,19 @@ var Plottable;
                         throw new Error("tick length must be positive");
                     }
                     this._tickLength = length;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+            Axis.prototype.endTickLength = function (length) {
+                if (length == null) {
+                    return this._endTickLength;
+                }
+                else {
+                    if (length < 0) {
+                        throw new Error("end tick length must be positive");
+                    }
+                    this._endTickLength = length;
                     this._invalidateLayout();
                     return this;
                 }
@@ -3373,6 +3391,7 @@ var Plottable;
                     }
                 });
             };
+            Axis.END_TICK_MARK_CLASS = "end-tick-mark";
             Axis.TICK_MARK_CLASS = "tick-mark";
             Axis.TICK_LABEL_CLASS = "tick-label";
             return Axis;

@@ -144,17 +144,42 @@ describe("BaseAxis", () => {
     var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     (<any> baseAxis)._getTickValues = function() { return tickValues; };
     baseAxis.renderTo(svg);
+    var secondTickMark = svg.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS + ":nth-child(2)");
+    assert.strictEqual(secondTickMark.attr("x1"), "50");
+    assert.strictEqual(secondTickMark.attr("x2"), "50");
+    assert.strictEqual(secondTickMark.attr("y1"), "0");
+    assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.tickLength()));
 
-    var firstTickMark = svg.select("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
+    baseAxis.tickLength(10);
+    assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
+
+    assert.throws(() => baseAxis.tickLength(-1), "must be positive");
+
+    svg.remove();
+  });
+
+  it("endTickLength()", () => {
+    var SVG_WIDTH = 500;
+    var SVG_HEIGHT = 100;
+    var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    var scale = new Plottable.Scale.Linear();
+    scale.domain([0, 10]);
+    scale.range([0, SVG_WIDTH]);
+    var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+    var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    (<any> baseAxis)._getTickValues = function() { return tickValues; };
+    baseAxis.renderTo(svg);
+
+    var firstTickMark = svg.selectAll("." + Plottable.Abstract.Axis.END_TICK_MARK_CLASS);
     assert.strictEqual(firstTickMark.attr("x1"), "0");
     assert.strictEqual(firstTickMark.attr("x2"), "0");
     assert.strictEqual(firstTickMark.attr("y1"), "0");
-    assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.tickLength()));
+    assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.endTickLength()));
 
-    baseAxis.tickLength(10);
-    assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
+    baseAxis.endTickLength(10);
+    assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.endTickLength()), "end tick length was updated");
 
-    assert.throws(() => baseAxis.tickLength(-1), "must be positive");
+    assert.throws(() => baseAxis.endTickLength(-1), "must be positive");
 
     svg.remove();
   });
