@@ -15,7 +15,7 @@ export module Plot {
      */
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
-      this.classed("area-renderer", true);
+      this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
       this.project("fill-opacity", () => 0.5); // default

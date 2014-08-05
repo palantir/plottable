@@ -2024,7 +2024,7 @@ var Plottable;
                 this._projectors = {};
                 this.animateOnNextRender = true;
                 this.clipPathEnabled = true;
-                this.classed("renderer", true);
+                this.classed("plot", true);
                 var dataSource;
                 if (dataset != null) {
                     if (typeof dataset.data === "function") {
@@ -4371,7 +4371,7 @@ var Plottable;
                 if (xScale == null || yScale == null) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
-                this.classed("xy-renderer", true);
+                this.classed("xy-plot", true);
                 this.project("x", "x", xScale);
                 this.project("y", "y", yScale);
             }
@@ -4435,7 +4435,7 @@ var Plottable;
                     "circles-reset": new Plottable.Animator.Null(),
                     "circles": new Plottable.Animator.IterativeDelay().duration(250).delay(5)
                 };
-                this.classed("circle-renderer", true);
+                this.classed("scatter-plot", true);
                 this.project("r", 3);
                 this.project("fill", function () { return "steelblue"; });
             }
@@ -4486,7 +4486,7 @@ var Plottable;
                 this._animators = {
                     "cells": new Plottable.Animator.Null()
                 };
-                this.classed("grid-renderer", true);
+                this.classed("grid-plot", true);
                 this.xScale.rangeType("bands", 0, 0);
                 this.yScale.rangeType("bands", 0, 0);
                 this.colorScale = colorScale;
@@ -4538,7 +4538,7 @@ var Plottable;
                     "bars": new Plottable.Animator.IterativeDelay(),
                     "baseline": new Plottable.Animator.Null()
                 };
-                this.classed("bar-renderer", true);
+                this.classed("bar-plot", true);
                 this.project("fill", function () { return "steelblue"; });
                 this.baseline(this._baselineValue);
             }
@@ -4768,7 +4768,7 @@ var Plottable;
                     "line-reset": new Plottable.Animator.Null(),
                     "line": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
                 };
-                this.classed("line-renderer", true);
+                this.classed("line-plot", true);
                 this.project("stroke", function () { return "steelblue"; });
                 this.project("stroke-width", function () { return "2px"; });
             }
@@ -4826,7 +4826,7 @@ var Plottable;
             __extends(Area, _super);
             function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this.classed("area-renderer", true);
+                this.classed("area-plot", true);
                 this.project("y0", 0, yScale);
                 this.project("fill", function () { return "steelblue"; });
                 this.project("fill-opacity", function () { return 0.5; });
