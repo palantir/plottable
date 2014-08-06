@@ -82,14 +82,7 @@ export module Plot {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      d3.keys(attrToProjector).forEach(function (attribute: string) {
-        var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = function(data: any[], i: number) {
-          if (data.length > 0) {
-            return projector(data[0], i);
-          }
-        };
-      });
+      this._projectToFirstDatum(attrToProjector);
 
       this.areaPath.datum(this._dataSource.data());
 

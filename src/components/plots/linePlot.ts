@@ -50,14 +50,7 @@ export module Plot {
       return (d: any, i: number) => scaledStartValue;
     }
 
-    public _paint() {
-      super._paint();
-      var attrToProjector = this._generateAttrToProjector();
-      var xFunction       = attrToProjector["x"];
-      var yFunction       = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y"];
-
+    public _projectToFirstDatum(attrToProjector: Abstract.IAttributeToProjector) {
       d3.keys(attrToProjector).forEach(function (attribute: string) {
         var projector = attrToProjector[attribute];
         attrToProjector[attribute] = function(data: any[], i: number) {
@@ -66,6 +59,17 @@ export module Plot {
           }
         };
       });
+    }
+
+    public _paint() {
+      super._paint();
+      var attrToProjector = this._generateAttrToProjector();
+      var xFunction       = attrToProjector["x"];
+      var yFunction       = attrToProjector["y"];
+      delete attrToProjector["x"];
+      delete attrToProjector["y"];
+
+      this._projectToFirstDatum(attrToProjector);
 
       this.linePath.datum(this._dataSource.data());
 
