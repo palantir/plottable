@@ -81,6 +81,15 @@ describe("Domainer", () => {
     assert.deepEqual(domain, [-5, 105]);
   });
 
+  it("pad() works with scales that have 0-size domain", () => {
+    scale.domain([5, 5]);
+    var domain = domainer.computeDomain([[0, 100]], scale);
+    assert.deepEqual(domain, [0, 100]);
+    domainer.pad(0.1);
+    domain = domainer.computeDomain([[0, 100]], scale);
+    assert.deepEqual(domain, [0, 100]);
+  });
+
   it("paddingException(n) will not pad beyond n", () => {
     domainer.pad(0.1).addPaddingException(0, "key").addPaddingException(200);
     var domain = domainer.computeDomain([[0, 100]], scale);
