@@ -17,6 +17,7 @@
 /// <reference path="utils/formatters/timeFormatter.ts" />
 
 
+
 /// <reference path="core/version.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
@@ -27,6 +28,8 @@
 /// <reference path="core/table.ts" />
 /// <reference path="core/scale.ts" />
 /// <reference path="core/plot.ts" />
+/// <reference path="components/plots/xyPlot.ts" />
+/// <reference path="core/newStylePlot.ts" />
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/resizeBroadcaster.ts" />
@@ -44,6 +47,9 @@
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="scales/scaleDomainCoordinator.ts" />
 
+/// <reference path="drawers/baseDrawer.ts" />
+/// <reference path="drawers/rectDrawer.ts" />
+
 /// <reference path="components/baseAxis.ts" />
 /// <reference path="components/timeAxis.ts" />
 /// <reference path="components/numericAxis.ts" />
@@ -53,7 +59,6 @@
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/axisUtils.ts" />
 
-/// <reference path="components/plots/xyPlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
 /// <reference path="components/plots/abstractBarPlot.ts" />
@@ -61,6 +66,7 @@
 /// <reference path="components/plots/horizontalBarPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
+/// <reference path="components/plots/stackedBarPlot.ts" />
 
 /// <reference path="animators/nullAnimator.ts" />
 /// <reference path="animators/defaultAnimator.ts" />

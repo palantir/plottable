@@ -113,7 +113,7 @@ export module Abstract {
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
       if (existingScale != null) {
-        existingScale.removeExtent(this._plottableID, attrToSet);
+        existingScale.removeExtent(this._plottableID.toString(), attrToSet);
         existingScale.broadcaster.deregisterListener(this);
       }
 
@@ -184,14 +184,14 @@ export module Abstract {
       return this;
     }
 
-    private updateProjector(attr: string) {
+    public updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
         if (extent.length === 0 || !this._isAnchored) {
-          projector.scale.removeExtent(this._plottableID, attr);
+          projector.scale.removeExtent(this._plottableID.toString(), attr);
         } else {
-          projector.scale.updateExtent(this._plottableID, attr, extent);
+          projector.scale.updateExtent(this._plottableID.toString(), attr, extent);
         }
       }
       return this;

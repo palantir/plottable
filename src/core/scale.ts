@@ -131,14 +131,14 @@ export module Abstract {
      * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
      * @param {any[]} extent The new extent to be included in the scale.
      */
-    public updateExtent(rendererID: number, attr: string, extent: any[]) {
-      this._rendererAttrID2Extent[rendererID + attr] = extent;
+    public updateExtent(plotProvidedKey: string, attr: string, extent: any[]) {
+      this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
       this._autoDomainIfAutomaticMode();
       return this;
     }
 
-    public removeExtent(rendererID: number, attr: string) {
-      delete this._rendererAttrID2Extent[rendererID + attr];
+    public removeExtent(plotProvidedKey: string, attr: string) {
+      delete this._rendererAttrID2Extent[plotProvidedKey + attr];
       this._autoDomainIfAutomaticMode();
       return this;
     }
