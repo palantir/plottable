@@ -55,13 +55,13 @@ export module Abstract {
 
     public _computeWidth() {
       // to be overridden by subclass logic
-      this._computedWidth = this._tickLength;
+      this._computedWidth = Math.max(this._tickLength, this._endTickLength);
       return this._computedWidth;
     }
 
     public _computeHeight() {
       // to be overridden by subclass logic
-      this._computedHeight = this._tickLength;
+      this._computedHeight = Math.max(this._tickLength, this._endTickLength);
       return this._computedHeight;
     }
 
@@ -130,7 +130,7 @@ export module Abstract {
       tickMarks.attr(this._generateTickMarkAttrHash());
       d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
                                 .attr(this._generateTickMarkAttrHash(true));
-      d3.select(tickMarks[0][tickMarks[0].length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
+      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
                                                       .attr(this._generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
       this._baseline.attr(this._generateBaselineAttrHash());
@@ -218,9 +218,9 @@ export module Abstract {
     }
 
     public _invalidateLayout() {
-      super._invalidateLayout();
       this._computedWidth = null;
       this._computedHeight = null;
+      super._invalidateLayout();
     }
 
     /**

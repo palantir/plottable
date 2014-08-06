@@ -3112,11 +3112,11 @@ var Plottable;
                 return this._orientation === "top" || this._orientation === "bottom";
             };
             Axis.prototype._computeWidth = function () {
-                this._computedWidth = this._tickLength;
+                this._computedWidth = Math.max(this._tickLength, this._endTickLength);
                 return this._computedWidth;
             };
             Axis.prototype._computeHeight = function () {
-                this._computedHeight = this._tickLength;
+                this._computedHeight = Math.max(this._tickLength, this._endTickLength);
                 return this._computedHeight;
             };
             Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -3173,7 +3173,7 @@ var Plottable;
                 tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
                 tickMarks.attr(this._generateTickMarkAttrHash());
                 d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
-                d3.select(tickMarks[0][tickMarks[0].length - 1]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
+                d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
                 tickMarks.exit().remove();
                 this._baseline.attr(this._generateBaselineAttrHash());
                 return this;
@@ -3246,9 +3246,9 @@ var Plottable;
                 return (this.element != null) ? this._render() : null;
             };
             Axis.prototype._invalidateLayout = function () {
-                _super.prototype._invalidateLayout.call(this);
                 this._computedWidth = null;
                 this._computedHeight = null;
+                _super.prototype._invalidateLayout.call(this);
             };
             Axis.prototype.width = function (w) {
                 if (w == null) {

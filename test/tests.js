@@ -264,6 +264,23 @@ describe("BaseAxis", function () {
         assert.throws(function () { return baseAxis.endTickLength(-1); }, "must be positive");
         svg.remove();
     });
+    it("height is adjusted to greater of tickLength or endTickLength", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        baseAxis.renderTo(svg);
+        var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength());
+        assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
+        baseAxis.tickLength(20);
+        assert.strictEqual(baseAxis.height(), 20, "height should increase to tick length");
+        baseAxis.endTickLength(30);
+        assert.strictEqual(baseAxis.height(), 30, "height should increase to end tick length");
+        baseAxis.tickLength(10);
+        assert.strictEqual(baseAxis.height(), 30, "height should not decrease");
+        svg.remove();
+    });
 });
 
 var assert = chai.assert;
