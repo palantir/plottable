@@ -37,7 +37,7 @@ export module Abstract {
     constructor(dataset?: any) {
       super();
       this.clipPathEnabled = true;
-      this.classed("renderer", true);
+      this.classed("plot", true);
 
       var dataSource: DataSource;
       if (dataset != null) {
