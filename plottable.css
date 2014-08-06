@@ -47,7 +47,7 @@ svg.plottable {
   font-family: sans-serif;
 }
 
-.plottable .bar-renderer .baseline {
+.plottable .bar-plot .baseline {
   stroke: #999;
 }
 
@@ -70,12 +70,12 @@ svg.plottable {
   font-size: 14pt;
 }
 
-.plottable .line-renderer path.line {
+.plottable .line-plot path.line {
   fill: none;
   vector-effect: non-scaling-stroke;
 }
 
-.plottable .area-renderer path.area {
+.plottable .area-plot path.area {
   stroke: none;
 }
 
@@ -83,7 +83,7 @@ svg.plottable {
   fill: #d3d3d3;
 }
 
-.plottable .renderer.toggled-on {
+.plottable .plot.toggled-on {
   visibility:visible;
 }
 
@@ -95,6 +95,6 @@ svg.plottable {
   opacity:1;
 }
 
-.plottable .renderer.toggled-off {
+.plottable .plot.toggled-off {
   visibility:hidden;
 }
