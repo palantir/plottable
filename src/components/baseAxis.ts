@@ -353,13 +353,13 @@ export module Abstract {
     }
 
     /**
-     * Gets the size of the gutter (the extra space beyond the tick labels).
+     * Gets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
      *
      * @returns {number} The current size of the gutter, in pixels.
      */
     public gutter(): number;
     /**
-     * Sets the size of the gutter (the extra space beyond the tick labels).
+     * Sets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
      *
      * @param {number} size The desired size of the gutter, in pixels.
      * @returns {Axis} The calling Axis.

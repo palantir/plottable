@@ -31,11 +31,10 @@ export module Axis {
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this._formatter.format(v);
         return measurer(formattedValue).width;
-        // return measurer("X" + formattedValue).width; // extra character of padding
       });
       testTextEl.remove();
 
-      var maxTextLength = Math.max.apply(null, textLengths);
+      var maxTextLength = d3.max(textLengths);
 
       if (this.tickLabelPositioning === "center") {
         this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;

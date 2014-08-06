@@ -3665,7 +3665,7 @@ var Plottable;
                     return measurer(formattedValue).width;
                 });
                 testTextEl.remove();
-                var maxTextLength = Math.max.apply(null, textLengths);
+                var maxTextLength = d3.max(textLengths);
                 if (this.tickLabelPositioning === "center") {
                     this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;
                 }
