@@ -394,6 +394,7 @@ declare module Plottable {
         class Plot extends Component {
             renderArea: D3.Selection;
             element: D3.Selection;
+            animateOnNextRender: boolean;
             constructor();
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
@@ -478,7 +479,7 @@ declare module Plottable {
         color?: string;
     }
     interface IAccessor {
-        (datum: any, index?: number, metadata?: any): any;
+        (datum: any, index?: number, seriesKey?: string, metadata?: any): any;
     }
     interface IAppliedAccessor {
         (datum: any, index: number): any;
@@ -830,6 +831,29 @@ declare module Plottable {
             selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
             selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
             deselectAll(): BarPlot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class ClusteredBar extends Plottable.Abstract.BarPlot {
+            static DEFAULT_WIDTH: number;
+            barMap: D3.Map;
+            datasetMap: D3.Map;
+            clusterOrder: string[];
+            renderArea: D3.Selection;
+            colorScale: Plottable.Scale.Color;
+            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+            addDataset(key: string, dataset: DataSource): ClusteredBar;
+            addDataset(key: string, dataset: any[]): ClusteredBar;
+            addDataset(dataset: DataSource): ClusteredBar;
+            addDataset(dataset: any[]): ClusteredBar;
+            removeDataset(key: string): ClusteredBar;
+            cluster(): string[];
+            cluster(cluster: string[]): ClusteredBar;
+            setColor(scale: Plottable.Scale.Color): void;
         }
     }
 }

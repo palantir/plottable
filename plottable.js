@@ -1193,7 +1193,7 @@ var Plottable;
             return cachedExtent;
         };
         DataSource.prototype.computeExtent = function (accessor) {
-            var mappedData = this._data.map(accessor);
+            var mappedData = this._data.map(function (d) { return accessor(d); });
             if (mappedData.length === 0) {
                 return [];
             }
@@ -4688,6 +4688,142 @@ var Plottable;
         Abstract.BarPlot = BarPlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
+        var ClusteredBar = (function (_super) {
+            __extends(ClusteredBar, _super);
+            function ClusteredBar(dataset, xScale, yScale) {
+                _super.call(this, dataset, xScale, yScale);
+                this.nextSeriesIndex = 0;
+                this.barMap = d3.map();
+                this.datasetMap = d3.map();
+                this._baselineValue = 0;
+                this.clusterOrder = [];
+                this.innerScale = new Plottable.Scale.Ordinal();
+                this._isVertical = true;
+            }
+            ClusteredBar.prototype.addDataset = function (first, second) {
+                if (typeof (first) !== "string" && second !== undefined) {
+                    throw new Error("addDataSet takes string keys");
+                }
+                if (typeof (first) === "string" && first[0] === "_") {
+                    Plottable.Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
+                }
+                var key = typeof (first) === "string" ? first : "_" + this.nextSeriesIndex++;
+                var data = typeof (first) !== "string" ? first : second;
+                var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
+                this.datasetMap.set(key, dataset);
+                this.clusterOrder.push(key);
+                this._onDataSourceUpdate();
+                return this;
+            };
+            ClusteredBar.prototype._onDataSourceUpdate = function () {
+                this._updateAllProjectors();
+                _super.prototype._onDataSourceUpdate.call(this);
+            };
+            ClusteredBar.prototype.removeDataset = function (key) {
+                this.datasetMap.remove(key);
+                var barGroup = this.barMap.get(key);
+                barGroup.remove();
+                this.barMap.remove(key);
+                if (this.clusterOrder.indexOf(key) >= 0) {
+                    this.clusterOrder.splice(this.clusterOrder.indexOf(key), 1);
+                }
+                this._onDataSourceUpdate();
+                return this;
+            };
+            ClusteredBar.prototype.cluster = function (cluster) {
+                if (cluster == null) {
+                    return this.clusterOrder;
+                }
+                this.clusterOrder = cluster;
+                this._onDataSourceUpdate();
+                return this;
+            };
+            ClusteredBar.prototype._updateAllProjectors = function () {
+                var _this = this;
+                d3.keys(this._projectors).forEach(function (attr) { return _this._updateProjector(attr); });
+                return this;
+            };
+            ClusteredBar.prototype._updateProjector = function (attr) {
+                var _this = this;
+                var projector = this._projectors[attr];
+                if (projector.scale != null) {
+                    this.datasetMap.values().forEach(function (datasource, i) {
+                        var extent = datasource._getExtent(projector.accessor);
+                        if (extent.length === 0 || !_this._isAnchored) {
+                            projector.scale.removeExtent(_this._plottableID * 100 + i, attr);
+                        }
+                        else {
+                            projector.scale.updateExtent(_this._plottableID * 100 + i, attr, extent);
+                        }
+                    });
+                }
+                return this;
+            };
+            ClusteredBar.prototype._paint = function () {
+                var _this = this;
+                _super.prototype._paint.call(this);
+                this.clusterOrder.forEach(function (e) {
+                    var barGroup;
+                    if (_this.barMap.has(e)) {
+                        barGroup = _this.barMap.get(e);
+                    }
+                    else {
+                        barGroup = _this.renderArea.append("g");
+                    }
+                    var bars = barGroup.selectAll("rect").data(_this.datasetMap.get(e).data(), function (d) { return d.year; });
+                    bars.enter().append("rect");
+                    var primaryScale = _this._isVertical ? _this.yScale : _this.xScale;
+                    var scaledBaseline = primaryScale.scale(_this._baselineValue);
+                    var positionAttr = _this._isVertical ? "y" : "x";
+                    var secondaryAttr = _this._isVertical ? "x" : "y";
+                    var dimensionAttr = _this._isVertical ? "height" : "width";
+                    if (_this._dataChanged && _this._animate && !_this.barMap.has(e)) {
+                        var resetAttrToProjector = _this.__generateAttrToProjector(e);
+                        resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
+                        resetAttrToProjector[dimensionAttr] = function () { return 0; };
+                        _this._applyAnimatedAttributes(bars, "bars-reset", resetAttrToProjector);
+                    }
+                    var attrToProjector = _this.__generateAttrToProjector(e);
+                    if (attrToProjector["fill"] != null) {
+                        _this._bars.attr("fill", attrToProjector["fill"]);
+                    }
+                    _this._applyAnimatedAttributes(bars, "bars", attrToProjector);
+                    bars.exit().remove();
+                    _this.barMap.set(e, barGroup);
+                });
+            };
+            ClusteredBar.prototype.__generateAttrToProjector = function (seriesKey) {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                this.innerScale.domain(this.clusterOrder);
+                var widthF = attrToProjector["width"];
+                this.innerScale.range([0, widthF(null, 1)]);
+                attrToProjector["width"] = function (d, i) { return (widthF(d, i) / _this.clusterOrder.length * .7); };
+                var positionF = attrToProjector["x"];
+                attrToProjector["x"] = function (d, i) { return (positionF(d, i) + _this.innerScale.scale(seriesKey)); };
+                attrToProjector["fill"] = function (d, i) { return (_this.colorScale.scale(seriesKey)); };
+                return attrToProjector;
+            };
+            ClusteredBar.prototype.setColor = function (scale) {
+                this.colorScale = scale;
+            };
+            ClusteredBar.DEFAULT_WIDTH = 10;
+            return ClusteredBar;
+        })(Plottable.Abstract.BarPlot);
+        Plot.ClusteredBar = ClusteredBar;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {

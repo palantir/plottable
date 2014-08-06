@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <title>Clustered Quicktest</title>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../bower_components/d3/d3.min.js"></script>
+    <script src="../../plottable.js"></script>
+    <script src="../../examples/exampleUtil.js"></script>
+    <style>
+    </style>
+
+    <script>
+    var plot;
+    var index = 0;
+    window.onload = function() {
+      var xScale = new Plottable.Scale.Ordinal();
+      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+
+      var yScale = new Plottable.Scale.Linear();
+      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+
+      var colorScale = new Plottable.Scale.Color("20b");
+
+      plot = new Plottable.Plot.ClusteredBar([], xScale, yScale);
+      plot.project("x", "year", xScale);
+      plot.setColor(colorScale);
+      plot.project("fill", function(d, i, m) {return m;}, colorScale);
+      // plot.animate(true);
+      var chart = new Plottable.Component.Table([
+                                  [yAxis, plot],
+                                  [null,  xAxis]
+                                ]);
+        chart.renderTo("#chart");
+        for(var i = 0; i < 10; i++) addPlot();
+    }
+
+    function addPlot() {
+      var data = [{year:"2014", y: Math.random() * 5 + 5},
+                  {year:"2015", y: Math.random() * 10 + 10},
+                  {year:"2016", y: Math.random() * 5}];
+      plot.addDataset("" + (index++), data);
+    }
+
+    function removePlot() {
+      plot.removeDataset("" + (--index));
+    }
+
+    function shift() {
+      var c = plot.cluster();
+      var j = c[0];
+      c.splice(0, 1);
+      c.push(j);
+      plot.cluster(c);
+    }
+
+    </script>
+  </head>
+  <body>
+    <svg id="chart" width="1200" height="400"></svg>
+    <p />
+    <button name="add" onclick="addPlot()">add</button>
+    <button name="remove" onclick="removePlot()">remove</button>
+    <button name="shift" onclick="shift()">shift</button>
+  </body>
+
+</html>

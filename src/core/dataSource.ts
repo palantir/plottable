@@ -82,7 +82,7 @@ module Plottable {
     }
 
     private computeExtent(accessor: IAccessor): any[] {
-      var mappedData = this._data.map(accessor);
+      var mappedData = this._data.map((d) => accessor(d));
       if (mappedData.length === 0){
         return [];
       } else if (typeof(mappedData[0]) === "string") {

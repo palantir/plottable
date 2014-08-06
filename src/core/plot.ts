@@ -23,7 +23,7 @@ export module Abstract {
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
-    private animateOnNextRender = true;
+    public animateOnNextRender = true;
 
     /**
      * Creates a Plot.
