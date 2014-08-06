@@ -13,3 +13,6 @@ local/
 # vim
 *.swp
 *~
+
+# Eclipse
+*.project
