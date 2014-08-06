@@ -4811,13 +4811,11 @@ var Plottable;
                 delete attrToProjector["y"];
                 d3.keys(attrToProjector).forEach(function (attribute) {
                     var projector = attrToProjector[attribute];
-                    if (typeof (projector) === "function") {
-                        attrToProjector[attribute] = function (data, i) {
-                            if (data.length > 0) {
-                                return projector(data[0], i);
-                            }
-                        };
-                    }
+                    attrToProjector[attribute] = function (data, i) {
+                        if (data.length > 0) {
+                            return projector(data[0], i);
+                        }
+                    };
                 });
                 this.linePath.datum(this._dataSource.data());
                 if (this._dataChanged) {
@@ -4905,13 +4903,11 @@ var Plottable;
                 delete attrToProjector["y"];
                 d3.keys(attrToProjector).forEach(function (attribute) {
                     var projector = attrToProjector[attribute];
-                    if (typeof (projector) === "function") {
-                        attrToProjector[attribute] = function (data, i) {
-                            if (data.length > 0) {
-                                return projector(data[0], i);
-                            }
-                        };
-                    }
+                    attrToProjector[attribute] = function (data, i) {
+                        if (data.length > 0) {
+                            return projector(data[0], i);
+                        }
+                    };
                 });
                 this.areaPath.datum(this._dataSource.data());
                 if (this._dataChanged) {

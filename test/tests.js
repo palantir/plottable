@@ -1208,6 +1208,64 @@ describe("Plots", function () {
 
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("LinePlot", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var xAccessor;
+        var yAccessor;
+        var y0Accessor;
+        var colorAccessor;
+        var fillAccessor;
+        var simpleDataset;
+        var linePlot;
+        var renderArea;
+        var verifier;
+        var normalizePath = function (s) { return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ","); };
+        before(function () {
+            svg = generateSVG(500, 500);
+            verifier = new MultiTestVerifier();
+            xScale = new Plottable.Scale.Linear().domain([0, 1]);
+            yScale = new Plottable.Scale.Linear().domain([0, 1]);
+            xAccessor = function (d) { return d.foo; };
+            yAccessor = function (d) { return d.bar; };
+            y0Accessor = function () { return 0; };
+            colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
+            fillAccessor = function () { return "steelblue"; };
+            simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
+            linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            renderArea = linePlot.renderArea;
+        });
+        beforeEach(function () {
+            verifier.start();
+        });
+        it("stroke color can be changed by projecting attribute accessor (sets to first datum stroke attribute)", function () {
+            var data = simpleDataset.data();
+            data.forEach(function (d) {
+                d.stroke = "pink";
+            });
+            simpleDataset.data(data);
+            linePlot.project("stroke", "stroke");
+            renderArea = linePlot.renderArea;
+            var areaPath = renderArea.select(".line");
+            assert.equal(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
+            data[0].stroke = "green";
+            simpleDataset.data(data);
+            assert.equal(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
+            verifier.end();
+        });
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+    });
+});
+
+var assert = chai.assert;
+describe("Plots", function () {
     describe("AreaPlot", function () {
         var svg;
         var xScale;
@@ -1284,7 +1342,10 @@ describe("Plots", function () {
             areaPlot.project("fill", "fill");
             renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
-            assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
+            assert.equal(areaPath.attr("fill"), "pink", "fill set to uniform stroke color");
+            data[0].fill = "green";
+            simpleDataset.data(data);
+            assert.equal(areaPath.attr("fill"), "green", "fill set to first datum stroke color");
             verifier.end();
         });
         after(function () {

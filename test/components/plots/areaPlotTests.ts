@@ -91,7 +91,11 @@ describe("Plots", () => {
       areaPlot.project("fill", "fill");
       renderArea = areaPlot.renderArea;
       var areaPath = renderArea.select(".area");
-      assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
+      assert.equal(areaPath.attr("fill"), "pink", "fill set to uniform stroke color");
+
+      data[0].fill = "green";
+      simpleDataset.data(data);
+      assert.equal(areaPath.attr("fill"), "green", "fill set to first datum stroke color");
       verifier.end();
     });
 
