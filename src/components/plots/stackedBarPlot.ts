@@ -121,35 +121,6 @@ export module Plot {
       return this;
     }
 
-
-    // /**
-    //  * Gets the Plot's DataSource.
-    //  *
-    //  * @return {DataSource} The current DataSource.
-    //  */
-    // public dataSource(): DataSource;
-    // /**
-    //  * Sets the Plot's DataSource.
-    //  *
-    //  * @param {DataSource} source The DataSource the Plot should use.
-    //  * @return {Plot} The calling Plot.
-    //  */
-    // public dataSource(source: DataSource): Plot;
-    // public dataSource(source?: DataSource): any {
-    //   if (source == null) {
-    //     return this._dataSource;
-    //   }
-    //   var oldSource = this._dataSource;
-    //   if (oldSource != null) {
-    //     this._dataSource.broadcaster.deregisterListener(this);
-    //   }
-    //   this._dataSource = source;
-    //   this._dataSource.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
-    //   this._onDataSourceUpdate();
-    //   return this;
-    // }
-
-
     public _paint() {
       var scaledBaseline = this.yScale.scale(this._baselineValue);
 
