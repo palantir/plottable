@@ -2044,7 +2044,7 @@ var Plottable;
                 _super.prototype._anchor.call(this, element);
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
-                this.updateAllProjectors();
+                this._updateAllProjectors();
                 return this;
             };
             Plot.prototype.remove = function () {
@@ -2074,7 +2074,7 @@ var Plottable;
                 return this;
             };
             Plot.prototype._onDataSourceUpdate = function () {
-                this.updateAllProjectors();
+                this._updateAllProjectors();
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
@@ -2130,10 +2130,10 @@ var Plottable;
             };
             Plot.prototype.detach = function () {
                 _super.prototype.detach.call(this);
-                this.updateAllProjectors();
+                this._updateAllProjectors();
                 return this;
             };
-            Plot.prototype.updateAllProjectors = function () {
+            Plot.prototype._updateAllProjectors = function () {
                 var _this = this;
                 d3.keys(this._projectors).forEach(function (attr) { return _this.updateProjector(attr); });
                 return this;
@@ -5064,6 +5064,7 @@ var Plottable;
                 this.stackedData = [];
                 this._isVertical = true;
                 this._baselineValue = 0;
+                this.stackedExtent = [];
             }
             StackedBar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5071,7 +5072,21 @@ var Plottable;
                 return this;
             };
             StackedBar.prototype._onDataSourceUpdate = function () {
+                _super.prototype._onDataSourceUpdate.call(this);
                 this._render();
+            };
+            StackedBar.prototype._updateAllProjectors = function () {
+                _super.prototype._updateAllProjectors.call(this);
+                if (this.yScale == null) {
+                    return;
+                }
+                if (this._isAnchored && this.stackedExtent.length > 0) {
+                    this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+                }
+                else {
+                    this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+                }
+                return this;
             };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -5127,7 +5142,8 @@ var Plottable;
                         return d;
                     });
                 });
-                this.project("y", "_PLOTTABLE_PROTECTED_FIELD_Y", this.yScale);
+                this.stackedExtent = [0, d3.max(currentBase)];
+                this._onDataSourceUpdate();
                 return stacks;
             };
             StackedBar.prototype._updateYDomainer = function () {

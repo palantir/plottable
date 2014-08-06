@@ -56,7 +56,7 @@ export module Abstract {
       super._anchor(element);
       this.animateOnNextRender = true;
       this._dataChanged = true;
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       return this;
     }
 
@@ -101,7 +101,7 @@ export module Abstract {
     }
 
     public _onDataSourceUpdate() {
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       this.animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
@@ -171,7 +171,7 @@ export module Abstract {
     public detach() {
       super.detach();
       // make the domain resize
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       return this;
     }
 
@@ -179,7 +179,7 @@ export module Abstract {
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
      */
-    private updateAllProjectors(): Plot {
+    public _updateAllProjectors(): Plot {
       d3.keys(this._projectors).forEach((attr: string) => this.updateProjector(attr));
       return this;
     }

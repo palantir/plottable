@@ -9,6 +9,7 @@ export module Plot {
     public _isVertical = true;
     public _baselineValue = 0;
     public _baseline: D3.Selection;
+    private stackedExtent: number[] = [];
 
     constructor(dataset: any, xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
       super(dataset, xScale, yScale);
@@ -21,9 +22,22 @@ export module Plot {
     }
 
     public _onDataSourceUpdate() {
-      // super._onDataSourceUpdate();
+      super._onDataSourceUpdate();
       // this.stackedData = this.stack(this._yAccessor);
       this._render();
+    }
+
+    public _updateAllProjectors() {
+      super._updateAllProjectors();
+      if (this.yScale == null) {
+        return;
+      }
+      if (this._isAnchored && this.stackedExtent.length > 0) {
+        this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
+      } else {
+        this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
+      }
+      return this;
     }
 
 
@@ -91,8 +105,8 @@ export module Plot {
           return d;
           });
       });
-
-      this.project("y", "_PLOTTABLE_PROTECTED_FIELD_Y", this.yScale)
+      this.stackedExtent = [0, d3.max(currentBase)];
+      this._onDataSourceUpdate();
       return stacks;
     }
 
