@@ -4809,6 +4809,16 @@ var Plottable;
                 var yFunction = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
+                d3.keys(attrToProjector).forEach(function (attribute) {
+                    var projector = attrToProjector[attribute];
+                    if (typeof (projector) === "function") {
+                        attrToProjector[attribute] = function (data, i) {
+                            if (data.length > 0) {
+                                return projector(data[0], i);
+                            }
+                        };
+                    }
+                });
                 this.linePath.datum(this._dataSource.data());
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
@@ -4893,6 +4903,16 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
+                d3.keys(attrToProjector).forEach(function (attribute) {
+                    var projector = attrToProjector[attribute];
+                    if (typeof (projector) === "function") {
+                        attrToProjector[attribute] = function (data, i) {
+                            if (data.length > 0) {
+                                return projector(data[0], i);
+                            }
+                        };
+                    }
+                });
                 this.areaPath.datum(this._dataSource.data());
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());

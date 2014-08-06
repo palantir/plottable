@@ -1275,6 +1275,18 @@ describe("Plots", function () {
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             verifier.end();
         });
+        it("fill color can be changed by projecting attribute accessor (sets to first datum fill attribute)", function () {
+            var data = simpleDataset.data();
+            data.forEach(function (d) {
+                d.fill = "pink";
+            });
+            simpleDataset.data(data);
+            areaPlot.project("fill", "fill");
+            renderArea = areaPlot.renderArea;
+            var areaPath = renderArea.select(".area");
+            assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
+            verifier.end();
+        });
         after(function () {
             if (verifier.passed) {
                 svg.remove();

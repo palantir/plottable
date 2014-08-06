@@ -84,6 +84,17 @@ describe("Plots", () => {
       verifier.end();
     });
 
+    it("fill color can be changed by projecting attribute accessor (sets to first datum fill attribute)", () => {
+      var data = simpleDataset.data();
+      data.forEach(function(d: any) { d.fill = "pink"; });
+      simpleDataset.data(data);
+      areaPlot.project("fill", "fill");
+      renderArea = areaPlot.renderArea;
+      var areaPath = renderArea.select(".area");
+      assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
+      verifier.end();
+    });
+
     after(() => {
       if (verifier.passed) {svg.remove();};
     });
