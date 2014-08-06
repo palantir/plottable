@@ -25,12 +25,13 @@
       plot.setColor(colorScale);
       plot.project("fill", function(d, i, m) {return m;}, colorScale);
       // plot.animate(true);
+      var legend = new Plottable.Component.Legend(colorScale);
       var chart = new Plottable.Component.Table([
-                                  [yAxis, plot],
-                                  [null,  xAxis]
+                                  [yAxis, plot, legend],
+                                  [null,  xAxis, null]
                                 ]);
         chart.renderTo("#chart");
-        for(var i = 0; i < 10; i++) addPlot();
+        // for(var i = 0; i < 10; i++) addPlot();
     }
 
     function addPlot() {
@@ -55,7 +56,7 @@
     </script>
   </head>
   <body>
-    <svg id="chart" width="1200" height="400"></svg>
+    <svg id="chart" width="600" height="400"></svg>
     <p />
     <button name="add" onclick="addPlot()">add</button>
     <button name="remove" onclick="removePlot()">remove</button>

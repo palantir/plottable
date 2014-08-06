@@ -4807,6 +4807,7 @@ var Plottable;
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 this.innerScale.domain(this.clusterOrder);
+                this.colorScale.domain(this.clusterOrder);
                 var widthF = attrToProjector["width"];
                 this.innerScale.range([0, widthF(null, 1)]);
                 attrToProjector["width"] = function (d, i) { return (widthF(d, i) / _this.clusterOrder.length * .7); };

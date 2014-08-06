@@ -130,6 +130,7 @@ export module Plot {
     public __generateAttrToProjector(seriesKey: string) {
       var attrToProjector = super._generateAttrToProjector();
       this.innerScale.domain(this.clusterOrder);
+      this.colorScale.domain(this.clusterOrder);
       // the width is constant, so set the inner scale range to that
       var widthF = attrToProjector["width"];
       this.innerScale.range([0, widthF(null, 1)]);
