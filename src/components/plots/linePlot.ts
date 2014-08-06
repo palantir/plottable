@@ -60,13 +60,11 @@ export module Plot {
 
       d3.keys(attrToProjector).forEach(function (attribute: string) {
         var projector = attrToProjector[attribute];
-        if (typeof(projector) === "function") {
-          attrToProjector[attribute] = function(data: any, i: number) {
-            if (data.length > 0) {
-              return projector(data[0], i);
-            }
-          };
-        }
+        attrToProjector[attribute] = function(data: any[], i: number) {
+          if (data.length > 0) {
+            return projector(data[0], i);
+          }
+        };
       });
 
       this.linePath.datum(this._dataSource.data());
