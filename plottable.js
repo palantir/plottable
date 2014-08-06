@@ -3118,11 +3118,11 @@ var Plottable;
                 return this._orientation === "top" || this._orientation === "bottom";
             };
             Axis.prototype._computeWidth = function () {
-                this._computedWidth = Math.max(this._tickLength, this._endTickLength);
+                this._computedWidth = this._maxTickLength();
                 return this._computedWidth;
             };
             Axis.prototype._computeHeight = function () {
-                this._computedHeight = Math.max(this._tickLength, this._endTickLength);
+                this._computedHeight = this._maxTickLength();
                 return this._computedHeight;
             };
             Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -3326,6 +3326,17 @@ var Plottable;
                     return this;
                 }
             };
+            Axis.prototype._maxTickLength = function () {
+                return Math.max(this.tickLength(), this._endTickLength);
+            };
+            Axis.prototype._maxLabelTickLength = function () {
+                if (this.showEndTickLabels()) {
+                    return this._maxTickLength();
+                }
+                else {
+                    return this.tickLength();
+                }
+            };
             Axis.prototype.tickLabelPadding = function (padding) {
                 if (padding == null) {
                     return this._tickLabelPadding;
@@ -3436,7 +3447,8 @@ var Plottable;
                 }
                 var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
                 this.tickLength(textHeight);
-                this._computedHeight = textHeight + 2 * this.tickLabelPadding();
+                this.endTickLength(textHeight);
+                this._computedHeight = this._maxTickLength() + 2 * this.tickLabelPadding();
                 return this._computedHeight;
             };
             Time.prototype.calculateWorstWidth = function (container, format) {
@@ -3521,7 +3533,7 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-                var yTranslate = (this._orientation === "bottom" ? (this.tickLength() / 2 * height) : (this.availableHeight - this.tickLength() / 2 * height + 2 * this.tickLabelPadding()));
+                var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) : (this.availableHeight - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {
                     Plottable.Util.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -3575,8 +3587,8 @@ var Plottable;
                 if (this.getIntervalLength(Time.minorIntervals[index]) * 1.5 >= totalLength) {
                     this.generateLabellessTicks(index - 1);
                 }
-                this.adjustTickLength(this.tickLength() / 2, Time.minorIntervals[index]);
-                this.adjustTickLength(this.tickLength(), Time.majorIntervals[index]);
+                this.adjustTickLength(this._maxLabelTickLength() / 2, Time.minorIntervals[index]);
+                this.adjustTickLength(this._maxLabelTickLength(), Time.majorIntervals[index]);
                 return this;
             };
             Time.minorIntervals = [
@@ -3679,10 +3691,10 @@ var Plottable;
                 var textLength = testTextEl.text(formattedTestValue).node().getComputedTextLength();
                 testTextEl.remove();
                 if (this.tickLabelPositioning === "center") {
-                    this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+                    this._computedWidth = this._maxTickLength() + this.tickLabelPadding() + textLength;
                 }
                 else {
-                    this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
+                    this._computedWidth = Math.max(this._maxTickLength(), this.tickLabelPadding() + textLength);
                 }
                 return this._computedWidth;
             };
@@ -3691,10 +3703,10 @@ var Plottable;
                 var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
                 testTextEl.remove();
                 if (this.tickLabelPositioning === "center") {
-                    this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+                    this._computedHeight = this._maxTickLength() + this.tickLabelPadding() + textHeight;
                 }
                 else {
-                    this._computedHeight = Math.max(this.tickLength(), this.tickLabelPadding() + textHeight);
+                    this._computedHeight = Math.max(this._maxTickLength(), this.tickLabelPadding() + textHeight);
                 }
                 return this._computedHeight;
             };
@@ -3710,7 +3722,7 @@ var Plottable;
                     dx: "0em",
                     dy: "0.3em"
                 };
-                var tickMarkLength = this.tickLength();
+                var tickMarkLength = this._maxLabelTickLength();
                 var tickLabelPadding = this.tickLabelPadding();
                 var tickLabelTextAnchor = "middle";
                 var labelGroupTransformX = 0;
@@ -3867,8 +3879,8 @@ var Plottable;
                 return this;
             };
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var widthRequiredByTicks = this._isHorizontal() ? 0 : this.tickLength() + this.tickLabelPadding();
-                var heightRequiredByTicks = this._isHorizontal() ? this.tickLength() + this.tickLabelPadding() : 0;
+                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxTickLength() + this.tickLabelPadding();
+                var heightRequiredByTicks = this._isHorizontal() ? this._maxTickLength() + this.tickLabelPadding() : 0;
                 if (offeredWidth < 0 || offeredHeight < 0) {
                     return {
                         width: offeredWidth,
@@ -3911,8 +3923,8 @@ var Plottable;
                 var iterator = draw ? function (f) { return dataOrTicks.each(f); } : function (f) { return dataOrTicks.forEach(f); };
                 iterator(function (d) {
                     var bandWidth = scale.fullBandStartAndWidth(d)[1];
-                    var width = self._isHorizontal() ? bandWidth : axisWidth - self.tickLength() - self.tickLabelPadding();
-                    var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
+                    var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+                    var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
                     var textWriteResult;
                     var formatter = self._formatter;
                     if (draw) {
@@ -3955,8 +3967,8 @@ var Plottable;
                 tickLabels.text("");
                 this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
                 var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
-                var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
-                var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
+                var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+                var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable.Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 Plottable.Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
                 return this;

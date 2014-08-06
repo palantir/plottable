@@ -39,9 +39,9 @@ export module Axis {
       testTextEl.remove();
 
       if (this.tickLabelPositioning === "center") {
-        this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+        this._computedWidth = this._maxTickLength() + this.tickLabelPadding() + textLength;
       } else {
-        this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
+        this._computedWidth = Math.max(this._maxTickLength(), this.tickLabelPadding() + textLength);
       }
 
       return this._computedWidth;
@@ -53,9 +53,9 @@ export module Axis {
       testTextEl.remove();
 
       if (this.tickLabelPositioning === "center") {
-        this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+        this._computedHeight = this._maxTickLength() + this.tickLabelPadding() + textHeight;
       } else {
-        this._computedHeight = Math.max(this.tickLength(), this.tickLabelPadding()+ textHeight);
+        this._computedHeight = Math.max(this._maxTickLength(), this.tickLabelPadding()+ textHeight);
       }
 
       return this._computedHeight;
@@ -75,7 +75,7 @@ export module Axis {
         dy: "0.3em"
       };
 
-      var tickMarkLength = this.tickLength();
+      var tickMarkLength = this._maxLabelTickLength();
       var tickLabelPadding = this.tickLabelPadding();
 
       var tickLabelTextAnchor = "middle";

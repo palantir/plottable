@@ -55,13 +55,13 @@ export module Abstract {
 
     public _computeWidth() {
       // to be overridden by subclass logic
-      this._computedWidth = Math.max(this._tickLength, this._endTickLength);
+      this._computedWidth = this._maxTickLength();
       return this._computedWidth;
     }
 
     public _computeHeight() {
       // to be overridden by subclass logic
-      this._computedHeight = Math.max(this._tickLength, this._endTickLength);
+      this._computedHeight = this._maxTickLength();
       return this._computedHeight;
     }
 
@@ -356,6 +356,18 @@ export module Abstract {
         this._endTickLength = length;
         this._invalidateLayout();
         return this;
+      }
+    }
+
+    public _maxTickLength() {
+      return Math.max(this.tickLength(), this._endTickLength);
+    }
+
+    public _maxLabelTickLength() {
+      if (this.showEndTickLabels()) {
+        return this._maxTickLength();
+      } else {
+        return this.tickLength();
       }
     }
 
