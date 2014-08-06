@@ -2251,10 +2251,20 @@ var Plottable;
                     toCompute.forEach(function (c) { return c._computeLayout(); });
                     var toRender = d3.values(_componentsNeedingRender);
                     toRender.forEach(function (c) { return c._render(); });
-                    toRender = d3.values(_componentsNeedingRender);
-                    toRender.forEach(function (c) { return c._doRender(); });
+                    var failed = {};
+                    Object.keys(_componentsNeedingRender).forEach(function (k) {
+                        try {
+                            _componentsNeedingRender[k]._doRender();
+                        }
+                        catch (err) {
+                            setTimeout(function () {
+                                throw err;
+                            }, 0);
+                            failed[k] = _componentsNeedingRender[k];
+                        }
+                    });
                     _componentsNeedingComputeLayout = {};
-                    _componentsNeedingRender = {};
+                    _componentsNeedingRender = failed;
                     _animationRequested = false;
                 }
                 Core.ResizeBroadcaster.clearResizing();
