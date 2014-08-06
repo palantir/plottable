@@ -2565,6 +2565,10 @@ var Plottable;
             __extends(Log, _super);
             function Log(scale) {
                 _super.call(this, scale == null ? d3.scale.log() : scale);
+                if (!Log.warned) {
+                    Log.warned = true;
+                    Plottable.Util.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
+                }
             }
             Log.prototype.copy = function () {
                 return new Log(this._d3Scale.copy());
@@ -2572,6 +2576,7 @@ var Plottable;
             Log.prototype._defaultExtent = function () {
                 return [1, 10];
             };
+            Log.warned = false;
             return Log;
         })(Plottable.Abstract.QuantitativeScale);
         Scale.Log = Log;
