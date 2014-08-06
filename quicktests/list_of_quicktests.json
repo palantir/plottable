@@ -1,6 +1,6 @@
 [
   {
-    "name":"animate_Area Plot",
+    "name":"animate_area",
     "categories":["Linear Scale", "Numeric Axis", "Area Plot", "Project", "Animate", "Click Interaction"]
   },  {
     "name":"animate_horizontalBar",
@@ -18,7 +18,7 @@
     "name":"basic_allPlots",
     "categories":["Linear Scale", "Numeric Axis", "Area Plot", "Scatter Plot", "Vertical Bar Plot", "Horizontal Bar Plot", "Line Plot", "Table", "Layout"]
   },  {
-    "name":"basic_Area Plot",
+    "name":"basic_area",
     "categories":["Accessor", "Data", "Linear Scale", "Numeric Axis", "Project", "Area Plot", "Gridlines", "Group", "Merge", "Standard Chart"]
   },  {
     "name":"basic_moveToFront",
