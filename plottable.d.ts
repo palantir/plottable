@@ -2376,8 +2376,8 @@ declare module Plottable {
             public origin: number[];
             public location: number[];
             public ondragstart: (origin: ICoord) => void;
-            public ondrag: (upperLeft: ICoord, lowerRight: ICoord) => void;
-            public ondragend: (upperLeft: ICoord, lowerRight: ICoord) => void;
+            public ondrag: (startLocation: ICoord, endLocation: ICoord) => void;
+            public ondragend: (startLocation: ICoord, endLocation: ICoord) => void;
             /**
             * Creates a Drag.
             *

@@ -120,16 +120,16 @@ describe("Interactions", () => {
       });
       interaction.dragend(function(a: Plottable.ICoord, b: Plottable.ICoord) {
         timesCalled++;
-        var expectedUpperLeft = {
+        var expectedStart = {
           x: dragstartX,
           y: dragstartY,
         };
-        var expectedLowerRight = {
+        var expectedEnd = {
           x: dragendX,
           y: dragendY
         };
-        assert.deepEqual(a, expectedUpperLeft, "areaCallback was passed the correct upper left corner");
-        assert.deepEqual(b, expectedLowerRight, "areaCallback was passed the correct lower right corner");
+        assert.deepEqual(a, expectedStart, "areaCallback was passed the correct upper left corner");
+        assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct lower right corner");
       });
 
       // fake a drag event
@@ -201,10 +201,10 @@ describe("Interactions", () => {
       })
       interaction.dragend(function(a: Plottable.ICoord, b: Plottable.ICoord) {
         timesCalled++;
-        var expectedUpperLeftY = dragstartY;
-        var expectedLowerRightY = dragendY;
-        assert.deepEqual(a.y, expectedUpperLeftY);
-        assert.deepEqual(b.y, expectedLowerRightY);
+        var expectedStartY = dragstartY;
+        var expectedEndY = dragendY;
+        assert.deepEqual(a.y, expectedStartY);
+        assert.deepEqual(b.y, expectedEndY);
       });
 
       // fake a drag event

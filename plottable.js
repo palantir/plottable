@@ -7274,7 +7274,9 @@ var Plottable;
 
             Drag.prototype._doDrag = function () {
                 if (this.ondrag != null) {
-                    this.ondrag(this.getTopLeft(), this.getBottomRight());
+                    var startLocation = { x: this.origin[0], y: this.origin[1] };
+                    var endLocation = { x: this.location[0], y: this.location[1] };
+                    this.ondrag(startLocation, endLocation);
                 }
             };
 
@@ -7288,20 +7290,10 @@ var Plottable;
 
             Drag.prototype._doDragend = function () {
                 if (this.ondragend != null) {
-                    this.ondragend(this.getTopLeft(), this.getBottomRight());
+                    var startLocation = { x: this.origin[0], y: this.origin[1] };
+                    var endLocation = { x: this.location[0], y: this.location[1] };
+                    this.ondragend(startLocation, endLocation);
                 }
-            };
-
-            Drag.prototype.getTopLeft = function () {
-                var x = Math.min(this.origin[0], this.location[0]);
-                var y = Math.min(this.origin[1], this.location[1]);
-                return { x: x, y: y };
-            };
-
-            Drag.prototype.getBottomRight = function () {
-                var x = Math.max(this.origin[0], this.location[0]);
-                var y = Math.max(this.origin[1], this.location[1]);
-                return { x: x, y: y };
             };
 
             Drag.prototype._anchor = function (hitBox) {

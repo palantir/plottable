@@ -10,8 +10,8 @@ export module Interaction {
     private constrainX: (n: number) => number;
     private constrainY: (n: number) => number;
     public ondragstart: (origin: ICoord) => void;
-    public      ondrag: (upperLeft: ICoord, lowerRight: ICoord) => void;
-    public   ondragend: (upperLeft: ICoord, lowerRight: ICoord) => void;
+    public      ondrag: (startLocation: ICoord, endLocation: ICoord) => void;
+    public   ondragend: (startLocation: ICoord, endLocation: ICoord) => void;
 
     /**
      * Creates a Drag.
@@ -87,7 +87,9 @@ export module Interaction {
 
     public _doDrag() {
       if (this.ondrag != null) {
-        this.ondrag(this.getTopLeft(), this.getBottomRight());
+        var startLocation = {x: this.origin[0], y: this.origin[1]};
+        var endLocation = {x: this.location[0], y: this.location[1]};
+        this.ondrag(startLocation, endLocation);
       }
     }
 
@@ -101,20 +103,10 @@ export module Interaction {
 
     public _doDragend() {
       if (this.ondragend != null) {
-        this.ondragend(this.getTopLeft(), this.getBottomRight());
+        var startLocation = {x: this.origin[0], y: this.origin[1]};
+        var endLocation = {x: this.location[0], y: this.location[1]};
+        this.ondragend(startLocation, endLocation);
       }
-    }
-
-    private getTopLeft(): ICoord {
-      var x = Math.min(this.origin[0], this.location[0]);
-      var y = Math.min(this.origin[1], this.location[1]);
-      return {x: x, y: y};
-    }
-
-    private getBottomRight(): ICoord {
-      var x = Math.max(this.origin[0], this.location[0]);
-      var y = Math.max(this.origin[1], this.location[1]);
-      return {x: x, y: y};
     }
 
     public _anchor(hitBox: D3.Selection) {
