@@ -211,8 +211,8 @@ export module Util {
       var anchorConverter: {[s: string]: string} = {left: "start", center: "middle", right: "end"};
       var anchor: string = anchorConverter[xAlign];
       var xOff = width * xOffsetFactor[xAlign];
-      var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
-      var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
+      var yOff = height * yOffsetFactor[yAlign];
+      var ems = 0.85 - yOffsetFactor[yAlign];
       textEl.attr("text-anchor", anchor).attr("y", ems + "em");
       DOM.translate(innerG, xOff, yOff);
       return {width: w, height: h};

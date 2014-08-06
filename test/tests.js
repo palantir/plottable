@@ -754,6 +754,28 @@ describe("Legends", function () {
         });
         svg.remove();
     });
+    it("icon radius is not too small or too big", function () {
+        color.domain(["foo"]);
+        legend.renderTo(svg);
+        var style = legend.element.append("style");
+        style.attr("type", "text/css");
+        function verifyCircleHeight() {
+            var text = legend.content.select("text");
+            var circle = legend.content.select("circle");
+            var textHeight = Plottable.Util.DOM.getBBox(text).height;
+            var circleHeight = Plottable.Util.DOM.getBBox(circle).height;
+            assert.operator(circleHeight, "<", textHeight, "icons are too big. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
+            assert.operator(circleHeight, ">", textHeight / 2, "icons are too small. iconHeight = " + circleHeight + " vs circleHeight = " + circleHeight);
+        }
+        verifyCircleHeight();
+        style.text(".plottable .legend text { font-size: 60px; }");
+        legend._computeLayout()._render();
+        verifyCircleHeight();
+        style.text(".plottable .legend text { font-size: 10px; }");
+        legend._computeLayout()._render();
+        verifyCircleHeight();
+        svg.remove();
+    });
     describe("Legend toggle tests", function () {
         var toggleLegend;
         beforeEach(function () {
