@@ -32,8 +32,8 @@ function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, 
       wantsHeight: fixedHeight == null ? false : h < fixedHeight
     };
   };
-  c.__isFixedWidth  = fixedWidth  == null ? false : true;
-  c.__isFixedHeight = fixedHeight == null ? false : true;
+  c._fixedWidthFlag  = fixedWidth  == null ? false : true;
+  c._fixedHeightFlag = fixedHeight == null ? false : true;
   return c;
 }
 

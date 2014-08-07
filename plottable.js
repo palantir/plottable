@@ -1735,8 +1735,8 @@ var Plottable;
                 this._yOffset = 0;
                 this._xAlignProportion = 0;
                 this._yAlignProportion = 0;
-                this.__isFixedHeight = false;
-                this.__isFixedWidth = false;
+                this._fixedHeightFlag = false;
+                this._fixedWidthFlag = false;
                 this.cssClasses = ["component"];
                 this._isSetup = false;
                 this._isAnchored = false;
@@ -2119,7 +2119,7 @@ var Plottable;
             * @return {boolean} Whether the component has a fixed width.
             */
             Component.prototype._isFixedWidth = function () {
-                return this.__isFixedWidth;
+                return this._fixedWidthFlag;
             };
 
             /**
@@ -2129,7 +2129,7 @@ var Plottable;
             * @return {boolean} Whether the component has a fixed height.
             */
             Component.prototype._isFixedHeight = function () {
-                return this.__isFixedHeight;
+                return this._fixedHeightFlag;
             };
 
             /**
@@ -2335,11 +2335,11 @@ var Plottable;
                 });
                 var isEmpty = this.empty();
                 return {
-                    width: isEmpty ? 0 : d3.max(requests, function (l) {
-                        return l.width;
+                    width: isEmpty ? 0 : d3.max(requests, function (request) {
+                        return request.width;
                     }),
-                    height: isEmpty ? 0 : d3.max(requests, function (l) {
-                        return l.height;
+                    height: isEmpty ? 0 : d3.max(requests, function (request) {
+                        return request.height;
                     }),
                     wantsWidth: isEmpty ? false : requests.map(function (r) {
                         return r.wantsWidth;
@@ -5547,8 +5547,8 @@ var Plottable;
                     throw new Error(orientation + " is not a valid orientation for LabelComponent");
                 }
                 this.xAlign("center").yAlign("center");
-                this.__isFixedHeight = true;
-                this.__isFixedWidth = true;
+                this._fixedHeightFlag = true;
+                this._fixedWidthFlag = true;
             }
             Label.prototype.xAlign = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
@@ -5667,8 +5667,8 @@ var Plottable;
                 this.scale(colorScale);
                 this.xAlign("RIGHT").yAlign("TOP");
                 this.xOffset(5).yOffset(5);
-                this.__isFixedWidth = true;
-                this.__isFixedHeight = true;
+                this._fixedWidthFlag = true;
+                this._fixedHeightFlag = true;
             }
             Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);

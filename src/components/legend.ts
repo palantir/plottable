@@ -41,8 +41,8 @@ export module Component {
       this.scale(colorScale);
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
-      this.__isFixedWidth = true;
-      this.__isFixedHeight = true;
+      this._fixedWidthFlag = true;
+      this._fixedHeightFlag = true;
     }
 
     public remove() {

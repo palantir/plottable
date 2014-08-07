@@ -26,8 +26,8 @@ export module Abstract {
     private _yOffset = 0;
     public _xAlignProportion = 0; // What % along the free space do we want to position (0 = left, .5 = center, 1 = right)
     public _yAlignProportion = 0;
-    public __isFixedHeight = false;
-    public __isFixedWidth = false;
+    public _fixedHeightFlag = false;
+    public _fixedWidthFlag = false;
 
     private cssClasses: string[] = ["component"];
 
@@ -414,7 +414,7 @@ export module Abstract {
      * @return {boolean} Whether the component has a fixed width.
      */
     public _isFixedWidth(): boolean {
-      return this.__isFixedWidth;
+      return this._fixedWidthFlag;
     }
 
     /**
@@ -424,7 +424,7 @@ export module Abstract {
      * @return {boolean} Whether the component has a fixed height.
      */
     public _isFixedHeight(): boolean {
-      return this.__isFixedHeight;
+      return this._fixedHeightFlag;
     }
 
     /**

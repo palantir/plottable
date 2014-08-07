@@ -30,8 +30,8 @@ export module Component {
         throw new Error(orientation + " is not a valid orientation for LabelComponent");
       }
       this.xAlign("center").yAlign("center");
-      this.__isFixedHeight = true;
-      this.__isFixedWidth = true;
+      this._fixedHeightFlag = true;
+      this._fixedWidthFlag = true;
     }
 
     public xAlign(alignment: string): Label {
