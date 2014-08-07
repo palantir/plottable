@@ -93,11 +93,19 @@ export module Abstract {
       }
 
       return {
-        width : Math.min(offeredWidth, requestedWidth),
-        height: Math.min(offeredHeight, requestedHeight),
+        width : requestedWidth,
+        height: requestedHeight,
         wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
         wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
       };
+    }
+
+    public _isFixedHeight() {
+      return this._isHorizontal();
+    }
+
+    public _isFixedWidth() {
+      return !this._isHorizontal();
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
