@@ -24,7 +24,7 @@ export module Plot {
      */
     constructor(dataset: any, xScale: Scale.Ordinal, yScale: Scale.Ordinal, colorScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
-      this.classed("grid-renderer", true);
+      this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding
       this.xScale.rangeType("bands", 0, 0);

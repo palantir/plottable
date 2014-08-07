@@ -686,7 +686,8 @@ var Plottable;
                 var h = bb.height;
                 var w = bb.width;
                 if (w > width || h > height) {
-                    Util.Methods.warn("Insufficient space to fit text");
+                    Util.Methods.warn("Insufficient space to fit text: " + line);
+                    textEl.text("");
                     return { width: 0, height: 0 };
                 }
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
@@ -2924,7 +2925,7 @@ var Plottable;
                 this._projectors = {};
                 this.animateOnNextRender = true;
                 this.clipPathEnabled = true;
-                this.classed("renderer", true);
+                this.classed("plot", true);
 
                 var dataSource;
                 if (dataset != null) {
@@ -3758,6 +3759,10 @@ var Plottable;
             __extends(Log, _super);
             function Log(scale) {
                 _super.call(this, scale == null ? d3.scale.log() : scale);
+                if (!Log.warned) {
+                    Log.warned = true;
+                    Plottable.Util.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
+                }
             }
             /**
             * Creates a copy of the Scale.Log with the same domain and range but without any registered listeners.
@@ -3771,6 +3776,7 @@ var Plottable;
             Log.prototype._defaultExtent = function () {
                 return [1, 10];
             };
+            Log.warned = false;
             return Log;
         })(Plottable.Abstract.QuantitativeScale);
         Scale.Log = Log;
@@ -5596,7 +5602,7 @@ var Plottable;
 
             Label.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
-                this.textContainer.selectAll("text").remove();
+                this.textContainer.text("");
                 var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
                 var truncatedText = Plottable.Util.Text.getTruncatedText(this._text, dimension, this.measurer);
                 if (this.orientation === "horizontal") {
@@ -6029,7 +6035,7 @@ var Plottable;
                 if (xScale == null || yScale == null) {
                     throw new Error("XYPlots require an xScale and yScale");
                 }
-                this.classed("xy-renderer", true);
+                this.classed("xy-plot", true);
 
                 this.project("x", "x", xScale); // default accessor
                 this.project("y", "y", yScale); // default accessor
@@ -6111,7 +6117,7 @@ var Plottable;
                     "circles-reset": new Plottable.Animator.Null(),
                     "circles": new Plottable.Animator.IterativeDelay().duration(250).delay(5)
                 };
-                this.classed("circle-renderer", true);
+                this.classed("scatter-plot", true);
                 this.project("r", 3); // default
                 this.project("fill", function () {
                     return "steelblue";
@@ -6182,7 +6188,7 @@ var Plottable;
                 this._animators = {
                     "cells": new Plottable.Animator.Null()
                 };
-                this.classed("grid-renderer", true);
+                this.classed("grid-plot", true);
 
                 // The x and y scales should render in bands with no padding
                 this.xScale.rangeType("bands", 0, 0);
@@ -6255,7 +6261,7 @@ var Plottable;
                     "bars": new Plottable.Animator.IterativeDelay(),
                     "baseline": new Plottable.Animator.Null()
                 };
-                this.classed("bar-renderer", true);
+                this.classed("bar-plot", true);
                 this.project("fill", function () {
                     return "steelblue";
                 });
@@ -6583,7 +6589,7 @@ var Plottable;
                     "line-reset": new Plottable.Animator.Null(),
                     "line": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
                 };
-                this.classed("line-renderer", true);
+                this.classed("line-plot", true);
                 this.project("stroke", function () {
                     return "steelblue";
                 }); // default
@@ -6664,7 +6670,7 @@ var Plottable;
             */
             function Area(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this.classed("area-renderer", true);
+                this.classed("area-plot", true);
                 this.project("y0", 0, yScale); // default
                 this.project("fill", function () {
                     return "steelblue";

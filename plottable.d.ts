@@ -1406,6 +1406,12 @@ declare module Plottable {
             /**
             * Creates a new Scale.Log.
             *
+            * Warning: Log is deprecated; if possible, use ModifiedLog. Log scales are
+            * very unstable due to the fact that they can't handle 0 or negative
+            * numbers. The only time when you would want to use a Log scale over a
+            * ModifiedLog scale is if you're plotting very small data, such as all
+            * data < 1.
+            *
             * @constructor
             * @param {D3.Scale.LogScale} [scale] The D3 Scale.Log backing the Scale.Log. If not supplied, uses a default scale.
             */

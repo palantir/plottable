@@ -2,7 +2,7 @@
 
 function generateSVG(width = 400, height = 400): D3.Selection {
   var parent: D3.Selection = getSVGParent();
-  return parent.append("svg").attr("width", width).attr("height", height);
+  return parent.append("svg").attr("width", width).attr("height", height).attr("class", "svg");
 }
 
 function getSVGParent(): D3.Selection {

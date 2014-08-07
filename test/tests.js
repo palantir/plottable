@@ -2,7 +2,7 @@ function generateSVG(width, height) {
     if (width === void 0) { width = 400; }
     if (height === void 0) { height = 400; }
     var parent = getSVGParent();
-    return parent.append("svg").attr("width", width).attr("height", height);
+    return parent.append("svg").attr("width", width).attr("height", height).attr("class", "svg");
 }
 function getSVGParent() {
     var mocha = d3.select("#mocha-report");
@@ -95,6 +95,20 @@ var MultiTestVerifier = (function () {
 before(function () {
     Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
     window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
+});
+after(function () {
+    var parent = getSVGParent();
+    var mocha = d3.select("#mocha-report");
+    if (mocha.node() != null) {
+        var suites = mocha.selectAll(".suite");
+        for (var i = 0; i < suites[0].length; i++) {
+            var curSuite = d3.select(suites[0][i]);
+            assert(curSuite.selectAll("ul").selectAll("svg").node() === null, "all svgs have been removed");
+        }
+    }
+    else {
+        assert(d3.select("body").selectAll("svg").node() === null, "all svgs have been removed");
+    }
 });
 
 var assert = chai.assert;
@@ -3521,11 +3535,13 @@ describe("CachingCharacterMeasurer", function () {
         g = svg.append("g");
         measurer = new Plottable.Util.Text.CachingCharacterMeasurer(g);
     });
+    afterEach(function () {
+        svg.remove();
+    });
     it("empty string has non-zero size", function () {
         var a = measurer.measure("x x").width;
         var b = measurer.measure("xx").width;
         assert.operator(a, ">", b, "'x x' is longer than 'xx'");
-        svg.remove();
     });
     it("should repopulate cache if it changes size and clear() is called", function () {
         var a = measurer.measure("x").width;
@@ -3535,7 +3551,6 @@ describe("CachingCharacterMeasurer", function () {
         measurer.clear();
         var c = measurer.measure("x").width;
         assert.operator(a, "<", c, "cache reset after font size changed");
-        svg.remove();
     });
     it("multiple spaces take up same area as one space", function () {
         var a = measurer.measure("x x").width;
@@ -3764,6 +3779,16 @@ describe("Util.Text", function () {
         var text = "hello world ARE YOU THERE?";
         var hideResults = true;
         describe("writeLineHorizontally", function () {
+            it("writes no text if there is insufficient space", function () {
+                svg = generateSVG(20, 20);
+                g = svg.append("g");
+                var wh = Plottable.Util.Text.writeLineHorizontally(text, g, 20, 20);
+                assert.equal(wh.width, 0, "no width used");
+                assert.equal(wh.height, 0, "no height used");
+                var textEl = g.select("text");
+                assert.equal(g.text(), "", "no text written");
+                svg.remove();
+            });
             it("performs basic functionality and defaults to left, top", function () {
                 svg = generateSVG(400, 400);
                 g = svg.append("g");
