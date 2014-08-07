@@ -47,7 +47,7 @@ export module Abstract {
     public addDataset(dataset: any[]): Plot;
     public addDataset(first: any, second?: any): Plot {
       if (typeof(first) !== "string" && second !== undefined) {
-        throw new Error("addDataset takes string keys")
+        throw new Error("addDataset takes string keys");
       }
       if (typeof(first) === "string" && first[0] === "_") {
         Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
