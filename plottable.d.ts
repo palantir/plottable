@@ -1190,6 +1190,10 @@ declare module Plottable {
         min: number;
         max: number;
     }
+    interface Point {
+        x: number;
+        y: number;
+    }
 }
 
 
@@ -1669,6 +1673,7 @@ declare module Plottable {
             static TICK_LABEL_CLASS: string;
             public axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: any);
+<<<<<<< HEAD
             public remove(): void;
             /**
             * Gets the current width.
@@ -1762,6 +1767,41 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public showEndTickLabels(show: boolean): Axis;
+||||||| merged common ancestors
+            remove(): void;
+            width(): number;
+            width(w: any): Axis;
+            height(): number;
+            height(h: any): Axis;
+            formatter(): Formatter;
+            formatter(formatter: any): Axis;
+            tickLength(): number;
+            tickLength(length: number): Axis;
+            tickLabelPadding(): number;
+            tickLabelPadding(padding: number): Axis;
+            orient(): string;
+            orient(newOrientation: string): Axis;
+            showEndTickLabels(): boolean;
+            showEndTickLabels(show: boolean): Axis;
+=======
+            remove(): void;
+            width(): number;
+            width(w: any): Axis;
+            height(): number;
+            height(h: any): Axis;
+            formatter(): Formatter;
+            formatter(formatter: any): Axis;
+            tickLength(): number;
+            tickLength(length: number): Axis;
+            tickLabelPadding(): number;
+            tickLabelPadding(padding: number): Axis;
+            gutter(): number;
+            gutter(size: number): Axis;
+            orient(): string;
+            orient(newOrientation: string): Axis;
+            showEndTickLabels(): boolean;
+            showEndTickLabels(show: boolean): Axis;
+>>>>>>> master
         }
     }
 }
@@ -2448,6 +2488,34 @@ declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
             public setBox(y0: number, y1: number): YDragBox;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Dispatcher extends PlottableObject {
+            constructor(target: D3.Selection);
+            target(): D3.Selection;
+            target(targetElement: D3.Selection): Dispatcher;
+            connect(): Dispatcher;
+            disconnect(): Dispatcher;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Dispatcher {
+        class Mouse extends Plottable.Abstract.Dispatcher {
+            constructor(target: D3.Selection);
+            mouseover(): (location: Point) => any;
+            mouseover(callback: (location: Point) => any): Mouse;
+            mousemove(): (location: Point) => any;
+            mousemove(callback: (location: Point) => any): Mouse;
+            mouseout(): (location: Point) => any;
+            mouseout(callback: (location: Point) => any): Mouse;
         }
     }
 }

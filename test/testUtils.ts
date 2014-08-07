@@ -107,3 +107,22 @@ class MultiTestVerifier {
     this.passed = this.temp;
   }
 }
+
+function triggerFakeUIEvent(type: string, target: D3.Selection) {
+  var e = <UIEvent> document.createEvent("UIEvents");
+  e.initUIEvent(type, true, true, window, 1);
+  target.node().dispatchEvent(e);
+}
+
+function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+  var clientRect = target.node().getBoundingClientRect();
+  var xPos = clientRect.left + relativeX;
+  var yPos = clientRect.top + relativeY;
+  var e = <MouseEvent> document.createEvent("MouseEvents");
+  e.initMouseEvent(type, true, true, window, 1,
+                    xPos, yPos,
+                    xPos, yPos,
+                    false, false, false, false,
+                    1, null);
+  target.node().dispatchEvent(e);
+}

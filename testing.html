@@ -5,6 +5,7 @@
   <script src="/bower_components/lodash/dist/lodash.js"></script>
   <script src="/examples/exampleUtil.js"></script>
   <link rel="stylesheet" type="text/css" href="/plottable.css">
+  <link rel="stylesheet" type="text/css" href="/plottable_testing.css">
 
   <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
   <script src="/quicktests/quicktest.js" defer> </script>
@@ -27,7 +28,7 @@
     }
   </style>
 
-  <title>Plottable.js: Axis Tests</title>
+  <title>Plottable.js: Tests</title>
 </head>
 
 <body>
@@ -36,18 +37,22 @@
     <th width = "40%">Master</th>
     <th width = "20%">
       <form>
-        Keyword: <input type="text" id="filterWord" name="filterWord" ></input>
+      Keyword: <select type="text" id="filterWord" name="filterWord">
+        <option value=""></option>
+      </select>
       </form>
     </th>
     <th width = "40%">
       <form>
-        Feature Branch: <input type="text" id="featureBranch" name="featureBranch" ></input>
+      Feature Branch: <select type="text" id="featureBranch" name="featureBranch">
+        <option value=""></option>
+      </select>      
       </form>
       <button id="button" name="button">update with new branch</button>
     </th>
   </tr>
-
   </table>
+
 
 </body>
 </html>
