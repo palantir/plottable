@@ -115,8 +115,8 @@ describe("Interactions", () => {
       var timesCalled = 0;
       interaction.dragstart(function(a: Plottable.ICoord) {
         timesCalled++;
-        var expectedOrigin = { x: dragstartX, y: dragstartY };
-        assert.deepEqual(a, expectedOrigin, "areaCallback called with null arg on dragstart");
+        var expectedStartLocation = { x: dragstartX, y: dragstartY };
+        assert.deepEqual(a, expectedStartLocation, "areaCallback called with null arg on dragstart");
       });
       interaction.dragend(function(a: Plottable.ICoord, b: Plottable.ICoord) {
         timesCalled++;

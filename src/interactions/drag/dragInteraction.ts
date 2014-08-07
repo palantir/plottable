@@ -9,7 +9,7 @@ export module Interaction {
     public location = [0,0];
     private constrainX: (n: number) => number;
     private constrainY: (n: number) => number;
-    public ondragstart: (origin: ICoord) => void;
+    public ondragstart: (startLocation: ICoord) => void;
     public      ondrag: (startLocation: ICoord, endLocation: ICoord) => void;
     public   ondragend: (startLocation: ICoord, endLocation: ICoord) => void;
 
