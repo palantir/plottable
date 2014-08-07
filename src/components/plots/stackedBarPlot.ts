@@ -35,11 +35,6 @@ export module Plot {
       return this;
     }
 
-    public _updateYDomainer() {
-      this._updateDomainer(this.yScale);
-      return this;
-    }
-
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       var primaryScale    = this._isVertical ? this.yScale : this.xScale;
@@ -80,7 +75,6 @@ export module Plot {
       this._onDataSourceUpdate();
       return stacks;
     }
-
 
     public _paint() {
       var accessor = this._projectors["y"].accessor;

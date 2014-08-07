@@ -5164,6 +5164,24 @@ var Plottable;
                 };
                 return attrToProjector;
             };
+            NewStyleBarPlot.prototype._updateYDomainer = function () {
+                if (this._isVertical) {
+                    this._updateDomainer(this.yScale);
+                }
+                else {
+                    _super.prototype._updateYDomainer.call(this);
+                }
+                return this;
+            };
+            NewStyleBarPlot.prototype._updateXDomainer = function () {
+                if (!this._isVertical) {
+                    this._updateDomainer(this.xScale);
+                }
+                else {
+                    _super.prototype._updateXDomainer.call(this);
+                }
+                return this;
+            };
             NewStyleBarPlot.DEFAULT_WIDTH = 10;
             NewStyleBarPlot._BarAlignmentToFactor = {};
             return NewStyleBarPlot;
@@ -5206,10 +5224,6 @@ var Plottable;
                 else {
                     this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
                 }
-                return this;
-            };
-            StackedBar.prototype._updateYDomainer = function () {
-                this._updateDomainer(this.yScale);
                 return this;
             };
             StackedBar.prototype._generateAttrToProjector = function () {
