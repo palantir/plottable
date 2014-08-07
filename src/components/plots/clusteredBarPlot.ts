@@ -2,142 +2,67 @@
 
 module Plottable {
 export module Plot {
-  export class ClusteredBar extends Abstract.BarPlot {
+  export class ClusteredBar extends Abstract.NewStyleBarPlot {
     public static DEFAULT_WIDTH = 10;
-    private nextSeriesIndex = 0;
-    public barMap = d3.map();
-    public datasetMap = d3.map();
-    public _baselineValue = 0;
-    public clusterOrder: string[];
-    public renderArea: D3.Selection;
-    public _isVertical: boolean;
+    public _isVertical = true;
     private innerScale: Scale.Ordinal;
     public colorScale: Scale.Color;
 
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
       super(dataset, xScale, yScale);
-      this.clusterOrder = [];
       this.innerScale = new Scale.Ordinal();
-      this._isVertical = true;
     }
 
+    private getKeys() {
+      return this.datasets.map((d) => d.key);
+    }
 
-    public addDataset(key: string, dataset: DataSource): ClusteredBar;
-    public addDataset(key: string, dataset: any[]): ClusteredBar;
-    public addDataset(dataset: DataSource): ClusteredBar;
-    public addDataset(dataset: any[]): ClusteredBar;
-    public addDataset(first: any, second?: any): ClusteredBar {
-      if (typeof(first) !== "string" && second !== undefined) {
-        throw new Error("addDataSet takes string keys");
+    public cluster(accessor: IAccessor) {
+      var keys = this.getKeys();
+      this.innerScale.domain(keys);
+      this.colorScale.domain(keys);
+      var lengths = this.datasets.map((d) => d.dataset.data().length);
+      if (Util.Methods.uniqNumbers(lengths).length > 1) {
+        Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
       }
-      if (typeof(first) === "string" && first[0] === "_") {
-        Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-      }     
-      var key  = typeof(first) === "string" ? first : "_" + this.nextSeriesIndex++;
-      var data = typeof(first) !== "string" ? first : second;
-      var dataset = (data instanceof DataSource) ? data : new DataSource(data);
+      var clusters = this.datasets.map((dnk) => {
+        var data = dnk.dataset.data();
+        var key = dnk.key;
+        var vals = data.map((d) => accessor(d));
 
-      this.datasetMap.set(key, dataset);
-      this.clusterOrder.push(key);
-      this._onDataSourceUpdate();
-      return this;
-    }
-
-    public _onDataSourceUpdate() {
-      this._updateAllProjectors();
-      super._onDataSourceUpdate();
-    }
- 
-    public removeDataset(key: string): ClusteredBar {
-      this.datasetMap.remove(key);
-      var barGroup = this.barMap.get(key);
-      barGroup.remove();
-      this.barMap.remove(key);
-      if (this.clusterOrder.indexOf(key) >= 0) {
-        this.clusterOrder.splice(this.clusterOrder.indexOf(key), 1);
-      }
-      this._onDataSourceUpdate();
-      return this;
-    }
-
-    public cluster(): string[];
-    public cluster(cluster: string[]): ClusteredBar;
-    public cluster(cluster?: string[]): any {
-      if (cluster == null) {
-        return this.clusterOrder;
-      }
-      this.clusterOrder = cluster;
-      this._onDataSourceUpdate();
-      return this;
-    }
-    // basically the same as in plot.ts, but I just iterate through the datasets
-    private _updateAllProjectors(): ClusteredBar {
-      d3.keys(this._projectors).forEach((attr: string) => this._updateProjector(attr));
-      return this;
-    }
-
-    private _updateProjector(attr: string): ClusteredBar {
-      var projector = this._projectors[attr];
-      if (projector.scale != null) {
-        this.datasetMap.values().forEach((datasource: DataSource, i: number) => {
-          var extent = datasource._getExtent(projector.accessor);
-          // I don't want to overwrite my previous extents, so I'm making a unique number somehow
-          if (extent.length === 0 || !this._isAnchored) {
-            projector.scale.removeExtent(this._plottableID * 100 + i, attr);
-          } else {
-            projector.scale.updateExtent(this._plottableID * 100 + i, attr, extent);
-          }
+        return data.map((d, i) => {
+          d["_PLOTTABLE_PROTECTED_FIELD_X"] = this.xScale.scale(vals[i]) + this.innerScale.scale(key);
+          d["_PLOTTABLE_PROTECTED_FIELD_FILL"] = this.colorScale.scale(key);
+          return d;
         });
-      }
-      return this;
+      });
+      return clusters;
     }
 
     public _paint() {
       super._paint();
-      this.clusterOrder.forEach((e) =>  {
-        var barGroup: D3.Selection;
-        if (this.barMap.has(e)) {
-          barGroup = this.barMap.get(e);
-        } else {
-          barGroup = this.renderArea.append("g");
-        }
-        var bars = barGroup.selectAll("rect").data(this.datasetMap.get(e).data(), (d) => d.year);
-        bars.enter().append("rect");
-        var primaryScale = this._isVertical ? this.yScale : this.xScale;
-        var scaledBaseline = primaryScale.scale(this._baselineValue);
-        var positionAttr = this._isVertical ? "y" : "x";
-        var secondaryAttr = this._isVertical ? "x" : "y";
-        var dimensionAttr = this._isVertical ? "height" : "width";
-
-
-        if (this._dataChanged && this._animate && !this.barMap.has(e)) {
-          var resetAttrToProjector = this.__generateAttrToProjector(e);
-          resetAttrToProjector[positionAttr] = () => scaledBaseline;
-          resetAttrToProjector[dimensionAttr] = () => 0;
-          this._applyAnimatedAttributes(bars, "bars-reset", resetAttrToProjector);
-        }
-
-        var attrToProjector = this.__generateAttrToProjector(e);
-        if (attrToProjector["fill"] != null) {
-          this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-        }
-        this._applyAnimatedAttributes(bars, "bars", attrToProjector);
-        bars.exit().remove();
-        this.barMap.set(e, barGroup);
-      });
+      var accessor = this._projectors["x"].accessor;
+      var attrHash = this._generateAttrToProjector();
+      var clusteredData = this.cluster(accessor);
+      this.drawers.forEach((d, i) => d.draw(clusteredData[i], attrHash));
     }
 
-    public __generateAttrToProjector(seriesKey: string) {
+    public getDrawer(key: string) {
+      return new Drawer.RectDrawer(key);
+    }
+
+    public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      this.innerScale.domain(this.clusterOrder);
-      this.colorScale.domain(this.clusterOrder);
       // the width is constant, so set the inner scale range to that
       var widthF = attrToProjector["width"];
-      this.innerScale.range([0, widthF(null, 1)]);
-      attrToProjector["width"] = (d: any, i: number) => (widthF(d, i) / this.clusterOrder.length * .7);
-      var positionF = attrToProjector["x"];
-      attrToProjector["x"] = (d: any, i: number) => (positionF(d, i) + this.innerScale.scale(seriesKey));
-      attrToProjector["fill"] = (d: any, i: number) => (this.colorScale.scale(seriesKey));
+      this.innerScale.range([0, widthF(null, 0)]);
+      attrToProjector["width"] = (d: any, i: number) => this.innerScale.rangeBand();
+
+      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var getFill = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_FILL;
+      var getX = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_X;
+      attrToProjector["fill"] = getFill;
+      attrToProjector["x"] = getX;
       return attrToProjector;
     }
 

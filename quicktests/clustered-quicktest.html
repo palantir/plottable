@@ -22,8 +22,8 @@
 
       plot = new Plottable.Plot.ClusteredBar([], xScale, yScale);
       plot.project("x", "year", xScale);
+      plot.project("y", "y", yScale);
       plot.setColor(colorScale);
-      plot.project("fill", function(d, i, m) {return m;}, colorScale);
       // plot.animate(true);
       var legend = new Plottable.Component.Legend(colorScale);
       var chart = new Plottable.Component.Table([

@@ -891,29 +891,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class ClusteredBar extends Plottable.Abstract.BarPlot {
-            static DEFAULT_WIDTH: number;
-            barMap: D3.Map;
-            datasetMap: D3.Map;
-            clusterOrder: string[];
-            renderArea: D3.Selection;
-            colorScale: Plottable.Scale.Color;
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
-            addDataset(key: string, dataset: DataSource): ClusteredBar;
-            addDataset(key: string, dataset: any[]): ClusteredBar;
-            addDataset(dataset: DataSource): ClusteredBar;
-            addDataset(dataset: any[]): ClusteredBar;
-            removeDataset(key: string): ClusteredBar;
-            cluster(): string[];
-            cluster(cluster: string[]): ClusteredBar;
-            setColor(scale: Plottable.Scale.Color): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Plot {
         class VerticalBar extends Plottable.Abstract.BarPlot {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
@@ -973,11 +950,13 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
-            stackedData: any[][];
-            constructor(dataset: any, xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
+        class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
+            static DEFAULT_WIDTH: number;
+            colorScale: Plottable.Scale.Color;
+            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+            cluster(accessor: IAccessor): any[][];
             getDrawer(key: string): Drawer.RectDrawer;
-            stack(accessor: IAccessor): any[][];
+            setColor(scale: Plottable.Scale.Color): void;
         }
     }
 }

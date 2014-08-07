@@ -95,8 +95,10 @@ export module Abstract {
         for (var i=0; i <= this.datasets.length && this.datasets[i].key !== key; i++) {};
         var drawer = this.drawers[i];
         drawer.remove();
+        this.drawers.splice(i, 1);
         this.datasets.splice(i, 1);
         this.datasetKeySet.remove(key);
+        this._onDataSourceUpdate();
       } else {
         Util.Methods.warn("Attempted to remove series " + key + ", but series not found");
       }

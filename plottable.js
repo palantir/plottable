@@ -2316,8 +2316,10 @@ var Plottable;
                     ;
                     var drawer = this.drawers[i];
                     drawer.remove();
+                    this.drawers.splice(i, 1);
                     this.datasets.splice(i, 1);
                     this.datasetKeySet.remove(key);
+                    this._onDataSourceUpdate();
                 }
                 else {
                     Plottable.Util.Methods.warn("Attempted to remove series " + key + ", but series not found");
@@ -4872,143 +4874,6 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
-        var ClusteredBar = (function (_super) {
-            __extends(ClusteredBar, _super);
-            function ClusteredBar(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
-                this.nextSeriesIndex = 0;
-                this.barMap = d3.map();
-                this.datasetMap = d3.map();
-                this._baselineValue = 0;
-                this.clusterOrder = [];
-                this.innerScale = new Plottable.Scale.Ordinal();
-                this._isVertical = true;
-            }
-            ClusteredBar.prototype.addDataset = function (first, second) {
-                if (typeof (first) !== "string" && second !== undefined) {
-                    throw new Error("addDataSet takes string keys");
-                }
-                if (typeof (first) === "string" && first[0] === "_") {
-                    Plottable.Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
-                }
-                var key = typeof (first) === "string" ? first : "_" + this.nextSeriesIndex++;
-                var data = typeof (first) !== "string" ? first : second;
-                var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
-                this.datasetMap.set(key, dataset);
-                this.clusterOrder.push(key);
-                this._onDataSourceUpdate();
-                return this;
-            };
-            ClusteredBar.prototype._onDataSourceUpdate = function () {
-                this._updateAllProjectors();
-                _super.prototype._onDataSourceUpdate.call(this);
-            };
-            ClusteredBar.prototype.removeDataset = function (key) {
-                this.datasetMap.remove(key);
-                var barGroup = this.barMap.get(key);
-                barGroup.remove();
-                this.barMap.remove(key);
-                if (this.clusterOrder.indexOf(key) >= 0) {
-                    this.clusterOrder.splice(this.clusterOrder.indexOf(key), 1);
-                }
-                this._onDataSourceUpdate();
-                return this;
-            };
-            ClusteredBar.prototype.cluster = function (cluster) {
-                if (cluster == null) {
-                    return this.clusterOrder;
-                }
-                this.clusterOrder = cluster;
-                this._onDataSourceUpdate();
-                return this;
-            };
-            ClusteredBar.prototype._updateAllProjectors = function () {
-                var _this = this;
-                d3.keys(this._projectors).forEach(function (attr) { return _this._updateProjector(attr); });
-                return this;
-            };
-            ClusteredBar.prototype._updateProjector = function (attr) {
-                var _this = this;
-                var projector = this._projectors[attr];
-                if (projector.scale != null) {
-                    this.datasetMap.values().forEach(function (datasource, i) {
-                        var extent = datasource._getExtent(projector.accessor);
-                        if (extent.length === 0 || !_this._isAnchored) {
-                            projector.scale.removeExtent(_this._plottableID * 100 + i, attr);
-                        }
-                        else {
-                            projector.scale.updateExtent(_this._plottableID * 100 + i, attr, extent);
-                        }
-                    });
-                }
-                return this;
-            };
-            ClusteredBar.prototype._paint = function () {
-                var _this = this;
-                _super.prototype._paint.call(this);
-                this.clusterOrder.forEach(function (e) {
-                    var barGroup;
-                    if (_this.barMap.has(e)) {
-                        barGroup = _this.barMap.get(e);
-                    }
-                    else {
-                        barGroup = _this.renderArea.append("g");
-                    }
-                    var bars = barGroup.selectAll("rect").data(_this.datasetMap.get(e).data(), function (d) { return d.year; });
-                    bars.enter().append("rect");
-                    var primaryScale = _this._isVertical ? _this.yScale : _this.xScale;
-                    var scaledBaseline = primaryScale.scale(_this._baselineValue);
-                    var positionAttr = _this._isVertical ? "y" : "x";
-                    var secondaryAttr = _this._isVertical ? "x" : "y";
-                    var dimensionAttr = _this._isVertical ? "height" : "width";
-                    if (_this._dataChanged && _this._animate && !_this.barMap.has(e)) {
-                        var resetAttrToProjector = _this.__generateAttrToProjector(e);
-                        resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
-                        resetAttrToProjector[dimensionAttr] = function () { return 0; };
-                        _this._applyAnimatedAttributes(bars, "bars-reset", resetAttrToProjector);
-                    }
-                    var attrToProjector = _this.__generateAttrToProjector(e);
-                    if (attrToProjector["fill"] != null) {
-                        _this._bars.attr("fill", attrToProjector["fill"]);
-                    }
-                    _this._applyAnimatedAttributes(bars, "bars", attrToProjector);
-                    bars.exit().remove();
-                    _this.barMap.set(e, barGroup);
-                });
-            };
-            ClusteredBar.prototype.__generateAttrToProjector = function (seriesKey) {
-                var _this = this;
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                this.innerScale.domain(this.clusterOrder);
-                this.colorScale.domain(this.clusterOrder);
-                var widthF = attrToProjector["width"];
-                this.innerScale.range([0, widthF(null, 1)]);
-                attrToProjector["width"] = function (d, i) { return (widthF(d, i) / _this.clusterOrder.length * .7); };
-                var positionF = attrToProjector["x"];
-                attrToProjector["x"] = function (d, i) { return (positionF(d, i) + _this.innerScale.scale(seriesKey)); };
-                attrToProjector["fill"] = function (d, i) { return (_this.colorScale.scale(seriesKey)); };
-                return attrToProjector;
-            };
-            ClusteredBar.prototype.setColor = function (scale) {
-                this.colorScale = scale;
-            };
-            ClusteredBar.DEFAULT_WIDTH = 10;
-            return ClusteredBar;
-        })(Plottable.Abstract.BarPlot);
-        Plot.ClusteredBar = ClusteredBar;
-    })(Plottable.Plot || (Plottable.Plot = {}));
-    var Plot = Plottable.Plot;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Plot) {
         var VerticalBar = (function (_super) {
             __extends(VerticalBar, _super);
             function VerticalBar(dataset, xScale, yScale) {
@@ -5341,81 +5206,67 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
-        var StackedBar = (function (_super) {
-            __extends(StackedBar, _super);
-            function StackedBar(dataset, xScale, yScale) {
+        var ClusteredBar = (function (_super) {
+            __extends(ClusteredBar, _super);
+            function ClusteredBar(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
-                this.stackedData = [];
                 this._isVertical = true;
-                this._baselineValue = 0;
-                this.stackedExtent = [];
+                this.innerScale = new Plottable.Scale.Ordinal();
             }
-            StackedBar.prototype._onDataSourceUpdate = function () {
-                _super.prototype._onDataSourceUpdate.call(this);
-                this._render();
+            ClusteredBar.prototype.getKeys = function () {
+                return this.datasets.map(function (d) { return d.key; });
             };
-            StackedBar.prototype._updateAllProjectors = function () {
-                _super.prototype._updateAllProjectors.call(this);
-                if (this.yScale == null) {
-                    return;
-                }
-                if (this._isAnchored && this.stackedExtent.length > 0) {
-                    this.yScale.updateExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT", this.stackedExtent);
-                }
-                else {
-                    this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
-                }
-                return this;
-            };
-            StackedBar.prototype._updateYDomainer = function () {
-                this._updateDomainer(this.yScale);
-                return this;
-            };
-            StackedBar.prototype._generateAttrToProjector = function () {
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var getY0 = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0); };
-                var getY = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y); };
-                attrToProjector["height"] = function (d) { return Math.abs(getY(d) - getY0(d)); };
-                attrToProjector["y"] = function (d) { return getY(d); };
-                return attrToProjector;
-            };
-            StackedBar.prototype.getDrawer = function (key) {
-                return new Plottable.Drawer.RectDrawer(key);
-            };
-            StackedBar.prototype.stack = function (accessor) {
+            ClusteredBar.prototype.cluster = function (accessor) {
+                var _this = this;
+                var keys = this.getKeys();
+                this.innerScale.domain(keys);
+                this.colorScale.domain(keys);
                 var lengths = this.datasets.map(function (d) { return d.dataset.data().length; });
                 if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
-                    Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
+                    Plottable.Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
                 }
-                var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
-                var stacks = this.datasets.map(function (dnk) {
+                var clusters = this.datasets.map(function (dnk) {
                     var data = dnk.dataset.data();
-                    var base = currentBase.slice();
-                    var vals = data.map(accessor);
-                    if (vals.some(function (x) { return x < 0; })) {
-                        Plottable.Util.Methods.warn("Warning: Behavior for stacked bars undefined when data includes negative values");
-                    }
-                    currentBase = Plottable.Util.Methods.addArrays(base, vals);
+                    var key = dnk.key;
+                    var vals = data.map(function (d) { return accessor(d); });
                     return data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_Y0"] = base[i];
-                        d["_PLOTTABLE_PROTECTED_FIELD_Y"] = currentBase[i];
+                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(vals[i]) + _this.innerScale.scale(key);
+                        d["_PLOTTABLE_PROTECTED_FIELD_FILL"] = _this.colorScale.scale(key);
                         return d;
                     });
                 });
-                this.stackedExtent = [0, d3.max(currentBase)];
-                this._onDataSourceUpdate();
-                return stacks;
+                return clusters;
             };
-            StackedBar.prototype._paint = function () {
-                var accessor = this._projectors["y"].accessor;
+            ClusteredBar.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+                var accessor = this._projectors["x"].accessor;
                 var attrHash = this._generateAttrToProjector();
-                var stackedData = this.stack(accessor);
-                this.drawers.forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
+                var clusteredData = this.cluster(accessor);
+                this.drawers.forEach(function (d, i) { return d.draw(clusteredData[i], attrHash); });
             };
-            return StackedBar;
+            ClusteredBar.prototype.getDrawer = function (key) {
+                return new Plottable.Drawer.RectDrawer(key);
+            };
+            ClusteredBar.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var widthF = attrToProjector["width"];
+                this.innerScale.range([0, widthF(null, 0)]);
+                attrToProjector["width"] = function (d, i) { return _this.innerScale.rangeBand(); };
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var getFill = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_FILL; };
+                var getX = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_X; };
+                attrToProjector["fill"] = getFill;
+                attrToProjector["x"] = getX;
+                return attrToProjector;
+            };
+            ClusteredBar.prototype.setColor = function (scale) {
+                this.colorScale = scale;
+            };
+            ClusteredBar.DEFAULT_WIDTH = 10;
+            return ClusteredBar;
         })(Plottable.Abstract.NewStyleBarPlot);
-        Plot.StackedBar = StackedBar;
+        Plot.ClusteredBar = ClusteredBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));
