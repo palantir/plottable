@@ -533,7 +533,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class QuantitativeScale extends Scale {
-            constructor(scale: D3.Scale.QuantitiveScale);
+            constructor(scale: D3.Scale.QuantitativeScale);
             invert(value: number): number;
             copy(): QuantitativeScale;
             domain(): any[];
