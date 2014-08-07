@@ -1586,7 +1586,7 @@ var Plottable;
             * Construct a broadcaster, taking the Listenable that the broadcaster will be attached to.
             *
             * @constructor
-            * @param {IListenable} Listenable The Listenable-object that this broadcaster is attached to.
+            * @param {IListenable} listenable The Listenable-object that this broadcaster is attached to.
             */
             function Broadcaster(listenable) {
                 _super.call(this);
