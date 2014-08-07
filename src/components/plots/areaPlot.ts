@@ -2,6 +2,9 @@
 
 module Plottable {
 export module Plot {
+  /**
+   * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
+   */
   export class Area extends Line {
     private areaPath: D3.Selection;
 

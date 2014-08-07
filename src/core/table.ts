@@ -212,17 +212,11 @@ export module Component {
             spaceRequest = {width: 0, height: 0, wantsWidth: false, wantsHeight: false};
           }
 
-          var epsilon = 0.001;
-          var epsilonGT = (a: number, b: number) => {
-            return a - b - epsilon > 0;
-          };
+          var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
+          var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
 
-          if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
-            Util.Methods.warn("Invariant Violation: Abstract.Component cannot request more space than is offered");
-          }
-
-          requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], spaceRequest.width );
-          requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], spaceRequest.height);
+          requestedWidths [colIndex] = Math.max(requestedWidths [colIndex], allocatedWidth );
+          requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
           layoutWantsWidth [colIndex] = layoutWantsWidth [colIndex] || spaceRequest.wantsWidth;
           layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
         });

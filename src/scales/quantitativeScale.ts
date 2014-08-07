@@ -3,7 +3,7 @@
 module Plottable {
 export module Abstract {
   export class QuantitativeScale extends Scale {
-    public _d3Scale: D3.Scale.QuantitiveScale;
+    public _d3Scale: D3.Scale.QuantitativeScale;
     public _lastRequestedTickCount = 10;
     public _PADDING_FOR_IDENTICAL_DOMAIN = 1;
     public _userSetDomainer: boolean = false;
@@ -13,9 +13,9 @@ export module Abstract {
      * Creates a new QuantitativeScale.
      *
      * @constructor
-     * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitativeScale backing the QuantitativeScale.
+     * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale backing the QuantitativeScale.
      */
-    constructor(scale: D3.Scale.QuantitiveScale) {
+    constructor(scale: D3.Scale.QuantitativeScale) {
       super(scale);
     }
 

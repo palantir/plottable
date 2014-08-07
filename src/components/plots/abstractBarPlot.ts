@@ -2,8 +2,12 @@
 
 module Plottable {
 export module Abstract {
+  /*
+   * An Abstract.BarPlot is the base implementation for HorizontalBarPlot and
+   * VerticalBarPlot. It should not be used on its own.
+   */
   export class BarPlot extends XYPlot {
-    public static DEFAULT_WIDTH = 10;
+    private static DEFAULT_WIDTH = 10;
     public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _baselineValue = 0;

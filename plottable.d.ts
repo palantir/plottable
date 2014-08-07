@@ -268,9 +268,9 @@ declare module Plottable {
         class Broadcaster extends Plottable.Abstract.PlottableObject {
             listenable: IListenable;
             constructor(listenable: IListenable);
-            registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
+            registerListener(key: any, callback: IBroadcasterCallback): Broadcaster;
             broadcast(...args: any[]): Broadcaster;
-            deregisterListener(listener: any): Broadcaster;
+            deregisterListener(key: any): Broadcaster;
             deregisterAllListeners(): void;
         }
     }
@@ -533,7 +533,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class QuantitativeScale extends Scale {
-            constructor(scale: D3.Scale.QuantitiveScale);
+            constructor(scale: D3.Scale.QuantitativeScale);
             invert(value: number): number;
             copy(): QuantitativeScale;
             domain(): any[];
@@ -660,7 +660,6 @@ declare module Plottable {
         class Axis extends Component {
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
-            axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: any);
             remove(): void;
             width(): number;
@@ -673,6 +672,8 @@ declare module Plottable {
             tickLength(length: number): Axis;
             tickLabelPadding(): number;
             tickLabelPadding(padding: number): Axis;
+            gutter(): number;
+            gutter(size: number): Axis;
             orient(): string;
             orient(newOrientation: string): Axis;
             showEndTickLabels(): boolean;
@@ -751,6 +752,7 @@ declare module Plottable {
             (datum?: string): any;
         }
         class Legend extends Plottable.Abstract.Component {
+            static SUBELEMENT_CLASS: string;
             constructor(colorScale?: Plottable.Scale.Color);
             remove(): void;
             toggleCallback(callback: ToggleCallback): Legend;
@@ -822,7 +824,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-            static DEFAULT_WIDTH: number;
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
