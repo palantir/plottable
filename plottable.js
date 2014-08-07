@@ -5170,7 +5170,7 @@ var Plottable;
                 var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 if (attrToProjector["width"] == null) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : Abstract.BarPlot.DEFAULT_WIDTH;
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : NewStyleBarPlot.DEFAULT_WIDTH;
                     attrToProjector["width"] = function (d, i) { return constantWidth; };
                 }
                 var positionF = attrToProjector[secondaryAttr];
