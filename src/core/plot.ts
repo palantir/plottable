@@ -37,7 +37,7 @@ export module Abstract {
     constructor(dataset?: any) {
       super();
       this.clipPathEnabled = true;
-      this.classed("renderer", true);
+      this.classed("plot", true);
 
       var dataSource: DataSource;
       if (dataset != null) {
@@ -56,7 +56,7 @@ export module Abstract {
       super._anchor(element);
       this.animateOnNextRender = true;
       this._dataChanged = true;
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       return this;
     }
 
@@ -101,7 +101,7 @@ export module Abstract {
     }
 
     public _onDataSourceUpdate() {
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       this.animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
@@ -113,7 +113,7 @@ export module Abstract {
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
       if (existingScale != null) {
-        existingScale.removeExtent(this._plottableID, attrToSet);
+        existingScale.removeExtent(this._plottableID.toString(), attrToSet);
         existingScale.broadcaster.deregisterListener(this);
       }
 
@@ -171,7 +171,7 @@ export module Abstract {
     public detach() {
       super.detach();
       // make the domain resize
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       return this;
     }
 
@@ -179,19 +179,19 @@ export module Abstract {
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
      */
-    private updateAllProjectors(): Plot {
+    public _updateAllProjectors(): Plot {
       d3.keys(this._projectors).forEach((attr: string) => this.updateProjector(attr));
       return this;
     }
 
-    private updateProjector(attr: string) {
+    public updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
         if (extent.length === 0 || !this._isAnchored) {
-          projector.scale.removeExtent(this._plottableID, attr);
+          projector.scale.removeExtent(this._plottableID.toString(), attr);
         } else {
-          projector.scale.updateExtent(this._plottableID, attr, extent);
+          projector.scale.updateExtent(this._plottableID.toString(), attr, extent);
         }
       }
       return this;

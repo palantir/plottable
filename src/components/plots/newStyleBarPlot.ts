@@ -2,9 +2,8 @@
 
 module Plottable {
 export module Abstract {
-  export class BarPlot extends XYPlot {
+  export class NewStyleBarPlot extends NewStylePlot {
     public static DEFAULT_WIDTH = 10;
-    public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
@@ -38,35 +37,14 @@ export module Abstract {
     public _setup() {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
-      this._bars = this.renderArea.selectAll("rect").data([]);
       return this;
     }
 
     public _paint() {
       super._paint();
-      this._bars = this.renderArea.selectAll("rect").data(this._dataSource.data());
-      this._bars.enter().append("rect");
 
       var primaryScale = this._isVertical ? this.yScale : this.xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
-      var positionAttr = this._isVertical ? "y" : "x";
-      var dimensionAttr = this._isVertical ? "height" : "width";
-
-      if (this._dataChanged && this._animate) {
-        var resetAttrToProjector = this._generateAttrToProjector();
-        resetAttrToProjector[positionAttr] = () => scaledBaseline;
-        resetAttrToProjector[dimensionAttr] = () => 0;
-        this._applyAnimatedAttributes(this._bars, "bars-reset", resetAttrToProjector);
-      }
-
-      var attrToProjector = this._generateAttrToProjector();
-      if (attrToProjector["fill"] != null) {
-        this._bars.attr("fill", attrToProjector["fill"]); // so colors don't animate
-      }
-      this._applyAnimatedAttributes(this._bars, "bars", attrToProjector);
-
-      this._bars.exit().remove();
-
       var baselineAttr: Abstract.IAttributeToProjector = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
@@ -134,54 +112,54 @@ export module Abstract {
      * @param {boolean} [select] Whether or not to select the bar (by classing it "selected");
      * @return {D3.Selection} The selected bar, or null if no bar was selected.
      */
-    public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
-    public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
-      if (!this._isSetup) {
-        return null;
-      }
+    // public selectBar(xValOrExtent: IExtent, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+    // public selectBar(xValOrExtent: number, yValOrExtent: IExtent, select?: boolean): D3.Selection;
+    // public selectBar(xValOrExtent: IExtent, yValOrExtent: number, select?: boolean): D3.Selection;
+    // public selectBar(xValOrExtent: number, yValOrExtent: number, select?: boolean): D3.Selection;
+    // public selectBar(xValOrExtent: any, yValOrExtent: any, select = true): D3.Selection {
+    //   if (!this._isSetup) {
+    //     return null;
+    //   }
 
-      var selectedBars: any[] = [];
+    //   var selectedBars: any[] = [];
 
-      var xExtent: IExtent = this.parseExtent(xValOrExtent);
-      var yExtent: IExtent = this.parseExtent(yValOrExtent);
+    //   var xExtent: IExtent = this.parseExtent(xValOrExtent);
+    //   var yExtent: IExtent = this.parseExtent(yValOrExtent);
 
-      // the SVGRects are positioned with sub-pixel accuracy (the default unit
-      // for the x, y, height & width attributes), but user selections (e.g. via
-      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-      // seems appropriate:
-      var tolerance: number = 0.5;
+    //   // the SVGRects are positioned with sub-pixel accuracy (the default unit
+    //   // for the x, y, height & width attributes), but user selections (e.g. via
+    //   // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+    //   // seems appropriate:
+    //   var tolerance: number = 0.5;
 
-      // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      this._bars.each(function(d: any) {
-        var bbox = this.getBBox();
-        if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
-            bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
-          selectedBars.push(this);
-        }
-      });
+    //   // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
+    //   this._bars.each(function(d: any) {
+    //     var bbox = this.getBBox();
+    //     if (bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance &&
+    //         bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance) {
+    //       selectedBars.push(this);
+    //     }
+    //   });
 
-      if (selectedBars.length > 0) {
-        var selection: D3.Selection = d3.selectAll(selectedBars);
-        selection.classed("selected", select);
-        return selection;
-      } else {
-        return null;
-      }
-    }
+    //   if (selectedBars.length > 0) {
+    //     var selection: D3.Selection = d3.selectAll(selectedBars);
+    //     selection.classed("selected", select);
+    //     return selection;
+    //   } else {
+    //     return null;
+    //   }
+    // }
 
     /**
      * Deselects all bars.
      * @return {AbstractBarPlot} The calling AbstractBarPlot.
      */
-    public deselectAll() {
-      if (this._isSetup) {
-        this._bars.classed("selected", false);
-      }
-      return this;
-    }
+    // public deselectAll() {
+      // if (this._isSetup) {
+        // this._bars.classed("selected", false);
+      // }
+      // return this;
+    // }
 
     public _updateDomainer(scale: Scale) {
       if (scale instanceof Abstract.QuantitativeScale) {
@@ -246,4 +224,3 @@ export module Abstract {
   }
 }
 }
-

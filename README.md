@@ -16,7 +16,7 @@ Quick Start
 ---
 
 - Download [plottable.zip](plottable.zip) or get it via Bower: `bower install --save plottable`
-- Read the [docs](http://palantir.github.io/plottable/)
+- Read the [docs](http://palantir.github.io/plottable/tutorials/) and visit the [website](http://palantir.github.io/plottable/)
 
 Development
 ---
