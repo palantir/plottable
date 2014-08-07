@@ -200,7 +200,7 @@ body#page-index {
         }
 
         @media (min-width: $screen-lg-min) {
-          margin-top: 400px;
+          margin-top: 300px;
         }
       }
 
@@ -346,7 +346,7 @@ div#page-nav {
 /* Example */
 #section-example-1 {
   padding: 40px 0;
-  height: 100%;
+  min-height: 100%;
 }
 
 /*

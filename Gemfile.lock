@@ -27,7 +27,7 @@ GEM
     fast-stemmer (1.0.2)
     ffi (1.9.3)
     fssm (0.2.10)
-    gemoji (2.0.0)
+    gemoji (2.1.0)
     github-pages (22)
       RedCloth (= 4.2.9)
       jekyll (= 2.2.0)
