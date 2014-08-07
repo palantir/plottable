@@ -673,6 +673,8 @@ declare module Plottable {
             tickLength(length: number): Axis;
             tickLabelPadding(): number;
             tickLabelPadding(padding: number): Axis;
+            gutter(): number;
+            gutter(size: number): Axis;
             orient(): string;
             orient(newOrientation: string): Axis;
             showEndTickLabels(): boolean;
