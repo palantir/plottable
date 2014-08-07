@@ -547,6 +547,10 @@ declare module Plottable {
         min: number;
         max: number;
     }
+    interface Point {
+        x: number;
+        y: number;
+    }
 }
 
 
@@ -567,7 +571,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class QuantitativeScale extends Scale {
-            constructor(scale: D3.Scale.QuantitiveScale);
+            constructor(scale: D3.Scale.QuantitativeScale);
             invert(value: number): number;
             copy(): QuantitativeScale;
             domain(): any[];
@@ -729,6 +733,8 @@ declare module Plottable {
             tickLength(length: number): Axis;
             tickLabelPadding(): number;
             tickLabelPadding(padding: number): Axis;
+            gutter(): number;
+            gutter(size: number): Axis;
             orient(): string;
             orient(newOrientation: string): Axis;
             showEndTickLabels(): boolean;
@@ -1127,6 +1133,34 @@ declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
             setBox(y0: number, y1: number): YDragBox;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Dispatcher extends PlottableObject {
+            constructor(target: D3.Selection);
+            target(): D3.Selection;
+            target(targetElement: D3.Selection): Dispatcher;
+            connect(): Dispatcher;
+            disconnect(): Dispatcher;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Dispatcher {
+        class Mouse extends Plottable.Abstract.Dispatcher {
+            constructor(target: D3.Selection);
+            mouseover(): (location: Point) => any;
+            mouseover(callback: (location: Point) => any): Mouse;
+            mousemove(): (location: Point) => any;
+            mousemove(callback: (location: Point) => any): Mouse;
+            mouseout(): (location: Point) => any;
+            mouseout(callback: (location: Point) => any): Mouse;
         }
     }
 }

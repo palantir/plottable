@@ -416,8 +416,8 @@ var Plottable;
                 var anchorConverter = { left: "start", center: "middle", right: "end" };
                 var anchor = anchorConverter[xAlign];
                 var xOff = width * xOffsetFactor[xAlign];
-                var yOff = height * yOffsetFactor[yAlign] + h * (1 - yOffsetFactor[yAlign]);
-                var ems = -0.4 * (1 - yOffsetFactor[yAlign]);
+                var yOff = height * yOffsetFactor[yAlign];
+                var ems = 0.85 - yOffsetFactor[yAlign];
                 textEl.attr("text-anchor", anchor).attr("y", ems + "em");
                 Util.DOM.translate(innerG, xOff, yOff);
                 return { width: w, height: h };
@@ -1237,6 +1237,8 @@ var Plottable;
                 this._yOffset = 0;
                 this._xAlignProportion = 0;
                 this._yAlignProportion = 0;
+                this._fixedHeightFlag = false;
+                this._fixedWidthFlag = false;
                 this.cssClasses = ["component"];
                 this._isSetup = false;
                 this._isAnchored = false;
@@ -1503,10 +1505,10 @@ var Plottable;
                 }
             };
             Component.prototype._isFixedWidth = function () {
-                return this._requestedSpace(-1, -1).wantsWidth;
+                return this._fixedWidthFlag;
             };
             Component.prototype._isFixedHeight = function () {
-                return this._requestedSpace(-1, -1).wantsHeight;
+                return this._fixedHeightFlag;
             };
             Component.prototype.merge = function (c) {
                 var cg;
@@ -1640,11 +1642,9 @@ var Plottable;
             Group.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this._components.map(function (c) { return c._requestedSpace(offeredWidth, offeredHeight); });
                 var isEmpty = this.empty();
-                var desiredWidth = isEmpty ? 0 : d3.max(requests, function (l) { return l.width; });
-                var desiredHeight = isEmpty ? 0 : d3.max(requests, function (l) { return l.height; });
                 return {
-                    width: Math.min(desiredWidth, offeredWidth),
-                    height: Math.min(desiredHeight, offeredHeight),
+                    width: isEmpty ? 0 : d3.max(requests, function (request) { return request.width; }),
+                    height: isEmpty ? 0 : d3.max(requests, function (request) { return request.height; }),
                     wantsWidth: isEmpty ? false : requests.map(function (r) { return r.wantsWidth; }).some(function (x) { return x; }),
                     wantsHeight: isEmpty ? false : requests.map(function (r) { return r.wantsHeight; }).some(function (x) { return x; })
                 };
@@ -1811,15 +1811,10 @@ var Plottable;
                         else {
                             spaceRequest = { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                         }
-                        var epsilon = 0.001;
-                        var epsilonGT = function (a, b) {
-                            return a - b - epsilon > 0;
-                        };
-                        if (epsilonGT(spaceRequest.width, offeredWidths[colIndex]) || epsilonGT(spaceRequest.height, offeredHeights[rowIndex])) {
-                            Plottable.Util.Methods.warn("Invariant Violation: Abstract.Component cannot request more space than is offered");
-                        }
-                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], spaceRequest.width);
-                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], spaceRequest.height);
+                        var allocatedWidth = Math.min(spaceRequest.width, offeredWidths[colIndex]);
+                        var allocatedHeight = Math.min(spaceRequest.height, offeredHeights[rowIndex]);
+                        requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], allocatedWidth);
+                        requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], allocatedHeight);
                         layoutWantsWidth[colIndex] = layoutWantsWidth[colIndex] || spaceRequest.wantsWidth;
                         layoutWantsHeight[rowIndex] = layoutWantsHeight[rowIndex] || spaceRequest.wantsHeight;
                     });
@@ -2412,10 +2407,20 @@ var Plottable;
                     toCompute.forEach(function (c) { return c._computeLayout(); });
                     var toRender = d3.values(_componentsNeedingRender);
                     toRender.forEach(function (c) { return c._render(); });
-                    toRender = d3.values(_componentsNeedingRender);
-                    toRender.forEach(function (c) { return c._doRender(); });
+                    var failed = {};
+                    Object.keys(_componentsNeedingRender).forEach(function (k) {
+                        try {
+                            _componentsNeedingRender[k]._doRender();
+                        }
+                        catch (err) {
+                            setTimeout(function () {
+                                throw err;
+                            }, 0);
+                            failed[k] = _componentsNeedingRender[k];
+                        }
+                    });
                     _componentsNeedingComputeLayout = {};
-                    _componentsNeedingRender = {};
+                    _componentsNeedingRender = failed;
                     _animationRequested = false;
                 }
                 Core.ResizeBroadcaster.clearResizing();
@@ -3300,6 +3305,7 @@ var Plottable;
                 this._height = "auto";
                 this._tickLength = 5;
                 this._tickLabelPadding = 3;
+                this._gutter = 10;
                 this._showEndTickLabels = false;
                 if (scale == null || orientation == null) {
                     throw new Error("Axis requires a scale and orientation");
@@ -3343,7 +3349,7 @@ var Plottable;
                         if (this._computedHeight == null) {
                             this._computeHeight();
                         }
-                        requestedHeight = this._computedHeight;
+                        requestedHeight = this._computedHeight + this._gutter;
                     }
                     requestedWidth = 0;
                 }
@@ -3352,16 +3358,22 @@ var Plottable;
                         if (this._computedWidth == null) {
                             this._computeWidth();
                         }
-                        requestedWidth = this._computedWidth;
+                        requestedWidth = this._computedWidth + this._gutter;
                     }
                     requestedHeight = 0;
                 }
                 return {
-                    width: Math.min(offeredWidth, requestedWidth),
-                    height: Math.min(offeredHeight, requestedHeight),
+                    width: requestedWidth,
+                    height: requestedHeight,
                     wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
                     wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
                 };
+            };
+            Axis.prototype._isFixedHeight = function () {
+                return this._isHorizontal();
+            };
+            Axis.prototype._isFixedWidth = function () {
+                return !this._isHorizontal();
             };
             Axis.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
@@ -3525,6 +3537,19 @@ var Plottable;
                         throw new Error("tick label padding must be positive");
                     }
                     this._tickLabelPadding = padding;
+                    this._invalidateLayout();
+                    return this;
+                }
+            };
+            Axis.prototype.gutter = function (size) {
+                if (size == null) {
+                    return this._gutter;
+                }
+                else {
+                    if (size < 0) {
+                        throw new Error("gutter size must be positive");
+                    }
+                    this._gutter = size;
                     this._invalidateLayout();
                     return this;
                 }
@@ -3855,29 +3880,29 @@ var Plottable;
                 this.showLastTickLabel = false;
             }
             Numeric.prototype._computeWidth = function () {
+                var _this = this;
                 var tickValues = this._getTickValues();
-                var valueLength = function (v) {
-                    var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
-                    return (logLength > 0) ? logLength : 1;
-                };
-                var pow10 = Math.max.apply(null, tickValues.map(valueLength));
-                var precision = this._formatter.precision();
-                var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision));
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var formattedTestValue = this._formatter.format(testValue);
-                var textLength = testTextEl.text(formattedTestValue).node().getComputedTextLength();
+                var epsilon = Math.pow(10, -this._formatter.precision());
+                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
+                var textLengths = tickValues.map(function (v) {
+                    var formattedValue = _this._formatter.format(v);
+                    return measurer(formattedValue).width;
+                });
                 testTextEl.remove();
+                var maxTextLength = d3.max(textLengths);
                 if (this.tickLabelPositioning === "center") {
-                    this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
+                    this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;
                 }
                 else {
-                    this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
+                    this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + maxTextLength);
                 }
                 return this._computedWidth;
             };
             Numeric.prototype._computeHeight = function () {
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var textHeight = Plottable.Util.DOM.getBBox(testTextEl.text("test")).height;
+                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
+                var textHeight = measurer("test").height;
                 testTextEl.remove();
                 if (this.tickLabelPositioning === "center") {
                     this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
@@ -4058,21 +4083,8 @@ var Plottable;
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var widthRequiredByTicks = this._isHorizontal() ? 0 : this.tickLength() + this.tickLabelPadding();
                 var heightRequiredByTicks = this._isHorizontal() ? this.tickLength() + this.tickLabelPadding() : 0;
-                if (offeredWidth < 0 || offeredHeight < 0) {
-                    return {
-                        width: offeredWidth,
-                        height: offeredHeight,
-                        wantsWidth: !this._isHorizontal(),
-                        wantsHeight: this._isHorizontal()
-                    };
-                }
                 if (this._scale.domain().length === 0) {
-                    return {
-                        width: 0,
-                        height: 0,
-                        wantsWidth: false,
-                        wantsHeight: false
-                    };
+                    return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }
                 var fakeScale = this._scale.copy();
                 if (this._isHorizontal()) {
@@ -4192,6 +4204,8 @@ var Plottable;
                     throw new Error(orientation + " is not a valid orientation for LabelComponent");
                 }
                 this.xAlign("center").yAlign("center");
+                this._fixedHeightFlag = true;
+                this._fixedWidthFlag = true;
             }
             Label.prototype.xAlign = function (alignment) {
                 var alignmentLC = alignment.toLowerCase();
@@ -4210,8 +4224,8 @@ var Plottable;
                 var desiredWidth = (this.orientation === "horizontal" ? desiredWH.width : desiredWH.height);
                 var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
                 return {
-                    width: Math.min(desiredWidth, offeredWidth),
-                    height: Math.min(desiredHeight, offeredHeight),
+                    width: desiredWidth,
+                    height: desiredHeight,
                     wantsWidth: desiredWidth > offeredWidth,
                     wantsHeight: desiredHeight > offeredHeight
                 };
@@ -4293,6 +4307,8 @@ var Plottable;
                 this.scale(colorScale);
                 this.xAlign("RIGHT").yAlign("TOP");
                 this.xOffset(5).yOffset(5);
+                this._fixedWidthFlag = true;
+                this._fixedHeightFlag = true;
             }
             Legend.prototype.remove = function () {
                 _super.prototype.remove.call(this);
@@ -4355,21 +4371,22 @@ var Plottable;
                 this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
                 return this;
             };
-            Legend.prototype._requestedSpace = function (offeredWidth, offeredY) {
+            Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var textHeight = this.measureTextHeight();
                 var totalNumRows = this.colorScale.domain().length;
-                var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
+                var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var fakeText = fakeLegendEl.append("text");
                 var maxWidth = d3.max(this.colorScale.domain(), function (d) { return Plottable.Util.Text.getTextWidth(fakeText, d); });
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
-                var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
+                var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
+                var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend.MARGIN;
                 return {
-                    width: Math.min(desiredWidth, offeredWidth),
-                    height: rowsICanFit * textHeight,
+                    width: desiredWidth,
+                    height: desiredHeight,
                     wantsWidth: offeredWidth < desiredWidth,
-                    wantsHeight: rowsICanFit < totalNumRows
+                    wantsHeight: offeredHeight < desiredHeight
                 };
             };
             Legend.prototype.measureTextHeight = function () {
@@ -4386,17 +4403,22 @@ var Plottable;
                 var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
                 var textHeight = this.measureTextHeight();
                 var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
-                var r = textHeight / 2 - Legend.MARGIN;
+                var r = textHeight * 0.3;
                 var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
                 var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                legendEnter.append("circle").attr("cx", Legend.MARGIN + r).attr("cy", Legend.MARGIN + r).attr("r", r);
-                legendEnter.append("text").attr("x", textHeight).attr("y", Legend.MARGIN + textHeight / 2);
+                legendEnter.append("circle");
+                legendEnter.append("g").classed("text-container", true);
                 legend.exit().remove();
-                legend.attr("transform", function (d) { return "translate(0," + domain.indexOf(d) * textHeight + ")"; });
-                legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
-                legend.selectAll("text").text(function (d) {
-                    var measure = Plottable.Util.Text.getTextMeasure(d3.select(this));
-                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
+                legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this.colorScale._d3Scale);
+                legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
+                    var d3this = d3.select(this);
+                    var measure = Plottable.Util.Text.getTextMeasure(d3this);
+                    var writeLine = Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
+                    var writeLineMeasure = measure(writeLine);
+                    Plottable.Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
+                });
+                legend.attr("transform", function (d) {
+                    return "translate(" + Legend.MARGIN + "," + (domain.indexOf(d) * textHeight + Legend.MARGIN) + ")";
                 });
                 this.updateClasses();
                 this.updateListeners();
@@ -5983,6 +6005,130 @@ var Plottable;
         Interaction.YDragBox = YDragBox;
     })(Plottable.Interaction || (Plottable.Interaction = {}));
     var Interaction = Plottable.Interaction;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Dispatcher = (function (_super) {
+            __extends(Dispatcher, _super);
+            function Dispatcher(target) {
+                _super.call(this);
+                this._event2Callback = {};
+                this.connected = false;
+                this._target = target;
+            }
+            Dispatcher.prototype.target = function (targetElement) {
+                if (targetElement == null) {
+                    return this._target;
+                }
+                var wasConnected = this.connected;
+                this.disconnect();
+                this._target = targetElement;
+                if (wasConnected) {
+                    this.connect();
+                }
+                return this;
+            };
+            Dispatcher.prototype.getEventString = function (eventName) {
+                return eventName + ".dispatcher" + this._plottableID;
+            };
+            Dispatcher.prototype.connect = function () {
+                var _this = this;
+                if (this.connected) {
+                    throw new Error("Can't connect dispatcher twice!");
+                }
+                this.connected = true;
+                Object.keys(this._event2Callback).forEach(function (event) {
+                    var callback = _this._event2Callback[event];
+                    _this._target.on(_this.getEventString(event), callback);
+                });
+                return this;
+            };
+            Dispatcher.prototype.disconnect = function () {
+                var _this = this;
+                this.connected = false;
+                Object.keys(this._event2Callback).forEach(function (event) {
+                    _this._target.on(_this.getEventString(event), null);
+                });
+                return this;
+            };
+            return Dispatcher;
+        })(Abstract.PlottableObject);
+        Abstract.Dispatcher = Dispatcher;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Dispatcher) {
+        var Mouse = (function (_super) {
+            __extends(Mouse, _super);
+            function Mouse(target) {
+                _super.call(this, target);
+                var _this = this;
+                this._event2Callback["mouseover"] = function () {
+                    if (_this._mouseover != null) {
+                        _this._mouseover(_this.getMousePosition());
+                    }
+                };
+                this._event2Callback["mousemove"] = function () {
+                    if (_this._mousemove != null) {
+                        _this._mousemove(_this.getMousePosition());
+                    }
+                };
+                this._event2Callback["mouseout"] = function () {
+                    if (_this._mouseout != null) {
+                        _this._mouseout(_this.getMousePosition());
+                    }
+                };
+            }
+            Mouse.prototype.getMousePosition = function () {
+                var xy = d3.mouse(this._target.node());
+                return {
+                    x: xy[0],
+                    y: xy[1]
+                };
+            };
+            Mouse.prototype.mouseover = function (callback) {
+                if (callback === undefined) {
+                    return this._mouseover;
+                }
+                this._mouseover = callback;
+                return this;
+            };
+            Mouse.prototype.mousemove = function (callback) {
+                if (callback === undefined) {
+                    return this._mousemove;
+                }
+                this._mousemove = callback;
+                return this;
+            };
+            Mouse.prototype.mouseout = function (callback) {
+                if (callback === undefined) {
+                    return this._mouseout;
+                }
+                this._mouseout = callback;
+                return this;
+            };
+            return Mouse;
+        })(Plottable.Abstract.Dispatcher);
+        Dispatcher.Mouse = Mouse;
+    })(Plottable.Dispatcher || (Plottable.Dispatcher = {}));
+    var Dispatcher = Plottable.Dispatcher;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
