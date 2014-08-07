@@ -60,8 +60,8 @@ export module Scale {
      *     type (linear/log/sqrt/pow)
      * @returns a Quantitative d3 scale.
      */
-    private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitiveScale {
-      var scale: D3.Scale.QuantitiveScale;
+    private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
+      var scale: D3.Scale.QuantitativeScale;
       switch(scaleType){
         case "linear":
           scale = d3.scale.linear();
