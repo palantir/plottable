@@ -1,0 +1,978 @@
+﻿<!doctype html>
+<html class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Percentage | plottable-website</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+
+<header>
+    <div class="tsd-page-toolbar">
+        <div class="container">
+            <div id="tsd-filter">
+                <input type="checkbox" id="tsd-filter-inherited" checked />
+                <label for="tsd-filter-inherited">Inherited</label>
+
+                <input type="checkbox" id="tsd-filter-private" checked />
+                <label for="tsd-filter-private">Private</label>
+
+                <input type="checkbox" id="tsd-filter-only-exported" />
+                <label for="tsd-filter-only-exported">Only exported</label>
+            </div>
+
+            <a href="../index.html">plottable-website</a>
+        </div>
+    </div>
+    <div class="tsd-page-title">
+        <div class="container">
+            <ul class="breadcrumb">
+                
+    
+    
+    
+    <li>
+        <a href="../modules/plottable.html">Plottable</a>
+    </li>
+
+    <li>
+        <a href="../modules/plottable.formatter.html">Formatter</a>
+    </li>
+
+    <li>
+        <a href="plottable.formatter.percentage.html">Percentage</a>
+    </li>
+
+            </ul>
+            <h1>Class Percentage</h1>
+        </div>
+    </div>
+</header>
+
+<div class="container container-main">
+    <div class="row">
+        <div class="col-8">
+            
+    
+
+
+
+
+
+
+
+    <section class="tsd-hierarchy">
+        <h2>Hierarchy</h2>
+        <ul>
+            
+                <li >
+    
+        
+    
+        <a href="plottable.formatter.fixed.html" class="tsd-signature-type">Fixed</a>
+    
+
+    
+
+    
+        <ul>
+            
+                <li class="target">
+    
+        Percentage
+    
+
+    
+</li>
+            
+        </ul>
+    
+</li>
+            
+        </ul>
+    </section>
+
+
+
+    <section class="tsd-member-index">
+    <h2>Index</h2>
+    
+        <section class="tsd-member-index-group ">
+            <h3>Constructor methods</h3>
+            <ul class="tsd-member-index">
+                
+                    <li class="tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.formatter.percentage.html#constructor" class="tsd-kind-icon">constructor</a></li>
+                
+            </ul>
+        </section>
+    
+        <section class="tsd-member-index-group tsd-is-inherited">
+            <h3>Properties</h3>
+            <ul class="tsd-member-index">
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.formatter.percentage.html#_formatfunction" class="tsd-kind-icon">_formatFunction</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.formatter.percentage.html#_onlyshowunchanged" class="tsd-kind-icon">_onlyShowUnchanged</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.formatter.percentage.html#_precision" class="tsd-kind-icon">_precision</a></li>
+                
+            </ul>
+        </section>
+    
+        <section class="tsd-member-index-group ">
+            <h3>Methods</h3>
+            <ul class="tsd-member-index">
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.formatter.percentage.html#_valuechanged" class="tsd-kind-icon">_valueChanged</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.formatter.percentage.html#format" class="tsd-kind-icon">format</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.formatter.percentage.html#precision" class="tsd-kind-icon">precision</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.formatter.percentage.html#showonlyunchangedvalues" class="tsd-kind-icon">showOnlyUnchangedValues</a></li>
+                
+            </ul>
+        </section>
+    
+</section>
+    
+    
+        <section class="tsd-member-group ">
+    <h2>Constructor methods</h2>
+    
+        
+            <section class="tsd-member tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite">
+    <a name="constructor"></a>
+    
+        
+            <h3 class="tsd-kind-icon">constructor<span class="tsd-signature-symbols">(</span>precision<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols"> =&nbsp;</span>0<span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.formatter.percentage.html" class="tsd-signature-type">Percentage</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#constructor">constructor</a>
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/percentageFormatter.ts:12</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Creates a formatter for percentage values.
+Multiplies the supplied value by 100 and appends &quot;%&quot;.</p>
+
+
+
+
+
+
+    <dl class="tsd-comment-tags">
+        
+            <dt>constructor</dt>
+            <dd></dd>
+        
+    </dl>
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>precision?: <span class="tsd-signature-type">number</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.formatter.percentage.html" class="tsd-signature-type">Percentage</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+</section>
+    
+
+    
+        <section class="tsd-member-group tsd-is-inherited">
+    <h2>Properties</h2>
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+    <a name="_formatfunction"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _formatFunction<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">(d: any) =&gt; string</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#_formatfunction">_formatFunction</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/formatter.ts:6</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+    <a name="_onlyshowunchanged"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _onlyShowUnchanged<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">boolean</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#_onlyshowunchanged">_onlyShowUnchanged</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/formatter.ts:5</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+    <a name="_precision"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _precision<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">number</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#_precision">_precision</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/formatter.ts:7</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+</section>
+    
+
+    
+        <section class="tsd-member-group ">
+    <h2>Methods</h2>
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="_valuechanged"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _valueChanged<span class="tsd-signature-symbols">(</span>d<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span>, formattedValue<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">boolean</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#_valuechanged">_valueChanged</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/formatter.ts:27</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>d: <span class="tsd-signature-type">any</span></h5>
+                
+
+
+
+
+            </li>
+        
+            <li>
+                <h5>formattedValue: <span class="tsd-signature-type">string</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">boolean</span>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+    <a name="format"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> format<span class="tsd-signature-symbols">(</span>d<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">string</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#format">format</a>
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/percentageFormatter.ts:16</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>d: <span class="tsd-signature-type">any</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">string</span>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="precision"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> precision<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#precision">precision</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/formatter.ts:37</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Gets the current precision of the Formatter.
+The meaning depends on the implementation.</p>
+
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">number</span>
+    
+</p>
+    
+
+
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> precision<span class="tsd-signature-symbols">(</span>value<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.formatter.html" class="tsd-signature-type">Formatter</a></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#precision">precision</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/formatter.ts:45</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Sets the precision of the Formatter.
+The meaning depends on the implementation.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>value: <span class="tsd-signature-type">number</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.formatter.html" class="tsd-signature-type">Formatter</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="showonlyunchangedvalues"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> showOnlyUnchangedValues<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">boolean</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#showonlyunchangedvalues">showOnlyUnchangedValues</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/formatter.ts:62</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Checks if this formatter will show only unchanged values.</p>
+
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">boolean</span>
+    
+</p>
+    
+
+
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> showOnlyUnchangedValues<span class="tsd-signature-symbols">(</span>showUnchanged<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.formatter.html" class="tsd-signature-type">Formatter</a></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.formatter.html">Formatter</a>.<a href="plottable.abstract.formatter.html#showonlyunchangedvalues">showOnlyUnchangedValues</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in utils/formatters/formatter.ts:71</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Sets whether this formatter will show only unchanged values.
+If true, inputs whose value is changed by the formatter will be formatted
+to an empty string.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>showUnchanged: <span class="tsd-signature-type">boolean</span></h5>
+                
+    <p>Whether or not to show only unchanged values.</p>
+
+
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.formatter.html" class="tsd-signature-type">Formatter</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+</section>
+    
+
+
+        </div>
+        <div class="offset-1 col-3">
+            <nav class="tsd-navigation primary">
+                <ul>
+                    
+                        <li class=" ">
+    <a href="../globals.html"><em>Globals</em></a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container">
+    <a href="../modules/plottable.html">Plottable</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.html">Plottable.Util</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.methods.html">Plottable.Util.Methods</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.opensource.html">Plottable.Util.OpenSource</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.text.html">Plottable.Util.Text</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.wordwrap.html">Plottable.Util.WordWrap</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.dom.html">Plottable.Util.DOM</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.abstract.html">Plottable.Abstract</a>
+    
+</li>
+                    
+                        <li class="current tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.formatter.html">Plottable.Formatter</a>
+    
+        
+            <ul>
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.html">Plottable.Core</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.component.html">Plottable.Component</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.rendercontroller.html">Plottable.Core.RenderController</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.rendercontroller.renderpolicy.html">Plottable.Core.RenderController.RenderPolicy</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.resizebroadcaster.html">Plottable.Core.ResizeBroadcaster</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.animator.html">Plottable.Animator</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.scale.html">Plottable.Scale</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.axis.html">Plottable.Axis</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.axis.html">Plottable.Util.Axis</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.plot.html">Plottable.Plot</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.keyeventlistener.html">Plottable.Core.KeyEventListener</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.interaction.html">Plottable.Interaction</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.template.html">Plottable.Template</a>
+    
+</li>
+                    
+                </ul>
+            </nav>
+
+            <nav class="tsd-navigation secondary">
+                
+                    
+
+    <ul>
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.formatter.currency.html" class="tsd-kind-icon">Currency</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.formatter.custom.html" class="tsd-kind-icon">Custom</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.formatter.fixed.html" class="tsd-kind-icon">Fixed</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.formatter.general.html" class="tsd-kind-icon">General</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.formatter.identity.html" class="tsd-kind-icon">Identity</a>
+                    
+                </li>
+            
+        
+            
+                <li class="current tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.formatter.percentage.html" class="tsd-kind-icon">Percentage</a>
+                    
+
+    <ul>
+        
+            
+                <li class=" tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite">
+                    <a href="plottable.formatter.percentage.html#constructor" class="tsd-kind-icon">constructor</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.formatter.percentage.html#_formatfunction" class="tsd-kind-icon">_formatFunction</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.formatter.percentage.html#_onlyshowunchanged" class="tsd-kind-icon">_onlyShowUnchanged</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.formatter.percentage.html#_precision" class="tsd-kind-icon">_precision</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.formatter.percentage.html#_valuechanged" class="tsd-kind-icon">_valueChanged</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+                    <a href="plottable.formatter.percentage.html#format" class="tsd-kind-icon">format</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.formatter.percentage.html#precision" class="tsd-kind-icon">precision</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.formatter.percentage.html#showonlyunchangedvalues" class="tsd-kind-icon">showOnlyUnchangedValues</a>
+                    
+                </li>
+            
+        
+    </ul>
+
+
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.formatter.sisuffix.html" class="tsd-kind-icon">SISuffix</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.formatter.time.html" class="tsd-kind-icon">Time</a>
+                    
+                </li>
+            
+        
+    </ul>
+
+
+                
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>

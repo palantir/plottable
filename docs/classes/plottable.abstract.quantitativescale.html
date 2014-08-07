@@ -1,0 +1,2591 @@
+﻿<!doctype html>
+<html class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>QuantitativeScale | plottable-website</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+
+<header>
+    <div class="tsd-page-toolbar">
+        <div class="container">
+            <div id="tsd-filter">
+                <input type="checkbox" id="tsd-filter-inherited" checked />
+                <label for="tsd-filter-inherited">Inherited</label>
+
+                <input type="checkbox" id="tsd-filter-private" checked />
+                <label for="tsd-filter-private">Private</label>
+
+                <input type="checkbox" id="tsd-filter-only-exported" />
+                <label for="tsd-filter-only-exported">Only exported</label>
+            </div>
+
+            <a href="../index.html">plottable-website</a>
+        </div>
+    </div>
+    <div class="tsd-page-title">
+        <div class="container">
+            <ul class="breadcrumb">
+                
+    
+    
+    
+    <li>
+        <a href="../modules/plottable.html">Plottable</a>
+    </li>
+
+    <li>
+        <a href="../modules/plottable.abstract.html">Abstract</a>
+    </li>
+
+    <li>
+        <a href="plottable.abstract.quantitativescale.html">QuantitativeScale</a>
+    </li>
+
+            </ul>
+            <h1>Class QuantitativeScale</h1>
+        </div>
+    </div>
+</header>
+
+<div class="container container-main">
+    <div class="row">
+        <div class="col-8">
+            
+    
+
+
+
+
+
+
+
+    <section class="tsd-hierarchy">
+        <h2>Hierarchy</h2>
+        <ul>
+            
+                <li >
+    
+        
+    
+        <a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a>
+    
+
+    
+
+    
+        <ul>
+            
+                <li class="target">
+    
+        QuantitativeScale
+    
+
+    
+        <ul>
+            
+                <li >
+    
+        
+    
+        <a href="plottable.scale.linear.html" class="tsd-signature-type">Linear</a>
+    
+
+    
+
+    
+</li>
+            
+                <li >
+    
+        
+    
+        <a href="plottable.scale.log.html" class="tsd-signature-type">Log</a>
+    
+
+    
+
+    
+</li>
+            
+                <li >
+    
+        
+    
+        <a href="plottable.scale.modifiedlog.html" class="tsd-signature-type">ModifiedLog</a>
+    
+
+    
+
+    
+</li>
+            
+                <li >
+    
+        
+    
+        <a href="plottable.scale.time.html" class="tsd-signature-type">Time</a>
+    
+
+    
+
+    
+</li>
+            
+                <li >
+    
+        
+    
+        <a href="plottable.scale.interpolatedcolor.html" class="tsd-signature-type">InterpolatedColor</a>
+    
+
+    
+
+    
+</li>
+            
+        </ul>
+    
+</li>
+            
+        </ul>
+    
+</li>
+            
+        </ul>
+    </section>
+
+
+
+    <section class="tsd-member-index">
+    <h2>Index</h2>
+    
+        <section class="tsd-member-index-group ">
+            <h3>Constructor methods</h3>
+            <ul class="tsd-member-index">
+                
+                    <li class="tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.abstract.quantitativescale.html#constructor" class="tsd-kind-icon">constructor</a></li>
+                
+            </ul>
+        </section>
+    
+        <section class="tsd-member-index-group ">
+            <h3>Properties</h3>
+            <ul class="tsd-member-index">
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#_padding_for_identical_domain" class="tsd-kind-icon">_PADDING_FOR_IDENTICAL_DOMAIN</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.abstract.quantitativescale.html#_d3scale" class="tsd-kind-icon">_d3Scale</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="plottable.abstract.quantitativescale.html#_domainer" class="tsd-kind-icon">_domainer</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#_lastrequestedtickcount" class="tsd-kind-icon">_lastRequestedTickCount</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#_plottableid" class="tsd-kind-icon">_plottableID</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#_rendererattrid2extent" class="tsd-kind-icon">_rendererAttrID2Extent</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#_usersetdomainer" class="tsd-kind-icon">_userSetDomainer</a></li>
+                
+                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#broadcaster" class="tsd-kind-icon">broadcaster</a></li>
+                
+            </ul>
+        </section>
+    
+        <section class="tsd-member-index-group ">
+            <h3>Methods</h3>
+            <ul class="tsd-member-index">
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#_autodomainifautomaticmode" class="tsd-kind-icon">_autoDomainIfAutomaticMode</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#_defaultextent" class="tsd-kind-icon">_defaultExtent</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#_getallextents" class="tsd-kind-icon">_getAllExtents</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#_getdomain" class="tsd-kind-icon">_getDomain</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.abstract.quantitativescale.html#_getextent" class="tsd-kind-icon">_getExtent</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#_nicedomain" class="tsd-kind-icon">_niceDomain</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.abstract.quantitativescale.html#_setdomain" class="tsd-kind-icon">_setDomain</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#autodomain" class="tsd-kind-icon">autoDomain</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#clamp" class="tsd-kind-icon">clamp</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.abstract.quantitativescale.html#copy" class="tsd-kind-icon">copy</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.abstract.quantitativescale.html#domain" class="tsd-kind-icon">domain</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#domainer" class="tsd-kind-icon">domainer</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#interpolate" class="tsd-kind-icon">interpolate</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#invert" class="tsd-kind-icon">invert</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#range" class="tsd-kind-icon">range</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#rangeround" class="tsd-kind-icon">rangeRound</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#removeextent" class="tsd-kind-icon">removeExtent</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#scale" class="tsd-kind-icon">scale</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#tickformat" class="tsd-kind-icon">tickFormat</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.abstract.quantitativescale.html#ticks" class="tsd-kind-icon">ticks</a></li>
+                
+                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.abstract.quantitativescale.html#updateextent" class="tsd-kind-icon">updateExtent</a></li>
+                
+            </ul>
+        </section>
+    
+</section>
+    
+    
+        <section class="tsd-member-group ">
+    <h2>Constructor methods</h2>
+    
+        
+            <section class="tsd-member tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite">
+    <a name="constructor"></a>
+    
+        
+            <h3 class="tsd-kind-icon">constructor<span class="tsd-signature-symbols">(</span>scale<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">D3.Scale.QuantitiveScale</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#constructor">constructor</a>
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:17</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Creates a new QuantitativeScale.</p>
+
+
+
+
+
+
+    <dl class="tsd-comment-tags">
+        
+            <dt>constructor</dt>
+            <dd></dd>
+        
+    </dl>
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>scale: <span class="tsd-signature-type">D3.Scale.QuantitiveScale</span></h5>
+                
+    <p>The D3 QuantitativeScale backing the QuantitativeScale.</p>
+
+
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+</section>
+    
+
+    
+        <section class="tsd-member-group ">
+    <h2>Properties</h2>
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class">
+    <a name="_padding_for_identical_domain"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _PADDING_FOR_IDENTICAL_DOMAIN<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">number</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:7</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
+    <a name="_d3scale"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _d3Scale<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">D3.Scale.QuantitiveScale</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#_d3scale">_d3Scale</a>
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:5</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+    <a name="_domainer"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagprivate">private</span> _domainer<span class="tsd-signature-symbols">:</span> <a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:9</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class">
+    <a name="_lastrequestedtickcount"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _lastRequestedTickCount<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">number</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:6</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+    <a name="_plottableid"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _plottableID<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">number</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.plottableobject.html">PlottableObject</a>.<a href="plottable.abstract.plottableobject.html#_plottableid">_plottableID</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/plottableObject.ts:6</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+    <a name="_rendererattrid2extent"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _rendererAttrID2Extent<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">{ [rendererAttrID: string]: any[]; }</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#_rendererattrid2extent">_rendererAttrID2Extent</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:8</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+        
+            
+                <section class="tsd-member tsd-kind-index-signature tsd-parent-kind-property">
+    <a name="_rendererattrid2extent."></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:8</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+</section>
+            
+        
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class">
+    <a name="_usersetdomainer"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _userSetDomainer<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">boolean</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:8</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+    <a name="broadcaster"></a>
+    
+        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> broadcaster<span class="tsd-signature-symbols">:</span> <a href="plottable.core.broadcaster.html" class="tsd-signature-type">Broadcaster</a></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#broadcaster">broadcaster</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:7</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+    
+
+    
+</section>
+        
+    
+</section>
+    
+
+    
+        <section class="tsd-member-group ">
+    <h2>Methods</h2>
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="_autodomainifautomaticmode"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _autoDomainIfAutomaticMode<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#_autodomainifautomaticmode">_autoDomainIfAutomaticMode</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:41</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="_defaultextent"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _defaultExtent<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:168</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">Array&lt;any&gt;</span>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="_getallextents"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _getAllExtents<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any[]&gt;</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#_getallextents">_getAllExtents</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:20</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">Array&lt;any[]&gt;</span>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="_getdomain"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _getDomain<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#_getdomain">_getDomain</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:83</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">Array&lt;any&gt;</span>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+    <a name="_getextent"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _getExtent<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#_getextent">_getExtent</a>
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:21</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">Array&lt;any&gt;</span>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="_nicedomain"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _niceDomain<span class="tsd-signature-symbols">(</span>domain<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span>, count<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:134</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Given a domain, expands its domain onto &quot;nice&quot; values, e.g. whole
+numbers.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>domain: <span class="tsd-signature-type">Array&lt;any&gt;</span></h5>
+                
+
+
+
+
+            </li>
+        
+            <li>
+                <h5>count?: <span class="tsd-signature-type">number</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">Array&lt;any&gt;</span>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+    <a name="_setdomain"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _setDomain<span class="tsd-signature-symbols">(</span>values<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span><span class="tsd-signature-symbols">)</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#_setdomain">_setDomain</a>
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:50</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>values: <span class="tsd-signature-type">Array&lt;any&gt;</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="autodomain"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> autoDomain<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#autodomain">autoDomain</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:35</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Modify the domain on the scale so that it includes the extent of all
+perspectives it depends on. Extent: The (min, max) pair for a
+QuantitiativeScale, all covered strings for an OrdinalScale.
+Perspective: A combination of a DataSource and an Accessor that
+represents a view in to the data.</p>
+
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="clamp"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> clamp<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">boolean</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:90</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Gets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).</p>
+
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">boolean</span>
+    
+</p>
+    
+
+
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> clamp<span class="tsd-signature-symbols">(</span>clamp<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:97</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Sets the clamp status of the QuantitativeScale (whether to cut off values outside the ouput range).</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>clamp: <span class="tsd-signature-type">boolean</span></h5>
+                
+    <p>Whether or not to clamp the QuantitativeScale.</p>
+
+
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+    <a name="copy"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> copy<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#copy">copy</a>
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:40</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Creates a copy of the QuantitativeScale with the same domain and range but without any registered listeners.</p>
+
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>
+    
+</p>
+    
+        <p>A copy of the calling QuantitativeScale.</p>
+
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+    <a name="domain"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> domain<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        Plottable.Abstract.Scale.domain
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:44</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">Array&lt;any&gt;</span>
+    
+</p>
+    
+
+
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> domain<span class="tsd-signature-symbols">(</span>values<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+        <p>Overwrites 
+    
+        Plottable.Abstract.Scale.domain
+    
+</p>
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:45</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>values: <span class="tsd-signature-type">Array&lt;any&gt;</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="domainer"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> domainer<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:144</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Retrieve a Domainer of a scale. A Domainer is responsible for combining
+multiple extents into a single domain.</p>
+
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a>
+    
+</p>
+    
+
+
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> domainer<span class="tsd-signature-symbols">(</span>domainer<span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:156</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Sets a Domainer of a scale. A Domainer is responsible for combining
+multiple extents into a single domain.</p>
+
+
+
+
+    <p>When you set domainer, we assume that you know what you want the domain
+to look like better that we do. Ensuring that the domain is padded,
+includes 0, etc., will be the responsability of the new domainer.</p>
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>domainer: <a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></h5>
+                
+    <p>The domainer to be set.</p>
+
+
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="interpolate"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> interpolate<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">D3.Transition.Interpolate</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:65</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Sets or gets the QuantitativeScale&#39;s output interpolator</p>
+
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">D3.Transition.Interpolate</span>
+    
+</p>
+    
+
+
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> interpolate<span class="tsd-signature-symbols">(</span>factory<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">D3.Transition.Interpolate</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:66</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>factory: <span class="tsd-signature-type">D3.Transition.Interpolate</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="invert"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> invert<span class="tsd-signature-symbols">(</span>value<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:31</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Retrieves the domain value corresponding to a supplied range value.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>value: <span class="tsd-signature-type">number</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">number</span>
+    
+</p>
+    
+        <p>The domain value corresponding to the supplied range value.</p>
+
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="range"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> range<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#range">range</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:97</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Gets the range.</p>
+
+
+
+
+
+
+
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">Array&lt;any&gt;</span>
+    
+</p>
+    
+
+
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> range<span class="tsd-signature-symbols">(</span>values<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#range">range</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:104</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Sets the Scale&#39;s range to the specified values.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>values: <span class="tsd-signature-type">Array&lt;any&gt;</span></h5>
+                
+    <p>The new values for the range.</p>
+
+
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="rangeround"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> rangeRound<span class="tsd-signature-symbols">(</span>values<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;number&gt;</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:80</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Sets the range of the QuantitativeScale and sets the interpolator to d3.interpolateRound.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>values: <span class="tsd-signature-type">Array&lt;number&gt;</span></h5>
+                
+    <p>The new range value for the range.</p>
+
+
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="removeextent"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> removeExtent<span class="tsd-signature-symbols">(</span>rendererID<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span>, attr<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#removeextent">removeExtent</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:139</li>
+            
+        </ul>
+    
+</aside>
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>rendererID: <span class="tsd-signature-type">number</span></h5>
+                
+
+
+
+
+            </li>
+        
+            <li>
+                <h5>attr: <span class="tsd-signature-type">string</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="scale"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> scale<span class="tsd-signature-symbols">(</span>value<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#scale">scale</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:53</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Returns the range value corresponding to a given domain value.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>value: <span class="tsd-signature-type">any</span></h5>
+                
+    <p>A domain value to be scaled.</p>
+
+
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">any</span>
+    
+</p>
+    
+        <p>The range value corresponding to the supplied domain value.</p>
+
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="tickformat"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> tickFormat<span class="tsd-signature-symbols">(</span>count<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span>, format<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">(n: number) =&gt; string</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:126</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Gets a tick formatting function for displaying tick values.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>count: <span class="tsd-signature-type">number</span></h5>
+                
+    <p>The number of ticks to be displayed</p>
+
+
+
+
+
+
+            </li>
+        
+            <li>
+                <h5>format?: <span class="tsd-signature-type">string</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">(n: number) =&gt; string</span>
+    
+</p>
+    
+        <p>A formatting function.</p>
+
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+    <a name="ticks"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> ticks<span class="tsd-signature-symbols">(</span>count<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
+
+<aside class="tsd-sources">
+    
+    
+    
+        <ul>
+            
+                <li>Defined in scales/quantitativeScale.ts:112</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>Generates tick values.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>count?: <span class="tsd-signature-type">number</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+                
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <span class="tsd-signature-type">Array&lt;any&gt;</span>
+    
+</p>
+    
+        <p>The generated ticks.</p>
+
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+        
+            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+    <a name="updateextent"></a>
+    
+        
+            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> updateExtent<span class="tsd-signature-symbols">(</span>rendererID<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span>, attr<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">string</span>, extent<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a></h3>
+
+<aside class="tsd-sources">
+    
+        <p>Inherited from 
+    
+        <a href="plottable.abstract.scale.html">Scale</a>.<a href="plottable.abstract.scale.html#updateextent">updateExtent</a>
+    
+</p>
+    
+    
+    
+        <ul>
+            
+                <li>Defined in core/scale.ts:133</li>
+            
+        </ul>
+    
+</aside>
+
+    <p>When a renderer determines that the extent of a projector has changed,
+it will call this function. This function should ensure that
+the scale has a domain at least large enough to include extent.</p>
+
+
+
+
+
+
+
+
+    <h4>Parameters</h4>
+    <ul>
+        
+            <li>
+                <h5>rendererID: <span class="tsd-signature-type">number</span></h5>
+                
+    <p>A unique indentifier of the renderer sending
+                the new extent.</p>
+
+
+
+
+
+
+            </li>
+        
+            <li>
+                <h5>attr: <span class="tsd-signature-type">string</span></h5>
+                
+    <p>The attribute being projected, e.g. &quot;x&quot;, &quot;y0&quot;, &quot;r&quot;</p>
+
+
+
+
+
+
+            </li>
+        
+            <li>
+                <h5>extent: <span class="tsd-signature-type">Array&lt;any&gt;</span></h5>
+                
+    <p>The new extent to be included in the scale.</p>
+
+
+
+
+
+
+            </li>
+        
+    </ul>
+
+
+
+    <h4>Returns</h4>
+    <p>
+    
+        <a href="plottable.abstract.scale.html" class="tsd-signature-type">Scale</a>
+    
+</p>
+    
+
+
+        
+    
+
+    
+</section>
+        
+    
+</section>
+    
+
+
+        </div>
+        <div class="offset-1 col-3">
+            <nav class="tsd-navigation primary">
+                <ul>
+                    
+                        <li class=" ">
+    <a href="../globals.html"><em>Globals</em></a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container">
+    <a href="../modules/plottable.html">Plottable</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.html">Plottable.Util</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.methods.html">Plottable.Util.Methods</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.opensource.html">Plottable.Util.OpenSource</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.text.html">Plottable.Util.Text</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.wordwrap.html">Plottable.Util.WordWrap</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.dom.html">Plottable.Util.DOM</a>
+    
+</li>
+                    
+                        <li class="current tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.abstract.html">Plottable.Abstract</a>
+    
+        
+            <ul>
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.formatter.html">Plottable.Formatter</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.html">Plottable.Core</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.component.html">Plottable.Component</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.rendercontroller.html">Plottable.Core.RenderController</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.rendercontroller.renderpolicy.html">Plottable.Core.RenderController.RenderPolicy</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.resizebroadcaster.html">Plottable.Core.ResizeBroadcaster</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.animator.html">Plottable.Animator</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.scale.html">Plottable.Scale</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.axis.html">Plottable.Axis</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.util.axis.html">Plottable.Util.Axis</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.plot.html">Plottable.Plot</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.core.keyeventlistener.html">Plottable.Core.KeyEventListener</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.interaction.html">Plottable.Interaction</a>
+    
+</li>
+                    
+                        <li class=" tsd-kind-container tsd-parent-kind-container">
+    <a href="../modules/plottable.template.html">Plottable.Template</a>
+    
+</li>
+                    
+                </ul>
+            </nav>
+
+            <nav class="tsd-navigation secondary">
+                
+                    
+
+    <ul>
+        
+            
+                <li class=" tsd-kind-interface tsd-parent-kind-container">
+                    <a href="../interfaces/plottable.abstract.iattributetoprojector.html" class="tsd-kind-icon">IAttributeToProjector</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-interface tsd-parent-kind-container">
+                    <a href="../interfaces/plottable.abstract._iprojector.html" class="tsd-kind-icon">_IProjector</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.axis.html" class="tsd-kind-icon">Axis</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.barplot.html" class="tsd-kind-icon">BarPlot</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.component.html" class="tsd-kind-icon">Component</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.componentcontainer.html" class="tsd-kind-icon">ComponentContainer</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.formatter.html" class="tsd-kind-icon">Formatter</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.interaction.html" class="tsd-kind-icon">Interaction</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.plot.html" class="tsd-kind-icon">Plot</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.plottableobject.html" class="tsd-kind-icon">PlottableObject</a>
+                    
+                </li>
+            
+        
+            
+                <li class="current tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.quantitativescale.html" class="tsd-kind-icon">QuantitativeScale</a>
+                    
+
+    <ul>
+        
+            
+                <li class=" tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite">
+                    <a href="plottable.abstract.quantitativescale.html#constructor" class="tsd-kind-icon">constructor</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#_padding_for_identical_domain" class="tsd-kind-icon">_PADDING_FOR_IDENTICAL_DOMAIN</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
+                    <a href="plottable.abstract.quantitativescale.html#_d3scale" class="tsd-kind-icon">_d3Scale</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+                    <a href="plottable.abstract.quantitativescale.html#_domainer" class="tsd-kind-icon">_domainer</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#_lastrequestedtickcount" class="tsd-kind-icon">_lastRequestedTickCount</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#_plottableid" class="tsd-kind-icon">_plottableID</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#_rendererattrid2extent" class="tsd-kind-icon">_rendererAttrID2Extent</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#_usersetdomainer" class="tsd-kind-icon">_userSetDomainer</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#broadcaster" class="tsd-kind-icon">broadcaster</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#_autodomainifautomaticmode" class="tsd-kind-icon">_autoDomainIfAutomaticMode</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#_defaultextent" class="tsd-kind-icon">_defaultExtent</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#_getallextents" class="tsd-kind-icon">_getAllExtents</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#_getdomain" class="tsd-kind-icon">_getDomain</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+                    <a href="plottable.abstract.quantitativescale.html#_getextent" class="tsd-kind-icon">_getExtent</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#_nicedomain" class="tsd-kind-icon">_niceDomain</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+                    <a href="plottable.abstract.quantitativescale.html#_setdomain" class="tsd-kind-icon">_setDomain</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#autodomain" class="tsd-kind-icon">autoDomain</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#clamp" class="tsd-kind-icon">clamp</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+                    <a href="plottable.abstract.quantitativescale.html#copy" class="tsd-kind-icon">copy</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+                    <a href="plottable.abstract.quantitativescale.html#domain" class="tsd-kind-icon">domain</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#domainer" class="tsd-kind-icon">domainer</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#interpolate" class="tsd-kind-icon">interpolate</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#invert" class="tsd-kind-icon">invert</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#range" class="tsd-kind-icon">range</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#rangeround" class="tsd-kind-icon">rangeRound</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#removeextent" class="tsd-kind-icon">removeExtent</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#scale" class="tsd-kind-icon">scale</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#tickformat" class="tsd-kind-icon">tickFormat</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class">
+                    <a href="plottable.abstract.quantitativescale.html#ticks" class="tsd-kind-icon">ticks</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+                    <a href="plottable.abstract.quantitativescale.html#updateextent" class="tsd-kind-icon">updateExtent</a>
+                    
+                </li>
+            
+        
+    </ul>
+
+
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.scale.html" class="tsd-kind-icon">Scale</a>
+                    
+                </li>
+            
+        
+            
+                <li class=" tsd-kind-class tsd-parent-kind-container">
+                    <a href="plottable.abstract.xyplot.html" class="tsd-kind-icon">XYPlot</a>
+                    
+                </li>
+            
+        
+    </ul>
+
+
+                
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>
