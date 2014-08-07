@@ -4653,6 +4653,7 @@ var Plottable;
                         else {
                             qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
                         }
+                        qscale.domainer().pad();
                     }
                     qscale._autoDomainIfAutomaticMode();
                 }
