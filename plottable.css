@@ -11,11 +11,16 @@ svg.plottable {
 
 .plottable .label text {
   font-family: sans-serif;
-  fill: #656565;
+  fill: #32313F;
 }
 
 .plottable .axis-label text {
-  font-size: 14pt;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  line-height: normal;
+  text-transform: uppercase;
 }
 
 .plottable .title-label text {
@@ -26,25 +31,22 @@ svg.plottable {
   writing-mode: tb;
 }
 
-.plottable .axis line {
-  stroke: #979797;
-  stroke-width: 2px;
+.plottable .axis line.baseline {
+  stroke: #CCC;
+  stroke-width: 1px;
 }
 
-.plottable .axis path {
-  fill: none;
-  stroke-width: 2px;
-  stroke: #979797;
-}
-
-.plottable .y-axis path {
-  stroke: none;
+.plottable .axis line.tick-mark {
+  stroke: #CCC;
+  stroke-width: 1px;
 }
 
 .plottable .axis text {
-  font-size: 10pt;
-  fill: #979797;
-  font-family: sans-serif;
+  fill: #32313F;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  font-weight: 200;
+  line-height: normal;
 }
 
 .plottable .bar-plot .baseline {
@@ -52,9 +54,8 @@ svg.plottable {
 }
 
 .plottable .gridlines line {
-  stroke: #999;
-  stroke-dasharray: 2, 2;
-  opacity: 0.4;
+  stroke: #EFEFEF;
+  stroke-width: 1px;
 }
 
 .plottable .drag-box {
