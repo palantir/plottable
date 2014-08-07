@@ -4819,7 +4819,7 @@ var Plottable;
                 var scaledStartValue = this.yScale.scale(startValue);
                 return function (d, i) { return scaledStartValue; };
             };
-            Line.prototype._projectToFirstDatum = function (attrToProjector) {
+            Line.prototype._projectFromFirstDatum = function (attrToProjector) {
                 d3.keys(attrToProjector).forEach(function (attribute) {
                     var projector = attrToProjector[attribute];
                     attrToProjector[attribute] = function (data, i) {
@@ -4836,7 +4836,7 @@ var Plottable;
                 var yFunction = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                this._projectToFirstDatum(attrToProjector);
+                this._projectFromFirstDatum(attrToProjector);
                 this.linePath.datum(this._dataSource.data());
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
@@ -4921,7 +4921,7 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
-                this._projectToFirstDatum(attrToProjector);
+                this._projectFromFirstDatum(attrToProjector);
                 this.areaPath.datum(this._dataSource.data());
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());

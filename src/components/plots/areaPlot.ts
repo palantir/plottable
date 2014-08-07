@@ -85,7 +85,7 @@ export module Plot {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      this._projectToFirstDatum(attrToProjector);
+      this._projectFromFirstDatum(attrToProjector);
 
       this.areaPath.datum(this._dataSource.data());
 
