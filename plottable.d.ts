@@ -519,7 +519,7 @@ declare module Plottable {
         color?: string;
     }
     interface IAccessor {
-        (datum: any, index?: number, seriesKey?: string, metadata?: any): any;
+        (datum: any, index?: number, metadata?: any): any;
     }
     interface IAppliedAccessor {
         (datum: any, index: number): any;

@@ -1194,7 +1194,7 @@ var Plottable;
             return cachedExtent;
         };
         DataSource.prototype.computeExtent = function (accessor) {
-            var mappedData = this._data.map(function (d) { return accessor(d); });
+            var mappedData = this._data.map(accessor);
             if (mappedData.length === 0) {
                 return [];
             }
@@ -2187,6 +2187,8 @@ var Plottable;
                     throw new Error("XYPlots require an xScale and yScale");
                 }
                 this.classed("xy-plot", true);
+                this.project("x", "x", xScale);
+                this.project("y", "y", yScale);
             }
             XYPlot.prototype.project = function (attrToSet, accessor, scale) {
                 if (attrToSet === "x" && scale != null) {

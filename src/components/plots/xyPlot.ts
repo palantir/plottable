@@ -17,6 +17,9 @@ export module Abstract {
       super(dataset);
       if (xScale == null || yScale == null) {throw new Error("XYPlots require an xScale and yScale");}
       this.classed("xy-plot", true);
+
+      this.project("x", "x", xScale);
+      this.project("y", "y", yScale);
     }
 
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {

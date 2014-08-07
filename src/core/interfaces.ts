@@ -10,7 +10,7 @@ module Plottable {
   }
 
   export interface IAccessor {
-    (datum: any, index?: number, seriesKey?: string, metadata?: any): any;
+    (datum: any, index?: number, metadata?: any): any;
   };
 
   export interface IAppliedAccessor {
