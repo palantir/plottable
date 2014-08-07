@@ -24,14 +24,14 @@
       plot.project("x", "year", xScale);
       plot.project("y", "y", yScale);
       plot.setColor(colorScale);
-      // plot.animate(true);
+      plot.animate(true);
       var legend = new Plottable.Component.Legend(colorScale);
       var chart = new Plottable.Component.Table([
                                   [yAxis, plot, legend],
                                   [null,  xAxis, null]
                                 ]);
         chart.renderTo("#chart");
-        // for(var i = 0; i < 10; i++) addPlot();
+        for(var i = 0; i < 5; i++) addPlot();
     }
 
     function addPlot() {
@@ -45,14 +45,6 @@
       plot.removeDataset("" + (--index));
     }
 
-    function shift() {
-      var c = plot.cluster();
-      var j = c[0];
-      c.splice(0, 1);
-      c.push(j);
-      plot.cluster(c);
-    }
-
     </script>
   </head>
   <body>
@@ -60,7 +52,6 @@
     <p />
     <button name="add" onclick="addPlot()">add</button>
     <button name="remove" onclick="removePlot()">remove</button>
-    <button name="shift" onclick="shift()">shift</button>
   </body>
 
 </html>
