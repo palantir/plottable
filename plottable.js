@@ -840,16 +840,11 @@ var Plottable;
                 return formattedValue;
             };
         };
-        Formatters.siSuffix = function (precision, onlyShowUnchanged) {
+        Formatters.siSuffix = function (precision) {
             if (precision === void 0) { precision = 3; }
-            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             Formatters.verifyPrecision(precision);
             return function (d) {
-                var formattedValue = d3.format("." + precision + "s")(d);
-                if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
-                    return "";
-                }
-                return formattedValue;
+                return d3.format("." + precision + "s")(d);
             };
         };
         Formatters.time = function () {

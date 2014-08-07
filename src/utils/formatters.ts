@@ -78,14 +78,10 @@ module Plottable {
       };
     }
 
-    public static siSuffix(precision = 3, onlyShowUnchanged = true) {
+    public static siSuffix(precision = 3) {
       Formatters.verifyPrecision(precision);
       return function(d: any) {
-        var formattedValue = d3.format("." + precision + "s")(d);
-        if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
-          return "";
-        }
-        return formattedValue;
+        return d3.format("." + precision + "s")(d);
       };
     }
 

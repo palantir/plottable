@@ -157,7 +157,7 @@ declare module Plottable {
         static general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
         static identity(): (d: any) => string;
         static percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
-        static siSuffix(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        static siSuffix(precision?: number): (d: any) => string;
         static time(): (d: any) => string;
     }
 }
