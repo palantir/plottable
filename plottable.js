@@ -5781,7 +5781,7 @@ var Plottable;
             Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
                 var textHeight = this.measureTextHeight();
                 var totalNumRows = this.colorScale.domain().length;
-
+                var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var fakeText = fakeLegendEl.append("text");
                 var maxWidth = d3.max(this.colorScale.domain(), function (d) {
@@ -5789,8 +5789,8 @@ var Plottable;
                 });
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
-                var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
-                var desiredHeight = totalNumRows * textHeight + 2 * Legend.MARGIN;
+                var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
+                var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend.MARGIN;
                 return {
                     width: desiredWidth,
                     height: desiredHeight,
