@@ -143,12 +143,6 @@ export module Component {
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-<<<<<<< HEAD
-||||||| merged common ancestors
-      var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
-=======
-      var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
->>>>>>> master
 
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
@@ -156,19 +150,12 @@ export module Component {
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
       var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
+      var desiredHeight = totalNumRows * textHeight + 2 * Legend.MARGIN;
       return {
-<<<<<<< HEAD
         width : desiredWidth,
-        height: totalNumRows * textHeight,
-||||||| merged common ancestors
-        width : Math.min(desiredWidth, offeredWidth),
-        height: rowsICanFit * textHeight,
-=======
-        width : Math.min(desiredWidth, offeredWidth),
-        height: rowsICanFit === 0 ? 0 : rowsICanFit * textHeight + 2 * Legend.MARGIN,
->>>>>>> master
+        height: desiredHeight,
         wantsWidth: offeredWidth < desiredWidth,
-        wantsHeight: offeredY < totalNumRows * textHeight
+        wantsHeight: offeredHeight < desiredHeight
       };
     }
 

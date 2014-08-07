@@ -549,6 +549,16 @@ declare module Plottable {
 declare module Plottable {
     module Formatter {
         class Custom extends Abstract.Formatter {
+            /**
+            * Creates a Custom Formatter.
+            *
+            * @constructor
+            * @param {(d: any, formatter: Formatter.Custom) => string} customFormatFunction A
+            *                           formatting function that is passed a datum
+            *                           and the Custom Formatter itself.
+            * @param {number} precision The precision of the Custom Formatter. The
+            *                           actual behavior will depend on the customFormatFunction.
+            */
             constructor(customFormatFunction: (d: any, formatter: Custom) => string, precision?: number);
         }
     }
@@ -1673,7 +1683,6 @@ declare module Plottable {
             static TICK_LABEL_CLASS: string;
             public axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: any);
-<<<<<<< HEAD
             public remove(): void;
             /**
             * Gets the current width.
@@ -1741,6 +1750,19 @@ declare module Plottable {
             */
             public tickLabelPadding(padding: number): Axis;
             /**
+            * Gets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+            *
+            * @returns {number} The current size of the gutter, in pixels.
+            */
+            public gutter(): number;
+            /**
+            * Sets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+            *
+            * @param {number} size The desired size of the gutter, in pixels.
+            * @returns {Axis} The calling Axis.
+            */
+            public gutter(size: number): Axis;
+            /**
             * Gets the orientation of the Axis.
             *
             * @returns {string} The current orientation.
@@ -1767,41 +1789,6 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public showEndTickLabels(show: boolean): Axis;
-||||||| merged common ancestors
-            remove(): void;
-            width(): number;
-            width(w: any): Axis;
-            height(): number;
-            height(h: any): Axis;
-            formatter(): Formatter;
-            formatter(formatter: any): Axis;
-            tickLength(): number;
-            tickLength(length: number): Axis;
-            tickLabelPadding(): number;
-            tickLabelPadding(padding: number): Axis;
-            orient(): string;
-            orient(newOrientation: string): Axis;
-            showEndTickLabels(): boolean;
-            showEndTickLabels(show: boolean): Axis;
-=======
-            remove(): void;
-            width(): number;
-            width(w: any): Axis;
-            height(): number;
-            height(h: any): Axis;
-            formatter(): Formatter;
-            formatter(formatter: any): Axis;
-            tickLength(): number;
-            tickLength(length: number): Axis;
-            tickLabelPadding(): number;
-            tickLabelPadding(padding: number): Axis;
-            gutter(): number;
-            gutter(size: number): Axis;
-            orient(): string;
-            orient(newOrientation: string): Axis;
-            showEndTickLabels(): boolean;
-            showEndTickLabels(show: boolean): Axis;
->>>>>>> master
         }
     }
 }
@@ -2496,11 +2483,37 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Dispatcher extends PlottableObject {
+            /**
+            * Creates a Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
             constructor(target: D3.Selection);
-            target(): D3.Selection;
-            target(targetElement: D3.Selection): Dispatcher;
-            connect(): Dispatcher;
-            disconnect(): Dispatcher;
+            /**
+            * Gets the target of the Dispatcher.
+            *
+            * @returns {D3.Selection} The Dispatcher's current target.
+            */
+            public target(): D3.Selection;
+            /**
+            * Sets the target of the Dispatcher.
+            *
+            * @param {D3.Selection} target The element to listen for updates on.
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public target(targetElement: D3.Selection): Dispatcher;
+            /**
+            * Attaches the Dispatcher's listeners to the Dispatcher's target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public connect(): Dispatcher;
+            /**
+            * Detaches the Dispatcher's listeners from the Dispatchers' target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public disconnect(): Dispatcher;
         }
     }
 }
@@ -2508,14 +2521,55 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatcher {
-        class Mouse extends Plottable.Abstract.Dispatcher {
+        class Mouse extends Abstract.Dispatcher {
+            /**
+            * Creates a Mouse Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
             constructor(target: D3.Selection);
-            mouseover(): (location: Point) => any;
-            mouseover(callback: (location: Point) => any): Mouse;
-            mousemove(): (location: Point) => any;
-            mousemove(callback: (location: Point) => any): Mouse;
-            mouseout(): (location: Point) => any;
-            mouseout(callback: (location: Point) => any): Mouse;
+            /**
+            * Gets the current callback to be called on mouseover.
+            *
+            * @return {(location: Point) => any} The current mouseover callback.
+            */
+            public mouseover(): (location: Point) => any;
+            /**
+            * Attaches a callback to be called on mouseover.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            *                                            Pass in null to remove the callback.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mouseover(callback: (location: Point) => any): Mouse;
+            /**
+            * Gets the current callback to be called on mousemove.
+            *
+            * @return {(location: Point) => any} The current mousemove callback.
+            */
+            public mousemove(): (location: Point) => any;
+            /**
+            * Attaches a callback to be called on mousemove.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            *                                            Pass in null to remove the callback.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mousemove(callback: (location: Point) => any): Mouse;
+            /**
+            * Gets the current callback to be called on mouseout.
+            *
+            * @return {(location: Point) => any} The current mouseout callback.
+            */
+            public mouseout(): (location: Point) => any;
+            /**
+            * Attaches a callback to be called on mouseout.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            *                                            Pass in null to remove the callback.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mouseout(callback: (location: Point) => any): Mouse;
         }
     }
 }

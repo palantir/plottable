@@ -1428,6 +1428,16 @@ var Plottable;
     (function (Formatter) {
         var Custom = (function (_super) {
             __extends(Custom, _super);
+            /**
+            * Creates a Custom Formatter.
+            *
+            * @constructor
+            * @param {(d: any, formatter: Formatter.Custom) => string} customFormatFunction A
+            *                           formatting function that is passed a datum
+            *                           and the Custom Formatter itself.
+            * @param {number} precision The precision of the Custom Formatter. The
+            *                           actual behavior will depend on the customFormatFunction.
+            */
             function Custom(customFormatFunction, precision) {
                 if (typeof precision === "undefined") { precision = 0; }
                 _super.call(this, precision);
@@ -3236,37 +3246,26 @@ var Plottable;
                     // Top level render.
                     // Containers will put their children in the toRender queue
                     var toRender = d3.values(_componentsNeedingRender);
-<<<<<<< HEAD
                     toRender.forEach(function (c) {
                         return c._render();
                     });
 
                     // Finally, perform render of all components
-                    toRender = d3.values(_componentsNeedingRender);
-                    toRender.forEach(function (c) {
-                        return c._doRender();
-                    });
-
-                    // Reset queues
-||||||| merged common ancestors
-                    toRender.forEach(function (c) { return c._render(); });
-                    toRender = d3.values(_componentsNeedingRender);
-                    toRender.forEach(function (c) { return c._doRender(); });
-=======
-                    toRender.forEach(function (c) { return c._render(); });
                     var failed = {};
                     Object.keys(_componentsNeedingRender).forEach(function (k) {
-                        try {
+                        try  {
                             _componentsNeedingRender[k]._doRender();
-                        }
-                        catch (err) {
+                        } catch (err) {
+                            // using setTimeout instead of console.log, we get the familiar red
+                            // stack trace
                             setTimeout(function () {
                                 throw err;
                             }, 0);
                             failed[k] = _componentsNeedingRender[k];
                         }
                     });
->>>>>>> master
+
+                    // Reset queues
                     _componentsNeedingComputeLayout = {};
                     _componentsNeedingRender = failed;
                     _animationRequested = false;
@@ -4786,15 +4785,11 @@ var Plottable;
                     return this;
                 }
             };
-<<<<<<< HEAD
 
-||||||| merged common ancestors
-=======
             Axis.prototype.gutter = function (size) {
                 if (size == null) {
                     return this._gutter;
-                }
-                else {
+                } else {
                     if (size < 0) {
                         throw new Error("gutter size must be positive");
                     }
@@ -4803,7 +4798,7 @@ var Plottable;
                     return this;
                 }
             };
->>>>>>> master
+
             Axis.prototype.orient = function (newOrientation) {
                 if (newOrientation == null) {
                     return this._orientation;
@@ -5198,62 +5193,25 @@ var Plottable;
                 this.showLastTickLabel = false;
             }
             Numeric.prototype._computeWidth = function () {
-<<<<<<< HEAD
-                // generate a test value to measure width
-||||||| merged common ancestors
-=======
                 var _this = this;
->>>>>>> master
                 var tickValues = this._getTickValues();
-<<<<<<< HEAD
-                var valueLength = function (v) {
-                    var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
-                    return (logLength > 0) ? logLength : 1;
-                };
-                var pow10 = Math.max.apply(null, tickValues.map(valueLength));
-                var precision = this._formatter.precision();
-                var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision));
-
-||||||| merged common ancestors
-                var valueLength = function (v) {
-                    var logLength = Math.floor(Math.log(Math.abs(v)) / Math.LN10);
-                    return (logLength > 0) ? logLength : 1;
-                };
-                var pow10 = Math.max.apply(null, tickValues.map(valueLength));
-                var precision = this._formatter.precision();
-                var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision));
-=======
->>>>>>> master
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 var epsilon = Math.pow(10, -this._formatter.precision());
+
+                // create a new text measurerer every time; see issue #643
                 var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this._formatter.format(v);
                     return measurer(formattedValue).width;
                 });
                 testTextEl.remove();
-<<<<<<< HEAD
 
-||||||| merged common ancestors
-=======
                 var maxTextLength = d3.max(textLengths);
->>>>>>> master
+
                 if (this.tickLabelPositioning === "center") {
-<<<<<<< HEAD
-                    this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
-                } else {
-                    this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
-||||||| merged common ancestors
-                    this._computedWidth = this.tickLength() + this.tickLabelPadding() + textLength;
-                }
-                else {
-                    this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + textLength);
-=======
                     this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;
-                }
-                else {
+                } else {
                     this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + maxTextLength);
->>>>>>> master
                 }
 
                 return this._computedWidth;
@@ -5261,6 +5219,8 @@ var Plottable;
 
             Numeric.prototype._computeHeight = function () {
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+
+                // create a new text measurerer every time; see issue #643
                 var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textHeight = measurer("test").height;
                 testTextEl.remove();
@@ -5817,23 +5777,11 @@ var Plottable;
                 this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
                 return this;
             };
-<<<<<<< HEAD
 
-            Legend.prototype._requestedSpace = function (offeredWidth, offeredY) {
-||||||| merged common ancestors
-            Legend.prototype._requestedSpace = function (offeredWidth, offeredY) {
-=======
             Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
->>>>>>> master
                 var textHeight = this.measureTextHeight();
                 var totalNumRows = this.colorScale.domain().length;
-<<<<<<< HEAD
 
-||||||| merged common ancestors
-                var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
-=======
-                var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
->>>>>>> master
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
                 var fakeText = fakeLegendEl.append("text");
                 var maxWidth = d3.max(this.colorScale.domain(), function (d) {
@@ -5842,19 +5790,12 @@ var Plottable;
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
                 var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
+                var desiredHeight = totalNumRows * textHeight + 2 * Legend.MARGIN;
                 return {
-<<<<<<< HEAD
                     width: desiredWidth,
-                    height: totalNumRows * textHeight,
-||||||| merged common ancestors
-                    width: Math.min(desiredWidth, offeredWidth),
-                    height: rowsICanFit * textHeight,
-=======
-                    width: Math.min(desiredWidth, offeredWidth),
-                    height: rowsICanFit === 0 ? 0 : rowsICanFit * textHeight + 2 * Legend.MARGIN,
->>>>>>> master
+                    height: desiredHeight,
                     wantsWidth: offeredWidth < desiredWidth,
-                    wantsHeight: offeredY < totalNumRows * textHeight
+                    wantsHeight: offeredHeight < desiredHeight
                 };
             };
 
@@ -5876,37 +5817,17 @@ var Plottable;
                 var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
                 var textHeight = this.measureTextHeight();
                 var availableWidth = this.availableWidth - textHeight - Legend.MARGIN;
-<<<<<<< HEAD
-                var r = textHeight / 2 - Legend.MARGIN;
+                var r = textHeight * 0.3;
                 var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) {
                     return d;
                 });
-||||||| merged common ancestors
-                var r = textHeight / 2 - Legend.MARGIN;
-                var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
-=======
-                var r = textHeight * 0.3;
-                var legend = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, function (d) { return d; });
->>>>>>> master
                 var legendEnter = legend.enter().append("g").classed(Legend.SUBELEMENT_CLASS, true);
+
                 legendEnter.append("circle");
                 legendEnter.append("g").classed("text-container", true);
+
                 legend.exit().remove();
-<<<<<<< HEAD
-                legend.attr("transform", function (d) {
-                    return "translate(0," + domain.indexOf(d) * textHeight + ")";
-                });
-                legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
-                legend.selectAll("text").text(function (d) {
-                    var measure = Plottable.Util.Text.getTextMeasure(d3.select(this));
-                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
-||||||| merged common ancestors
-                legend.attr("transform", function (d) { return "translate(0," + domain.indexOf(d) * textHeight + ")"; });
-                legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
-                legend.selectAll("text").text(function (d) {
-                    var measure = Plottable.Util.Text.getTextMeasure(d3.select(this));
-                    return Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
-=======
+
                 legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this.colorScale._d3Scale);
                 legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
                     var d3this = d3.select(this);
@@ -5915,10 +5836,11 @@ var Plottable;
                     var writeLineMeasure = measure(writeLine);
                     Plottable.Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
                 });
+
                 legend.attr("transform", function (d) {
                     return "translate(" + Legend.MARGIN + "," + (domain.indexOf(d) * textHeight + Legend.MARGIN) + ")";
->>>>>>> master
                 });
+
                 this.updateClasses();
                 this.updateListeners();
                 return this;
@@ -7623,6 +7545,11 @@ var Plottable;
     (function (Abstract) {
         var Dispatcher = (function (_super) {
             __extends(Dispatcher, _super);
+            /**
+            * Creates a Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
             function Dispatcher(target) {
                 _super.call(this);
                 this._event2Callback = {};
@@ -7637,13 +7564,24 @@ var Plottable;
                 this.disconnect();
                 this._target = targetElement;
                 if (wasConnected) {
+                    // re-connect to the new target
                     this.connect();
                 }
                 return this;
             };
+
+            /**
+            * Gets a namespaced version of the event name.
+            */
             Dispatcher.prototype.getEventString = function (eventName) {
                 return eventName + ".dispatcher" + this._plottableID;
             };
+
+            /**
+            * Attaches the Dispatcher's listeners to the Dispatcher's target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
             Dispatcher.prototype.connect = function () {
                 var _this = this;
                 if (this.connected) {
@@ -7654,8 +7592,15 @@ var Plottable;
                     var callback = _this._event2Callback[event];
                     _this._target.on(_this.getEventString(event), callback);
                 });
+
                 return this;
             };
+
+            /**
+            * Detaches the Dispatcher's listeners from the Dispatchers' target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
             Dispatcher.prototype.disconnect = function () {
                 var _this = this;
                 this.connected = false;
@@ -7671,6 +7616,7 @@ var Plottable;
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -7682,19 +7628,27 @@ var Plottable;
     (function (Dispatcher) {
         var Mouse = (function (_super) {
             __extends(Mouse, _super);
+            /**
+            * Creates a Mouse Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
             function Mouse(target) {
-                _super.call(this, target);
                 var _this = this;
+                _super.call(this, target);
+
                 this._event2Callback["mouseover"] = function () {
                     if (_this._mouseover != null) {
                         _this._mouseover(_this.getMousePosition());
                     }
                 };
+
                 this._event2Callback["mousemove"] = function () {
                     if (_this._mousemove != null) {
                         _this._mousemove(_this.getMousePosition());
                     }
                 };
+
                 this._event2Callback["mouseout"] = function () {
                     if (_this._mouseout != null) {
                         _this._mouseout(_this.getMousePosition());
@@ -7708,6 +7662,7 @@ var Plottable;
                     y: xy[1]
                 };
             };
+
             Mouse.prototype.mouseover = function (callback) {
                 if (callback === undefined) {
                     return this._mouseover;
@@ -7715,6 +7670,7 @@ var Plottable;
                 this._mouseover = callback;
                 return this;
             };
+
             Mouse.prototype.mousemove = function (callback) {
                 if (callback === undefined) {
                     return this._mousemove;
@@ -7722,6 +7678,7 @@ var Plottable;
                 this._mousemove = callback;
                 return this;
             };
+
             Mouse.prototype.mouseout = function (callback) {
                 if (callback === undefined) {
                     return this._mouseout;
@@ -7736,6 +7693,7 @@ var Plottable;
     var Dispatcher = Plottable.Dispatcher;
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
