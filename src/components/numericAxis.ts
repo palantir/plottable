@@ -25,11 +25,10 @@ export module Axis {
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var epsilon = Math.pow(10, -this._formatter.precision()); // small delta to force display of longer numbers
       // create a new text measurerer every time; see issue #643
       var measurer = Util.Text.getTextMeasure(testTextEl);
       var textLengths = tickValues.map((v: any) => {
-        var formattedValue = this._formatter.format(v);
+        var formattedValue = this._formatter(v);
         return measurer(formattedValue).width;
       });
       testTextEl.remove();

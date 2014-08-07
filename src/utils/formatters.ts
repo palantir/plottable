@@ -9,12 +9,15 @@ module Plottable {
 
   export class Formatters {
 
-    public static currency(precision = 2, symbol = "$", prefix = true) {
+    public static currency(precision = 2, symbol = "$", prefix = true, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
         var formattedValue = fixedFormatter(Math.abs(d));
+        if (onlyShowUnchanged && Formatters._valueChanged(Math.abs(d), formattedValue)) {
+          return "";
+        }
         if (formattedValue !== "") {
-          if (this.prefix) {
+          if (prefix) {
             formattedValue = symbol + formattedValue;
           } else {
             formattedValue += symbol;
@@ -25,26 +28,34 @@ module Plottable {
           }
         }
         return formattedValue;
-      }
+      };
     }
 
-    public static fixed(precision = 3) {
+    public static fixed(precision = 3, onlyShowUnchanged = true) {
       Formatters.verifyPrecision(precision);
       return function(d: any) {
-        return (<number> d).toFixed(precision);
-      }
+        var formattedValue = (<number> d).toFixed(precision);
+        if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+          return "";
+        }
+        return formattedValue;
+      };
     }
 
-    public static general(precision = 3) {
+    public static general(precision = 3, onlyShowUnchanged = true) {
       Formatters.verifyPrecision(precision);
       return function(d: any) {
         if (typeof d === "number") {
           var multiplier = Math.pow(10, precision);
-          return String(Math.round(d * multiplier) / multiplier);
+          var formattedValue = String(Math.round(d * multiplier) / multiplier);
+          if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+            return "";
+          }
+          return formattedValue;
         } else {
           return String(d);
         }
-      }
+      };
     }
 
     public static identity() {
@@ -53,21 +64,29 @@ module Plottable {
       };
     }
 
-    public static percentage(precision = 0) {
+    public static percentage(precision = 0, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
-      var percentageFormatter = function(d: any) {
-        var formattedValue = fixedFormatter(d);
+      return function(d: any) {
+        var formattedValue = fixedFormatter(d * 100);
+        if (onlyShowUnchanged && Formatters._valueChanged(d * 100, formattedValue)) {
+          return "";
+        }
         if (formattedValue !== "") {
           formattedValue += "%";
         }
         return formattedValue;
-      }
-      return percentageFormatter;
+      };
     }
 
-    public static si(precision = 3) {
+    public static si(precision = 3, onlyShowUnchanged = true) {
       Formatters.verifyPrecision(precision);
-      return d3.format("." + precision + "s");
+      return function(d: any) {
+        var formattedValue = d3.format("." + precision + "s")(d);
+        if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+          return "";
+        }
+        return formattedValue;
+      };
     }
 
     public static time() {
@@ -117,13 +136,17 @@ module Plottable {
             return d3.time.format(timeFormat[i].format)(d);
           }
         }
-      }
+      };
     }
 
     private static verifyPrecision(precision: number) {
       if (precision < 0 || precision > 20) {
         throw new RangeError("Formatter precision must be between 0 and 20");
       }
+    }
+
+    private static _valueChanged(d: any, formattedValue: string) {
+      return d !== parseFloat(formattedValue);
     }
 
   }
