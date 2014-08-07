@@ -6,6 +6,13 @@ export module Scale {
     [key: string]: string[];
   };
 
+  /**
+   * This class implements a color scale that takes quantitive input and
+   * interpolates between a list of color values. It returns a hex string
+   * representing the interpolated color.
+   *
+   * By default it generates a linear scale internally.
+   */
   export class InterpolatedColor extends Abstract.QuantitativeScale {
     private static COLOR_SCALES: ColorGroups = {
       reds : [
@@ -57,7 +64,7 @@ export module Scale {
      * @param {string[]} colors an array of strings representing color
      *     values in hex ("#FFFFFF") or keywords ("white").
      * @param {string} scaleType a string representing the underlying scale
-     *     type (linear/log/sqrt/pow)
+     *     type ("linear"/"log"/"sqrt"/"pow")
      * @returns a Quantitative d3 scale.
      */
     private static getD3InterpolatedScale(colors: string[], scaleType: string): D3.Scale.QuantitativeScale {
