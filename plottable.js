@@ -766,6 +766,7 @@ var Plottable;
         var Formatter = (function () {
             function Formatter(precision) {
                 this._onlyShowUnchanged = true;
+                Plottable.Util.Methods.warn("Formatter objects will soon be deprecated.  Please use the factory methods to generate formatter functions.");
                 this.precision(precision);
             }
             Formatter.prototype.format = function (d) {
@@ -794,6 +795,117 @@ var Plottable;
                 }
                 this._onlyShowUnchanged = showUnchanged;
                 return this;
+            };
+            Formatter.currency = function (precision, symbol, prefix) {
+                if (precision === void 0) { precision = 2; }
+                if (symbol === void 0) { symbol = "$"; }
+                if (prefix === void 0) { prefix = true; }
+                var fixedFormatter = Formatter.fixed(precision);
+                return function (d) {
+                    var formattedValue = fixedFormatter(Math.abs(d));
+                    if (formattedValue !== "") {
+                        if (this.prefix) {
+                            formattedValue = symbol + formattedValue;
+                        }
+                        else {
+                            formattedValue += symbol;
+                        }
+                        if (d < 0) {
+                            formattedValue = "-" + formattedValue;
+                        }
+                    }
+                    return formattedValue;
+                };
+            };
+            Formatter.fixed = function (precision) {
+                if (precision === void 0) { precision = 3; }
+                Formatter.verifyPrecision(precision);
+                return function (d) {
+                    return d.toFixed(precision);
+                };
+            };
+            Formatter.general = function (precision) {
+                if (precision === void 0) { precision = 3; }
+                Formatter.verifyPrecision(precision);
+                return function (d) {
+                    if (typeof d === "number") {
+                        var multiplier = Math.pow(10, precision);
+                        return String(Math.round(d * multiplier) / multiplier);
+                    }
+                    else {
+                        return String(d);
+                    }
+                };
+            };
+            Formatter.identity = function () {
+                return function (d) {
+                    return String(d);
+                };
+            };
+            Formatter.percentage = function (precision) {
+                if (precision === void 0) { precision = 0; }
+                var fixedFormatter = Formatter.fixed(precision);
+                var percentageFormatter = function (d) {
+                    var formattedValue = fixedFormatter(d);
+                    if (formattedValue !== "") {
+                        formattedValue += "%";
+                    }
+                    return formattedValue;
+                };
+                return percentageFormatter;
+            };
+            Formatter.si = function (precision) {
+                if (precision === void 0) { precision = 3; }
+                Formatter.verifyPrecision(precision);
+                return d3.format("." + precision + "s");
+            };
+            Formatter.time = function () {
+                var numFormats = 8;
+                var timeFormat = {};
+                timeFormat[0] = {
+                    format: ".%L",
+                    filter: function (d) { return d.getMilliseconds() !== 0; }
+                };
+                timeFormat[1] = {
+                    format: ":%S",
+                    filter: function (d) { return d.getSeconds() !== 0; }
+                };
+                timeFormat[2] = {
+                    format: "%I:%M",
+                    filter: function (d) { return d.getMinutes() !== 0; }
+                };
+                timeFormat[3] = {
+                    format: "%I %p",
+                    filter: function (d) { return d.getHours() !== 0; }
+                };
+                timeFormat[4] = {
+                    format: "%a %d",
+                    filter: function (d) { return d.getDay() !== 0 && d.getDate() !== 1; }
+                };
+                timeFormat[5] = {
+                    format: "%b %d",
+                    filter: function (d) { return d.getDate() !== 1; }
+                };
+                timeFormat[6] = {
+                    format: "%b",
+                    filter: function (d) { return d.getMonth() !== 0; }
+                };
+                timeFormat[7] = {
+                    format: "%Y",
+                    filter: function () { return true; }
+                };
+                return function (d) {
+                    for (var i = 0; i < numFormats; i++) {
+                        if (timeFormat[i].filter(d)) {
+                            return d3.time.format(timeFormat[i].format)(d);
+                        }
+                    }
+                };
+            };
+            Formatter.verifyPrecision = function (precision) {
+                if (precision < 0 || precision > 20) {
+                    throw new RangeError("Formatter precision must be between 0 and 20");
+                }
             };
             return Formatter;
         })();
@@ -3113,8 +3225,7 @@ var Plottable;
                     this.classed("y-axis", true);
                 }
                 if (formatter == null) {
-                    formatter = new Plottable.Formatter.General();
-                    formatter.showOnlyUnchangedValues(false);
+                    formatter = Abstract.Formatter.general();
                 }
                 this.formatter(formatter);
                 this._scale.broadcaster.registerListener(this, function () { return _this.rescale(); });

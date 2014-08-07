@@ -16,9 +16,9 @@ export module Axis {
      * @constructor
      * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {Formatter} [formatter] A function to format tick labels.
+     * @param {function} [formatter] A function to format tick labels.
      */
-    constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: any) {
+    constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: (d: any) => string) {
       super(scale, orientation, formatter);
     }
 
@@ -34,7 +34,7 @@ export module Axis {
       var testValue = -(Math.pow(10, pow10) + Math.pow(10, -precision)); // leave room for negative sign
 
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var formattedTestValue = this._formatter.format(testValue);
+      var formattedTestValue = this._formatter(testValue);
       var textLength = (<SVGTextElement> testTextEl.text(formattedTestValue).node()).getComputedTextLength();
       testTextEl.remove();
 
@@ -152,11 +152,10 @@ export module Axis {
       tickLabels.enter().append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
 
-      var formatFunction = (d: any) => this._formatter.format(d);
       tickLabels.style("text-anchor", tickLabelTextAnchor)
                 .style("visibility", "visible")
                 .attr(tickLabelAttrHash)
-                .text(formatFunction);
+                .text(this._formatter);
 
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);

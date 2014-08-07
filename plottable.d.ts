@@ -159,6 +159,13 @@ declare module Plottable {
             precision(value: number): Formatter;
             showOnlyUnchangedValues(): boolean;
             showOnlyUnchangedValues(showUnchanged: boolean): Formatter;
+            static currency(precision?: number, symbol?: string, prefix?: boolean): (d: any) => string;
+            static fixed(precision?: number): (d: any) => string;
+            static general(precision?: number): (d: any) => string;
+            static identity(): (d: any) => string;
+            static percentage(precision?: number): (d: any) => string;
+            static si(precision?: number): (value: number) => string;
+            static time(): (d: any) => string;
         }
     }
 }
