@@ -2087,7 +2087,7 @@ var Plottable;
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
                 var activatedAccessor = Plottable.Util.Methods._applyAccessor(accessor, this);
-                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale };
+                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
                 this.updateProjector(attrToSet);
                 this._render();
                 return this;
@@ -2245,20 +2245,21 @@ var Plottable;
             function NewStylePlot(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this.nextSeriesIndex = 0;
-                this.drawers = [];
-                this.datasets = [];
-                this.datasetKeySet = d3.set();
+                this._key2DatasetDrawerKey = {};
+                this._datasetKeysInOrder = [];
             }
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
-                this.drawers.forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
+                var drawers = d3.values(this._key2DatasetDrawerKey).map(function (ddk) { return ddk.drawer; });
+                drawers.forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
                 return this;
             };
             NewStylePlot.prototype.remove = function () {
                 var _this = this;
                 _super.prototype.remove.call(this);
-                this.datasets.forEach(function (d) { return d.dataset.broadcaster.deregisterListener(_this); });
+                var keys = d3.keys(this._key2DatasetDrawerKey);
+                keys.forEach(function (k) { return _this.removeDataset(k); });
             };
             NewStylePlot.prototype.addDataset = function (first, second) {
                 if (typeof (first) !== "string" && second !== undefined) {
@@ -2270,24 +2271,24 @@ var Plottable;
                 var key = typeof (first) === "string" ? first : "_" + this.nextSeriesIndex++;
                 var data = typeof (first) !== "string" ? first : second;
                 var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
-                return this._addDataset(key, dataset);
+                this._addDataset(key, dataset);
+                return this;
             };
             NewStylePlot.prototype._addDataset = function (key, dataset) {
                 var _this = this;
-                var drawer = this.getDrawer(key);
-                if (this.datasetKeySet.has(key)) {
+                if (this._key2DatasetDrawerKey[key] != null) {
                     this.removeDataset(key);
                 }
                 ;
-                this.datasetKeySet.add(key);
+                var drawer = this.getDrawer(key);
+                var ddk = { drawer: drawer, dataset: dataset, key: key };
+                this._datasetKeysInOrder.push(key);
+                this._key2DatasetDrawerKey[key] = ddk;
                 if (this._isSetup) {
                     drawer.renderArea = this.renderArea.append("g");
                 }
-                this.drawers.push(drawer);
-                this.datasets.push({ dataset: dataset, key: key });
                 dataset.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
                 this._onDataSourceUpdate();
-                return this;
             };
             NewStylePlot.prototype.getDrawer = function (key) {
                 throw new Error("Abstract Method Not Implemented");
@@ -2296,9 +2297,9 @@ var Plottable;
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
-                    this.datasets.forEach(function (dnk) {
-                        var extent = dnk.dataset._getExtent(projector.accessor);
-                        var scaleKey = _this._plottableID.toString() + "_" + dnk.key;
+                    d3.values(this._key2DatasetDrawerKey).forEach(function (ddk) {
+                        var extent = ddk.dataset._getExtent(projector.accessor);
+                        var scaleKey = _this._plottableID.toString() + "_" + ddk.key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale.removeExtent(scaleKey, attr);
                         }
@@ -2310,19 +2311,20 @@ var Plottable;
                 return this;
             };
             NewStylePlot.prototype.removeDataset = function (key) {
-                if (this.datasetKeySet.has(key)) {
-                    for (var i = 0; i <= this.datasets.length && this.datasets[i].key !== key; i++) {
-                    }
-                    ;
-                    var drawer = this.drawers[i];
-                    drawer.remove();
-                    this.drawers.splice(i, 1);
-                    this.datasets.splice(i, 1);
-                    this.datasetKeySet.remove(key);
+                if (this._key2DatasetDrawerKey[key] != null) {
+                    var ddk = this._key2DatasetDrawerKey[key];
+                    ddk.drawer.remove();
+                    var projectors = d3.values(this._projectors);
+                    var scaleKey = this._plottableID.toString() + "_" + key;
+                    projectors.forEach(function (p) {
+                        if (p.scale !== undefined) {
+                            p.scale.removeExtent(scaleKey, p.attribute);
+                        }
+                    });
+                    ddk.dataset.broadcaster.deregisterListener(this);
+                    this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
+                    delete this._key2DatasetDrawerKey[key];
                     this._onDataSourceUpdate();
-                }
-                else {
-                    Plottable.Util.Methods.warn("Attempted to remove series " + key + ", but series not found");
                 }
                 return this;
             };
@@ -5188,6 +5190,24 @@ var Plottable;
                 };
                 return attrToProjector;
             };
+            NewStyleBarPlot.prototype._updateYDomainer = function () {
+                if (this._isVertical) {
+                    this._updateDomainer(this.yScale);
+                }
+                else {
+                    _super.prototype._updateYDomainer.call(this);
+                }
+                return this;
+            };
+            NewStyleBarPlot.prototype._updateXDomainer = function () {
+                if (!this._isVertical) {
+                    this._updateDomainer(this.xScale);
+                }
+                else {
+                    _super.prototype._updateXDomainer.call(this);
+                }
+                return this;
+            };
             NewStyleBarPlot.DEFAULT_WIDTH = 10;
             NewStyleBarPlot._BarAlignmentToFactor = {};
             return NewStyleBarPlot;
@@ -5213,23 +5233,27 @@ var Plottable;
                 this._isVertical = true;
                 this.innerScale = new Plottable.Scale.Ordinal();
             }
-            ClusteredBar.prototype.getKeys = function () {
-                return this.datasets.map(function (d) { return d.key; });
+            ClusteredBar.prototype.clusterOrder = function (order) {
+                if (order === undefined) {
+                    return this._datasetKeysInOrder;
+                }
+                this._datasetKeysInOrder = order;
+                this._onDataSourceUpdate();
+                return this;
             };
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
-                var keys = this.getKeys();
-                this.innerScale.domain(keys);
-                this.colorScale.domain(keys);
-                var lengths = this.datasets.map(function (d) { return d.dataset.data().length; });
+                this.innerScale.domain(this._datasetKeysInOrder);
+                this.colorScale.domain(this._datasetKeysInOrder);
+                var lengths = this._datasetKeysInOrder.map(function (e) { return _this._key2DatasetDrawerKey[e].dataset.data().length; });
                 if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
                 }
-                var clusters = this.datasets.map(function (dnk) {
-                    var data = dnk.dataset.data();
-                    var key = dnk.key;
+                var clusters = {};
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var data = _this._key2DatasetDrawerKey[key].dataset.data();
                     var vals = data.map(function (d) { return accessor(d); });
-                    return data.map(function (d, i) {
+                    clusters[key] = data.map(function (d, i) {
                         d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(vals[i]) + _this.innerScale.scale(key);
                         d["_PLOTTABLE_PROTECTED_FIELD_FILL"] = _this.colorScale.scale(key);
                         return d;
@@ -5238,11 +5262,12 @@ var Plottable;
                 return clusters;
             };
             ClusteredBar.prototype._paint = function () {
+                var _this = this;
                 _super.prototype._paint.call(this);
                 var accessor = this._projectors["x"].accessor;
                 var attrHash = this._generateAttrToProjector();
                 var clusteredData = this.cluster(accessor);
-                this.drawers.forEach(function (d, i) { return d.draw(clusteredData[i], attrHash); });
+                this._datasetKeysInOrder.forEach(function (key) { return _this._key2DatasetDrawerKey[key].drawer.draw(clusteredData[key], attrHash); });
             };
             ClusteredBar.prototype.getDrawer = function (key) {
                 return new Plottable.Drawer.RectDrawer(key);

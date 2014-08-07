@@ -387,6 +387,7 @@ declare module Plottable {
         interface _IProjector {
             accessor: IAccessor;
             scale?: Scale;
+            attribute: string;
         }
         interface IAttributeToProjector {
             [attrToSet: string]: IAppliedAccessor;
@@ -429,18 +430,20 @@ declare module Plottable {
         dataset: DataSource;
         key: string;
     }
+    interface DatasetDrawerKey {
+        dataset: DataSource;
+        drawer: Plottable.Abstract.Drawer;
+        key: string;
+    }
     module Abstract {
         class NewStylePlot extends XYPlot {
-            drawers: Drawer.RectDrawer[];
-            datasets: DatasetAndKey[];
-            datasetKeySet: D3.Set;
             constructor(dataset: any, xScale?: Scale, yScale?: Scale);
             remove(): void;
             addDataset(key: string, dataset: DataSource): Plot;
             addDataset(key: string, dataset: any[]): Plot;
             addDataset(dataset: DataSource): Plot;
             addDataset(dataset: any[]): Plot;
-            getDrawer(key: string): Drawer.RectDrawer;
+            getDrawer(key: string): Drawer;
             updateProjector(attr: string): NewStylePlot;
             removeDataset(key: string): Plot;
         }
@@ -954,7 +957,11 @@ declare module Plottable {
             static DEFAULT_WIDTH: number;
             colorScale: Plottable.Scale.Color;
             constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
-            cluster(accessor: IAccessor): any[][];
+            clusterOrder(): string[];
+            clusterOrder(order: string[]): ClusteredBar;
+            cluster(accessor: IAccessor): {
+                [x: string]: any[];
+            };
             getDrawer(key: string): Drawer.RectDrawer;
             setColor(scale: Plottable.Scale.Color): void;
         }

@@ -5,6 +5,7 @@ export module Abstract {
   export interface _IProjector {
     accessor: IAccessor;
     scale?: Abstract.Scale;
+    attribute: string;
   }
 
   export interface IAttributeToProjector {
@@ -121,7 +122,7 @@ export module Abstract {
         scale.broadcaster.registerListener(this, () => this._render());
       }
       var activatedAccessor = Util.Methods._applyAccessor(accessor, this);
-      this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale};
+      this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
       this.updateProjector(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;

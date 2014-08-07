@@ -221,6 +221,24 @@ export module Abstract {
 
       return attrToProjector;
     }
+
+    public _updateYDomainer() {
+      if (this._isVertical) {
+        this._updateDomainer(this.yScale);
+      } else {
+        super._updateYDomainer();
+      }
+      return this;
+    }
+
+    public _updateXDomainer() {
+      if (!this._isVertical) {
+        this._updateDomainer(this.xScale);
+      } else {
+        super._updateXDomainer();
+      }
+      return this;
+    }
   }
 }
 }

@@ -13,24 +13,31 @@ export module Plot {
       this.innerScale = new Scale.Ordinal();
     }
 
-    private getKeys() {
-      return this.datasets.map((d) => d.key);
+    public clusterOrder(): string[];
+    public clusterOrder(order: string[]): ClusteredBar;
+    public clusterOrder(order?: string[]): any {
+      if (order === undefined) {
+        return this._datasetKeysInOrder;
+      }
+      this._datasetKeysInOrder = order;
+      this._onDataSourceUpdate();
+      return this;
     }
 
     public cluster(accessor: IAccessor) {
-      var keys = this.getKeys();
-      this.innerScale.domain(keys);
-      this.colorScale.domain(keys);
-      var lengths = this.datasets.map((d) => d.dataset.data().length);
+      this.innerScale.domain(this._datasetKeysInOrder);
+      this.colorScale.domain(this._datasetKeysInOrder);
+
+      var lengths = this._datasetKeysInOrder.map((e) => this._key2DatasetDrawerKey[e].dataset.data().length);
       if (Util.Methods.uniqNumbers(lengths).length > 1) {
         Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
       }
-      var clusters = this.datasets.map((dnk) => {
-        var data = dnk.dataset.data();
-        var key = dnk.key;
+      var clusters: {[key: string]: any[]} = {};
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var data = this._key2DatasetDrawerKey[key].dataset.data();
         var vals = data.map((d) => accessor(d));
 
-        return data.map((d, i) => {
+        clusters[key] = data.map((d, i) => {
           d["_PLOTTABLE_PROTECTED_FIELD_X"] = this.xScale.scale(vals[i]) + this.innerScale.scale(key);
           d["_PLOTTABLE_PROTECTED_FIELD_FILL"] = this.colorScale.scale(key);
           return d;
@@ -44,7 +51,7 @@ export module Plot {
       var accessor = this._projectors["x"].accessor;
       var attrHash = this._generateAttrToProjector();
       var clusteredData = this.cluster(accessor);
-      this.drawers.forEach((d, i) => d.draw(clusteredData[i], attrHash));
+      this._datasetKeysInOrder.forEach((key: string) => this._key2DatasetDrawerKey[key].drawer.draw(clusteredData[key], attrHash));
     }
 
     public getDrawer(key: string) {
