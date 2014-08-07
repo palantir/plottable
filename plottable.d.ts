@@ -927,8 +927,23 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Abstract {
+        class NewStyleBarPlot extends NewStylePlot {
+            static DEFAULT_WIDTH: number;
+            static _BarAlignmentToFactor: {
+                [x: string]: number;
+            };
+            constructor(dataset: any, xScale: Scale, yScale: Scale);
+            baseline(value: number): NewStyleBarPlot;
+            barAlignment(alignment: string): NewStyleBarPlot;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Plot {
-        class StackedBar extends Plottable.Abstract.NewStylePlot {
+        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
             constructor(dataset: any, xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
             getDrawer(key: string): Drawer.RectDrawer;

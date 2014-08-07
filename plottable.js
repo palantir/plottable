@@ -5056,6 +5056,131 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    (function (Abstract) {
+        var NewStyleBarPlot = (function (_super) {
+            __extends(NewStyleBarPlot, _super);
+            function NewStyleBarPlot(dataset, xScale, yScale) {
+                _super.call(this, dataset, xScale, yScale);
+                this._baselineValue = 0;
+                this._barAlignmentFactor = 0;
+                this._animators = {
+                    "bars-reset": new Plottable.Animator.Null(),
+                    "bars": new Plottable.Animator.IterativeDelay(),
+                    "baseline": new Plottable.Animator.Null()
+                };
+                this.classed("bar-plot", true);
+                this.project("fill", function () { return "steelblue"; });
+                this.baseline(this._baselineValue);
+            }
+            NewStyleBarPlot.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._baseline = this.renderArea.append("line").classed("baseline", true);
+                return this;
+            };
+            NewStyleBarPlot.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var baselineAttr = {
+                    "x1": this._isVertical ? 0 : scaledBaseline,
+                    "y1": this._isVertical ? scaledBaseline : 0,
+                    "x2": this._isVertical ? this.availableWidth : scaledBaseline,
+                    "y2": this._isVertical ? scaledBaseline : this.availableHeight
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+            };
+            NewStyleBarPlot.prototype.baseline = function (value) {
+                this._baselineValue = value;
+                this._updateXDomainer();
+                this._updateYDomainer();
+                this._render();
+                return this;
+            };
+            NewStyleBarPlot.prototype.barAlignment = function (alignment) {
+                var alignmentLC = alignment.toLowerCase();
+                var align2factor = this.constructor._BarAlignmentToFactor;
+                if (align2factor[alignmentLC] === undefined) {
+                    throw new Error("unsupported bar alignment");
+                }
+                this._barAlignmentFactor = align2factor[alignmentLC];
+                this._render();
+                return this;
+            };
+            NewStyleBarPlot.prototype.parseExtent = function (input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                }
+                else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                }
+                else {
+                    throw new Error("input '" + input + "' can't be parsed as an IExtent");
+                }
+            };
+            NewStyleBarPlot.prototype._updateDomainer = function (scale) {
+                if (scale instanceof Abstract.QuantitativeScale) {
+                    var qscale = scale;
+                    if (!qscale._userSetDomainer) {
+                        if (this._baselineValue != null) {
+                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+                        }
+                        else {
+                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
+                        }
+                    }
+                    qscale._autoDomainIfAutomaticMode();
+                }
+                return this;
+            };
+            NewStyleBarPlot.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var secondaryScale = this._isVertical ? this.xScale : this.yScale;
+                var primaryAttr = this._isVertical ? "y" : "x";
+                var secondaryAttr = this._isVertical ? "x" : "y";
+                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                if (attrToProjector["width"] == null) {
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : Abstract.BarPlot.DEFAULT_WIDTH;
+                    attrToProjector["width"] = function (d, i) { return constantWidth; };
+                }
+                var positionF = attrToProjector[secondaryAttr];
+                var widthF = attrToProjector["width"];
+                if (!bandsMode) {
+                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor; };
+                }
+                else {
+                    var bandWidth = secondaryScale.rangeBand();
+                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2; };
+                }
+                var originalPositionFn = attrToProjector[primaryAttr];
+                attrToProjector[primaryAttr] = function (d, i) {
+                    var originalPos = originalPositionFn(d, i);
+                    return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
+                };
+                attrToProjector["height"] = function (d, i) {
+                    return Math.abs(scaledBaseline - originalPositionFn(d, i));
+                };
+                return attrToProjector;
+            };
+            NewStyleBarPlot.DEFAULT_WIDTH = 10;
+            NewStyleBarPlot._BarAlignmentToFactor = {};
+            return NewStyleBarPlot;
+        })(Abstract.NewStylePlot);
+        Abstract.NewStyleBarPlot = NewStyleBarPlot;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
@@ -5066,11 +5191,6 @@ var Plottable;
                 this._baselineValue = 0;
                 this.stackedExtent = [];
             }
-            StackedBar.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this._baseline = this.renderArea.append("line").classed("baseline", true);
-                return this;
-            };
             StackedBar.prototype._onDataSourceUpdate = function () {
                 _super.prototype._onDataSourceUpdate.call(this);
                 this._render();
@@ -5088,33 +5208,15 @@ var Plottable;
                 }
                 return this;
             };
+            StackedBar.prototype._updateYDomainer = function () {
+                this._updateDomainer(this.yScale);
+                return this;
+            };
             StackedBar.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var secondaryScale = this._isVertical ? this.xScale : this.yScale;
-                var primaryAttr = this._isVertical ? "y" : "x";
-                var secondaryAttr = this._isVertical ? "x" : "y";
-                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
-                if (secondaryScale == null || primaryScale == null) {
-                    console.log("warning: scales null, continuing");
-                    return {};
-                }
-                if (attrToProjector["width"] == null) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : 5;
-                    attrToProjector["width"] = function (d, i) { return constantWidth; };
-                }
-                var positionF = attrToProjector[secondaryAttr];
-                var widthF = attrToProjector["width"];
-                if (!bandsMode) {
-                    throw new Error("only supported for bands mode atm");
-                }
-                else {
-                    var bandWidth = secondaryScale.rangeBand();
-                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2; };
-                }
-                var getY0 = function (d) { return _this.yScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0); };
-                var getY = function (d) { return _this.yScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y); };
+                var getY0 = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0); };
+                var getY = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y); };
                 attrToProjector["height"] = function (d) { return Math.abs(getY(d) - getY0(d)); };
                 attrToProjector["y"] = function (d) { return getY(d); };
                 return attrToProjector;
@@ -5146,41 +5248,14 @@ var Plottable;
                 this._onDataSourceUpdate();
                 return stacks;
             };
-            StackedBar.prototype._updateYDomainer = function () {
-                this._updateDomainer(this.yScale);
-                return this;
-            };
-            StackedBar.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Plottable.Abstract.QuantitativeScale) {
-                    var qscale = scale;
-                    if (!qscale._userSetDomainer) {
-                        if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-                        }
-                        else {
-                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
-                        }
-                    }
-                    qscale._autoDomainIfAutomaticMode();
-                }
-                return this;
-            };
             StackedBar.prototype._paint = function () {
-                var scaledBaseline = this.yScale.scale(this._baselineValue);
-                var baselineAttr = {
-                    "x1": this._isVertical ? 0 : scaledBaseline,
-                    "y1": this._isVertical ? scaledBaseline : 0,
-                    "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-                    "y2": this._isVertical ? scaledBaseline : this.availableHeight
-                };
-                this._baseline.attr(baselineAttr);
                 var accessor = this._projectors["y"].accessor;
                 var attrHash = this._generateAttrToProjector();
                 var stackedData = this.stack(accessor);
                 this.drawers.forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
             };
             return StackedBar;
-        })(Plottable.Abstract.NewStylePlot);
+        })(Plottable.Abstract.NewStyleBarPlot);
         Plot.StackedBar = StackedBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;

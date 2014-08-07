@@ -3,7 +3,7 @@
 module Plottable {
 export module Plot {
 
-  export class StackedBar extends Abstract.NewStylePlot {
+  export class StackedBar extends Abstract.NewStyleBarPlot {
     public stackedData: any[][] = [];
     public _yAccessor: IAccessor;
     public _isVertical = true;
@@ -15,11 +15,6 @@ export module Plot {
       super(dataset, xScale, yScale);
     }
 
-    public _setup() {
-      super._setup();
-      this._baseline = this.renderArea.append("line").classed("baseline", true);
-      return this;
-    }
 
     public _onDataSourceUpdate() {
       super._onDataSourceUpdate();
@@ -40,40 +35,16 @@ export module Plot {
       return this;
     }
 
+    public _updateYDomainer() {
+      this._updateDomainer(this.yScale);
+      return this;
+    }
 
     public _generateAttrToProjector() {
-      // Primary scale/direction: the "length" of the bars
-      // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
       var primaryScale    = this._isVertical ? this.yScale : this.xScale;
-      var secondaryScale  = this._isVertical ? this.xScale : this.yScale;
-      var primaryAttr     = this._isVertical ? "y" : "x";
-      var secondaryAttr   = this._isVertical ? "x" : "y";
-      var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
-                      && (<Plottable.Scale.Ordinal> secondaryScale).rangeType() === "bands";
-
-      if (secondaryScale == null || primaryScale == null) {
-        console.log("warning: scales null, continuing");
-        return (<any> {});
-      }
-
-      if (attrToProjector["width"] == null) {
-        var constantWidth = bandsMode ? (<Scale.Ordinal> secondaryScale).rangeBand() : 5;
-        attrToProjector["width"] = (d: any, i: number) => constantWidth;
-      }
-
-      var positionF = attrToProjector[secondaryAttr];
-      var widthF = attrToProjector["width"];
-      if (!bandsMode) {
-        throw new Error("only supported for bands mode atm");
-        // attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
-      } else {
-        var bandWidth = (<Plottable.Scale.Ordinal> secondaryScale).rangeBand();
-        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
-      }
-
-      var getY0 = (d: any) => this.yScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0);
-      var getY = (d: any) => this.yScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y);
+      var getY0 = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0);
+      var getY = (d: any) => primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y);
       attrToProjector["height"] = (d) => Math.abs(getY(d) - getY0(d));
       attrToProjector["y"] = (d) => getY(d);
       return attrToProjector;
@@ -110,42 +81,8 @@ export module Plot {
       return stacks;
     }
 
-    public _updateYDomainer() {
-      this._updateDomainer(this.yScale);
-      return this;
-    }
-
-    public _updateDomainer(scale: Abstract.Scale) {
-      if (scale instanceof Abstract.QuantitativeScale) {
-        var qscale = <Abstract.QuantitativeScale> scale;
-        if (!qscale._userSetDomainer) {
-          if (this._baselineValue != null) {
-            qscale.domainer()
-              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
-              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-          } else {
-            qscale.domainer()
-              .removePaddingException("BAR_PLOT+" + this._plottableID)
-              .removeIncludedValue("BAR_PLOT+" + this._plottableID);
-          }
-        }
-            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        qscale._autoDomainIfAutomaticMode();
-      }
-      return this;
-    }
 
     public _paint() {
-      var scaledBaseline = this.yScale.scale(this._baselineValue);
-
-      var baselineAttr: Abstract.IAttributeToProjector = {
-        "x1": this._isVertical ? 0 : scaledBaseline,
-        "y1": this._isVertical ? scaledBaseline : 0,
-        "x2": this._isVertical ? this.availableWidth : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.availableHeight
-      };
-      this._baseline.attr(baselineAttr);
-
       var accessor = this._projectors["y"].accessor;
       var attrHash = this._generateAttrToProjector();
       var stackedData = this.stack(accessor);

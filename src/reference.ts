@@ -16,8 +16,6 @@
 /// <reference path="utils/formatters/customFormatter.ts" />
 /// <reference path="utils/formatters/timeFormatter.ts" />
 
-
-
 /// <reference path="core/version.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
@@ -66,6 +64,7 @@
 /// <reference path="components/plots/horizontalBarPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
+/// <reference path="components/plots/newStyleBarPlot.ts" />
 /// <reference path="components/plots/stackedBarPlot.ts" />
 
 /// <reference path="animators/nullAnimator.ts" />
