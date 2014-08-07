@@ -3575,7 +3575,7 @@ describe("Formatters", function () {
     });
     describe("SISuffix", function () {
         it("shortens long numbers", function () {
-            var lnFormatter = Plottable.Formatters.si();
+            var lnFormatter = Plottable.Formatters.siSuffix();
             var result = lnFormatter(1);
             assert.strictEqual(result, "1.00", "shows 3 signifigicant figures by default");
             result = lnFormatter(Math.pow(10, 12));

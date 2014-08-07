@@ -840,7 +840,7 @@ var Plottable;
                 return formattedValue;
             };
         };
-        Formatters.si = function (precision, onlyShowUnchanged) {
+        Formatters.siSuffix = function (precision, onlyShowUnchanged) {
             if (precision === void 0) { precision = 3; }
             if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
             Formatters.verifyPrecision(precision);

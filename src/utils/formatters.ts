@@ -78,7 +78,7 @@ module Plottable {
       };
     }
 
-    public static si(precision = 3, onlyShowUnchanged = true) {
+    public static siSuffix(precision = 3, onlyShowUnchanged = true) {
       Formatters.verifyPrecision(precision);
       return function(d: any) {
         var formattedValue = d3.format("." + precision + "s")(d);
