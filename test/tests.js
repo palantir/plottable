@@ -24,12 +24,14 @@ function verifySpaceRequest(sr, w, h, ww, wh, id) {
 function fixComponentSize(c, fixedWidth, fixedHeight) {
     c._requestedSpace = function (w, h) {
         return {
-            width: fixedWidth == null ? 0 : Math.min(w, fixedWidth),
-            height: fixedHeight == null ? 0 : Math.min(h, fixedHeight),
+            width: fixedWidth == null ? 0 : fixedWidth,
+            height: fixedHeight == null ? 0 : fixedHeight,
             wantsWidth: fixedWidth == null ? false : w < fixedWidth,
             wantsHeight: fixedHeight == null ? false : h < fixedHeight
         };
     };
+    c._fixedWidthFlag = fixedWidth == null ? false : true;
+    c._fixedHeightFlag = fixedHeight == null ? false : true;
     return c;
 }
 function makeFixedSizeComponent(fixedWidth, fixedHeight) {
@@ -133,15 +135,23 @@ describe("BaseAxis", function () {
         var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
         assert.throws(function () { return baseAxis.tickLabelPadding(-1); }, "must be positive");
     });
-    it("width()", function () {
+    it("gutter() rejects negative values", function () {
+        var scale = new Plottable.Scale.Linear();
+        var axis = new Plottable.Abstract.Axis(scale, "right");
+        assert.throws(function () { return axis.gutter(-1); }, "must be positive");
+    });
+    it("width() + gutter()", function () {
         var SVG_WIDTH = 100;
         var SVG_HEIGHT = 500;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
         var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
         verticalAxis.renderTo(svg);
-        var expectedWidth = verticalAxis.tickLength();
+        var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
         assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
+        verticalAxis.gutter(20);
+        expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
+        assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the gutter size updates the width");
         verticalAxis.width(20);
         assert.strictEqual(verticalAxis.width(), 20, "width was set to user-specified value");
         verticalAxis.width(10 * SVG_WIDTH);
@@ -152,15 +162,18 @@ describe("BaseAxis", function () {
         assert.throws(function () { return horizontalAxis.width(2014); }, Error, "horizontal");
         svg.remove();
     });
-    it("height()", function () {
+    it("height() + gutter()", function () {
         var SVG_WIDTH = 500;
         var SVG_HEIGHT = 100;
         var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scale.Linear();
         var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
         horizontalAxis.renderTo(svg);
-        var expectedHeight = horizontalAxis.tickLength();
+        var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
         assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
+        horizontalAxis.gutter(20);
+        expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
+        assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the gutter size updates the height");
         horizontalAxis.height(20);
         assert.strictEqual(horizontalAxis.height(), 20, "height was set to user-specified value");
         horizontalAxis.height(10 * SVG_HEIGHT);
@@ -316,6 +329,37 @@ describe("TimeAxis", function () {
 
 var assert = chai.assert;
 describe("NumericAxis", function () {
+    function boxesOverlap(boxA, boxB) {
+        if (boxA.right < boxB.left) {
+            return false;
+        }
+        if (boxA.left > boxB.right) {
+            return false;
+        }
+        if (boxA.bottom < boxB.top) {
+            return false;
+        }
+        if (boxA.top > boxB.bottom) {
+            return false;
+        }
+        return true;
+    }
+    function boxIsInside(inner, outer, epsilon) {
+        if (epsilon === void 0) { epsilon = 0; }
+        if (inner.left < outer.left - epsilon) {
+            return false;
+        }
+        if (inner.right > outer.right + epsilon) {
+            return false;
+        }
+        if (inner.top < outer.top - epsilon) {
+            return false;
+        }
+        if (inner.bottom > outer.bottom + epsilon) {
+            return false;
+        }
+        return true;
+    }
     it("tickLabelPosition() input validation", function () {
         var scale = new Plottable.Scale.Linear();
         var horizontalAxis = new Plottable.Axis.Numeric(scale, "bottom");
@@ -476,6 +520,56 @@ describe("NumericAxis", function () {
                 box2 = visibleTickLabels[0][j].getBoundingClientRect();
                 assert.isFalse(Plottable.Util.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
             }
+        }
+        svg.remove();
+    });
+    it("allocates enough width to show all tick labels when vertical", function () {
+        var SVG_WIDTH = 100;
+        var SVG_HEIGHT = 500;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([5, -5]);
+        scale.range([0, SVG_HEIGHT]);
+        var customFormatFunction = function (d, formatter) {
+            if (d === 0) {
+                return "This is zero";
+            }
+            return String(d);
+        };
+        var formatter = new Plottable.Formatter.Custom(customFormatFunction, 0);
+        var numericAxis = new Plottable.Axis.Numeric(scale, "left", formatter);
+        numericAxis.renderTo(svg);
+        var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        });
+        var numLabels = visibleTickLabels[0].length;
+        var boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+        var labelBox;
+        for (var i = 0; i < numLabels; i++) {
+            labelBox = visibleTickLabels[0][i].getBoundingClientRect();
+            assert.isTrue(boxIsInside(labelBox, boundingBox), "tick labels don't extend outside the bounding box");
+        }
+        svg.remove();
+    });
+    it("allocates enough height to show all tick labels when horizontal", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([5, -5]);
+        scale.range([0, SVG_WIDTH]);
+        var formatter = new Plottable.Formatter.Fixed(2);
+        var numericAxis = new Plottable.Axis.Numeric(scale, "bottom", formatter);
+        numericAxis.renderTo(svg);
+        var visibleTickLabels = numericAxis.element.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
+            return d3.select(this).style("visibility") === "visible";
+        });
+        var numLabels = visibleTickLabels[0].length;
+        var boundingBox = numericAxis.element.select(".bounding-box").node().getBoundingClientRect();
+        var labelBox;
+        for (var i = 0; i < numLabels; i++) {
+            labelBox = visibleTickLabels[0][i].getBoundingClientRect();
+            assert.isTrue(boxIsInside(labelBox, boundingBox, 0.5), "tick labels don't extend outside the bounding box");
         }
         svg.remove();
     });
@@ -2066,7 +2160,7 @@ describe("ComponentGroups", function () {
             fixComponentSize(c1, null, 10);
             fixComponentSize(c2, null, 50);
             var request = cg._requestedSpace(10, 10);
-            verifySpaceRequest(request, 0, 10, false, true, "");
+            verifySpaceRequest(request, 0, 50, false, true, "");
         });
     });
     describe("Component.merge works as expected", function () {

@@ -26,12 +26,14 @@ function verifySpaceRequest(sr: Plottable.ISpaceRequest, w: number, h: number, w
 function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, fixedHeight?: number) {
   c._requestedSpace = function(w, h) {
     return {
-      width:  fixedWidth  == null ? 0 : Math.min(w, fixedWidth) ,
-      height: fixedHeight == null ? 0 : Math.min(h, fixedHeight),
+      width:  fixedWidth  == null ? 0 : fixedWidth,
+      height: fixedHeight == null ? 0 : fixedHeight,
       wantsWidth : fixedWidth  == null ? false : w < fixedWidth ,
       wantsHeight: fixedHeight == null ? false : h < fixedHeight
     };
   };
+  c._fixedWidthFlag  = fixedWidth  == null ? false : true;
+  c._fixedHeightFlag = fixedHeight == null ? false : true;
   return c;
 }
 
