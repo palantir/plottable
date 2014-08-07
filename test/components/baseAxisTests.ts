@@ -8,14 +8,21 @@ describe("BaseAxis", () => {
     assert.throws(() => new Plottable.Abstract.Axis(scale, "blargh"), "unsupported");
   });
 
-    it("tickLabelPadding() rejects negative values", () => {
+  it("tickLabelPadding() rejects negative values", () => {
     var scale = new Plottable.Scale.Linear();
     var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
 
     assert.throws(() => baseAxis.tickLabelPadding(-1), "must be positive");
   });
 
-  it("width()", () => {
+  it("gutter() rejects negative values", () => {
+    var scale = new Plottable.Scale.Linear();
+    var axis = new Plottable.Abstract.Axis(scale, "right");
+
+    assert.throws(() => axis.gutter(-1), "must be positive");
+  });
+
+  it("width() + gutter()", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -23,8 +30,12 @@ describe("BaseAxis", () => {
     var verticalAxis = new Plottable.Abstract.Axis(scale, "right");
     verticalAxis.renderTo(svg);
 
-    var expectedWidth = verticalAxis.tickLength(); // vertical BaseAxis returns tick length as width
+    var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter(); // tick length and gutter by default
     assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
+
+    verticalAxis.gutter(20);
+    expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
+    assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the gutter size updates the width");
 
     verticalAxis.width(20);
     assert.strictEqual(verticalAxis.width(), 20, "width was set to user-specified value");
@@ -41,7 +52,7 @@ describe("BaseAxis", () => {
     svg.remove();
   });
 
-  it("height()", () => {
+  it("height() + gutter()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -49,8 +60,12 @@ describe("BaseAxis", () => {
     var horizontalAxis = new Plottable.Abstract.Axis(scale, "bottom");
     horizontalAxis.renderTo(svg);
 
-    var expectedHeight = horizontalAxis.tickLength(); // horizontal BaseAxis returns tick length as height
+    var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter(); // tick length and gutter by default
     assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
+
+    horizontalAxis.gutter(20);
+    expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
+    assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the gutter size updates the height");
 
     horizontalAxis.height(20);
     assert.strictEqual(horizontalAxis.height(), 20, "height was set to user-specified value");

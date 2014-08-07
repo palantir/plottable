@@ -55,6 +55,7 @@ function run(div, data, Plottable) {
             var invertedYMax = yScale.invert(xy.yMin);
             xScale.domain([invertedXMin, invertedXMax]);
             yScale.domain([invertedYMin, invertedYMax]);
+            dragboxInteraction.clearBox();
         }
 
         var dragboxInteraction = new Plottable.Interaction.XYDragBox(cg)

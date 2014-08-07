@@ -111,6 +111,41 @@ function reporter(n, v) {
 
 
 function main() {
+  //load keyword dropdown
+  var keywordList = {};
+  d3.json("/quicktests/list_of_quicktests.json", function(data) {
+    for(var obj in data){
+      for(var keyword in data[obj].categories){
+        keywordList[data[obj].categories[keyword]] = data[obj].categories[keyword];
+      }
+    }
+    var keywordDropdown = $('#filterWord');
+        $.each(keywordList, function(val, text) {
+          keywordDropdown.append(
+              $('<option></option>').val(text).html(text)
+          );
+      });
+      $("#filterWord").html($("#filterWord option").sort(function (a, b) {
+          return a.text == b.text ? 0 : a.text < b.text ? -1 : 1
+      }))
+  });
+
+  //load github branch dropdown
+  var branchOptions = {};
+  $.get("https://api.github.com/repos/palantir/plottable/branches",function(data,status){
+      for(var i = 0; i < data.length; i++){
+        branchOptions["val" + i] = data[i].name;
+      }
+      var branchDropdown = $('#featureBranch');
+        $.each(branchOptions, function(val, text) {
+          branchDropdown.append(
+              $('<option></option>').val(text).html(text)
+          );
+      });
+    });
+
+
+
   var table = d3.select("table");
   table.selectAll(".quicktest-row").remove();
   var firstBranch = "master";
