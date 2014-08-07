@@ -60,13 +60,12 @@
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />
 /// <reference path="components/plots/abstractBarPlot.ts" />
-/// <reference path="components/plots/clusteredBarPlot.ts" />
 /// <reference path="components/plots/verticalBarPlot.ts" />
 /// <reference path="components/plots/horizontalBarPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/newStyleBarPlot.ts" />
-/// <reference path="components/plots/stackedBarPlot.ts" />
+/// <reference path="components/plots/clusteredBarPlot.ts" />
 
 /// <reference path="animators/nullAnimator.ts" />
 /// <reference path="animators/defaultAnimator.ts" />
