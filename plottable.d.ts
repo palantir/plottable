@@ -949,7 +949,6 @@ declare module Plottable {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
             constructor(dataset: any, xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
-            removeDataset(key: string): Plottable.Abstract.Plot;
             getDrawer(key: string): Drawer.RectDrawer;
             stack(accessor: IAccessor): any[][];
         }

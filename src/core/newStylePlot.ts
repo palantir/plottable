@@ -16,6 +16,8 @@ export module Abstract {
   export class NewStylePlot extends XYPlot {
     private nextSeriesIndex = 0;
     public _key2DatasetDrawerKey: {[key: string]: DatasetDrawerKey; } = {};
+    public _datasetKeysInOrder: string[] = [];
+
     /**
      * Creates a Plot.
      *
@@ -64,6 +66,7 @@ export module Abstract {
       };
       var drawer = this.getDrawer(key);
       var ddk = {drawer: drawer, dataset: dataset, key: key};
+      this._datasetKeysInOrder.push(key);
       this._key2DatasetDrawerKey[key] = ddk;
 
       if (this._isSetup) {
@@ -108,7 +111,7 @@ export module Abstract {
         });
 
         ddk.dataset.broadcaster.deregisterListener(this);
-
+        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2DatasetDrawerKey[key] = null;
       }
       return this;

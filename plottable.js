@@ -2251,6 +2251,7 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this.nextSeriesIndex = 0;
                 this._key2DatasetDrawerKey = {};
+                this._datasetKeysInOrder = [];
             }
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
@@ -2286,6 +2287,7 @@ var Plottable;
                 ;
                 var drawer = this.getDrawer(key);
                 var ddk = { drawer: drawer, dataset: dataset, key: key };
+                this._datasetKeysInOrder.push(key);
                 this._key2DatasetDrawerKey[key] = ddk;
                 if (this._isSetup) {
                     drawer.renderArea = this.renderArea.append("g");
@@ -2325,6 +2327,7 @@ var Plottable;
                         }
                     });
                     ddk.dataset.broadcaster.deregisterListener(this);
+                    this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                     this._key2DatasetDrawerKey[key] = null;
                 }
                 return this;
@@ -5208,7 +5211,6 @@ var Plottable;
                 this._isVertical = true;
                 this._baselineValue = 0;
                 this.stackedExtent = [];
-                this.keysInStackOrder = [];
             }
             StackedBar.prototype._onDataSourceUpdate = function () {
                 _super.prototype._onDataSourceUpdate.call(this);
@@ -5236,14 +5238,6 @@ var Plottable;
                 attrToProjector["y"] = function (d) { return getY(d); };
                 return attrToProjector;
             };
-            StackedBar.prototype._addDataset = function (key, dataset) {
-                this.keysInStackOrder.push(key);
-                return _super.prototype._addDataset.call(this, key, dataset);
-            };
-            StackedBar.prototype.removeDataset = function (key) {
-                this.keysInStackOrder.splice(this.keysInStackOrder.indexOf(key), 1);
-                return _super.prototype.removeDataset.call(this, key);
-            };
             StackedBar.prototype.getDrawer = function (key) {
                 return new Plottable.Drawer.RectDrawer(key);
             };
@@ -5255,7 +5249,7 @@ var Plottable;
                     Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
                 }
                 var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
-                var datasetsInStackOrder = this.keysInStackOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
+                var datasetsInStackOrder = this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
                 var stacks = datasetsInStackOrder.map(function (dataset) {
                     var data = dataset.data();
                     var base = currentBase.slice();
@@ -5279,7 +5273,7 @@ var Plottable;
                 var accessor = this._projectors["y"].accessor;
                 var attrHash = this._generateAttrToProjector();
                 var stackedData = this.stack(accessor);
-                var drawersInStackOrder = this.keysInStackOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
+                var drawersInStackOrder = this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
                 drawersInStackOrder.forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
             };
             return StackedBar;
