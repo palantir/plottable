@@ -35,7 +35,7 @@ export module Abstract {
       }
 
       if (formatter == null) {
-        formatter = Formatters.general();
+        formatter = Formatters.general(3, false);
       }
       this.formatter(formatter);
 
