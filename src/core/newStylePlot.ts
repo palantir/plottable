@@ -5,13 +5,17 @@ module Plottable {
     dataset: DataSource;
     key: string;
   }
+
+  export interface DatasetDrawerKey {
+    dataset: DataSource;
+    drawer: Abstract.Drawer;
+    key: string;
+  }
+
 export module Abstract {
   export class NewStylePlot extends XYPlot {
     private nextSeriesIndex = 0;
-    public drawers: Drawer.RectDrawer[] = [];
-    public datasets: DatasetAndKey[] = [];
-    public datasetKeySet = d3.set();
-
+    public _key2DatasetDrawerKey: {[key: string]: DatasetDrawerKey; } = {};
     /**
      * Creates a Plot.
      *
@@ -24,13 +28,15 @@ export module Abstract {
 
     public _setup() {
       super._setup();
-      this.drawers.forEach((d) => d.renderArea = this.renderArea.append("g"));
+      var drawers = d3.values(this._key2DatasetDrawerKey).map((ddk) => ddk.drawer);
+      drawers.forEach((d) => d.renderArea = this.renderArea.append("g"));
       return this;
     }
 
     public remove() {
       super.remove();
-      this.datasets.forEach((d) => d.dataset.broadcaster.deregisterListener(this));
+      var keys = d3.keys(this._key2DatasetDrawerKey);
+      keys.forEach((k) => this.removeDataset(k));
     }
 
     public addDataset(key: string, dataset: DataSource): Plot;
@@ -48,36 +54,35 @@ export module Abstract {
       var data = typeof(first) !== "string" ? first : second;
       var dataset = (data instanceof DataSource) ? data : new DataSource(data);
 
-      return this._addDataset(key, dataset);
+      this._addDataset(key, dataset);
+      return this;
     }
 
     public _addDataset(key: string, dataset: DataSource) {
-      var drawer = this.getDrawer(key);
-      if (this.datasetKeySet.has(key)) {
+      if (this._key2DatasetDrawerKey[key] != null) {
         this.removeDataset(key);
       };
-      this.datasetKeySet.add(key);
+      var drawer = this.getDrawer(key);
+      var ddk = {drawer: drawer, dataset: dataset, key: key};
+      this._key2DatasetDrawerKey[key] = ddk;
 
       if (this._isSetup) {
         drawer.renderArea = this.renderArea.append("g");
       }
-      this.drawers.push(drawer);
-      this.datasets.push({dataset: dataset, key: key});
       dataset.broadcaster.registerListener(this, () => this._onDataSourceUpdate());
       this._onDataSourceUpdate();
-      return this;
     }
 
-    public getDrawer(key: string): Drawer.RectDrawer {
+    public getDrawer(key: string): Abstract.Drawer {
       throw new Error("Abstract Method Not Implemented");
     }
 
     public updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
-        this.datasets.forEach((dnk) => {
-          var extent = dnk.dataset._getExtent(projector.accessor);
-          var scaleKey = this._plottableID.toString() + "_" + dnk.key;
+        d3.values(this._key2DatasetDrawerKey).forEach((ddk) => {
+          var extent = ddk.dataset._getExtent(projector.accessor);
+          var scaleKey = this._plottableID.toString() + "_" + ddk.key;
           if (extent.length === 0 || !this._isAnchored) {
             projector.scale.removeExtent(scaleKey, attr);
           } else {
@@ -89,16 +94,22 @@ export module Abstract {
       return this;
     }
 
-
     public removeDataset(key: string): Plot {
-      if (this.datasetKeySet.has(key)) {
-        for (var i=0; i <= this.datasets.length && this.datasets[i].key !== key; i++) {};
-        var drawer = this.drawers[i];
-        drawer.remove();
-        this.datasets.splice(i, 1);
-        this.datasetKeySet.remove(key);
-      } else {
-        Util.Methods.warn("Attempted to remove series " + key + ", but series not found");
+      if (this._key2DatasetDrawerKey[key] != null) {
+        var ddk = this._key2DatasetDrawerKey[key];
+        ddk.drawer.remove();
+
+        var projectors = d3.values(this._projectors);
+        var scaleKey = this._plottableID.toString() + "_" + key;
+        projectors.forEach((p) => {
+          if (p.scale !== null) {
+            p.scale.removeExtent(scaleKey, p.attribute);
+          }
+        });
+
+        ddk.dataset.broadcaster.deregisterListener(this);
+
+        this._key2DatasetDrawerKey[key] = null;
       }
       return this;
     }

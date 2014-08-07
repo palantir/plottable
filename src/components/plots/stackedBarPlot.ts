@@ -10,6 +10,7 @@ export module Plot {
     public _baselineValue = 0;
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
+    private keysInStackOrder: string[] = [];
 
     constructor(dataset: any, xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
       super(dataset, xScale, yScale);
@@ -45,31 +46,42 @@ export module Plot {
       return attrToProjector;
     }
 
+    public _addDataset(key: string, dataset: DataSource) {
+      this.keysInStackOrder.push(key);
+      return super._addDataset(key, dataset);
+    }
+
+    public removeDataset(key: string) {
+      this.keysInStackOrder.splice(this.keysInStackOrder.indexOf(key), 1);
+      return super.removeDataset(key);
+    }
 
     public getDrawer(key: string) {
       return new Drawer.RectDrawer(key);
     }
 
     public stack(accessor: IAccessor) {
-      var lengths = this.datasets.map((d) => d.dataset.data().length);
+      var datasets = d3.values(this._key2DatasetDrawerKey);
+      var lengths = datasets.map((d) => d.dataset.data().length);
       if (Util.Methods.uniqNumbers(lengths).length > 1) {
         Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
       }
       var currentBase = Util.Methods.createFilledArray(0, lengths[0]);
-      var stacks =  this.datasets.map((dnk) => {
-        var data = dnk.dataset.data();
+      var datasetsInStackOrder = this.keysInStackOrder.map((k) => this._key2DatasetDrawerKey[k].dataset);
+      var stacks = datasetsInStackOrder.map((dataset) => {
+        var data = dataset.data();
         var base = currentBase.slice();
         var vals = data.map(accessor);
-        if (vals.some((x) => x<0)) {
+        if (vals.some((x: number) => x<0)) {
           Util.Methods.warn("Warning: Behavior for stacked bars undefined when data includes negative values");
         }
         currentBase = Util.Methods.addArrays(base, vals);
 
-        return data.map((d, i) => {
+        return data.map((d: any, i: number) => {
           d["_PLOTTABLE_PROTECTED_FIELD_Y0"] = base[i];
           d["_PLOTTABLE_PROTECTED_FIELD_Y"] = currentBase[i];
           return d;
-          });
+        });
       });
       this.stackedExtent = [0, d3.max(currentBase)];
       this._onDataSourceUpdate();
@@ -80,7 +92,8 @@ export module Plot {
       var accessor = this._projectors["y"].accessor;
       var attrHash = this._generateAttrToProjector();
       var stackedData = this.stack(accessor);
-      this.drawers.forEach((d, i) => d.draw(stackedData[i], attrHash));
+      var drawersInStackOrder = this.keysInStackOrder.map((k) => this._key2DatasetDrawerKey[k].drawer);
+      drawersInStackOrder.forEach((d, i) => d.draw(stackedData[i], attrHash));
 
     }
   }

@@ -2092,7 +2092,7 @@ var Plottable;
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
                 var activatedAccessor = Plottable.Util.Methods._applyAccessor(accessor, this);
-                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale };
+                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
                 this.updateProjector(attrToSet);
                 this._render();
                 return this;
@@ -2250,20 +2250,20 @@ var Plottable;
             function NewStylePlot(dataset, xScale, yScale) {
                 _super.call(this, dataset, xScale, yScale);
                 this.nextSeriesIndex = 0;
-                this.drawers = [];
-                this.datasets = [];
-                this.datasetKeySet = d3.set();
+                this._key2DatasetDrawerKey = {};
             }
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
-                this.drawers.forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
+                var drawers = d3.values(this._key2DatasetDrawerKey).map(function (ddk) { return ddk.drawer; });
+                drawers.forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
                 return this;
             };
             NewStylePlot.prototype.remove = function () {
                 var _this = this;
                 _super.prototype.remove.call(this);
-                this.datasets.forEach(function (d) { return d.dataset.broadcaster.deregisterListener(_this); });
+                var keys = d3.keys(this._key2DatasetDrawerKey);
+                keys.forEach(function (k) { return _this.removeDataset(k); });
             };
             NewStylePlot.prototype.addDataset = function (first, second) {
                 if (typeof (first) !== "string" && second !== undefined) {
@@ -2275,24 +2275,23 @@ var Plottable;
                 var key = typeof (first) === "string" ? first : "_" + this.nextSeriesIndex++;
                 var data = typeof (first) !== "string" ? first : second;
                 var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
-                return this._addDataset(key, dataset);
+                this._addDataset(key, dataset);
+                return this;
             };
             NewStylePlot.prototype._addDataset = function (key, dataset) {
                 var _this = this;
-                var drawer = this.getDrawer(key);
-                if (this.datasetKeySet.has(key)) {
+                if (this._key2DatasetDrawerKey[key] != null) {
                     this.removeDataset(key);
                 }
                 ;
-                this.datasetKeySet.add(key);
+                var drawer = this.getDrawer(key);
+                var ddk = { drawer: drawer, dataset: dataset, key: key };
+                this._key2DatasetDrawerKey[key] = ddk;
                 if (this._isSetup) {
                     drawer.renderArea = this.renderArea.append("g");
                 }
-                this.drawers.push(drawer);
-                this.datasets.push({ dataset: dataset, key: key });
                 dataset.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
                 this._onDataSourceUpdate();
-                return this;
             };
             NewStylePlot.prototype.getDrawer = function (key) {
                 throw new Error("Abstract Method Not Implemented");
@@ -2301,9 +2300,9 @@ var Plottable;
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
-                    this.datasets.forEach(function (dnk) {
-                        var extent = dnk.dataset._getExtent(projector.accessor);
-                        var scaleKey = _this._plottableID.toString() + "_" + dnk.key;
+                    d3.values(this._key2DatasetDrawerKey).forEach(function (ddk) {
+                        var extent = ddk.dataset._getExtent(projector.accessor);
+                        var scaleKey = _this._plottableID.toString() + "_" + ddk.key;
                         if (extent.length === 0 || !_this._isAnchored) {
                             projector.scale.removeExtent(scaleKey, attr);
                         }
@@ -2315,17 +2314,18 @@ var Plottable;
                 return this;
             };
             NewStylePlot.prototype.removeDataset = function (key) {
-                if (this.datasetKeySet.has(key)) {
-                    for (var i = 0; i <= this.datasets.length && this.datasets[i].key !== key; i++) {
-                    }
-                    ;
-                    var drawer = this.drawers[i];
-                    drawer.remove();
-                    this.datasets.splice(i, 1);
-                    this.datasetKeySet.remove(key);
-                }
-                else {
-                    Plottable.Util.Methods.warn("Attempted to remove series " + key + ", but series not found");
+                if (this._key2DatasetDrawerKey[key] != null) {
+                    var ddk = this._key2DatasetDrawerKey[key];
+                    ddk.drawer.remove();
+                    var projectors = d3.values(this._projectors);
+                    var scaleKey = this._plottableID.toString() + "_" + key;
+                    projectors.forEach(function (p) {
+                        if (p.scale !== null) {
+                            p.scale.removeExtent(scaleKey, p.attribute);
+                        }
+                    });
+                    ddk.dataset.broadcaster.deregisterListener(this);
+                    this._key2DatasetDrawerKey[key] = null;
                 }
                 return this;
             };
@@ -5208,6 +5208,7 @@ var Plottable;
                 this._isVertical = true;
                 this._baselineValue = 0;
                 this.stackedExtent = [];
+                this.keysInStackOrder = [];
             }
             StackedBar.prototype._onDataSourceUpdate = function () {
                 _super.prototype._onDataSourceUpdate.call(this);
@@ -5235,17 +5236,28 @@ var Plottable;
                 attrToProjector["y"] = function (d) { return getY(d); };
                 return attrToProjector;
             };
+            StackedBar.prototype._addDataset = function (key, dataset) {
+                this.keysInStackOrder.push(key);
+                return _super.prototype._addDataset.call(this, key, dataset);
+            };
+            StackedBar.prototype.removeDataset = function (key) {
+                this.keysInStackOrder.splice(this.keysInStackOrder.indexOf(key), 1);
+                return _super.prototype.removeDataset.call(this, key);
+            };
             StackedBar.prototype.getDrawer = function (key) {
                 return new Plottable.Drawer.RectDrawer(key);
             };
             StackedBar.prototype.stack = function (accessor) {
-                var lengths = this.datasets.map(function (d) { return d.dataset.data().length; });
+                var _this = this;
+                var datasets = d3.values(this._key2DatasetDrawerKey);
+                var lengths = datasets.map(function (d) { return d.dataset.data().length; });
                 if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
                 }
                 var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
-                var stacks = this.datasets.map(function (dnk) {
-                    var data = dnk.dataset.data();
+                var datasetsInStackOrder = this.keysInStackOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
+                var stacks = datasetsInStackOrder.map(function (dataset) {
+                    var data = dataset.data();
                     var base = currentBase.slice();
                     var vals = data.map(accessor);
                     if (vals.some(function (x) { return x < 0; })) {
@@ -5263,10 +5275,12 @@ var Plottable;
                 return stacks;
             };
             StackedBar.prototype._paint = function () {
+                var _this = this;
                 var accessor = this._projectors["y"].accessor;
                 var attrHash = this._generateAttrToProjector();
                 var stackedData = this.stack(accessor);
-                this.drawers.forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
+                var drawersInStackOrder = this.keysInStackOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
+                drawersInStackOrder.forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
             };
             return StackedBar;
         })(Plottable.Abstract.NewStyleBarPlot);

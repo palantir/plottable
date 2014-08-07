@@ -387,6 +387,7 @@ declare module Plottable {
         interface _IProjector {
             accessor: IAccessor;
             scale?: Scale;
+            attribute: string;
         }
         interface IAttributeToProjector {
             [attrToSet: string]: IAppliedAccessor;
@@ -428,18 +429,20 @@ declare module Plottable {
         dataset: DataSource;
         key: string;
     }
+    interface DatasetDrawerKey {
+        dataset: DataSource;
+        drawer: Plottable.Abstract.Drawer;
+        key: string;
+    }
     module Abstract {
         class NewStylePlot extends XYPlot {
-            drawers: Drawer.RectDrawer[];
-            datasets: DatasetAndKey[];
-            datasetKeySet: D3.Set;
             constructor(dataset: any, xScale?: Scale, yScale?: Scale);
             remove(): void;
             addDataset(key: string, dataset: DataSource): Plot;
             addDataset(key: string, dataset: any[]): Plot;
             addDataset(dataset: DataSource): Plot;
             addDataset(dataset: any[]): Plot;
-            getDrawer(key: string): Drawer.RectDrawer;
+            getDrawer(key: string): Drawer;
             updateProjector(attr: string): NewStylePlot;
             removeDataset(key: string): Plot;
         }
@@ -946,6 +949,7 @@ declare module Plottable {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
             constructor(dataset: any, xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
+            removeDataset(key: string): Plottable.Abstract.Plot;
             getDrawer(key: string): Drawer.RectDrawer;
             stack(accessor: IAccessor): any[][];
         }
