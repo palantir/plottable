@@ -24,17 +24,6 @@ export module Abstract {
       super(new Plottable.DataSource(), xScale, yScale);
     }
 
-    public keyOrder(): string[];
-    public keyOrder(order: string[]): NewStylePlot;
-    public keyOrder(order?: string[]): any {
-      if (order === undefined) {
-        return this._datasetKeysInOrder;
-      }
-      this._datasetKeysInOrder = order;
-      this._onDataSourceUpdate();
-      return this;
-    }
-
     public _setup() {
       super._setup();
       this._getDrawersInOrder().forEach((d) => d.renderArea = this.renderArea.append("g"));
@@ -99,6 +88,26 @@ export module Abstract {
           }
 
         });
+      }
+      return this;
+    }
+
+    public datasetOrder(): string[];
+    public datasetOrder(order: string[]): NewStylePlot;
+    public datasetOrder(order?: string[]): any {
+      if (order === undefined) {
+        return this._datasetKeysInOrder;
+      }
+      function isPermutation(l1: string[], l2: string[]) {
+        var intersection = Util.Methods.intersection(d3.set(l1), d3.set(l2));
+        var size = (<any> intersection).size(); // hackhack pending on borisyankov/definitelytyped/ pr #2653
+        return size === l1.length && size === l2.length;
+      }
+      if (isPermutation(order, this._datasetKeysInOrder)) {
+        this._datasetKeysInOrder = order;
+        this._onDataSourceUpdate();
+      } else {
+        Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
       }
       return this;
     }
