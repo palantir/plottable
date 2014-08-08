@@ -2931,7 +2931,7 @@ var Plottable;
                     this.classed("y-axis", true);
                 }
                 if (formatter == null) {
-                    formatter = Plottable.Formatters.general(3, false);
+                    formatter = Plottable.Formatters.identity();
                 }
                 this.formatter(formatter);
                 this._scale.broadcaster.registerListener(this, function () { return _this.rescale(); });
@@ -3487,6 +3487,9 @@ var Plottable;
                 this.tickLabelPositioning = "center";
                 this.showFirstTickLabel = false;
                 this.showLastTickLabel = false;
+                if (formatter == null) {
+                    this._formatter = Plottable.Formatters.general(3, false);
+                }
             }
             Numeric.prototype._computeWidth = function () {
                 var _this = this;

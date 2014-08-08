@@ -20,6 +20,9 @@ export module Axis {
      */
     constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: (d: any) => string) {
       super(scale, orientation, formatter);
+      if (formatter == null) {
+        this._formatter = Formatters.general(3, false);
+      }
     }
 
     public _computeWidth() {
