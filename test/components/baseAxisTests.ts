@@ -205,19 +205,20 @@ describe("BaseAxis", () => {
     var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
     var scale = new Plottable.Scale.Linear();
     var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+    baseAxis.showEndTickLabels(true);
     baseAxis.renderTo(svg);
 
-    var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength());
+    var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.gutter();
     assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
 
     baseAxis.tickLength(20);
-    assert.strictEqual(baseAxis.height(), 20, "height should increase to tick length");
+    assert.strictEqual(baseAxis.height(), 20 + baseAxis.gutter(), "height should increase to tick length");
 
     baseAxis.endTickLength(30);
-    assert.strictEqual(baseAxis.height(), 30, "height should increase to end tick length");
+    assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should increase to end tick length");
 
     baseAxis.tickLength(10);
-    assert.strictEqual(baseAxis.height(), 30, "height should not decrease");
+    assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
 
     svg.remove();
   });
