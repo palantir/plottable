@@ -1983,13 +1983,13 @@ var Plottable;
             Scale.prototype.copy = function () {
                 return new Scale(this._d3Scale.copy());
             };
-            Scale.prototype.updateExtent = function (rendererID, attr, extent) {
-                this._rendererAttrID2Extent[rendererID + attr] = extent;
+            Scale.prototype.updateExtent = function (plotProvidedKey, attr, extent) {
+                this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
                 this._autoDomainIfAutomaticMode();
                 return this;
             };
-            Scale.prototype.removeExtent = function (rendererID, attr) {
-                delete this._rendererAttrID2Extent[rendererID + attr];
+            Scale.prototype.removeExtent = function (plotProvidedKey, attr) {
+                delete this._rendererAttrID2Extent[plotProvidedKey + attr];
                 this._autoDomainIfAutomaticMode();
                 return this;
             };
@@ -2039,7 +2039,7 @@ var Plottable;
                 _super.prototype._anchor.call(this, element);
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
-                this.updateAllProjectors();
+                this._updateAllProjectors();
                 return this;
             };
             Plot.prototype.remove = function () {
@@ -2069,7 +2069,7 @@ var Plottable;
                 return this;
             };
             Plot.prototype._onDataSourceUpdate = function () {
-                this.updateAllProjectors();
+                this._updateAllProjectors();
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this._render();
@@ -2080,14 +2080,14 @@ var Plottable;
                 var currentProjection = this._projectors[attrToSet];
                 var existingScale = (currentProjection != null) ? currentProjection.scale : null;
                 if (existingScale != null) {
-                    existingScale.removeExtent(this._plottableID, attrToSet);
+                    existingScale.removeExtent(this._plottableID.toString(), attrToSet);
                     existingScale.broadcaster.deregisterListener(this);
                 }
                 if (scale != null) {
                     scale.broadcaster.registerListener(this, function () { return _this._render(); });
                 }
                 var activatedAccessor = Plottable.Util.Methods._applyAccessor(accessor, this);
-                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale };
+                this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
                 this.updateProjector(attrToSet);
                 this._render();
                 return this;
@@ -2125,10 +2125,10 @@ var Plottable;
             };
             Plot.prototype.detach = function () {
                 _super.prototype.detach.call(this);
-                this.updateAllProjectors();
+                this._updateAllProjectors();
                 return this;
             };
-            Plot.prototype.updateAllProjectors = function () {
+            Plot.prototype._updateAllProjectors = function () {
                 var _this = this;
                 d3.keys(this._projectors).forEach(function (attr) { return _this.updateProjector(attr); });
                 return this;
@@ -2138,10 +2138,10 @@ var Plottable;
                 if (projector.scale != null) {
                     var extent = this.dataSource()._getExtent(projector.accessor);
                     if (extent.length === 0 || !this._isAnchored) {
-                        projector.scale.removeExtent(this._plottableID, attr);
+                        projector.scale.removeExtent(this._plottableID.toString(), attr);
                     }
                     else {
-                        projector.scale.updateExtent(this._plottableID, attr, extent);
+                        projector.scale.updateExtent(this._plottableID.toString(), attr, extent);
                     }
                 }
                 return this;
@@ -2166,6 +2166,180 @@ var Plottable;
             return Plot;
         })(Abstract.Component);
         Abstract.Plot = Plot;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var XYPlot = (function (_super) {
+            __extends(XYPlot, _super);
+            function XYPlot(dataset, xScale, yScale) {
+                _super.call(this, dataset);
+                if (xScale == null || yScale == null) {
+                    throw new Error("XYPlots require an xScale and yScale");
+                }
+                this.classed("xy-plot", true);
+                this.project("x", "x", xScale);
+                this.project("y", "y", yScale);
+            }
+            XYPlot.prototype.project = function (attrToSet, accessor, scale) {
+                if (attrToSet === "x" && scale != null) {
+                    this.xScale = scale;
+                    this._updateXDomainer();
+                }
+                if (attrToSet === "y" && scale != null) {
+                    this.yScale = scale;
+                    this._updateYDomainer();
+                }
+                _super.prototype.project.call(this, attrToSet, accessor, scale);
+                return this;
+            };
+            XYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
+                this.xScale.range([0, this.availableWidth]);
+                this.yScale.range([this.availableHeight, 0]);
+                return this;
+            };
+            XYPlot.prototype._updateXDomainer = function () {
+                if (this.xScale instanceof Abstract.QuantitativeScale) {
+                    var scale = this.xScale;
+                    if (!scale._userSetDomainer) {
+                        scale.domainer().pad().nice();
+                    }
+                }
+                return this;
+            };
+            XYPlot.prototype._updateYDomainer = function () {
+                if (this.yScale instanceof Abstract.QuantitativeScale) {
+                    var scale = this.yScale;
+                    if (!scale._userSetDomainer) {
+                        scale.domainer().pad().nice();
+                    }
+                }
+                return this;
+            };
+            return XYPlot;
+        })(Abstract.Plot);
+        Abstract.XYPlot = XYPlot;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var NewStylePlot = (function (_super) {
+            __extends(NewStylePlot, _super);
+            function NewStylePlot(xScale, yScale) {
+                _super.call(this, new Plottable.DataSource(), xScale, yScale);
+                this.nextSeriesIndex = 0;
+                this._key2DatasetDrawerKey = {};
+                this._datasetKeysInOrder = [];
+            }
+            NewStylePlot.prototype._setup = function () {
+                var _this = this;
+                _super.prototype._setup.call(this);
+                this._getDrawersInOrder().forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
+                return this;
+            };
+            NewStylePlot.prototype.remove = function () {
+                var _this = this;
+                _super.prototype.remove.call(this);
+                var keys = d3.keys(this._key2DatasetDrawerKey);
+                keys.forEach(function (k) { return _this.removeDataset(k); });
+            };
+            NewStylePlot.prototype.addDataset = function (first, second) {
+                if (typeof (first) !== "string" && second !== undefined) {
+                    throw new Error("addDataset takes string keys");
+                }
+                if (typeof (first) === "string" && first[0] === "_") {
+                    Plottable.Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
+                }
+                var key = typeof (first) === "string" ? first : "_" + this.nextSeriesIndex++;
+                var data = typeof (first) !== "string" ? first : second;
+                var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
+                this._addDataset(key, dataset);
+                return this;
+            };
+            NewStylePlot.prototype._addDataset = function (key, dataset) {
+                var _this = this;
+                if (this._key2DatasetDrawerKey[key] != null) {
+                    this.removeDataset(key);
+                }
+                ;
+                var drawer = this.getDrawer(key);
+                var ddk = { drawer: drawer, dataset: dataset, key: key };
+                this._datasetKeysInOrder.push(key);
+                this._key2DatasetDrawerKey[key] = ddk;
+                if (this._isSetup) {
+                    drawer.renderArea = this.renderArea.append("g");
+                }
+                dataset.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
+                this._onDataSourceUpdate();
+            };
+            NewStylePlot.prototype.getDrawer = function (key) {
+                throw new Error("Abstract Method Not Implemented");
+            };
+            NewStylePlot.prototype.updateProjector = function (attr) {
+                var _this = this;
+                var projector = this._projectors[attr];
+                if (projector.scale != null) {
+                    d3.values(this._key2DatasetDrawerKey).forEach(function (ddk) {
+                        var extent = ddk.dataset._getExtent(projector.accessor);
+                        var scaleKey = _this._plottableID.toString() + "_" + ddk.key;
+                        if (extent.length === 0 || !_this._isAnchored) {
+                            projector.scale.removeExtent(scaleKey, attr);
+                        }
+                        else {
+                            projector.scale.updateExtent(scaleKey, attr, extent);
+                        }
+                    });
+                }
+                return this;
+            };
+            NewStylePlot.prototype.removeDataset = function (key) {
+                if (this._key2DatasetDrawerKey[key] != null) {
+                    var ddk = this._key2DatasetDrawerKey[key];
+                    ddk.drawer.remove();
+                    var projectors = d3.values(this._projectors);
+                    var scaleKey = this._plottableID.toString() + "_" + key;
+                    projectors.forEach(function (p) {
+                        if (p.scale !== undefined) {
+                            p.scale.removeExtent(scaleKey, p.attribute);
+                        }
+                    });
+                    ddk.dataset.broadcaster.deregisterListener(this);
+                    this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
+                    delete this._key2DatasetDrawerKey[key];
+                    this._onDataSourceUpdate();
+                }
+                return this;
+            };
+            NewStylePlot.prototype._getDatasetsInOrder = function () {
+                var _this = this;
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
+            };
+            NewStylePlot.prototype._getDrawersInOrder = function () {
+                var _this = this;
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
+            };
+            return NewStylePlot;
+        })(Abstract.XYPlot);
+        Abstract.NewStylePlot = NewStylePlot;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
@@ -3076,6 +3250,56 @@ var Plottable;
     var Util = Plottable.Util;
 })(Plottable || (Plottable = {}));
 
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var Drawer = (function () {
+            function Drawer(key) {
+                this.key = key;
+            }
+            Drawer.prototype.remove = function () {
+                if (this.renderArea != null) {
+                    this.renderArea.remove();
+                }
+            };
+            Drawer.prototype.draw = function (data, attrHash) {
+                throw new Error("Abstract Method Not Implemented");
+            };
+            return Drawer;
+        })();
+        Abstract.Drawer = Drawer;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Drawer) {
+        var RectDrawer = (function (_super) {
+            __extends(RectDrawer, _super);
+            function RectDrawer() {
+                _super.apply(this, arguments);
+            }
+            RectDrawer.prototype.draw = function (data, attrHash) {
+                var svgElement = "rect";
+                var dataElements = this.renderArea.selectAll(svgElement).data(data);
+                dataElements.enter().append(svgElement);
+                dataElements.attr(attrHash);
+                dataElements.exit().remove();
+            };
+            return RectDrawer;
+        })(Plottable.Abstract.Drawer);
+        Drawer.RectDrawer = RectDrawer;
+    })(Plottable.Drawer || (Plottable.Drawer = {}));
+    var Drawer = Plottable.Drawer;
+})(Plottable || (Plottable = {}));
+
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -3113,7 +3337,7 @@ var Plottable;
                     formatter.showOnlyUnchangedValues(false);
                 }
                 this.formatter(formatter);
-                this._scale.broadcaster.registerListener(this, function () { return _this.rescale(); });
+                this._scale.broadcaster.registerListener(this, function () { return _this._render(); });
             }
             Axis.prototype.remove = function () {
                 _super.prototype.remove.call(this);
@@ -3254,9 +3478,6 @@ var Plottable;
                         break;
                 }
                 return tickMarkAttrHash;
-            };
-            Axis.prototype.rescale = function () {
-                return (this.element != null) ? this._render() : null;
             };
             Axis.prototype._invalidateLayout = function () {
                 _super.prototype._invalidateLayout.call(this);
@@ -4391,69 +4612,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Abstract) {
-        var XYPlot = (function (_super) {
-            __extends(XYPlot, _super);
-            function XYPlot(dataset, xScale, yScale) {
-                _super.call(this, dataset);
-                if (xScale == null || yScale == null) {
-                    throw new Error("XYPlots require an xScale and yScale");
-                }
-                this.classed("xy-plot", true);
-                this.project("x", "x", xScale);
-                this.project("y", "y", yScale);
-            }
-            XYPlot.prototype.project = function (attrToSet, accessor, scale) {
-                if (attrToSet === "x" && scale != null) {
-                    this.xScale = scale;
-                    this._updateXDomainer();
-                }
-                if (attrToSet === "y" && scale != null) {
-                    this.yScale = scale;
-                    this._updateYDomainer();
-                }
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                return this;
-            };
-            XYPlot.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.xScale.range([0, this.availableWidth]);
-                this.yScale.range([this.availableHeight, 0]);
-                return this;
-            };
-            XYPlot.prototype._updateXDomainer = function () {
-                if (this.xScale instanceof Abstract.QuantitativeScale) {
-                    var scale = this.xScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
-                    }
-                }
-                return this;
-            };
-            XYPlot.prototype._updateYDomainer = function () {
-                if (this.yScale instanceof Abstract.QuantitativeScale) {
-                    var scale = this.yScale;
-                    if (!scale._userSetDomainer) {
-                        scale.domainer().pad().nice();
-                    }
-                }
-                return this;
-            };
-            return XYPlot;
-        })(Abstract.Plot);
-        Abstract.XYPlot = XYPlot;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
     (function (Plot) {
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
@@ -4921,6 +5079,228 @@ var Plottable;
             return Area;
         })(Plot.Line);
         Plot.Area = Area;
+    })(Plottable.Plot || (Plottable.Plot = {}));
+    var Plot = Plottable.Plot;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Abstract) {
+        var NewStyleBarPlot = (function (_super) {
+            __extends(NewStyleBarPlot, _super);
+            function NewStyleBarPlot(xScale, yScale) {
+                _super.call(this, xScale, yScale);
+                this._baselineValue = 0;
+                this._barAlignmentFactor = 0;
+                this._animators = {
+                    "bars-reset": new Plottable.Animator.Null(),
+                    "bars": new Plottable.Animator.IterativeDelay(),
+                    "baseline": new Plottable.Animator.Null()
+                };
+                this.classed("bar-plot", true);
+                this.project("fill", function () { return "steelblue"; });
+                this.baseline(this._baselineValue);
+            }
+            NewStyleBarPlot.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._baseline = this.renderArea.append("line").classed("baseline", true);
+                return this;
+            };
+            NewStyleBarPlot.prototype._paint = function () {
+                _super.prototype._paint.call(this);
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var baselineAttr = {
+                    "x1": this._isVertical ? 0 : scaledBaseline,
+                    "y1": this._isVertical ? scaledBaseline : 0,
+                    "x2": this._isVertical ? this.availableWidth : scaledBaseline,
+                    "y2": this._isVertical ? scaledBaseline : this.availableHeight
+                };
+                this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
+            };
+            NewStyleBarPlot.prototype.baseline = function (value) {
+                this._baselineValue = value;
+                this._updateXDomainer();
+                this._updateYDomainer();
+                this._render();
+                return this;
+            };
+            NewStyleBarPlot.prototype.barAlignment = function (alignment) {
+                var alignmentLC = alignment.toLowerCase();
+                var align2factor = this.constructor._BarAlignmentToFactor;
+                if (align2factor[alignmentLC] === undefined) {
+                    throw new Error("unsupported bar alignment");
+                }
+                this._barAlignmentFactor = align2factor[alignmentLC];
+                this._render();
+                return this;
+            };
+            NewStyleBarPlot.prototype.parseExtent = function (input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                }
+                else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                }
+                else {
+                    throw new Error("input '" + input + "' can't be parsed as an IExtent");
+                }
+            };
+            NewStyleBarPlot.prototype._updateDomainer = function (scale) {
+                if (scale instanceof Abstract.QuantitativeScale) {
+                    var qscale = scale;
+                    if (!qscale._userSetDomainer) {
+                        if (this._baselineValue != null) {
+                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
+                        }
+                        else {
+                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
+                        }
+                    }
+                    qscale._autoDomainIfAutomaticMode();
+                }
+                return this;
+            };
+            NewStyleBarPlot.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var secondaryScale = this._isVertical ? this.xScale : this.yScale;
+                var primaryAttr = this._isVertical ? "y" : "x";
+                var secondaryAttr = this._isVertical ? "x" : "y";
+                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
+                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                if (attrToProjector["width"] == null) {
+                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : NewStyleBarPlot.DEFAULT_WIDTH;
+                    attrToProjector["width"] = function (d, i) { return constantWidth; };
+                }
+                var positionF = attrToProjector[secondaryAttr];
+                var widthF = attrToProjector["width"];
+                if (!bandsMode) {
+                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor; };
+                }
+                else {
+                    var bandWidth = secondaryScale.rangeBand();
+                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2; };
+                }
+                var originalPositionFn = attrToProjector[primaryAttr];
+                attrToProjector[primaryAttr] = function (d, i) {
+                    var originalPos = originalPositionFn(d, i);
+                    return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
+                };
+                attrToProjector["height"] = function (d, i) {
+                    return Math.abs(scaledBaseline - originalPositionFn(d, i));
+                };
+                return attrToProjector;
+            };
+            NewStyleBarPlot.prototype._updateYDomainer = function () {
+                if (this._isVertical) {
+                    this._updateDomainer(this.yScale);
+                }
+                else {
+                    _super.prototype._updateYDomainer.call(this);
+                }
+                return this;
+            };
+            NewStyleBarPlot.prototype._updateXDomainer = function () {
+                if (!this._isVertical) {
+                    this._updateDomainer(this.xScale);
+                }
+                else {
+                    _super.prototype._updateXDomainer.call(this);
+                }
+                return this;
+            };
+            NewStyleBarPlot.DEFAULT_WIDTH = 10;
+            NewStyleBarPlot._BarAlignmentToFactor = {};
+            return NewStyleBarPlot;
+        })(Abstract.NewStylePlot);
+        Abstract.NewStyleBarPlot = NewStyleBarPlot;
+    })(Plottable.Abstract || (Plottable.Abstract = {}));
+    var Abstract = Plottable.Abstract;
+})(Plottable || (Plottable = {}));
+
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    (function (Plot) {
+        var ClusteredBar = (function (_super) {
+            __extends(ClusteredBar, _super);
+            function ClusteredBar(xScale, yScale) {
+                _super.call(this, xScale, yScale);
+                this._isVertical = true;
+                this.innerScale = new Plottable.Scale.Ordinal();
+            }
+            ClusteredBar.prototype.clusterOrder = function (order) {
+                if (order === undefined) {
+                    return this._datasetKeysInOrder;
+                }
+                this._datasetKeysInOrder = order;
+                this._onDataSourceUpdate();
+                return this;
+            };
+            ClusteredBar.prototype.cluster = function (accessor) {
+                var _this = this;
+                this.innerScale.domain(this._datasetKeysInOrder);
+                this.colorScale.domain(this._datasetKeysInOrder);
+                var lengths = this._datasetKeysInOrder.map(function (e) { return _this._key2DatasetDrawerKey[e].dataset.data().length; });
+                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
+                    Plottable.Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
+                }
+                var clusters = {};
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var data = _this._key2DatasetDrawerKey[key].dataset.data();
+                    var vals = data.map(function (d) { return accessor(d); });
+                    clusters[key] = data.map(function (d, i) {
+                        d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(vals[i]) + _this.innerScale.scale(key);
+                        d["_PLOTTABLE_PROTECTED_FIELD_FILL"] = _this.colorScale.scale(key);
+                        return d;
+                    });
+                });
+                return clusters;
+            };
+            ClusteredBar.prototype._paint = function () {
+                var _this = this;
+                _super.prototype._paint.call(this);
+                var accessor = this._projectors["x"].accessor;
+                var attrHash = this._generateAttrToProjector();
+                var clusteredData = this.cluster(accessor);
+                this._datasetKeysInOrder.forEach(function (key) { return _this._key2DatasetDrawerKey[key].drawer.draw(clusteredData[key], attrHash); });
+            };
+            ClusteredBar.prototype.getDrawer = function (key) {
+                return new Plottable.Drawer.RectDrawer(key);
+            };
+            ClusteredBar.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var widthF = attrToProjector["width"];
+                this.innerScale.range([0, widthF(null, 0)]);
+                attrToProjector["width"] = function (d, i) { return _this.innerScale.rangeBand(); };
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var getFill = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_FILL; };
+                var getX = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_X; };
+                attrToProjector["fill"] = getFill;
+                attrToProjector["x"] = getX;
+                return attrToProjector;
+            };
+            ClusteredBar.prototype.setColor = function (scale) {
+                this.colorScale = scale;
+            };
+            ClusteredBar.DEFAULT_WIDTH = 10;
+            return ClusteredBar;
+        })(Plottable.Abstract.NewStyleBarPlot);
+        Plot.ClusteredBar = ClusteredBar;
     })(Plottable.Plot || (Plottable.Plot = {}));
     var Plot = Plottable.Plot;
 })(Plottable || (Plottable = {}));

@@ -5,6 +5,7 @@ export module Abstract {
   export interface _IProjector {
     accessor: IAccessor;
     scale?: Abstract.Scale;
+    attribute: string;
   }
 
   export interface IAttributeToProjector {
@@ -23,7 +24,7 @@ export module Abstract {
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
-    private animateOnNextRender = true;
+    public animateOnNextRender = true;
 
     /**
      * Creates a Plot.
@@ -56,7 +57,7 @@ export module Abstract {
       super._anchor(element);
       this.animateOnNextRender = true;
       this._dataChanged = true;
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       return this;
     }
 
@@ -101,7 +102,7 @@ export module Abstract {
     }
 
     public _onDataSourceUpdate() {
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       this.animateOnNextRender = true;
       this._dataChanged = true;
       this._render();
@@ -113,7 +114,7 @@ export module Abstract {
       var existingScale = (currentProjection != null) ? currentProjection.scale : null;
 
       if (existingScale != null) {
-        existingScale.removeExtent(this._plottableID, attrToSet);
+        existingScale.removeExtent(this._plottableID.toString(), attrToSet);
         existingScale.broadcaster.deregisterListener(this);
       }
 
@@ -121,7 +122,7 @@ export module Abstract {
         scale.broadcaster.registerListener(this, () => this._render());
       }
       var activatedAccessor = Util.Methods._applyAccessor(accessor, this);
-      this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale};
+      this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
       this.updateProjector(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
@@ -171,7 +172,7 @@ export module Abstract {
     public detach() {
       super.detach();
       // make the domain resize
-      this.updateAllProjectors();
+      this._updateAllProjectors();
       return this;
     }
 
@@ -179,19 +180,19 @@ export module Abstract {
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
      */
-    private updateAllProjectors(): Plot {
+    public _updateAllProjectors(): Plot {
       d3.keys(this._projectors).forEach((attr: string) => this.updateProjector(attr));
       return this;
     }
 
-    private updateProjector(attr: string) {
+    public updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);
         if (extent.length === 0 || !this._isAnchored) {
-          projector.scale.removeExtent(this._plottableID, attr);
+          projector.scale.removeExtent(this._plottableID.toString(), attr);
         } else {
-          projector.scale.updateExtent(this._plottableID, attr, extent);
+          projector.scale.updateExtent(this._plottableID.toString(), attr, extent);
         }
       }
       return this;

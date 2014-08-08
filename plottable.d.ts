@@ -375,8 +375,8 @@ declare module Plottable {
             range(): any[];
             range(values: any[]): Scale;
             copy(): Scale;
-            updateExtent(rendererID: number, attr: string, extent: any[]): Scale;
-            removeExtent(rendererID: number, attr: string): Scale;
+            updateExtent(plotProvidedKey: string, attr: string, extent: any[]): Scale;
+            removeExtent(plotProvidedKey: string, attr: string): Scale;
         }
     }
 }
@@ -387,6 +387,7 @@ declare module Plottable {
         interface _IProjector {
             accessor: IAccessor;
             scale?: Scale;
+            attribute: string;
         }
         interface IAttributeToProjector {
             [attrToSet: string]: IAppliedAccessor;
@@ -394,6 +395,7 @@ declare module Plottable {
         class Plot extends Component {
             renderArea: D3.Selection;
             element: D3.Selection;
+            animateOnNextRender: boolean;
             constructor();
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
@@ -403,8 +405,43 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;
+            updateProjector(attr: string): Plot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class XYPlot extends Plot {
+            xScale: Scale;
+            yScale: Scale;
+            constructor(dataset: any, xScale: Scale, yScale: Scale);
+            project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    interface DatasetDrawerKey {
+        dataset: DataSource;
+        drawer: Plottable.Abstract.Drawer;
+        key: string;
+    }
+    module Abstract {
+        class NewStylePlot extends XYPlot {
+            constructor(xScale?: Scale, yScale?: Scale);
+            remove(): void;
+            addDataset(key: string, dataset: DataSource): Plot;
+            addDataset(key: string, dataset: any[]): Plot;
+            addDataset(dataset: DataSource): Plot;
+            addDataset(dataset: any[]): Plot;
+            getDrawer(key: string): Drawer;
+            updateProjector(attr: string): NewStylePlot;
+            removeDataset(key: string): Plot;
         }
     }
 }
@@ -657,6 +694,28 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
+        class Drawer {
+            key: string;
+            renderArea: D3.Selection;
+            constructor(key: string);
+            remove(): void;
+            draw(data: any[][], attrHash: any): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Drawer {
+        class RectDrawer extends Plottable.Abstract.Drawer {
+            draw(data: any[][], attrHash: any): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
         class Axis extends Component {
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
@@ -787,18 +846,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class XYPlot extends Plot {
-            xScale: Scale;
-            yScale: Scale;
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
-            project(attrToSet: string, accessor: any, scale?: Scale): XYPlot;
-        }
-    }
-}
-
-
-declare module Plottable {
     module Plot {
         class Scatter extends Plottable.Abstract.XYPlot {
             constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
@@ -879,6 +926,39 @@ declare module Plottable {
         class Area extends Line {
             constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.Scale);
             project(attrToSet: string, accessor: any, scale?: Plottable.Abstract.Scale): Area;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class NewStyleBarPlot extends NewStylePlot {
+            static DEFAULT_WIDTH: number;
+            static _BarAlignmentToFactor: {
+                [x: string]: number;
+            };
+            constructor(xScale: Scale, yScale: Scale);
+            baseline(value: number): NewStyleBarPlot;
+            barAlignment(alignment: string): NewStyleBarPlot;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plot {
+        class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
+            static DEFAULT_WIDTH: number;
+            colorScale: Plottable.Scale.Color;
+            constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+            clusterOrder(): string[];
+            clusterOrder(order: string[]): ClusteredBar;
+            cluster(accessor: IAccessor): {
+                [x: string]: any[];
+            };
+            getDrawer(key: string): Drawer.RectDrawer;
+            setColor(scale: Plottable.Scale.Color): void;
         }
     }
 }
