@@ -360,7 +360,7 @@ export module Abstract {
     }
 
     public _maxTickLength() {
-      return Math.max(this.tickLength(), this._endTickLength);
+      return Math.max(this.tickLength(), this.endTickLength());
     }
 
     public _maxLabelTickLength() {

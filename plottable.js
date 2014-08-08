@@ -3337,7 +3337,7 @@ var Plottable;
                 }
             };
             Axis.prototype._maxTickLength = function () {
-                return Math.max(this.tickLength(), this._endTickLength);
+                return Math.max(this.tickLength(), this.endTickLength());
             };
             Axis.prototype._maxLabelTickLength = function () {
                 if (this.showEndTickLabels()) {
