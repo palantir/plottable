@@ -2250,14 +2250,6 @@ var Plottable;
                 this._key2DatasetDrawerKey = {};
                 this._datasetKeysInOrder = [];
             }
-            NewStylePlot.prototype.keyOrder = function (order) {
-                if (order === undefined) {
-                    return this._datasetKeysInOrder;
-                }
-                this._datasetKeysInOrder = order;
-                this._onDataSourceUpdate();
-                return this;
-            };
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
@@ -2316,6 +2308,24 @@ var Plottable;
                             projector.scale.updateExtent(scaleKey, attr, extent);
                         }
                     });
+                }
+                return this;
+            };
+            NewStylePlot.prototype.datasetOrder = function (order) {
+                if (order === undefined) {
+                    return this._datasetKeysInOrder;
+                }
+                function isPermutation(l1, l2) {
+                    var intersection = Plottable.Util.Methods.intersection(d3.set(l1), d3.set(l2));
+                    var size = intersection.size();
+                    return size === l1.length && size === l2.length;
+                }
+                if (isPermutation(order, this._datasetKeysInOrder)) {
+                    this._datasetKeysInOrder = order;
+                    this._onDataSourceUpdate();
+                }
+                else {
+                    Plottable.Util.Methods.warn("Attempted to change datasetOrder, but new order is not permutation of old. Ignoring.");
                 }
                 return this;
             };

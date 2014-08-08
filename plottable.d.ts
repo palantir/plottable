@@ -434,8 +434,6 @@ declare module Plottable {
     module Abstract {
         class NewStylePlot extends XYPlot {
             constructor(xScale?: Scale, yScale?: Scale);
-            keyOrder(): string[];
-            keyOrder(order: string[]): NewStylePlot;
             remove(): void;
             addDataset(key: string, dataset: DataSource): Plot;
             addDataset(key: string, dataset: any[]): Plot;
@@ -443,6 +441,8 @@ declare module Plottable {
             addDataset(dataset: any[]): Plot;
             getDrawer(key: string): Drawer;
             updateProjector(attr: string): NewStylePlot;
+            datasetOrder(): string[];
+            datasetOrder(order: string[]): NewStylePlot;
             removeDataset(key: string): Plot;
         }
     }
