@@ -434,6 +434,8 @@ declare module Plottable {
     module Abstract {
         class NewStylePlot extends XYPlot {
             constructor(xScale?: Scale, yScale?: Scale);
+            keyOrder(): string[];
+            keyOrder(order: string[]): NewStylePlot;
             remove(): void;
             addDataset(key: string, dataset: DataSource): Plot;
             addDataset(key: string, dataset: any[]): Plot;
@@ -953,8 +955,6 @@ declare module Plottable {
             static DEFAULT_WIDTH: number;
             colorScale: Plottable.Scale.Color;
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
-            clusterOrder(): string[];
-            clusterOrder(order: string[]): ClusteredBar;
             cluster(accessor: IAccessor): {
                 [x: string]: any[];
             };

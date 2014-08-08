@@ -2250,6 +2250,14 @@ var Plottable;
                 this._key2DatasetDrawerKey = {};
                 this._datasetKeysInOrder = [];
             }
+            NewStylePlot.prototype.keyOrder = function (order) {
+                if (order === undefined) {
+                    return this._datasetKeysInOrder;
+                }
+                this._datasetKeysInOrder = order;
+                this._onDataSourceUpdate();
+                return this;
+            };
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
@@ -5242,14 +5250,6 @@ var Plottable;
                 this._isVertical = true;
                 this.innerScale = new Plottable.Scale.Ordinal();
             }
-            ClusteredBar.prototype.clusterOrder = function (order) {
-                if (order === undefined) {
-                    return this._datasetKeysInOrder;
-                }
-                this._datasetKeysInOrder = order;
-                this._onDataSourceUpdate();
-                return this;
-            };
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
@@ -5271,12 +5271,11 @@ var Plottable;
                 return clusters;
             };
             ClusteredBar.prototype._paint = function () {
-                var _this = this;
                 _super.prototype._paint.call(this);
                 var accessor = this._projectors["x"].accessor;
                 var attrHash = this._generateAttrToProjector();
                 var clusteredData = this.cluster(accessor);
-                this._datasetKeysInOrder.forEach(function (key) { return _this._key2DatasetDrawerKey[key].drawer.draw(clusteredData[key], attrHash); });
+                this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], attrHash); });
             };
             ClusteredBar.prototype.getDrawer = function (key) {
                 return new Plottable.Drawer.RectDrawer(key);

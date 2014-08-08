@@ -24,6 +24,17 @@ export module Abstract {
       super(new Plottable.DataSource(), xScale, yScale);
     }
 
+    public keyOrder(): string[];
+    public keyOrder(order: string[]): NewStylePlot;
+    public keyOrder(order?: string[]): any {
+      if (order === undefined) {
+        return this._datasetKeysInOrder;
+      }
+      this._datasetKeysInOrder = order;
+      this._onDataSourceUpdate();
+      return this;
+    }
+
     public _setup() {
       super._setup();
       this._getDrawersInOrder().forEach((d) => d.renderArea = this.renderArea.append("g"));

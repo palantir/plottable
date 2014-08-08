@@ -13,17 +13,6 @@ export module Plot {
       this.innerScale = new Scale.Ordinal();
     }
 
-    public clusterOrder(): string[];
-    public clusterOrder(order: string[]): ClusteredBar;
-    public clusterOrder(order?: string[]): any {
-      if (order === undefined) {
-        return this._datasetKeysInOrder;
-      }
-      this._datasetKeysInOrder = order;
-      this._onDataSourceUpdate();
-      return this;
-    }
-
     public cluster(accessor: IAccessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
       this.colorScale.domain(this._datasetKeysInOrder);
@@ -51,7 +40,7 @@ export module Plot {
       var accessor = this._projectors["x"].accessor;
       var attrHash = this._generateAttrToProjector();
       var clusteredData = this.cluster(accessor);
-      this._datasetKeysInOrder.forEach((key: string) => this._key2DatasetDrawerKey[key].drawer.draw(clusteredData[key], attrHash));
+      this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], attrHash));
     }
 
     public getDrawer(key: string) {
