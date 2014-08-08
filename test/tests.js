@@ -1639,6 +1639,7 @@ describe("Plots", function () {
                 var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
                 axisWidth = yAxis.availableWidth;
                 bandWidth = yScale.rangeBand();
+                xScale.domainer(xScale.domainer().pad(0));
             });
             beforeEach(function () {
                 verifier.start();
@@ -2881,6 +2882,14 @@ describe("Domainer", function () {
         domainer.pad(0.1);
         var domain = domainer.computeDomain([[0, 100]], scale);
         assert.deepEqual(domain, [-5, 105]);
+    });
+    it("pad() works with scales that have 0-size domain", function () {
+        scale.domain([5, 5]);
+        var domain = domainer.computeDomain([[0, 100]], scale);
+        assert.deepEqual(domain, [0, 100]);
+        domainer.pad(0.1);
+        domain = domainer.computeDomain([[0, 100]], scale);
+        assert.deepEqual(domain, [0, 100]);
     });
     it("paddingException(n) will not pad beyond n", function () {
         domainer.pad(0.1).addPaddingException(0, "key").addPaddingException(200);

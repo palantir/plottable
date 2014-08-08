@@ -2412,6 +2412,9 @@ var Plottable;
                     return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
                 }
             }
+            if (scale.domain()[0] === scale.domain()[1]) {
+                return domain;
+            }
             var p = this.padProportion / 2;
             var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
             var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
@@ -4672,6 +4675,7 @@ var Plottable;
                         else {
                             qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
                         }
+                        qscale.domainer().pad();
                     }
                     qscale._autoDomainIfAutomaticMode();
                 }

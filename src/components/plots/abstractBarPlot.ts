@@ -200,6 +200,7 @@ export module Abstract {
               .removePaddingException("BAR_PLOT+" + this._plottableID)
               .removeIncludedValue("BAR_PLOT+" + this._plottableID);
           }
+          qscale.domainer().pad();
         }
             // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         qscale._autoDomainIfAutomaticMode();
