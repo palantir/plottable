@@ -1308,7 +1308,7 @@ describe("Plots", function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
-            p.getDrawer = function (k) { return new Plottable.Drawer.RectDrawer(k); };
+            p.getDrawer = function (k) { return new Plottable.Drawer.Rect(k); };
         });
         it("Datasets can be added and removed as expected", function () {
             p.addDataset("foo", [1, 2, 3]);

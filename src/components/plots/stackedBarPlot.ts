@@ -39,7 +39,7 @@ export module Plot {
     }
 
     public getDrawer(key: string) {
-      return new Drawer.RectDrawer(key);
+      return new Drawer.Rect(key);
     }
 
     private stack(accessor: IAccessor) {

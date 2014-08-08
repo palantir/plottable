@@ -3298,21 +3298,21 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Drawer) {
-        var RectDrawer = (function (_super) {
-            __extends(RectDrawer, _super);
-            function RectDrawer() {
+        var Rect = (function (_super) {
+            __extends(Rect, _super);
+            function Rect() {
                 _super.apply(this, arguments);
             }
-            RectDrawer.prototype.draw = function (data, attrHash) {
+            Rect.prototype.draw = function (data, attrHash) {
                 var svgElement = "rect";
                 var dataElements = this.renderArea.selectAll(svgElement).data(data);
                 dataElements.enter().append(svgElement);
                 dataElements.attr(attrHash);
                 dataElements.exit().remove();
             };
-            return RectDrawer;
+            return Rect;
         })(Plottable.Abstract.Drawer);
-        Drawer.RectDrawer = RectDrawer;
+        Drawer.Rect = Rect;
     })(Plottable.Drawer || (Plottable.Drawer = {}));
     var Drawer = Plottable.Drawer;
 })(Plottable || (Plottable = {}));
@@ -5252,7 +5252,7 @@ var Plottable;
                 return attrToProjector;
             };
             ClusteredBar.prototype.getDrawer = function (key) {
-                return new Plottable.Drawer.RectDrawer(key);
+                return new Plottable.Drawer.Rect(key);
             };
             ClusteredBar.prototype.setColor = function (scale) {
                 this.colorScale = scale;
@@ -5334,7 +5334,7 @@ var Plottable;
                 return attrToProjector;
             };
             StackedBar.prototype.getDrawer = function (key) {
-                return new Plottable.Drawer.RectDrawer(key);
+                return new Plottable.Drawer.Rect(key);
             };
             StackedBar.prototype.stack = function (accessor) {
                 var _this = this;

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Drawer {
-  export class RectDrawer extends Abstract.Drawer {
+  export class Rect extends Abstract.Drawer {
 
     public draw(data: any[][], attrHash: any) {
       var svgElement = "rect";

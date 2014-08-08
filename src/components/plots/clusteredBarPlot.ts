@@ -30,14 +30,14 @@ export module Plot {
     }
 
     public getDrawer(key: string) {
-      return new Drawer.RectDrawer(key);
+      return new Drawer.Rect(key);
     }
 
     /**
      * TODO: remove this method once accessor can also take in series keys
      * Sets the colorScale, sets colors based on the seriesKey
      * 
-     * @param {scale} The color scale to set
+     * @param {Scale.Color} scale The color scale to set
      */
     public setColor(scale: Scale.Color) {
       this.colorScale = scale;

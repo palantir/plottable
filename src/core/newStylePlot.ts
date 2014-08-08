@@ -14,10 +14,11 @@ export module Abstract {
     public _datasetKeysInOrder: string[] = [];
 
     /**
-     * Creates a Plot.
+     * Creates a NewStylePlot.
      *
      * @constructor
-     * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Plot.
+     * @param [Scale] xScale The x scale to use
+     * @param [Scale] yScale The y scale to use
      */
     constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
       // make a dummy dataSource to satisfy the base Plot (hackhack)
@@ -38,9 +39,9 @@ export module Abstract {
     /**
      * Adds a dataset to this plot. Optionally identify this dataset with a key.
      *
-     * @param [key] The key of the dataset.
-     * @param {dataset} The dataset to add.
-     * @return {Plot} The calling Plot. 
+     * @param [string] key The key of the dataset.
+     * @param {any[]|DataSource} dataset dataset to add.
+     * @return {NewStylePlot} The calling NewStylePlot. 
      */
     public addDataset(key: string, dataset: DataSource): Plot;
     public addDataset(key: string, dataset: any[]): Plot;
@@ -80,7 +81,7 @@ export module Abstract {
     /**
      * Gets a drawer by key.
      * 
-     * @param {key} The key to use.
+     * @param {string} key The key to use.
      */
     public getDrawer(key: string): Abstract.Drawer {
       throw new Error("Abstract Method Not Implemented");
@@ -112,7 +113,7 @@ export module Abstract {
     /**
      * Sets the dataset order by key
      *
-     * @param {order} A string array which represents the order of the keys. This must be a permutation of existing keys.
+     * @param {string[]} order A string array which represents the order of the keys. This must be a permutation of existing keys.
      */
     public datasetOrder(order: string[]): NewStylePlot;
     public datasetOrder(order?: string[]): any {
@@ -136,8 +137,8 @@ export module Abstract {
     /**
      * Removes a dataset
      *
-     * @param {key} The key of the dataset
-     * @return {Plot} The calling Plot.
+     * @param {string} key The key of the dataset
+     * @return {NewStylePlot} The calling NewStylePlot.
      */
     public removeDataset(key: string): Plot {
       if (this._key2DatasetDrawerKey[key] != null) {

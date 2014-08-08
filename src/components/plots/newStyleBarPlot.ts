@@ -17,10 +17,9 @@ export module Abstract {
     };
 
     /**
-     * Creates an AbstractBarPlot.
+     * Creates an NewStyleBarPlot.
      *
      * @constructor
-     * @param {IDataset} dataset The dataset to render.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
@@ -58,7 +57,7 @@ export module Abstract {
      * Sets the baseline for the bars to the specified value.
      *
      * @param {number} value The value to position the baseline at.
-     * @return {AbstractBarPlot} The calling AbstractBarPlot.
+     * @return {NewStyleBarPlot} The calling NewStyleBarPlot.
      */
     public baseline(value: number) {
       this._baselineValue = value;

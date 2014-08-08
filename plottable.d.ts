@@ -709,7 +709,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawer {
-        class RectDrawer extends Plottable.Abstract.Drawer {
+        class Rect extends Plottable.Abstract.Drawer {
             draw(data: any[][], attrHash: any): void;
         }
     }
@@ -954,7 +954,7 @@ declare module Plottable {
             static DEFAULT_WIDTH: number;
             colorScale: Plottable.Scale.Color;
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
-            getDrawer(key: string): Drawer.RectDrawer;
+            getDrawer(key: string): Drawer.Rect;
             setColor(scale: Plottable.Scale.Color): ClusteredBar;
         }
     }
@@ -966,7 +966,7 @@ declare module Plottable {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
             constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
-            getDrawer(key: string): Drawer.RectDrawer;
+            getDrawer(key: string): Drawer.Rect;
         }
     }
 }

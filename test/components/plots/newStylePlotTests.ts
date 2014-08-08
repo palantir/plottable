@@ -9,7 +9,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
-      p.getDrawer = (k: string) => new Plottable.Drawer.RectDrawer(k);
+      p.getDrawer = (k: string) => new Plottable.Drawer.Rect(k);
     });
 
     it("Datasets can be added and removed as expected", () => {
