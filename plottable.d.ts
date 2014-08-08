@@ -949,21 +949,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
-<<<<<<< HEAD
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
             colorScale: Plottable.Scale.Color;
-            constructor(dataset: any, xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
+            constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
             clusterOrder(): string[];
             clusterOrder(order: string[]): ClusteredBar;
             cluster(accessor: IAccessor): {
                 [x: string]: any[];
             };
-=======
-        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
-            stackedData: any[][];
-            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
->>>>>>> stacked-bars-simpler
             getDrawer(key: string): Drawer.RectDrawer;
             setColor(scale: Plottable.Scale.Color): void;
         }

@@ -20,7 +20,7 @@
 
       var colorScale = new Plottable.Scale.Color("20b");
 
-      plot = new Plottable.Plot.ClusteredBar([], xScale, yScale);
+      plot = new Plottable.Plot.ClusteredBar(xScale, yScale);
       plot.project("x", "year", xScale);
       plot.project("y", "y", yScale);
       plot.setColor(colorScale);

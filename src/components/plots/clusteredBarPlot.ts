@@ -8,8 +8,8 @@ export module Plot {
     private innerScale: Scale.Ordinal;
     public colorScale: Scale.Color;
 
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
+      super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
     }
 

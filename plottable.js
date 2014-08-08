@@ -5235,18 +5235,10 @@ var __extends = this.__extends || function (d, b) {
 var Plottable;
 (function (Plottable) {
     (function (Plot) {
-<<<<<<< HEAD
         var ClusteredBar = (function (_super) {
             __extends(ClusteredBar, _super);
-            function ClusteredBar(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
-=======
-        var StackedBar = (function (_super) {
-            __extends(StackedBar, _super);
-            function StackedBar(xScale, yScale) {
+            function ClusteredBar(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.stackedData = [];
->>>>>>> stacked-bars-simpler
                 this._isVertical = true;
                 this.innerScale = new Plottable.Scale.Ordinal();
             }
@@ -5258,7 +5250,6 @@ var Plottable;
                 this._onDataSourceUpdate();
                 return this;
             };
-<<<<<<< HEAD
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
@@ -5274,44 +5265,11 @@ var Plottable;
                     clusters[key] = data.map(function (d, i) {
                         d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(vals[i]) + _this.innerScale.scale(key);
                         d["_PLOTTABLE_PROTECTED_FIELD_FILL"] = _this.colorScale.scale(key);
-=======
-            StackedBar.prototype._generateAttrToProjector = function () {
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var getY0 = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y0); };
-                var getY = function (d) { return primaryScale.scale(d._PLOTTABLE_PROTECTED_FIELD_Y); };
-                attrToProjector["height"] = function (d) { return Math.abs(getY(d) - getY0(d)); };
-                attrToProjector["y"] = function (d) { return getY(d); };
-                return attrToProjector;
-            };
-            StackedBar.prototype.getDrawer = function (key) {
-                return new Plottable.Drawer.RectDrawer(key);
-            };
-            StackedBar.prototype.stack = function (accessor) {
-                var datasets = d3.values(this._key2DatasetDrawerKey);
-                var lengths = datasets.map(function (d) { return d.dataset.data().length; });
-                if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
-                    Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
-                }
-                var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
-                var stacks = this._getDatasetsInOrder().map(function (dataset) {
-                    var data = dataset.data();
-                    var base = currentBase.slice();
-                    var vals = data.map(accessor);
-                    if (vals.some(function (x) { return x < 0; })) {
-                        Plottable.Util.Methods.warn("Warning: Behavior for stacked bars undefined when data includes negative values");
-                    }
-                    currentBase = Plottable.Util.Methods.addArrays(base, vals);
-                    return data.map(function (d, i) {
-                        d["_PLOTTABLE_PROTECTED_FIELD_Y0"] = base[i];
-                        d["_PLOTTABLE_PROTECTED_FIELD_Y"] = currentBase[i];
->>>>>>> stacked-bars-simpler
                         return d;
                     });
                 });
                 return clusters;
             };
-<<<<<<< HEAD
             ClusteredBar.prototype._paint = function () {
                 var _this = this;
                 _super.prototype._paint.call(this);
@@ -5319,13 +5277,6 @@ var Plottable;
                 var attrHash = this._generateAttrToProjector();
                 var clusteredData = this.cluster(accessor);
                 this._datasetKeysInOrder.forEach(function (key) { return _this._key2DatasetDrawerKey[key].drawer.draw(clusteredData[key], attrHash); });
-=======
-            StackedBar.prototype._paint = function () {
-                var accessor = this._projectors["y"].accessor;
-                var attrHash = this._generateAttrToProjector();
-                var stackedData = this.stack(accessor);
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
->>>>>>> stacked-bars-simpler
             };
             ClusteredBar.prototype.getDrawer = function (key) {
                 return new Plottable.Drawer.RectDrawer(key);
