@@ -2247,8 +2247,8 @@ var Plottable;
     (function (Abstract) {
         var NewStylePlot = (function (_super) {
             __extends(NewStylePlot, _super);
-            function NewStylePlot(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
+            function NewStylePlot(xScale, yScale) {
+                _super.call(this, new Plottable.DataSource(), xScale, yScale);
                 this.nextSeriesIndex = 0;
                 this._key2DatasetDrawerKey = {};
                 this._datasetKeysInOrder = [];
@@ -2256,8 +2256,7 @@ var Plottable;
             NewStylePlot.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
-                var drawers = d3.values(this._key2DatasetDrawerKey).map(function (ddk) { return ddk.drawer; });
-                drawers.forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
+                this._getDrawersInOrder().forEach(function (d) { return d.renderArea = _this.renderArea.append("g"); });
                 return this;
             };
             NewStylePlot.prototype.remove = function () {
@@ -2331,6 +2330,14 @@ var Plottable;
                     this._key2DatasetDrawerKey[key] = null;
                 }
                 return this;
+            };
+            NewStylePlot.prototype._getDatasetsInOrder = function () {
+                var _this = this;
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
+            };
+            NewStylePlot.prototype._getDrawersInOrder = function () {
+                var _this = this;
+                return this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
             };
             return NewStylePlot;
         })(Abstract.XYPlot);
@@ -5062,8 +5069,8 @@ var Plottable;
     (function (Abstract) {
         var NewStyleBarPlot = (function (_super) {
             __extends(NewStyleBarPlot, _super);
-            function NewStyleBarPlot(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
+            function NewStyleBarPlot(xScale, yScale) {
+                _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
                 this._barAlignmentFactor = 0;
                 this._animators = {
@@ -5205,8 +5212,8 @@ var Plottable;
     (function (Plot) {
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
-            function StackedBar(dataset, xScale, yScale) {
-                _super.call(this, dataset, xScale, yScale);
+            function StackedBar(xScale, yScale) {
+                _super.call(this, xScale, yScale);
                 this.stackedData = [];
                 this._isVertical = true;
                 this._baselineValue = 0;
@@ -5242,15 +5249,13 @@ var Plottable;
                 return new Plottable.Drawer.RectDrawer(key);
             };
             StackedBar.prototype.stack = function (accessor) {
-                var _this = this;
                 var datasets = d3.values(this._key2DatasetDrawerKey);
                 var lengths = datasets.map(function (d) { return d.dataset.data().length; });
                 if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
                 }
                 var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
-                var datasetsInStackOrder = this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
-                var stacks = datasetsInStackOrder.map(function (dataset) {
+                var stacks = this._getDatasetsInOrder().map(function (dataset) {
                     var data = dataset.data();
                     var base = currentBase.slice();
                     var vals = data.map(accessor);
@@ -5269,12 +5274,10 @@ var Plottable;
                 return stacks;
             };
             StackedBar.prototype._paint = function () {
-                var _this = this;
                 var accessor = this._projectors["y"].accessor;
                 var attrHash = this._generateAttrToProjector();
                 var stackedData = this.stack(accessor);
-                var drawersInStackOrder = this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
-                drawersInStackOrder.forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
             };
             return StackedBar;
         })(Plottable.Abstract.NewStyleBarPlot);

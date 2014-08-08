@@ -24,8 +24,8 @@ export module Abstract {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
-      super(dataset, xScale, yScale);
+    constructor(xScale: Abstract.Scale, yScale: Abstract.Scale) {
+      super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => "steelblue");
       // because this._baselineValue was not initialized during the super()

@@ -425,10 +425,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    interface DatasetAndKey {
-        dataset: DataSource;
-        key: string;
-    }
     interface DatasetDrawerKey {
         dataset: DataSource;
         drawer: Plottable.Abstract.Drawer;
@@ -436,7 +432,7 @@ declare module Plottable {
     }
     module Abstract {
         class NewStylePlot extends XYPlot {
-            constructor(dataset: any, xScale?: Scale, yScale?: Scale);
+            constructor(xScale?: Scale, yScale?: Scale);
             remove(): void;
             addDataset(key: string, dataset: DataSource): Plot;
             addDataset(key: string, dataset: any[]): Plot;
@@ -936,7 +932,7 @@ declare module Plottable {
             static _BarAlignmentToFactor: {
                 [x: string]: number;
             };
-            constructor(dataset: any, xScale: Scale, yScale: Scale);
+            constructor(xScale: Scale, yScale: Scale);
             baseline(value: number): NewStyleBarPlot;
             barAlignment(alignment: string): NewStyleBarPlot;
         }
@@ -948,7 +944,7 @@ declare module Plottable {
     module Plot {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
-            constructor(dataset: any, xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
+            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
             getDrawer(key: string): Drawer.RectDrawer;
             stack(accessor: IAccessor): any[][];
         }

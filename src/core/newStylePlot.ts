@@ -1,11 +1,6 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export interface DatasetAndKey {
-    dataset: DataSource;
-    key: string;
-  }
-
   export interface DatasetDrawerKey {
     dataset: DataSource;
     drawer: Abstract.Drawer;
@@ -24,14 +19,14 @@ export module Abstract {
      * @constructor
      * @param {any[]|DataSource} [dataset] The data or DataSource to be associated with this Plot.
      */
-    constructor(dataset: any, xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
-      super(dataset, xScale, yScale);
+    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
+      // make a dummy dataSource to satisfy the base Plot (hackhack)
+      super(new Plottable.DataSource(), xScale, yScale);
     }
 
     public _setup() {
       super._setup();
-      var drawers = d3.values(this._key2DatasetDrawerKey).map((ddk) => ddk.drawer);
-      drawers.forEach((d) => d.renderArea = this.renderArea.append("g"));
+      this._getDrawersInOrder().forEach((d) => d.renderArea = this.renderArea.append("g"));
       return this;
     }
 
@@ -115,6 +110,14 @@ export module Abstract {
         this._key2DatasetDrawerKey[key] = null;
       }
       return this;
+    }
+
+    public _getDatasetsInOrder(): DataSource[] {
+      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].dataset);
+    }
+
+    public _getDrawersInOrder(): Abstract.Drawer[] {
+      return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].drawer);
     }
   }
 }
