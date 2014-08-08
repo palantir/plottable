@@ -1,1048 +1,338 @@
 ﻿<!doctype html>
 <html class="no-js">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>DataSource | plottable-website</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="stylesheet" href="../assets/css/main.css">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>DataSource | plottable-website</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
-
 <header>
-    <div class="tsd-page-toolbar">
-        <div class="container">
-            <div id="tsd-filter">
-                <input type="checkbox" id="tsd-filter-inherited" checked />
-                <label for="tsd-filter-inherited">Inherited</label>
-
-                <input type="checkbox" id="tsd-filter-private" checked />
-                <label for="tsd-filter-private">Private</label>
-
-                <input type="checkbox" id="tsd-filter-only-exported" />
-                <label for="tsd-filter-only-exported">Only exported</label>
-            </div>
-
-            <a href="../index.html">plottable-website</a>
-        </div>
-    </div>
-    <div class="tsd-page-title">
-        <div class="container">
-            <ul class="breadcrumb">
-                
-    
-    
-    <li>
-        <a href="../modules/plottable.html">Plottable</a>
-    </li>
-
-    <li>
-        <a href="plottable.datasource.html">DataSource</a>
-    </li>
-
-            </ul>
-            <h1>Class DataSource</h1>
-        </div>
-    </div>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">plottable-website</a>
+				</div>
+				<div class="table-cell" id="tsd-filter">
+					<input type="checkbox" id="tsd-filter-inherited" checked />
+					<label for="tsd-filter-inherited">Inherited</label>
+					<input type="checkbox" id="tsd-filter-private" checked />
+					<label for="tsd-filter-private">Private</label>
+					<input type="checkbox" id="tsd-filter-externals" checked />
+					<label for="tsd-filter-externals">Externals</label>
+					<input type="checkbox" id="tsd-filter-only-exported" />
+					<label for="tsd-filter-only-exported">Only exported</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="breadcrumb">
+				<li>
+					<a href="../globals.html">plottable-website</a>
+				</li>
+				<li>
+					<a href="../modules/plottable.html">Plottable</a>
+				</li>
+				<li>
+					<a href="plottable.datasource.html">DataSource</a>
+				</li>
+			</ul>
+			<h1>Class DataSource</h1>
+		</div>
+	</div>
 </header>
-
 <div class="container container-main">
-    <div class="row">
-        <div class="col-8">
-            
-    
-
-
-
-
-
-
-
-    <section class="tsd-hierarchy">
-        <h2>Hierarchy</h2>
-        <ul>
-            
-                <li >
-    
-        
-    
-        <a href="plottable.abstract.plottableobject.html" class="tsd-signature-type">PlottableObject</a>
-    
-
-    
-
-    
-        <ul>
-            
-                <li class="target">
-    
-        DataSource
-    
-
-    
-</li>
-            
-        </ul>
-    
-</li>
-            
-        </ul>
-    </section>
-
-
-
-    <section class="tsd-member-index">
-    <h2>Index</h2>
-    
-        <section class="tsd-member-index-group ">
-            <h3>Constructor methods</h3>
-            <ul class="tsd-member-index">
-                
-                    <li class="tsd-kind-constructor-method tsd-parent-kind-class"><a href="plottable.datasource.html#constructor" class="tsd-kind-icon">constructor</a></li>
-                
-            </ul>
-        </section>
-    
-        <section class="tsd-member-index-group ">
-            <h3>Properties</h3>
-            <ul class="tsd-member-index">
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="plottable.datasource.html#_data" class="tsd-kind-icon">_data</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="plottable.datasource.html#_metadata" class="tsd-kind-icon">_metadata</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.datasource.html#_plottableid" class="tsd-kind-icon">_plottableID</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="plottable.datasource.html#accessor2cachedextent" class="tsd-kind-icon">accessor2cachedExtent</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class"><a href="plottable.datasource.html#broadcaster" class="tsd-kind-icon">broadcaster</a></li>
-                
-            </ul>
-        </section>
-    
-        <section class="tsd-member-index-group ">
-            <h3>Methods</h3>
-            <ul class="tsd-member-index">
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.datasource.html#_getextent" class="tsd-kind-icon">_getExtent</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="plottable.datasource.html#computeextent" class="tsd-kind-icon">computeExtent</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.datasource.html#data" class="tsd-kind-icon">data</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.datasource.html#metadata" class="tsd-kind-icon">metadata</a></li>
-                
-            </ul>
-        </section>
-    
-</section>
-    
-    
-        <section class="tsd-member-group ">
-    <h2>Constructor methods</h2>
-    
-        
-            <section class="tsd-member tsd-kind-constructor-method tsd-parent-kind-class">
-    <a name="constructor"></a>
-    
-        
-            <h3 class="tsd-kind-icon">constructor<span class="tsd-signature-symbols">(</span>data<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">Array&lt;any&gt;</span><span class="tsd-signature-symbols"> =&nbsp;</span>[], metadata<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols"> =&nbsp;</span>{}<span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:19</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Creates a new DataSource.</p>
-
-
-
-
-
-
-    <dl class="tsd-comment-tags">
-        
-            <dt>constructor</dt>
-            <dd></dd>
-        
-    </dl>
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>data?: <span class="tsd-signature-type">Array&lt;any&gt;</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
-                
-
-
-
-
-            </li>
-        
-            <li>
-                <h5>metadata?: <span class="tsd-signature-type">any</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
-                
-    <p>An object containing additional information.</p>
-
-
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-</section>
-    
-
-    
-        <section class="tsd-member-group ">
-    <h2>Properties</h2>
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-    <a name="_data"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagprivate">private</span> _data<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:8</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-    <a name="_metadata"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagprivate">private</span> _metadata<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">any</span></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:9</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-    <a name="_plottableid"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _plottableID<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">number</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.abstract.plottableobject.html">PlottableObject</a>.<a href="plottable.abstract.plottableobject.html#_plottableid">_plottableID</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/plottableObject.ts:6</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-    <a name="accessor2cachedextent"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagprivate">private</span> accessor2cachedExtent<span class="tsd-signature-symbols">:</span> <a href="plottable.util.strictequalityassociativearray.html" class="tsd-signature-type">StrictEqualityAssociativeArray</a></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:10</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class">
-    <a name="broadcaster"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> broadcaster<span class="tsd-signature-symbols">:</span> <a href="plottable.core.broadcaster.html" class="tsd-signature-type">Broadcaster</a></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:11</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-</section>
-    
-
-    
-        <section class="tsd-member-group ">
-    <h2>Methods</h2>
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
-    <a name="_getextent"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _getExtent<span class="tsd-signature-symbols">(</span>accessor<span class="tsd-signature-symbols">: </span><a href="../interfaces/plottable.iaccessor.html" class="tsd-signature-type">IAccessor</a><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:74</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>accessor: <a href="../interfaces/plottable.iaccessor.html" class="tsd-signature-type">IAccessor</a></h5>
-                
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <span class="tsd-signature-type">Array&lt;any&gt;</span>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
-    <a name="computeextent"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagprivate">private</span> computeExtent<span class="tsd-signature-symbols">(</span>accessor<span class="tsd-signature-symbols">: </span><a href="../interfaces/plottable.iaccessor.html" class="tsd-signature-type">IAccessor</a><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:83</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>accessor: <a href="../interfaces/plottable.iaccessor.html" class="tsd-signature-type">IAccessor</a></h5>
-                
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <span class="tsd-signature-type">Array&lt;any&gt;</span>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
-    <a name="data"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> data<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:31</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Gets the data.</p>
-
-
-
-
-
-
-
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <span class="tsd-signature-type">Array&lt;any&gt;</span>
-    
-</p>
-    
-
-
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> data<span class="tsd-signature-symbols">(</span>data<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:38</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Sets new data.</p>
-
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>data: <span class="tsd-signature-type">Array&lt;any&gt;</span></h5>
-                
-    <p>The new data.</p>
-
-
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class">
-    <a name="metadata"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> metadata<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:55</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Gets the metadata.</p>
-
-
-
-
-
-
-
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <span class="tsd-signature-type">any</span>
-    
-</p>
-    
-
-
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> metadata<span class="tsd-signature-symbols">(</span>metadata<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a></h3>
-
-<aside class="tsd-sources">
-    
-    
-    
-        <ul>
-            
-                <li>Defined in core/dataSource.ts:62</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Sets the metadata.</p>
-
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>metadata: <span class="tsd-signature-type">any</span></h5>
-                
-    <p>The new metadata.</p>
-
-
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-</section>
-    
-
-
-        </div>
-        <div class="offset-1 col-3">
-            <nav class="tsd-navigation primary">
-                <ul>
-                    
-                        <li class=" ">
-    <a href="../globals.html"><em>Globals</em></a>
-    
-</li>
-                    
-                        <li class="current tsd-kind-container">
-    <a href="../modules/plottable.html">Plottable</a>
-    
-        
-            <ul>
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-            </ul>
-        
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.html">Plottable.Util</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.methods.html">Plottable.Util.Methods</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.opensource.html">Plottable.Util.OpenSource</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.text.html">Plottable.Util.Text</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.wordwrap.html">Plottable.Util.WordWrap</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.dom.html">Plottable.Util.DOM</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.abstract.html">Plottable.Abstract</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.formatter.html">Plottable.Formatter</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.html">Plottable.Core</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.component.html">Plottable.Component</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.rendercontroller.html">Plottable.Core.RenderController</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.rendercontroller.renderpolicy.html">Plottable.Core.RenderController.RenderPolicy</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.resizebroadcaster.html">Plottable.Core.ResizeBroadcaster</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.animator.html">Plottable.Animator</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.scale.html">Plottable.Scale</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.axis.html">Plottable.Axis</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.axis.html">Plottable.Util.Axis</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.plot.html">Plottable.Plot</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.keyeventlistener.html">Plottable.Core.KeyEventListener</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.interaction.html">Plottable.Interaction</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.template.html">Plottable.Template</a>
-    
-</li>
-                    
-                </ul>
-            </nav>
-
-            <nav class="tsd-navigation secondary">
-                
-                    
-
-    <ul>
-        
-            
-                <li class=" tsd-kind-variable tsd-parent-kind-container">
-                    <a href="../modules/plottable.html#version" class="tsd-kind-icon">version</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.filterformat.html" class="tsd-kind-icon">FilterFormat</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.fullselectionarea.html" class="tsd-kind-icon">FullSelectionArea</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.iaccessor.html" class="tsd-kind-icon">IAccessor</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.iappliedaccessor.html" class="tsd-kind-icon">IAppliedAccessor</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container tsd-is-not-exported">
-                    <a href="../interfaces/plottable.icachedextent.html" class="tsd-kind-icon">ICachedExtent</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.idataset.html" class="tsd-kind-icon">IDataset</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.iextent.html" class="tsd-kind-icon">IExtent</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.imetadata.html" class="tsd-kind-icon">IMetadata</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.ipixelarea.html" class="tsd-kind-icon">IPixelArea</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.ispacerequest.html" class="tsd-kind-icon">ISpaceRequest</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-interface tsd-parent-kind-container">
-                    <a href="../interfaces/plottable.selectionarea.html" class="tsd-kind-icon">SelectionArea</a>
-                    
-                </li>
-            
-        
-            
-                <li class="current tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.datasource.html" class="tsd-kind-icon">DataSource</a>
-                    
-
-    <ul>
-        
-            
-                <li class=" tsd-kind-constructor-method tsd-parent-kind-class">
-                    <a href="plottable.datasource.html#constructor" class="tsd-kind-icon">constructor</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-                    <a href="plottable.datasource.html#_data" class="tsd-kind-icon">_data</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-                    <a href="plottable.datasource.html#_metadata" class="tsd-kind-icon">_metadata</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.datasource.html#_plottableid" class="tsd-kind-icon">_plottableID</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-                    <a href="plottable.datasource.html#accessor2cachedextent" class="tsd-kind-icon">accessor2cachedExtent</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class">
-                    <a href="plottable.datasource.html#broadcaster" class="tsd-kind-icon">broadcaster</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class">
-                    <a href="plottable.datasource.html#_getextent" class="tsd-kind-icon">_getExtent</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
-                    <a href="plottable.datasource.html#computeextent" class="tsd-kind-icon">computeExtent</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class">
-                    <a href="plottable.datasource.html#data" class="tsd-kind-icon">data</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class">
-                    <a href="plottable.datasource.html#metadata" class="tsd-kind-icon">metadata</a>
-                    
-                </li>
-            
-        
-    </ul>
-
-
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.domainer.html" class="tsd-kind-icon">Domainer</a>
-                    
-                </li>
-            
-        
-    </ul>
-
-
-                
-            </nav>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-8">
+			<section class="tsd-hierarchy">
+				<h2>Hierarchy</h2>
+				<ul>
+					<li>
+						<a href="plottable.abstract.plottableobject.html" class="tsd-signature-type">PlottableObject</a>
+						<ul>
+							<li>
+								DataSource
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-member-index">
+				<h2>Index</h2>
+				<section class="tsd-member-index-group ">
+					<h3>Constructor methods</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-constructor-method tsd-parent-kind-class"><a href="plottable.datasource.html#constructor" class="tsd-kind-icon">constructor</a></li>
+					</ul>
+				</section>
+				<section class="tsd-member-index-group ">
+					<h3>Properties</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-property tsd-parent-kind-class"><a href="plottable.datasource.html#broadcaster" class="tsd-kind-icon">broadcaster</a></li>
+					</ul>
+				</section>
+				<section class="tsd-member-index-group ">
+					<h3>Methods</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.datasource.html#data" class="tsd-kind-icon">data</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.datasource.html#metadata" class="tsd-kind-icon">metadata</a></li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-member-group ">
+				<h2>Constructor methods</h2>
+				<section class="tsd-member tsd-kind-constructor-method tsd-parent-kind-class">
+					<a name="constructor" class="anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">constructor<span class="tsd-signature-symbols">(</span>data<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">Array&lt;any&gt;</span>, metadata<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:639</li>
+								</ul>
+							</aside>
+							<p>Creates a new DataSource.</p>
+							<dl class="tsd-comment-tags">
+								<dt>constructor</dt>
+								<dd></dd>
+							</dl>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>data?: <span class="tsd-signature-type">Array&lt;any&gt;</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+								</li>
+								<li>
+									<h5>metadata?: <span class="tsd-signature-type">any</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+									<p>An object containing additional information.</p>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a>
+							</h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="broadcaster" class="anchor"></a>
+					<h3>broadcaster</h3>
+					<div class="tsd-signature tsd-kind-icon">broadcaster<span class="tsd-signature-symbols">:</span> <a href="plottable.core.broadcaster.html" class="tsd-signature-type">Broadcaster</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in plottable.d.ts:631</li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="data" class="anchor"></a>
+					<h3>data</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbols">(</span>data<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:645</li>
+								</ul>
+							</aside>
+							<p>Gets the data.</p>
+							<h4>Returns 
+								<span class="tsd-signature-type">Array&lt;any&gt;</span>
+							</h4>
+							<p>The current data.</p>
+						</li>
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:652</li>
+								</ul>
+							</aside>
+							<p>Sets new data.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>data: <span class="tsd-signature-type">Array&lt;any&gt;</span></h5>
+									<p>The new data.</p>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a>
+							</h4>
+							<p>The calling DataSource.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="metadata" class="anchor"></a>
+					<h3>metadata</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">metadata<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span></li>
+						<li class="tsd-signature tsd-kind-icon">metadata<span class="tsd-signature-symbols">(</span>metadata<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:658</li>
+								</ul>
+							</aside>
+							<p>Gets the metadata.</p>
+							<h4>Returns 
+								<span class="tsd-signature-type">any</span>
+							</h4>
+							<p>The current metadata.</p>
+						</li>
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:665</li>
+								</ul>
+							</aside>
+							<p>Sets the metadata.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>metadata: <span class="tsd-signature-type">any</span></h5>
+									<p>The new metadata.</p>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.datasource.html" class="tsd-signature-type">DataSource</a>
+							</h4>
+							<p>The calling DataSource.</p>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="offset-1 col-3">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-container">
+						<a href="../modules/d3.html">D3</a>
+					</li>
+					<li class="current tsd-kind-container">
+						<a href="../modules/plottable.html">Plottable</a>
+						<ul>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.abstract.html">Abstract</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.animator.html">Animator</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.axis.html">Axis</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.component.html">Component</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.core.html">Core</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.formatter.html">Formatter</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.interaction.html">Interaction</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.plot.html">Plot</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.scale.html">Scale</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.template.html">Template</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.util.html">Util</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary">
+				<ul>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.filterformat.html" class="tsd-kind-icon">Filter<wbr>Format</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.fullselectionarea.html" class="tsd-kind-icon">Full<wbr>Selection<wbr>Area</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.iaccessor.html" class="tsd-kind-icon">IAccessor</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.iappliedaccessor.html" class="tsd-kind-icon">IApplied<wbr>Accessor</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.idataset.html" class="tsd-kind-icon">IDataset</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.iextent.html" class="tsd-kind-icon">IExtent</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.imetadata.html" class="tsd-kind-icon">IMetadata</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.ipixelarea.html" class="tsd-kind-icon">IPixel<wbr>Area</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.ispacerequest.html" class="tsd-kind-icon">ISpace<wbr>Request</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.selectionarea.html" class="tsd-kind-icon">Selection<wbr>Area</a>
+					</li>
+					<li class="current tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.datasource.html" class="tsd-kind-icon">Data<wbr>Source</a>
+						<ul>
+							<li class=" tsd-kind-constructor-method tsd-parent-kind-class">
+								<a href="plottable.datasource.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plottable.datasource.html#broadcaster" class="tsd-kind-icon">broadcaster</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.datasource.html#data" class="tsd-kind-icon">data</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.datasource.html#metadata" class="tsd-kind-icon">metadata</a>
+							</li>
+						</ul>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.domainer.html" class="tsd-kind-icon">Domainer</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-container">
+						<a href="../modules/plottable.html#version" class="tsd-kind-icon">version</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
 </div>
-
 <script src="../assets/js/main.js"></script>
-
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

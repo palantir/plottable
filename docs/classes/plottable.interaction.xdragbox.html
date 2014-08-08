@@ -1,1430 +1,561 @@
 ﻿<!doctype html>
 <html class="no-js">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>XDragBox | plottable-website</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="stylesheet" href="../assets/css/main.css">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>XDragBox | plottable-website</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
-
 <header>
-    <div class="tsd-page-toolbar">
-        <div class="container">
-            <div id="tsd-filter">
-                <input type="checkbox" id="tsd-filter-inherited" checked />
-                <label for="tsd-filter-inherited">Inherited</label>
-
-                <input type="checkbox" id="tsd-filter-private" checked />
-                <label for="tsd-filter-private">Private</label>
-
-                <input type="checkbox" id="tsd-filter-only-exported" />
-                <label for="tsd-filter-only-exported">Only exported</label>
-            </div>
-
-            <a href="../index.html">plottable-website</a>
-        </div>
-    </div>
-    <div class="tsd-page-title">
-        <div class="container">
-            <ul class="breadcrumb">
-                
-    
-    
-    
-    <li>
-        <a href="../modules/plottable.html">Plottable</a>
-    </li>
-
-    <li>
-        <a href="../modules/plottable.interaction.html">Interaction</a>
-    </li>
-
-    <li>
-        <a href="plottable.interaction.xdragbox.html">XDragBox</a>
-    </li>
-
-            </ul>
-            <h1>Class XDragBox</h1>
-        </div>
-    </div>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">plottable-website</a>
+				</div>
+				<div class="table-cell" id="tsd-filter">
+					<input type="checkbox" id="tsd-filter-inherited" checked />
+					<label for="tsd-filter-inherited">Inherited</label>
+					<input type="checkbox" id="tsd-filter-private" checked />
+					<label for="tsd-filter-private">Private</label>
+					<input type="checkbox" id="tsd-filter-externals" checked />
+					<label for="tsd-filter-externals">Externals</label>
+					<input type="checkbox" id="tsd-filter-only-exported" />
+					<label for="tsd-filter-only-exported">Only exported</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="breadcrumb">
+				<li>
+					<a href="../globals.html">plottable-website</a>
+				</li>
+				<li>
+					<a href="../modules/plottable.html">Plottable</a>
+				</li>
+				<li>
+					<a href="../modules/plottable.interaction.html">Interaction</a>
+				</li>
+				<li>
+					<a href="plottable.interaction.xdragbox.html">XDragBox</a>
+				</li>
+			</ul>
+			<h1>Class XDragBox</h1>
+		</div>
+	</div>
 </header>
-
 <div class="container container-main">
-    <div class="row">
-        <div class="col-8">
-            
-    
-
-
-
-
-
-
-
-    <section class="tsd-hierarchy">
-        <h2>Hierarchy</h2>
-        <ul>
-            
-                <li >
-    
-        
-    
-        <a href="plottable.interaction.dragbox.html" class="tsd-signature-type">DragBox</a>
-    
-
-    
-
-    
-        <ul>
-            
-                <li class="target">
-    
-        XDragBox
-    
-
-    
-</li>
-            
-        </ul>
-    
-</li>
-            
-        </ul>
-    </section>
-
-
-
-    <section class="tsd-member-index">
-    <h2>Index</h2>
-    
-        <section class="tsd-member-index-group tsd-is-inherited">
-            <h3>Constructor methods</h3>
-            <ul class="tsd-member-index">
-                
-                    <li class="tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#constructor" class="tsd-kind-icon">constructor</a></li>
-                
-            </ul>
-        </section>
-    
-        <section class="tsd-member-index-group tsd-is-inherited">
-            <h3>Properties</h3>
-            <ul class="tsd-member-index">
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#boxisdrawn" class="tsd-kind-icon">boxIsDrawn</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#callbacktocall" class="tsd-kind-icon">callbackToCall</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#componenttolistento" class="tsd-kind-icon">componentToListenTo</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#dragbox" class="tsd-kind-icon">dragBox</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#hitbox" class="tsd-kind-icon">hitBox</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#location" class="tsd-kind-icon">location</a></li>
-                
-                    <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#origin" class="tsd-kind-icon">origin</a></li>
-                
-            </ul>
-        </section>
-    
-        <section class="tsd-member-index-group ">
-            <h3>Methods</h3>
-            <ul class="tsd-member-index">
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#_anchor" class="tsd-kind-icon">_anchor</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.interaction.xdragbox.html#_dodragend" class="tsd-kind-icon">_doDragend</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.interaction.xdragbox.html#_drag" class="tsd-kind-icon">_drag</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#_dragend" class="tsd-kind-icon">_dragend</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#_dragstart" class="tsd-kind-icon">_dragstart</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#callback" class="tsd-kind-icon">callback</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#clearbox" class="tsd-kind-icon">clearBox</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#registerwithcomponent" class="tsd-kind-icon">registerWithComponent</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.interaction.xdragbox.html#setbox" class="tsd-kind-icon">setBox</a></li>
-                
-                    <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#setupzoomcallback" class="tsd-kind-icon">setupZoomCallback</a></li>
-                
-            </ul>
-        </section>
-    
-</section>
-    
-    
-        <section class="tsd-member-group tsd-is-inherited">
-    <h2>Constructor methods</h2>
-    
-        
-            <section class="tsd-member tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-    <a name="constructor"></a>
-    
-        
-            <h3 class="tsd-kind-icon">constructor<span class="tsd-signature-symbols">(</span>componentToListenTo<span class="tsd-signature-symbols">: </span><a href="plottable.abstract.component.html" class="tsd-signature-type">Component</a><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#constructor">constructor</a>
-    
-</p>
-    
-    
-        <p>Overwrites 
-    
-        <a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#constructor">constructor</a>
-    
-</p>
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragInteraction.ts:18</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Creates a Drag.</p>
-
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>componentToListenTo: <a href="plottable.abstract.component.html" class="tsd-signature-type">Component</a></h5>
-                
-    <p>The component to listen for interactions on.</p>
-
-
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-</section>
-    
-
-    
-        <section class="tsd-member-group tsd-is-inherited">
-    <h2>Properties</h2>
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-    <a name="boxisdrawn"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> boxIsDrawn<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">boolean</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#boxisdrawn">boxIsDrawn</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragBoxInteraction.ts:7</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-    <a name="callbacktocall"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> callbackToCall<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">(dragInfo: any) =&gt; any</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#callbacktocall">callbackToCall</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragInteraction.ts:11</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-    <a name="componenttolistento"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> componentToListenTo<span class="tsd-signature-symbols">:</span> <a href="plottable.abstract.component.html" class="tsd-signature-type">Component</a></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#componenttolistento">componentToListenTo</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/interaction.ts:12</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-    <a name="dragbox"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> dragBox<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">D3.Selection</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#dragbox">dragBox</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragBoxInteraction.ts:6</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-    <a name="hitbox"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> hitBox<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">D3.Selection</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#hitbox">hitBox</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/interaction.ts:11</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-    <a name="location"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> location<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">Array&lt;number&gt;</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#location">location</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragInteraction.ts:8</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-    <a name="origin"></a>
-    
-        <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> origin<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">Array&lt;number&gt;</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#origin">origin</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragInteraction.ts:7</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-    
-
-    
-</section>
-        
-    
-</section>
-    
-
-    
-        <section class="tsd-member-group ">
-    <h2>Methods</h2>
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-    <a name="_anchor"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _anchor<span class="tsd-signature-symbols">(</span>hitBox<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">D3.Selection</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.dragbox.html" class="tsd-signature-type">DragBox</a></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#_anchor">_anchor</a>
-    
-</p>
-    
-    
-        <p>Overwrites 
-    
-        <a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#_anchor">_anchor</a>
-    
-</p>
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragBoxInteraction.ts:40</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>hitBox: <span class="tsd-signature-type">D3.Selection</span></h5>
-                
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.interaction.dragbox.html" class="tsd-signature-type">DragBox</a>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-    <a name="_dodragend"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _doDragend<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span></h3>
-
-<aside class="tsd-sources">
-    
-    
-        <p>Overwrites 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#_dodragend">_doDragend</a>
-    
-</p>
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/xDragBoxInteraction.ts:10</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-    <a name="_drag"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _drag<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span></h3>
-
-<aside class="tsd-sources">
-    
-    
-        <p>Overwrites 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#_drag">_drag</a>
-    
-</p>
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/xDragBoxInteraction.ts:5</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-    <a name="_dragend"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _dragend<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#_dragend">_dragend</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragInteraction.ts:55</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-    <a name="_dragstart"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> _dragstart<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#_dragstart">_dragstart</a>
-    
-</p>
-    
-    
-        <p>Overwrites 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#_dragstart">_dragstart</a>
-    
-</p>
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragBoxInteraction.ts:9</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-    <a name="callback"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> callback<span class="tsd-signature-symbols">(</span>cb<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">(a: any) =&gt; any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#callback">callback</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragInteraction.ts:32</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Adds a callback to be called when the AreaInteraction triggers.</p>
-
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>cb?: <span class="tsd-signature-type">(a: any) =&gt; any</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
-                
-    <p>The function to be called. Takes in a SelectionArea in pixels.</p>
-
-
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a>
-    
-</p>
-    
-        <p>The calling AreaInteraction.</p>
-
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-    <a name="clearbox"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> clearBox<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.dragbox.html" class="tsd-signature-type">DragBox</a></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#clearbox">clearBox</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragBoxInteraction.ts:22</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Clears the highlighted drag-selection box drawn by the AreaInteraction.</p>
-
-
-
-
-
-
-
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.interaction.dragbox.html" class="tsd-signature-type">DragBox</a>
-    
-</p>
-    
-        <p>The calling AreaInteraction.</p>
-
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-    <a name="registerwithcomponent"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> registerWithComponent<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.interaction.html" class="tsd-signature-type">Interaction</a></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#registerwithcomponent">registerWithComponent</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/interaction.ts:33</li>
-            
-        </ul>
-    
-</aside>
-
-    <p>Registers the Interaction on the Component it&#39;s listening to.
-This needs to be called to activate the interaction.</p>
-
-
-
-
-
-
-
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.abstract.interaction.html" class="tsd-signature-type">Interaction</a>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-    <a name="setbox"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> setBox<span class="tsd-signature-symbols">(</span>x0<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span>, x1<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.xdragbox.html" class="tsd-signature-type">XDragBox</a></h3>
-
-<aside class="tsd-sources">
-    
-    
-        <p>Overwrites 
-    
-        <a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#setbox">setBox</a>
-    
-</p>
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/xDragBoxInteraction.ts:20</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>x0: <span class="tsd-signature-type">number</span></h5>
-                
-
-
-
-
-            </li>
-        
-            <li>
-                <h5>x1: <span class="tsd-signature-type">number</span></h5>
-                
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.interaction.xdragbox.html" class="tsd-signature-type">XDragBox</a>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-        
-            <section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-    <a name="setupzoomcallback"></a>
-    
-        
-            <h3 class="tsd-kind-icon"><span class="tsd-flag ts-flagpublic">public</span> setupZoomCallback<span class="tsd-signature-symbols">(</span>xScale<span class="tsd-signature-symbols">?: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>, yScale<span class="tsd-signature-symbols">?: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a></h3>
-
-<aside class="tsd-sources">
-    
-        <p>Inherited from 
-    
-        <a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#setupzoomcallback">setupZoomCallback</a>
-    
-</p>
-    
-    
-    
-        <ul>
-            
-                <li>Defined in interactions/drag/dragInteraction.ts:77</li>
-            
-        </ul>
-    
-</aside>
-
-
-
-
-
-
-
-    <h4>Parameters</h4>
-    <ul>
-        
-            <li>
-                <h5>xScale?: <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a> <span class="tsd-flag ts-flagoptional">optional</span></h5>
-                
-
-
-
-
-            </li>
-        
-            <li>
-                <h5>yScale?: <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a> <span class="tsd-flag ts-flagoptional">optional</span></h5>
-                
-
-
-
-
-            </li>
-        
-    </ul>
-
-
-
-    <h4>Returns</h4>
-    <p>
-    
-        <a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a>
-    
-</p>
-    
-
-
-        
-    
-
-    
-</section>
-        
-    
-</section>
-    
-
-
-        </div>
-        <div class="offset-1 col-3">
-            <nav class="tsd-navigation primary">
-                <ul>
-                    
-                        <li class=" ">
-    <a href="../globals.html"><em>Globals</em></a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container">
-    <a href="../modules/plottable.html">Plottable</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.html">Plottable.Util</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.methods.html">Plottable.Util.Methods</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.opensource.html">Plottable.Util.OpenSource</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.text.html">Plottable.Util.Text</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.wordwrap.html">Plottable.Util.WordWrap</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.dom.html">Plottable.Util.DOM</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.abstract.html">Plottable.Abstract</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.formatter.html">Plottable.Formatter</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.html">Plottable.Core</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.component.html">Plottable.Component</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.rendercontroller.html">Plottable.Core.RenderController</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.rendercontroller.renderpolicy.html">Plottable.Core.RenderController.RenderPolicy</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.resizebroadcaster.html">Plottable.Core.ResizeBroadcaster</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.animator.html">Plottable.Animator</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.scale.html">Plottable.Scale</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.axis.html">Plottable.Axis</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.util.axis.html">Plottable.Util.Axis</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.plot.html">Plottable.Plot</a>
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.core.keyeventlistener.html">Plottable.Core.KeyEventListener</a>
-    
-</li>
-                    
-                        <li class="current tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.interaction.html">Plottable.Interaction</a>
-    
-        
-            <ul>
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-            </ul>
-        
-    
-</li>
-                    
-                        <li class=" tsd-kind-container tsd-parent-kind-container">
-    <a href="../modules/plottable.template.html">Plottable.Template</a>
-    
-</li>
-                    
-                </ul>
-            </nav>
-
-            <nav class="tsd-navigation secondary">
-                
-                    
-
-    <ul>
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.click.html" class="tsd-kind-icon">Click</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.doubleclick.html" class="tsd-kind-icon">DoubleClick</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.drag.html" class="tsd-kind-icon">Drag</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.dragbox.html" class="tsd-kind-icon">DragBox</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.key.html" class="tsd-kind-icon">Key</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.mousemove.html" class="tsd-kind-icon">Mousemove</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.panzoom.html" class="tsd-kind-icon">PanZoom</a>
-                    
-                </li>
-            
-        
-            
-                <li class="current tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.xdragbox.html" class="tsd-kind-icon">XDragBox</a>
-                    
-
-    <ul>
-        
-            
-                <li class=" tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#constructor" class="tsd-kind-icon">constructor</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#boxisdrawn" class="tsd-kind-icon">boxIsDrawn</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#callbacktocall" class="tsd-kind-icon">callbackToCall</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#componenttolistento" class="tsd-kind-icon">componentToListenTo</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#dragbox" class="tsd-kind-icon">dragBox</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#hitbox" class="tsd-kind-icon">hitBox</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#location" class="tsd-kind-icon">location</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#origin" class="tsd-kind-icon">origin</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#_anchor" class="tsd-kind-icon">_anchor</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-                    <a href="plottable.interaction.xdragbox.html#_dodragend" class="tsd-kind-icon">_doDragend</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-                    <a href="plottable.interaction.xdragbox.html#_drag" class="tsd-kind-icon">_drag</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#_dragend" class="tsd-kind-icon">_dragend</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#_dragstart" class="tsd-kind-icon">_dragstart</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#callback" class="tsd-kind-icon">callback</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#clearbox" class="tsd-kind-icon">clearBox</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#registerwithcomponent" class="tsd-kind-icon">registerWithComponent</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-                    <a href="plottable.interaction.xdragbox.html#setbox" class="tsd-kind-icon">setBox</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-                    <a href="plottable.interaction.xdragbox.html#setupzoomcallback" class="tsd-kind-icon">setupZoomCallback</a>
-                    
-                </li>
-            
-        
-    </ul>
-
-
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.xydragbox.html" class="tsd-kind-icon">XYDragBox</a>
-                    
-                </li>
-            
-        
-            
-                <li class=" tsd-kind-class tsd-parent-kind-container">
-                    <a href="plottable.interaction.ydragbox.html" class="tsd-kind-icon">YDragBox</a>
-                    
-                </li>
-            
-        
-    </ul>
-
-
-                
-            </nav>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-8">
+			<section class="tsd-hierarchy">
+				<h2>Hierarchy</h2>
+				<ul>
+					<li>
+						<a href="plottable.interaction.dragbox.html" class="tsd-signature-type">DragBox</a>
+						<ul>
+							<li>
+								XDragBox
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-member-index">
+				<h2>Index</h2>
+				<section class="tsd-member-index-group tsd-is-inherited">
+					<h3>Constructor methods</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#constructor" class="tsd-kind-icon">constructor</a></li>
+					</ul>
+				</section>
+				<section class="tsd-member-index-group tsd-is-inherited">
+					<h3>Properties</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#boxisdrawn" class="tsd-kind-icon">box<wbr>IsDrawn</a></li>
+						<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#callbacktocall" class="tsd-kind-icon">callback<wbr>ToCall</a></li>
+						<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#componenttolistento" class="tsd-kind-icon">component<wbr>ToListen<wbr>To</a></li>
+						<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#dragbox" class="tsd-kind-icon">drag<wbr>Box</a></li>
+						<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#hitbox" class="tsd-kind-icon">hit<wbr>Box</a></li>
+						<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#location" class="tsd-kind-icon">location</a></li>
+						<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#origin" class="tsd-kind-icon">origin</a></li>
+					</ul>
+				</section>
+				<section class="tsd-member-index-group ">
+					<h3>Methods</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#callback" class="tsd-kind-icon">callback</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#clearbox" class="tsd-kind-icon">clear<wbr>Box</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#registerwithcomponent" class="tsd-kind-icon">register<wbr>With<wbr>Component</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="plottable.interaction.xdragbox.html#setbox" class="tsd-kind-icon">set<wbr>Box</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plottable.interaction.xdragbox.html#setupzoomcallback" class="tsd-kind-icon">setup<wbr>Zoom<wbr>Callback</a></li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-member-group tsd-is-inherited">
+				<h2>Constructor methods</h2>
+				<section class="tsd-member tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+					<a name="constructor" class="anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">constructor<span class="tsd-signature-symbols">(</span>componentToListenTo<span class="tsd-signature-symbols">: </span><a href="plottable.abstract.component.html" class="tsd-signature-type">Component</a><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<p>Inherited from 
+									<a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#constructor">constructor</a>
+								</p>
+								<p>Overwrites 
+									<a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#constructor">constructor</a>
+								</p>
+								<ul>
+									<li>Defined in plottable.d.ts:2385</li>
+								</ul>
+							</aside>
+							<p>Creates a Drag.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>componentToListenTo: <a href="plottable.abstract.component.html" class="tsd-signature-type">Component</a></h5>
+									<p>The component to listen for interactions on.</p>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a>
+							</h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-member-group tsd-is-inherited">
+				<h2>Properties</h2>
+				<section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="boxisdrawn" class="anchor"></a>
+					<h3>box<wbr>IsDrawn</h3>
+					<div class="tsd-signature tsd-kind-icon">box<wbr>IsDrawn<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from 
+							<a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#boxisdrawn">boxIsDrawn</a>
+						</p>
+						<ul>
+							<li>Defined in plottable.d.ts:2403</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="callbacktocall" class="anchor"></a>
+					<h3>callback<wbr>ToCall</h3>
+					<div class="tsd-signature tsd-kind-icon">callback<wbr>ToCall<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">Function</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from 
+							<a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#callbacktocall">callbackToCall</a>
+						</p>
+						<ul>
+							<li>Defined in plottable.d.ts:2379</li>
+						</ul>
+					</aside>
+					<section class="tsd-member tsd-kind-function-type tsd-parent-kind-property tsd-is-inherited">
+						<a name="callbacktocall.callbacktocall_function_signature" class="anchor"></a>
+						<h3>callback<wbr>ToCall function signature</h3>
+						<ul class="tsd-signatures tsd-kind-function-type tsd-parent-kind-property tsd-is-inherited">
+							<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbols">(</span>dragInfo<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span></li>
+						</ul>
+						<ul class="tsd-descriptions">
+							<li class="tsd-description"><aside class="tsd-sources">
+									<p>Inherited from 
+										<a href="plottable.interaction.drag.html#callbacktocall">callbackToCall</a>.<a href="plottable.interaction.drag.html#callbacktocall.callbacktocall_function_signature">callbackToCall function signature</a>
+									</p>
+									<ul>
+										<li>Defined in plottable.d.ts:2379</li>
+									</ul>
+								</aside>
+								<h4>Parameters</h4>
+								<ul>
+									<li>
+										<h5>dragInfo: <span class="tsd-signature-type">any</span></h5>
+									</li>
+								</ul>
+								<h4>Returns 
+									<span class="tsd-signature-type">any</span>
+								</h4>
+							</li>
+						</ul>
+					</section>
+				</section>
+				<section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="componenttolistento" class="anchor"></a>
+					<h3>component<wbr>ToListen<wbr>To</h3>
+					<div class="tsd-signature tsd-kind-icon">component<wbr>ToListen<wbr>To<span class="tsd-signature-symbols">:</span> <a href="plottable.abstract.component.html" class="tsd-signature-type">Component</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from 
+							<a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#componenttolistento">componentToListenTo</a>
+						</p>
+						<ul>
+							<li>Defined in plottable.d.ts:2274</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="dragbox" class="anchor"></a>
+					<h3>drag<wbr>Box</h3>
+					<div class="tsd-signature tsd-kind-icon">drag<wbr>Box<span class="tsd-signature-symbols">:</span> <a href="../interfaces/d3.selection.html" class="tsd-signature-type">Selection</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from 
+							<a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#dragbox">dragBox</a>
+						</p>
+						<ul>
+							<li>Defined in plottable.d.ts:2402</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="hitbox" class="anchor"></a>
+					<h3>hit<wbr>Box</h3>
+					<div class="tsd-signature tsd-kind-icon">hit<wbr>Box<span class="tsd-signature-symbols">:</span> <a href="../interfaces/d3.selection.html" class="tsd-signature-type">Selection</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from 
+							<a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#hitbox">hitBox</a>
+						</p>
+						<ul>
+							<li>Defined in plottable.d.ts:2273</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="location" class="anchor"></a>
+					<h3>location</h3>
+					<div class="tsd-signature tsd-kind-icon">location<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">Array&lt;number&gt;</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from 
+							<a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#location">location</a>
+						</p>
+						<ul>
+							<li>Defined in plottable.d.ts:2378</li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="origin" class="anchor"></a>
+					<h3>origin</h3>
+					<div class="tsd-signature tsd-kind-icon">origin<span class="tsd-signature-symbols">:</span> <span class="tsd-signature-type">Array&lt;number&gt;</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from 
+							<a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#origin">origin</a>
+						</p>
+						<ul>
+							<li>Defined in plottable.d.ts:2377</li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="callback" class="anchor"></a>
+					<h3>callback</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">callback<span class="tsd-signature-symbols">(</span>cb<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<p>Inherited from 
+									<a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#callback">callback</a>
+								</p>
+								<ul>
+									<li>Defined in plottable.d.ts:2392</li>
+								</ul>
+							</aside>
+							<p>Adds a callback to be called when the AreaInteraction triggers.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>cb?: <span class="tsd-signature-type">Function</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+									<p>The function to be called. Takes in a SelectionArea in pixels.</p>
+									<ul>
+										<li>
+											<h5>cb function signature<span class="tsd-signature-symbols"></span></h5>
+											<ul class="tsd-signatures tsd-kind-function-type tsd-parent-kind-parameter tsd-is-inherited">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbols">(</span>a<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description"><aside class="tsd-sources">
+														<p>Inherited from 
+															<a href="../undefined">cb</a>.<a href="../undefined">cb function signature</a>
+														</p>
+														<ul>
+															<li>Defined in plottable.d.ts:2392</li>
+														</ul>
+													</aside>
+													<h4>Parameters</h4>
+													<ul>
+														<li>
+															<h5>a: <span class="tsd-signature-type">any</span></h5>
+														</li>
+													</ul>
+													<h4>Returns 
+														<span class="tsd-signature-type">any</span>
+													</h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a>
+							</h4>
+							<p>The calling AreaInteraction.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="clearbox" class="anchor"></a>
+					<h3>clear<wbr>Box</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">clear<wbr>Box<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.dragbox.html" class="tsd-signature-type">DragBox</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<p>Inherited from 
+									<a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#clearbox">clearBox</a>
+								</p>
+								<ul>
+									<li>Defined in plottable.d.ts:2409</li>
+								</ul>
+							</aside>
+							<p>Clears the highlighted drag-selection box drawn by the AreaInteraction.</p>
+							<h4>Returns 
+								<a href="plottable.interaction.dragbox.html" class="tsd-signature-type">DragBox</a>
+							</h4>
+							<p>The calling AreaInteraction.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="registerwithcomponent" class="anchor"></a>
+					<h3>register<wbr>With<wbr>Component</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">register<wbr>With<wbr>Component<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.abstract.interaction.html" class="tsd-signature-type">Interaction</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<p>Inherited from 
+									<a href="plottable.abstract.interaction.html">Interaction</a>.<a href="plottable.abstract.interaction.html#registerwithcomponent">registerWithComponent</a>
+								</p>
+								<ul>
+									<li>Defined in plottable.d.ts:2286</li>
+								</ul>
+							</aside>
+							<p>Registers the Interaction on the Component it&#39;s listening to.
+							This needs to be called to activate the interaction.</p>
+							<h4>Returns 
+								<a href="plottable.abstract.interaction.html" class="tsd-signature-type">Interaction</a>
+							</h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="setbox" class="anchor"></a>
+					<h3>set<wbr>Box</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Box<span class="tsd-signature-symbols">(</span>x0<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span>, x1<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.xdragbox.html" class="tsd-signature-type">XDragBox</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<p>Overwrites 
+									<a href="plottable.interaction.dragbox.html">DragBox</a>.<a href="plottable.interaction.dragbox.html#setbox">setBox</a>
+								</p>
+								<ul>
+									<li>Defined in plottable.d.ts:2419</li>
+								</ul>
+							</aside>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>x0: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>x1: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.interaction.xdragbox.html" class="tsd-signature-type">XDragBox</a>
+							</h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="setupzoomcallback" class="anchor"></a>
+					<h3>setup<wbr>Zoom<wbr>Callback</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">setup<wbr>Zoom<wbr>Callback<span class="tsd-signature-symbols">(</span>xScale<span class="tsd-signature-symbols">?: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a>, yScale<span class="tsd-signature-symbols">?: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<p>Inherited from 
+									<a href="plottable.interaction.drag.html">Drag</a>.<a href="plottable.interaction.drag.html#setupzoomcallback">setupZoomCallback</a>
+								</p>
+								<ul>
+									<li>Defined in plottable.d.ts:2393</li>
+								</ul>
+							</aside>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>xScale?: <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+								</li>
+								<li>
+									<h5>yScale?: <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.interaction.drag.html" class="tsd-signature-type">Drag</a>
+							</h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="offset-1 col-3">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-container">
+						<a href="../modules/d3.html">D3</a>
+					</li>
+					<li class="current tsd-kind-container">
+						<a href="../modules/plottable.html">Plottable</a>
+						<ul>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.abstract.html">Abstract</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.animator.html">Animator</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.axis.html">Axis</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.component.html">Component</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.core.html">Core</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.formatter.html">Formatter</a>
+							</li>
+							<li class="current tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.interaction.html">Interaction</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.plot.html">Plot</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.scale.html">Scale</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.template.html">Template</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.util.html">Util</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary">
+				<ul>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.click.html" class="tsd-kind-icon">Click</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.doubleclick.html" class="tsd-kind-icon">Double<wbr>Click</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.drag.html" class="tsd-kind-icon">Drag</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.dragbox.html" class="tsd-kind-icon">Drag<wbr>Box</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.key.html" class="tsd-kind-icon">Key</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.mousemove.html" class="tsd-kind-icon">Mousemove</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.panzoom.html" class="tsd-kind-icon">Pan<wbr>Zoom</a>
+					</li>
+					<li class="current tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.xdragbox.html" class="tsd-kind-icon">XDrag<wbr>Box</a>
+						<ul>
+							<li class=" tsd-kind-constructor-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#boxisdrawn" class="tsd-kind-icon">box<wbr>IsDrawn</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#callbacktocall" class="tsd-kind-icon">callback<wbr>ToCall</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#componenttolistento" class="tsd-kind-icon">component<wbr>ToListen<wbr>To</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#dragbox" class="tsd-kind-icon">drag<wbr>Box</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#hitbox" class="tsd-kind-icon">hit<wbr>Box</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#location" class="tsd-kind-icon">location</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#origin" class="tsd-kind-icon">origin</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#callback" class="tsd-kind-icon">callback</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#clearbox" class="tsd-kind-icon">clear<wbr>Box</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#registerwithcomponent" class="tsd-kind-icon">register<wbr>With<wbr>Component</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plottable.interaction.xdragbox.html#setbox" class="tsd-kind-icon">set<wbr>Box</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plottable.interaction.xdragbox.html#setupzoomcallback" class="tsd-kind-icon">setup<wbr>Zoom<wbr>Callback</a>
+							</li>
+						</ul>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.xydragbox.html" class="tsd-kind-icon">XYDrag<wbr>Box</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.interaction.ydragbox.html" class="tsd-kind-icon">YDrag<wbr>Box</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
 </div>
-
 <script src="../assets/js/main.js"></script>
-
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

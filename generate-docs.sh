@@ -7,6 +7,6 @@ if [[ "$version" == "" ]]; then
     exit 1
 fi
 
-git checkout "$version" -- plottable.d.ts plottable.js src/ typings/ &&
-./node_modules/typedoc/bin/typedoc docs.d.ts --out docs/ &&
-git rm -rf src/ typings/ > /dev/null
+git checkout "$version" -- plottable.d.ts typings/ &&
+./node_modules/typedoc/bin/typedoc --includeDeclarations typings/d3/d3.d.ts plottable.d.ts --out docs/ &&
+git rm -rf typings/ > /dev/null
