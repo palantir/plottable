@@ -22,7 +22,7 @@ var colorScale = new Plottable.Scale.Color("10").domain(["q1", "q2", "q3"]);
 
 var xAxis = new Plottable.Axis.Category(xScale, "bottom");
 var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-stackedBarRenderer = new Plottable.Plot.StackedBar([], xScale, yScale)
+stackedBarRenderer = new Plottable.Plot.StackedBar(xScale, yScale)
   .addDataset("d1", data1)
   .addDataset("d2", data2)
   .addDataset("d3", data3)
