@@ -5149,27 +5149,6 @@ var Plottable;
                 this._render();
                 return this;
             };
-            NewStyleBarPlot.prototype.barAlignment = function (alignment) {
-                var alignmentLC = alignment.toLowerCase();
-                var align2factor = this.constructor._BarAlignmentToFactor;
-                if (align2factor[alignmentLC] === undefined) {
-                    throw new Error("unsupported bar alignment");
-                }
-                this._barAlignmentFactor = align2factor[alignmentLC];
-                this._render();
-                return this;
-            };
-            NewStyleBarPlot.prototype.parseExtent = function (input) {
-                if (typeof (input) === "number") {
-                    return { min: input, max: input };
-                }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
-                }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an IExtent");
-                }
-            };
             NewStyleBarPlot.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Abstract.QuantitativeScale) {
                     var qscale = scale;

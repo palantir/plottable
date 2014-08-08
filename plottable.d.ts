@@ -943,7 +943,6 @@ declare module Plottable {
             };
             constructor(xScale: Scale, yScale: Scale);
             baseline(value: number): NewStyleBarPlot;
-            barAlignment(alignment: string): NewStyleBarPlot;
         }
     }
 }
