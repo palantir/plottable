@@ -2387,24 +2387,24 @@ declare module Plottable {
             /**
             * Adds a callback to be called when dragging starts.
             *
-            * @param {(a: SelectionArea) => any} cb The function to be called.
+            * @param {(startLocation: ICoord) => any} cb The function to be called.
             * @returns {AreaInteraction}
             */
-            public dragstart(cb?: (a: ICoord) => any): Drag;
+            public dragstart(cb?: (startLocation: ICoord) => any): Drag;
             /**
             * Adds a callback to be called during dragging.
             *
-            * @param {(a: SelectionArea) => any} cb The function to be called.
+            * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called.
             * @returns {AreaInteraction}
             */
-            public drag(cb?: (a: ICoord, b: ICoord) => any): Drag;
+            public drag(cb?: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
             /**
             * Adds a callback to be called when the dragging ends.
             *
-            * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+            * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called. Takes in a SelectionArea in pixels.
             * @returns {AreaInteraction} The calling AreaInteraction.
             */
-            public dragend(cb?: (a: ICoord, b: ICoord) => any): Drag;
+            public dragend(cb?: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
             public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale): Drag;
         }
     }

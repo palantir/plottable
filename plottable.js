@@ -7211,7 +7211,7 @@ var Plottable;
             /**
             * Adds a callback to be called when dragging starts.
             *
-            * @param {(a: SelectionArea) => any} cb The function to be called.
+            * @param {(startLocation: ICoord) => any} cb The function to be called.
             * @returns {AreaInteraction}
             */
             Drag.prototype.dragstart = function (cb) {
@@ -7222,7 +7222,7 @@ var Plottable;
             /**
             * Adds a callback to be called during dragging.
             *
-            * @param {(a: SelectionArea) => any} cb The function to be called.
+            * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called.
             * @returns {AreaInteraction}
             */
             Drag.prototype.drag = function (cb) {
@@ -7233,7 +7233,7 @@ var Plottable;
             /**
             * Adds a callback to be called when the dragging ends.
             *
-            * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+            * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called. Takes in a SelectionArea in pixels.
             * @returns {AreaInteraction} The calling AreaInteraction.
             */
             Drag.prototype.dragend = function (cb) {

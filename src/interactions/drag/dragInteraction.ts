@@ -29,10 +29,10 @@ export module Interaction {
     /**
      * Adds a callback to be called when dragging starts.
      *
-     * @param {(a: SelectionArea) => any} cb The function to be called.
+     * @param {(startLocation: ICoord) => any} cb The function to be called.
      * @returns {AreaInteraction}
      */
-    public dragstart(cb?: (a: ICoord) => any) {
+    public dragstart(cb?: (startLocation: ICoord) => any) {
       this.ondragstart = cb;
       return this;
     }
@@ -40,10 +40,10 @@ export module Interaction {
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(a: SelectionArea) => any} cb The function to be called.
+     * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called.
      * @returns {AreaInteraction}
      */
-    public drag(cb?: (a: ICoord, b: ICoord) => any) {
+    public drag(cb?: (startLocation: ICoord, endLocation: ICoord) => any) {
       this.ondrag = cb;
       return this;
     }
@@ -51,10 +51,10 @@ export module Interaction {
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+     * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called. Takes in a SelectionArea in pixels.
      * @returns {AreaInteraction} The calling AreaInteraction.
      */
-    public dragend(cb?: (a: ICoord, b: ICoord) => any) {
+    public dragend(cb?: (startLocation: ICoord, endLocation: ICoord) => any) {
       this.ondragend = cb;
       return this;
     }
