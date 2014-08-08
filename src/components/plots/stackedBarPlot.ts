@@ -15,13 +15,6 @@ export module Plot {
       super(xScale, yScale);
     }
 
-
-    public _onDataSourceUpdate() {
-      super._onDataSourceUpdate();
-      // this.stackedData = this.stack(this._yAccessor);
-      this._render();
-    }
-
     public _updateAllProjectors() {
       super._updateAllProjectors();
       if (this.yScale == null) {
@@ -49,7 +42,7 @@ export module Plot {
       return new Drawer.RectDrawer(key);
     }
 
-    public stack(accessor: IAccessor) {
+    private stack(accessor: IAccessor) {
       var datasets = d3.values(this._key2DatasetDrawerKey);
       var lengths = datasets.map((d) => d.dataset.data().length);
       if (Util.Methods.uniqNumbers(lengths).length > 1) {

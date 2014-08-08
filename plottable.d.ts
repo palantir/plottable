@@ -954,11 +954,8 @@ declare module Plottable {
             static DEFAULT_WIDTH: number;
             colorScale: Plottable.Scale.Color;
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
-            cluster(accessor: IAccessor): {
-                [x: string]: any[];
-            };
             getDrawer(key: string): Drawer.RectDrawer;
-            setColor(scale: Plottable.Scale.Color): void;
+            setColor(scale: Plottable.Scale.Color): ClusteredBar;
         }
     }
 }
@@ -970,7 +967,6 @@ declare module Plottable {
             stackedData: any[][];
             constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
             getDrawer(key: string): Drawer.RectDrawer;
-            stack(accessor: IAccessor): any[][];
         }
     }
 }

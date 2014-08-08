@@ -5238,6 +5238,26 @@ var Plottable;
                 this._isVertical = true;
                 this.innerScale = new Plottable.Scale.Ordinal();
             }
+            ClusteredBar.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var widthF = attrToProjector["width"];
+                this.innerScale.range([0, widthF(null, 0)]);
+                attrToProjector["width"] = function (d, i) { return _this.innerScale.rangeBand(); };
+                var primaryScale = this._isVertical ? this.yScale : this.xScale;
+                var getFill = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_FILL; };
+                var getX = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_X; };
+                attrToProjector["fill"] = getFill;
+                attrToProjector["x"] = getX;
+                return attrToProjector;
+            };
+            ClusteredBar.prototype.getDrawer = function (key) {
+                return new Plottable.Drawer.RectDrawer(key);
+            };
+            ClusteredBar.prototype.setColor = function (scale) {
+                this.colorScale = scale;
+                return this;
+            };
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
@@ -5265,25 +5285,6 @@ var Plottable;
                 var clusteredData = this.cluster(accessor);
                 this._getDrawersInOrder().forEach(function (d) { return d.draw(clusteredData[d.key], attrHash); });
             };
-            ClusteredBar.prototype.getDrawer = function (key) {
-                return new Plottable.Drawer.RectDrawer(key);
-            };
-            ClusteredBar.prototype._generateAttrToProjector = function () {
-                var _this = this;
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var widthF = attrToProjector["width"];
-                this.innerScale.range([0, widthF(null, 0)]);
-                attrToProjector["width"] = function (d, i) { return _this.innerScale.rangeBand(); };
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var getFill = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_FILL; };
-                var getX = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_X; };
-                attrToProjector["fill"] = getFill;
-                attrToProjector["x"] = getX;
-                return attrToProjector;
-            };
-            ClusteredBar.prototype.setColor = function (scale) {
-                this.colorScale = scale;
-            };
             ClusteredBar.DEFAULT_WIDTH = 10;
             return ClusteredBar;
         })(Plottable.Abstract.NewStyleBarPlot);
@@ -5310,10 +5311,6 @@ var Plottable;
                 this._baselineValue = 0;
                 this.stackedExtent = [];
             }
-            StackedBar.prototype._onDataSourceUpdate = function () {
-                _super.prototype._onDataSourceUpdate.call(this);
-                this._render();
-            };
             StackedBar.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);
                 if (this.yScale == null) {

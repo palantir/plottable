@@ -35,6 +35,13 @@ export module Abstract {
       this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
     }
 
+    /**
+     * Adds a dataset to this plot. Optionally identify this dataset with a key.
+     *
+     * @param [key] The key of the dataset.
+     * @param {dataset} The dataset to add.
+     * @return {Plot} The calling Plot. 
+     */
     public addDataset(key: string, dataset: DataSource): Plot;
     public addDataset(key: string, dataset: any[]): Plot;
     public addDataset(dataset: DataSource): Plot;
@@ -70,6 +77,11 @@ export module Abstract {
       this._onDataSourceUpdate();
     }
 
+    /**
+     * Gets a drawer by key.
+     * 
+     * @param {key} The key to use.
+     */
     public getDrawer(key: string): Abstract.Drawer {
       throw new Error("Abstract Method Not Implemented");
     }
@@ -91,7 +103,17 @@ export module Abstract {
       return this;
     }
 
+    /**
+     * Gets the dataset order by key
+     * 
+     * @return {string[]} a string array of the keys in order
+     */
     public datasetOrder(): string[];
+    /**
+     * Sets the dataset order by key
+     *
+     * @param {order} A string array which represents the order of the keys. This must be a permutation of existing keys.
+     */
     public datasetOrder(order: string[]): NewStylePlot;
     public datasetOrder(order?: string[]): any {
       if (order === undefined) {
@@ -111,6 +133,12 @@ export module Abstract {
       return this;
     }
 
+    /**
+     * Removes a dataset
+     *
+     * @param {key} The key of the dataset
+     * @return {Plot} The calling Plot.
+     */
     public removeDataset(key: string): Plot {
       if (this._key2DatasetDrawerKey[key] != null) {
         var ddk = this._key2DatasetDrawerKey[key];

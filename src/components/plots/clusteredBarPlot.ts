@@ -13,7 +13,38 @@ export module Plot {
       this.innerScale = new Scale.Ordinal();
     }
 
-    public cluster(accessor: IAccessor) {
+
+    public _generateAttrToProjector() {
+      var attrToProjector = super._generateAttrToProjector();
+      // the width is constant, so set the inner scale range to that
+      var widthF = attrToProjector["width"];
+      this.innerScale.range([0, widthF(null, 0)]);
+      attrToProjector["width"] = (d: any, i: number) => this.innerScale.rangeBand();
+
+      var primaryScale = this._isVertical ? this.yScale : this.xScale;
+      var getFill = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_FILL;
+      var getX = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_X;
+      attrToProjector["fill"] = getFill;
+      attrToProjector["x"] = getX;
+      return attrToProjector;
+    }
+
+    public getDrawer(key: string) {
+      return new Drawer.RectDrawer(key);
+    }
+
+    /**
+     * TODO: remove this method once accessor can also take in series keys
+     * Sets the colorScale, sets colors based on the seriesKey
+     * 
+     * @param {scale} The color scale to set
+     */
+    public setColor(scale: Scale.Color) {
+      this.colorScale = scale;
+      return this;
+    }
+
+    private cluster(accessor: IAccessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
       this.colorScale.domain(this._datasetKeysInOrder);
 
@@ -41,30 +72,6 @@ export module Plot {
       var attrHash = this._generateAttrToProjector();
       var clusteredData = this.cluster(accessor);
       this._getDrawersInOrder().forEach((d) => d.draw(clusteredData[d.key], attrHash));
-    }
-
-    public getDrawer(key: string) {
-      return new Drawer.RectDrawer(key);
-    }
-
-    public _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      // the width is constant, so set the inner scale range to that
-      var widthF = attrToProjector["width"];
-      this.innerScale.range([0, widthF(null, 0)]);
-      attrToProjector["width"] = (d: any, i: number) => this.innerScale.rangeBand();
-
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
-      var getFill = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_FILL;
-      var getX = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_X;
-      attrToProjector["fill"] = getFill;
-      attrToProjector["x"] = getX;
-      return attrToProjector;
-    }
-
-    // manually set colorscale for now, this should be easy to fix once the accessor changes come through
-    public setColor(scale: Scale.Color) {
-      this.colorScale = scale;
     }
   }
 }
