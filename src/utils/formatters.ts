@@ -9,6 +9,16 @@ module Plottable {
 
   export class Formatters {
 
+    /**
+     * Creates a formatter for currency values.
+     *
+     * @param {number} [precision] The number of decimal places to show.
+     * @param {String} [symbol] The currency symbol to use.
+     * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
+     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting.
+     *
+     * @returns {function} A formatter for currency values.
+     */
     public static currency(precision = 2, symbol = "$", prefix = true, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
@@ -31,6 +41,14 @@ module Plottable {
       };
     }
 
+    /**
+     * Creates a formatter that displays exactly [precision] decimal places.
+     *
+     * @param {number} [precision] The number of decimal places to show.
+     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting.
+     *
+     * @returns {function} A formatter that displays exactly [precision] decimal places.
+     */
     public static fixed(precision = 3, onlyShowUnchanged = true) {
       Formatters.verifyPrecision(precision);
       return function(d: any) {
@@ -42,6 +60,15 @@ module Plottable {
       };
     }
 
+    /**
+     * Creates a formatter that formats numbers to show no more than
+     * [precision] decimal places. All other values are stringified.
+     *
+     * @param {number} [precision] The number of decimal places to show.
+     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting.
+     *
+     * @returns {function} A formatter for general values.
+     */
     public static general(precision = 3, onlyShowUnchanged = true) {
       Formatters.verifyPrecision(precision);
       return function(d: any) {
@@ -58,12 +85,26 @@ module Plottable {
       };
     }
 
+    /**
+     * Creates a formatter that stringifies its input.
+     *
+     * @returns {function} A formatter that stringifies its input.
+     */
     public static identity() {
       return function(d: any) {
         return String(d);
       };
     }
 
+    /**
+     * Creates a formatter for percentage values.
+     * Multiplies the input by 100 and appends "%".
+     *
+     * @param {number} [precision] The number of decimal places to show.
+     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting.
+     *
+     * @returns {function} A formatter for percentage values.
+     */
     public static percentage(precision = 0, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
       return function(d: any) {
@@ -78,6 +119,13 @@ module Plottable {
       };
     }
 
+    /**
+     * Creates a formatter for values that displays [precision] significant figures.
+     *
+     * @param {number} [precision] The number of significant figures to show.
+     *
+     * @returns {function} A formatter for SI values.
+     */
     public static siSuffix(precision = 3) {
       Formatters.verifyPrecision(precision);
       return function(d: any) {
@@ -85,6 +133,11 @@ module Plottable {
       };
     }
 
+    /**
+     * Creates a formatter that displays [precision] dates.
+     *
+     * @returns {function} A formatter for time/date values.
+     */
     public static time() {
 
       var numFormats = 8;
