@@ -27,34 +27,55 @@ export module Interaction {
     }
 
     /**
-     * Adds a callback to be called when dragging starts.
+     * Gets the callback that is called when dragging starts.
+     *
+     * @returns {any}
+     */
+    public dragstart(): any;
+    /**
+     * Sets the callback to be called when dragging starts.
      *
      * @param {(startLocation: ICoord) => any} cb The function to be called.
-     * @returns {AreaInteraction}
+     * @returns {Drag}
      */
-    public dragstart(cb?: (startLocation: ICoord) => any) {
+    public dragstart(cb: (startLocation: ICoord) => any): Drag;
+    public dragstart(cb?: (startLocation: ICoord) => any): Drag {
       this.ondragstart = cb;
       return this;
     }
 
     /**
+     * Gets the callback that is called during dragging.
+     *
+     * @returns {any}
+     */
+    public drag(): any;
+    /**
      * Adds a callback to be called during dragging.
      *
      * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called.
-     * @returns {AreaInteraction}
+     * @returns {Drag}
      */
-    public drag(cb?: (startLocation: ICoord, endLocation: ICoord) => any) {
+    public drag(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
+    public drag(cb?: (startLocation: ICoord, endLocation: ICoord) => any): Drag {
       this.ondrag = cb;
       return this;
     }
 
     /**
+     * Gets the callback that is called when dragging ends.
+     *
+     * @returns {any}
+     */
+    public dragend(): any;
+    /**
      * Adds a callback to be called when the dragging ends.
      *
      * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called. Takes in a SelectionArea in pixels.
-     * @returns {AreaInteraction} The calling AreaInteraction.
+     * @returns {Drag} The calling Drag.
      */
-    public dragend(cb?: (startLocation: ICoord, endLocation: ICoord) => any) {
+    public dragend(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
+    public dragend(cb?: (startLocation: ICoord, endLocation: ICoord) => any): Drag {
       this.ondragend = cb;
       return this;
     }

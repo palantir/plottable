@@ -4915,9 +4915,9 @@ describe("Interactions", function () {
         });
 
         afterEach(function () {
-            interaction.dragstart();
-            interaction.drag();
-            interaction.dragend();
+            interaction.dragstart(null);
+            interaction.drag(null);
+            interaction.dragend(null);
             interaction.clearBox();
         });
 
@@ -4996,9 +4996,9 @@ describe("Interactions", function () {
         });
 
         afterEach(function () {
-            interaction.dragstart();
-            interaction.drag();
-            interaction.dragend();
+            interaction.dragstart(null);
+            interaction.drag(null);
+            interaction.dragend(null);
             interaction.clearBox();
         });
 

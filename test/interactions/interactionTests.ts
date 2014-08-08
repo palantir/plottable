@@ -105,9 +105,9 @@ describe("Interactions", () => {
     });
 
     afterEach(() => {
-      interaction.dragstart();
-      interaction.drag();
-      interaction.dragend();
+      interaction.dragstart(null);
+      interaction.drag(null);
+      interaction.dragend(null);
       interaction.clearBox();
     });
 
@@ -186,9 +186,9 @@ describe("Interactions", () => {
     });
 
     afterEach(() => {
-      interaction.dragstart();
-      interaction.drag();
-      interaction.dragend();
+      interaction.dragstart(null);
+      interaction.drag(null);
+      interaction.dragend(null);
       interaction.clearBox();
     });
 

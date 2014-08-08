@@ -7208,34 +7208,16 @@ var Plottable;
                     return _this._dragend();
                 });
             }
-            /**
-            * Adds a callback to be called when dragging starts.
-            *
-            * @param {(startLocation: ICoord) => any} cb The function to be called.
-            * @returns {AreaInteraction}
-            */
             Drag.prototype.dragstart = function (cb) {
                 this.ondragstart = cb;
                 return this;
             };
 
-            /**
-            * Adds a callback to be called during dragging.
-            *
-            * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called.
-            * @returns {AreaInteraction}
-            */
             Drag.prototype.drag = function (cb) {
                 this.ondrag = cb;
                 return this;
             };
 
-            /**
-            * Adds a callback to be called when the dragging ends.
-            *
-            * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called. Takes in a SelectionArea in pixels.
-            * @returns {AreaInteraction} The calling AreaInteraction.
-            */
             Drag.prototype.dragend = function (cb) {
                 this.ondragend = cb;
                 return this;
