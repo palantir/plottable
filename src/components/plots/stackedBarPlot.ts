@@ -10,10 +10,9 @@ export module Plot {
     public _baselineValue = 0;
     public _baseline: D3.Selection;
     private stackedExtent: number[] = [];
-    private keysInStackOrder: string[] = [];
 
-    constructor(dataset: any, xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
-      super(dataset, xScale, yScale);
+    constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
+      super(xScale, yScale);
     }
 
 
@@ -46,16 +45,6 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _addDataset(key: string, dataset: DataSource) {
-      this.keysInStackOrder.push(key);
-      return super._addDataset(key, dataset);
-    }
-
-    public removeDataset(key: string) {
-      this.keysInStackOrder.splice(this.keysInStackOrder.indexOf(key), 1);
-      return super.removeDataset(key);
-    }
-
     public getDrawer(key: string) {
       return new Drawer.RectDrawer(key);
     }
@@ -67,7 +56,7 @@ export module Plot {
         Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
       }
       var currentBase = Util.Methods.createFilledArray(0, lengths[0]);
-      var datasetsInStackOrder = this.keysInStackOrder.map((k) => this._key2DatasetDrawerKey[k].dataset);
+      var datasetsInStackOrder = this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].dataset);
       var stacks = datasetsInStackOrder.map((dataset) => {
         var data = dataset.data();
         var base = currentBase.slice();
@@ -92,7 +81,7 @@ export module Plot {
       var accessor = this._projectors["y"].accessor;
       var attrHash = this._generateAttrToProjector();
       var stackedData = this.stack(accessor);
-      var drawersInStackOrder = this.keysInStackOrder.map((k) => this._key2DatasetDrawerKey[k].drawer);
+      var drawersInStackOrder = this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].drawer);
       drawersInStackOrder.forEach((d, i) => d.draw(stackedData[i], attrHash));
 
     }

@@ -966,6 +966,18 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Plot {
+        class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
+            stackedData: any[][];
+            constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
+            getDrawer(key: string): Drawer.RectDrawer;
+            stack(accessor: IAccessor): any[][];
+        }
+    }
+}
+
+
+declare module Plottable {
     module Animator {
         class Null implements IPlotAnimator {
             animate(selection: any, attrToProjector: Plottable.Abstract.IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
