@@ -36,21 +36,8 @@ export module Axis {
       var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxTickLength() + this.tickLabelPadding();
       var heightRequiredByTicks = this._isHorizontal() ? this._maxTickLength() + this.tickLabelPadding() : 0;
 
-      if (offeredWidth < 0 || offeredHeight < 0) {
-        return {
-          width:  offeredWidth,
-          height: offeredHeight,
-          wantsWidth: !this._isHorizontal(),
-          wantsHeight: this._isHorizontal()
-        };
-      }
       if (this._scale.domain().length === 0) {
-        return {
-          width: 0,
-          height: 0,
-          wantsWidth: false,
-          wantsHeight: false
-        };
+        return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
       var fakeScale = this._scale.copy();

@@ -4,9 +4,11 @@ module Plottable {
 export module Abstract {
   export class Axis extends Abstract.Component {
     public static END_TICK_MARK_CLASS = "end-tick-mark";
+    /**
+     * The css class applied to each tick mark (the line on the tick).
+     */
     public static TICK_MARK_CLASS = "tick-mark";
     public static TICK_LABEL_CLASS = "tick-label";
-    public axisElement: D3.Selection;
     public _tickMarkContainer: D3.Selection;
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
@@ -20,7 +22,9 @@ export module Abstract {
     private _endTickLength = 5;
     private _tickLength = 5;
     private _tickLabelPadding = 3;
+    private _gutter = 10;
     private _showEndTickLabels = false;
+
 
     constructor(scale: Abstract.Scale, orientation: string, formatter?: any) {
       super();
@@ -74,7 +78,7 @@ export module Abstract {
           if (this._computedHeight == null) {
             this._computeHeight();
           }
-          requestedHeight = this._computedHeight;
+          requestedHeight = this._computedHeight + this._gutter;
         }
         requestedWidth = 0;
       } else { // vertical
@@ -82,17 +86,25 @@ export module Abstract {
           if (this._computedWidth == null) {
             this._computeWidth();
           }
-          requestedWidth = this._computedWidth;
+          requestedWidth = this._computedWidth + this._gutter;
         }
         requestedHeight = 0;
       }
 
       return {
-        width : Math.min(offeredWidth, requestedWidth),
-        height: Math.min(offeredHeight, requestedHeight),
+        width : requestedWidth,
+        height: requestedHeight,
         wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
         wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
       };
+    }
+
+    public _isFixedHeight() {
+      return this._isHorizontal();
+    }
+
+    public _isFixedWidth() {
+      return !this._isHorizontal();
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -392,6 +404,32 @@ export module Abstract {
           throw new Error("tick label padding must be positive");
         }
         this._tickLabelPadding = padding;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+     *
+     * @returns {number} The current size of the gutter, in pixels.
+     */
+    public gutter(): number;
+    /**
+     * Sets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+     *
+     * @param {number} size The desired size of the gutter, in pixels.
+     * @returns {Axis} The calling Axis.
+     */
+    public gutter(size: number): Axis;
+    public gutter(size?: number): any {
+      if (size == null) {
+        return this._gutter;
+      } else {
+        if (size < 0) {
+          throw new Error("gutter size must be positive");
+        }
+        this._gutter = size;
         this._invalidateLayout();
         return this;
       }

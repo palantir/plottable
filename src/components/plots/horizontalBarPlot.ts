@@ -2,9 +2,19 @@
 
 module Plottable {
 export module Plot {
+  /**
+   * A HorizontalBarPlot draws bars horizontally.
+   * Key projected attributes:
+   *  - "width" - the vertical height of a bar (since the bar is rotated horizontally)
+   *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
+   *      - if a quantitative scale is attached, this defaults to 10
+   *  - "x" - the horizontal length of a bar
+   *  - "y" - the vertical position of a bar
+   */
   export class HorizontalBar extends Abstract.BarPlot {
     public static _BarAlignmentToFactor: {[alignment: string]: number} = {"top": 0, "center": 0.5, "bottom": 1};
     public isVertical = false;
+
     /**
      * Creates a HorizontalBarPlot.
      *
@@ -16,7 +26,6 @@ export module Plot {
     constructor(dataset: any, xScale: Abstract.QuantitativeScale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
     }
-
 
     public _updateXDomainer() {
       this._updateDomainer(this.xScale);
