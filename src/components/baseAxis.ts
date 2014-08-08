@@ -59,13 +59,13 @@ export module Abstract {
 
     public _computeWidth() {
       // to be overridden by subclass logic
-      this._computedWidth = this._maxTickLength();
+      this._computedWidth = this._maxLabelTickLength();
       return this._computedWidth;
     }
 
     public _computeHeight() {
       // to be overridden by subclass logic
-      this._computedHeight = this._maxTickLength();
+      this._computedHeight = this._maxLabelTickLength();
       return this._computedHeight;
     }
 
@@ -371,13 +371,9 @@ export module Abstract {
       }
     }
 
-    public _maxTickLength() {
-      return Math.max(this.tickLength(), this.endTickLength());
-    }
-
     public _maxLabelTickLength() {
       if (this.showEndTickLabels()) {
-        return this._maxTickLength();
+        return Math.max(this.tickLength(), this.endTickLength());
       } else {
         return this.tickLength();
       }

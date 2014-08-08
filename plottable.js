@@ -3124,11 +3124,11 @@ var Plottable;
                 return this._orientation === "top" || this._orientation === "bottom";
             };
             Axis.prototype._computeWidth = function () {
-                this._computedWidth = this._maxTickLength();
+                this._computedWidth = this._maxLabelTickLength();
                 return this._computedWidth;
             };
             Axis.prototype._computeHeight = function () {
-                this._computedHeight = this._maxTickLength();
+                this._computedHeight = this._maxLabelTickLength();
                 return this._computedHeight;
             };
             Axis.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -3338,12 +3338,9 @@ var Plottable;
                     return this;
                 }
             };
-            Axis.prototype._maxTickLength = function () {
-                return Math.max(this.tickLength(), this.endTickLength());
-            };
             Axis.prototype._maxLabelTickLength = function () {
                 if (this.showEndTickLabels()) {
-                    return this._maxTickLength();
+                    return Math.max(this.tickLength(), this.endTickLength());
                 }
                 else {
                     return this.tickLength();
@@ -3473,7 +3470,7 @@ var Plottable;
                 var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
                 this.tickLength(textHeight);
                 this.endTickLength(textHeight);
-                this._computedHeight = this._maxTickLength() + 2 * this.tickLabelPadding();
+                this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
                 return this._computedHeight;
             };
             Time.prototype.calculateWorstWidth = function (container, format) {
@@ -3715,10 +3712,10 @@ var Plottable;
                 testTextEl.remove();
                 var maxTextLength = d3.max(textLengths);
                 if (this.tickLabelPositioning === "center") {
-                    this._computedWidth = this._maxTickLength() + this.tickLabelPadding() + maxTextLength;
+                    this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
                 }
                 else {
-                    this._computedWidth = Math.max(this._maxTickLength(), this.tickLabelPadding() + maxTextLength);
+                    this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
                 }
                 return this._computedWidth;
             };
@@ -3728,10 +3725,10 @@ var Plottable;
                 var textHeight = measurer("test").height;
                 testTextEl.remove();
                 if (this.tickLabelPositioning === "center") {
-                    this._computedHeight = this._maxTickLength() + this.tickLabelPadding() + textHeight;
+                    this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
                 else {
-                    this._computedHeight = Math.max(this._maxTickLength(), this.tickLabelPadding() + textHeight);
+                    this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + textHeight);
                 }
                 return this._computedHeight;
             };
@@ -3904,8 +3901,8 @@ var Plottable;
                 return this;
             };
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
-                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxTickLength() + this.tickLabelPadding();
-                var heightRequiredByTicks = this._isHorizontal() ? this._maxTickLength() + this.tickLabelPadding() : 0;
+                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 if (this._scale.domain().length === 0) {
                     return { width: 0, height: 0, wantsWidth: false, wantsHeight: false };
                 }

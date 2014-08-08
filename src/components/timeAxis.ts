@@ -110,7 +110,7 @@ export module Axis {
       var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
       this.tickLength(textHeight);
       this.endTickLength(textHeight);
-      this._computedHeight = this._maxTickLength() + 2 * this.tickLabelPadding();
+      this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
       return this._computedHeight;
     }
 

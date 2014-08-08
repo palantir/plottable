@@ -37,9 +37,9 @@ export module Axis {
       var maxTextLength = d3.max(textLengths);
 
       if (this.tickLabelPositioning === "center") {
-        this._computedWidth = this._maxTickLength() + this.tickLabelPadding() + maxTextLength;
+        this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
       } else {
-        this._computedWidth = Math.max(this._maxTickLength(), this.tickLabelPadding() + maxTextLength);
+        this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
       }
 
       return this._computedWidth;
@@ -53,9 +53,9 @@ export module Axis {
       testTextEl.remove();
 
       if (this.tickLabelPositioning === "center") {
-        this._computedHeight = this._maxTickLength() + this.tickLabelPadding() + textHeight;
+        this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
-        this._computedHeight = Math.max(this._maxTickLength(), this.tickLabelPadding()+ textHeight);
+        this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding()+ textHeight);
       }
 
       return this._computedHeight;
