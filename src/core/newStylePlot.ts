@@ -32,8 +32,7 @@ export module Abstract {
 
     public remove() {
       super.remove();
-      var keys = d3.keys(this._key2DatasetDrawerKey);
-      keys.forEach((k) => this.removeDataset(k));
+      this._datasetKeysInOrder.forEach((k) => this.removeDataset(k));
     }
 
     public addDataset(key: string, dataset: DataSource): Plot;
@@ -120,7 +119,7 @@ export module Abstract {
         var projectors = d3.values(this._projectors);
         var scaleKey = this._plottableID.toString() + "_" + key;
         projectors.forEach((p) => {
-          if (p.scale !== undefined) {
+          if (p.scale != null) {
             p.scale.removeExtent(scaleKey, p.attribute);
           }
         });

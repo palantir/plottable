@@ -2259,8 +2259,7 @@ var Plottable;
             NewStylePlot.prototype.remove = function () {
                 var _this = this;
                 _super.prototype.remove.call(this);
-                var keys = d3.keys(this._key2DatasetDrawerKey);
-                keys.forEach(function (k) { return _this.removeDataset(k); });
+                this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
             };
             NewStylePlot.prototype.addDataset = function (first, second) {
                 if (typeof (first) !== "string" && second !== undefined) {
@@ -2336,7 +2335,7 @@ var Plottable;
                     var projectors = d3.values(this._projectors);
                     var scaleKey = this._plottableID.toString() + "_" + key;
                     projectors.forEach(function (p) {
-                        if (p.scale !== undefined) {
+                        if (p.scale != null) {
                             p.scale.removeExtent(scaleKey, p.attribute);
                         }
                     });
