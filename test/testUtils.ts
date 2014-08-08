@@ -26,12 +26,14 @@ function verifySpaceRequest(sr: Plottable.ISpaceRequest, w: number, h: number, w
 function fixComponentSize(c: Plottable.Abstract.Component, fixedWidth?: number, fixedHeight?: number) {
   c._requestedSpace = function(w, h) {
     return {
-      width:  fixedWidth  == null ? 0 : Math.min(w, fixedWidth) ,
-      height: fixedHeight == null ? 0 : Math.min(h, fixedHeight),
+      width:  fixedWidth  == null ? 0 : fixedWidth,
+      height: fixedHeight == null ? 0 : fixedHeight,
       wantsWidth : fixedWidth  == null ? false : w < fixedWidth ,
       wantsHeight: fixedHeight == null ? false : h < fixedHeight
     };
   };
+  c._fixedWidthFlag  = fixedWidth  == null ? false : true;
+  c._fixedHeightFlag = fixedHeight == null ? false : true;
   return c;
 }
 
@@ -104,4 +106,23 @@ class MultiTestVerifier {
   public end() {
     this.passed = this.temp;
   }
+}
+
+function triggerFakeUIEvent(type: string, target: D3.Selection) {
+  var e = <UIEvent> document.createEvent("UIEvents");
+  e.initUIEvent(type, true, true, window, 1);
+  target.node().dispatchEvent(e);
+}
+
+function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number) {
+  var clientRect = target.node().getBoundingClientRect();
+  var xPos = clientRect.left + relativeX;
+  var yPos = clientRect.top + relativeY;
+  var e = <MouseEvent> document.createEvent("MouseEvents");
+  e.initMouseEvent(type, true, true, window, 1,
+                    xPos, yPos,
+                    xPos, yPos,
+                    false, false, false, false,
+                    1, null);
+  target.node().dispatchEvent(e);
 }

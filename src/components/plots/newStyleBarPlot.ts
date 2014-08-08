@@ -193,7 +193,7 @@ export module Abstract {
                       && (<Plottable.Scale.Ordinal> secondaryScale).rangeType() === "bands";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
       if (attrToProjector["width"] == null) {
-        var constantWidth = bandsMode ? (<Scale.Ordinal> secondaryScale).rangeBand() : BarPlot.DEFAULT_WIDTH;
+        var constantWidth = bandsMode ? (<Scale.Ordinal> secondaryScale).rangeBand() : NewStyleBarPlot.DEFAULT_WIDTH;
         attrToProjector["width"] = (d: any, i: number) => constantWidth;
       }
 

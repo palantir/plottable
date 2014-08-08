@@ -42,7 +42,7 @@ export module Abstract {
     public addDataset(dataset: any[]): Plot;
     public addDataset(first: any, second?: any): Plot {
       if (typeof(first) !== "string" && second !== undefined) {
-        throw new Error("addDataset takes string keys")
+        throw new Error("addDataset takes string keys");
       }
       if (typeof(first) === "string" && first[0] === "_") {
         Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
@@ -100,14 +100,15 @@ export module Abstract {
         var projectors = d3.values(this._projectors);
         var scaleKey = this._plottableID.toString() + "_" + key;
         projectors.forEach((p) => {
-          if (p.scale !== null) {
+          if (p.scale !== undefined) {
             p.scale.removeExtent(scaleKey, p.attribute);
           }
         });
 
         ddk.dataset.broadcaster.deregisterListener(this);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        this._key2DatasetDrawerKey[key] = null;
+        delete this._key2DatasetDrawerKey[key];
+        this._onDataSourceUpdate();
       }
       return this;
     }

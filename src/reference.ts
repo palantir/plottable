@@ -65,7 +65,7 @@
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/newStyleBarPlot.ts" />
-/// <reference path="components/plots/stackedBarPlot.ts" />
+/// <reference path="components/plots/clusteredBarPlot.ts" />
 
 /// <reference path="animators/nullAnimator.ts" />
 /// <reference path="animators/defaultAnimator.ts" />
@@ -82,5 +82,8 @@
 /// <reference path="interactions/drag/xDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/xyDragBoxInteraction.ts" />
 /// <reference path="interactions/drag/yDragBoxInteraction.ts" />
+
+/// <reference path="dispatchers/dispatcher.ts" />
+/// <reference path="dispatchers/mouseDispatcher.ts" />
 
 /// <reference path="templates/standardChart.ts" />

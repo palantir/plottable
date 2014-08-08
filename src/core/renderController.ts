@@ -66,12 +66,23 @@ export module Core {
         toRender.forEach((c) => c._render());
 
         // Finally, perform render of all components
-        toRender = d3.values(_componentsNeedingRender);
-        toRender.forEach((c) => c._doRender());
+        var failed: {[key: string]: Abstract.Component} = {};
+        Object.keys(_componentsNeedingRender).forEach((k) => {
+          try {
+            _componentsNeedingRender[k]._doRender();
+          } catch (err) {
+            // using setTimeout instead of console.log, we get the familiar red
+            // stack trace
+            setTimeout(() => {
+              throw err;
+            }, 0);
+            failed[k] = _componentsNeedingRender[k];
+          }
+        });
 
         // Reset queues
         _componentsNeedingComputeLayout = {};
-        _componentsNeedingRender = {};
+        _componentsNeedingRender = failed;
         _animationRequested = false;
       }
 
