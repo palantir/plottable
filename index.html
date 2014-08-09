@@ -109,9 +109,9 @@ function makeCommiterChart(svg, commitData, contributorData) {
   var colorScale = new Plottable.Scale.Color("10");
 
   var format = d3.time.format("%Y/%m/%d");
-  var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", format);
-  var yAxisCommits = new Plottable.Axis.YAxis(yScaleCommits, "left");
-  var yAxisContrib = new Plottable.Axis.YAxis(yScaleContrib, "right");
+  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom", format);
+  var yAxisCommits = new Plottable.Axis.Numeric(yScaleCommits, "left");
+  var yAxisContrib = new Plottable.Axis.Numeric(yScaleContrib, "right");
 
   var lineCommits = new Plottable.Plot.Area(commitData, xScale, yScaleCommits)
                     .project("x", "parsedDate", xScale)
@@ -228,9 +228,9 @@ window.onload = function() {
       var colorScale = new Plottable.Scale.Color("10");
 
       var format = d3.time.format("%Y/%m/%d");
-      var xAxis = new Plottable.Axis.XAxis(xScale, "bottom", format);
-      var yAxisCommits = new Plottable.Axis.YAxis(yScaleCommits, "left");
-      var yAxisContrib = new Plottable.Axis.YAxis(yScaleContrib, "right");
+      var xAxis = new Plottable.Axis.Numeric(xScale, "bottom", format);
+      var yAxisCommits = new Plottable.Axis.Numeric(yScaleCommits, "left");
+      var yAxisContrib = new Plottable.Axis.Numeric(yScaleContrib, "right");
 
       var lineCommits = new Plottable.Plot.Area(commitData, xScale, yScaleCommits)
                         .project("x", "parsedDate", xScale)
