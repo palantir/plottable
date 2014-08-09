@@ -1,0 +1,479 @@
+﻿<!doctype html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Domainer | plottable-website</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">plottable-website</a>
+				</div>
+				<div class="table-cell" id="tsd-filter">
+					<input type="checkbox" id="tsd-filter-inherited" checked />
+					<label for="tsd-filter-inherited">Inherited</label>
+					<input type="checkbox" id="tsd-filter-private" checked />
+					<label for="tsd-filter-private">Private</label>
+					<input type="checkbox" id="tsd-filter-externals" checked />
+					<label for="tsd-filter-externals">Externals</label>
+					<input type="checkbox" id="tsd-filter-only-exported" />
+					<label for="tsd-filter-only-exported">Only exported</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="breadcrumb">
+				<li>
+					<a href="../globals.html">plottable-website</a>
+				</li>
+				<li>
+					<a href="../modules/plottable.html">Plottable</a>
+				</li>
+				<li>
+					<a href="plottable.domainer.html">Domainer</a>
+				</li>
+			</ul>
+			<h1>Class Domainer</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8">
+			<section class="tsd-member-index">
+				<h2>Index</h2>
+				<section class="tsd-member-index-group ">
+					<h3>Constructor methods</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-constructor-method tsd-parent-kind-class"><a href="plottable.domainer.html#constructor" class="tsd-kind-icon">constructor</a></li>
+					</ul>
+				</section>
+				<section class="tsd-member-index-group ">
+					<h3>Methods</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.domainer.html#addincludedvalue" class="tsd-kind-icon">add<wbr>Included<wbr>Value</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.domainer.html#addpaddingexception" class="tsd-kind-icon">add<wbr>Padding<wbr>Exception</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.domainer.html#computedomain" class="tsd-kind-icon">compute<wbr>Domain</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.domainer.html#nice" class="tsd-kind-icon">nice</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.domainer.html#pad" class="tsd-kind-icon">pad</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.domainer.html#removeincludedvalue" class="tsd-kind-icon">remove<wbr>Included<wbr>Value</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.domainer.html#removepaddingexception" class="tsd-kind-icon">remove<wbr>Padding<wbr>Exception</a></li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-member-group ">
+				<h2>Constructor methods</h2>
+				<section class="tsd-member tsd-kind-constructor-method tsd-parent-kind-class">
+					<a name="constructor" class="anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">constructor<span class="tsd-signature-symbols">(</span>combineExtents<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:1201</li>
+								</ul>
+							</aside>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>combineExtents?: <span class="tsd-signature-type">Function</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+									<pre><code>   If present, this <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">will</span> <span class="hljs-title">be</span> <span class="hljs-title">used</span> <span class="hljs-title">by</span> <span class="hljs-title">the</span> <span class="hljs-title">Domainer</span> <span class="hljs-title">to</span> <span class="hljs-title">merge</span></span>
+   all <span class="hljs-operator">the</span> <span class="hljs-built_in">extents</span> that are present <span class="hljs-command"><span class="hljs-keyword">on</span> <span class="hljs-title">a</span> <span class="hljs-title">scale</span>.</span>
+
+   A plot may draw multiple things <span class="hljs-built_in">relative</span> <span class="hljs-built_in">to</span> <span class="hljs-operator">a</span> scale, e.g.
+   different stocks over <span class="hljs-built_in">time</span>. The plot computes their <span class="hljs-built_in">extents</span>,
+   which are <span class="hljs-operator">a</span> [<span class="hljs-built_in">min</span>, <span class="hljs-built_in">max</span>] pair. combineExtents is responsible <span class="hljs-keyword">for</span>
+   merging them all <span class="hljs-keyword">into</span> <span class="hljs-constant">one</span> [<span class="hljs-built_in">min</span>, <span class="hljs-built_in">max</span>] pair. It defaults <span class="hljs-built_in">to</span> taking
+   <span class="hljs-operator">the</span> <span class="hljs-built_in">min</span> <span class="hljs-operator">of</span> <span class="hljs-operator">the</span> <span class="hljs-keyword">first</span> elements <span class="hljs-operator">and</span> <span class="hljs-operator">the</span> <span class="hljs-built_in">max</span> <span class="hljs-operator">of</span> <span class="hljs-operator">the</span> <span class="hljs-keyword">second</span> arguments.
+</code></pre>
+									<ul>
+										<li>
+											<h5>combine<wbr>Extents function signature<span class="tsd-signature-symbols"></span></h5>
+											<ul class="tsd-signatures tsd-kind-function-type tsd-parent-kind-parameter">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbols">(</span>extents<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any[]&gt;</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description"><aside class="tsd-sources">
+														<ul>
+															<li>Defined in plottable.d.ts:1201</li>
+														</ul>
+													</aside>
+													<h4>Parameters</h4>
+													<ul>
+														<li>
+															<h5>extents: <span class="tsd-signature-type">Array&lt;any[]&gt;</span></h5>
+														</li>
+													</ul>
+													<h4>Returns 
+														<span class="tsd-signature-type">Array&lt;any&gt;</span>
+													</h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a>
+							</h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="addincludedvalue" class="anchor"></a>
+					<h3>add<wbr>Included<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Included<wbr>Value<span class="tsd-signature-symbols">(</span>value<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span>, key<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:1260</li>
+								</ul>
+							</aside>
+							<p>Add an included value, a value that must be included inside the domain.</p>
+							<p>Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
+								If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+							If a key is not provided, it will be added with set semantics (Can be removed by value)</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>value: <span class="tsd-signature-type">any</span></h5>
+									<p>The included value to add.</p>
+								</li>
+								<li>
+									<h5>key?: <span class="tsd-signature-type">string</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a>
+							</h4>
+							<p>Domainer The calling domainer</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="addpaddingexception" class="anchor"></a>
+					<h3>add<wbr>Padding<wbr>Exception</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Padding<wbr>Exception<span class="tsd-signature-symbols">(</span>exception<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span>, key<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:1238</li>
+								</ul>
+							</aside>
+							<p>Add a padding exception, a value that will not be padded at either end of the domain.</p>
+							<p>Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
+								If a key is provided, it will be registered under that key with standard map semantics. (Overwrite / remove by key)
+							If a key is not provided, it will be added with set semantics (Can be removed by value)</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>exception: <span class="tsd-signature-type">any</span></h5>
+									<p>The padding exception to add.</p>
+								</li>
+								<li>
+									<h5>key?: <span class="tsd-signature-type">string</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a>
+							</h4>
+							<p>Domainer The calling domainer</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="computedomain" class="anchor"></a>
+					<h3>compute<wbr>Domain</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">compute<wbr>Domain<span class="tsd-signature-symbols">(</span>extents<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any[]&gt;</span>, scale<span class="tsd-signature-symbols">: </span><a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:1211</li>
+								</ul>
+							</aside>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>extents: <span class="tsd-signature-type">Array&lt;any[]&gt;</span></h5>
+									<p>The list of extents to be reduced to a single
+									extent.</p>
+								</li>
+								<li>
+									<h5>scale: <a href="plottable.abstract.quantitativescale.html" class="tsd-signature-type">QuantitativeScale</a></h5>
+									<pre><code>   Since nice() must <span class="hljs-operator"><span class="hljs-keyword">do</span> different things depending <span class="hljs-keyword">on</span> Linear, <span class="hljs-keyword">Log</span>,
+   <span class="hljs-keyword">or</span> <span class="hljs-keyword">Time</span> scale, the scale must be passed <span class="hljs-keyword">in</span> <span class="hljs-keyword">for</span> nice() <span class="hljs-keyword">to</span> <span class="hljs-keyword">work</span>.</span>
+</code></pre>
+								</li>
+							</ul>
+							<h4>Returns 
+								<span class="tsd-signature-type">Array&lt;any&gt;</span>
+							</h4>
+							<p>The domain, as a merging of all exents, as a [min, max]
+							pair.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="nice" class="anchor"></a>
+					<h3>nice</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">nice<span class="tsd-signature-symbols">(</span>count<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:1277</li>
+								</ul>
+							</aside>
+							<p>Extends the scale&#39;s domain so it starts and ends with &quot;nice&quot; values.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>count?: <span class="tsd-signature-type">number</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a>
+							</h4>
+							<p>The calling Domainer.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="pad" class="anchor"></a>
+					<h3>pad</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">pad<span class="tsd-signature-symbols">(</span>padProportion<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:1226</li>
+								</ul>
+							</aside>
+							<p>Sets the Domainer to pad by a given ratio.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>padProportion?: <span class="tsd-signature-type">number</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a>
+							</h4>
+							<p>The calling Domainer.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="removeincludedvalue" class="anchor"></a>
+					<h3>remove<wbr>Included<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Included<wbr>Value<span class="tsd-signature-symbols">(</span>valueOrKey<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:1270</li>
+								</ul>
+							</aside>
+							<p>Remove an included value, allowing the domain to not include that value gain again.</p>
+							<p>If a string is provided, it is assumed to be a key and the value associated with that key is removed.
+							If a non-string is provdied, it is assumed to be an unkeyed value and that value is removed.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>valueOrKey: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a>
+							</h4>
+							<p>Domainer The calling domainer</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="removepaddingexception" class="anchor"></a>
+					<h3>remove<wbr>Padding<wbr>Exception</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Padding<wbr>Exception<span class="tsd-signature-symbols">(</span>keyOrException<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:1248</li>
+								</ul>
+							</aside>
+							<p>Remove a padding exception, allowing the domain to pad out that value again.</p>
+							<p>If a string is provided, it is assumed to be a key and the exception associated with that key is removed.
+							If a non-string is provdied, it is assumed to be an unkeyed exception and that exception is removed.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>keyOrException: <span class="tsd-signature-type">any</span></h5>
+									<p>The key for the value to remove, or the value to remove</p>
+								</li>
+							</ul>
+							<h4>Returns 
+								<a href="plottable.domainer.html" class="tsd-signature-type">Domainer</a>
+							</h4>
+							<p>Domainer The calling domainer</p>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="offset-1 col-3">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-container">
+						<a href="../modules/d3.html">D3</a>
+					</li>
+					<li class="current tsd-kind-container">
+						<a href="../modules/plottable.html">Plottable</a>
+						<ul>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.abstract.html">Abstract</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.animator.html">Animator</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.axis.html">Axis</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.component.html">Component</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.core.html">Core</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.formatter.html">Formatter</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.interaction.html">Interaction</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.plot.html">Plot</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.scale.html">Scale</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.template.html">Template</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.util.html">Util</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary">
+				<ul>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.filterformat.html" class="tsd-kind-icon">Filter<wbr>Format</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.fullselectionarea.html" class="tsd-kind-icon">Full<wbr>Selection<wbr>Area</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.iaccessor.html" class="tsd-kind-icon">IAccessor</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.iappliedaccessor.html" class="tsd-kind-icon">IApplied<wbr>Accessor</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.idataset.html" class="tsd-kind-icon">IDataset</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.iextent.html" class="tsd-kind-icon">IExtent</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.imetadata.html" class="tsd-kind-icon">IMetadata</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.ipixelarea.html" class="tsd-kind-icon">IPixel<wbr>Area</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.ispacerequest.html" class="tsd-kind-icon">ISpace<wbr>Request</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-container">
+						<a href="../interfaces/plottable.selectionarea.html" class="tsd-kind-icon">Selection<wbr>Area</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.datasource.html" class="tsd-kind-icon">Data<wbr>Source</a>
+					</li>
+					<li class="current tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.domainer.html" class="tsd-kind-icon">Domainer</a>
+						<ul>
+							<li class=" tsd-kind-constructor-method tsd-parent-kind-class">
+								<a href="plottable.domainer.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.domainer.html#addincludedvalue" class="tsd-kind-icon">add<wbr>Included<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.domainer.html#addpaddingexception" class="tsd-kind-icon">add<wbr>Padding<wbr>Exception</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.domainer.html#computedomain" class="tsd-kind-icon">compute<wbr>Domain</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.domainer.html#nice" class="tsd-kind-icon">nice</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.domainer.html#pad" class="tsd-kind-icon">pad</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.domainer.html#removeincludedvalue" class="tsd-kind-icon">remove<wbr>Included<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.domainer.html#removepaddingexception" class="tsd-kind-icon">remove<wbr>Padding<wbr>Exception</a>
+							</li>
+						</ul>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-container">
+						<a href="../modules/plottable.html#version" class="tsd-kind-icon">version</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
