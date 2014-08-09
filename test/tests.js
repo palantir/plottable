@@ -1304,11 +1304,15 @@ var assert = chai.assert;
 describe("Plots", function () {
     describe("New Style Plots", function () {
         var p;
+        var oldWarn = Plottable.Util.Methods.warn;
         beforeEach(function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
             p.getDrawer = function (k) { return new Plottable.Drawer.Rect(k); };
+        });
+        afterEach(function () {
+            Plottable.Util.Methods.warn = oldWarn;
         });
         it("Datasets can be added and removed as expected", function () {
             p.addDataset("foo", [1, 2, 3]);
@@ -1339,6 +1343,19 @@ describe("Plots", function () {
             assert.equal(callbackCounter, 2, "modifying data triggers listener");
             p.removeDataset("foo");
             assert.equal(callbackCounter, 3, "removing dataset triggers listener");
+        });
+        it("Datasets can be reordered", function () {
+            p.addDataset("foo", [1]);
+            p.addDataset("bar", [2]);
+            p.addDataset("baz", [3]);
+            assert.deepEqual(p.datasetOrder(), ["foo", "bar", "baz"]);
+            p.datasetOrder(["bar", "baz", "foo"]);
+            assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
+            var warned = 0;
+            Plottable.Util.Methods.warn = function () { return warned++; };
+            p.datasetOrder(["blah", "blee", "bar", "baz", "foo"]);
+            assert.equal(warned, 1);
+            assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
         });
     });
 });
