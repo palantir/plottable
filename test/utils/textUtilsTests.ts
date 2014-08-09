@@ -41,10 +41,12 @@ describe("Util.Text", () => {
     var svg: D3.Selection;
     var measure: any;
     var e: any;
+    var textSelection: D3.Selection;
 
     before(() => {
       svg = generateSVG();
-      measure = Plottable.Util.Text.getTextMeasure(svg);
+      textSelection = svg.append("text");
+      measure = Plottable.Util.Text.getTextMeasure(textSelection);
       e = (text: string, width: number) => Plottable.Util.Text._addEllipsesToLine(text, width, measure);
     });
     it("works on an empty string" ,() => {
@@ -76,6 +78,7 @@ describe("Util.Text", () => {
     });
 
     after(() => {
+      textSelection.remove();
       assert.lengthOf(svg.node().childNodes, 0, "this was all without side-effects");
       svg.remove();
     });
@@ -86,7 +89,8 @@ describe("Util.Text", () => {
       var svg = generateSVG();
       var width = 1;
       var height = 1;
-      var measure = Plottable.Util.Text.getTextMeasure(svg);
+      var textSelection = svg.append("text");
+      var measure = Plottable.Util.Text.getTextMeasure(textSelection);
       var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
       assert.isFalse(results.textFits,    "measurement mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "measurement mode: no width used");
@@ -97,6 +101,7 @@ describe("Util.Text", () => {
       assert.isFalse(results.textFits,    "write mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "write mode: no width used");
       assert.equal(0, results.usedHeight, "write mode: no height used");
+      textSelection.remove();
       assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
       svg.remove();
     });
@@ -105,7 +110,8 @@ describe("Util.Text", () => {
       var svg = generateSVG();
       var width = 500;
       var height = 1;
-      var measure = Plottable.Util.Text.getTextMeasure(svg);
+      var textSelection = svg.append("text");
+      var measure = Plottable.Util.Text.getTextMeasure(textSelection);
       var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
       assert.isFalse(results.textFits,    "measurement mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "measurement mode: no width used");
@@ -116,6 +122,7 @@ describe("Util.Text", () => {
       assert.isFalse(results.textFits,    "write mode: text doesn't fit");
       assert.equal(0, results.usedWidth,  "write mode: no width used");
       assert.equal(0, results.usedHeight, "write mode: no height used");
+      textSelection.remove();
       assert.lengthOf(svg.selectAll("text")[0], 0, "no text was written");
       svg.remove();
     });
@@ -147,13 +154,6 @@ describe("Util.Text", () => {
       var result2 = measure("hi there");
       assert.deepEqual(result2, canonicalResult, "measurement is as expected");
       assert.equal(t.text(), "bla bla bla", "the text was unchanged");
-    });
-
-    it("works when operating on the top svg instead of text selection, and has no side effects", () => {
-      var measure2 = Plottable.Util.Text.getTextMeasure(svg);
-      var result3 = measure2("hi there");
-      assert.deepEqual(result3, canonicalResult, "measurement is as expected for svg measure");
-      assert.lengthOf(svg.node().childNodes, 1, "no nodes were added to the svg");
     });
     after(() => {
       svg.remove();

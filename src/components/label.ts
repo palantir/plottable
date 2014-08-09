@@ -63,7 +63,8 @@ export module Component {
     public _setup() {
       super._setup();
       this.textContainer = this.content.append("g");
-      this.measurer = Util.Text.getTextMeasure(this.textContainer);
+      var textSelection = this.textContainer.append("text");
+      this.measurer = Util.Text.getTextMeasure(textSelection);
       this.text(this._text);
       return this;
     }
@@ -107,8 +108,9 @@ export module Component {
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
+      var textSelection = this.textContainer.append("text");
+      this.measurer = Util.Text.getTextMeasure(textSelection); // reset it in case fonts have changed
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
-      this.measurer = Util.Text.getTextMeasure(this.textContainer); // reset it in case fonts have changed
       return this;
     }
   }

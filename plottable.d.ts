@@ -84,7 +84,7 @@ declare module Plottable {
                 clear(): CachingCharacterMeasurer;
             }
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            function getTextHeight(selection: D3.Selection): number;
+            function getTextHeight(textElement: D3.Selection): number;
             function getTextWidth(textElement: D3.Selection, text: string): number;
             function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {

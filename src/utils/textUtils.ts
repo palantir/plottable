@@ -24,19 +24,11 @@ export module Util {
         if (s.trim() === "") {
           return {width: 0, height: 0};
         }
-        var bb: SVGRect;
-        if (selection.node().nodeName === "text") {
-          var originalText = selection.text();
-          selection.text(s);
-          bb = DOM.getBBox(selection);
-          selection.text(originalText);
-          return {width: bb.width, height: bb.height};
-        } else {
-          var t = selection.append("text").text(s);
-          bb = DOM.getBBox(t);
-          t.remove();
-          return {width: bb.width, height: bb.height};
-        }
+        var originalText = selection.text();
+        selection.text(s);
+        var bb = DOM.getBBox(selection);
+        selection.text(originalText);
+        return { width: bb.width, height: bb.height };
       };
     }
 
@@ -150,8 +142,8 @@ export module Util {
      * @param {D3.Selection} textElement
      * @return {number} The height of the text element, in pixels.
      */
-    export function getTextHeight(selection: D3.Selection) {
-      return getTextMeasure(selection)("bqpdl").height;
+    export function getTextHeight(textElement: D3.Selection) {
+      return getTextMeasure(textElement)("bqpdl").height;
     }
 
     /**

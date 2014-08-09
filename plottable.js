@@ -293,20 +293,11 @@ var Plottable;
                     if (s.trim() === "") {
                         return { width: 0, height: 0 };
                     }
-                    var bb;
-                    if (selection.node().nodeName === "text") {
-                        var originalText = selection.text();
-                        selection.text(s);
-                        bb = Util.DOM.getBBox(selection);
-                        selection.text(originalText);
-                        return { width: bb.width, height: bb.height };
-                    }
-                    else {
-                        var t = selection.append("text").text(s);
-                        bb = Util.DOM.getBBox(t);
-                        t.remove();
-                        return { width: bb.width, height: bb.height };
-                    }
+                    var originalText = selection.text();
+                    selection.text(s);
+                    var bb = Util.DOM.getBBox(selection);
+                    selection.text(originalText);
+                    return { width: bb.width, height: bb.height };
                 };
             }
             Text.getTextMeasure = getTextMeasure;
@@ -366,8 +357,8 @@ var Plottable;
                 }
             }
             Text.getTruncatedText = getTruncatedText;
-            function getTextHeight(selection) {
-                return getTextMeasure(selection)("bqpdl").height;
+            function getTextHeight(textElement) {
+                return getTextMeasure(textElement)("bqpdl").height;
             }
             Text.getTextHeight = getTextHeight;
             function getTextWidth(textElement, text) {
@@ -3450,7 +3441,7 @@ var Plottable;
             };
             Time.prototype.calculateWorstWidth = function (container, format) {
                 var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-                return Plottable.Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
+                return Plottable.Util.Text.getTextWidth(container.append("text"), d3.time.format(format)(longDate));
             };
             Time.prototype.getIntervalLength = function (interval) {
                 var testDate = this._scale.domain()[0];
@@ -3543,7 +3534,7 @@ var Plottable;
             Time.prototype.canFitLabelFilter = function (container, position, label, isCentered) {
                 var endPosition;
                 var startPosition;
-                var width = Plottable.Util.Text.getTextWidth(container, label) + this.tickLabelPadding();
+                var width = Plottable.Util.Text.getTextWidth(container.append("text"), label) + this.tickLabelPadding();
                 if (isCentered) {
                     endPosition = this._scale.scale(position) + width / 2;
                     startPosition = this._scale.scale(position) - width / 2;
@@ -3872,7 +3863,7 @@ var Plottable;
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
+                this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
                 return this;
             };
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -4028,7 +4019,8 @@ var Plottable;
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.textContainer = this.content.append("g");
-                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
+                var textSelection = this.textContainer.append("text");
+                this.measurer = Plottable.Util.Text.getTextMeasure(textSelection);
                 this.text(this._text);
                 return this;
             };
@@ -4056,8 +4048,9 @@ var Plottable;
                 return this;
             };
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
+                var textSelection = this.textContainer.append("text");
+                this.measurer = Plottable.Util.Text.getTextMeasure(textSelection);
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
-                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
                 return this;
             };
             return Label;
@@ -4207,9 +4200,11 @@ var Plottable;
                 legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this.colorScale._d3Scale);
                 legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
                     var d3this = d3.select(this);
-                    var measure = Plottable.Util.Text.getTextMeasure(d3this);
+                    var textSelection = d3this.append("text");
+                    var measure = Plottable.Util.Text.getTextMeasure(textSelection);
                     var writeLine = Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
                     var writeLineMeasure = measure(writeLine);
+                    textSelection.remove();
                     Plottable.Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
                 });
                 legend.attr("transform", function (d) {

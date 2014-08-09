@@ -28,7 +28,7 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
+      this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer.append("text"));
       return this;
     }
 

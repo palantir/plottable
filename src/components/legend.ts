@@ -201,9 +201,11 @@ export module Component {
         .attr("transform", "translate(" + textHeight + ", 0)")
         .each(function(d: string) {
           var d3this = d3.select(this);
-          var measure = Util.Text.getTextMeasure(d3this);
+          var textSelection = d3this.append("text");
+          var measure = Util.Text.getTextMeasure(textSelection);
           var writeLine = Util.Text.getTruncatedText(d, availableWidth, measure);
           var writeLineMeasure = measure(writeLine);
+          textSelection.remove();
           Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
         });
 
