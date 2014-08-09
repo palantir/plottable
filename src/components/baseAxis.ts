@@ -21,7 +21,7 @@ export module Abstract {
     private _gutter = 10;
     private _showEndTickLabels = false;
 
-    constructor(scale: Abstract.Scale, orientation: string, formatter?: (d: any) => string) {
+    constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
@@ -34,9 +34,6 @@ export module Abstract {
         this.classed("y-axis", true);
       }
 
-      if (formatter == null) {
-        formatter = Formatters.identity();
-      }
       this.formatter(formatter);
 
       this._scale.broadcaster.registerListener(this, () => this.rescale());
