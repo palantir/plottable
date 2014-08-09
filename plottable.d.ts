@@ -33,6 +33,11 @@ declare module Plottable {
             */
             function intersection(set1: D3.Set, set2: D3.Set): D3.Set;
             /**
+            * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
+            * and "activate" it by turning it into a function in (datum, index, metadata)
+            */
+            function _accessorize(accessor: any): IAccessor;
+            /**
             * Takes two sets and returns the union
             *
             * @param{D3.Set} set1 The first set
@@ -40,8 +45,10 @@ declare module Plottable {
             * @return{D3.Set} A set that contains elements that appear in either set1 or set2
             */
             function union(set1: D3.Set, set2: D3.Set): D3.Set;
-            function accessorize(accessor: any): IAccessor;
-            function applyAccessor(accessor: IAccessor, dataSource: DataSource): (d: any, i: number) => any;
+            /**
+            * Take an accessor object, activate it, and partially apply it to a Plot's datasource's metadata
+            */
+            function _applyAccessor(accessor: IAccessor, plot: Abstract.Plot): (d: any, i: number) => any;
             function uniq(strings: string[]): string[];
             function uniqNumbers(a: number[]): number[];
             /**
@@ -542,6 +549,16 @@ declare module Plottable {
 declare module Plottable {
     module Formatter {
         class Custom extends Abstract.Formatter {
+            /**
+            * Creates a Custom Formatter.
+            *
+            * @constructor
+            * @param {(d: any, formatter: Formatter.Custom) => string} customFormatFunction A
+            *                           formatting function that is passed a datum
+            *                           and the Custom Formatter itself.
+            * @param {number} precision The precision of the Custom Formatter. The
+            *                           actual behavior will depend on the customFormatFunction.
+            */
             constructor(customFormatFunction: (d: any, formatter: Custom) => string, precision?: number);
         }
     }
@@ -581,27 +598,57 @@ declare module Plottable {
 
 declare module Plottable {
     module Core {
+        /**
+        * This interface represents anything in Plottable which can have a listener attached.
+        * Listeners attach by referencing the Listenable's broadcaster, and calling registerListener
+        * on it.
+        *
+        * e.g.:
+        * listenable: Plottable.IListenable;
+        * listenable.broadcaster.registerListener(callbackToCallOnBroadcast)
+        */
         interface IListenable {
             broadcaster: Broadcaster;
         }
+        /**
+        * This interface represents the callback that should be passed to the Broadcaster on a Listenable.
+        *
+        * The callback will be called with the attached Listenable as the first object, and optional arguments
+        * as the subsequent arguments.
+        *
+        * The Listenable is passed as the first argument so that it is easy for the callback to reference the
+        * current state of the Listenable in the resolution logic.
+        */
         interface IBroadcasterCallback {
             (listenable: IListenable, ...args: any[]): any;
         }
+        /**
+        * The Broadcaster class is owned by an IListenable. Third parties can register and deregister listeners
+        * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
+        * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
+        * to, along with optional arguments passed to the `broadcast` method.
+        *
+        * The listeners are called synchronously.
+        */
         class Broadcaster extends Abstract.PlottableObject {
             public listenable: IListenable;
+            /**
+            * Construct a broadcaster, taking the Listenable that the broadcaster will be attached to.
+            *
+            * @constructor
+            * @param {IListenable} listenable The Listenable-object that this broadcaster is attached to.
+            */
             constructor(listenable: IListenable);
             /**
-            * Registers a callback to be called when the broadcast method is called. Also takes a listener which
-            * is used to support deregistering the same callback later, by passing in the same listener.
-            * If there is already a callback associated with that listener, then the callback will be replaced.
+            * Registers a callback to be called when the broadcast method is called. Also takes a key which
+            * is used to support deregistering the same callback later, by passing in the same key.
+            * If there is already a callback associated with that key, then the callback will be replaced.
             *
-            * This should NOT be called directly by a Component; registerToBroadcaster should be used instead.
-            *
-            * @param listener The listener associated with the callback.
+            * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
             * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
             * @returns {Broadcaster} this object
             */
-            public registerListener(listener: any, callback: IBroadcasterCallback): Broadcaster;
+            public registerListener(key: any, callback: IBroadcasterCallback): Broadcaster;
             /**
             * Call all listening callbacks, optionally with arguments passed through.
             *
@@ -610,12 +657,12 @@ declare module Plottable {
             */
             public broadcast(...args: any[]): Broadcaster;
             /**
-            * Deregisters the callback associated with a listener.
+            * Deregisters the callback associated with a key.
             *
-            * @param listener The listener to deregister.
+            * @param key The key to deregister.
             * @returns {Broadcaster} this object
             */
-            public deregisterListener(listener: any): Broadcaster;
+            public deregisterListener(key: any): Broadcaster;
             /**
             * Deregisters all listeners and callbacks associated with the broadcaster.
             *
@@ -1181,6 +1228,10 @@ declare module Plottable {
         min: number;
         max: number;
     }
+    interface Point {
+        x: number;
+        y: number;
+    }
 }
 
 
@@ -1285,9 +1336,9 @@ declare module Plottable {
             * Creates a new QuantitativeScale.
             *
             * @constructor
-            * @param {D3.Scale.QuantitiveScale} scale The D3 QuantitativeScale backing the QuantitativeScale.
+            * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale backing the QuantitativeScale.
             */
-            constructor(scale: D3.Scale.QuantitiveScale);
+            constructor(scale: D3.Scale.QuantitativeScale);
             /**
             * Retrieves the domain value corresponding to a supplied range value.
             *
@@ -1396,6 +1447,12 @@ declare module Plottable {
         class Log extends Abstract.QuantitativeScale {
             /**
             * Creates a new Scale.Log.
+            *
+            * Warning: Log is deprecated; if possible, use ModifiedLog. Log scales are
+            * very unstable due to the fact that they can't handle 0 or negative
+            * numbers. The only time when you would want to use a Log scale over a
+            * ModifiedLog scale is if you're plotting very small data, such as all
+            * data < 1.
             *
             * @constructor
             * @param {D3.Scale.LogScale} [scale] The D3 Scale.Log backing the Scale.Log. If not supplied, uses a default scale.
@@ -1547,6 +1604,7 @@ declare module Plottable {
             * @constructor
             * @param {string} [scaleType] the type of color scale to create
             *     (Category10/Category20/Category20b/Category20c).
+            * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
             */
             constructor(scaleType?: string);
         }
@@ -1581,6 +1639,13 @@ declare module Plottable {
 
 declare module Plottable {
     module Scale {
+        /**
+        * This class implements a color scale that takes quantitive input and
+        * interpolates between a list of color values. It returns a hex string
+        * representing the interpolated color.
+        *
+        * By default it generates a linear scale internally.
+        */
         class InterpolatedColor extends Abstract.QuantitativeScale {
             /**
             * Creates a InterpolatedColorScale.
@@ -1650,9 +1715,14 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
+            /**
+            * The css class applied to each tick mark (the line on the tick).
+            */
             static TICK_MARK_CLASS: string;
+            /**
+            * The css class applied to each tick label (the text associated with the tick).
+            */
             static TICK_LABEL_CLASS: string;
-            public axisElement: D3.Selection;
             constructor(scale: Scale, orientation: string, formatter?: any);
             public remove(): void;
             /**
@@ -1720,6 +1790,19 @@ declare module Plottable {
             * @returns {Axis} The calling Axis.
             */
             public tickLabelPadding(padding: number): Axis;
+            /**
+            * Gets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+            *
+            * @returns {number} The current size of the gutter, in pixels.
+            */
+            public gutter(): number;
+            /**
+            * Sets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+            *
+            * @param {number} size The desired size of the gutter, in pixels.
+            * @returns {Axis} The calling Axis.
+            */
+            public gutter(size: number): Axis;
             /**
             * Gets the orientation of the Axis.
             *
@@ -1900,25 +1983,31 @@ declare module Plottable {
         }
         class Legend extends Abstract.Component {
             /**
+            * The css class applied to each legend row
+            */
+            static SUBELEMENT_CLASS: string;
+            /**
             * Creates a Legend.
-            * A legend consists of a series of legend rows, each with a color and label taken from the colorScale.
-            * The rows will be displayed in the order of the colorScale domain.
-            * This legend also allows interactions, through the functions "toggleCallback" and "hoverCallback"
+            *
+            * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
+            * The rows will be displayed in the order of the `colorScale` domain.
+            * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
             * Setting a callback will also put classes on the individual rows.
             *
             * @constructor
-            * @param {ColorScale} colorScale
+            * @param {Scale.Color} colorScale
             */
             constructor(colorScale?: Scale.Color);
             public remove(): void;
             /**
             * Assigns or gets the callback to the Legend
+            *
             * This callback is associated with toggle events, which trigger when a legend row is clicked.
             * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
             * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
             * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
             *
-            * @param{ToggleCallback} callback The new callback function
+            * @param {ToggleCallback} callback The new callback function
             */
             public toggleCallback(callback: ToggleCallback): Legend;
             public toggleCallback(): ToggleCallback;
@@ -2044,7 +2133,6 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class BarPlot extends XYPlot {
-            static DEFAULT_WIDTH: number;
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
@@ -2100,6 +2188,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+        * A VerticalBarPlot draws bars vertically.
+        * Key projected attributes:
+        *  - "width" - the horizontal width of a bar.
+        *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
+        *      - if a quantitative scale is attached, this defaults to 10
+        *  - "x" - the horizontal position of a bar
+        *  - "y" - the vertical height of a bar
+        */
         class VerticalBar extends Abstract.BarPlot {
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
@@ -2120,6 +2217,15 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+        * A HorizontalBarPlot draws bars horizontally.
+        * Key projected attributes:
+        *  - "width" - the vertical height of a bar (since the bar is rotated horizontally)
+        *      - if an ordinal scale is attached, this defaults to ordinalScale.rangeBand()
+        *      - if a quantitative scale is attached, this defaults to 10
+        *  - "x" - the horizontal length of a bar
+        *  - "y" - the vertical position of a bar
+        */
         class HorizontalBar extends Abstract.BarPlot {
             static _BarAlignmentToFactor: {
                 [alignment: string]: number;
@@ -2158,6 +2264,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Plot {
+        /**
+        * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
+        */
         class Area extends Line {
             /**
             * Creates an AreaPlot.
@@ -2467,6 +2576,101 @@ declare module Plottable {
     module Interaction {
         class YDragBox extends DragBox {
             public setBox(y0: number, y1: number): YDragBox;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Abstract {
+        class Dispatcher extends PlottableObject {
+            /**
+            * Creates a Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
+            constructor(target: D3.Selection);
+            /**
+            * Gets the target of the Dispatcher.
+            *
+            * @returns {D3.Selection} The Dispatcher's current target.
+            */
+            public target(): D3.Selection;
+            /**
+            * Sets the target of the Dispatcher.
+            *
+            * @param {D3.Selection} target The element to listen for updates on.
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public target(targetElement: D3.Selection): Dispatcher;
+            /**
+            * Attaches the Dispatcher's listeners to the Dispatcher's target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public connect(): Dispatcher;
+            /**
+            * Detaches the Dispatcher's listeners from the Dispatchers' target element.
+            *
+            * @returns {Dispatcher} The calling Dispatcher.
+            */
+            public disconnect(): Dispatcher;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Dispatcher {
+        class Mouse extends Abstract.Dispatcher {
+            /**
+            * Creates a Mouse Dispatcher with the specified target.
+            *
+            * @param {D3.Selection} target The selection to listen for events on.
+            */
+            constructor(target: D3.Selection);
+            /**
+            * Gets the current callback to be called on mouseover.
+            *
+            * @return {(location: Point) => any} The current mouseover callback.
+            */
+            public mouseover(): (location: Point) => any;
+            /**
+            * Attaches a callback to be called on mouseover.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            *                                            Pass in null to remove the callback.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mouseover(callback: (location: Point) => any): Mouse;
+            /**
+            * Gets the current callback to be called on mousemove.
+            *
+            * @return {(location: Point) => any} The current mousemove callback.
+            */
+            public mousemove(): (location: Point) => any;
+            /**
+            * Attaches a callback to be called on mousemove.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            *                                            Pass in null to remove the callback.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mousemove(callback: (location: Point) => any): Mouse;
+            /**
+            * Gets the current callback to be called on mouseout.
+            *
+            * @return {(location: Point) => any} The current mouseout callback.
+            */
+            public mouseout(): (location: Point) => any;
+            /**
+            * Attaches a callback to be called on mouseout.
+            *
+            * @param {(location: Point) => any} callback A function that takes the pixel position of the mouse event.
+            *                                            Pass in null to remove the callback.
+            * @return {Mouse} The calling Mouse Handler.
+            */
+            public mouseout(callback: (location: Point) => any): Mouse;
         }
     }
 }

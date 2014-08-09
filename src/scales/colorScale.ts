@@ -10,6 +10,7 @@ export module Scale {
      * @constructor
      * @param {string} [scaleType] the type of color scale to create
      *     (Category10/Category20/Category20b/Category20c).
+     * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
      */
     constructor(scaleType?: string) {
       var scale: D3.Scale.OrdinalScale;

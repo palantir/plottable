@@ -45,4 +45,9 @@ module Plottable {
     min: number;
     max: number;
   }
+
+  export interface Point {
+    x: number;
+    y: number;
+  }
 }
