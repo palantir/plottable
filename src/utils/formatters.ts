@@ -12,10 +12,10 @@ module Plottable {
     /**
      * Creates a formatter for currency values.
      *
-     * @param {number} [precision] The number of decimal places to show.
-     * @param {String} [symbol] The currency symbol to use.
-     * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
-     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting.
+     * @param {number} [precision] The number of decimal places to show (default 2).
+     * @param {string} [symbol] The currency symbol to use (default "$").
+     * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
+     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
      *
      * @returns {function} A formatter for currency values.
      */
@@ -44,8 +44,8 @@ module Plottable {
     /**
      * Creates a formatter that displays exactly [precision] decimal places.
      *
-     * @param {number} [precision] The number of decimal places to show.
-     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting.
+     * @param {number} [precision] The number of decimal places to show (default 3).
+     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
      *
      * @returns {function} A formatter that displays exactly [precision] decimal places.
      */
@@ -64,8 +64,8 @@ module Plottable {
      * Creates a formatter that formats numbers to show no more than
      * [precision] decimal places. All other values are stringified.
      *
-     * @param {number} [precision] The number of decimal places to show.
-     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting.
+     * @param {number} [precision] The number of decimal places to show (default 3).
+     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
      *
      * @returns {function} A formatter for general values.
      */
@@ -100,8 +100,8 @@ module Plottable {
      * Creates a formatter for percentage values.
      * Multiplies the input by 100 and appends "%".
      *
-     * @param {number} [precision] The number of decimal places to show.
-     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting.
+     * @param {number} [precision] The number of decimal places to show (default 0).
+     * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
      *
      * @returns {function} A formatter for percentage values.
      */
@@ -120,9 +120,10 @@ module Plottable {
     }
 
     /**
-     * Creates a formatter for values that displays [precision] significant figures.
+     * Creates a formatter for values that displays [precision] significant figures
+     * and puts SI notation.
      *
-     * @param {number} [precision] The number of significant figures to show.
+     * @param {number} [precision] The number of significant figures to show (default 3).
      *
      * @returns {function} A formatter for SI values.
      */
@@ -134,7 +135,7 @@ module Plottable {
     }
 
     /**
-     * Creates a formatter that displays [precision] dates.
+     * Creates a formatter that displays dates.
      *
      * @returns {function} A formatter for time/date values.
      */
