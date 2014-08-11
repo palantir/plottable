@@ -50,6 +50,26 @@ export module Plot {
       return (d: any, i: number) => scaledStartValue;
     }
 
+    public _generateAttrToProjector() {
+      var attrToProjector = super._generateAttrToProjector();
+      var wholeDatumAttributes = this._wholeDatumAttributes();
+      function singleDatumAttributeFilter(attr: string) {
+        return wholeDatumAttributes.indexOf(attr) === -1;
+      }
+      var singleDatumAttributes = d3.keys(attrToProjector).filter(singleDatumAttributeFilter);
+      singleDatumAttributes.forEach((attribute: string) => {
+        var projector = attrToProjector[attribute];
+        attrToProjector[attribute] = (data: any[], i: number) => {
+          if (data.length > 0) {
+            return projector(data[0], i);
+          } else {
+            return null;
+          }
+        };
+      });
+      return attrToProjector;
+    }
+
     public _paint() {
       super._paint();
       var attrToProjector = this._generateAttrToProjector();
@@ -72,6 +92,10 @@ export module Plot {
         .x(xFunction)
         .y(yFunction);
       this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
+    }
+
+    public _wholeDatumAttributes() {
+      return ["x", "y"];
     }
   }
 }
