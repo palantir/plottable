@@ -3775,7 +3775,7 @@ describe("Util.Text", function () {
         var svg = generateSVG();
         var textEl = svg.append("text").attr("x", 20).attr("y", 50);
         textEl.text("foobar");
-        var measure = Plottable.Util.Text.getTextMeasure(textEl);
+        var measure = Plottable.Util.Text.getTextMeasurer(textEl);
         var fullText = Plottable.Util.Text.getTruncatedText("hellom world!", 200, measure);
         assert.equal(fullText, "hellom world!", "text untruncated");
         var partialText = Plottable.Util.Text.getTruncatedText("hellom world!", 70, measure);
@@ -3792,7 +3792,7 @@ describe("Util.Text", function () {
         before(function () {
             svg = generateSVG();
             textSelection = svg.append("text");
-            measure = Plottable.Util.Text.getTextMeasure(textSelection);
+            measure = Plottable.Util.Text.getTextMeasurer(textSelection);
             e = function (text, width) { return Plottable.Util.Text._addEllipsesToLine(text, width, measure); };
         });
         it("works on an empty string", function () {
@@ -3828,7 +3828,7 @@ describe("Util.Text", function () {
             var width = 1;
             var height = 1;
             var textSelection = svg.append("text");
-            var measure = Plottable.Util.Text.getTextMeasure(textSelection);
+            var measure = Plottable.Util.Text.getTextMeasurer(textSelection);
             var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
@@ -3847,7 +3847,7 @@ describe("Util.Text", function () {
             var width = 500;
             var height = 1;
             var textSelection = svg.append("text");
-            var measure = Plottable.Util.Text.getTextMeasure(textSelection);
+            var measure = Plottable.Util.Text.getTextMeasurer(textSelection);
             var results = Plottable.Util.Text.writeText("hello world", width, height, measure, true);
             assert.isFalse(results.textFits, "measurement mode: text doesn't fit");
             assert.equal(0, results.usedWidth, "measurement mode: no width used");
@@ -3862,7 +3862,7 @@ describe("Util.Text", function () {
             svg.remove();
         });
     });
-    describe("getTextMeasure", function () {
+    describe("getTextMeasurer", function () {
         var svg;
         var measurer;
         var canonicalBB;
@@ -3874,7 +3874,7 @@ describe("Util.Text", function () {
             canonicalBB = Plottable.Util.DOM.getBBox(t);
             canonicalResult = { width: canonicalBB.width, height: canonicalBB.height };
             t.text("bla bla bla");
-            measurer = Plottable.Util.Text.getTextMeasure(t);
+            measurer = Plottable.Util.Text.getTextMeasurer(t);
         });
         it("works on empty string", function () {
             var result = measurer("");

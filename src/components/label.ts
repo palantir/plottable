@@ -63,7 +63,7 @@ export module Component {
     public _setup() {
       super._setup();
       this.textContainer = this.content.append("g");
-      this.measurer = Util.Text.getTextMeasure(this.textContainer.append("text"));
+      this.measurer = Util.Text.getTextMeasurer(this.textContainer.append("text"));
       this.text(this._text);
       return this;
     }
@@ -107,7 +107,7 @@ export module Component {
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
-      this.measurer = Util.Text.getTextMeasure(this.textContainer.append("text")); // reset it in case fonts have changed
+      this.measurer = Util.Text.getTextMeasurer(this.textContainer.append("text")); // reset it in case fonts have changed
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       return this;
     }

@@ -140,7 +140,7 @@ export module Axis {
       super._setup();
       this._majorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       this._minorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      this.measurer = Util.Text.getTextMeasure(this._majorTickLabels.append("text"));
+      this.measurer = Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
       return this;
     }
 

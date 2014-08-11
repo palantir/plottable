@@ -150,7 +150,7 @@ export module Component {
       var totalNumRows = this.colorScale.domain().length;
       var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var measure = Util.Text.getTextMeasure(fakeLegendEl.append("text"));
+      var measure = Util.Text.getTextMeasurer(fakeLegendEl.append("text"));
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => measure(d).width);
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
@@ -167,7 +167,7 @@ export module Component {
     private measureTextHeight(): number {
       // note: can't be called before anchoring atm
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      var textHeight = Util.Text.getTextMeasure(fakeLegendEl.append("text"))(Util.Text.HEIGHT_TEXT).height;
+      var textHeight = Util.Text.getTextMeasurer(fakeLegendEl.append("text"))(Util.Text.HEIGHT_TEXT).height;
       // HACKHACK
       if (textHeight === 0) {
         textHeight = 1;
@@ -201,7 +201,7 @@ export module Component {
         .attr("transform", "translate(" + textHeight + ", 0)")
         .each(function(d: string) {
           var d3this = d3.select(this);
-          var measure = Util.Text.getTextMeasure(d3this.append("text"));
+          var measure = Util.Text.getTextMeasurer(d3this.append("text"));
           var writeLine = Util.Text.getTruncatedText(d, availableWidth, measure);
           var writeLineMeasure = measure(writeLine);
           Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);

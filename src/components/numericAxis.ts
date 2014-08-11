@@ -25,7 +25,7 @@ export module Axis {
 
     public _setup() {
       super._setup();
-      this.measurer = Util.Text.getTextMeasure(this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true));
+      this.measurer = Util.Text.getTextMeasurer(this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true));
       return this;
     }
 

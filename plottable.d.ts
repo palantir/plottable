@@ -78,7 +78,7 @@ declare module Plottable {
             interface TextMeasurer {
                 (s: string): Dimensions;
             }
-            function getTextMeasure(selection: D3.Selection): TextMeasurer;
+            function getTextMeasurer(selection: D3.Selection): TextMeasurer;
             class CachingCharacterMeasurer {
                 measure: TextMeasurer;
                 constructor(textSelection: D3.Selection);

@@ -19,10 +19,11 @@ export module Util {
      * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
      * in the given text selection
      *
-     * @param {D3.Selection} selection: A temporary text selection that the string will be placed into for measurement.  Will be removed on function creation and appended only for measurement.
+     * @param {D3.Selection} selection: A temporary text selection that the string will be placed into for measurement.
+     *                                  Will be removed on function creation and appended only for measurement.
      * @returns {Dimensions} width and height of the text
      */
-    export function getTextMeasure(selection: D3.Selection): TextMeasurer {
+    export function getTextMeasurer(selection: D3.Selection): TextMeasurer {
       var parentNode = selection.node().parentNode;
       selection.remove();
       return (s: string) => {
@@ -109,7 +110,7 @@ export module Util {
        *        this element will to the text being measured.
        */
       constructor(textSelection: D3.Selection) {
-        this.cache = new Cache(getTextMeasure(textSelection), CANONICAL_CHR, Methods.objEq);
+        this.cache = new Cache(getTextMeasurer(textSelection), CANONICAL_CHR, Methods.objEq);
         this.measure = combineWhitespace(
                           measureByCharacter(
                             wrapWhitespace(
@@ -218,7 +219,7 @@ export module Util {
     function writeTextHorizontally(brokenText: string[], g: D3.Selection,
                                    width: number, height: number,
                                    xAlign = "left", yAlign = "top") {
-      var h = getTextMeasure(g.append("text"))(HEIGHT_TEXT).height;
+      var h = getTextMeasurer(g.append("text"))(HEIGHT_TEXT).height;
       var maxWidth = 0;
       var blockG = g.append("g");
       brokenText.forEach((line: string, i: number) => {
@@ -239,7 +240,7 @@ export module Util {
     function writeTextVertically(brokenText: string[], g: D3.Selection,
                                  width: number, height: number,
                                  xAlign = "left", yAlign = "top", rotation = "left") {
-      var h = getTextMeasure(g.append("text"))(HEIGHT_TEXT).height;
+      var h = getTextMeasurer(g.append("text"))(HEIGHT_TEXT).height;
       var maxHeight = 0;
       var blockG = g.append("g");
       brokenText.forEach((line: string, i: number) => {
