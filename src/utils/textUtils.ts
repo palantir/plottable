@@ -17,8 +17,9 @@ export module Util {
 
     /**
      * Returns a quasi-pure function of typesignature (t: string) => Dimensions which measures height and width of text
+     * in the given text selection
      *
-     * @param {D3.Selection} selection: The selection in which text will be drawn and measured
+     * @param {D3.Selection} selection: A temporary text selection that the string will be placed into for measurement.  Will be removed on function creation and appended only for measurement.
      * @returns {Dimensions} width and height of the text
      */
     export function getTextMeasure(selection: D3.Selection): TextMeasurer {
