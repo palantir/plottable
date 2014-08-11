@@ -151,6 +151,7 @@ function main() {
   var firstBranch = "master";
   var secondBranch = $('#featureBranch').val();
   if (secondBranch === "") {secondBranch = "#local"};
+  $('#featureHeader').text(secondBranch);
   var quicktestCategory = $('#filterWord').val();
   if (quicktestCategory == null || quicktestCategory === "") {
     var query = window.location.search.substring(1);
