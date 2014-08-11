@@ -9,49 +9,40 @@
     </style>
 
     <script>
-    var plot;
-    var index = 0;
-    window.onload = function() {
-      var xScale = new Plottable.Scale.Ordinal();
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+window.onload = function() {
+  // Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate)
+data1 = [{name: "jon", y: 1, type: "q1"}, {name: "dan", y: 2, type: "q1"}, {name: "zoo", y: 1, type: "q1"}];
+data2 = [{name: "jon", y: 2, type: "q2"}, {name: "dan", y: 4, type: "q2"}, {name: "zoo", y: 2, type: "q2"}];
+data3 = [{name: "jon", y: 4, type: "q3"}, {name: "dan", y: 15, type: "q3"}, {name: "zoo", y: 15, type: "q3"}];
 
-      var yScale = new Plottable.Scale.Linear();
-      var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+xScale = new Plottable.Scale.Ordinal().domain(["jon", "dan", "zoo"]);
+yScale = new Plottable.Scale.Linear();
+var colorScale = new Plottable.Scale.Color("10").domain(["q1", "q2", "q3"]);
 
-      var colorScale = new Plottable.Scale.Color("20b");
+var xAxis = new Plottable.Axis.Category(xScale, "bottom");
+var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+clusteredBarRenderer = new Plottable.Plot.ClusteredBar(xScale, yScale)
+  .addDataset("d1", data1)
+  .addDataset("d2", data2)
+  .addDataset("d3", data3)
+  .project("x", "name", xScale)
+  .project("y", "y", yScale)
+  .project("fill", "type", colorScale)
+  .project("type", "type")
+  .project("yval", "y")
 
-      plot = new Plottable.Plot.ClusteredBar(xScale, yScale);
-      plot.project("x", "year", xScale);
-      plot.project("y", "y", yScale);
-      plot.setColor(colorScale);
-      plot.animate(true);
-      var legend = new Plottable.Component.Legend(colorScale);
-      var chart = new Plottable.Component.Table([
-                                  [yAxis, plot, legend],
-                                  [null,  xAxis, null]
-                                ]);
-        chart.renderTo("#chart");
-        for(var i = 0; i < 5; i++) addPlot();
-    }
+var center = clusteredBarRenderer.merge(new Plottable.Component.Legend(colorScale));
 
-    function addPlot() {
-      var data = [{year:"2014", y: Math.random() * 5 + 5},
-                  {year:"2015", y: Math.random() * 10 + 10},
-                  {year:"2016", y: Math.random() * 5}];
-      plot.addDataset("" + (index++), data);
-    }
-
-    function removePlot() {
-      plot.removeDataset("" + (--index));
-    }
+horizChart = new Plottable.Component.Table([
+  [yAxis, center], [null, xAxis]
+  ]).renderTo("svg");
+}
 
     </script>
   </head>
   <body>
     <svg id="chart" width="600" height="400"></svg>
     <p />
-    <button name="add" onclick="addPlot()">add</button>
-    <button name="remove" onclick="removePlot()">remove</button>
   </body>
 
 </html>
