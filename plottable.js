@@ -4819,15 +4819,25 @@ var Plottable;
                 var scaledStartValue = this.yScale.scale(startValue);
                 return function (d, i) { return scaledStartValue; };
             };
-            Line.prototype._projectFromFirstDatum = function (attrToProjector) {
-                d3.keys(attrToProjector).forEach(function (attribute) {
+            Line.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var wholeDatumAttributes = this._wholeDatumAttributes();
+                function singleDatumAttributeFilter(attr) {
+                    return wholeDatumAttributes.indexOf(attr) === -1;
+                }
+                var singleDatumAttributes = d3.keys(attrToProjector).filter(singleDatumAttributeFilter);
+                singleDatumAttributes.forEach(function (attribute) {
                     var projector = attrToProjector[attribute];
                     attrToProjector[attribute] = function (data, i) {
                         if (data.length > 0) {
                             return projector(data[0], i);
                         }
+                        else {
+                            return null;
+                        }
                     };
                 });
+                return attrToProjector;
             };
             Line.prototype._paint = function () {
                 _super.prototype._paint.call(this);
@@ -4836,7 +4846,6 @@ var Plottable;
                 var yFunction = attrToProjector["y"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y"];
-                this._projectFromFirstDatum(attrToProjector);
                 this.linePath.datum(this._dataSource.data());
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.line().x(xFunction).y(this._getResetYFunction());
@@ -4844,6 +4853,9 @@ var Plottable;
                 }
                 attrToProjector["d"] = d3.svg.line().x(xFunction).y(yFunction);
                 this._applyAnimatedAttributes(this.linePath, "line", attrToProjector);
+            };
+            Line.prototype._wholeDatumAttributes = function () {
+                return ["x", "y"];
             };
             return Line;
         })(Plottable.Abstract.XYPlot);
@@ -4921,7 +4933,6 @@ var Plottable;
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
-                this._projectFromFirstDatum(attrToProjector);
                 this.areaPath.datum(this._dataSource.data());
                 if (this._dataChanged) {
                     attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(this._getResetYFunction());
@@ -4929,6 +4940,11 @@ var Plottable;
                 }
                 attrToProjector["d"] = d3.svg.area().x(xFunction).y0(y0Function).y1(yFunction);
                 this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
+            };
+            Area.prototype._wholeDatumAttributes = function () {
+                var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);
+                wholeDatumAttributes.push("y0");
+                return wholeDatumAttributes;
             };
             return Area;
         })(Plot.Line);

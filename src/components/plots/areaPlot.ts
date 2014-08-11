@@ -85,8 +85,6 @@ export module Plot {
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
 
-      this._projectFromFirstDatum(attrToProjector);
-
       this.areaPath.datum(this._dataSource.data());
 
       if (this._dataChanged) {
@@ -103,6 +101,13 @@ export module Plot {
         .y1(yFunction);
       this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
     }
+
+    public _wholeDatumAttributes() {
+      var wholeDatumAttributes = super._wholeDatumAttributes();
+      wholeDatumAttributes.push("y0");
+      return wholeDatumAttributes;
+    }
+
   }
 }
 }
