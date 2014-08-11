@@ -120,6 +120,7 @@ function main() {
       }
     }
     var keywordDropdown = $('#filterWord');
+    keywordDropdown.empty();
         $.each(keywordList, function(val, text) {
           keywordDropdown.append(
               $('<option></option>').val(text).html(text)
@@ -146,6 +147,7 @@ function main() {
         branchOptions["val" + i] = data[i].name;
       }
       var branchDropdown = $('#featureBranch');
+      branchDropdown.empty();
         $.each(branchOptions, function(val, text) {
           branchDropdown.append(
               $('<option></option>').val(text).html(text)

@@ -37,12 +37,25 @@
 	text-align:center;
 	text-shadow:1px 1px 0px #c70067;
 }
-.classname:hover {
+.cassieButton:hover {
 	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ef025d), color-stop(1, #ff5bb0) );
 	background:-moz-linear-gradient( center top, #ef025d 5%, #ff5bb0 100% );
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef027d', endColorstr='#ff5bb0');
 	background-color:#ef025d;
-}.classname:active {
+}
+.cassieButton:active {
 	position:relative;
 	top:1px;
+}
+
+h1 {
+	color: #820A56;
+}
+
+form {
+	color: #820A56;
+}
+
+#filterWord:select {
+    border: #820A56;
 }
