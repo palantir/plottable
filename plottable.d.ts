@@ -952,10 +952,8 @@ declare module Plottable {
     module Plot {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
-            colorScale: Plottable.Scale.Color;
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
             getDrawer(key: string): Drawer.Rect;
-            setColor(scale: Plottable.Scale.Color): ClusteredBar;
         }
     }
 }

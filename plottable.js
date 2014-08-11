@@ -5237,7 +5237,6 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._isVertical = true;
                 this.innerScale = new Plottable.Scale.Ordinal();
-                this.setColor(new Plottable.Scale.Color());
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -5246,23 +5245,16 @@ var Plottable;
                 this.innerScale.range([0, widthF(null, 0)]);
                 attrToProjector["width"] = function (d, i) { return _this.innerScale.rangeBand(); };
                 var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var getFill = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_FILL; };
                 var getX = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_X; };
-                attrToProjector["fill"] = getFill;
                 attrToProjector["x"] = getX;
                 return attrToProjector;
             };
             ClusteredBar.prototype.getDrawer = function (key) {
                 return new Plottable.Drawer.Rect(key);
             };
-            ClusteredBar.prototype.setColor = function (scale) {
-                this.colorScale = scale;
-                return this;
-            };
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
-                this.colorScale.domain(this._datasetKeysInOrder);
                 var lengths = this._datasetKeysInOrder.map(function (e) { return _this._key2DatasetDrawerKey[e].dataset.data().length; });
                 if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
@@ -5273,7 +5265,6 @@ var Plottable;
                     var vals = data.map(function (d) { return accessor(d); });
                     clusters[key] = data.map(function (d, i) {
                         d["_PLOTTABLE_PROTECTED_FIELD_X"] = _this.xScale.scale(vals[i]) + _this.innerScale.scale(key);
-                        d["_PLOTTABLE_PROTECTED_FIELD_FILL"] = _this.colorScale.scale(key);
                         return d;
                     });
                 });
