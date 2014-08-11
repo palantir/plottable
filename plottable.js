@@ -2105,7 +2105,7 @@ var Plottable;
                 return h;
             };
             Plot.prototype._doRender = function () {
-                if (this.element != null) {
+                if (this._isAnchored) {
                     this._paint();
                     this._dataChanged = false;
                     this.animateOnNextRender = false;
