@@ -4,6 +4,8 @@ module Plottable {
 export module Util {
   export module Text {
 
+    export var HEIGHT_TEXT = "bqpdl";
+
     export interface Dimensions {
       width: number;
       height: number;
@@ -20,14 +22,16 @@ export module Util {
      * @returns {Dimensions} width and height of the text
      */
     export function getTextMeasure(selection: D3.Selection): TextMeasurer {
+      var parentNode = selection.node().parentNode;
+      selection.remove();
       return (s: string) => {
         if (s.trim() === "") {
           return {width: 0, height: 0};
         }
-        var originalText = selection.text();
+        parentNode.appendChild(selection.node());
         selection.text(s);
         var bb = DOM.getBBox(selection);
-        selection.text(originalText);
+        selection.remove();
         return { width: bb.width, height: bb.height };
       };
     }
@@ -137,27 +141,6 @@ export module Util {
     }
 
     /**
-     * Gets the height of a text element, as rendered.
-     *
-     * @param {D3.Selection} textElement
-     * @return {number} The height of the text element, in pixels.
-     */
-    export function getTextHeight(textElement: D3.Selection) {
-      return getTextMeasure(textElement)("bqpdl").height;
-    }
-
-    /**
-     * Gets the width of a text element, as rendered.
-     *
-     * @param {D3.Selection} textElement
-     * @return {number} The width of the text element, in pixels.
-     */
-    export function getTextWidth(textElement: D3.Selection, text: string) {
-      return getTextMeasure(textElement)(text).width;
-    }
-
-
-    /**
      * Takes a line, a width to fit it in, and a text measurer. Will attempt to add ellipses to the end of the line,
      * shortening the line as required to ensure that it fits within width.
      */
@@ -231,10 +214,10 @@ export module Util {
       return wh;
     }
 
-    export function writeTextHorizontally(brokenText: string[], g: D3.Selection,
-                                          width: number, height: number,
-                                          xAlign = "left", yAlign = "top") {
-      var h = getTextHeight(g);
+    function writeTextHorizontally(brokenText: string[], g: D3.Selection,
+                                   width: number, height: number,
+                                   xAlign = "left", yAlign = "top") {
+      var h = getTextMeasure(g.append("text"))(HEIGHT_TEXT).height;
       var maxWidth = 0;
       var blockG = g.append("g");
       brokenText.forEach((line: string, i: number) => {
@@ -252,10 +235,10 @@ export module Util {
       return {width: maxWidth, height: usedSpace};
     }
 
-    export function writeTextVertically(brokenText: string[], g: D3.Selection,
-                                          width: number, height: number,
-                                          xAlign = "left", yAlign = "top", rotation = "left") {
-      var h = getTextHeight(g);
+    function writeTextVertically(brokenText: string[], g: D3.Selection,
+                                 width: number, height: number,
+                                 xAlign = "left", yAlign = "top", rotation = "left") {
+      var h = getTextMeasure(g.append("text"))(HEIGHT_TEXT).height;
       var maxHeight = 0;
       var blockG = g.append("g");
       brokenText.forEach((line: string, i: number) => {

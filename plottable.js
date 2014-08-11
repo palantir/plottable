@@ -286,17 +286,20 @@ var Plottable;
 (function (Plottable) {
     (function (Util) {
         (function (Text) {
+            Text.HEIGHT_TEXT = "bqpdl";
             ;
             ;
             function getTextMeasure(selection) {
+                var parentNode = selection.node().parentNode;
+                selection.remove();
                 return function (s) {
                     if (s.trim() === "") {
                         return { width: 0, height: 0 };
                     }
-                    var originalText = selection.text();
+                    parentNode.appendChild(selection.node());
                     selection.text(s);
                     var bb = Util.DOM.getBBox(selection);
-                    selection.text(originalText);
+                    selection.remove();
                     return { width: bb.width, height: bb.height };
                 };
             }
@@ -357,14 +360,6 @@ var Plottable;
                 }
             }
             Text.getTruncatedText = getTruncatedText;
-            function getTextHeight(textElement) {
-                return getTextMeasure(textElement)("bqpdl").height;
-            }
-            Text.getTextHeight = getTextHeight;
-            function getTextWidth(textElement, text) {
-                return getTextMeasure(textElement)(text).width;
-            }
-            Text.getTextWidth = getTextWidth;
             function _addEllipsesToLine(line, width, measureText) {
                 var mutatedLine = line.trim();
                 var widthMeasure = function (s) { return measureText(s).width; };
@@ -437,7 +432,7 @@ var Plottable;
             function writeTextHorizontally(brokenText, g, width, height, xAlign, yAlign) {
                 if (xAlign === void 0) { xAlign = "left"; }
                 if (yAlign === void 0) { yAlign = "top"; }
-                var h = getTextHeight(g);
+                var h = getTextMeasure(g.append("text"))(Text.HEIGHT_TEXT).height;
                 var maxWidth = 0;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
@@ -454,12 +449,11 @@ var Plottable;
                 Util.DOM.translate(blockG, 0, freeSpace * translator[yAlign]);
                 return { width: maxWidth, height: usedSpace };
             }
-            Text.writeTextHorizontally = writeTextHorizontally;
             function writeTextVertically(brokenText, g, width, height, xAlign, yAlign, rotation) {
                 if (xAlign === void 0) { xAlign = "left"; }
                 if (yAlign === void 0) { yAlign = "top"; }
                 if (rotation === void 0) { rotation = "left"; }
-                var h = getTextHeight(g);
+                var h = getTextMeasure(g.append("text"))(Text.HEIGHT_TEXT).height;
                 var maxHeight = 0;
                 var blockG = g.append("g");
                 brokenText.forEach(function (line, i) {
@@ -476,7 +470,6 @@ var Plottable;
                 Util.DOM.translate(blockG, freeSpace * translator[xAlign], 0);
                 return { width: usedSpace, height: maxHeight };
             }
-            Text.writeTextVertically = writeTextVertically;
             ;
             function writeText(text, width, height, tm, horizontally, write) {
                 var orientHorizontally = (horizontally != null) ? horizontally : width * 1.1 > height;
@@ -3441,7 +3434,7 @@ var Plottable;
             };
             Time.prototype.calculateWorstWidth = function (container, format) {
                 var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-                return Plottable.Util.Text.getTextWidth(container.append("text"), d3.time.format(format)(longDate));
+                return Plottable.Util.Text.getTextMeasure(container.append("text"))(d3.time.format(format)(longDate)).width;
             };
             Time.prototype.getIntervalLength = function (interval) {
                 var testDate = this._scale.domain()[0];
@@ -3493,7 +3486,7 @@ var Plottable;
             };
             Time.prototype._measureTextHeight = function (container) {
                 var fakeTickLabel = container.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var textHeight = Plottable.Util.Text.getTextHeight(fakeTickLabel.append("text"));
+                var textHeight = Plottable.Util.Text.getTextMeasure(fakeTickLabel.append("text"))(Plottable.Util.Text.HEIGHT_TEXT).height;
                 fakeTickLabel.remove();
                 return textHeight;
             };
@@ -3534,7 +3527,7 @@ var Plottable;
             Time.prototype.canFitLabelFilter = function (container, position, label, isCentered) {
                 var endPosition;
                 var startPosition;
-                var width = Plottable.Util.Text.getTextWidth(container.append("text"), label) + this.tickLabelPadding();
+                var width = Plottable.Util.Text.getTextMeasure(container.append("text"))(label).width + this.tickLabelPadding();
                 if (isCentered) {
                     endPosition = this._scale.scale(position) + width / 2;
                     startPosition = this._scale.scale(position) - width / 2;
@@ -4164,8 +4157,8 @@ var Plottable;
                 var totalNumRows = this.colorScale.domain().length;
                 var rowsICanFit = Math.min(totalNumRows, Math.floor((offeredHeight - 2 * Legend.MARGIN) / textHeight));
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                var fakeText = fakeLegendEl.append("text");
-                var maxWidth = d3.max(this.colorScale.domain(), function (d) { return Plottable.Util.Text.getTextWidth(fakeText, d); });
+                var measure = Plottable.Util.Text.getTextMeasure(fakeLegendEl.append("text"));
+                var maxWidth = d3.max(this.colorScale.domain(), function (d) { return measure(d).width; });
                 fakeLegendEl.remove();
                 maxWidth = maxWidth === undefined ? 0 : maxWidth;
                 var desiredWidth = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
@@ -4179,7 +4172,7 @@ var Plottable;
             };
             Legend.prototype.measureTextHeight = function () {
                 var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
-                var textHeight = Plottable.Util.Text.getTextHeight(fakeLegendEl.append("text"));
+                var textHeight = Plottable.Util.Text.getTextMeasure(fakeLegendEl.append("text"))(Plottable.Util.Text.HEIGHT_TEXT).height;
                 if (textHeight === 0) {
                     textHeight = 1;
                 }

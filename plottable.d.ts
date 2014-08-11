@@ -70,6 +70,7 @@ declare module Plottable {
 declare module Plottable {
     module Util {
         module Text {
+            var HEIGHT_TEXT: string;
             interface Dimensions {
                 width: number;
                 height: number;
@@ -84,22 +85,12 @@ declare module Plottable {
                 clear(): CachingCharacterMeasurer;
             }
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;
-            function getTextHeight(textElement: D3.Selection): number;
-            function getTextWidth(textElement: D3.Selection, text: string): number;
             function _addEllipsesToLine(line: string, width: number, measureText: TextMeasurer): string;
             function writeLineHorizontally(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
                 width: number;
                 height: number;
             };
             function writeLineVertically(line: string, g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
-                width: number;
-                height: number;
-            };
-            function writeTextHorizontally(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string): {
-                width: number;
-                height: number;
-            };
-            function writeTextVertically(brokenText: string[], g: D3.Selection, width: number, height: number, xAlign?: string, yAlign?: string, rotation?: string): {
                 width: number;
                 height: number;
             };
