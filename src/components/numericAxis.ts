@@ -37,9 +37,9 @@ export module Axis {
       var maxTextLength = d3.max(textLengths);
 
       if (this.tickLabelPositioning === "center") {
-        this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;
+        this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
       } else {
-        this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + maxTextLength);
+        this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
       }
 
       return this._computedWidth;
@@ -53,9 +53,9 @@ export module Axis {
       testTextEl.remove();
 
       if (this.tickLabelPositioning === "center") {
-        this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+        this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
-        this._computedHeight = Math.max(this.tickLength(), this.tickLabelPadding()+ textHeight);
+        this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding()+ textHeight);
       }
 
       return this._computedHeight;
@@ -75,7 +75,7 @@ export module Axis {
         dy: "0.3em"
       };
 
-      var tickMarkLength = this.tickLength();
+      var tickMarkLength = this._maxLabelTickLength();
       var tickLabelPadding = this.tickLabelPadding();
 
       var tickLabelTextAnchor = "middle";
