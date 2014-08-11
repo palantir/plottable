@@ -81,7 +81,7 @@ declare module Plottable {
             function getTextMeasure(selection: D3.Selection): TextMeasurer;
             class CachingCharacterMeasurer {
                 measure: TextMeasurer;
-                constructor(g: D3.Selection);
+                constructor(textSelection: D3.Selection);
                 clear(): CachingCharacterMeasurer;
             }
             function getTruncatedText(text: string, availableWidth: number, measurer: TextMeasurer): string;

@@ -103,12 +103,12 @@ export module Util {
       public measure: TextMeasurer;
 
       /**
-       * @param {D3.Selection} g The element that will have text inserted into
+       * @param {D3.Selection} textSelection The element that will have text inserted into
        *        it in order to measure text. The styles present for text in
        *        this element will to the text being measured.
        */
-      constructor(g: D3.Selection) {
-        this.cache = new Cache(getTextMeasure(g), CANONICAL_CHR, Methods.objEq);
+      constructor(textSelection: D3.Selection) {
+        this.cache = new Cache(getTextMeasure(textSelection), CANONICAL_CHR, Methods.objEq);
         this.measure = combineWhitespace(
                           measureByCharacter(
                             wrapWhitespace(

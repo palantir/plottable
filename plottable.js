@@ -339,9 +339,9 @@ var Plottable;
                 };
             }
             var CachingCharacterMeasurer = (function () {
-                function CachingCharacterMeasurer(g) {
+                function CachingCharacterMeasurer(textSelection) {
                     var _this = this;
-                    this.cache = new Util.Cache(getTextMeasure(g), CANONICAL_CHR, Util.Methods.objEq);
+                    this.cache = new Util.Cache(getTextMeasure(textSelection), CANONICAL_CHR, Util.Methods.objEq);
                     this.measure = combineWhitespace(measureByCharacter(wrapWhitespace(function (s) { return _this.cache.get(s); })));
                 }
                 CachingCharacterMeasurer.prototype.clear = function () {
@@ -3434,7 +3434,7 @@ var Plottable;
             };
             Time.prototype.calculateWorstWidth = function (container, format) {
                 var longDate = new Date(9999, 8, 29, 12, 59, 9999);
-                return Plottable.Util.Text.getTextMeasure(container.append("text"))(d3.time.format(format)(longDate)).width;
+                return this.measurer(d3.time.format(format)(longDate)).width;
             };
             Time.prototype.getIntervalLength = function (interval) {
                 var testDate = this._scale.domain()[0];
@@ -3450,6 +3450,7 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._majorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 this._minorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
+                this.measurer = Plottable.Util.Text.getTextMeasure(this._majorTickLabels.append("text"));
                 return this;
             };
             Time.prototype.getTickLevel = function () {
@@ -3486,7 +3487,7 @@ var Plottable;
             };
             Time.prototype._measureTextHeight = function (container) {
                 var fakeTickLabel = container.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var textHeight = Plottable.Util.Text.getTextMeasure(fakeTickLabel.append("text"))(Plottable.Util.Text.HEIGHT_TEXT).height;
+                var textHeight = this.measurer(Plottable.Util.Text.HEIGHT_TEXT).height;
                 fakeTickLabel.remove();
                 return textHeight;
             };
@@ -3527,7 +3528,7 @@ var Plottable;
             Time.prototype.canFitLabelFilter = function (container, position, label, isCentered) {
                 var endPosition;
                 var startPosition;
-                var width = Plottable.Util.Text.getTextMeasure(container.append("text"))(label).width + this.tickLabelPadding();
+                var width = this.measurer(label).width + this.tickLabelPadding();
                 if (isCentered) {
                     endPosition = this._scale.scale(position) + width / 2;
                     startPosition = this._scale.scale(position) - width / 2;
@@ -3658,17 +3659,19 @@ var Plottable;
                 this.showFirstTickLabel = false;
                 this.showLastTickLabel = false;
             }
+            Numeric.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this.measurer = Plottable.Util.Text.getTextMeasure(this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true));
+                return this;
+            };
             Numeric.prototype._computeWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
-                var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 var epsilon = Math.pow(10, -this._formatter.precision());
-                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this._formatter.format(v);
-                    return measurer(formattedValue).width;
+                    return _this.measurer(formattedValue).width;
                 });
-                testTextEl.remove();
                 var maxTextLength = d3.max(textLengths);
                 if (this.tickLabelPositioning === "center") {
                     this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;
@@ -3679,10 +3682,7 @@ var Plottable;
                 return this._computedWidth;
             };
             Numeric.prototype._computeHeight = function () {
-                var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
-                var textHeight = measurer("test").height;
-                testTextEl.remove();
+                var textHeight = this.measurer(Plottable.Util.Text.HEIGHT_TEXT).height;
                 if (this.tickLabelPositioning === "center") {
                     this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
                 }
@@ -4012,8 +4012,7 @@ var Plottable;
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.textContainer = this.content.append("g");
-                var textSelection = this.textContainer.append("text");
-                this.measurer = Plottable.Util.Text.getTextMeasure(textSelection);
+                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer.append("text"));
                 this.text(this._text);
                 return this;
             };
@@ -4041,8 +4040,7 @@ var Plottable;
                 return this;
             };
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
-                var textSelection = this.textContainer.append("text");
-                this.measurer = Plottable.Util.Text.getTextMeasure(textSelection);
+                this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer.append("text"));
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 return this;
             };
@@ -4193,11 +4191,9 @@ var Plottable;
                 legend.selectAll("circle").attr("cx", textHeight / 2).attr("cy", textHeight / 2).attr("r", r).attr("fill", this.colorScale._d3Scale);
                 legend.selectAll("g.text-container").text("").attr("transform", "translate(" + textHeight + ", 0)").each(function (d) {
                     var d3this = d3.select(this);
-                    var textSelection = d3this.append("text");
-                    var measure = Plottable.Util.Text.getTextMeasure(textSelection);
+                    var measure = Plottable.Util.Text.getTextMeasure(d3this.append("text"));
                     var writeLine = Plottable.Util.Text.getTruncatedText(d, availableWidth, measure);
                     var writeLineMeasure = measure(writeLine);
-                    textSelection.remove();
                     Plottable.Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
                 });
                 legend.attr("transform", function (d) {
