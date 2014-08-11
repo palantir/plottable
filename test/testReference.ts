@@ -16,6 +16,7 @@
 ///<reference path="components/labelTests.ts" />
 ///<reference path="components/legendTests.ts" />
 ///<reference path="components/plots/plotTests.ts" />
+///<reference path="components/plots/linePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
 ///<reference path="components/plots/barPlotTests.ts" />
 ///<reference path="components/plots/gridPlotTests.ts" />

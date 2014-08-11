@@ -1712,6 +1712,10 @@ declare module Plottable {
     module Abstract {
         class Axis extends Component {
             /**
+            * The css class applied to each end tick mark (the line on the end tick).
+            */
+            static END_TICK_MARK_CLASS: string;
+            /**
             * The css class applied to each tick mark (the line on the tick).
             */
             static TICK_MARK_CLASS: string;
@@ -1773,6 +1777,19 @@ declare module Plottable {
             * @returns {BaseAxis} The calling Axis.
             */
             public tickLength(length: number): Axis;
+            /**
+            * Gets the current end tick mark length.
+            *
+            * @returns {number} The current end tick mark length.
+            */
+            public endTickLength(): number;
+            /**
+            * Sets the end tick mark length.
+            *
+            * @param {number} length The length of the end ticks.
+            * @returns {BaseAxis} The calling Axis.
+            */
+            public endTickLength(length: number): Axis;
             /**
             * Gets the padding between each tick mark and its associated label.
             *

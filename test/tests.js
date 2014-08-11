@@ -326,19 +326,72 @@ describe("BaseAxis", function () {
             return tickValues;
         };
         baseAxis.renderTo(svg);
-
-        var firstTickMark = svg.select("." + Plottable.Abstract.Axis.TICK_MARK_CLASS);
-        assert.strictEqual(firstTickMark.attr("x1"), "0");
-        assert.strictEqual(firstTickMark.attr("x2"), "0");
-        assert.strictEqual(firstTickMark.attr("y1"), "0");
-        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.tickLength()));
+        var secondTickMark = svg.selectAll("." + Plottable.Abstract.Axis.TICK_MARK_CLASS + ":nth-child(2)");
+        assert.strictEqual(secondTickMark.attr("x1"), "50");
+        assert.strictEqual(secondTickMark.attr("x2"), "50");
+        assert.strictEqual(secondTickMark.attr("y1"), "0");
+        assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.tickLength()));
 
         baseAxis.tickLength(10);
-        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
+        assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
 
         assert.throws(function () {
             return baseAxis.tickLength(-1);
         }, "must be positive");
+
+        svg.remove();
+    });
+
+    it("endTickLength()", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        scale.domain([0, 10]);
+        scale.range([0, SVG_WIDTH]);
+        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        var tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        baseAxis._getTickValues = function () {
+            return tickValues;
+        };
+        baseAxis.renderTo(svg);
+
+        var firstTickMark = svg.selectAll("." + Plottable.Abstract.Axis.END_TICK_MARK_CLASS);
+        assert.strictEqual(firstTickMark.attr("x1"), "0");
+        assert.strictEqual(firstTickMark.attr("x2"), "0");
+        assert.strictEqual(firstTickMark.attr("y1"), "0");
+        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.endTickLength()));
+
+        baseAxis.endTickLength(10);
+        assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.endTickLength()), "end tick length was updated");
+
+        assert.throws(function () {
+            return baseAxis.endTickLength(-1);
+        }, "must be positive");
+
+        svg.remove();
+    });
+
+    it("height is adjusted to greater of tickLength or endTickLength", function () {
+        var SVG_WIDTH = 500;
+        var SVG_HEIGHT = 100;
+        var svg = generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        var scale = new Plottable.Scale.Linear();
+        var baseAxis = new Plottable.Abstract.Axis(scale, "bottom");
+        baseAxis.showEndTickLabels(true);
+        baseAxis.renderTo(svg);
+
+        var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.gutter();
+        assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
+
+        baseAxis.tickLength(20);
+        assert.strictEqual(baseAxis.height(), 20 + baseAxis.gutter(), "height should increase to tick length");
+
+        baseAxis.endTickLength(30);
+        assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should increase to end tick length");
+
+        baseAxis.tickLength(10);
+        assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
 
         svg.remove();
     });
@@ -1632,6 +1685,85 @@ describe("Plots", function () {
 var assert = chai.assert;
 
 describe("Plots", function () {
+    describe("LinePlot", function () {
+        var svg;
+        var xScale;
+        var yScale;
+        var xAccessor;
+        var yAccessor;
+        var y0Accessor;
+        var colorAccessor;
+        var fillAccessor;
+        var simpleDataset;
+        var linePlot;
+        var renderArea;
+        var verifier;
+
+        // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
+        var normalizePath = function (s) {
+            return s.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+        };
+
+        before(function () {
+            svg = generateSVG(500, 500);
+            verifier = new MultiTestVerifier();
+            xScale = new Plottable.Scale.Linear().domain([0, 1]);
+            yScale = new Plottable.Scale.Linear().domain([0, 1]);
+            xAccessor = function (d) {
+                return d.foo;
+            };
+            yAccessor = function (d) {
+                return d.bar;
+            };
+            y0Accessor = function () {
+                return 0;
+            };
+            colorAccessor = function (d, i, m) {
+                return d3.rgb(d.foo, d.bar, i).toString();
+            };
+            fillAccessor = function () {
+                return "steelblue";
+            };
+            simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
+            linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
+            linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            renderArea = linePlot.renderArea;
+        });
+
+        beforeEach(function () {
+            verifier.start();
+        });
+
+        it("stroke color can be changed by projecting attribute accessor (sets to first datum stroke attribute)", function () {
+            var data = simpleDataset.data();
+            data.forEach(function (d) {
+                d.stroke = "pink";
+            });
+            simpleDataset.data(data);
+            linePlot.project("stroke", "stroke");
+            renderArea = linePlot.renderArea;
+            var areaPath = renderArea.select(".line");
+            assert.equal(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
+
+            data[0].stroke = "green";
+            simpleDataset.data(data);
+            assert.equal(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
+            verifier.end();
+        });
+
+        after(function () {
+            if (verifier.passed) {
+                svg.remove();
+            }
+            ;
+        });
+    });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+
+describe("Plots", function () {
     describe("AreaPlot", function () {
         var svg;
         var xScale;
@@ -1722,6 +1854,23 @@ describe("Plots", function () {
             renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
+            verifier.end();
+        });
+
+        it("fill color can be changed by projecting attribute accessor (sets to first datum fill attribute)", function () {
+            var data = simpleDataset.data();
+            data.forEach(function (d) {
+                d.fill = "pink";
+            });
+            simpleDataset.data(data);
+            areaPlot.project("fill", "fill");
+            renderArea = areaPlot.renderArea;
+            var areaPath = renderArea.select(".area");
+            assert.equal(areaPath.attr("fill"), "pink", "fill set to uniform stroke color");
+
+            data[0].fill = "green";
+            simpleDataset.data(data);
+            assert.equal(areaPath.attr("fill"), "green", "fill set to first datum stroke color");
             verifier.end();
         });
 
