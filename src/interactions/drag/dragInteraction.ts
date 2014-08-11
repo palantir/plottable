@@ -40,7 +40,7 @@ export module Interaction {
      */
     public dragstart(cb: (startLocation: ICoord) => any): Drag;
     public dragstart(cb?: (startLocation: ICoord) => any): any {
-      if (!arguments.length) {
+      if (cb === undefined) {
         return this.ondragstart;
       } else {
         this.ondragstart = cb;
@@ -62,7 +62,7 @@ export module Interaction {
      */
     public drag(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
     public drag(cb?: (startLocation: ICoord, endLocation: ICoord) => any): any {
-      if (!arguments.length) {
+      if (cb === undefined) {
         return this.ondrag;
       } else {
         this.ondrag = cb;
@@ -84,7 +84,7 @@ export module Interaction {
      */
     public dragend(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
     public dragend(cb?: (startLocation: ICoord, endLocation: ICoord) => any): any {
-      if (!arguments.length) {
+      if (cb === undefined) {
         return this.ondragend;
       } else {
         this.ondragend = cb;

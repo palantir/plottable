@@ -7311,7 +7311,7 @@ var Plottable;
                 });
             }
             Drag.prototype.dragstart = function (cb) {
-                if (!arguments.length) {
+                if (cb === undefined) {
                     return this.ondragstart;
                 } else {
                     this.ondragstart = cb;
@@ -7320,7 +7320,7 @@ var Plottable;
             };
 
             Drag.prototype.drag = function (cb) {
-                if (!arguments.length) {
+                if (cb === undefined) {
                     return this.ondrag;
                 } else {
                     this.ondrag = cb;
@@ -7329,7 +7329,7 @@ var Plottable;
             };
 
             Drag.prototype.dragend = function (cb) {
-                if (!arguments.length) {
+                if (cb === undefined) {
                     return this.ondragend;
                 } else {
                     this.ondragend = cb;
