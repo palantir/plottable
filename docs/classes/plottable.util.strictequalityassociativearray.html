@@ -1,0 +1,410 @@
+﻿<!doctype html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>StrictEqualityAssociativeArray | plottable-website</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">plottable-website</a>
+				</div>
+				<div class="table-cell" id="tsd-filter">
+					<input type="checkbox" id="tsd-filter-inherited" checked />
+					<label for="tsd-filter-inherited">Inherited</label>
+					<input type="checkbox" id="tsd-filter-private" checked />
+					<label for="tsd-filter-private">Private</label>
+					<input type="checkbox" id="tsd-filter-externals" checked />
+					<label for="tsd-filter-externals">Externals</label>
+					<input type="checkbox" id="tsd-filter-only-exported" />
+					<label for="tsd-filter-only-exported">Only exported</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="breadcrumb">
+				<li>
+					<a href="../globals.html">plottable-website</a>
+				</li>
+				<li>
+					<a href="../modules/plottable.html">Plottable</a>
+				</li>
+				<li>
+					<a href="../modules/plottable.util.html">Util</a>
+				</li>
+				<li>
+					<a href="plottable.util.strictequalityassociativearray.html">StrictEqualityAssociativeArray</a>
+				</li>
+			</ul>
+			<h1>Class StrictEqualityAssociativeArray</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8">
+			<p>An associative array that can be keyed by anything (inc objects).
+				Uses pointer equality checks which is why this works.
+			This power has a price: everything is linear time since it is actually backed by an array...</p>
+			<section class="tsd-member-index">
+				<h2>Index</h2>
+				<section class="tsd-member-index-group ">
+					<h3>Methods</h3>
+					<ul class="tsd-member-index">
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.util.strictequalityassociativearray.html#delete" class="tsd-kind-icon">delete</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.util.strictequalityassociativearray.html#get" class="tsd-kind-icon">get</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.util.strictequalityassociativearray.html#has" class="tsd-kind-icon">has</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.util.strictequalityassociativearray.html#keys" class="tsd-kind-icon">keys</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.util.strictequalityassociativearray.html#map" class="tsd-kind-icon">map</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.util.strictequalityassociativearray.html#set" class="tsd-kind-icon">set</a></li>
+						<li class="tsd-kind-method tsd-parent-kind-class"><a href="plottable.util.strictequalityassociativearray.html#values" class="tsd-kind-icon">values</a></li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="delete" class="anchor"></a>
+					<h3>delete</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">delete<span class="tsd-signature-symbols">(</span>key<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:192</li>
+								</ul>
+							</aside>
+							<p>Delete a key from the key-value store. Return whether the key was present.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>key: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4>Returns 
+								<span class="tsd-signature-type">boolean</span>
+							</h4>
+							<p>Whether a matching entry was found and removed</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="get" class="anchor"></a>
+					<h3>get</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbols">(</span>key<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:156</li>
+								</ul>
+							</aside>
+							<p>Get a value from the store, given a key.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>key: <span class="tsd-signature-type">any</span></h5>
+									<p>Key associated with value to retrieve</p>
+								</li>
+							</ul>
+							<h4>Returns 
+								<span class="tsd-signature-type">any</span>
+							</h4>
+							<p>Value if found, undefined otherwise</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="has" class="anchor"></a>
+					<h3>has</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">has<span class="tsd-signature-symbols">(</span>key<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:166</li>
+								</ul>
+							</aside>
+							<p>Test whether store has a value associated with given key.</p>
+							<p>Will return true if there is a key/value entry,
+							even if the value is explicitly <code>undefined</code>.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>key: <span class="tsd-signature-type">any</span></h5>
+									<p>Key to test for presence of an entry</p>
+								</li>
+							</ul>
+							<h4>Returns 
+								<span class="tsd-signature-type">boolean</span>
+							</h4>
+							<p>Whether there was a matching entry for that key</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="keys" class="anchor"></a>
+					<h3>keys</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">keys<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:178</li>
+								</ul>
+							</aside>
+							<p>Return an array of keys in the key-value store</p>
+							<h4>Returns 
+								<span class="tsd-signature-type">Array&lt;any&gt;</span>
+							</h4>
+							<p>The keys in the store</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="map" class="anchor"></a>
+					<h3>map</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">map<span class="tsd-signature-symbols">(</span>cb<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:185</li>
+								</ul>
+							</aside>
+							<p>Execute a callback for each entry in the array.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>cb: <span class="tsd-signature-type">Function</span></h5>
+									<ul>
+										<li>
+											<h5>cb function signature<span class="tsd-signature-symbols"></span></h5>
+											<ul class="tsd-signatures tsd-kind-function-type tsd-parent-kind-parameter">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbols">(</span>index<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">number</span>, key<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">any</span>, val<span class="tsd-signature-symbols">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description"><aside class="tsd-sources">
+														<ul>
+															<li>Defined in plottable.d.ts:185</li>
+														</ul>
+													</aside>
+													<p>The callback to eecute</p>
+													<h4>Parameters</h4>
+													<ul>
+														<li>
+															<h5>index?: <span class="tsd-signature-type">number</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+														</li>
+														<li>
+															<h5>key?: <span class="tsd-signature-type">any</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+														</li>
+														<li>
+															<h5>val?: <span class="tsd-signature-type">any</span> <span class="tsd-flag ts-flagoptional">optional</span></h5>
+														</li>
+													</ul>
+													<h4>Returns 
+														<span class="tsd-signature-type">any</span>
+													</h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4>Returns 
+								<span class="tsd-signature-type">Array&lt;any&gt;</span>
+							</h4>
+							<p>The results of mapping the callback over the entries</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="set" class="anchor"></a>
+					<h3>set</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<span class="tsd-signature-symbols">(</span>key<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span>, value<span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:149</li>
+								</ul>
+							</aside>
+							<p>Set a new key/value pair in the store.</p>
+							<h4>Parameters</h4>
+							<ul>
+								<li>
+									<h5>key: <span class="tsd-signature-type">any</span></h5>
+									<p>Key to set in the store</p>
+								</li>
+								<li>
+									<h5>value: <span class="tsd-signature-type">any</span></h5>
+									<p>Value to set in the store</p>
+								</li>
+							</ul>
+							<h4>Returns 
+								<span class="tsd-signature-type">boolean</span>
+							</h4>
+							<p>True if key already in store, false otherwise</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="values" class="anchor"></a>
+					<h3>values</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">values<span class="tsd-signature-symbols">(</span><span class="tsd-signature-symbols">)</span><span class="tsd-signature-symbols">: </span><span class="tsd-signature-type">Array&lt;any&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description"><aside class="tsd-sources">
+								<ul>
+									<li>Defined in plottable.d.ts:172</li>
+								</ul>
+							</aside>
+							<p>Return an array of the values in the key-value store</p>
+							<h4>Returns 
+								<span class="tsd-signature-type">Array&lt;any&gt;</span>
+							</h4>
+							<p>The values in the store</p>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="offset-1 col-3">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-container">
+						<a href="../modules/d3.html">D3</a>
+					</li>
+					<li class="current tsd-kind-container">
+						<a href="../modules/plottable.html">Plottable</a>
+						<ul>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.abstract.html">Abstract</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.animator.html">Animator</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.axis.html">Axis</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.component.html">Component</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.core.html">Core</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.formatter.html">Formatter</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.interaction.html">Interaction</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.plot.html">Plot</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.scale.html">Scale</a>
+							</li>
+							<li class=" tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.template.html">Template</a>
+							</li>
+							<li class="current tsd-kind-container tsd-parent-kind-container">
+								<a href="../modules/plottable.util.html">Util</a>
+								<ul>
+									<li class=" tsd-kind-container tsd-parent-kind-container">
+										<a href="../modules/plottable.util.axis.html">Axis</a>
+									</li>
+									<li class=" tsd-kind-container tsd-parent-kind-container">
+										<a href="../modules/plottable.util.dom.html">DOM</a>
+									</li>
+									<li class=" tsd-kind-container tsd-parent-kind-container">
+										<a href="../modules/plottable.util.methods.html">Methods</a>
+									</li>
+									<li class=" tsd-kind-container tsd-parent-kind-container">
+										<a href="../modules/plottable.util.opensource.html">Open<wbr>Source</a>
+									</li>
+									<li class=" tsd-kind-container tsd-parent-kind-container">
+										<a href="../modules/plottable.util.text.html">Text</a>
+									</li>
+									<li class=" tsd-kind-container tsd-parent-kind-container">
+										<a href="../modules/plottable.util.wordwrap.html">Word<wbr>Wrap</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary">
+				<ul>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.util.cache.html" class="tsd-kind-icon">Cache</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.util.idcounter.html" class="tsd-kind-icon">IDCounter</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.util.scaledomaincoordinator.html" class="tsd-kind-icon">Scale<wbr>Domain<wbr>Coordinator</a>
+					</li>
+					<li class="current tsd-kind-class tsd-parent-kind-container">
+						<a href="plottable.util.strictequalityassociativearray.html" class="tsd-kind-icon">Strict<wbr>Equality<wbr>Associative<wbr>Array</a>
+						<ul>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.util.strictequalityassociativearray.html#delete" class="tsd-kind-icon">delete</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.util.strictequalityassociativearray.html#get" class="tsd-kind-icon">get</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.util.strictequalityassociativearray.html#has" class="tsd-kind-icon">has</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.util.strictequalityassociativearray.html#keys" class="tsd-kind-icon">keys</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.util.strictequalityassociativearray.html#map" class="tsd-kind-icon">map</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.util.strictequalityassociativearray.html#set" class="tsd-kind-icon">set</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="plottable.util.strictequalityassociativearray.html#values" class="tsd-kind-icon">values</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
