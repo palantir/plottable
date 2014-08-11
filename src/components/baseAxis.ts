@@ -3,9 +3,14 @@
 module Plottable {
 export module Abstract {
   export class Axis extends Abstract.Component {
+    /**
+     * The css class applied to each tick mark (the line on the tick).
+     */
     public static TICK_MARK_CLASS = "tick-mark";
+    /**
+     * The css class applied to each tick label (the text associated with the tick).
+     */
     public static TICK_LABEL_CLASS = "tick-label";
-    public axisElement: D3.Selection;
     public _tickMarkContainer: D3.Selection;
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;

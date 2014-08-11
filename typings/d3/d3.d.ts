@@ -749,7 +749,7 @@ declare module D3 {
         insert: (name: string, before: string) => Selection;
         remove: () => Selection;
         empty: () => boolean;
-            
+
         data: {
             (values: (data: any, index?: number) => any[], key?: (data: any, index?: number) => any): UpdateSelection;
             (values: any[], key?: (data: any, index?: number) => any): UpdateSelection;
@@ -1156,6 +1156,19 @@ declare module D3 {
                 (): Array<number>;
                 /**
                 * Sets the available layout size
+                */
+                (size: Array<number>): TreeLayout;
+            };
+            /**
+            * Gets or sets the available node size
+            */
+            nodeSize: {
+                /**
+                * Gets the available node size
+                */
+                (): Array<number>;
+                /**
+                * Sets the available node size
                 */
                 (size: Array<number>): TreeLayout;
             };
@@ -2519,7 +2532,7 @@ declare module D3 {
             copy(): Scale;
         }
 
-        export interface QuantitiveScale extends Scale {
+        export interface QuantitativeScale extends Scale {
             /**
             * Get the range value corresponding to a given domain value.
             *
@@ -2541,7 +2554,7 @@ declare module D3 {
                 *
                 * @param value The input domain
                 */
-                (values: any[]): QuantitiveScale;
+                (values: any[]): QuantitativeScale;
                 /**
                 * Get the scale's input domain.
                 */
@@ -2556,7 +2569,7 @@ declare module D3 {
                 *
                 * @param value The output range.
                 */
-                (values: any[]): QuantitiveScale;
+                (values: any[]): QuantitativeScale;
                 /**
                 * Get the scale's output range.
                 */
@@ -2567,13 +2580,13 @@ declare module D3 {
             *
             * @param value The output range.
             */
-            rangeRound: (values: any[]) => QuantitiveScale;
+            rangeRound: (values: any[]) => QuantitativeScale;
             /**
             * get or set the scale's output interpolator.
             */
             interpolate: {
                 (): D3.Transition.Interpolate;
-                (factory: D3.Transition.Interpolate): QuantitiveScale;
+                (factory: D3.Transition.Interpolate): QuantitativeScale;
             };
             /**
             * enable or disable clamping of the output range.
@@ -2582,14 +2595,14 @@ declare module D3 {
             */
             clamp: {
                 (): boolean;
-                (clamp: boolean): QuantitiveScale;
+                (clamp: boolean): QuantitativeScale;
             }
             /**
             * extend the scale domain to nice round numbers.
-            * 
+            *
             * @param count Optional number of ticks to exactly fit the domain
             */
-            nice(count?: number): QuantitiveScale;
+            nice(count?: number): QuantitativeScale;
             /**
             * get representative values from the input domain.
             *
@@ -2605,10 +2618,10 @@ declare module D3 {
             /**
             * create a new scale from an existing scale..
             */
-            copy(): QuantitiveScale;
+            copy(): QuantitativeScale;
         }
 
-        export interface LinearScale extends QuantitiveScale {
+        export interface LinearScale extends QuantitativeScale {
             /**
             * Get the range value corresponding to a given domain value.
             *
@@ -2644,7 +2657,7 @@ declare module D3 {
             tickFormat(count: number): (n: number) => string;
         }
 
-        export interface SqrtScale extends QuantitiveScale {
+        export interface SqrtScale extends QuantitativeScale {
             /**
             * Get the range value corresponding to a given domain value.
             *
@@ -2653,7 +2666,7 @@ declare module D3 {
             (value: number): number;
         }
 
-        export interface PowScale extends QuantitiveScale {
+        export interface PowScale extends QuantitativeScale {
             /**
             * Get the range value corresponding to a given domain value.
             *
@@ -2662,7 +2675,7 @@ declare module D3 {
             (value: number): number;
         }
 
-        export interface LogScale extends QuantitiveScale {
+        export interface LogScale extends QuantitativeScale {
             /**
             * Get the range value corresponding to a given domain value.
             *
@@ -3432,7 +3445,7 @@ declare module D3 {
                 *
                 * @param constant The new constant value.
                 */
-                (constant: number): Voronoi<T>;   
+                (constant: number): Voronoi<T>;
             }
             clipExtent: {
                 /**

@@ -936,11 +936,11 @@ var Plottable;
             __extends(Broadcaster, _super);
             function Broadcaster(listenable) {
                 _super.call(this);
-                this.listener2Callback = new Plottable.Util.StrictEqualityAssociativeArray();
+                this.key2callback = new Plottable.Util.StrictEqualityAssociativeArray();
                 this.listenable = listenable;
             }
-            Broadcaster.prototype.registerListener = function (listener, callback) {
-                this.listener2Callback.set(listener, callback);
+            Broadcaster.prototype.registerListener = function (key, callback) {
+                this.key2callback.set(key, callback);
                 return this;
             };
             Broadcaster.prototype.broadcast = function () {
@@ -949,15 +949,15 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this.listener2Callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
+                this.key2callback.values().forEach(function (callback) { return callback(_this.listenable, args); });
                 return this;
             };
-            Broadcaster.prototype.deregisterListener = function (listener) {
-                this.listener2Callback.delete(listener);
+            Broadcaster.prototype.deregisterListener = function (key) {
+                this.key2callback.delete(key);
                 return this;
             };
             Broadcaster.prototype.deregisterAllListeners = function () {
-                this.listener2Callback = new Plottable.Util.StrictEqualityAssociativeArray();
+                this.key2callback = new Plottable.Util.StrictEqualityAssociativeArray();
             };
             return Broadcaster;
         })(Plottable.Abstract.PlottableObject);
@@ -2233,6 +2233,9 @@ var Plottable;
                 else {
                     return [d - Domainer.PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
                 }
+            }
+            if (scale.domain()[0] === scale.domain()[1]) {
+                return domain;
             }
             var p = this.padProportion / 2;
             var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
@@ -4485,6 +4488,7 @@ var Plottable;
                         else {
                             qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
                         }
+                        qscale.domainer().pad();
                     }
                     qscale._autoDomainIfAutomaticMode();
                 }

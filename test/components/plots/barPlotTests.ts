@@ -307,6 +307,7 @@ describe("Plots", () => {
         var table = new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
         axisWidth = yAxis.availableWidth;
         bandWidth = yScale.rangeBand();
+        xScale.domainer(xScale.domainer().pad(0));
       });
       beforeEach(() => {
         verifier.start();
