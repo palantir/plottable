@@ -7311,18 +7311,30 @@ var Plottable;
                 });
             }
             Drag.prototype.dragstart = function (cb) {
-                this.ondragstart = cb;
-                return this;
+                if (cb == null) {
+                    return this.ondragstart;
+                } else {
+                    this.ondragstart = cb;
+                    return this;
+                }
             };
 
             Drag.prototype.drag = function (cb) {
-                this.ondrag = cb;
-                return this;
+                if (cb == null) {
+                    return this.ondrag;
+                } else {
+                    this.ondrag = cb;
+                    return this;
+                }
             };
 
             Drag.prototype.dragend = function (cb) {
-                this.ondragend = cb;
-                return this;
+                if (cb == null) {
+                    return this.ondragend;
+                } else {
+                    this.ondragend = cb;
+                    return this;
+                }
             };
 
             Drag.prototype._dragstart = function () {

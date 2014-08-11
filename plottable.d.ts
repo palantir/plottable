@@ -2496,9 +2496,9 @@ declare module Plottable {
             /**
             * Gets the callback that is called when dragging starts.
             *
-            * @returns {any}
+            * @returns {(startLocation: ICoord) => void}
             */
-            public dragstart(): any;
+            public dragstart(): (startLocation: ICoord) => void;
             /**
             * Sets the callback to be called when dragging starts.
             *
@@ -2509,9 +2509,9 @@ declare module Plottable {
             /**
             * Gets the callback that is called during dragging.
             *
-            * @returns {any}
+            * @returns {(startLocation: ICoord, endLocation: ICoord) => void}
             */
-            public drag(): any;
+            public drag(): (startLocation: ICoord, endLocation: ICoord) => void;
             /**
             * Adds a callback to be called during dragging.
             *
@@ -2522,9 +2522,9 @@ declare module Plottable {
             /**
             * Gets the callback that is called when dragging ends.
             *
-            * @returns {any}
+            * @returns {(startLocation: ICoord, endLocation: ICoord) => void}
             */
-            public dragend(): any;
+            public dragend(): (startLocation: ICoord, endLocation: ICoord) => void;
             /**
             * Adds a callback to be called when the dragging ends.
             *

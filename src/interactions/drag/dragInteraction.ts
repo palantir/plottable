@@ -29,9 +29,9 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging starts.
      *
-     * @returns {any}
+     * @returns {(startLocation: ICoord) => void}
      */
-    public dragstart(): any;
+    public dragstart(): (startLocation: ICoord) => void;
     /**
      * Sets the callback to be called when dragging starts.
      *
@@ -39,17 +39,21 @@ export module Interaction {
      * @returns {Drag}
      */
     public dragstart(cb: (startLocation: ICoord) => any): Drag;
-    public dragstart(cb?: (startLocation: ICoord) => any): Drag {
-      this.ondragstart = cb;
-      return this;
+    public dragstart(cb?: (startLocation: ICoord) => any): any {
+      if (cb == null) {
+        return this.ondragstart;
+      } else {
+        this.ondragstart = cb;
+        return this;
+      }
     }
 
     /**
      * Gets the callback that is called during dragging.
      *
-     * @returns {any}
+     * @returns {(startLocation: ICoord, endLocation: ICoord) => void}
      */
-    public drag(): any;
+    public drag(): (startLocation: ICoord, endLocation: ICoord) => void;
     /**
      * Adds a callback to be called during dragging.
      *
@@ -57,17 +61,21 @@ export module Interaction {
      * @returns {Drag}
      */
     public drag(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
-    public drag(cb?: (startLocation: ICoord, endLocation: ICoord) => any): Drag {
-      this.ondrag = cb;
-      return this;
+    public drag(cb?: (startLocation: ICoord, endLocation: ICoord) => any): any {
+      if (cb == null) {
+        return this.ondrag;
+      } else {
+        this.ondrag = cb;
+        return this;
+      }
     }
 
     /**
      * Gets the callback that is called when dragging ends.
      *
-     * @returns {any}
+     * @returns {(startLocation: ICoord, endLocation: ICoord) => void}
      */
-    public dragend(): any;
+    public dragend(): (startLocation: ICoord, endLocation: ICoord) => void;
     /**
      * Adds a callback to be called when the dragging ends.
      *
@@ -75,9 +83,13 @@ export module Interaction {
      * @returns {Drag} The calling Drag.
      */
     public dragend(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
-    public dragend(cb?: (startLocation: ICoord, endLocation: ICoord) => any): Drag {
-      this.ondragend = cb;
-      return this;
+    public dragend(cb?: (startLocation: ICoord, endLocation: ICoord) => any): any {
+      if (cb == null) {
+        return this.ondragend;
+      } else {
+        this.ondragend = cb;
+        return this;
+      }
     }
 
     public _dragstart(){
