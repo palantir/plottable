@@ -5237,6 +5237,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this._isVertical = true;
                 this.innerScale = new Plottable.Scale.Ordinal();
+                this.setColor(new Plottable.Scale.Color());
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;

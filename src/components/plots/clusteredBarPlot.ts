@@ -11,6 +11,7 @@ export module Plot {
     constructor(xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
       super(xScale, yScale);
       this.innerScale = new Scale.Ordinal();
+      this.setColor(new Plottable.Scale.Color());
     }
 
 

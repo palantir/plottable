@@ -19,9 +19,10 @@
 ///<reference path="components/plots/newStylePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
 ///<reference path="components/plots/barPlotTests.ts" />
-///<reference path="components/plots/stackedBarPlotTests.ts" />
 ///<reference path="components/plots/gridPlotTests.ts" />
 ///<reference path="components/plots/scatterPlotTests.ts" />
+///<reference path="components/plots/stackedBarPlotTests.ts" />
+///<reference path="components/plots/clusteredBarPlotTests.ts" />
 
 ///<reference path="core/broadcasterTests.ts" />
 ///<reference path="core/componentContainerTests.ts" />
