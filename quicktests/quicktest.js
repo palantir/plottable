@@ -130,9 +130,18 @@ function main() {
       }))
   });
 
-  //load github branch dropdown
-  var branchOptions = {};
-  $.get("https://api.github.com/repos/palantir/plottable/branches",function(data,status){
+  d3.text("/quicktests/github_token.txt", function (err, data) {
+    var auth = "";
+    if (err != null) {
+      console.log("Something went wrong acquiring the Github token. Using unauthenticated requests for feature branches");
+      console.log("To acquire a github token, go here: https://github.com/settings/applications#personal-access-tokens");
+      console.log("Make a new token (it needs no permissions) and then save it as quicktests/github_token.txt");
+    } else {
+      auth = "?access_token=" + data.substring(0,40);
+    }
+    //load github branch dropdown
+    var branchOptions = {};
+    $.get("https://api.github.com/repos/palantir/plottable/branches" + auth, function(data,status){
       for(var i = 0; i < data.length; i++){
         branchOptions["val" + i] = data[i].name;
       }
@@ -143,8 +152,7 @@ function main() {
           );
       });
     });
-
-
+  })
 
   var table = d3.select("table");
   table.selectAll(".quicktest-row").remove();
