@@ -15,7 +15,7 @@ export module Abstract {
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
     public _scale: Abstract.Scale;
-    public _formatter: (d: any) => string;
+    public _formatter: Formatter;
     public _orientation: string;
     public _width: any = "auto";
     public _height: any = "auto";
@@ -286,17 +286,17 @@ export module Abstract {
     /**
      * Get the current formatter on the axis.
      *
-     * @returns {function} the axis formatter
+     * @returns {Formatter} the axis formatter
      */
-    public formatter(): (d: any) => string;
+    public formatter(): Formatter;
     /**
      * Sets a new tick formatter.
      *
-     * @param {function} formatter
+     * @param {Formatter} formatter
      * @returns {Abstract.Axis} The calling Axis.
      */
-    public formatter(formatter: (d: any) => string): Abstract.Axis;
-    public formatter(formatter?: (d: any) => string): any {
+    public formatter(formatter: Formatter): Abstract.Axis;
+    public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
       }

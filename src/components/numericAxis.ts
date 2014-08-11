@@ -16,7 +16,7 @@ export module Axis {
      * @constructor
      * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {function} [formatter] A function to format tick labels (default Formatters.general(3, false)).
+     * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
      */
     constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter = Formatters.general(3, false)) {
       super(scale, orientation, formatter);

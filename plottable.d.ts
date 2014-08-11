@@ -151,6 +151,9 @@ declare module Plottable {
 
 
 declare module Plottable {
+    interface Formatter {
+        (d: any): string;
+    }
     class Formatters {
         static currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
         static fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
@@ -585,8 +588,8 @@ declare module Plottable {
             width(w: any): Axis;
             height(): number;
             height(h: any): Axis;
-            formatter(): (d: any) => string;
-            formatter(formatter: (d: any) => string): Axis;
+            formatter(): Formatter;
+            formatter(formatter: Formatter): Axis;
             tickLength(): number;
             tickLength(length: number): Axis;
             tickLabelPadding(): number;

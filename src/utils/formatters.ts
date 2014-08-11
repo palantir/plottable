@@ -2,6 +2,10 @@
 
 module Plottable {
 
+  export interface Formatter {
+    (d: any): string;
+  }
+
   interface TimeFilterFormat {
     format: string;
     filter: (d: any) => any;
@@ -17,7 +21,7 @@ module Plottable {
      * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
      * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
      *
-     * @returns {function} A formatter for currency values.
+     * @returns {Formatter} A formatter for currency values.
      */
     public static currency(precision = 2, symbol = "$", prefix = true, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
@@ -47,7 +51,7 @@ module Plottable {
      * @param {number} [precision] The number of decimal places to show (default 3).
      * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
      *
-     * @returns {function} A formatter that displays exactly [precision] decimal places.
+     * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
      */
     public static fixed(precision = 3, onlyShowUnchanged = true) {
       Formatters.verifyPrecision(precision);
@@ -67,7 +71,7 @@ module Plottable {
      * @param {number} [precision] The number of decimal places to show (default 3).
      * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
      *
-     * @returns {function} A formatter for general values.
+     * @returns {Formatter} A formatter for general values.
      */
     public static general(precision = 3, onlyShowUnchanged = true) {
       Formatters.verifyPrecision(precision);
@@ -88,7 +92,7 @@ module Plottable {
     /**
      * Creates a formatter that stringifies its input.
      *
-     * @returns {function} A formatter that stringifies its input.
+     * @returns {Formatter} A formatter that stringifies its input.
      */
     public static identity() {
       return function(d: any) {
@@ -103,7 +107,7 @@ module Plottable {
      * @param {number} [precision] The number of decimal places to show (default 0).
      * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
      *
-     * @returns {function} A formatter for percentage values.
+     * @returns {Formatter} A formatter for percentage values.
      */
     public static percentage(precision = 0, onlyShowUnchanged = true) {
       var fixedFormatter = Formatters.fixed(precision);
@@ -125,7 +129,7 @@ module Plottable {
      *
      * @param {number} [precision] The number of significant figures to show (default 3).
      *
-     * @returns {function} A formatter for SI values.
+     * @returns {Formatter} A formatter for SI values.
      */
     public static siSuffix(precision = 3) {
       Formatters.verifyPrecision(precision);
@@ -137,7 +141,7 @@ module Plottable {
     /**
      * Creates a formatter that displays dates.
      *
-     * @returns {function} A formatter for time/date values.
+     * @returns {Formatter} A formatter for time/date values.
      */
     public static time() {
 
