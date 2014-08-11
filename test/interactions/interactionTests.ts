@@ -274,4 +274,118 @@ describe("Interactions", () => {
       svg.remove();
     });
   });
+
+  describe("BarHover", () => {
+    var dataset: any[];
+    var ordinalScale: Plottable.Scale.Ordinal;
+    var linearScale: Plottable.Scale.Linear;
+
+    before(() => {
+      dataset = [
+        { name: "A", value: 3 },
+        { name: "B", value: 5 }
+      ];
+      ordinalScale = new Plottable.Scale.Ordinal();
+      linearScale = new Plottable.Scale.Linear();
+    });
+
+    it("hoverMode()", () => {
+      var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+      var bhi = new Plottable.Interaction.BarHover(barPlot);
+
+      bhi.hoverMode("line");
+      bhi.hoverMode("POINT");
+
+      assert.throws(() => bhi.hoverMode("derp"), "not a valid");
+    });
+
+    it("correctly triggers callbacks (vertical)", () => {
+      var svg = generateSVG(400, 400);
+      var barPlot = new Plottable.Plot.VerticalBar(dataset, ordinalScale, linearScale);
+      barPlot.project("x", "name", ordinalScale).project("y", "value", linearScale);
+      var bhi = new Plottable.Interaction.BarHover(barPlot);
+
+      var barDatum: any = null;
+      bhi.onHover((datum: any, bar: D3.Selection) => {
+        barDatum = datum;
+      });
+
+      var unhoverCalled = false;
+      bhi.onUnhover(() => {
+        unhoverCalled = true;
+      });
+
+      barPlot.renderTo(svg);
+      bhi.registerWithComponent();
+
+      var hitbox = barPlot.element.select(".hit-box");
+
+      triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+      assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
+      barDatum = null;
+      triggerFakeMouseEvent("mousemove", hitbox, 100, 201);
+      assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
+
+
+      triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
+      assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
+      unhoverCalled = false;
+      triggerFakeMouseEvent("mousemove", hitbox, 11, 11);
+      assert.isFalse(unhoverCalled, "unhover callback isn't triggered multiple times in succession");
+
+      triggerFakeMouseEvent("mousemove", hitbox, 100, 200);
+      triggerFakeMouseEvent("mouseout", hitbox, 100, 9999);
+      assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing out of the chart");
+
+      bhi.hoverMode("line");
+      triggerFakeMouseEvent("mousemove", hitbox, 100, 1);
+      assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
+
+      svg.remove();
+    });
+
+    it("correctly triggers callbacks (hoizontal)", () => {
+      var svg = generateSVG(400, 400);
+      var barPlot = new Plottable.Plot.HorizontalBar(dataset, linearScale, ordinalScale);
+      barPlot.project("y", "name", ordinalScale).project("x", "value", linearScale);
+      var bhi = new Plottable.Interaction.BarHover(barPlot);
+
+      var barDatum: any = null;
+      bhi.onHover((datum: any, bar: D3.Selection) => {
+        barDatum = datum;
+      });
+
+      var unhoverCalled = false;
+      bhi.onUnhover(() => {
+        unhoverCalled = true;
+      });
+
+      barPlot.renderTo(svg);
+      bhi.registerWithComponent();
+
+      var hitbox = barPlot.element.select(".hit-box");
+
+      triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+      assert.deepEqual(barDatum, dataset[0], "the first bar was selected (point mode)");
+      barDatum = null;
+      triggerFakeMouseEvent("mousemove", hitbox, 201, 250);
+      assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
+
+      triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
+      assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
+      unhoverCalled = false;
+      triggerFakeMouseEvent("mousemove", hitbox, 11, 11);
+      assert.isFalse(unhoverCalled, "unhover callback isn't triggered multiple times in succession");
+
+      triggerFakeMouseEvent("mousemove", hitbox, 200, 250);
+      triggerFakeMouseEvent("mouseout", hitbox, -999, 250);
+      assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing out of the chart");
+
+      bhi.hoverMode("line");
+      triggerFakeMouseEvent("mousemove", hitbox, 399, 250);
+      assert.deepEqual(barDatum, dataset[0], "the first bar was selected (line mode)");
+
+      svg.remove();
+    });
+  });
 });
