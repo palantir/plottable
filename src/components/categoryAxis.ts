@@ -17,7 +17,7 @@ export module Axis {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
      * @param {function} [formatter] The Formatter for the Axis (default Formatters.identity())
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter: any = Formatters.identity()) {
+    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {

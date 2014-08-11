@@ -638,7 +638,7 @@ declare module Plottable {
 declare module Plottable {
     module Axis {
         class Category extends Plottable.Abstract.Axis {
-            constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: any);
+            constructor(scale: Plottable.Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
         }
     }
 }
