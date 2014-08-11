@@ -101,6 +101,13 @@ export module Plot {
         .y1(yFunction);
       this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
     }
+
+    public _wholeDatumAttributes() {
+      var wholeDatumAttributes = super._wholeDatumAttributes();
+      wholeDatumAttributes.push("y0");
+      return wholeDatumAttributes;
+    }
+
   }
 }
 }

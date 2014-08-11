@@ -658,6 +658,7 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class Axis extends Component {
+            static END_TICK_MARK_CLASS: string;
             static TICK_MARK_CLASS: string;
             static TICK_LABEL_CLASS: string;
             constructor(scale: Scale, orientation: string, formatter?: any);
@@ -670,6 +671,8 @@ declare module Plottable {
             formatter(formatter: any): Axis;
             tickLength(): number;
             tickLength(length: number): Axis;
+            endTickLength(): number;
+            endTickLength(length: number): Axis;
             tickLabelPadding(): number;
             tickLabelPadding(padding: number): Axis;
             gutter(): number;
