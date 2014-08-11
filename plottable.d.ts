@@ -1220,10 +1220,6 @@ declare module Plottable {
         wantsWidth: boolean;
         wantsHeight: boolean;
     }
-    interface ICoord {
-        x: number;
-        y: number;
-    }
     interface IExtent {
         min: number;
         max: number;
@@ -2484,9 +2480,9 @@ declare module Plottable {
         class Drag extends Abstract.Interaction {
             public origin: number[];
             public location: number[];
-            public ondragstart: (startLocation: ICoord) => void;
-            public ondrag: (startLocation: ICoord, endLocation: ICoord) => void;
-            public ondragend: (startLocation: ICoord, endLocation: ICoord) => void;
+            public ondragstart: (startLocation: Point) => void;
+            public ondrag: (startLocation: Point, endLocation: Point) => void;
+            public ondragend: (startLocation: Point, endLocation: Point) => void;
             /**
             * Creates a Drag.
             *
@@ -2496,42 +2492,42 @@ declare module Plottable {
             /**
             * Gets the callback that is called when dragging starts.
             *
-            * @returns {(startLocation: ICoord) => void}
+            * @returns {(startLocation: Point) => void}
             */
-            public dragstart(): (startLocation: ICoord) => void;
+            public dragstart(): (startLocation: Point) => void;
             /**
             * Sets the callback to be called when dragging starts.
             *
-            * @param {(startLocation: ICoord) => any} cb The function to be called.
+            * @param {(startLocation: Point) => any} cb The function to be called.
             * @returns {Drag}
             */
-            public dragstart(cb: (startLocation: ICoord) => any): Drag;
+            public dragstart(cb: (startLocation: Point) => any): Drag;
             /**
             * Gets the callback that is called during dragging.
             *
-            * @returns {(startLocation: ICoord, endLocation: ICoord) => void}
+            * @returns {(startLocation: Point, endLocation: Point) => void}
             */
-            public drag(): (startLocation: ICoord, endLocation: ICoord) => void;
+            public drag(): (startLocation: Point, endLocation: Point) => void;
             /**
             * Adds a callback to be called during dragging.
             *
-            * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called.
+            * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called.
             * @returns {Drag}
             */
-            public drag(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
+            public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
             /**
             * Gets the callback that is called when dragging ends.
             *
-            * @returns {(startLocation: ICoord, endLocation: ICoord) => void}
+            * @returns {(startLocation: Point, endLocation: Point) => void}
             */
-            public dragend(): (startLocation: ICoord, endLocation: ICoord) => void;
+            public dragend(): (startLocation: Point, endLocation: Point) => void;
             /**
             * Adds a callback to be called when the dragging ends.
             *
-            * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+            * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
             * @returns {Drag} The calling Drag.
             */
-            public dragend(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
+            public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
             public setupZoomCallback(xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale): Drag;
         }
     }

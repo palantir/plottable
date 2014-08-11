@@ -36,11 +36,6 @@ module Plottable {
     wantsHeight: boolean;
   }
 
-  export interface ICoord {
-    x: number;
-    y: number;
-  }
-
   export interface IExtent {
     min: number;
     max: number;

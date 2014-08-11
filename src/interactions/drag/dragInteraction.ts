@@ -9,9 +9,9 @@ export module Interaction {
     public location = [0,0];
     private constrainX: (n: number) => number;
     private constrainY: (n: number) => number;
-    public ondragstart: (startLocation: ICoord) => void;
-    public      ondrag: (startLocation: ICoord, endLocation: ICoord) => void;
-    public   ondragend: (startLocation: ICoord, endLocation: ICoord) => void;
+    public ondragstart: (startLocation: Point) => void;
+    public      ondrag: (startLocation: Point, endLocation: Point) => void;
+    public   ondragend: (startLocation: Point, endLocation: Point) => void;
 
     /**
      * Creates a Drag.
@@ -29,17 +29,17 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging starts.
      *
-     * @returns {(startLocation: ICoord) => void}
+     * @returns {(startLocation: Point) => void}
      */
-    public dragstart(): (startLocation: ICoord) => void;
+    public dragstart(): (startLocation: Point) => void;
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(startLocation: ICoord) => any} cb The function to be called.
+     * @param {(startLocation: Point) => any} cb The function to be called.
      * @returns {Drag}
      */
-    public dragstart(cb: (startLocation: ICoord) => any): Drag;
-    public dragstart(cb?: (startLocation: ICoord) => any): any {
+    public dragstart(cb: (startLocation: Point) => any): Drag;
+    public dragstart(cb?: (startLocation: Point) => any): any {
       if (cb === undefined) {
         return this.ondragstart;
       } else {
@@ -51,17 +51,17 @@ export module Interaction {
     /**
      * Gets the callback that is called during dragging.
      *
-     * @returns {(startLocation: ICoord, endLocation: ICoord) => void}
+     * @returns {(startLocation: Point, endLocation: Point) => void}
      */
-    public drag(): (startLocation: ICoord, endLocation: ICoord) => void;
+    public drag(): (startLocation: Point, endLocation: Point) => void;
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called.
+     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called.
      * @returns {Drag}
      */
-    public drag(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
-    public drag(cb?: (startLocation: ICoord, endLocation: ICoord) => any): any {
+    public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
+    public drag(cb?: (startLocation: Point, endLocation: Point) => any): any {
       if (cb === undefined) {
         return this.ondrag;
       } else {
@@ -73,17 +73,17 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging ends.
      *
-     * @returns {(startLocation: ICoord, endLocation: ICoord) => void}
+     * @returns {(startLocation: Point, endLocation: Point) => void}
      */
-    public dragend(): (startLocation: ICoord, endLocation: ICoord) => void;
+    public dragend(): (startLocation: Point, endLocation: Point) => void;
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(startLocation: ICoord, endLocation: ICoord) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
      * @returns {Drag} The calling Drag.
      */
-    public dragend(cb: (startLocation: ICoord, endLocation: ICoord) => any): Drag;
-    public dragend(cb?: (startLocation: ICoord, endLocation: ICoord) => any): any {
+    public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
+    public dragend(cb?: (startLocation: Point, endLocation: Point) => any): any {
       if (cb === undefined) {
         return this.ondragend;
       } else {
@@ -152,7 +152,7 @@ export module Interaction {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;
-      function callback(upperLeft: ICoord, lowerRight: ICoord) {
+      function callback(upperLeft: Point, lowerRight: Point) {
         if (upperLeft == null || lowerRight == null) {
           if (resetOnNextClick) {
             if (xScale != null) {
