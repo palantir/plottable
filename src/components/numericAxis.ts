@@ -29,7 +29,6 @@ export module Axis {
       return this;
     }
 
-
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var epsilon = Math.pow(10, -this._formatter.precision()); // small delta to force display of longer numbers
