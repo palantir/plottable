@@ -2863,7 +2863,6 @@ var Plottable;
             __extends(Time, _super);
             function Time(scale) {
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                this._PADDING_FOR_IDENTICAL_DOMAIN = 1000 * 60 * 60 * 24;
             }
             Time.prototype.tickInterval = function (interval, step) {
                 var tempScale = d3.time.scale();
@@ -2885,6 +2884,12 @@ var Plottable;
             Time.prototype.copy = function () {
                 return new Time(this._d3Scale.copy());
             };
+            Time.prototype._defaultExtent = function () {
+                var endTime = new Date().valueOf();
+                var startTime = endTime - Time._DEFAULT_DOMAIN_LENGTH;
+                return [startTime, endTime];
+            };
+            Time._DEFAULT_DOMAIN_LENGTH = 1000 * 60 * 60 * 24;
             return Time;
         })(Plottable.Abstract.QuantitativeScale);
         Scale.Time = Time;

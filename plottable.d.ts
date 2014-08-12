@@ -620,6 +620,7 @@ declare module Plottable {
 declare module Plottable {
     module Scale {
         class Time extends Plottable.Abstract.QuantitativeScale {
+            static _DEFAULT_DOMAIN_LENGTH: number;
             constructor();
             constructor(scale: D3.Scale.LinearScale);
             tickInterval(interval: D3.Time.Interval, step?: number): any[];
