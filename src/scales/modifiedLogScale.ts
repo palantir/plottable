@@ -123,7 +123,12 @@ export module Scale {
                                         .ticks(this.howManyTicks(negativeUpper, positiveLower)) :
                                 [-this.pivot, 0, this.pivot].filter((x) => min <= x && x <= max);
 
-      return negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+      var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+      // If you only have 1 tick, you can't tell how big the scale is.
+      if (ticks.length <= 1) {
+        ticks = d3.scale.linear().domain([min, max]).ticks(this._lastRequestedTickCount);
+      }
+      return ticks;
     }
 
     /**

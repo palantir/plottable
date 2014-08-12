@@ -3352,6 +3352,13 @@ describe("Scales", function () {
             assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
             assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
         });
+        it("ticks() is always non-empty", function () {
+            [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (domain) {
+                scale.updateExtent(1, "x", domain);
+                var ticks = scale.ticks();
+                assert.operator(ticks.length, ">", 0);
+            });
+        });
     });
 });
 
