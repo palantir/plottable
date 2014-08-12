@@ -19,7 +19,7 @@ export module Abstract {
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
     public _scale: Abstract.Scale;
-    public _formatter: Abstract.Formatter;
+    public _formatter: Formatter;
     public _orientation: string;
     public _width: any = "auto";
     public _height: any = "auto";
@@ -31,8 +31,7 @@ export module Abstract {
     private _gutter = 10;
     private _showEndTickLabels = false;
 
-
-    constructor(scale: Abstract.Scale, orientation: string, formatter?: any) {
+    constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) {throw new Error("Axis requires a scale and orientation");}
       this._scale = scale;
@@ -45,10 +44,6 @@ export module Abstract {
         this.classed("y-axis", true);
       }
 
-      if (formatter == null) {
-        formatter = new Plottable.Formatter.General();
-        formatter.showOnlyUnchangedValues(false);
-      }
       this.formatter(formatter);
 
       this._scale.broadcaster.registerListener(this, () => this.rescale());
@@ -298,23 +293,19 @@ export module Abstract {
     /**
      * Get the current formatter on the axis.
      *
-     * @returns {Abstract.Formatter} the axis formatter
+     * @returns {Formatter} the axis formatter
      */
-    public formatter(): Abstract.Formatter;
+    public formatter(): Formatter;
     /**
      * Sets a new tick formatter.
      *
-     * @param {function | Abstract.Formatter} formatter
+     * @param {Formatter} formatter
      * @returns {Abstract.Axis} The calling Axis.
      */
-    public formatter(formatter: any): Abstract.Axis;
-    public formatter(formatter?: any): any {
+    public formatter(formatter: Formatter): Abstract.Axis;
+    public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
-      }
-      if (typeof(formatter) === "function") {
-        formatter = new Plottable.Formatter.Custom(formatter);
-        formatter.showOnlyUnchangedValues(false);
       }
       this._formatter = formatter;
       this._invalidateLayout();
