@@ -2,37 +2,67 @@
 
 module Plottable {
 export module Core {
+  /**
+   * This interface represents anything in Plottable which can have a listener attached.
+   * Listeners attach by referencing the Listenable's broadcaster, and calling registerListener
+   * on it.
+   *
+   * e.g.:
+   * listenable: Plottable.IListenable;
+   * listenable.broadcaster.registerListener(callbackToCallOnBroadcast)
+   */
   export interface IListenable {
     broadcaster: Broadcaster;
   }
 
+  /**
+   * This interface represents the callback that should be passed to the Broadcaster on a Listenable.
+   *
+   * The callback will be called with the attached Listenable as the first object, and optional arguments
+   * as the subsequent arguments.
+   *
+   * The Listenable is passed as the first argument so that it is easy for the callback to reference the
+   * current state of the Listenable in the resolution logic.
+   */
   export interface IBroadcasterCallback {
     (listenable: IListenable, ...args: any[]): any;
   }
 
 
+  /**
+   * The Broadcaster class is owned by an IListenable. Third parties can register and deregister listeners
+   * from the broadcaster. When the broadcaster.broadcast method is activated, all registered callbacks are
+   * called. The registered callbacks are called with the registered Listenable that the broadcaster is attached
+   * to, along with optional arguments passed to the `broadcast` method.
+   *
+   * The listeners are called synchronously.
+   */
   export class Broadcaster extends Abstract.PlottableObject {
-    private listener2Callback = new Util.StrictEqualityAssociativeArray();
+    private key2callback = new Util.StrictEqualityAssociativeArray();
     public listenable: IListenable;
 
+    /**
+     * Construct a broadcaster, taking the Listenable that the broadcaster will be attached to.
+     *
+     * @constructor
+     * @param {IListenable} listenable The Listenable-object that this broadcaster is attached to.
+     */
     constructor(listenable: IListenable) {
       super();
       this.listenable = listenable;
     }
 
     /**
-     * Registers a callback to be called when the broadcast method is called. Also takes a listener which
-     * is used to support deregistering the same callback later, by passing in the same listener.
-     * If there is already a callback associated with that listener, then the callback will be replaced.
+     * Registers a callback to be called when the broadcast method is called. Also takes a key which
+     * is used to support deregistering the same callback later, by passing in the same key.
+     * If there is already a callback associated with that key, then the callback will be replaced.
      *
-     * This should NOT be called directly by a Component; registerToBroadcaster should be used instead.
-     *
-     * @param listener The listener associated with the callback.
+     * @param key The key associated with the callback. Key uniqueness is determined by deep equality.
      * @param {IBroadcasterCallback} callback A callback to be called when the Scale's domain changes.
      * @returns {Broadcaster} this object
      */
-    public registerListener(listener: any, callback: IBroadcasterCallback) {
-      this.listener2Callback.set(listener, callback);
+    public registerListener(key: any, callback: IBroadcasterCallback) {
+      this.key2callback.set(key, callback);
       return this;
     }
 
@@ -43,18 +73,18 @@ export module Core {
      * @returns {Broadcaster} this object
      */
     public broadcast(...args: any[]) {
-      this.listener2Callback.values().forEach((callback) => callback(this.listenable, args));
+      this.key2callback.values().forEach((callback) => callback(this.listenable, args));
       return this;
     }
 
     /**
-     * Deregisters the callback associated with a listener.
+     * Deregisters the callback associated with a key.
      *
-     * @param listener The listener to deregister.
+     * @param key The key to deregister.
      * @returns {Broadcaster} this object
      */
-    public deregisterListener(listener: any) {
-      this.listener2Callback.delete(listener);
+    public deregisterListener(key: any) {
+      this.key2callback.delete(key);
       return this;
     }
 
@@ -64,7 +94,7 @@ export module Core {
      * @returns {Broadcaster} this object
      */
     public deregisterAllListeners() {
-      this.listener2Callback = new Util.StrictEqualityAssociativeArray();
+      this.key2callback = new Util.StrictEqualityAssociativeArray();
     }
   }
 }

@@ -182,6 +182,10 @@ module Plottable {
                   d + Domainer.PADDING_FOR_IDENTICAL_DOMAIN];
         }
       }
+
+      if (scale.domain()[0] === scale.domain()[1]) {
+        return domain;
+      }
       var p = this.padProportion / 2;
       // This scaling is done to account for log scales and other non-linear
       // scales. A log scale should be padded more on the max than on the min.

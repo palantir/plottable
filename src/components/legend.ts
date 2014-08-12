@@ -10,7 +10,10 @@ export module Component {
   }
 
   export class Legend extends Abstract.Component {
-    private static SUBELEMENT_CLASS = "legend-row";
+    /**
+     * The css class applied to each legend row
+     */
+    public static SUBELEMENT_CLASS = "legend-row";
     private static MARGIN = 5;
 
     private colorScale: Scale.Color;
@@ -27,13 +30,14 @@ export module Component {
 
     /**
      * Creates a Legend.
-     * A legend consists of a series of legend rows, each with a color and label taken from the colorScale.
-     * The rows will be displayed in the order of the colorScale domain.
-     * This legend also allows interactions, through the functions "toggleCallback" and "hoverCallback"
+     *
+     * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
+     * The rows will be displayed in the order of the `colorScale` domain.
+     * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
      * Setting a callback will also put classes on the individual rows.
      *
      * @constructor
-     * @param {ColorScale} colorScale
+     * @param {Scale.Color} colorScale
      */
     constructor(colorScale?: Scale.Color) {
       super();
@@ -54,12 +58,13 @@ export module Component {
 
     /**
      * Assigns or gets the callback to the Legend
+     *
      * This callback is associated with toggle events, which trigger when a legend row is clicked.
      * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
      * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      *
-     * @param{ToggleCallback} callback The new callback function
+     * @param {ToggleCallback} callback The new callback function
      */
     public toggleCallback(callback: ToggleCallback): Legend;
     public toggleCallback(): ToggleCallback;
@@ -137,7 +142,6 @@ export module Component {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
       this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
-      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -171,7 +175,7 @@ export module Component {
       return textHeight;
     }
 
-    public _doRender(): Legend {
+    public _doRender() {
       super._doRender();
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
@@ -208,7 +212,6 @@ export module Component {
 
       this.updateClasses();
       this.updateListeners();
-      return this;
     }
 
     private updateListeners() {

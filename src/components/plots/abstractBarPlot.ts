@@ -2,8 +2,12 @@
 
 module Plottable {
 export module Abstract {
+  /*
+   * An Abstract.BarPlot is the base implementation for HorizontalBarPlot and
+   * VerticalBarPlot. It should not be used on its own.
+   */
   export class BarPlot extends XYPlot {
-    public static DEFAULT_WIDTH = 10;
+    private static DEFAULT_WIDTH = 10;
     public _bars: D3.UpdateSelection;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
@@ -39,7 +43,6 @@ export module Abstract {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
       this._bars = this.renderArea.selectAll("rect").data([]);
-      return this;
     }
 
     public _paint() {
@@ -196,11 +199,11 @@ export module Abstract {
               .removePaddingException("BAR_PLOT+" + this._plottableID)
               .removeIncludedValue("BAR_PLOT+" + this._plottableID);
           }
+          qscale.domainer().pad();
         }
             // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         qscale._autoDomainIfAutomaticMode();
       }
-      return this;
     }
 
     public _generateAttrToProjector() {

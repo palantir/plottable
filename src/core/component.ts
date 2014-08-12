@@ -40,7 +40,6 @@ export module Abstract {
      * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
      *
      * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
-     * @returns {Component} The calling component.
      */
     public _anchor(element: D3.Selection) {
       if (this.removed) {
@@ -64,15 +63,12 @@ export module Abstract {
         this._setup();
       }
       this._isAnchored = true;
-      return this;
     }
 
     /**
      * Creates additional elements as necessary for the Component to function.
      * Called during _anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
-     *
-     * @returns {Component} The calling Component.
      */
     public _setup() {
       if (this._isSetup) {
@@ -100,7 +96,6 @@ export module Abstract {
         this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
       }
       this._isSetup = true;
-      return this;
     }
 
     public _requestedSpace(availableWidth : number, availableHeight: number): ISpaceRequest {
@@ -116,7 +111,6 @@ export module Abstract {
      * @param {number} yOrigin
      * @param {number} availableWidth
      * @param {number} availableHeight
-     * @returns {Component} The calling Component.
      */
     public _computeLayout(xOrigin?: number, yOrigin?: number, availableWidth?: number, availableHeight?: number) {
       if (xOrigin == null || yOrigin == null || availableWidth == null || availableHeight == null) {
@@ -168,30 +162,25 @@ export module Abstract {
       this.availableHeight = availableHeight;
       this.element.attr("transform", "translate(" + xPosition + "," + yPosition + ")");
       this.boxes.forEach((b: D3.Selection) => b.attr("width", this.availableWidth ).attr("height", this.availableHeight));
-      return this;
     }
 
     /**
      * Renders the component.
-     *
-     * @returns {Component} The calling Component.
      */
     public _render() {
       if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToRender(this);
       }
-      return this;
     }
 
     public _scheduleComputeLayout() {
       if (this._isAnchored && this._isSetup) {
         Core.RenderController.registerToComputeLayout(this);
       }
-      return this;
     }
 
     public _doRender() {
-      return this; //no-op
+      //no-op
     }
 
 
@@ -221,7 +210,8 @@ export module Abstract {
         }
         this._anchor(selection);
       }
-      this._computeLayout()._render();
+      this._computeLayout();
+      this._render();
       return this;
     }
 

@@ -72,7 +72,7 @@ export module Component {
       return this;
     }
 
-    public _removeComponent(component: Abstract.Component): Table {
+    public _removeComponent(component: Abstract.Component) {
       super._removeComponent(component);
       var rowpos: number;
       var colpos: number;
@@ -86,13 +86,9 @@ export module Component {
         }
       }
 
-      if (rowpos === undefined) {
-        return this;
+      if (rowpos !== undefined) {
+        this.rows[rowpos][colpos] = null;
       }
-
-      this.rows[rowpos][colpos] = null;
-
-      return this;
     }
 
     private iterateLayout(availableWidth : number, availableHeight: number): IterateLayoutResult {
@@ -256,7 +252,6 @@ export module Component {
         });
         childYOffset += rowHeights[rowIndex] + this.rowPadding;
       });
-      return this;
     }
 
     /**

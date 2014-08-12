@@ -16,20 +16,19 @@ export module Axis {
      * @constructor
      * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {Formatter} [formatter] A function to format tick labels.
+     * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
      */
-    constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: any) {
+    constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter = Formatters.general(3, false)) {
       super(scale, orientation, formatter);
     }
 
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var epsilon = Math.pow(10, -this._formatter.precision()); // small delta to force display of longer numbers
       // create a new text measurerer every time; see issue #643
       var measurer = Util.Text.getTextMeasure(testTextEl);
       var textLengths = tickValues.map((v: any) => {
-        var formattedValue = this._formatter.format(v);
+        var formattedValue = this._formatter(v);
         return measurer(formattedValue).width;
       });
       testTextEl.remove();
@@ -37,9 +36,9 @@ export module Axis {
       var maxTextLength = d3.max(textLengths);
 
       if (this.tickLabelPositioning === "center") {
-        this._computedWidth = this.tickLength() + this.tickLabelPadding() + maxTextLength;
+        this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
       } else {
-        this._computedWidth = Math.max(this.tickLength(), this.tickLabelPadding() + maxTextLength);
+        this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
       }
 
       return this._computedWidth;
@@ -53,9 +52,9 @@ export module Axis {
       testTextEl.remove();
 
       if (this.tickLabelPositioning === "center") {
-        this._computedHeight = this.tickLength() + this.tickLabelPadding() + textHeight;
+        this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
-        this._computedHeight = Math.max(this.tickLength(), this.tickLabelPadding()+ textHeight);
+        this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding()+ textHeight);
       }
 
       return this._computedHeight;
@@ -75,7 +74,7 @@ export module Axis {
         dy: "0.3em"
       };
 
-      var tickMarkLength = this.tickLength();
+      var tickMarkLength = this._maxLabelTickLength();
       var tickLabelPadding = this.tickLabelPadding();
 
       var tickLabelTextAnchor = "middle";
@@ -152,11 +151,10 @@ export module Axis {
       tickLabels.enter().append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
 
-      var formatFunction = (d: any) => this._formatter.format(d);
       tickLabels.style("text-anchor", tickLabelTextAnchor)
                 .style("visibility", "visible")
                 .attr(tickLabelAttrHash)
-                .text(formatFunction);
+                .text(this._formatter);
 
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
@@ -166,7 +164,6 @@ export module Axis {
       }
 
       this._hideOverlappingTickLabels();
-      return this;
     }
 
     /**
@@ -234,7 +231,8 @@ export module Axis {
           return this.showFirstTickLabel;
         } else {
           this.showFirstTickLabel = show;
-          return this._render();
+          this._render();
+          return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
                  (!this._isHorizontal() && orientation === "top")) {
@@ -242,7 +240,8 @@ export module Axis {
           return this.showLastTickLabel;
         } else {
           this.showLastTickLabel = show;
-          return this._render();
+          this._render();
+          return this;
         }
       } else {
         throw new Error("Attempt to show " + orientation + " tick label on a " +
