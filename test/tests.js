@@ -5289,8 +5289,8 @@ describe("Interactions", function () {
                     x: dragendX,
                     y: dragendY
                 };
-                assert.deepEqual(a, expectedStart, "areaCallback was passed the correct upper left corner");
-                assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct lower right corner");
+                assert.deepEqual(a, expectedStart, "areaCallback was passed the correct starting point");
+                assert.deepEqual(b, expectedEnd, "areaCallback was passed the correct ending point");
             });
 
             // fake a drag event
