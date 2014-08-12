@@ -48,7 +48,7 @@ export module Abstract {
 
       var primaryScale = this._isVertical ? this.yScale : this.xScale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
-      var baselineAttr: Abstract.IAttributeToProjector = {
+      var baselineAttr: IAttributeToProjector = {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
         "x2": this._isVertical ? this.availableWidth : scaledBaseline,

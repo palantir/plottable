@@ -384,14 +384,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        interface _IProjector {
-            accessor: IAccessor;
-            scale?: Scale;
-            attribute: string;
-        }
-        interface IAttributeToProjector {
-            [attrToSet: string]: IAppliedAccessor;
-        }
         class Plot extends Component {
             renderArea: D3.Selection;
             element: D3.Selection;
@@ -498,7 +490,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         interface IPlotAnimator {
-            animate(selection: any, attrToProjector: Plottable.Abstract.IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
         }
         interface IPlotAnimatorMap {
             [animatorKey: string]: IPlotAnimator;
@@ -520,6 +512,14 @@ declare module Plottable {
     }
     interface IAppliedAccessor {
         (datum: any, index: number): any;
+    }
+    interface _IProjector {
+        accessor: IAccessor;
+        scale?: Plottable.Abstract.Scale;
+        attribute: string;
+    }
+    interface IAttributeToProjector {
+        [attrToSet: string]: IAppliedAccessor;
     }
     interface SelectionArea {
         xMin: number;
@@ -700,7 +700,7 @@ declare module Plottable {
             renderArea: D3.Selection;
             constructor(key: string);
             remove(): void;
-            draw(data: any[][], attrHash: IAttributeToProjector): void;
+            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
         }
     }
 }
@@ -709,7 +709,7 @@ declare module Plottable {
 declare module Plottable {
     module _Drawer {
         class Rect extends Plottable.Abstract._Drawer {
-            draw(data: any[][], attrHash: Plottable.Abstract.IAttributeToProjector): void;
+            draw(data: any[][], attrToProjector: IAttributeToProjector): void;
         }
     }
 }
@@ -970,7 +970,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Null implements IPlotAnimator {
-            animate(selection: any, attrToProjector: Plottable.Abstract.IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
         }
     }
 }
@@ -979,7 +979,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class Default implements IPlotAnimator {
-            animate(selection: any, attrToProjector: Plottable.Abstract.IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
             duration(): Number;
             duration(duration: Number): Default;
             delay(): Number;
@@ -994,7 +994,7 @@ declare module Plottable {
 declare module Plottable {
     module Animator {
         class IterativeDelay extends Default {
-            animate(selection: any, attrToProjector: Plottable.Abstract.IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
+            animate(selection: any, attrToProjector: IAttributeToProjector, plot: Plottable.Abstract.Plot): any;
         }
     }
 }

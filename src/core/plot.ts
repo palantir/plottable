@@ -2,16 +2,6 @@
 
 module Plottable {
 export module Abstract {
-  export interface _IProjector {
-    accessor: IAccessor;
-    scale?: Abstract.Scale;
-    attribute: string;
-  }
-
-  export interface IAttributeToProjector {
-    [attrToSet: string]: IAppliedAccessor;
-  }
-
   export class Plot extends Component {
     public _dataSource: DataSource;
     public _dataChanged = false;
@@ -209,10 +199,10 @@ export module Abstract {
      *
      * @param {D3.Selection} selection The selection of elements to update.
      * @param {string} animatorKey The key for the animator.
-     * @param {Abstract.IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
+     * @param {IAttributeToProjector} attrToProjector The set of attributes to set on the selection.
      * @return {D3.Selection} The resulting selection (potentially after the transition)
      */
-    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: Abstract.IAttributeToProjector): any {
+    public _applyAnimatedAttributes(selection: any, animatorKey: string, attrToProjector: IAttributeToProjector): any {
       if (this._animate && this.animateOnNextRender && this._animators[animatorKey] != null) {
         return this._animators[animatorKey].animate(selection, attrToProjector, this);
       } else {

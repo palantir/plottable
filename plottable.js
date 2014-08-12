@@ -3279,7 +3279,7 @@ var Plottable;
                     this.renderArea.remove();
                 }
             };
-            _Drawer.prototype.draw = function (data, attrHash) {
+            _Drawer.prototype.draw = function (data, attrToProjector) {
                 throw new Error("Abstract Method Not Implemented");
             };
             return _Drawer;
@@ -3303,11 +3303,11 @@ var Plottable;
             function Rect() {
                 _super.apply(this, arguments);
             }
-            Rect.prototype.draw = function (data, attrHash) {
+            Rect.prototype.draw = function (data, attrToProjector) {
                 var svgElement = "rect";
                 var dataElements = this.renderArea.selectAll(svgElement).data(data);
                 dataElements.enter().append(svgElement);
-                dataElements.attr(attrHash);
+                dataElements.attr(attrToProjector);
                 dataElements.exit().remove();
             };
             return Rect;

@@ -8,7 +8,7 @@ export module Animator {
    * immediately set on the selection.
    */
   export class Null implements IPlotAnimator {
-    public animate(selection: any, attrToProjector: Abstract.IAttributeToProjector, plot: Abstract.Plot): any {
+    public animate(selection: any, attrToProjector: IAttributeToProjector, plot: Abstract.Plot): any {
       return selection.attr(attrToProjector);
     }
   }
