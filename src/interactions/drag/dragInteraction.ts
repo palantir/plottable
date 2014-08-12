@@ -9,9 +9,9 @@ export module Interaction {
     public location = [0,0];
     private constrainX: (n: number) => number;
     private constrainY: (n: number) => number;
-    public ondragstart: (startLocation: Point) => void;
-    public      ondrag: (startLocation: Point, endLocation: Point) => void;
-    public   ondragend: (startLocation: Point, endLocation: Point) => void;
+    public ondragstart: (start: Point) => void;
+    public      ondrag: (start: Point, end: Point) => void;
+    public   ondragend: (start: Point, end: Point) => void;
 
     /**
      * Creates a Drag.
@@ -29,17 +29,17 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging starts.
      *
-     * @returns {(startLocation: Point) => void}
+     * @returns {(start: Point) => void}
      */
-    public dragstart(): (startLocation: Point) => void;
+    public dragstart(): (start: Point) => void;
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(startLocation: Point) => any} cb The function to be called.
+     * @param {(start: Point) => any} cb The function to be called.
      * @returns {Drag}
      */
-    public dragstart(cb: (startLocation: Point) => any): Drag;
-    public dragstart(cb?: (startLocation: Point) => any): any {
+    public dragstart(cb: (start: Point) => any): Drag;
+    public dragstart(cb?: (start: Point) => any): any {
       if (cb === undefined) {
         return this.ondragstart;
       } else {
@@ -51,17 +51,17 @@ export module Interaction {
     /**
      * Gets the callback that is called during dragging.
      *
-     * @returns {(startLocation: Point, endLocation: Point) => void}
+     * @returns {(start: Point, end: Point) => void}
      */
-    public drag(): (startLocation: Point, endLocation: Point) => void;
+    public drag(): (start: Point, end: Point) => void;
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called.
+     * @param {(start: Point, end: Point) => any} cb The function to be called.
      * @returns {Drag}
      */
-    public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
-    public drag(cb?: (startLocation: Point, endLocation: Point) => any): any {
+    public drag(cb: (start: Point, end: Point) => any): Drag;
+    public drag(cb?: (start: Point, end: Point) => any): any {
       if (cb === undefined) {
         return this.ondrag;
       } else {
@@ -73,17 +73,17 @@ export module Interaction {
     /**
      * Gets the callback that is called when dragging ends.
      *
-     * @returns {(startLocation: Point, endLocation: Point) => void}
+     * @returns {(start: Point, end: Point) => void}
      */
-    public dragend(): (startLocation: Point, endLocation: Point) => void;
+    public dragend(): (start: Point, end: Point) => void;
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+     * @param {(start: Point, end: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
      * @returns {Drag} The calling Drag.
      */
-    public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
-    public dragend(cb?: (startLocation: Point, endLocation: Point) => any): any {
+    public dragend(cb: (start: Point, end: Point) => any): Drag;
+    public dragend(cb?: (start: Point, end: Point) => any): any {
       if (cb === undefined) {
         return this.ondragend;
       } else {
@@ -120,9 +120,9 @@ export module Interaction {
 
     public _doDrag() {
       if (this.ondrag != null) {
-        var startLocation = {x: this.origin[0], y: this.origin[1]};
-        var endLocation = {x: this.location[0], y: this.location[1]};
-        this.ondrag(startLocation, endLocation);
+        var start = {x: this.origin[0], y: this.origin[1]};
+        var end = {x: this.location[0], y: this.location[1]};
+        this.ondrag(start, end);
       }
     }
 
@@ -136,9 +136,9 @@ export module Interaction {
 
     public _doDragend() {
       if (this.ondragend != null) {
-        var startLocation = {x: this.origin[0], y: this.origin[1]};
-        var endLocation = {x: this.location[0], y: this.location[1]};
-        this.ondragend(startLocation, endLocation);
+        var start = {x: this.origin[0], y: this.origin[1]};
+        var end = {x: this.location[0], y: this.location[1]};
+        this.ondragend(start, end);
       }
     }
 

@@ -5,7 +5,7 @@ export module Interaction {
   export class YDragBox extends DragBox {
     public _drag(){
       super._drag();
-      this.setBox(this.origin[1], this.location[1]);
+      this.setBox(this._selectionOrigin.y, this.location[1]);
     }
 
     public setBox(y0: number, y1: number) {

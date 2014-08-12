@@ -8,6 +8,8 @@ export module Interaction {
     public boxIsDrawn = false;
     public resizeEnabled = false;
     public resizePadding = 10;
+    public _selectionOrigin: Point;
+    public selection: SelectionArea;
 
     public _isCloseEnough(val: number, t: number): boolean {
       return t - this.resizePadding <= val && val <= t + this.resizePadding;
@@ -27,7 +29,23 @@ export module Interaction {
       var origin = this.origin[i];
       var c1 = parseInt(this.dragBox.attr(attr1), 10);
       var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
-      return this._isCloseEnough(origin, c1) || this._isCloseEnough(origin, c2);
+      var result1 = this._isCloseEnough(origin, c1);
+      if (result1) {
+        if (attr1 == "x") {
+          this._selectionOrigin.x = c2;
+        } else {
+          this._selectionOrigin.y = c2;
+        }
+      }
+      var result2 = this._isCloseEnough(origin, c2);
+      if (result2) {
+        if (attr1 == "x") {
+          this._selectionOrigin.x = c1;
+        } else {
+          this._selectionOrigin.y = c1;
+        }
+      }
+      return result1 || result2;
     }
 
     public _isResizeStart(): boolean {
@@ -35,6 +53,7 @@ export module Interaction {
     }
 
     public _doDragstart() {
+      this._selectionOrigin = {x: this.origin[0], y: this.origin[1]};
       if (this.boxIsDrawn && (!this.resizeEnabled || !this._isResizeStart())) {
         this.clearBox();
       }
@@ -61,6 +80,12 @@ export module Interaction {
       var yo = Math.min(y0, y1);
       this.dragBox.attr({x: xo, y: yo, width: w, height: h});
       this.boxIsDrawn = (w > 0 && h > 0);
+      this.selection = {
+        xMin: xo,
+        xMax: xo + w,
+        yMin: yo,
+        yMax: yo + h
+      };
       return this;
     }
 
