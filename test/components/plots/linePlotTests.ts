@@ -9,9 +9,7 @@ describe("Plots", () => {
     var yScale: Plottable.Scale.Linear;
     var xAccessor: any;
     var yAccessor: any;
-    var y0Accessor: any;
     var colorAccessor: any;
-    var fillAccessor: any;
     var simpleDataset: Plottable.DataSource;
     var linePlot: Plottable.Plot.Line;
     var renderArea: D3.Selection;
@@ -26,15 +24,11 @@ describe("Plots", () => {
       yScale = new Plottable.Scale.Linear().domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
-      y0Accessor = () => 0;
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
-      fillAccessor = () => "steelblue";
       simpleDataset = new Plottable.DataSource([{foo: 0, bar: 0}, {foo: 1, bar: 1}]);
       linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
       linePlot.project("x", xAccessor, xScale)
               .project("y", yAccessor, yScale)
-              .project("y0", y0Accessor, yScale)
-              .project("fill", fillAccessor)
               .project("stroke", colorAccessor)
               .renderTo(svg);
       renderArea = linePlot.renderArea;
@@ -44,12 +38,34 @@ describe("Plots", () => {
       verifier.start();
     });
 
-    it("stroke color can be changed by projecting attribute accessor (sets to first datum stroke attribute)", () => {
+    it("draws a line correctly", () => {
+      var linePath = renderArea.select(".line");
+      assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
+      var lineComputedStyle = window.getComputedStyle(linePath.node());
+      assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+      verifier.end();
+    });
+
+    it("attributes set appropriately from accessor", () => {
+      var areaPath = renderArea.select(".line");
+      assert.equal(areaPath.attr("stroke"), "#000000", "stroke set correctly");
+      verifier.end();
+    });
+
+    it("attributes can be changed by projecting new accessor and re-render appropriately", () => {
+      var newColorAccessor = () => "pink";
+      linePlot.project("stroke", newColorAccessor);
+      linePlot.renderTo(svg);
+      var linePath = renderArea.select(".line");
+      assert.equal(linePath.attr("stroke"), "pink", "stroke changed correctly");
+      verifier.end();
+    });
+
+    it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", () => {
       var data = simpleDataset.data();
       data.forEach(function(d: any) { d.stroke = "pink"; });
       simpleDataset.data(data);
       linePlot.project("stroke", "stroke");
-      renderArea = linePlot.renderArea;
       var areaPath = renderArea.select(".line");
       assert.equal(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
 

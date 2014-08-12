@@ -140,7 +140,7 @@ export module Abstract {
     }
 
     public _doRender(): Plot {
-      if (this.element != null) {
+      if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
         this.animateOnNextRender = false;
