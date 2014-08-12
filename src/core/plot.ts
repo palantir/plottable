@@ -57,7 +57,6 @@ export module Abstract {
       this.animateOnNextRender = true;
       this._dataChanged = true;
       this.updateAllProjectors();
-      return this;
     }
 
     public remove() {
@@ -139,13 +138,12 @@ export module Abstract {
       return h;
     }
 
-    public _doRender(): Plot {
+    public _doRender() {
       if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
         this.animateOnNextRender = false;
       }
-      return this;
     }
 
     public _paint() {
@@ -155,7 +153,6 @@ export module Abstract {
     public _setup() {
       super._setup();
       this.renderArea = this.content.append("g").classed("render-area", true);
-      return this;
     }
 
     /**

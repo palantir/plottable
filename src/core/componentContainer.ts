@@ -12,12 +12,10 @@ export module Abstract {
     public _anchor(element: D3.Selection) {
       super._anchor(element);
       this._components.forEach((c) => c._anchor(this.content));
-      return this;
     }
 
     public _render() {
       this._components.forEach((c) => c._render());
-      return this;
     }
 
     public _removeComponent(c: Abstract.Component) {
@@ -26,7 +24,6 @@ export module Abstract {
         this._components.splice(removeIndex, 1);
         this._invalidateLayout();
       }
-      return this;
     }
 
     public _addComponent(c: Abstract.Component, prepend = false): boolean {
