@@ -59,43 +59,12 @@ describe("Plots", () => {
       verifier.end();
     });
 
-    it("fill colors set appropriately from accessor", () => {
-      var areaPath = renderArea.select(".area");
-      assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
-      verifier.end();
-    });
-
-    it("fill colors can be changed by projecting new accessor and re-render appropriately", () => {
-      var newFillAccessor = () => "pink";
-      areaPlot.project("fill", newFillAccessor);
-      areaPlot.renderTo(svg);
-      renderArea = areaPlot.renderArea;
-      var areaPath = renderArea.select(".area");
-      assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
-      verifier.end();
-    });
-
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
       areaPlot.project("y0", (d: any) => d.bar/2, yScale);
       areaPlot.renderTo(svg);
       renderArea = areaPlot.renderArea;
       var areaPath = renderArea.select(".area");
       assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
-      verifier.end();
-    });
-
-    it("fill color can be changed by projecting attribute accessor (sets to first datum fill attribute)", () => {
-      var data = simpleDataset.data();
-      data.forEach(function(d: any) { d.fill = "pink"; });
-      simpleDataset.data(data);
-      areaPlot.project("fill", "fill");
-      renderArea = areaPlot.renderArea;
-      var areaPath = renderArea.select(".area");
-      assert.equal(areaPath.attr("fill"), "pink", "fill set to uniform stroke color");
-
-      data[0].fill = "green";
-      simpleDataset.data(data);
-      assert.equal(areaPath.attr("fill"), "green", "fill set to first datum stroke color");
       verifier.end();
     });
 

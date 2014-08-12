@@ -1347,9 +1347,7 @@ describe("Plots", function () {
         var yScale;
         var xAccessor;
         var yAccessor;
-        var y0Accessor;
         var colorAccessor;
-        var fillAccessor;
         var simpleDataset;
         var linePlot;
         var renderArea;
@@ -1362,25 +1360,42 @@ describe("Plots", function () {
             yScale = new Plottable.Scale.Linear().domain([0, 1]);
             xAccessor = function (d) { return d.foo; };
             yAccessor = function (d) { return d.bar; };
-            y0Accessor = function () { return 0; };
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
-            fillAccessor = function () { return "steelblue"; };
             simpleDataset = new Plottable.DataSource([{ foo: 0, bar: 0 }, { foo: 1, bar: 1 }]);
             linePlot = new Plottable.Plot.Line(simpleDataset, xScale, yScale);
-            linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("y0", y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            linePlot.project("x", xAccessor, xScale).project("y", yAccessor, yScale).project("stroke", colorAccessor).renderTo(svg);
             renderArea = linePlot.renderArea;
         });
         beforeEach(function () {
             verifier.start();
         });
-        it("stroke color can be changed by projecting attribute accessor (sets to first datum stroke attribute)", function () {
+        it("draws a line correctly", function () {
+            var linePath = renderArea.select(".line");
+            assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
+            var lineComputedStyle = window.getComputedStyle(linePath.node());
+            assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+            verifier.end();
+        });
+        it("attributes set appropriately from accessor", function () {
+            var areaPath = renderArea.select(".line");
+            assert.equal(areaPath.attr("stroke"), "#000000", "stroke set correctly");
+            verifier.end();
+        });
+        it("attributes can be changed by projecting new accessor and re-render appropriately", function () {
+            var newColorAccessor = function () { return "pink"; };
+            linePlot.project("stroke", newColorAccessor);
+            linePlot.renderTo(svg);
+            var linePath = renderArea.select(".line");
+            assert.equal(linePath.attr("stroke"), "pink", "stroke changed correctly");
+            verifier.end();
+        });
+        it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", function () {
             var data = simpleDataset.data();
             data.forEach(function (d) {
                 d.stroke = "pink";
             });
             simpleDataset.data(data);
             linePlot.project("stroke", "stroke");
-            renderArea = linePlot.renderArea;
             var areaPath = renderArea.select(".line");
             assert.equal(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
             data[0].stroke = "green";
@@ -1444,41 +1459,12 @@ describe("Plots", function () {
             assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
             verifier.end();
         });
-        it("fill colors set appropriately from accessor", function () {
-            var areaPath = renderArea.select(".area");
-            assert.equal(areaPath.attr("fill"), "steelblue", "fill set correctly");
-            verifier.end();
-        });
-        it("fill colors can be changed by projecting new accessor and re-render appropriately", function () {
-            var newFillAccessor = function () { return "pink"; };
-            areaPlot.project("fill", newFillAccessor);
-            areaPlot.renderTo(svg);
-            renderArea = areaPlot.renderArea;
-            var areaPath = renderArea.select(".area");
-            assert.equal(areaPath.attr("fill"), "pink", "fill changed correctly");
-            verifier.end();
-        });
         it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
             areaPlot.project("y0", function (d) { return d.bar / 2; }, yScale);
             areaPlot.renderTo(svg);
             renderArea = areaPlot.renderArea;
             var areaPath = renderArea.select(".area");
             assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
-            verifier.end();
-        });
-        it("fill color can be changed by projecting attribute accessor (sets to first datum fill attribute)", function () {
-            var data = simpleDataset.data();
-            data.forEach(function (d) {
-                d.fill = "pink";
-            });
-            simpleDataset.data(data);
-            areaPlot.project("fill", "fill");
-            renderArea = areaPlot.renderArea;
-            var areaPath = renderArea.select(".area");
-            assert.equal(areaPath.attr("fill"), "pink", "fill set to uniform stroke color");
-            data[0].fill = "green";
-            simpleDataset.data(data);
-            assert.equal(areaPath.attr("fill"), "green", "fill set to first datum stroke color");
             verifier.end();
         });
         after(function () {
