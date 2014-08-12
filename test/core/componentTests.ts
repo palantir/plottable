@@ -200,7 +200,8 @@ it("components can be offset relative to their alignment, and throw errors if th
     c.clipPathEnabled = true;
     var expectedClipPathID = c._plottableID;
     c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
-    var expectedClipPathURL = "url(#clipPath" + expectedClipPathID+ ")";
+    var expectedDocumentURL = document.location.href;
+    var expectedClipPathURL = "url(" + expectedDocumentURL + "#clipPath" + expectedClipPathID+ ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
     var normalizeClipPath = (s: string) => s.replace(/"/g, "");
     assert.isTrue(normalizeClipPath(c.element.attr("clip-path")) === expectedClipPathURL,

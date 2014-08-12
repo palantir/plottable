@@ -1456,7 +1456,7 @@ var Plottable;
                 return box;
             };
             Component.prototype.generateClipPath = function () {
-                this.element.attr("clip-path", "url(#clipPath" + this._plottableID + ")");
+                this.element.attr("clip-path", "url(" + document.location.href + "#clipPath" + this._plottableID + ")");
                 var clipPathParent = this.boxContainer.append("clipPath").attr("id", "clipPath" + this._plottableID);
                 this.addBox("clip-rect", clipPathParent);
             };
