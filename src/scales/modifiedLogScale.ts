@@ -97,7 +97,6 @@ export module Scale {
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
       this._d3Scale.domain(transformedDomain);
       this.broadcaster.broadcast();
-      return this;
     }
 
     public ticks(count?: number) {

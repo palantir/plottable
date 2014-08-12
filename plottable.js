@@ -1133,202 +1133,38 @@ var Plottable;
     var Util = Plottable.Util;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../../reference.ts" />
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    (function (Abstract) {
-        var Formatter = (function () {
-            function Formatter(precision) {
-                this._onlyShowUnchanged = true;
-                this.precision(precision);
-            }
-            /**
-            * Format an input value.
-            *
-            * @param {any} d The value to be formatted.
-            * @returns {string} The formatted value.
-            */
-            Formatter.prototype.format = function (d) {
-                var formattedValue = this._formatFunction(d);
-                if (this._onlyShowUnchanged && this._valueChanged(d, formattedValue)) {
+    var Formatters = (function () {
+        function Formatters() {
+        }
+        /**
+        * Creates a formatter for currency values.
+        *
+        * @param {number} [precision] The number of decimal places to show (default 2).
+        * @param {string} [symbol] The currency symbol to use (default "$").
+        * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
+        * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+        *
+        * @returns {Formatter} A formatter for currency values.
+        */
+        Formatters.currency = function (precision, symbol, prefix, onlyShowUnchanged) {
+            if (typeof precision === "undefined") { precision = 2; }
+            if (typeof symbol === "undefined") { symbol = "$"; }
+            if (typeof prefix === "undefined") { prefix = true; }
+            if (typeof onlyShowUnchanged === "undefined") { onlyShowUnchanged = true; }
+            var fixedFormatter = Formatters.fixed(precision);
+            return function (d) {
+                var formattedValue = fixedFormatter(Math.abs(d));
+                if (onlyShowUnchanged && Formatters._valueChanged(Math.abs(d), formattedValue)) {
                     return "";
                 }
-                return formattedValue;
-            };
-
-            Formatter.prototype._valueChanged = function (d, formattedValue) {
-                return d !== parseFloat(formattedValue);
-            };
-
-            Formatter.prototype.precision = function (value) {
-                if (value === undefined) {
-                    return this._precision;
-                }
-                if (value < 0 || value > 20) {
-                    throw new RangeError("Formatter precision must be between 0 and 20");
-                }
-                this._precision = value;
-                return this;
-            };
-
-            Formatter.prototype.showOnlyUnchangedValues = function (showUnchanged) {
-                if (showUnchanged === undefined) {
-                    return this._onlyShowUnchanged;
-                }
-                this._onlyShowUnchanged = showUnchanged;
-                return this;
-            };
-            return Formatter;
-        })();
-        Abstract.Formatter = Formatter;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Identity = (function (_super) {
-            __extends(Identity, _super);
-            /**
-            * Creates an formatter that simply stringifies the input.
-            *
-            * @constructor
-            */
-            function Identity() {
-                _super.call(this, null);
-                this.showOnlyUnchangedValues(false);
-                this._formatFunction = function (d) {
-                    return String(d);
-                };
-            }
-            return Identity;
-        })(Plottable.Abstract.Formatter);
-        Formatter.Identity = Identity;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var General = (function (_super) {
-            __extends(General, _super);
-            /**
-            * Creates a formatter that formats numbers to show no more than
-            * [precision] decimal places. All other values are stringified.
-            *
-            * @constructor
-            * @param {number} [precision] The maximum number of decimal places to display.
-            */
-            function General(precision) {
-                if (typeof precision === "undefined") { precision = 3; }
-                _super.call(this, precision);
-                this._formatFunction = function (d) {
-                    if (typeof d === "number") {
-                        var multiplier = Math.pow(10, this._precision);
-                        return String(Math.round(d * multiplier) / multiplier);
-                    } else {
-                        return String(d);
-                    }
-                };
-            }
-            General.prototype._valueChanged = function (d, formattedValue) {
-                if (typeof d === "number") {
-                    return d !== parseFloat(formattedValue);
-                } else {
-                    return false;
-                }
-            };
-            return General;
-        })(Plottable.Abstract.Formatter);
-        Formatter.General = General;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Fixed = (function (_super) {
-            __extends(Fixed, _super);
-            /**
-            * Creates a formatter that displays exactly [precision] decimal places.
-            *
-            * @constructor
-            * @param {number} [precision] The number of decimal places to display.
-            */
-            function Fixed(precision) {
-                if (typeof precision === "undefined") { precision = 3; }
-                _super.call(this, precision);
-                this._formatFunction = function (d) {
-                    return d.toFixed(this._precision);
-                };
-            }
-            return Fixed;
-        })(Plottable.Abstract.Formatter);
-        Formatter.Fixed = Fixed;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Currency = (function (_super) {
-            __extends(Currency, _super);
-            /**
-            * Creates a formatter for currency values.
-            *
-            * @param {number} [precision] The number of decimal places to show.
-            * @param {string} [symbol] The currency symbol to use.
-            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
-            *
-            * @returns {IFormatter} A formatter for currency values.
-            */
-            function Currency(precision, symbol, prefix) {
-                if (typeof precision === "undefined") { precision = 2; }
-                if (typeof symbol === "undefined") { symbol = "$"; }
-                if (typeof prefix === "undefined") { prefix = true; }
-                _super.call(this, precision);
-                this.symbol = symbol;
-                this.prefix = prefix;
-            }
-            Currency.prototype.format = function (d) {
-                var formattedValue = _super.prototype.format.call(this, Math.abs(d));
                 if (formattedValue !== "") {
-                    if (this.prefix) {
-                        formattedValue = this.symbol + formattedValue;
+                    if (prefix) {
+                        formattedValue = symbol + formattedValue;
                     } else {
-                        formattedValue += this.symbol;
+                        formattedValue += symbol;
                     }
 
                     if (d < 0) {
@@ -1337,214 +1173,190 @@ var Plottable;
                 }
                 return formattedValue;
             };
-            return Currency;
-        })(Formatter.Fixed);
-        Formatter.Currency = Currency;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
+        };
 
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Percentage = (function (_super) {
-            __extends(Percentage, _super);
-            /**
-            * Creates a formatter for percentage values.
-            * Multiplies the supplied value by 100 and appends "%".
-            *
-            * @constructor
-            * @param {number} [precision] The number of decimal places to display.
-            */
-            function Percentage(precision) {
-                if (typeof precision === "undefined") { precision = 0; }
-                _super.call(this, precision);
-            }
-            Percentage.prototype.format = function (d) {
-                var formattedValue = _super.prototype.format.call(this, d * 100);
+        /**
+        * Creates a formatter that displays exactly [precision] decimal places.
+        *
+        * @param {number} [precision] The number of decimal places to show (default 3).
+        * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+        *
+        * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
+        */
+        Formatters.fixed = function (precision, onlyShowUnchanged) {
+            if (typeof precision === "undefined") { precision = 3; }
+            if (typeof onlyShowUnchanged === "undefined") { onlyShowUnchanged = true; }
+            Formatters.verifyPrecision(precision);
+            return function (d) {
+                var formattedValue = d.toFixed(precision);
+                if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                    return "";
+                }
+                return formattedValue;
+            };
+        };
+
+        /**
+        * Creates a formatter that formats numbers to show no more than
+        * [precision] decimal places. All other values are stringified.
+        *
+        * @param {number} [precision] The number of decimal places to show (default 3).
+        * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+        *
+        * @returns {Formatter} A formatter for general values.
+        */
+        Formatters.general = function (precision, onlyShowUnchanged) {
+            if (typeof precision === "undefined") { precision = 3; }
+            if (typeof onlyShowUnchanged === "undefined") { onlyShowUnchanged = true; }
+            Formatters.verifyPrecision(precision);
+            return function (d) {
+                if (typeof d === "number") {
+                    var multiplier = Math.pow(10, precision);
+                    var formattedValue = String(Math.round(d * multiplier) / multiplier);
+                    if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                        return "";
+                    }
+                    return formattedValue;
+                } else {
+                    return String(d);
+                }
+            };
+        };
+
+        /**
+        * Creates a formatter that stringifies its input.
+        *
+        * @returns {Formatter} A formatter that stringifies its input.
+        */
+        Formatters.identity = function () {
+            return function (d) {
+                return String(d);
+            };
+        };
+
+        /**
+        * Creates a formatter for percentage values.
+        * Multiplies the input by 100 and appends "%".
+        *
+        * @param {number} [precision] The number of decimal places to show (default 0).
+        * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+        *
+        * @returns {Formatter} A formatter for percentage values.
+        */
+        Formatters.percentage = function (precision, onlyShowUnchanged) {
+            if (typeof precision === "undefined") { precision = 0; }
+            if (typeof onlyShowUnchanged === "undefined") { onlyShowUnchanged = true; }
+            var fixedFormatter = Formatters.fixed(precision);
+            return function (d) {
+                var formattedValue = fixedFormatter(d * 100);
+                if (onlyShowUnchanged && Formatters._valueChanged(d * 100, formattedValue)) {
+                    return "";
+                }
                 if (formattedValue !== "") {
                     formattedValue += "%";
                 }
                 return formattedValue;
             };
-            return Percentage;
-        })(Formatter.Fixed);
-        Formatter.Percentage = Percentage;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
+        };
 
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var SISuffix = (function (_super) {
-            __extends(SISuffix, _super);
-            /**
-            * Creates a formatter for values that displays [precision] significant figures.
-            *
-            * @constructor
-            * @param {number} [precision] The number of significant figures to display.
-            */
-            function SISuffix(precision) {
-                if (typeof precision === "undefined") { precision = 3; }
-                _super.call(this, precision);
-                this.showOnlyUnchangedValues(false);
-            }
-            SISuffix.prototype.precision = function (value) {
-                var returnValue = _super.prototype.precision.call(this, value);
-                this._formatFunction = d3.format("." + this._precision + "s");
-                return returnValue;
+        /**
+        * Creates a formatter for values that displays [precision] significant figures
+        * and puts SI notation.
+        *
+        * @param {number} [precision] The number of significant figures to show (default 3).
+        *
+        * @returns {Formatter} A formatter for SI values.
+        */
+        Formatters.siSuffix = function (precision) {
+            if (typeof precision === "undefined") { precision = 3; }
+            Formatters.verifyPrecision(precision);
+            return function (d) {
+                return d3.format("." + precision + "s")(d);
             };
-            return SISuffix;
-        })(Plottable.Abstract.Formatter);
-        Formatter.SISuffix = SISuffix;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
+        };
 
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Custom = (function (_super) {
-            __extends(Custom, _super);
-            /**
-            * Creates a Custom Formatter.
-            *
-            * @constructor
-            * @param {(d: any, formatter: Formatter.Custom) => string} customFormatFunction A
-            *                           formatting function that is passed a datum
-            *                           and the Custom Formatter itself.
-            * @param {number} precision The precision of the Custom Formatter. The
-            *                           actual behavior will depend on the customFormatFunction.
-            */
-            function Custom(customFormatFunction, precision) {
-                if (typeof precision === "undefined") { precision = 0; }
-                _super.call(this, precision);
-                if (customFormatFunction == null) {
-                    throw new Error("Custom Formatters require a formatting function");
+        /**
+        * Creates a formatter that displays dates.
+        *
+        * @returns {Formatter} A formatter for time/date values.
+        */
+        Formatters.time = function () {
+            var numFormats = 8;
+
+            // these defaults were taken from d3
+            // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
+            var timeFormat = {};
+
+            timeFormat[0] = {
+                format: ".%L",
+                filter: function (d) {
+                    return d.getMilliseconds() !== 0;
                 }
-                this._onlyShowUnchanged = false;
-                this._formatFunction = function (d) {
-                    return customFormatFunction(d, this);
-                };
+            };
+            timeFormat[1] = {
+                format: ":%S",
+                filter: function (d) {
+                    return d.getSeconds() !== 0;
+                }
+            };
+            timeFormat[2] = {
+                format: "%I:%M",
+                filter: function (d) {
+                    return d.getMinutes() !== 0;
+                }
+            };
+            timeFormat[3] = {
+                format: "%I %p",
+                filter: function (d) {
+                    return d.getHours() !== 0;
+                }
+            };
+            timeFormat[4] = {
+                format: "%a %d",
+                filter: function (d) {
+                    return d.getDay() !== 0 && d.getDate() !== 1;
+                }
+            };
+            timeFormat[5] = {
+                format: "%b %d",
+                filter: function (d) {
+                    return d.getDate() !== 1;
+                }
+            };
+            timeFormat[6] = {
+                format: "%b",
+                filter: function (d) {
+                    return d.getMonth() !== 0;
+                }
+            };
+            timeFormat[7] = {
+                format: "%Y",
+                filter: function () {
+                    return true;
+                }
+            };
+
+            return function (d) {
+                for (var i = 0; i < numFormats; i++) {
+                    if (timeFormat[i].filter(d)) {
+                        return d3.time.format(timeFormat[i].format)(d);
+                    }
+                }
+            };
+        };
+
+        Formatters.verifyPrecision = function (precision) {
+            if (precision < 0 || precision > 20) {
+                throw new RangeError("Formatter precision must be between 0 and 20");
             }
-            return Custom;
-        })(Plottable.Abstract.Formatter);
-        Formatter.Custom = Custom;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
+        };
 
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Time = (function (_super) {
-            __extends(Time, _super);
-            /**
-            * Creates a formatter that displays dates
-            *
-            * @constructor
-            */
-            function Time() {
-                _super.call(this, null);
-
-                var numFormats = 8;
-
-                // these defaults were taken from d3
-                // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
-                var timeFormat = {};
-
-                timeFormat[0] = {
-                    format: ".%L",
-                    filter: function (d) {
-                        return d.getMilliseconds() !== 0;
-                    }
-                };
-                timeFormat[1] = {
-                    format: ":%S",
-                    filter: function (d) {
-                        return d.getSeconds() !== 0;
-                    }
-                };
-                timeFormat[2] = {
-                    format: "%I:%M",
-                    filter: function (d) {
-                        return d.getMinutes() !== 0;
-                    }
-                };
-                timeFormat[3] = {
-                    format: "%I %p",
-                    filter: function (d) {
-                        return d.getHours() !== 0;
-                    }
-                };
-                timeFormat[4] = {
-                    format: "%a %d",
-                    filter: function (d) {
-                        return d.getDay() !== 0 && d.getDate() !== 1;
-                    }
-                };
-                timeFormat[5] = {
-                    format: "%b %d",
-                    filter: function (d) {
-                        return d.getDate() !== 1;
-                    }
-                };
-                timeFormat[6] = {
-                    format: "%b",
-                    filter: function (d) {
-                        return d.getMonth() !== 0;
-                    }
-                };
-                timeFormat[7] = {
-                    format: "%Y",
-                    filter: function () {
-                        return true;
-                    }
-                };
-
-                this._formatFunction = function (d) {
-                    for (var i = 0; i < numFormats; i++) {
-                        if (timeFormat[i].filter(d)) {
-                            return d3.time.format(timeFormat[i].format)(d);
-                        }
-                    }
-                };
-                this.showOnlyUnchangedValues(false);
-            }
-            return Time;
-        })(Plottable.Abstract.Formatter);
-        Formatter.Time = Time;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
+        Formatters._valueChanged = function (d, formattedValue) {
+            return d !== parseFloat(formattedValue);
+        };
+        return Formatters;
+    })();
+    Plottable.Formatters = Formatters;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1773,7 +1585,6 @@ var Plottable;
             * Attaches the Component as a child of a given a DOM element. Usually only directly invoked on root-level Components.
             *
             * @param {D3.Selection} element A D3 selection consisting of the element to anchor under.
-            * @returns {Component} The calling component.
             */
             Component.prototype._anchor = function (element) {
                 if (this.removed) {
@@ -1798,15 +1609,12 @@ var Plottable;
                     this._setup();
                 }
                 this._isAnchored = true;
-                return this;
             };
 
             /**
             * Creates additional elements as necessary for the Component to function.
             * Called during _anchor() if the Component's element has not been created yet.
             * Override in subclasses to provide additional functionality.
-            *
-            * @returns {Component} The calling Component.
             */
             Component.prototype._setup = function () {
                 var _this = this;
@@ -1838,7 +1646,6 @@ var Plottable;
                     this.autoResize(Component.AUTORESIZE_BY_DEFAULT);
                 }
                 this._isSetup = true;
-                return this;
             };
 
             Component.prototype._requestedSpace = function (availableWidth, availableHeight) {
@@ -1854,7 +1661,6 @@ var Plottable;
             * @param {number} yOrigin
             * @param {number} availableWidth
             * @param {number} availableHeight
-            * @returns {Component} The calling Component.
             */
             Component.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
                 var _this = this;
@@ -1909,30 +1715,25 @@ var Plottable;
                 this.boxes.forEach(function (b) {
                     return b.attr("width", _this.availableWidth).attr("height", _this.availableHeight);
                 });
-                return this;
             };
 
             /**
             * Renders the component.
-            *
-            * @returns {Component} The calling Component.
             */
             Component.prototype._render = function () {
                 if (this._isAnchored && this._isSetup) {
                     Plottable.Core.RenderController.registerToRender(this);
                 }
-                return this;
             };
 
             Component.prototype._scheduleComputeLayout = function () {
                 if (this._isAnchored && this._isSetup) {
                     Plottable.Core.RenderController.registerToComputeLayout(this);
                 }
-                return this;
             };
 
             Component.prototype._doRender = function () {
-                return this;
+                //no-op
             };
 
             Component.prototype._invalidateLayout = function () {
@@ -1961,7 +1762,8 @@ var Plottable;
                     }
                     this._anchor(selection);
                 }
-                this._computeLayout()._render();
+                this._computeLayout();
+                this._render();
                 return this;
             };
 
@@ -2245,14 +2047,12 @@ var Plottable;
                 this._components.forEach(function (c) {
                     return c._anchor(_this.content);
                 });
-                return this;
             };
 
             ComponentContainer.prototype._render = function () {
                 this._components.forEach(function (c) {
                     return c._render();
                 });
-                return this;
             };
 
             ComponentContainer.prototype._removeComponent = function (c) {
@@ -2261,7 +2061,6 @@ var Plottable;
                     this._components.splice(removeIndex, 1);
                     this._invalidateLayout();
                 }
-                return this;
             };
 
             ComponentContainer.prototype._addComponent = function (c, prepend) {
@@ -2490,13 +2289,9 @@ var Plottable;
                     }
                 }
 
-                if (rowpos === undefined) {
-                    return this;
+                if (rowpos !== undefined) {
+                    this.rows[rowpos][colpos] = null;
                 }
-
-                this.rows[rowpos][colpos] = null;
-
-                return this;
             };
 
             Table.prototype.iterateLayout = function (availableWidth, availableHeight) {
@@ -2681,7 +2476,6 @@ var Plottable;
                     });
                     childYOffset += rowHeights[rowIndex] + _this.rowPadding;
                 });
-                return this;
             };
 
             /**
@@ -2970,7 +2764,6 @@ var Plottable;
                 this.animateOnNextRender = true;
                 this._dataChanged = true;
                 this.updateAllProjectors();
-                return this;
             };
 
             Plot.prototype.remove = function () {
@@ -3056,7 +2849,6 @@ var Plottable;
                     this._dataChanged = false;
                     this.animateOnNextRender = false;
                 }
-                return this;
             };
 
             Plot.prototype._paint = function () {
@@ -3066,7 +2858,6 @@ var Plottable;
             Plot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.renderArea = this.content.append("g").classed("render-area", true);
-                return this;
             };
 
             /**
@@ -3925,7 +3716,6 @@ var Plottable;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
                 this._d3Scale.domain(transformedDomain);
                 this.broadcaster.broadcast();
-                return this;
             };
 
             ModifiedLog.prototype.ticks = function (count) {
@@ -4383,6 +4173,7 @@ var Plottable;
                 }
                 this._colorRange = this._resolveColorValues(colorRange);
                 this._resetScale();
+                return this;
             };
 
             InterpolatedColor.prototype.scaleType = function (scaleType) {
@@ -4391,6 +4182,7 @@ var Plottable;
                 }
                 this._scaleType = scaleType;
                 this._resetScale();
+                return this;
             };
 
             InterpolatedColor.prototype._resetScale = function () {
@@ -4530,6 +4322,7 @@ var Plottable;
         var Axis = (function (_super) {
             __extends(Axis, _super);
             function Axis(scale, orientation, formatter) {
+                if (typeof formatter === "undefined") { formatter = Plottable.Formatters.identity(); }
                 var _this = this;
                 _super.call(this);
                 this._width = "auto";
@@ -4552,10 +4345,6 @@ var Plottable;
                     this.classed("y-axis", true);
                 }
 
-                if (formatter == null) {
-                    formatter = new Plottable.Formatter.General();
-                    formatter.showOnlyUnchangedValues(false);
-                }
                 this.formatter(formatter);
 
                 this._scale.broadcaster.registerListener(this, function () {
@@ -4628,7 +4417,6 @@ var Plottable;
                 } else {
                     this._scale.range([this.availableHeight, 0]);
                 }
-                return this;
             };
 
             Axis.prototype._setup = function () {
@@ -4636,7 +4424,6 @@ var Plottable;
                 this._tickMarkContainer = this.content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
                 this._tickLabelContainer = this.content.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true);
                 this._baseline = this.content.append("line").classed("baseline", true);
-                return this;
             };
 
             /*
@@ -4656,8 +4443,6 @@ var Plottable;
                 d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true).attr(this._generateTickMarkAttrHash(true));
                 tickMarks.exit().remove();
                 this._baseline.attr(this._generateBaselineAttrHash());
-
-                return this;
             };
 
             Axis.prototype._generateBaselineAttrHash = function () {
@@ -4784,10 +4569,6 @@ var Plottable;
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
                     return this._formatter;
-                }
-                if (typeof (formatter) === "function") {
-                    formatter = new Plottable.Formatter.Custom(formatter);
-                    formatter.showOnlyUnchangedValues(false);
                 }
                 this._formatter = formatter;
                 this._invalidateLayout();
@@ -4998,7 +4779,6 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._majorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 this._minorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                return this;
             };
 
             // returns a number to index into the major/minor intervals
@@ -5151,7 +4931,6 @@ var Plottable;
 
                 // however, we need to make major ticks longer, since they may have overlapped with some minor ticks
                 this.adjustTickLength(this._maxLabelTickLength(), Time.majorIntervals[index]);
-                return this;
             };
             Time.minorIntervals = [
                 { timeUnit: d3.time.second, step: 1, formatString: "%I:%M:%S %p" },
@@ -5241,9 +5020,10 @@ var Plottable;
             * @constructor
             * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-            * @param {Formatter} [formatter] A function to format tick labels.
+            * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
             */
             function Numeric(scale, orientation, formatter) {
+                if (typeof formatter === "undefined") { formatter = Plottable.Formatters.general(3, false); }
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
                 // Whether or not first/last tick label will still be displayed even if
@@ -5255,12 +5035,11 @@ var Plottable;
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var epsilon = Math.pow(10, -this._formatter.precision());
 
                 // create a new text measurerer every time; see issue #643
                 var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textLengths = tickValues.map(function (v) {
-                    var formattedValue = _this._formatter.format(v);
+                    var formattedValue = _this._formatter(v);
                     return measurer(formattedValue).width;
                 });
                 testTextEl.remove();
@@ -5298,7 +5077,6 @@ var Plottable;
             };
 
             Numeric.prototype._doRender = function () {
-                var _this = this;
                 _super.prototype._doRender.call(this);
 
                 var tickLabelAttrHash = {
@@ -5383,10 +5161,7 @@ var Plottable;
                 tickLabels.enter().append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
 
-                var formatFunction = function (d) {
-                    return _this._formatter.format(d);
-                };
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(formatFunction);
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(this._formatter);
 
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
@@ -5396,7 +5171,6 @@ var Plottable;
                 }
 
                 this._hideOverlappingTickLabels();
-                return this;
             };
 
             Numeric.prototype.tickLabelPosition = function (position) {
@@ -5425,14 +5199,16 @@ var Plottable;
                         return this.showFirstTickLabel;
                     } else {
                         this.showFirstTickLabel = show;
-                        return this._render();
+                        this._render();
+                        return this;
                     }
                 } else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
                     if (show === undefined) {
                         return this.showLastTickLabel;
                     } else {
                         this.showLastTickLabel = show;
-                        return this._render();
+                        this._render();
+                        return this;
                     }
                 } else {
                     throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
@@ -5466,11 +5242,11 @@ var Plottable;
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
+            * @param {Formatter} [formatter] The Formatter for the Axis (default Formatters.identity())
             */
             function Category(scale, orientation, formatter) {
                 if (typeof orientation === "undefined") { orientation = "bottom"; }
-                if (typeof formatter === "undefined") { formatter = new Plottable.Formatter.Identity(); }
+                if (typeof formatter === "undefined") { formatter = Plottable.Formatters.identity(); }
                 var _this = this;
                 _super.call(this, scale, orientation, formatter);
                 this.classed("category-axis", true);
@@ -5484,7 +5260,6 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.measurer = new Plottable.Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
-                return this;
             };
 
             Category.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -5539,13 +5314,13 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true, {
+                        textWriteResult = Plottable.Util.Text.writeText(formatter(d), width, height, tm, true, {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     } else {
-                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true);
+                        textWriteResult = Plottable.Util.Text.writeText(formatter(d), width, height, tm, true);
                     }
 
                     textWriteResults.push(textWriteResult);
@@ -5593,7 +5368,6 @@ var Plottable;
                 var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 Plottable.Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
                 Plottable.Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
-                return this;
             };
 
             Category.prototype._computeLayout = function (xOrigin, yOrigin, availableWidth, availableHeight) {
@@ -5682,7 +5456,6 @@ var Plottable;
                 this.textContainer = this.content.append("g");
                 this.measurer = Plottable.Util.Text.getTextMeasure(this.textContainer);
                 this.text(this._text);
-                return this;
             };
 
             Label.prototype.text = function (displayText) {
@@ -5705,7 +5478,6 @@ var Plottable;
                 } else {
                     Plottable.Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight, this.xAlignment, this.yAlignment, this.orientation);
                 }
-                return this;
             };
 
             Label.prototype._computeLayout = function (xOffset, yOffset, availableWidth, availableHeight) {
@@ -5835,7 +5607,6 @@ var Plottable;
                 var textHeight = this.measureTextHeight();
                 var totalNumRows = this.colorScale.domain().length;
                 this.nRowsDrawn = Math.min(totalNumRows, Math.floor(this.availableHeight / textHeight));
-                return this;
             };
 
             Legend.prototype._requestedSpace = function (offeredWidth, offeredHeight) {
@@ -5903,7 +5674,6 @@ var Plottable;
 
                 this.updateClasses();
                 this.updateListeners();
-                return this;
             };
 
             Legend.prototype.updateListeners = function () {
@@ -6037,14 +5807,12 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
                 this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
-                return this;
             };
 
             Gridlines.prototype._doRender = function () {
                 _super.prototype._doRender.call(this);
                 this.redrawXLines();
                 this.redrawYLines();
-                return this;
             };
 
             Gridlines.prototype.redrawXLines = function () {
@@ -6167,7 +5935,6 @@ var Plottable;
                 _super.prototype._computeLayout.call(this, xOffset, yOffset, availableWidth, availableHeight);
                 this.xScale.range([0, this.availableWidth]);
                 this.yScale.range([this.availableHeight, 0]);
-                return this;
             };
 
             XYPlot.prototype._updateXDomainer = function () {
@@ -6177,7 +5944,6 @@ var Plottable;
                         scale.domainer().pad().nice();
                     }
                 }
-                return this;
             };
 
             XYPlot.prototype._updateYDomainer = function () {
@@ -6187,7 +5953,6 @@ var Plottable;
                         scale.domainer().pad().nice();
                     }
                 }
-                return this;
             };
             return XYPlot;
         })(Abstract.Plot);
@@ -6384,7 +6149,6 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
                 this._bars = this.renderArea.selectAll("rect").data([]);
-                return this;
             };
 
             BarPlot.prototype._paint = function () {
@@ -6530,7 +6294,6 @@ var Plottable;
                     // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     qscale._autoDomainIfAutomaticMode();
                 }
-                return this;
             };
 
             BarPlot.prototype._generateAttrToProjector = function () {
@@ -6625,7 +6388,6 @@ var Plottable;
             }
             VerticalBar.prototype._updateYDomainer = function () {
                 this._updateDomainer(this.yScale);
-                return this;
             };
             VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             return VerticalBar;
@@ -6670,7 +6432,6 @@ var Plottable;
             }
             HorizontalBar.prototype._updateXDomainer = function () {
                 this._updateDomainer(this.xScale);
-                return this;
             };
 
             HorizontalBar.prototype._generateAttrToProjector = function () {
@@ -6728,7 +6489,6 @@ var Plottable;
             Line.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.linePath = this.renderArea.append("path").classed("line", true);
-                return this;
             };
 
             Line.prototype._getResetYFunction = function () {
@@ -6842,7 +6602,6 @@ var Plottable;
             Area.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this.areaPath = this.renderArea.append("path").classed("area", true);
-                return this;
             };
 
             Area.prototype._onDataSourceUpdate = function () {
@@ -6871,7 +6630,6 @@ var Plottable;
                     // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     scale._autoDomainIfAutomaticMode();
                 }
-                return this;
             };
 
             Area.prototype.project = function (attrToSet, accessor, scale) {

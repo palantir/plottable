@@ -44,27 +44,24 @@ export module Abstract {
       super._computeLayout(xOffset, yOffset, availableWidth, availableHeight);
       this.xScale.range([0, this.availableWidth]);
       this.yScale.range([this.availableHeight, 0]);
-      return this;
     }
 
-    public _updateXDomainer(): XYPlot {
+    public _updateXDomainer() {
       if (this.xScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale> this.xScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
       }
-      return this;
     }
 
-    public _updateYDomainer(): XYPlot {
+    public _updateYDomainer() {
       if (this.yScale instanceof QuantitativeScale) {
         var scale = <QuantitativeScale> this.yScale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
       }
-      return this;
     }
   }
 }

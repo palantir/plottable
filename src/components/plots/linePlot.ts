@@ -30,7 +30,6 @@ export module Plot {
     public _setup() {
       super._setup();
       this.linePath = this.renderArea.append("path").classed("line", true);
-      return this;
     }
 
     public _getResetYFunction() {

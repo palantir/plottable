@@ -15,9 +15,9 @@ export module Axis {
      * @constructor
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-     * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
+     * @param {Formatter} [formatter] The Formatter for the Axis (default Formatters.identity())
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter: any = new Plottable.Formatter.Identity()) {
+    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
@@ -29,7 +29,6 @@ export module Axis {
     public _setup() {
       super._setup();
       this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
-      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -90,13 +89,13 @@ export module Axis {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = Util.Text.writeText(formatter.format(d), width, height, tm, true, {
+          textWriteResult = Util.Text.writeText(formatter(d), width, height, tm, true, {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = Util.Text.writeText(formatter.format(d), width, height, tm, true);
+          textWriteResult = Util.Text.writeText(formatter(d), width, height, tm, true);
         }
 
         textWriteResults.push(textWriteResult);
@@ -134,7 +133,6 @@ export module Axis {
       var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
-      return this;
     }
 
 
