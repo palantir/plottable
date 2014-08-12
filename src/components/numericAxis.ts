@@ -16,20 +16,19 @@ export module Axis {
      * @constructor
      * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
      * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {Formatter} [formatter] A function to format tick labels.
+     * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
      */
-    constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: any) {
+    constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter = Formatters.general(3, false)) {
       super(scale, orientation, formatter);
     }
 
     public _computeWidth() {
       var tickValues = this._getTickValues();
       var testTextEl = this._tickLabelContainer.append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      var epsilon = Math.pow(10, -this._formatter.precision()); // small delta to force display of longer numbers
       // create a new text measurerer every time; see issue #643
       var measurer = Util.Text.getTextMeasure(testTextEl);
       var textLengths = tickValues.map((v: any) => {
-        var formattedValue = this._formatter.format(v);
+        var formattedValue = this._formatter(v);
         return measurer(formattedValue).width;
       });
       testTextEl.remove();
@@ -152,11 +151,10 @@ export module Axis {
       tickLabels.enter().append("text").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabels.exit().remove();
 
-      var formatFunction = (d: any) => this._formatter.format(d);
       tickLabels.style("text-anchor", tickLabelTextAnchor)
                 .style("visibility", "visible")
                 .attr(tickLabelAttrHash)
-                .text(formatFunction);
+                .text(this._formatter);
 
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
@@ -166,7 +164,6 @@ export module Axis {
       }
 
       this._hideOverlappingTickLabels();
-      return this;
     }
 
     /**
@@ -234,7 +231,8 @@ export module Axis {
           return this.showFirstTickLabel;
         } else {
           this.showFirstTickLabel = show;
-          return this._render();
+          this._render();
+          return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
                  (!this._isHorizontal() && orientation === "top")) {
@@ -242,7 +240,8 @@ export module Axis {
           return this.showLastTickLabel;
         } else {
           this.showLastTickLabel = show;
-          return this._render();
+          this._render();
+          return this;
         }
       } else {
         throw new Error("Attempt to show " + orientation + " tick label on a " +

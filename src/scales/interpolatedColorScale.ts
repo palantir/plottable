@@ -166,6 +166,7 @@ export module Scale {
       }
       this._colorRange = this._resolveColorValues(colorRange);
       this._resetScale();
+      return this;
     }
 
     /**
@@ -188,6 +189,7 @@ export module Scale {
       }
       this._scaleType = scaleType;
       this._resetScale();
+      return this;
     }
 
     private _resetScale(): any {

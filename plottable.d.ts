@@ -392,193 +392,71 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Abstract {
-        class Formatter {
-            constructor(precision: number);
-            /**
-            * Format an input value.
-            *
-            * @param {any} d The value to be formatted.
-            * @returns {string} The formatted value.
-            */
-            public format(d: any): string;
-            /**
-            * Gets the current precision of the Formatter.
-            * The meaning depends on the implementation.
-            *
-            * @returns {number} The current precision.
-            */
-            public precision(): number;
-            /**
-            * Sets the precision of the Formatter.
-            * The meaning depends on the implementation.
-            *
-            * @param {number} [value] The new precision.
-            * @returns {Formatter} The calling Formatter.
-            */
-            public precision(value: number): Formatter;
-            /**
-            * Checks if this formatter will show only unchanged values.
-            *
-            * @returns {boolean}
-            */
-            public showOnlyUnchangedValues(): boolean;
-            /**
-            * Sets whether this formatter will show only unchanged values.
-            * If true, inputs whose value is changed by the formatter will be formatted
-            * to an empty string.
-            *
-            * @param {boolean} showUnchanged Whether or not to show only unchanged values.
-            * @returns {Formatter} The calling Formatter.
-            */
-            public showOnlyUnchangedValues(showUnchanged: boolean): Formatter;
-        }
+    interface Formatter {
+        (d: any): string;
     }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Identity extends Abstract.Formatter {
-            /**
-            * Creates an formatter that simply stringifies the input.
-            *
-            * @constructor
-            */
-            constructor();
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class General extends Abstract.Formatter {
-            /**
-            * Creates a formatter that formats numbers to show no more than
-            * [precision] decimal places. All other values are stringified.
-            *
-            * @constructor
-            * @param {number} [precision] The maximum number of decimal places to display.
-            */
-            constructor(precision?: number);
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Fixed extends Abstract.Formatter {
-            /**
-            * Creates a formatter that displays exactly [precision] decimal places.
-            *
-            * @constructor
-            * @param {number} [precision] The number of decimal places to display.
-            */
-            constructor(precision?: number);
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Currency extends Fixed {
-            /**
-            * Creates a formatter for currency values.
-            *
-            * @param {number} [precision] The number of decimal places to show.
-            * @param {string} [symbol] The currency symbol to use.
-            * @param {boolean} [prefix] Whether to prepend or append the currency symbol.
-            *
-            * @returns {IFormatter} A formatter for currency values.
-            */
-            constructor(precision?: number, symbol?: string, prefix?: boolean);
-            public format(d: any): string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Percentage extends Fixed {
-            /**
-            * Creates a formatter for percentage values.
-            * Multiplies the supplied value by 100 and appends "%".
-            *
-            * @constructor
-            * @param {number} [precision] The number of decimal places to display.
-            */
-            constructor(precision?: number);
-            public format(d: any): string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class SISuffix extends Abstract.Formatter {
-            /**
-            * Creates a formatter for values that displays [precision] significant figures.
-            *
-            * @constructor
-            * @param {number} [precision] The number of significant figures to display.
-            */
-            constructor(precision?: number);
-            /**
-            * Gets the current number of significant figures shown by the Formatter.
-            *
-            * @returns {number} The current precision.
-            */
-            public precision(): number;
-            /**
-            * Sets the number of significant figures to be shown by the Formatter.
-            *
-            * @param {number} [value] The new precision.
-            * @returns {Formatter} The calling SISuffix Formatter.
-            */
-            public precision(value: number): SISuffix;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Formatter {
-        class Custom extends Abstract.Formatter {
-            /**
-            * Creates a Custom Formatter.
-            *
-            * @constructor
-            * @param {(d: any, formatter: Formatter.Custom) => string} customFormatFunction A
-            *                           formatting function that is passed a datum
-            *                           and the Custom Formatter itself.
-            * @param {number} precision The precision of the Custom Formatter. The
-            *                           actual behavior will depend on the customFormatFunction.
-            */
-            constructor(customFormatFunction: (d: any, formatter: Custom) => string, precision?: number);
-        }
-    }
-}
-
-
-declare module Plottable {
-    interface FilterFormat {
-        format: string;
-        filter: (d: any) => any;
-    }
-    module Formatter {
-        class Time extends Abstract.Formatter {
-            /**
-            * Creates a formatter that displays dates
-            *
-            * @constructor
-            */
-            constructor();
-        }
+    class Formatters {
+        /**
+        * Creates a formatter for currency values.
+        *
+        * @param {number} [precision] The number of decimal places to show (default 2).
+        * @param {string} [symbol] The currency symbol to use (default "$").
+        * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
+        * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+        *
+        * @returns {Formatter} A formatter for currency values.
+        */
+        static currency(precision?: number, symbol?: string, prefix?: boolean, onlyShowUnchanged?: boolean): (d: any) => string;
+        /**
+        * Creates a formatter that displays exactly [precision] decimal places.
+        *
+        * @param {number} [precision] The number of decimal places to show (default 3).
+        * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+        *
+        * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
+        */
+        static fixed(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        /**
+        * Creates a formatter that formats numbers to show no more than
+        * [precision] decimal places. All other values are stringified.
+        *
+        * @param {number} [precision] The number of decimal places to show (default 3).
+        * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+        *
+        * @returns {Formatter} A formatter for general values.
+        */
+        static general(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        /**
+        * Creates a formatter that stringifies its input.
+        *
+        * @returns {Formatter} A formatter that stringifies its input.
+        */
+        static identity(): (d: any) => string;
+        /**
+        * Creates a formatter for percentage values.
+        * Multiplies the input by 100 and appends "%".
+        *
+        * @param {number} [precision] The number of decimal places to show (default 0).
+        * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+        *
+        * @returns {Formatter} A formatter for percentage values.
+        */
+        static percentage(precision?: number, onlyShowUnchanged?: boolean): (d: any) => string;
+        /**
+        * Creates a formatter for values that displays [precision] significant figures
+        * and puts SI notation.
+        *
+        * @param {number} [precision] The number of significant figures to show (default 3).
+        *
+        * @returns {Formatter} A formatter for SI values.
+        */
+        static siSuffix(precision?: number): (d: any) => string;
+        /**
+        * Creates a formatter that displays dates.
+        *
+        * @returns {Formatter} A formatter for time/date values.
+        */
+        static time(): (d: any) => string;
     }
 }
 
@@ -1723,7 +1601,7 @@ declare module Plottable {
             * The css class applied to each tick label (the text associated with the tick).
             */
             static TICK_LABEL_CLASS: string;
-            constructor(scale: Scale, orientation: string, formatter?: any);
+            constructor(scale: Scale, orientation: string, formatter?: (d: any) => string);
             public remove(): void;
             /**
             * Gets the current width.
@@ -1754,16 +1632,16 @@ declare module Plottable {
             /**
             * Get the current formatter on the axis.
             *
-            * @returns {Abstract.Formatter} the axis formatter
+            * @returns {Formatter} the axis formatter
             */
             public formatter(): Formatter;
             /**
             * Sets a new tick formatter.
             *
-            * @param {function | Abstract.Formatter} formatter
+            * @param {Formatter} formatter
             * @returns {Abstract.Axis} The calling Axis.
             */
-            public formatter(formatter: any): Axis;
+            public formatter(formatter: Formatter): Axis;
             /**
             * Gets the current tick mark length.
             *
@@ -1883,9 +1761,9 @@ declare module Plottable {
             * @constructor
             * @param {QuantitativeScale} scale The QuantitativeScale to base the NumericAxis on.
             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-            * @param {Formatter} [formatter] A function to format tick labels.
+            * @param {Formatter} [formatter] A function to format tick labels (default Formatters.general(3, false)).
             */
-            constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: any);
+            constructor(scale: Abstract.QuantitativeScale, orientation: string, formatter?: (d: any) => string);
             /**
             * Gets the tick label position relative to the tick marks.
             *
@@ -1941,9 +1819,9 @@ declare module Plottable {
             * @constructor
             * @param {OrdinalScale} scale The scale to base the Axis on.
             * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-            * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
+            * @param {Formatter} [formatter] The Formatter for the Axis (default Formatters.identity())
             */
-            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: any);
+            constructor(scale: Scale.Ordinal, orientation?: string, formatter?: (d: any) => string);
         }
     }
 }

@@ -44,14 +44,12 @@ export module Component {
       super._setup();
       this.xLinesContainer = this.content.append("g").classed("x-gridlines", true);
       this.yLinesContainer = this.content.append("g").classed("y-gridlines", true);
-      return this;
     }
 
-    public _doRender(): Gridlines {
+    public _doRender() {
       super._doRender();
       this.redrawXLines();
       this.redrawYLines();
-      return this;
     }
 
     private redrawXLines() {
