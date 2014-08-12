@@ -26,7 +26,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public getDrawer(key: string) {
+    public _getDrawer(key: string) {
       return new Drawer.Rect(key);
     }
 

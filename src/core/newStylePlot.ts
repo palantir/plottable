@@ -37,9 +37,9 @@ export module Abstract {
     }
 
     /**
-     * Adds a dataset to this plot. Optionally identify this dataset with a key.
+     * Adds a dataset to this plot. Identify this dataset with a key.
      *
-     * @param [string] key The key of the dataset.
+     * @param {string} [key] The key of the dataset.
      * @param {any[]|DataSource} dataset dataset to add.
      * @return {NewStylePlot} The calling NewStylePlot. 
      */
@@ -66,7 +66,7 @@ export module Abstract {
       if (this._key2DatasetDrawerKey[key] != null) {
         this.removeDataset(key);
       };
-      var drawer = this.getDrawer(key);
+      var drawer = this._getDrawer(key);
       var ddk = {drawer: drawer, dataset: dataset, key: key};
       this._datasetKeysInOrder.push(key);
       this._key2DatasetDrawerKey[key] = ddk;
@@ -83,7 +83,7 @@ export module Abstract {
      * 
      * @param {string} key The key to use.
      */
-    public getDrawer(key: string): Abstract.Drawer {
+    public _getDrawer(key: string): Abstract.Drawer {
       throw new Error("Abstract Method Not Implemented");
     }
 

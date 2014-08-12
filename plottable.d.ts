@@ -439,7 +439,6 @@ declare module Plottable {
             addDataset(key: string, dataset: any[]): Plot;
             addDataset(dataset: DataSource): Plot;
             addDataset(dataset: any[]): Plot;
-            getDrawer(key: string): Drawer;
             updateProjector(attr: string): NewStylePlot;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NewStylePlot;
@@ -701,7 +700,7 @@ declare module Plottable {
             renderArea: D3.Selection;
             constructor(key: string);
             remove(): void;
-            draw(data: any[][], attrHash: any): void;
+            draw(data: any[][], attrHash: IAttributeToProjector): void;
         }
     }
 }
@@ -710,7 +709,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawer {
         class Rect extends Plottable.Abstract.Drawer {
-            draw(data: any[][], attrHash: any): void;
+            draw(data: any[][], attrHash: Plottable.Abstract.IAttributeToProjector): void;
         }
     }
 }
@@ -953,7 +952,6 @@ declare module Plottable {
         class ClusteredBar extends Plottable.Abstract.NewStyleBarPlot {
             static DEFAULT_WIDTH: number;
             constructor(xScale: Plottable.Abstract.Scale, yScale: Plottable.Abstract.QuantitativeScale);
-            getDrawer(key: string): Drawer.Rect;
         }
     }
 }
@@ -964,7 +962,6 @@ declare module Plottable {
         class StackedBar extends Plottable.Abstract.NewStyleBarPlot {
             stackedData: any[][];
             constructor(xScale?: Plottable.Abstract.Scale, yScale?: Plottable.Abstract.Scale);
-            getDrawer(key: string): Drawer.Rect;
         }
     }
 }

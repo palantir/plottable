@@ -10,7 +10,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
       p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
-      p.getDrawer = (k: string) => new Plottable.Drawer.Rect(k);
+      p._getDrawer = (k: string) => new Plottable.Drawer.Rect(k);
     });
 
     afterEach(() => {

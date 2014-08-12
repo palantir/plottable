@@ -2280,7 +2280,7 @@ var Plottable;
                     this.removeDataset(key);
                 }
                 ;
-                var drawer = this.getDrawer(key);
+                var drawer = this._getDrawer(key);
                 var ddk = { drawer: drawer, dataset: dataset, key: key };
                 this._datasetKeysInOrder.push(key);
                 this._key2DatasetDrawerKey[key] = ddk;
@@ -2290,7 +2290,7 @@ var Plottable;
                 dataset.broadcaster.registerListener(this, function () { return _this._onDataSourceUpdate(); });
                 this._onDataSourceUpdate();
             };
-            NewStylePlot.prototype.getDrawer = function (key) {
+            NewStylePlot.prototype._getDrawer = function (key) {
                 throw new Error("Abstract Method Not Implemented");
             };
             NewStylePlot.prototype.updateProjector = function (attr) {
@@ -5249,7 +5249,7 @@ var Plottable;
                 attrToProjector["x"] = getX;
                 return attrToProjector;
             };
-            ClusteredBar.prototype.getDrawer = function (key) {
+            ClusteredBar.prototype._getDrawer = function (key) {
                 return new Plottable.Drawer.Rect(key);
             };
             ClusteredBar.prototype.cluster = function (accessor) {
@@ -5325,7 +5325,7 @@ var Plottable;
                 attrToProjector["y"] = function (d) { return getY(d); };
                 return attrToProjector;
             };
-            StackedBar.prototype.getDrawer = function (key) {
+            StackedBar.prototype._getDrawer = function (key) {
                 return new Plottable.Drawer.Rect(key);
             };
             StackedBar.prototype.stack = function (accessor) {
@@ -5356,12 +5356,10 @@ var Plottable;
                 return stacks;
             };
             StackedBar.prototype._paint = function () {
-                var _this = this;
                 var accessor = this._projectors["y"].accessor;
                 var attrHash = this._generateAttrToProjector();
                 var stackedData = this.stack(accessor);
-                var drawersInStackOrder = this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].drawer; });
-                drawersInStackOrder.forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
             };
             return StackedBar;
         })(Plottable.Abstract.NewStyleBarPlot);

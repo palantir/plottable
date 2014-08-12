@@ -38,7 +38,7 @@ export module Plot {
       return attrToProjector;
     }
 
-    public getDrawer(key: string) {
+    public _getDrawer(key: string) {
       return new Drawer.Rect(key);
     }
 
@@ -74,9 +74,7 @@ export module Plot {
       var accessor = this._projectors["y"].accessor;
       var attrHash = this._generateAttrToProjector();
       var stackedData = this.stack(accessor);
-      var drawersInStackOrder = this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].drawer);
-      drawersInStackOrder.forEach((d, i) => d.draw(stackedData[i], attrHash));
-
+      this._getDrawersInOrder().forEach((d, i) => d.draw(stackedData[i], attrHash));
     }
   }
 }

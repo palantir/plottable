@@ -1309,7 +1309,7 @@ describe("Plots", function () {
             var xScale = new Plottable.Scale.Linear();
             var yScale = new Plottable.Scale.Linear();
             p = new Plottable.Abstract.NewStylePlot(xScale, yScale);
-            p.getDrawer = function (k) { return new Plottable.Drawer.Rect(k); };
+            p._getDrawer = function (k) { return new Plottable.Drawer.Rect(k); };
         });
         afterEach(function () {
             Plottable.Util.Methods.warn = oldWarn;
