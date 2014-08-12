@@ -5488,6 +5488,12 @@ describe("Interactions", function () {
                     timesCalled++;
                     assert.deepEqual(start, { x: dragstartX2, y: dragstartY2 });
                     assert.deepEqual(end, { x: dragendX2, y: dragendY2 });
+                    assert.deepEqual(interaction.selection, {
+                        xMin: 0,
+                        xMax: svgWidth,
+                        yMin: dragendY2,
+                        yMax: dragendY
+                    });
                 });
 
                 // fake another drag event to resize the box.
@@ -5511,6 +5517,12 @@ describe("Interactions", function () {
                     timesCalled++;
                     assert.deepEqual(start, { x: dragstartX2, y: dragstartY2 });
                     assert.deepEqual(end, { x: dragendX2, y: dragendY2 });
+                    assert.deepEqual(interaction.selection, {
+                        xMin: 0,
+                        xMax: svgWidth,
+                        yMin: dragstartY,
+                        yMax: dragendY2
+                    });
                 });
 
                 // fake another drag event to resize the box.
