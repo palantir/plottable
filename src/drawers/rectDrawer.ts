@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Drawer {
-  export class Rect extends Abstract.Drawer {
+export module _Drawer {
+  export class Rect extends Abstract._Drawer {
 
     public draw(data: any[][], attrHash: Abstract.IAttributeToProjector) {
       var svgElement = "rect";

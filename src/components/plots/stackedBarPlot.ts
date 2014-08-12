@@ -38,10 +38,6 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _getDrawer(key: string) {
-      return new Drawer.Rect(key);
-    }
-
     private stack(accessor: IAccessor) {
       var datasets = d3.values(this._key2DatasetDrawerKey);
       var lengths = datasets.map((d) => d.dataset.data().length);

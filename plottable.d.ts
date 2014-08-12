@@ -428,7 +428,7 @@ declare module Plottable {
 declare module Plottable {
     interface DatasetDrawerKey {
         dataset: DataSource;
-        drawer: Plottable.Abstract.Drawer;
+        drawer: Plottable.Abstract._Drawer;
         key: string;
     }
     module Abstract {
@@ -695,7 +695,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Abstract {
-        class Drawer {
+        class _Drawer {
             key: string;
             renderArea: D3.Selection;
             constructor(key: string);
@@ -707,8 +707,8 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Drawer {
-        class Rect extends Plottable.Abstract.Drawer {
+    module _Drawer {
+        class Rect extends Plottable.Abstract._Drawer {
             draw(data: any[][], attrHash: Plottable.Abstract.IAttributeToProjector): void;
         }
     }

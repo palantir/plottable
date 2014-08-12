@@ -26,10 +26,6 @@ export module Plot {
       return attrToProjector;
     }
 
-    public _getDrawer(key: string) {
-      return new Drawer.Rect(key);
-    }
-
     private cluster(accessor: IAccessor) {
       this.innerScale.domain(this._datasetKeysInOrder);
       var lengths = this._datasetKeysInOrder.map((e) => this._key2DatasetDrawerKey[e].dataset.data().length);

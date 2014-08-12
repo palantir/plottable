@@ -3270,21 +3270,21 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     (function (Abstract) {
-        var Drawer = (function () {
-            function Drawer(key) {
+        var _Drawer = (function () {
+            function _Drawer(key) {
                 this.key = key;
             }
-            Drawer.prototype.remove = function () {
+            _Drawer.prototype.remove = function () {
                 if (this.renderArea != null) {
                     this.renderArea.remove();
                 }
             };
-            Drawer.prototype.draw = function (data, attrHash) {
+            _Drawer.prototype.draw = function (data, attrHash) {
                 throw new Error("Abstract Method Not Implemented");
             };
-            return Drawer;
+            return _Drawer;
         })();
-        Abstract.Drawer = Drawer;
+        Abstract._Drawer = _Drawer;
     })(Plottable.Abstract || (Plottable.Abstract = {}));
     var Abstract = Plottable.Abstract;
 })(Plottable || (Plottable = {}));
@@ -3297,7 +3297,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    (function (Drawer) {
+    (function (_Drawer) {
         var Rect = (function (_super) {
             __extends(Rect, _super);
             function Rect() {
@@ -3311,10 +3311,10 @@ var Plottable;
                 dataElements.exit().remove();
             };
             return Rect;
-        })(Plottable.Abstract.Drawer);
-        Drawer.Rect = Rect;
-    })(Plottable.Drawer || (Plottable.Drawer = {}));
-    var Drawer = Plottable.Drawer;
+        })(Plottable.Abstract._Drawer);
+        _Drawer.Rect = Rect;
+    })(Plottable._Drawer || (Plottable._Drawer = {}));
+    var _Drawer = Plottable._Drawer;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
@@ -5124,6 +5124,9 @@ var Plottable;
                 this.project("fill", function () { return "steelblue"; });
                 this.baseline(this._baselineValue);
             }
+            NewStyleBarPlot.prototype._getDrawer = function (key) {
+                return new Plottable._Drawer.Rect(key);
+            };
             NewStyleBarPlot.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._baseline = this.renderArea.append("line").classed("baseline", true);
@@ -5249,9 +5252,6 @@ var Plottable;
                 attrToProjector["x"] = getX;
                 return attrToProjector;
             };
-            ClusteredBar.prototype._getDrawer = function (key) {
-                return new Plottable.Drawer.Rect(key);
-            };
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
@@ -5324,9 +5324,6 @@ var Plottable;
                 attrToProjector["height"] = function (d) { return Math.abs(getY(d) - getY0(d)); };
                 attrToProjector["y"] = function (d) { return getY(d); };
                 return attrToProjector;
-            };
-            StackedBar.prototype._getDrawer = function (key) {
-                return new Plottable.Drawer.Rect(key);
             };
             StackedBar.prototype.stack = function (accessor) {
                 var _this = this;

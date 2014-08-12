@@ -3,7 +3,7 @@
 module Plottable {
   export interface DatasetDrawerKey {
     dataset: DataSource;
-    drawer: Abstract.Drawer;
+    drawer: Abstract._Drawer;
     key: string;
   }
 
@@ -41,7 +41,7 @@ export module Abstract {
      *
      * @param {string} [key] The key of the dataset.
      * @param {any[]|DataSource} dataset dataset to add.
-     * @return {NewStylePlot} The calling NewStylePlot. 
+     * @return {NewStylePlot} The calling NewStylePlot.
      */
     public addDataset(key: string, dataset: DataSource): Plot;
     public addDataset(key: string, dataset: any[]): Plot;
@@ -80,10 +80,11 @@ export module Abstract {
 
     /**
      * Gets a drawer by key.
-     * 
+     *
      * @param {string} key The key to use.
      */
-    public _getDrawer(key: string): Abstract.Drawer {
+
+    public _getDrawer(key: string): Abstract._Drawer {
       throw new Error("Abstract Method Not Implemented");
     }
 
@@ -106,7 +107,7 @@ export module Abstract {
 
     /**
      * Gets the dataset order by key
-     * 
+     *
      * @return {string[]} a string array of the keys in order
      */
     public datasetOrder(): string[];
@@ -165,7 +166,7 @@ export module Abstract {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].dataset);
     }
 
-    public _getDrawersInOrder(): Abstract.Drawer[] {
+    public _getDrawersInOrder(): Abstract._Drawer[] {
       return this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].drawer);
     }
   }

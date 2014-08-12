@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Abstract {
-  export class Drawer {
+  export class _Drawer {
     public renderArea: D3.Selection;
 
     /**

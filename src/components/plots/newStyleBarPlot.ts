@@ -33,6 +33,10 @@ export module Abstract {
       this.baseline(this._baselineValue);
     }
 
+    public _getDrawer(key: string) {
+      return new Plottable._Drawer.Rect(key);
+    }
+
     public _setup() {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
