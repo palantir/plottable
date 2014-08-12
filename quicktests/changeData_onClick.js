@@ -8,6 +8,7 @@ function run(div, data, Plottable) {
     var svg = div.append("svg").attr("height", 500);
 
     var numPts = 5;
+    var toggler = false;
 
     var dataseries1 = new Plottable.DataSource(data[0].splice(0, 5));
     
@@ -16,20 +17,30 @@ function run(div, data, Plottable) {
     var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
     var yAxis = new Plottable.Axis.Numeric(yScale, "left");
 
+    domainer_y = new Plottable.Domainer()
+        .addIncludedValue(1.3)
+        .pad();
+    domainer_x = new Plottable.Domainer()
+        .pad(.1)
+        .addIncludedValue(0)
+        .addPaddingException(0);
 
-    var renderArea1 = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale);
-    renderArea1.animate(true); 
+    xScale.domainer(domainer_x);
+    yScale.domainer(domainer_y);
 
-    var renderArea2 = new Plottable.Plot.Scatter(renderArea1.dataSource(), xScale, yScale);
-    renderArea2.project("fill", function(){return "purple";});
-    renderArea2.animate(true);
+
+    var barPlot = new Plottable.Plot.VerticalBar(dataseries1, xScale, yScale)
+        .animate(true)
+        .baseline(1.3); 
+
+    var toggle2 = new Plottable.Component.TitleLabel("Include 2");
      
-    var renderGroup = renderArea1.merge(renderArea2);
     
     var basicTable = new Plottable.Component.Table()
                 .addComponent(2, 0, yAxis)
-                .addComponent(2, 1, renderGroup)
-                .addComponent(3, 1, xAxis);
+                .addComponent(2, 1, barPlot)
+                .addComponent(3, 1, xAxis)
+                .addComponent(4, 1, toggle2);
 
     basicTable.renderTo(svg);
 
@@ -43,9 +54,18 @@ function run(div, data, Plottable) {
             numPts = 5;
         }
     }  
+    function toggleinclude() {
+        console.log(toggler);
+        toggler?domainer_y.removeIncludedValue(2):domainer_y.addIncludedValue(2);   
+        toggler = !toggler;
+    }
 
-    window.xy = new Plottable.Interaction.Click(renderGroup)
+
+    clickInteraction = new Plottable.Interaction.Click(barPlot)
         .callback(cb)
+        .registerWithComponent();
+    toggleInteraction = new Plottable.Interaction.Click(toggle2)
+        .callback(toggleinclude)
         .registerWithComponent();
 
 }

@@ -52,3 +52,8 @@ h1, h2, h3 {
 	color: #820A56;
 	font-family: monospace;
 }
+
+table, tr{
+   border-bottom: 4px solid #ffcbf0;
+   border-collapse: collapse;
+}
