@@ -39,6 +39,8 @@ export module Abstract {
     /**
      * Adds a dataset to this plot. Identify this dataset with a key.
      *
+     * A key is automatically generated if not supplied.
+     *
      * @param {string} [key] The key of the dataset.
      * @param {any[]|DataSource} dataset dataset to add.
      * @return {NewStylePlot} The calling NewStylePlot.
