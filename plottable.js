@@ -3468,8 +3468,12 @@ var Plottable;
                 return Plottable.Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
             };
             Time.prototype.getIntervalLength = function (interval) {
-                var testDate = this._scale.domain()[0];
-                var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
+                var startDate = this._scale.domain()[0];
+                var endDate = interval.timeUnit.offset(startDate, interval.step);
+                if (endDate > this._scale.domain()[1]) {
+                    return this.availableWidth;
+                }
+                var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
                 return stepLength;
             };
             Time.prototype.isEnoughSpace = function (container, interval) {

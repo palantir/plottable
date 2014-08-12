@@ -116,9 +116,14 @@ export module Axis {
     }
 
     private getIntervalLength(interval: ITimeInterval) {
-      var testDate = this._scale.domain()[0]; // any date could go here
+      var startDate = this._scale.domain()[0];
+      var endDate = interval.timeUnit.offset(startDate, interval.step);
+      if (endDate > this._scale.domain()[1]) { 
+        // this offset is too large, so just return available width
+        return this.availableWidth;
+      }
       // meausre how much space one date can get
-      var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
+      var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
       return stepLength;
     }
 
