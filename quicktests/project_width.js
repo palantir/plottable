@@ -24,17 +24,13 @@ function run(div, data, Plottable) {
       var yAxis = new Plottable.Axis.Numeric(yScale, "left");
         
       var gridlines = new Plottable.Component.Gridlines(null, yScale);
-      var addLabel = new Plottable.Component.Label("add bar");
-      var removeLabel = new Plottable.Component.Label("remove bar");
+      var addLabel = new Plottable.Component.TitleLabel("add bar");
+      var removeLabel = new Plottable.Component.TitleLabel("remove bar");
         
         widthPicker = function(){
             var availableSpace = xAxis.width();
             var bars = d.length;
-            var w = availableSpace * .7 / bars;
-            console.log(w);
-            return w;
-
-            
+            var w = availableSpace * .7 / bars;         
         }
 
       barRenderer = new Plottable.Plot.VerticalBar(ds, xScale, yScale)

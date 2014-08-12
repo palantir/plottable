@@ -61,11 +61,25 @@ function run(div, data, Plottable) {
     renderAreaD4.project("stroke", colorProjector);
     renderAreas = renderAreaD1.merge(renderAreaD2)
                         .merge(renderAreaD3).merge(renderAreaD4);
+    var renderers = [renderAreaD1, renderAreaD2, renderAreaD3, renderAreaD4];
+    var renderersIncluded = [1, 1, 1, 1];
 
     
     //title + legend
     var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
     var legend1 = new Plottable.Component.Legend(colorScale1);
+    legend1.toggleCallback(
+        function (d, b) {
+            var index = colorScale1.domain().indexOf(d);
+            if(renderersIncluded[index]){
+                renderers[index].detach();
+                renderersIncluded[index] = 0;
+            } else{
+                renderAreas.merge(renderers[index]);
+                renderersIncluded[index] = 1;
+            }
+        }
+    );
     var titleTable = new Plottable.Component.Table().addComponent(0,0, title1)
                                           .addComponent(0,1, legend1);
     

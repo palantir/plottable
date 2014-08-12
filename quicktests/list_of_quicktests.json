@@ -33,6 +33,9 @@
     "name":"category_verticalBar",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate"]
   },  {
+    "name":"categoryAxis_timeAxis",
+    "categories":["Time Scale", "Ordinal Scale", "Horizontal Bar Plot", "Project", "Time Axis", "Category Axis", "Gridlines", "Group", "Standard Chart", "PanZoom Interaction"]
+  },  {    
     "name":"changeData_onClick",
     "categories":["Data", "Datasource", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Scatter Plot", "Animate", "Merge", "Click Interaction"]
   },  {
@@ -51,6 +54,9 @@
     "name":"interaction_panzoom",
     "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "Gridlines", "Merge", "PanZoom Interaction"]
   },  {
+    "name":"key_interaction",
+    "categories":["Linear Scale", "Numeric Axis", "Scatter Plot", "PanZoom Interaction", "Key Interaction"]
+  },  {
     "name":"layout_tables",
     "categories":["Linear Scale", "Numeric Axis", "Line Plot", "Area Plot", "Layout", "Label", "Table", "Project"]
   },  {
@@ -58,7 +64,7 @@
     "categories":["Legend", "Title", "Gridlines", "Color Scale", "Scatter Plot", "Line Plot", "Numeric Axis", "Metadata", "Project", "Merge", "Linear Scale"]
   },  {
     "name":"modifiedLog",
-    "categories":["Datasource", "Metadata", "Modified Log Scale", "Color Scale", "Line Plot", "Numeric Axis", "Accessor", "Project"]
+    "categories":["Datasource", "Metadata", "Modified Log Scale", "Color Scale", "Line Plot", "Numeric Axis", "Accessor", "Project", "Toggle Legend"]
   },  {
     "name":"no_data",
     "categories":[ "Linear Scale", "Numeric Axis", "Area Plot", "Scatter Plot", "Vertical Bar Plot", "Horizontal Bar Plot", "Line Plot", "Table", "Layout"]
