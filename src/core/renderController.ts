@@ -12,6 +12,14 @@ export module Core {
    *
    * If you require immediate rendering, call RenderController.flush() to
    * perform enqueued layout and rendering serially.
+   *
+   * If you want to always have immediate rendering (useful for debugging),
+   * call
+   * ```typescript
+   * Plottable.Core.RenderController.setRenderPolicy(
+   *   new Plottable.Core.RenderController.RenderPolicy.Immediate()
+   * );
+   * ```
    */
   export module RenderController {
     var _componentsNeedingRender: {[key: string]: Abstract.Component} = {};

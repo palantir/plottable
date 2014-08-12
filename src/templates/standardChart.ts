@@ -14,6 +14,28 @@ export module Template {
       private xyTable: Component.Table;
       private fullTable: Component.Table;
 
+      /**
+       * Creates a StandartChart.
+       *
+       * A StandardChart is a Component.Table with presets set to what users
+       * generally want.
+       *
+       * If you want to do this:
+       * ```typescript
+       * var table = new Table([[xAxis.merge(xLabel), plot.merge(title)],
+       *                        [null,                yAxis.merge(yLabel)]]);
+       * ```
+       * and laboriously create xLabel, xAxis, etc., you can do this:
+       * ```typescript
+       * var table = new StandardChart();
+       * table.xLabel("foo");
+       * table.xAxis(xAxis);
+       * ...
+       * ```
+       *
+       * StandardChart is what you should use if you just want a freakin'
+       * chart.
+       */
       constructor() {
         super();
         this.xTable    = new Component.Table();
@@ -128,6 +150,12 @@ export module Template {
       }
     }
 
+    /**
+     * Sets the component in the center, typically a plot.
+     *
+     * @param {Abstract.Component} c The component to place in the center.
+     * @return {StandardChart} The calling StandardChart.
+     */
     public center(c: Abstract.Component): StandardChart {
       this.centerComponent.merge(c);
       return this;

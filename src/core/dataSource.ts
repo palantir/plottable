@@ -10,8 +10,12 @@ module Plottable {
     private _metadata: any;
     private accessor2cachedExtent: Util.StrictEqualityAssociativeArray;
     public broadcaster = new Core.Broadcaster(this);
+
     /**
      * Creates a new DataSource.
+     *
+     * A DataSource is mostly just a wrapper around an any[], DataSource is the
+     * data you're going to plot.
      *
      * @constructor
      * @param {any[]} data
@@ -25,17 +29,12 @@ module Plottable {
     }
 
     /**
-     * Gets the data.
+     * Set or get the data.
      *
-     * @returns {any[]} The current data.
+     * @param {any[]} [data] The new data.
+     * @returns {DataSource|any[]} The calling DataSource, or the current data.
      */
     public data(): any[];
-    /**
-     * Sets new data.
-     *
-     * @param {any[]} data The new data.
-     * @returns {DataSource} The calling DataSource.
-     */
     public data(data: any[]): DataSource;
     public data(data?: any[]): any {
       if (data == null) {
@@ -49,17 +48,13 @@ module Plottable {
     }
 
     /**
-     * Gets the metadata.
+     * Get or set the metadata.
      *
-     * @returns {any} The current metadata.
+     * @param {any} [metadata] The new metadata.
+     * @returns {DataSource|any} The calling DataSource, or the current
+     * metadata.
      */
     public metadata(): any;
-    /**
-     * Sets the metadata.
-     *
-     * @param {any} metadata The new metadata.
-     * @returns {DataSource} The calling DataSource.
-     */
     public metadata(metadata: any): DataSource;
     public metadata(metadata?: any): any {
       if (metadata == null) {
