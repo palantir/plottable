@@ -118,7 +118,7 @@ export module Axis {
     private getIntervalLength(interval: ITimeInterval) {
       var startDate = this._scale.domain()[0];
       var endDate = interval.timeUnit.offset(startDate, interval.step);
-      if (endDate > this._scale.domain()[1]) { 
+      if (endDate > this._scale.domain()[1]) {
         // this offset is too large, so just return available width
         return this.availableWidth;
       }
