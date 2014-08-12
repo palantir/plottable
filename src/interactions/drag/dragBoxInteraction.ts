@@ -27,15 +27,7 @@ export module Interaction {
       var origin = this.origin[i];
       var c1 = parseInt(this.dragBox.attr(attr1), 10);
       var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
-      var result1 = this._isCloseEnough(origin, c1);
-      if (result1) {
-        this.origin[i] = c2;
-      }
-      var result2 = this._isCloseEnough(origin, c2);
-      if (result2) {
-        this.origin[i] = c1;
-      }
-      return result1 || result2;
+      return this._isCloseEnough(origin, c1) || this._isCloseEnough(origin, c2);
     }
 
     public _isResizeStart(): boolean {
@@ -46,25 +38,7 @@ export module Interaction {
       if (this.boxIsDrawn && (!this.resizeEnabled || !this._isResizeStart())) {
         this.clearBox();
       }
-    }
-
-    public _getPixelArea(): any {
-      // Should be overwritten.
-      return {};
-    }
-
-    public _doDrag() {
-      if (this.ondrag == null) {
-        return;
-      }
-      this.ondrag(this._getPixelArea());
-    }
-
-    public _doDragend(){
-      if (this.ondragend == null) {
-        return;
-      }
-      this.ondragend(this._getPixelArea());
+      super._doDragstart();
     }
 
     /**

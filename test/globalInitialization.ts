@@ -10,3 +10,17 @@ before(() => {
   Plottable.Core.RenderController.setRenderPolicy(new Plottable.Core.RenderController.RenderPolicy.Immediate());
   window.Pixel_CloseTo_Requirement = window.PHANTOMJS ? 2 : 0.5;
 });
+
+after(() => {
+	var parent: D3.Selection = getSVGParent();
+	var mocha = d3.select("#mocha-report");
+	if (mocha.node() != null) {
+		var suites = mocha.selectAll(".suite");
+		for (var i = 0; i < suites[0].length; i++) {
+			var curSuite = d3.select(suites[0][i]);
+			assert(curSuite.selectAll("ul").selectAll("svg").node() === null, "all svgs have been removed");
+		}
+	} else {
+		assert(d3.select("body").selectAll("svg").node() === null, "all svgs have been removed");
+	}
+});

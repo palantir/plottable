@@ -3,9 +3,18 @@
 module Plottable {
 export module Abstract {
   export class Axis extends Abstract.Component {
+    /**
+     * The css class applied to each end tick mark (the line on the end tick).
+     */
+    public static END_TICK_MARK_CLASS = "end-tick-mark";
+    /**
+     * The css class applied to each tick mark (the line on the tick).
+     */
     public static TICK_MARK_CLASS = "tick-mark";
+    /**
+     * The css class applied to each tick label (the text associated with the tick).
+     */
     public static TICK_LABEL_CLASS = "tick-label";
-    public axisElement: D3.Selection;
     public _tickMarkContainer: D3.Selection;
     public _tickLabelContainer: D3.Selection;
     public _baseline: D3.Selection;
@@ -16,9 +25,12 @@ export module Abstract {
     public _height: any = "auto";
     public _computedWidth: number;
     public _computedHeight: number;
+    private _endTickLength = 5;
     private _tickLength = 5;
     private _tickLabelPadding = 3;
+    private _gutter = 10;
     private _showEndTickLabels = false;
+
 
     constructor(scale: Abstract.Scale, orientation: string, formatter?: any) {
       super();
@@ -53,13 +65,13 @@ export module Abstract {
 
     public _computeWidth() {
       // to be overridden by subclass logic
-      this._computedWidth = this._tickLength;
+      this._computedWidth = this._maxLabelTickLength();
       return this._computedWidth;
     }
 
     public _computeHeight() {
       // to be overridden by subclass logic
-      this._computedHeight = this._tickLength;
+      this._computedHeight = this._maxLabelTickLength();
       return this._computedHeight;
     }
 
@@ -72,7 +84,7 @@ export module Abstract {
           if (this._computedHeight == null) {
             this._computeHeight();
           }
-          requestedHeight = this._computedHeight;
+          requestedHeight = this._computedHeight + this._gutter;
         }
         requestedWidth = 0;
       } else { // vertical
@@ -80,17 +92,25 @@ export module Abstract {
           if (this._computedWidth == null) {
             this._computeWidth();
           }
-          requestedWidth = this._computedWidth;
+          requestedWidth = this._computedWidth + this._gutter;
         }
         requestedHeight = 0;
       }
 
       return {
-        width : Math.min(offeredWidth, requestedWidth),
-        height: Math.min(offeredHeight, requestedHeight),
+        width : requestedWidth,
+        height: requestedHeight,
         wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
         wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
       };
+    }
+
+    public _isFixedHeight() {
+      return this._isHorizontal();
+    }
+
+    public _isFixedWidth() {
+      return !this._isHorizontal();
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {
@@ -126,6 +146,10 @@ export module Abstract {
       var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
+      d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
+                                .attr(this._generateTickMarkAttrHash(true));
+      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
+                                                      .attr(this._generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
       this._baseline.attr(this._generateBaselineAttrHash());
 
@@ -165,7 +189,7 @@ export module Abstract {
       return baselineAttrHash;
     }
 
-    public _generateTickMarkAttrHash() {
+    public _generateTickMarkAttrHash(isEndTickMark = false) {
       var tickMarkAttrHash = {
         x1: <any> 0,
         y1: <any> 0,
@@ -182,23 +206,25 @@ export module Abstract {
         tickMarkAttrHash["y2"] = scalingFunction;
       }
 
+      var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
+
       switch(this._orientation) {
         case "bottom":
-          tickMarkAttrHash["y2"] = this._tickLength;
+          tickMarkAttrHash["y2"] = tickLength;
           break;
 
         case "top":
           tickMarkAttrHash["y1"] = this.availableHeight;
-          tickMarkAttrHash["y2"] = this.availableHeight - this._tickLength;
+          tickMarkAttrHash["y2"] = this.availableHeight - tickLength;
           break;
 
         case "left":
           tickMarkAttrHash["x1"] = this.availableWidth;
-          tickMarkAttrHash["x2"] = this.availableWidth - this._tickLength;
+          tickMarkAttrHash["x2"] = this.availableWidth - tickLength;
           break;
 
         case "right":
-          tickMarkAttrHash["x2"] = this._tickLength;
+          tickMarkAttrHash["x2"] = tickLength;
           break;
       }
 
@@ -210,9 +236,9 @@ export module Abstract {
     }
 
     public _invalidateLayout() {
-      super._invalidateLayout();
       this._computedWidth = null;
       this._computedHeight = null;
+      super._invalidateLayout();
     }
 
     /**
@@ -326,6 +352,40 @@ export module Abstract {
     }
 
     /**
+     * Gets the current end tick mark length.
+     *
+     * @returns {number} The current end tick mark length.
+     */
+    public endTickLength(): number;
+    /**
+     * Sets the end tick mark length.
+     *
+     * @param {number} length The length of the end ticks.
+     * @returns {BaseAxis} The calling Axis.
+     */
+    public endTickLength(length: number): Axis;
+    public endTickLength(length?: number): any {
+      if (length == null) {
+        return this._endTickLength;
+      } else {
+        if (length < 0) {
+          throw new Error("end tick length must be positive");
+        }
+        this._endTickLength = length;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    public _maxLabelTickLength() {
+      if (this.showEndTickLabels()) {
+        return Math.max(this.tickLength(), this.endTickLength());
+      } else {
+        return this.tickLength();
+      }
+    }
+
+    /**
      * Gets the padding between each tick mark and its associated label.
      *
      * @returns {number} The current padding, in pixels.
@@ -346,6 +406,32 @@ export module Abstract {
           throw new Error("tick label padding must be positive");
         }
         this._tickLabelPadding = padding;
+        this._invalidateLayout();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+     *
+     * @returns {number} The current size of the gutter, in pixels.
+     */
+    public gutter(): number;
+    /**
+     * Sets the size of the gutter (the extra space between the tick labels and the outer edge of the axis).
+     *
+     * @param {number} size The desired size of the gutter, in pixels.
+     * @returns {Axis} The calling Axis.
+     */
+    public gutter(size: number): Axis;
+    public gutter(size?: number): any {
+      if (size == null) {
+        return this._gutter;
+      } else {
+        if (size < 0) {
+          throw new Error("gutter size must be positive");
+        }
+        this._gutter = size;
         this._invalidateLayout();
         return this;
       }

@@ -30,6 +30,8 @@ export module Component {
         throw new Error(orientation + " is not a valid orientation for LabelComponent");
       }
       this.xAlign("center").yAlign("center");
+      this._fixedHeightFlag = true;
+      this._fixedWidthFlag = true;
     }
 
     public xAlign(alignment: string): Label {
@@ -51,8 +53,8 @@ export module Component {
       var desiredHeight = (this.orientation === "horizontal" ? desiredWH.height : desiredWH.width);
 
       return {
-        width : Math.min(desiredWidth , offeredWidth),
-        height: Math.min(desiredHeight, offeredHeight),
+        width : desiredWidth,
+        height: desiredHeight,
         wantsWidth : desiredWidth  > offeredWidth,
         wantsHeight: desiredHeight > offeredHeight
       };
@@ -91,7 +93,7 @@ export module Component {
 
     public _doRender() {
       super._doRender();
-      this.textContainer.selectAll("text").remove();
+      this.textContainer.text("");
       var dimension = this.orientation === "horizontal" ? this.availableWidth : this.availableHeight;
       var truncatedText = Util.Text.getTruncatedText(this._text, dimension, this.measurer);
       if (this.orientation === "horizontal") {

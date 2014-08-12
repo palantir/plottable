@@ -9,9 +9,9 @@ export module Interaction {
     public location = [0,0];
     private constrainX: (n: number) => number;
     private constrainY: (n: number) => number;
-    public ondragstart: (dragInfo: any) => any;
-    public ondrag: (dragInfo: any) => any;
-    public ondragend: (dragInfo: any) => any;
+    public ondragstart: (startLocation: Point) => void;
+    public      ondrag: (startLocation: Point, endLocation: Point) => void;
+    public   ondragend: (startLocation: Point, endLocation: Point) => void;
 
     /**
      * Creates a Drag.
@@ -27,36 +27,69 @@ export module Interaction {
     }
 
     /**
-     * Adds a callback to be caleld when dragging starts.
+     * Gets the callback that is called when dragging starts.
      *
-     * @param {(a: SelectionArea) => any} cb The function to be called.
-     * @returns {AreaInteraction}
+     * @returns {(startLocation: Point) => void}
      */
-    public dragstart(cb?: (a: any) => any) {
-      this.ondragstart = cb;
-      return this;
+    public dragstart(): (startLocation: Point) => void;
+    /**
+     * Sets the callback to be called when dragging starts.
+     *
+     * @param {(startLocation: Point) => any} cb The function to be called.
+     * @returns {Drag}
+     */
+    public dragstart(cb: (startLocation: Point) => any): Drag;
+    public dragstart(cb?: (startLocation: Point) => any): any {
+      if (cb === undefined) {
+        return this.ondragstart;
+      } else {
+        this.ondragstart = cb;
+        return this;
+      }
     }
 
+    /**
+     * Gets the callback that is called during dragging.
+     *
+     * @returns {(startLocation: Point, endLocation: Point) => void}
+     */
+    public drag(): (startLocation: Point, endLocation: Point) => void;
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(a: SelectionArea) => any} cb The function to be called.
-     * @returns {AreaInteraction}
+     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called.
+     * @returns {Drag}
      */
-    public drag(cb?: (a: any) => any) {
-      this.ondrag = cb;
-      return this;
+    public drag(cb: (startLocation: Point, endLocation: Point) => any): Drag;
+    public drag(cb?: (startLocation: Point, endLocation: Point) => any): any {
+      if (cb === undefined) {
+        return this.ondrag;
+      } else {
+        this.ondrag = cb;
+        return this;
+      }
     }
 
     /**
+     * Gets the callback that is called when dragging ends.
+     *
+     * @returns {(startLocation: Point, endLocation: Point) => void}
+     */
+    public dragend(): (startLocation: Point, endLocation: Point) => void;
+    /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
-     * @returns {AreaInteraction} The calling AreaInteraction.
+     * @param {(startLocation: Point, endLocation: Point) => any} cb The function to be called. Takes in a SelectionArea in pixels.
+     * @returns {Drag} The calling Drag.
      */
-    public dragend(cb?: (a: any) => any) {
-      this.ondragend = cb;
-      return this;
+    public dragend(cb: (startLocation: Point, endLocation: Point) => any): Drag;
+    public dragend(cb?: (startLocation: Point, endLocation: Point) => any): any {
+      if (cb === undefined) {
+        return this.ondragend;
+      } else {
+        this.ondragend = cb;
+        return this;
+      }
     }
 
     public _dragstart(){
@@ -70,7 +103,7 @@ export module Interaction {
 
     public _doDragstart() {
       if (this.ondragstart != null) {
-        this.ondragstart(this.origin);
+        this.ondragstart({x: this.origin[0], y: this.origin[1]});
       }
     }
 
@@ -87,7 +120,9 @@ export module Interaction {
 
     public _doDrag() {
       if (this.ondrag != null) {
-        this.ondrag([this.origin, this.location]);
+        var startLocation = {x: this.origin[0], y: this.origin[1]};
+        var endLocation = {x: this.location[0], y: this.location[1]};
+        this.ondrag(startLocation, endLocation);
       }
     }
 
@@ -100,10 +135,10 @@ export module Interaction {
     }
 
     public _doDragend() {
-      // seperated out so it can be over-ridden by dragInteractions that want to pass out diff information
-      // eg just x values for an xSelectionInteraction
       if (this.ondragend != null) {
-        this.ondragend([this.origin, this.location]);
+        var startLocation = {x: this.origin[0], y: this.origin[1]};
+        var endLocation = {x: this.location[0], y: this.location[1]};
+        this.ondragend(startLocation, endLocation);
       }
     }
 
@@ -117,8 +152,8 @@ export module Interaction {
       var xDomainOriginal = xScale != null ? xScale.domain() : null;
       var yDomainOriginal = yScale != null ? yScale.domain() : null;
       var resetOnNextClick = false;
-      function callback(pixelArea: IPixelArea) {
-        if (pixelArea == null) {
+      function callback(upperLeft: Point, lowerRight: Point) {
+        if (upperLeft == null || lowerRight == null) {
           if (resetOnNextClick) {
             if (xScale != null) {
               xScale.domain(xDomainOriginal);
@@ -132,10 +167,10 @@ export module Interaction {
         }
         resetOnNextClick = false;
         if (xScale != null) {
-          xScale.domain([xScale.invert(pixelArea.xMin), xScale.invert(pixelArea.xMax)]);
+          xScale.domain([xScale.invert(upperLeft.x), xScale.invert(lowerRight.x)]);
         }
         if (yScale != null) {
-          yScale.domain([yScale.invert(pixelArea.yMax), yScale.invert(pixelArea.yMin)]);
+          yScale.domain([yScale.invert(lowerRight.y), yScale.invert(upperLeft.y)]);
         }
         this.clearBox();
         return;

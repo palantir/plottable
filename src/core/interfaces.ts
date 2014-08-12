@@ -36,15 +36,13 @@ module Plottable {
     wantsHeight: boolean;
   }
 
-  export interface IPixelArea {
-    xMin: number;
-    xMax: number;
-    yMin: number;
-    yMax: number;
-  }
-
   export interface IExtent {
     min: number;
     max: number;
+  }
+
+  export interface Point {
+    x: number;
+    y: number;
   }
 }

@@ -43,36 +43,13 @@ export module Interaction {
       return this.isResizingX || this.isResizingY;
     }
 
-    public _doDragstart() {
-      super._doDragstart();
-      if (this.ondragstart == null) {
-        return;
-      }
-      this.ondragstart({x: this.origin[0], y: this.origin[1]});
-    }
-
-    public _getPixelArea(): any {
-      var xMin: number, xMax: number, yMin: number, yMax: number;
-      if (this.resizeEnabled) {
-        xMin = parseInt(this.dragBox.attr("x"), 10);
-        xMax = parseInt(this.dragBox.attr("width"), 10) + xMin;
-        yMin = parseInt(this.dragBox.attr("y"), 10);
-        yMax = parseInt(this.dragBox.attr("height"), 10) + yMin;
-      } else {
-        xMin = Math.min(this.origin[0], this.location[0]);
-        xMax = Math.max(this.origin[0], this.location[0]);
-        yMin = Math.min(this.origin[1], this.location[1]);
-        yMax = Math.max(this.origin[1], this.location[1]);
-      }
-      return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax};
-    }
-
     public _cursorStyle(x: number, y: number): string {
       var x1 = parseInt(this.dragBox.attr("x"), 10);
-      var x2 = parseInt(this.dragBox.attr("width")) + x1;
+      var x2 = parseInt(this.dragBox.attr("width"), 10) + x1;
       var y1 = parseInt(this.dragBox.attr("y"), 10);
-      var y2 = parseInt(this.dragBox.attr("height")) + y1;
-      var hovering = y1 - this.resizePadding <= y && y <= y2 + this.resizePadding && x1 - this.resizePadding <= x && x <= x2 + this.resizePadding;
+      var y2 = parseInt(this.dragBox.attr("height"), 10) + y1;
+      var hovering = y1 - this.resizePadding <= y && y <= y2 + this.resizePadding &&
+        x1 - this.resizePadding <= x && x <= x2 + this.resizePadding;
       if (!hovering) {
         return "";
       }

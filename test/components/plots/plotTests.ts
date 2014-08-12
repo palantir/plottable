@@ -73,8 +73,10 @@ describe("Plots", () => {
       var yScaleCalls: number = 0;
       var xScale = new Plottable.Scale.Linear();
       var yScale = new Plottable.Scale.Linear();
+      var metadataProjector = (d: any, i: number, m: any) => m.cssClass;
       r.project("x", "x", xScale);
       r.project("y", "y", yScale);
+      r.project("meta", metadataProjector);
       xScale.broadcaster.registerListener(null, (listenable: Plottable.Core.IListenable) => {
         assert.equal(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
@@ -91,6 +93,9 @@ describe("Plots", () => {
       assert.equal(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.equal(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
+      var metaProjector = r._generateAttrToProjector()["meta"];
+      assert.equal(metaProjector(null, 0), "bar", "plot projector used the right metadata");
+
       var d2 = new Plottable.DataSource([{x: 7, y: 8}], {cssClass: "boo"});
       r.dataSource(d2);
       assert.equal(2, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
@@ -103,6 +108,10 @@ describe("Plots", () => {
       d2.broadcaster.broadcast();
       assert.equal(3, xScaleCalls, "X scale was hooked into new datasource");
       assert.equal(3, yScaleCalls, "Y scale was hooked into new datasource");
+
+      metaProjector = r._generateAttrToProjector()["meta"];
+      assert.equal(metaProjector(null, 0), "boo", "plot projector used the right metadata");
+
     });
 
     it("Plot automatically generates a DataSource if only data is provided", () => {
@@ -148,8 +157,8 @@ describe("Plots", () => {
       var s = new Plottable.Scale.Linear();
       r.project("attr", "a", s);
       r.remove();
-      var listener2Callback = (<any> s).broadcaster.listener2Callback;
-      assert.isUndefined(listener2Callback.get(r), "the plot is no longer attached to the scale");
+      var key2callback = (<any> s).broadcaster.key2callback;
+      assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
     });
   });
 });

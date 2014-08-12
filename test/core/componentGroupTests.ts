@@ -168,7 +168,7 @@ describe("ComponentGroups", () => {
       fixComponentSize(c1, null, 10);
       fixComponentSize(c2, null, 50);
       var request = cg._requestedSpace(10, 10);
-      verifySpaceRequest(request, 0, 10, false, true, "");
+      verifySpaceRequest(request, 0, 50, false, true, "");
     });
   });
 

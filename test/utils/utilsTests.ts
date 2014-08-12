@@ -21,19 +21,19 @@ describe("Util.s", () => {
     var datum = {"foo": 2, "bar": 3, "key": 4};
 
     var f = (d: any, i: number, m: any) => d + i;
-    var a1 = Plottable.Util.Methods.accessorize(f);
+    var a1 = Plottable.Util.Methods._accessorize(f);
     assert.equal(f, a1, "function passes through accessorize unchanged");
 
-    var a2 = Plottable.Util.Methods.accessorize("key");
+    var a2 = Plottable.Util.Methods._accessorize("key");
     assert.equal(a2(datum, 0, null), 4, "key accessor works appropriately");
 
-    var a3 = Plottable.Util.Methods.accessorize("#aaaa");
+    var a3 = Plottable.Util.Methods._accessorize("#aaaa");
     assert.equal(a3(datum, 0, null), "#aaaa", "strings beginning with # are returned as final value");
 
-    var a4 = Plottable.Util.Methods.accessorize(33);
+    var a4 = Plottable.Util.Methods._accessorize(33);
     assert.equal(a4(datum, 0, null), 33, "numbers are return as final value");
 
-    var a5 = Plottable.Util.Methods.accessorize(datum);
+    var a5 = Plottable.Util.Methods._accessorize(datum);
     assert.equal(a5(datum, 0, null), datum, "objects are return as final value");
   });
 

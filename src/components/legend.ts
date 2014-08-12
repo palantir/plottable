@@ -10,7 +10,10 @@ export module Component {
   }
 
   export class Legend extends Abstract.Component {
-    private static SUBELEMENT_CLASS = "legend-row";
+    /**
+     * The css class applied to each legend row
+     */
+    public static SUBELEMENT_CLASS = "legend-row";
     private static MARGIN = 5;
 
     private colorScale: Scale.Color;
@@ -27,13 +30,14 @@ export module Component {
 
     /**
      * Creates a Legend.
-     * A legend consists of a series of legend rows, each with a color and label taken from the colorScale.
-     * The rows will be displayed in the order of the colorScale domain.
-     * This legend also allows interactions, through the functions "toggleCallback" and "hoverCallback"
+     *
+     * A legend consists of a series of legend rows, each with a color and label taken from the `colorScale`.
+     * The rows will be displayed in the order of the `colorScale` domain.
+     * This legend also allows interactions, through the functions `toggleCallback` and `hoverCallback`
      * Setting a callback will also put classes on the individual rows.
      *
      * @constructor
-     * @param {ColorScale} colorScale
+     * @param {Scale.Color} colorScale
      */
     constructor(colorScale?: Scale.Color) {
       super();
@@ -41,6 +45,8 @@ export module Component {
       this.scale(colorScale);
       this.xAlign("RIGHT").yAlign("TOP");
       this.xOffset(5).yOffset(5);
+      this._fixedWidthFlag = true;
+      this._fixedHeightFlag = true;
     }
 
     public remove() {
@@ -52,12 +58,13 @@ export module Component {
 
     /**
      * Assigns or gets the callback to the Legend
+     *
      * This callback is associated with toggle events, which trigger when a legend row is clicked.
      * Internally, this will change the state of of the row from "toggled-on" to "toggled-off" and vice versa.
      * Setting a callback will also set a class to each individual legend row as "toggled-on" or "toggled-off".
      * Call with argument of null to remove the callback. This will also remove the above classes to legend rows.
      *
-     * @param{ToggleCallback} callback The new callback function
+     * @param {ToggleCallback} callback The new callback function
      */
     public toggleCallback(callback: ToggleCallback): Legend;
     public toggleCallback(): ToggleCallback;
@@ -138,22 +145,22 @@ export module Component {
       return this;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredY: number): ISpaceRequest {
+    public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
       var textHeight = this.measureTextHeight();
       var totalNumRows = this.colorScale.domain().length;
-      var rowsICanFit = Math.min(totalNumRows, Math.floor(offeredY / textHeight));
-
+      var rowsICanFit = Math.min(totalNumRows, Math.floor( (offeredHeight - 2 * Legend.MARGIN) / textHeight));
       var fakeLegendEl = this.content.append("g").classed(Legend.SUBELEMENT_CLASS, true);
       var fakeText = fakeLegendEl.append("text");
       var maxWidth = d3.max(this.colorScale.domain(), (d: string) => Util.Text.getTextWidth(fakeText, d));
       fakeLegendEl.remove();
       maxWidth = maxWidth === undefined ? 0 : maxWidth;
-      var desiredWidth = maxWidth + textHeight + 2 * Legend.MARGIN;
+      var desiredWidth  = rowsICanFit === 0 ? 0 : maxWidth + textHeight + 2 * Legend.MARGIN;
+      var desiredHeight = rowsICanFit === 0 ? 0 : totalNumRows * textHeight + 2 * Legend.MARGIN;
       return {
-        width : Math.min(desiredWidth, offeredWidth),
-        height: rowsICanFit * textHeight,
+        width : desiredWidth,
+        height: desiredHeight,
         wantsWidth: offeredWidth < desiredWidth,
-        wantsHeight: rowsICanFit < totalNumRows
+        wantsHeight: offeredHeight < desiredHeight
       };
     }
 
@@ -174,25 +181,36 @@ export module Component {
       var domain = this.colorScale.domain().slice(0, this.nRowsDrawn);
       var textHeight = this.measureTextHeight();
       var availableWidth  = this.availableWidth  - textHeight - Legend.MARGIN;
-      var r = textHeight - Legend.MARGIN * 2 - 2;
+      var r = textHeight * 0.3;
       var legend: D3.UpdateSelection = this.content.selectAll("." + Legend.SUBELEMENT_CLASS).data(domain, (d) => d);
       var legendEnter = legend.enter()
           .append("g").classed(Legend.SUBELEMENT_CLASS, true);
-      legendEnter.append("circle")
-          .attr("cx", Legend.MARGIN + r/2)
-          .attr("cy", Legend.MARGIN + r/2)
-          .attr("r",  r);
-      legendEnter.append("text")
-          .attr("x", textHeight)
-          .attr("y", Legend.MARGIN + textHeight / 2);
+
+      legendEnter.append("circle");
+      legendEnter.append("g").classed("text-container", true);
+
       legend.exit().remove();
-      legend.attr("transform", (d: string) => "translate(0," + domain.indexOf(d) * textHeight + ")");
-      legend.selectAll("circle").attr("fill", this.colorScale._d3Scale);
-      legend.selectAll("text")
-            .text(function(d: string) {
-              var measure = Util.Text.getTextMeasure(d3.select(this));
-              return Util.Text.getTruncatedText(d, availableWidth , measure);
-              });
+
+      legend.selectAll("circle")
+        .attr("cx", textHeight / 2)
+        .attr("cy", textHeight / 2)
+        .attr("r",  r)
+        .attr("fill", this.colorScale._d3Scale);
+      legend.selectAll("g.text-container")
+        .text("")
+        .attr("transform", "translate(" + textHeight + ", 0)")
+        .each(function(d: string) {
+          var d3this = d3.select(this);
+          var measure = Util.Text.getTextMeasure(d3this);
+          var writeLine = Util.Text.getTruncatedText(d, availableWidth, measure);
+          var writeLineMeasure = measure(writeLine);
+          Util.Text.writeLineHorizontally(writeLine, d3this, writeLineMeasure.width, writeLineMeasure.height);
+        });
+
+      legend.attr("transform", (d: string) => {
+        return "translate(" + Legend.MARGIN + "," + (domain.indexOf(d) * textHeight + Legend.MARGIN) + ")";
+      });
+
       this.updateClasses();
       this.updateListeners();
       return this;

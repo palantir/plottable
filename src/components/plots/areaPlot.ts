@@ -2,6 +2,9 @@
 
 module Plottable {
 export module Plot {
+  /**
+   * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
+   */
   export class Area extends Line {
     private areaPath: D3.Selection;
 
@@ -15,7 +18,7 @@ export module Plot {
      */
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(dataset, xScale, yScale);
-      this.classed("area-renderer", true);
+      this.classed("area-plot", true);
       this.project("y0", 0, yScale); // default
       this.project("fill", () => "steelblue"); // default
       this.project("fill-opacity", () => 0.5); // default
@@ -98,6 +101,13 @@ export module Plot {
         .y1(yFunction);
       this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
     }
+
+    public _wholeDatumAttributes() {
+      var wholeDatumAttributes = super._wholeDatumAttributes();
+      wholeDatumAttributes.push("y0");
+      return wholeDatumAttributes;
+    }
+
   }
 }
 }

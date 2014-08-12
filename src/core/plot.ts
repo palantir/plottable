@@ -37,7 +37,7 @@ export module Abstract {
     constructor(dataset?: any) {
       super();
       this.clipPathEnabled = true;
-      this.classed("renderer", true);
+      this.classed("plot", true);
 
       var dataSource: DataSource;
       if (dataset != null) {
@@ -120,8 +120,8 @@ export module Abstract {
       if (scale != null) {
         scale.broadcaster.registerListener(this, () => this._render());
       }
-
-      this._projectors[attrToSet] = {accessor: accessor, scale: scale};
+      var activatedAccessor = Util.Methods._applyAccessor(accessor, this);
+      this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale};
       this.updateProjector(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
@@ -131,7 +131,7 @@ export module Abstract {
       var h: IAttributeToProjector = {};
       d3.keys(this._projectors).forEach((a) => {
         var projector = this._projectors[a];
-        var accessor = Util.Methods.applyAccessor(projector.accessor, this.dataSource());
+        var accessor = projector.accessor;
         var scale = projector.scale;
         var fn = scale == null ? accessor : (d: any, i: number) => scale.scale(accessor(d, i));
         h[a] = fn;
@@ -140,7 +140,7 @@ export module Abstract {
     }
 
     public _doRender(): Plot {
-      if (this.element != null) {
+      if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
         this.animateOnNextRender = false;

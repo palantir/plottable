@@ -5,6 +5,7 @@
   <script src="/bower_components/lodash/dist/lodash.js"></script>
   <script src="/examples/exampleUtil.js"></script>
   <link rel="stylesheet" type="text/css" href="/plottable.css">
+  <link rel="stylesheet" type="text/css" href="/plottable_testing.css">
 
   <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
   <script src="/quicktests/quicktest.js" defer> </script>
@@ -27,27 +28,43 @@
     }
   </style>
 
-  <title>Plottable.js: Axis Tests</title>
+  <title>Plottable.js: Tests</title>
 </head>
 
 <body>
 <table style="width:100%"  border="0">
   <tr>
-    <th width = "40%">Master</th>
+    <th width = "40%"></th>
     <th width = "20%">
       <form>
-        Keyword: <input type="text" id="filterWord" name="filterWord" ></input>
+      Keyword: <br>
+      <select type="text" id="filterWord" name="filterWord" style="width:80%">
+        <option value=""></option>
+      </select>
       </form>
-    </th>
-    <th width = "40%">
       <form>
-        Feature Branch: <input type="text" id="featureBranch" name="featureBranch" ></input>
+      Feature Branch: <br>
+       <select type="text" id="featureBranch" name="featureBranch" style="width:80%">
+        <option value=""></option>
+      </select>      
       </form>
-      <button id="button" name="button">update with new branch</button>
     </th>
+    <th width = "40%"></th>
   </tr>
-
+  <tr>
+    <td></td>
+    <td>
+            <center><button id="button" name="button" class="cassieButton" style="width:80%">Update</button></center>
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><center><h1 id ="masterHeader" class="cassiePink">Master</h1></center></td>
+    <td></td>
+    <td><center><h1 id ="featureHeader" class="cassiePink">Feature</h1></center></td>
+  </tr>  
   </table>
+
 
 </body>
 </html>

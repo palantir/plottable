@@ -5,6 +5,8 @@ build
 plottable_multifile.js
 test/tests_multifile.js
 local/
+.tscache/
+quicktests/github_token.txt
 
 # Emacs
 .#*
@@ -12,3 +14,6 @@ local/
 # vim
 *.swp
 *~
+
+# Eclipse
+*.project

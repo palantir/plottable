@@ -33,24 +33,11 @@ export module Axis {
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var widthRequiredByTicks = this._isHorizontal() ? 0 : this.tickLength() + this.tickLabelPadding();
-      var heightRequiredByTicks = this._isHorizontal() ? this.tickLength() + this.tickLabelPadding() : 0;
+      var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+      var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
 
-      if (offeredWidth < 0 || offeredHeight < 0) {
-        return {
-          width:  offeredWidth,
-          height: offeredHeight,
-          wantsWidth: !this._isHorizontal(),
-          wantsHeight: this._isHorizontal()
-        };
-      }
       if (this._scale.domain().length === 0) {
-        return {
-          width: 0,
-          height: 0,
-          wantsWidth: false,
-          wantsHeight: false
-        };
+        return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
       }
 
       var fakeScale = this._scale.copy();
@@ -94,8 +81,8 @@ export module Axis {
 
       iterator(function (d: string) {
         var bandWidth = scale.fullBandStartAndWidth(d)[1];
-        var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
-        var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
+        var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+        var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
 
         var textWriteResult: Util.Text.IWriteTextResult;
         var formatter = self._formatter;
@@ -143,8 +130,8 @@ export module Axis {
       this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
-      var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
+      var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
       return this;
