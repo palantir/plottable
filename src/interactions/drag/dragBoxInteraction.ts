@@ -10,9 +10,23 @@ export module Interaction {
     public resizePadding = 10;
     public _selectionOrigin: number[];
     public selection: SelectionArea;
+    private isResizing = false;
+    public lastCursorStyle = "";
 
     public _isCloseEnough(val: number, t: number): boolean {
       return t - this.resizePadding <= val && val <= t + this.resizePadding;
+    }
+
+    public _isCloseEnoughXY(val: number, t: number, pad: number, left: boolean): boolean {
+      var leftValue: number, rightValue: number;
+      if (left) {
+        leftValue = t - Math.min(pad, this.resizePadding);
+        rightValue = t + this.resizePadding;
+      } else {
+        leftValue = t - this.resizePadding;
+        rightValue = t + Math.min(pad, this.resizePadding);
+      }
+      return leftValue <= val && val <= rightValue;
     }
 
     public enableResize() {
@@ -54,10 +68,17 @@ export module Interaction {
 
     public _doDragstart() {
       this._selectionOrigin = [this.origin[0], this.origin[1]];
-      if (this.boxIsDrawn && (!this.resizeEnabled || !this._isResizeStart())) {
-        this.clearBox();
+      if (this.boxIsDrawn) {
+        if (!this.resizeEnabled || !(this.isResizing = this._isResizeStart())) {
+          this.clearBox();
+        }
       }
       super._doDragstart();
+    }
+
+    public _doDragend() {
+      this.isResizing = false;
+      super._doDragend();
     }
 
     /**
@@ -104,6 +125,8 @@ export module Interaction {
         if (this.boxIsDrawn) {
           var position = d3.mouse(this.hitBox[0][0].parentNode);
           cursorStyle = this._cursorStyle(position[0], position[1]);
+        } else if (this.isResizing) {
+          cursorStyle = this.lastCursorStyle;
         } else {
           cursorStyle = "";
         }

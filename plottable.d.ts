@@ -2559,6 +2559,7 @@ declare module Plottable {
             public resizeEnabled: boolean;
             public resizePadding: number;
             public selection: SelectionArea;
+            public lastCursorStyle: string;
             public enableResize(): DragBox;
             public disableResize(): DragBox;
             /**

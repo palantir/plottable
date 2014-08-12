@@ -52,19 +52,43 @@ export module Interaction {
 
     public _cursorStyle(x: number, y: number): string {
       var x1 = parseInt(this.dragBox.attr("x"), 10);
-      var x2 = parseInt(this.dragBox.attr("width"), 10) + x1;
+      var width = parseInt(this.dragBox.attr("width"), 10);
+      var x2 = width + x1;
       var y1 = parseInt(this.dragBox.attr("y"), 10);
-      var y2 = parseInt(this.dragBox.attr("height"), 10) + y1;
+      var height = parseInt(this.dragBox.attr("height"), 10);
+      var y2 = height + y1;
+      var halfwidth = width / 2;
+      var halfheight = height / 2;
+      var left = this._isCloseEnoughXY(x, x1, halfwidth, false);
+      var top = this._isCloseEnoughXY(y, y1, halfheight, false);
+      var right = this._isCloseEnoughXY(x, x2, halfwidth, true);
+      var bottom = this._isCloseEnoughXY(y, y2, halfheight, true);
+      var cursorStyle = "";
+
+      if (this.isResizingX && this.isResizingY) {
+        if (left && top || bottom && right) {
+          cursorStyle = "nwse-resize";
+        } else if (top && right || bottom && left) {
+          cursorStyle = "nesw-resize";
+        }
+        // Using the last cursor in case `this._cursorStyle()` returns empty.
+        // This is to cover the cases where the user drags too fast.
+        return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+
+      } else if (this.isResizingX) {
+        cursorStyle = left || right ? "ew-resize" : "";
+        return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+
+      } else if (this.isResizingY) {
+        cursorStyle = top || bottom ? "ns-resize": "";
+        return this.lastCursorStyle = cursorStyle || this.lastCursorStyle;
+      }
+
       var hovering = y1 - this.resizePadding <= y && y <= y2 + this.resizePadding &&
         x1 - this.resizePadding <= x && x <= x2 + this.resizePadding;
       if (!hovering) {
         return "";
       }
-      var left = this._isCloseEnough(x, x1);
-      var top = this._isCloseEnough(y, y1);
-      var right = this._isCloseEnough(x, x2);
-      var bottom = this._isCloseEnough(y, y2);
-
       if (left && top || bottom && right) {
         return "nwse-resize";
       } else if (top && right || bottom && left) {
