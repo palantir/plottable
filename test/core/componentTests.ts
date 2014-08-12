@@ -45,7 +45,8 @@ describe("Component behavior", () => {
 
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
-      c._anchor(svg)._computeLayout();
+      c._anchor(svg);
+      c._computeLayout();
       assert.equal(c.availableWidth , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
@@ -69,7 +70,8 @@ describe("Component behavior", () => {
 
       // Remove width/height attributes and style with CSS
       svg.attr("width", null).attr("height", null);
-      c._anchor(svg)._computeLayout();
+      c._anchor(svg);
+      c._computeLayout();
       assert.equal(c.availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
       assert.equal(c.availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
       assert.equal((<any> c).xOrigin, 0 ,"xOrigin defaulted to 0");
@@ -117,7 +119,8 @@ describe("Component behavior", () => {
       var yOff = 20;
       var width = 100;
       var height = 200;
-      c._anchor(svg)._computeLayout(xOff, yOff, width, height);
+      c._anchor(svg);
+      c._computeLayout(xOff, yOff, width, height);
       var translate = getTranslate(c.element);
       assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
       assert.equal(c.availableWidth , width, "the width set properly");
@@ -199,7 +202,9 @@ it("components can be offset relative to their alignment, and throw errors if th
     assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
     c.clipPathEnabled = true;
     var expectedClipPathID = c._plottableID;
-    c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
+    c._anchor(svg);
+    c._computeLayout(0, 0, 100, 100);
+    c._render();
     var expectedDocumentURL = document.location.href;
     var expectedClipPathURL = "url(" + expectedDocumentURL + "#clipPath" + expectedClipPathID+ ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate

@@ -120,7 +120,6 @@ export module Abstract {
       } else {
         this._scale.range([this.availableHeight, 0]);
       }
-      return this;
     }
 
     public _setup() {
@@ -130,7 +129,6 @@ export module Abstract {
       this._tickLabelContainer = this.content.append("g")
                                              .classed(Axis.TICK_LABEL_CLASS + "-container", true);
       this._baseline = this.content.append("line").classed("baseline", true);
-      return this;
     }
 
     /*
@@ -152,8 +150,6 @@ export module Abstract {
                                                       .attr(this._generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
       this._baseline.attr(this._generateBaselineAttrHash());
-
-      return this;
     }
 
     public _generateBaselineAttrHash() {

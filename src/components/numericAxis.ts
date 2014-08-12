@@ -166,7 +166,6 @@ export module Axis {
       }
 
       this._hideOverlappingTickLabels();
-      return this;
     }
 
     /**
@@ -234,7 +233,8 @@ export module Axis {
           return this.showFirstTickLabel;
         } else {
           this.showFirstTickLabel = show;
-          return this._render();
+          this._render();
+          return this;
         }
       } else if ((this._isHorizontal() && orientation === "right") ||
                  (!this._isHorizontal() && orientation === "top")) {
@@ -242,7 +242,8 @@ export module Axis {
           return this.showLastTickLabel;
         } else {
           this.showLastTickLabel = show;
-          return this._render();
+          this._render();
+          return this;
         }
       } else {
         throw new Error("Attempt to show " + orientation + " tick label on a " +

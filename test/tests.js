@@ -915,10 +915,12 @@ describe("Legends", function () {
         }
         verifyCircleHeight();
         style.text(".plottable .legend text { font-size: 60px; }");
-        legend._computeLayout()._render();
+        legend._computeLayout();
+        legend._render();
         verifyCircleHeight();
         style.text(".plottable .legend text { font-size: 10px; }");
-        legend._computeLayout()._render();
+        legend._computeLayout();
+        legend._render();
         verifyCircleHeight();
         svg.remove();
     });
@@ -1231,7 +1233,8 @@ describe("Plots", function () {
             var svg = generateSVG(400, 300);
             var d1 = new Plottable.DataSource(["foo"], { cssClass: "bar" });
             var r = new Plottable.Abstract.Plot(d1);
-            r._anchor(svg)._computeLayout();
+            r._anchor(svg);
+            r._computeLayout();
             var renderArea = r.content.select(".render-area");
             assert.isNotNull(renderArea.node(), "there is a render-area");
             svg.remove();
@@ -1966,7 +1969,8 @@ describe("Plots", function () {
                 verifier.end();
             });
             it("rendering is idempotent", function () {
-                circlePlot._render()._render();
+                circlePlot._render();
+                circlePlot._render();
                 circlePlot.renderArea.selectAll("circle").each(getCirclePlotVerifier());
                 assert.equal(circlesInArea, 10, "10 circles were drawn");
                 verifier.end();
@@ -2343,7 +2347,8 @@ describe("Component behavior", function () {
     });
     describe("computeLayout", function () {
         it("computeLayout defaults and updates intelligently", function () {
-            c._anchor(svg)._computeLayout();
+            c._anchor(svg);
+            c._computeLayout();
             assert.equal(c.availableWidth, SVG_WIDTH, "computeLayout defaulted width to svg width");
             assert.equal(c.availableHeight, SVG_HEIGHT, "computeLayout defaulted height to svg height");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
@@ -2361,7 +2366,8 @@ describe("Component behavior", function () {
             parent.style("width", "400px");
             parent.style("height", "200px");
             svg.attr("width", null).attr("height", null);
-            c._anchor(svg)._computeLayout();
+            c._anchor(svg);
+            c._computeLayout();
             assert.equal(c.availableWidth, 400, "defaults to width of parent if width is not specified on <svg>");
             assert.equal(c.availableHeight, 200, "defaults to height of parent if width is not specified on <svg>");
             assert.equal(c.xOrigin, 0, "xOrigin defaulted to 0");
@@ -2398,7 +2404,8 @@ describe("Component behavior", function () {
             var yOff = 20;
             var width = 100;
             var height = 200;
-            c._anchor(svg)._computeLayout(xOff, yOff, width, height);
+            c._anchor(svg);
+            c._computeLayout(xOff, yOff, width, height);
             var translate = getTranslate(c.element);
             assert.deepEqual(translate, [xOff, yOff], "the element translated appropriately");
             assert.equal(c.availableWidth, width, "the width set properly");
@@ -2468,7 +2475,9 @@ describe("Component behavior", function () {
         assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
         c.clipPathEnabled = true;
         var expectedClipPathID = c._plottableID;
-        c._anchor(svg)._computeLayout(0, 0, 100, 100)._render();
+        c._anchor(svg);
+        c._computeLayout(0, 0, 100, 100);
+        c._render();
         var expectedDocumentURL = document.location.href;
         var expectedClipPathURL = "url(" + expectedDocumentURL + "#clipPath" + expectedClipPathID + ")";
         var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };

@@ -140,7 +140,6 @@ export module Axis {
       super._setup();
       this._majorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       this._minorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
-      return this;
     }
 
     // returns a number to index into the major/minor intervals
@@ -286,7 +285,6 @@ export module Axis {
       this.adjustTickLength(this._maxLabelTickLength() / 2, Time.minorIntervals[index]);
       // however, we need to make major ticks longer, since they may have overlapped with some minor ticks
       this.adjustTickLength(this._maxLabelTickLength(), Time.majorIntervals[index]);
-      return this;
     }
   }
 }
