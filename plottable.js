@@ -762,6 +762,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
+    Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     var Formatters = (function () {
         function Formatters() {
         }
@@ -888,6 +889,15 @@ var Plottable;
                         return d3.time.format(timeFormat[i].format)(d);
                     }
                 }
+            };
+        };
+        Formatters.relativeDate = function (baseValue, increment, label) {
+            if (baseValue === void 0) { baseValue = 0; }
+            if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
+            if (label === void 0) { label = ""; }
+            return function (d) {
+                var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
+                return relativeDate.toString() + label;
             };
         };
         Formatters.verifyPrecision = function (precision) {
@@ -4179,27 +4189,6 @@ var Plottable;
         Component.Gridlines = Gridlines;
     })(Plottable.Component || (Plottable.Component = {}));
     var Component = Plottable.Component;
-})(Plottable || (Plottable = {}));
-
-var Plottable;
-(function (Plottable) {
-    (function (Util) {
-        (function (Axis) {
-            Axis.ONE_DAY = 24 * 60 * 60 * 1000;
-            function generateRelativeDateFormatter(baseValue, increment, label) {
-                if (increment === void 0) { increment = Axis.ONE_DAY; }
-                if (label === void 0) { label = ""; }
-                var formatter = function (tickValue) {
-                    var relativeDate = Math.round((tickValue.valueOf() - baseValue) / increment);
-                    return relativeDate.toString() + label;
-                };
-                return formatter;
-            }
-            Axis.generateRelativeDateFormatter = generateRelativeDateFormatter;
-        })(Util.Axis || (Util.Axis = {}));
-        var Axis = Util.Axis;
-    })(Plottable.Util || (Plottable.Util = {}));
-    var Util = Plottable.Util;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
