@@ -3834,7 +3834,8 @@ var Plottable;
                     }
                     else {
                         this.showFirstTickLabel = show;
-                        return this._render();
+                        this._render();
+                        return this;
                     }
                 }
                 else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
@@ -3843,7 +3844,8 @@ var Plottable;
                     }
                     else {
                         this.showLastTickLabel = show;
-                        return this._render();
+                        this._render();
+                        return this;
                     }
                 }
                 else {
