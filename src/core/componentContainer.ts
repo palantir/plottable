@@ -2,11 +2,11 @@
 
 module Plottable {
 export module Abstract {
+  /*
+   * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
+   * It will not do anything if instantiated directly.
+   */
   export class ComponentContainer extends Component {
-    /*
-     * An abstract ComponentContainer class to encapsulate Table and ComponentGroup's shared functionality.
-     * It will not do anything if instantiated directly.
-     */
     public _components: Abstract.Component[] = [];
 
     public _anchor(element: D3.Selection) {
@@ -45,7 +45,7 @@ export module Abstract {
     }
 
     /**
-     * Returns a list of components in the ComponentContainer
+     * Returns a list of components in the ComponentContainer.
      *
      * @returns{Component[]} the contained Components
      */

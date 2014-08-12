@@ -13,6 +13,9 @@ export module Component {
     /**
      * Creates a Label.
      *
+     * A label is component that renders just text. The most common use of
+     * labels is to create a title or axis labels.
+     *
      * @constructor
      * @param {string} [displayText] The text of the Label.
      * @param {string} [orientation] The orientation of the Label (horizontal/vertical-left/vertical-right).
@@ -112,12 +115,22 @@ export module Component {
   }
 
   export class TitleLabel extends Label {
+    /**
+     * Creates a TitleLabel, a type of label made for rendering titles.
+     *
+     * @constructor
+     */
     constructor(text?: string, orientation?: string) {
       super(text, orientation);
       this.classed("title-label", true);
     }
   }
 
+  /**
+   * Creates a AxisLabel, a type of label made for rendering axis labels.
+   *
+   * @constructor
+   */
   export class AxisLabel extends Label {
     constructor(text?: string, orientation?: string) {
       super(text, orientation);

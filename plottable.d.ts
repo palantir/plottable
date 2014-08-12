@@ -245,7 +245,8 @@ declare module Plottable {
             xOrigin: number;
             yOrigin: number;
             static AUTORESIZE_BY_DEFAULT: boolean;
-            renderTo(element: any): Component;
+            renderTo(selector: String): Component;
+            renderTo(element: D3.Selection): Component;
             resize(width?: number, height?: number): Component;
             autoResize(flag: boolean): Component;
             xAlign(alignment: string): Component;

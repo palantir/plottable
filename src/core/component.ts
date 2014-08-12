@@ -195,11 +195,19 @@ export module Abstract {
     }
 
     /**
-     * Renders the Component into a given DOM element.
+     * Renders the Component into a given DOM element. The element must be as <svg>.
      *
-     * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
+     * @param {String} selector A CSS selector for getting the element to render into.
      * @return {Component} The calling component.
      */
+    public renderTo(selector: String): Component;
+    /**
+     * Renders the Component into a given DOM element. The element must be as <svg>.
+     *
+     * @param {D3.Selection} element A D3 selection for getting the element to render into.
+     * @return {Component} The calling component.
+     */
+    public renderTo(element: D3.Selection): Component;
     public renderTo(element: any): Component {
       if (element != null) {
         var selection: D3.Selection;
@@ -218,6 +226,9 @@ export module Abstract {
     /**
      * Cause the Component to recompute layout and redraw. If passed arguments, will resize the root SVG it lives in.
      *
+     * This function should be called when CSS changes could influence the size
+     * of the components, e.g. changing the font size.
+     *
      * @param {number} [availableWidth]  - the width of the container element
      * @param {number} [availableHeight] - the height of the container element
      */
@@ -233,7 +244,7 @@ export module Abstract {
     }
 
     /**
-     * Enables and disables auto-resize.
+     * Enables and disables resize on window resizes.
      *
      * If enabled, window resizes will enqueue this component for a re-layout
      * and re-render. Animations are disabled during window resizes when auto-
@@ -251,9 +262,14 @@ export module Abstract {
     }
 
     /**
-     * Sets the x alignment of the Component.
+     * Sets the x alignment of the Component. This will be used if the
+     * Component is given more space than it needs.
      *
-     * @param {string} alignment The x alignment of the Component (one of LEFT/CENTER/RIGHT).
+     * For example, you may want to make a Legend postition itself it the top
+     * right, so you would call `legend.xAlign("right")` and
+     * `legend.yAlign("top")`.
+     *
+     * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
      * @returns {Component} The calling Component.
      */
     public xAlign(alignment: string): Component {
@@ -272,9 +288,14 @@ export module Abstract {
     }
 
     /**
-     * Sets the y alignment of the Component.
+     * Sets the y alignment of the Component. This will be used if the
+     * Component is given more space than it needs.
      *
-     * @param {string} alignment The y alignment of the Component (one of TOP/CENTER/BOTTOM).
+     * For example, you may want to make a Legend postition itself it the top
+     * right, so you would call `legend.xAlign("right")` and
+     * `legend.yAlign("top")`.
+     *
+     * @param {string} alignment The x alignment of the Component (one of ["top", "center", "bottom"]).
      * @returns {Component} The calling Component.
      */
     public yAlign(alignment: string): Component {
@@ -293,9 +314,11 @@ export module Abstract {
     }
 
     /**
-     * Sets the x offset of the Component.
+     * Sets the x offset of the Component. This will be used if the Component
+     * is given more space than it needs.
      *
-     * @param {number} offset The desired x offset, in pixels.
+     * @param {number} offset The desired x offset, in pixels, from the left
+     * side of the container.
      * @returns {Component} The calling Component.
      */
     public xOffset(offset: number): Component {
@@ -305,9 +328,11 @@ export module Abstract {
     }
 
     /**
-     * Sets the y offset of the Component.
+     * Sets the y offset of the Component. This will be used if the Component
+     * is given more space than it needs.
      *
-     * @param {number} offset The desired y offset, in pixels.
+     * @param {number} offset The desired y offset, in pixels, from the left
+     * side of the container.
      * @returns {Component} The calling Component.
      */
     public yOffset(offset: number): Component {
@@ -362,13 +387,19 @@ export module Abstract {
 
 
     /**
-     * Adds/removes a given CSS class to/from the Component, or checks if the Component has a particular CSS class.
+     * Checks if the Component has a particular CSS class.
      *
-     * @param {string} cssClass The CSS class to add/remove/check for.
-     * @param {boolean} [addClass] Whether to add or remove the CSS class. If not supplied, checks for the CSS class.
-     * @return {boolean|Component} Whether the Component has the given CSS class, or the calling Component (if addClass is supplied).
+     * @param {string} cssClass The CSS class to check for.
+     * @return {boolean} Whether the Component has the given CSS class.
      */
     public classed(cssClass: string): boolean;
+    /**
+     * Adds/removes a given CSS class to/from the Component.
+     *
+     * @param {string} cssClass The CSS class to add/remove for.
+     * @param {boolean} [addClass] Whether to add or remove the CSS class.
+     * @return {Component} The calling Component.
+     */
     public classed(cssClass: string, addClass: boolean): Component;
     public classed(cssClass: string, addClass?: boolean): any {
       if (addClass == null) {
@@ -418,7 +449,9 @@ export module Abstract {
     }
 
     /**
-     * Merges this Component with another Component, returning a ComponentGroup.
+     * Merges this Component with another Component, returning a
+     * ComponentGroup. This is used to layer Components on top of each other.
+     *
      * There are four cases:
      * Component + Component: Returns a ComponentGroup with both components inside it.
      * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
@@ -445,6 +478,9 @@ export module Abstract {
 
     /**
      * Detaches a Component from the DOM. The component can be reused.
+     *
+     * This should only be used if you plan on reusing the calling
+     * Components. Otherwise, use remove().
      *
      * @returns The calling Component.
      */
