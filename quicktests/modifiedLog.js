@@ -36,7 +36,7 @@ function run(div, data, Plottable) {
     dataseries4.metadata({name: "series4"});
 
     
-    var colorScale1 = new Plottable.Scale.Color("20");
+    var colorScale1 = new Plottable.Scale.Color();
     colorScale1.domain(["series1", "series2", "series3", "series4"]);
     
     //Axis

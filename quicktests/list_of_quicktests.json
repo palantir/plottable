@@ -1,5 +1,8 @@
 [
   {
+    "name":"add_time",
+    "categories":["Standard Chart", "Time Scale", "Linear Scale", "Datasource", "Vertical Bar Plot", "Time Axis", "Numeric Axis", "Merge", "Gridlines", "Click Interaction"]
+  },  {
     "name":"animate_area",
     "categories":["Linear Scale", "Numeric Axis", "Area Plot", "Project", "Animate", "Click Interaction"]
   },  {

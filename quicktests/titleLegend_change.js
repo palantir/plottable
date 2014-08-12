@@ -26,7 +26,7 @@ var noTitleLabel, shortTitleLabel, longTitleLabel, noLegendLabel, shortLegendLab
     dataseries6 = new Plottable.DataSource(data[1].slice(20, 30));
     dataseries6.metadata({name: "grapes"});
     
-    colorScale1 = new Plottable.Scale.Color("10");
+    colorScale1 = new Plottable.Scale.Color();
     colorScale1.domain(["series1", "series2", "apples", "oranges", "bananas", "grapes"]);
     
     //Axis

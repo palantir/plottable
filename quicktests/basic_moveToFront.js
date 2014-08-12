@@ -7,7 +7,7 @@ function run(div, data, Plottable) {
   var backPlot = 0;
     //data
     var dataseries = data[0].slice(0, 10);
-    var colorScale1 = new Plottable.Scale.Color("20");
+    var colorScale1 = new Plottable.Scale.Color();
     colorScale1.domain(["scatter", "line", "area"]);
     
     //Axis
