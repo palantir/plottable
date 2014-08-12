@@ -27,8 +27,8 @@ export module Abstract {
     public _computedHeight: number;
     private _endTickLength = 5;
     private _tickLength = 5;
-    private _tickLabelPadding = 3;
-    private _gutter = 10;
+    private _tickLabelPadding = 10;
+    private _gutter = 15;
     private _showEndTickLabels = false;
 
     constructor(scale: Abstract.Scale, orientation: string, formatter = Formatters.identity()) {
