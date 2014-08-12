@@ -8,7 +8,7 @@ export module Interaction {
     public boxIsDrawn = false;
     public resizeEnabled = false;
     public resizePadding = 10;
-    public _selectionOrigin: Point;
+    public _selectionOrigin: number[];
     public selection: SelectionArea;
 
     public _isCloseEnough(val: number, t: number): boolean {
@@ -31,18 +31,18 @@ export module Interaction {
       var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
       var result1 = this._isCloseEnough(origin, c1);
       if (result1) {
-        if (attr1 == "x") {
-          this._selectionOrigin.x = c2;
+        if (attr1 === "x") {
+          this._selectionOrigin[0] = c2;
         } else {
-          this._selectionOrigin.y = c2;
+          this._selectionOrigin[1] = c2;
         }
       }
       var result2 = this._isCloseEnough(origin, c2);
       if (result2) {
-        if (attr1 == "x") {
-          this._selectionOrigin.x = c1;
+        if (attr1 === "x") {
+          this._selectionOrigin[0] = c1;
         } else {
-          this._selectionOrigin.y = c1;
+          this._selectionOrigin[1] = c1;
         }
       }
       return result1 || result2;
@@ -53,7 +53,7 @@ export module Interaction {
     }
 
     public _doDragstart() {
-      this._selectionOrigin = {x: this.origin[0], y: this.origin[1]};
+      this._selectionOrigin = [this.origin[0], this.origin[1]];
       if (this.boxIsDrawn && (!this.resizeEnabled || !this._isResizeStart())) {
         this.clearBox();
       }

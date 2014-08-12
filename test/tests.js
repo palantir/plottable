@@ -5302,7 +5302,7 @@ describe("Interactions", function () {
         describe("resize enabled", function () {
             var dragmidX = dragstartX + draghalfwidth;
             var dragmidY = dragstartY + draghalfheight;
-            function test(dragstartX2, dragstartY2) {
+            function test(dragstartX2, dragstartY2, expectedSelection) {
                 var timesCalled = 0;
 
                 // fake a drag event
@@ -5312,6 +5312,7 @@ describe("Interactions", function () {
                     timesCalled++;
                     assert.deepEqual(start, { x: dragstartX2, y: dragstartY2 }, "starting point given correctly");
                     assert.deepEqual(end, { x: dragmidX, y: dragmidY }, "ending point given correctly");
+                    assert.deepEqual(interaction.selection, expectedSelection, "selection updated correctly");
                 });
 
                 // fake another drag event to resize the box.
@@ -5321,35 +5322,75 @@ describe("Interactions", function () {
             }
 
             it("from the top left", function () {
-                test(dragstartX, dragendY);
+                test(dragstartX, dragendY, {
+                    xMin: dragmidX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragmidY
+                });
             });
 
             it("from the top", function () {
-                test(dragmidX, dragendY);
+                test(dragmidX, dragendY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragmidY
+                });
             });
 
             it("from the top right", function () {
-                test(dragendX, dragendY);
+                test(dragendX, dragendY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragmidX,
+                    yMax: dragmidY
+                });
             });
 
             it("from the right", function () {
-                test(dragendX, dragmidY);
+                test(dragendX, dragmidY, {
+                    xMin: dragstartX,
+                    yMin: dragstartY,
+                    xMax: dragmidX,
+                    yMax: dragendY
+                });
             });
 
             it("from the bottom right", function () {
-                test(dragendX, dragstartY);
+                test(dragendX, dragstartY, {
+                    xMin: dragstartX,
+                    yMin: dragmidY,
+                    xMax: dragmidX,
+                    yMax: dragendY
+                });
             });
 
             it("from the bottom", function () {
-                test(dragmidX, dragstartY);
+                test(dragmidX, dragstartY, {
+                    xMin: dragstartX,
+                    yMin: dragmidY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
             });
 
             it("from the bottom left", function () {
-                test(dragstartX, dragstartY);
+                test(dragstartX, dragstartY, {
+                    xMin: dragmidX,
+                    yMin: dragmidY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
             });
 
             it("from the left", function () {
-                test(dragstartX, dragmidY);
+                test(dragstartX, dragmidY, {
+                    xMin: dragmidX,
+                    yMin: dragstartY,
+                    xMax: dragendX,
+                    yMax: dragendY
+                });
             });
         });
 

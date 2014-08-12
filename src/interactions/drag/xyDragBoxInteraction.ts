@@ -8,14 +8,14 @@ export module Interaction {
 
     public _drag(){
       super._drag();
-      this.setBox(this._selectionOrigin.x, this.location[0], this._selectionOrigin.y, this.location[1]);
-    }
-
-    public setBox(x0: number, x1: number, y0: number, y1: number) {
       if (this.dragBox == null) {return;}
       var attrs: any = {};
       var drawnX: boolean = true;
       var drawnY: boolean = true;
+      var x0 = this._selectionOrigin[0];
+      var x1 = this.location[0];
+      var y0 = this._selectionOrigin[1];
+      var y1 = this.location[1];
       if (!this.resizeEnabled || this.isResizingX || !this.isResizingY) {
         attrs.width = Math.abs(x0 - x1);
         attrs.x = Math.min(x0, x1);
@@ -27,8 +27,15 @@ export module Interaction {
         drawnY = attrs.height > 0;
       }
       this.dragBox.attr(attrs);
+      var xMin = attrs.x || parseInt(this.dragBox.attr("x"), 10);
+      var yMin = attrs.y || parseInt(this.dragBox.attr("y"), 10);
+      this.selection = {
+        xMin: xMin,
+        xMax: (attrs.width || parseInt(this.dragBox.attr("width"), 10)) + xMin,
+        yMin: yMin,
+        yMax: (attrs.height || parseInt(this.dragBox.attr("height"), 10)) + yMin
+      };
       this.boxIsDrawn = drawnX && drawnY;
-      return this;
     }
 
     public _doDragend() {

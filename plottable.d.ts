@@ -2585,7 +2585,6 @@ declare module Plottable {
 declare module Plottable {
     module Interaction {
         class XYDragBox extends DragBox {
-            public setBox(x0: number, x1: number, y0: number, y1: number): XYDragBox;
         }
     }
 }

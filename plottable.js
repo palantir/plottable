@@ -7534,18 +7534,18 @@ var Plottable;
                 var c2 = parseInt(this.dragBox.attr(attr2), 10) + c1;
                 var result1 = this._isCloseEnough(origin, c1);
                 if (result1) {
-                    if (attr1 == "x") {
-                        this._selectionOrigin.x = c2;
+                    if (attr1 === "x") {
+                        this._selectionOrigin[0] = c2;
                     } else {
-                        this._selectionOrigin.y = c2;
+                        this._selectionOrigin[1] = c2;
                     }
                 }
                 var result2 = this._isCloseEnough(origin, c2);
                 if (result2) {
-                    if (attr1 == "x") {
-                        this._selectionOrigin.x = c1;
+                    if (attr1 === "x") {
+                        this._selectionOrigin[0] = c1;
                     } else {
-                        this._selectionOrigin.y = c1;
+                        this._selectionOrigin[1] = c1;
                     }
                 }
                 return result1 || result2;
@@ -7556,7 +7556,7 @@ var Plottable;
             };
 
             DragBox.prototype._doDragstart = function () {
-                this._selectionOrigin = { x: this.origin[0], y: this.origin[1] };
+                this._selectionOrigin = [this.origin[0], this.origin[1]];
                 if (this.boxIsDrawn && (!this.resizeEnabled || !this._isResizeStart())) {
                     this.clearBox();
                 }
@@ -7649,7 +7649,7 @@ var Plottable;
             }
             XDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);
-                this.setBox(this._selectionOrigin.x, this.location[0]);
+                this.setBox(this._selectionOrigin[0], this.location[0]);
             };
 
             XDragBox.prototype.setBox = function (x0, x1) {
@@ -7696,16 +7696,16 @@ var Plottable;
             }
             XYDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);
-                this.setBox(this._selectionOrigin.x, this.location[0], this._selectionOrigin.y, this.location[1]);
-            };
-
-            XYDragBox.prototype.setBox = function (x0, x1, y0, y1) {
                 if (this.dragBox == null) {
                     return;
                 }
                 var attrs = {};
                 var drawnX = true;
                 var drawnY = true;
+                var x0 = this._selectionOrigin[0];
+                var x1 = this.location[0];
+                var y0 = this._selectionOrigin[1];
+                var y1 = this.location[1];
                 if (!this.resizeEnabled || this.isResizingX || !this.isResizingY) {
                     attrs.width = Math.abs(x0 - x1);
                     attrs.x = Math.min(x0, x1);
@@ -7717,8 +7717,15 @@ var Plottable;
                     drawnY = attrs.height > 0;
                 }
                 this.dragBox.attr(attrs);
+                var xMin = attrs.x || parseInt(this.dragBox.attr("x"), 10);
+                var yMin = attrs.y || parseInt(this.dragBox.attr("y"), 10);
+                this.selection = {
+                    xMin: xMin,
+                    xMax: (attrs.width || parseInt(this.dragBox.attr("width"), 10)) + xMin,
+                    yMin: yMin,
+                    yMax: (attrs.height || parseInt(this.dragBox.attr("height"), 10)) + yMin
+                };
                 this.boxIsDrawn = drawnX && drawnY;
-                return this;
             };
 
             XYDragBox.prototype._doDragend = function () {
@@ -7783,7 +7790,7 @@ var Plottable;
             }
             YDragBox.prototype._drag = function () {
                 _super.prototype._drag.call(this);
-                this.setBox(this._selectionOrigin.y, this.location[1]);
+                this.setBox(this._selectionOrigin[1], this.location[1]);
             };
 
             YDragBox.prototype.setBox = function (y0, y1) {

@@ -160,7 +160,7 @@ describe("Interactions", () => {
     describe("resize enabled", () => {
       var dragmidX = dragstartX + draghalfwidth;
       var dragmidY = dragstartY + draghalfheight;
-      function test(dragstartX2: number, dragstartY2: number) {
+      function test(dragstartX2: number, dragstartY2: number, expectedSelection: Plottable.SelectionArea) {
         var timesCalled = 0;
 
         // fake a drag event
@@ -170,6 +170,7 @@ describe("Interactions", () => {
           timesCalled++;
           assert.deepEqual(start, {x: dragstartX2, y: dragstartY2}, "starting point given correctly")
           assert.deepEqual(end, {x: dragmidX, y: dragmidY}, "ending point given correctly")
+          assert.deepEqual(interaction.selection, expectedSelection, "selection updated correctly")
         });
 
         // fake another drag event to resize the box.
@@ -179,35 +180,75 @@ describe("Interactions", () => {
       }
 
       it("from the top left", () => {
-        test(dragstartX, dragendY);
+        test(dragstartX, dragendY, {
+          xMin: dragmidX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragmidY
+        });
       });
 
       it("from the top", () => {
-        test(dragmidX, dragendY);
+        test(dragmidX, dragendY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragmidY
+        });
       });
 
       it("from the top right", () => {
-        test(dragendX, dragendY);
+        test(dragendX, dragendY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragmidX,
+          yMax: dragmidY
+        });
       });
 
       it("from the right", () => {
-        test(dragendX, dragmidY);
+        test(dragendX, dragmidY, {
+          xMin: dragstartX,
+          yMin: dragstartY,
+          xMax: dragmidX,
+          yMax: dragendY
+        });
       });
 
       it("from the bottom right", () => {
-        test(dragendX, dragstartY);
+        test(dragendX, dragstartY, {
+          xMin: dragstartX,
+          yMin: dragmidY,
+          xMax: dragmidX,
+          yMax: dragendY
+        });
       });
 
       it("from the bottom", () => {
-        test(dragmidX, dragstartY);
+        test(dragmidX, dragstartY, {
+          xMin: dragstartX,
+          yMin: dragmidY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
       });
 
       it("from the bottom left", () => {
-        test(dragstartX, dragstartY);
+        test(dragstartX, dragstartY, {
+          xMin: dragmidX,
+          yMin: dragmidY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
       });
 
       it("from the left", () => {
-        test(dragstartX, dragmidY);
+        test(dragstartX, dragmidY, {
+          xMin: dragmidX,
+          yMin: dragstartY,
+          xMax: dragendX,
+          yMax: dragendY
+        });
       });
     });
 
