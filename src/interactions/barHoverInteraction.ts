@@ -25,7 +25,6 @@ export module Interaction {
       this.dispatcher = new Dispatcher.Mouse(hitBox);
 
       this.dispatcher.mousemove((p: Point) => {
-        // var selectedBar = this.componentToListenTo.selectBar(p.x, p.y, false);
         var selectedBar = this.getHoveredBar(p);
 
         if (selectedBar != null) {
@@ -51,8 +50,8 @@ export module Interaction {
     }
 
     private _hoverOut() {
-      this.componentToListenTo._bars.classed("not-hovered", false).classed("hovered", false);
-      if (this.currentBar != null) { // trigger callback only if a hoverout transition is occuring
+      this.componentToListenTo._bars.classed("not-hovered hovered", false);
+      if (this.currentBar != null) { // trigger callback only if a hoverout transition is occurring
         this.currentBar = null;
         if (this.unhoverCallback != null) {
           this.unhoverCallback();

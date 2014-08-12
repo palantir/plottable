@@ -326,7 +326,6 @@ describe("Interactions", () => {
       triggerFakeMouseEvent("mousemove", hitbox, 100, 201);
       assert.isNull(barDatum, "hover callback isn't called if the hovered bar didn't change");
 
-
       triggerFakeMouseEvent("mousemove", hitbox, 10, 10);
       assert.isTrue(unhoverCalled, "unhover callback is triggered on mousing away from a bar");
       unhoverCalled = false;

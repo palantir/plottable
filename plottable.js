@@ -5292,7 +5292,7 @@ var Plottable;
                 this.dispatcher.connect();
             };
             BarHover.prototype._hoverOut = function () {
-                this.componentToListenTo._bars.classed("not-hovered", false).classed("hovered", false);
+                this.componentToListenTo._bars.classed("not-hovered hovered", false);
                 if (this.currentBar != null) {
                     this.currentBar = null;
                     if (this.unhoverCallback != null) {
