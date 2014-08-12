@@ -166,7 +166,6 @@ export module Axis {
       }
 
       this._hideOverlappingTickLabels();
-      return this;
     }
 
     /**

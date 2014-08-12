@@ -29,7 +29,6 @@ export module Axis {
     public _setup() {
       super._setup();
       this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
-      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
@@ -134,7 +133,6 @@ export module Axis {
       var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
-      return this;
     }
 
 
