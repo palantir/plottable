@@ -80,10 +80,6 @@ export module Axis {
       {timeUnit: d3.time.year,   step: 100000, formatString: ""},
       {timeUnit: d3.time.year,   step: 100000, formatString: ""}
     ];
-
-    private previousSpan: number;
-    private previousIndex: number;
-
     /**
      * Creates a TimeAxis
      *
@@ -98,8 +94,6 @@ export module Axis {
       }
       super(scale, orientation);
       this.classed("time-axis", true);
-      this.previousSpan = 0;
-      this.previousIndex = Time.minorIntervals.length - 1;
       this.tickLabelPadding(5);
     }
 
@@ -114,21 +108,21 @@ export module Axis {
       return this._computedHeight;
     }
 
-    public calculateWorstWidth(container: D3.Selection, format: string): number {
+    private calculateWorstWidth(container: D3.Selection, format: string): number {
       // returns the worst case width for a format
       // September 29, 9999 at 12:59.9999 PM Wednesday
       var longDate = new Date(9999, 8, 29, 12, 59, 9999);
       return Util.Text.getTextWidth(container, d3.time.format(format)(longDate));
     }
 
-    public getIntervalLength(interval: ITimeInterval) {
+    private getIntervalLength(interval: ITimeInterval) {
       var testDate = this._scale.domain()[0]; // any date could go here
       // meausre how much space one date can get
       var stepLength = Math.abs(this._scale.scale(interval.timeUnit.offset(testDate, interval.step)) - this._scale.scale(testDate));
       return stepLength;
     }
 
-    public isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
+    private isEnoughSpace(container: D3.Selection, interval: ITimeInterval) {
       // compute number of ticks
       // if less than a certain threshold
       var worst = this.calculateWorstWidth(container, interval.formatString) + 2 * this.tickLabelPadding();
@@ -144,30 +138,16 @@ export module Axis {
 
     // returns a number to index into the major/minor intervals
     private getTickLevel(): number {
-      // for zooming, don't start search all the way from beginning.
-      var startingPoint = Time.minorIntervals.length - 1;
-      var curSpan = Math.abs(this._scale.domain()[1] - this._scale.domain()[0]);
-      if (curSpan <= this.previousSpan + 1) {
-        startingPoint = this.previousIndex;
-      }
-      // find lowest granularity that will fit
-      var i = startingPoint;
-      while (i >= 0) {
-        if (!(this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
-            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i]))) {
-          i++;
+      for (var i = 0; i < Time.minorIntervals.length; i++) {
+        if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i])
+            && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
           break;
         }
-        i--;
       }
-      i = Math.min(i, Time.minorIntervals.length - 1);
-      if (i < 0) {
-        i = 0;
-        Util.Methods.warn("could not find suitable interval to display labels");
+      if (i >= Time.minorIntervals.length) {
+        Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+        i = Time.minorIntervals.length - 1;
       }
-      this.previousIndex = Math.max(0, i - 1);
-      this.previousSpan = curSpan;
-
       return i;
     }
 

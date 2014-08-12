@@ -3451,8 +3451,6 @@ var Plottable;
                 }
                 _super.call(this, scale, orientation);
                 this.classed("time-axis", true);
-                this.previousSpan = 0;
-                this.previousIndex = Time.minorIntervals.length - 1;
                 this.tickLabelPadding(5);
             }
             Time.prototype._computeHeight = function () {
@@ -3485,26 +3483,15 @@ var Plottable;
                 this._minorTickLabels = this.content.append("g").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
             };
             Time.prototype.getTickLevel = function () {
-                var startingPoint = Time.minorIntervals.length - 1;
-                var curSpan = Math.abs(this._scale.domain()[1] - this._scale.domain()[0]);
-                if (curSpan <= this.previousSpan + 1) {
-                    startingPoint = this.previousIndex;
-                }
-                var i = startingPoint;
-                while (i >= 0) {
-                    if (!(this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i]))) {
-                        i++;
+                for (var i = 0; i < Time.minorIntervals.length; i++) {
+                    if (this.isEnoughSpace(this._minorTickLabels, Time.minorIntervals[i]) && this.isEnoughSpace(this._majorTickLabels, Time.majorIntervals[i])) {
                         break;
                     }
-                    i--;
                 }
-                i = Math.min(i, Time.minorIntervals.length - 1);
-                if (i < 0) {
-                    i = 0;
-                    Plottable.Util.Methods.warn("could not find suitable interval to display labels");
+                if (i >= Time.minorIntervals.length) {
+                    Plottable.Util.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+                    i = Time.minorIntervals.length - 1;
                 }
-                this.previousIndex = Math.max(0, i - 1);
-                this.previousSpan = curSpan;
                 return i;
             };
             Time.prototype._getTickIntervalValues = function (interval) {
