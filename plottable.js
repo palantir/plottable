@@ -762,162 +762,27 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
-    (function (Abstract) {
-        var Formatter = (function () {
-            function Formatter(precision) {
-                this._onlyShowUnchanged = true;
-                this.precision(precision);
-            }
-            Formatter.prototype.format = function (d) {
-                var formattedValue = this._formatFunction(d);
-                if (this._onlyShowUnchanged && this._valueChanged(d, formattedValue)) {
+    Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
+    var Formatters = (function () {
+        function Formatters() {
+        }
+        Formatters.currency = function (precision, symbol, prefix, onlyShowUnchanged) {
+            if (precision === void 0) { precision = 2; }
+            if (symbol === void 0) { symbol = "$"; }
+            if (prefix === void 0) { prefix = true; }
+            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
+            var fixedFormatter = Formatters.fixed(precision);
+            return function (d) {
+                var formattedValue = fixedFormatter(Math.abs(d));
+                if (onlyShowUnchanged && Formatters._valueChanged(Math.abs(d), formattedValue)) {
                     return "";
                 }
-                return formattedValue;
-            };
-            Formatter.prototype._valueChanged = function (d, formattedValue) {
-                return d !== parseFloat(formattedValue);
-            };
-            Formatter.prototype.precision = function (value) {
-                if (value === undefined) {
-                    return this._precision;
-                }
-                if (value < 0 || value > 20) {
-                    throw new RangeError("Formatter precision must be between 0 and 20");
-                }
-                this._precision = value;
-                return this;
-            };
-            Formatter.prototype.showOnlyUnchangedValues = function (showUnchanged) {
-                if (showUnchanged === undefined) {
-                    return this._onlyShowUnchanged;
-                }
-                this._onlyShowUnchanged = showUnchanged;
-                return this;
-            };
-            return Formatter;
-        })();
-        Abstract.Formatter = Formatter;
-    })(Plottable.Abstract || (Plottable.Abstract = {}));
-    var Abstract = Plottable.Abstract;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Identity = (function (_super) {
-            __extends(Identity, _super);
-            function Identity() {
-                _super.call(this, null);
-                this.showOnlyUnchangedValues(false);
-                this._formatFunction = function (d) {
-                    return String(d);
-                };
-            }
-            return Identity;
-        })(Plottable.Abstract.Formatter);
-        Formatter.Identity = Identity;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var General = (function (_super) {
-            __extends(General, _super);
-            function General(precision) {
-                if (precision === void 0) { precision = 3; }
-                _super.call(this, precision);
-                this._formatFunction = function (d) {
-                    if (typeof d === "number") {
-                        var multiplier = Math.pow(10, this._precision);
-                        return String(Math.round(d * multiplier) / multiplier);
-                    }
-                    else {
-                        return String(d);
-                    }
-                };
-            }
-            General.prototype._valueChanged = function (d, formattedValue) {
-                if (typeof d === "number") {
-                    return d !== parseFloat(formattedValue);
-                }
-                else {
-                    return false;
-                }
-            };
-            return General;
-        })(Plottable.Abstract.Formatter);
-        Formatter.General = General;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Fixed = (function (_super) {
-            __extends(Fixed, _super);
-            function Fixed(precision) {
-                if (precision === void 0) { precision = 3; }
-                _super.call(this, precision);
-                this._formatFunction = function (d) {
-                    return d.toFixed(this._precision);
-                };
-            }
-            return Fixed;
-        })(Plottable.Abstract.Formatter);
-        Formatter.Fixed = Fixed;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Currency = (function (_super) {
-            __extends(Currency, _super);
-            function Currency(precision, symbol, prefix) {
-                if (precision === void 0) { precision = 2; }
-                if (symbol === void 0) { symbol = "$"; }
-                if (prefix === void 0) { prefix = true; }
-                _super.call(this, precision);
-                this.symbol = symbol;
-                this.prefix = prefix;
-            }
-            Currency.prototype.format = function (d) {
-                var formattedValue = _super.prototype.format.call(this, Math.abs(d));
                 if (formattedValue !== "") {
-                    if (this.prefix) {
-                        formattedValue = this.symbol + formattedValue;
+                    if (prefix) {
+                        formattedValue = symbol + formattedValue;
                     }
                     else {
-                        formattedValue += this.symbol;
+                        formattedValue += symbol;
                     }
                     if (d < 0) {
                         formattedValue = "-" + formattedValue;
@@ -925,160 +790,127 @@ var Plottable;
                 }
                 return formattedValue;
             };
-            return Currency;
-        })(Formatter.Fixed);
-        Formatter.Currency = Currency;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Percentage = (function (_super) {
-            __extends(Percentage, _super);
-            function Percentage(precision) {
-                if (precision === void 0) { precision = 0; }
-                _super.call(this, precision);
-            }
-            Percentage.prototype.format = function (d) {
-                var formattedValue = _super.prototype.format.call(this, d * 100);
+        };
+        Formatters.fixed = function (precision, onlyShowUnchanged) {
+            if (precision === void 0) { precision = 3; }
+            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
+            Formatters.verifyPrecision(precision);
+            return function (d) {
+                var formattedValue = d.toFixed(precision);
+                if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                    return "";
+                }
+                return formattedValue;
+            };
+        };
+        Formatters.general = function (precision, onlyShowUnchanged) {
+            if (precision === void 0) { precision = 3; }
+            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
+            Formatters.verifyPrecision(precision);
+            return function (d) {
+                if (typeof d === "number") {
+                    var multiplier = Math.pow(10, precision);
+                    var formattedValue = String(Math.round(d * multiplier) / multiplier);
+                    if (onlyShowUnchanged && Formatters._valueChanged(d, formattedValue)) {
+                        return "";
+                    }
+                    return formattedValue;
+                }
+                else {
+                    return String(d);
+                }
+            };
+        };
+        Formatters.identity = function () {
+            return function (d) {
+                return String(d);
+            };
+        };
+        Formatters.percentage = function (precision, onlyShowUnchanged) {
+            if (precision === void 0) { precision = 0; }
+            if (onlyShowUnchanged === void 0) { onlyShowUnchanged = true; }
+            var fixedFormatter = Formatters.fixed(precision);
+            return function (d) {
+                var formattedValue = fixedFormatter(d * 100);
+                if (onlyShowUnchanged && Formatters._valueChanged(d * 100, formattedValue)) {
+                    return "";
+                }
                 if (formattedValue !== "") {
                     formattedValue += "%";
                 }
                 return formattedValue;
             };
-            return Percentage;
-        })(Formatter.Fixed);
-        Formatter.Percentage = Percentage;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var SISuffix = (function (_super) {
-            __extends(SISuffix, _super);
-            function SISuffix(precision) {
-                if (precision === void 0) { precision = 3; }
-                _super.call(this, precision);
-                this.showOnlyUnchangedValues(false);
-            }
-            SISuffix.prototype.precision = function (value) {
-                var returnValue = _super.prototype.precision.call(this, value);
-                this._formatFunction = d3.format("." + this._precision + "s");
-                return returnValue;
+        };
+        Formatters.siSuffix = function (precision) {
+            if (precision === void 0) { precision = 3; }
+            Formatters.verifyPrecision(precision);
+            return function (d) {
+                return d3.format("." + precision + "s")(d);
             };
-            return SISuffix;
-        })(Plottable.Abstract.Formatter);
-        Formatter.SISuffix = SISuffix;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Custom = (function (_super) {
-            __extends(Custom, _super);
-            function Custom(customFormatFunction, precision) {
-                if (precision === void 0) { precision = 0; }
-                _super.call(this, precision);
-                if (customFormatFunction == null) {
-                    throw new Error("Custom Formatters require a formatting function");
-                }
-                this._onlyShowUnchanged = false;
-                this._formatFunction = function (d) {
-                    return customFormatFunction(d, this);
-                };
-            }
-            return Custom;
-        })(Plottable.Abstract.Formatter);
-        Formatter.Custom = Custom;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
-})(Plottable || (Plottable = {}));
-
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    (function (Formatter) {
-        var Time = (function (_super) {
-            __extends(Time, _super);
-            function Time() {
-                _super.call(this, null);
-                var numFormats = 8;
-                var timeFormat = {};
-                timeFormat[0] = {
-                    format: ".%L",
-                    filter: function (d) { return d.getMilliseconds() !== 0; }
-                };
-                timeFormat[1] = {
-                    format: ":%S",
-                    filter: function (d) { return d.getSeconds() !== 0; }
-                };
-                timeFormat[2] = {
-                    format: "%I:%M",
-                    filter: function (d) { return d.getMinutes() !== 0; }
-                };
-                timeFormat[3] = {
-                    format: "%I %p",
-                    filter: function (d) { return d.getHours() !== 0; }
-                };
-                timeFormat[4] = {
-                    format: "%a %d",
-                    filter: function (d) { return d.getDay() !== 0 && d.getDate() !== 1; }
-                };
-                timeFormat[5] = {
-                    format: "%b %d",
-                    filter: function (d) { return d.getDate() !== 1; }
-                };
-                timeFormat[6] = {
-                    format: "%b",
-                    filter: function (d) { return d.getMonth() !== 0; }
-                };
-                timeFormat[7] = {
-                    format: "%Y",
-                    filter: function () { return true; }
-                };
-                this._formatFunction = function (d) {
-                    for (var i = 0; i < numFormats; i++) {
-                        if (timeFormat[i].filter(d)) {
-                            return d3.time.format(timeFormat[i].format)(d);
-                        }
+        };
+        Formatters.time = function () {
+            var numFormats = 8;
+            var timeFormat = {};
+            timeFormat[0] = {
+                format: ".%L",
+                filter: function (d) { return d.getMilliseconds() !== 0; }
+            };
+            timeFormat[1] = {
+                format: ":%S",
+                filter: function (d) { return d.getSeconds() !== 0; }
+            };
+            timeFormat[2] = {
+                format: "%I:%M",
+                filter: function (d) { return d.getMinutes() !== 0; }
+            };
+            timeFormat[3] = {
+                format: "%I %p",
+                filter: function (d) { return d.getHours() !== 0; }
+            };
+            timeFormat[4] = {
+                format: "%a %d",
+                filter: function (d) { return d.getDay() !== 0 && d.getDate() !== 1; }
+            };
+            timeFormat[5] = {
+                format: "%b %d",
+                filter: function (d) { return d.getDate() !== 1; }
+            };
+            timeFormat[6] = {
+                format: "%b",
+                filter: function (d) { return d.getMonth() !== 0; }
+            };
+            timeFormat[7] = {
+                format: "%Y",
+                filter: function () { return true; }
+            };
+            return function (d) {
+                for (var i = 0; i < numFormats; i++) {
+                    if (timeFormat[i].filter(d)) {
+                        return d3.time.format(timeFormat[i].format)(d);
                     }
-                };
-                this.showOnlyUnchangedValues(false);
+                }
+            };
+        };
+        Formatters.relativeDate = function (baseValue, increment, label) {
+            if (baseValue === void 0) { baseValue = 0; }
+            if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
+            if (label === void 0) { label = ""; }
+            return function (d) {
+                var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
+                return relativeDate.toString() + label;
+            };
+        };
+        Formatters.verifyPrecision = function (precision) {
+            if (precision < 0 || precision > 20) {
+                throw new RangeError("Formatter precision must be between 0 and 20");
             }
-            return Time;
-        })(Plottable.Abstract.Formatter);
-        Formatter.Time = Time;
-    })(Plottable.Formatter || (Plottable.Formatter = {}));
-    var Formatter = Plottable.Formatter;
+        };
+        Formatters._valueChanged = function (d, formattedValue) {
+            return d !== parseFloat(formattedValue);
+        };
+        return Formatters;
+    })();
+    Plottable.Formatters = Formatters;
 })(Plottable || (Plottable = {}));
 
 var Plottable;
@@ -2650,7 +2482,11 @@ var Plottable;
                 var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
                 var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
-                return negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+                var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+                if (ticks.length <= 1) {
+                    ticks = d3.scale.linear().domain([min, max]).ticks(this._lastRequestedTickCount);
+                }
+                return ticks;
             };
             ModifiedLog.prototype.logTicks = function (lower, upper) {
                 var _this = this;
@@ -3083,6 +2919,7 @@ var Plottable;
         var Axis = (function (_super) {
             __extends(Axis, _super);
             function Axis(scale, orientation, formatter) {
+                if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this);
                 var _this = this;
                 this._width = "auto";
@@ -3103,10 +2940,6 @@ var Plottable;
                 }
                 else {
                     this.classed("y-axis", true);
-                }
-                if (formatter == null) {
-                    formatter = new Plottable.Formatter.General();
-                    formatter.showOnlyUnchangedValues(false);
                 }
                 this.formatter(formatter);
                 this._scale.broadcaster.registerListener(this, function () { return _this.rescale(); });
@@ -3295,10 +3128,6 @@ var Plottable;
             Axis.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
                     return this._formatter;
-                }
-                if (typeof (formatter) === "function") {
-                    formatter = new Plottable.Formatter.Custom(formatter);
-                    formatter.showOnlyUnchangedValues(false);
                 }
                 this._formatter = formatter;
                 this._invalidateLayout();
@@ -3675,6 +3504,7 @@ var Plottable;
         var Numeric = (function (_super) {
             __extends(Numeric, _super);
             function Numeric(scale, orientation, formatter) {
+                if (formatter === void 0) { formatter = Plottable.Formatters.general(3, false); }
                 _super.call(this, scale, orientation, formatter);
                 this.tickLabelPositioning = "center";
                 this.showFirstTickLabel = false;
@@ -3684,10 +3514,9 @@ var Plottable;
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var testTextEl = this._tickLabelContainer.append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
-                var epsilon = Math.pow(10, -this._formatter.precision());
                 var measurer = Plottable.Util.Text.getTextMeasure(testTextEl);
                 var textLengths = tickValues.map(function (v) {
-                    var formattedValue = _this._formatter.format(v);
+                    var formattedValue = _this._formatter(v);
                     return measurer(formattedValue).width;
                 });
                 testTextEl.remove();
@@ -3717,7 +3546,6 @@ var Plottable;
                 return this._scale.ticks();
             };
             Numeric.prototype._doRender = function () {
-                var _this = this;
                 _super.prototype._doRender.call(this);
                 var tickLabelAttrHash = {
                     x: 0,
@@ -3793,8 +3621,7 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Abstract.Axis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Plottable.Abstract.Axis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
-                var formatFunction = function (d) { return _this._formatter.format(d); };
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(formatFunction);
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "visible").attr(tickLabelAttrHash).text(this._formatter);
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
                 if (!this.showEndTickLabels()) {
@@ -3868,7 +3695,7 @@ var Plottable;
             __extends(Category, _super);
             function Category(scale, orientation, formatter) {
                 if (orientation === void 0) { orientation = "bottom"; }
-                if (formatter === void 0) { formatter = new Plottable.Formatter.Identity(); }
+                if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 var _this = this;
                 this.classed("category-axis", true);
@@ -3921,14 +3748,14 @@ var Plottable;
                         var d3this = d3.select(this);
                         var xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
                         var yAlign = { left: "center", right: "center", top: "bottom", bottom: "top" };
-                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true, {
+                        textWriteResult = Plottable.Util.Text.writeText(formatter(d), width, height, tm, true, {
                             g: d3this,
                             xAlign: xAlign[self._orientation],
                             yAlign: yAlign[self._orientation]
                         });
                     }
                     else {
-                        textWriteResult = Plottable.Util.Text.writeText(formatter.format(d), width, height, tm, true);
+                        textWriteResult = Plottable.Util.Text.writeText(formatter(d), width, height, tm, true);
                     }
                     textWriteResults.push(textWriteResult);
                 });
@@ -4362,27 +4189,6 @@ var Plottable;
         Component.Gridlines = Gridlines;
     })(Plottable.Component || (Plottable.Component = {}));
     var Component = Plottable.Component;
-})(Plottable || (Plottable = {}));
-
-var Plottable;
-(function (Plottable) {
-    (function (Util) {
-        (function (Axis) {
-            Axis.ONE_DAY = 24 * 60 * 60 * 1000;
-            function generateRelativeDateFormatter(baseValue, increment, label) {
-                if (increment === void 0) { increment = Axis.ONE_DAY; }
-                if (label === void 0) { label = ""; }
-                var formatter = function (tickValue) {
-                    var relativeDate = Math.round((tickValue.valueOf() - baseValue) / increment);
-                    return relativeDate.toString() + label;
-                };
-                return formatter;
-            }
-            Axis.generateRelativeDateFormatter = generateRelativeDateFormatter;
-        })(Util.Axis || (Util.Axis = {}));
-        var Axis = Util.Axis;
-    })(Plottable.Util || (Plottable.Util = {}));
-    var Util = Plottable.Util;
 })(Plottable || (Plottable = {}));
 
 var __extends = this.__extends || function (d, b) {
