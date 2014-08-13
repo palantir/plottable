@@ -3,8 +3,6 @@
 module Plottable {
 export module Scale {
   export class Time extends Abstract.QuantitativeScale {
-    public static _DEFAULT_DOMAIN_LENGTH = 1000 * 60 * 60 * 24;
-
     /**
      * Creates a new Time Scale.
      *
@@ -52,7 +50,7 @@ export module Scale {
 
     public _defaultExtent(): any[] {
       var endTime = new Date().valueOf();
-      var startTime = endTime - Time._DEFAULT_DOMAIN_LENGTH;
+      var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
       return [startTime, endTime];
     }
   }

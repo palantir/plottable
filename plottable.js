@@ -2722,10 +2722,9 @@ var Plottable;
             };
             Time.prototype._defaultExtent = function () {
                 var endTime = new Date().valueOf();
-                var startTime = endTime - Time._DEFAULT_DOMAIN_LENGTH;
+                var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
                 return [startTime, endTime];
             };
-            Time._DEFAULT_DOMAIN_LENGTH = 1000 * 60 * 60 * 24;
             return Time;
         })(Plottable.Abstract.QuantitativeScale);
         Scale.Time = Time;
