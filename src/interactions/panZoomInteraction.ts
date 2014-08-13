@@ -10,6 +10,9 @@ export module Interaction {
     /**
      * Creates a PanZoomInteraction.
      *
+     * The allows you to move around and zoom in on a plot, interactively. It
+     * does so by changing the xScale and yScales' domains repeatedly.
+     *
      * @constructor
      * @param {Component} componentToListenTo The component to listen for interactions on.
      * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
@@ -31,6 +34,9 @@ export module Interaction {
       this.zoom.on("zoom", () => this.rerenderZoomed());
     }
 
+    /**
+     * Sets the scales back to their original domains.
+     */
     public resetZoom() {
       // HACKHACK #254
       this.zoom = d3.behavior.zoom();

@@ -2,8 +2,16 @@
 
 module Plottable {
 export module Interaction {
+  /**
+   * A DragBox is an interaction that automatically draws a box across the
+   * element you attach it to when you drag.
+   */
   export class DragBox extends Drag {
     private static CLASS_DRAG_BOX = "drag-box";
+    /**
+     * The DOM element of the box that is drawn. When no box is drawn, it is
+     * null.
+     */
     public dragBox: D3.Selection;
     public boxIsDrawn = false;
 
@@ -16,9 +24,9 @@ export module Interaction {
     }
 
     /**
-     * Clears the highlighted drag-selection box drawn by the AreaInteraction.
+     * Clears the highlighted drag-selection box drawn by the DragBox.
      *
-     * @returns {AreaInteraction} The calling AreaInteraction.
+     * @returns {DragBox} The calling DragBox.
      */
     public clearBox() {
       if (this.dragBox == null) {return;} // HACKHACK #593
@@ -27,6 +35,14 @@ export module Interaction {
       return this;
     }
 
+    /**
+     * Set where the box is draw explicitly.
+     *
+     * @param {number} x0 Left.
+     * @param {number} x1 Right.
+     * @param {number} y0 Top.
+     * @param {number} y1 Bottom.
+     */
     public setBox(x0: number, x1: number, y0: number, y1: number) {
       if (this.dragBox == null) {return;} // HACKHACK #593
       var w = Math.abs(x0 - x1);

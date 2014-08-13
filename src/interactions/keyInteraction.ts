@@ -10,6 +10,9 @@ export module Interaction {
     /**
      * Creates a KeyInteraction.
      *
+     * KeyInteraction listens to key events that occur while the component is
+     * moused over.
+     *
      * @constructor
      * @param {Component} componentToListenTo The component to listen for keypresses on.
      * @param {number} keyCode The key code to listen for.
@@ -36,7 +39,8 @@ export module Interaction {
     }
 
     /**
-     * Sets an callback to be called when the designated key is pressed.
+     * Sets an callback to be called when the designated key is pressed and the
+     * user is moused over the component.
      *
      * @param {() => any} cb: Callback to be called.
      */

@@ -12,9 +12,10 @@ export module Interaction {
     public callbackToCall: (dragInfo: any) => any;
 
     /**
-     * Creates a Drag.
+     * Creates a Drag. A Drag will signal its callbacks on mouse drag.
      *
-     * @param {Component} componentToListenTo The component to listen for interactions on.
+     * @param {Component} componentToListenTo The component to listen for
+     * interactions on.
      */
     constructor(componentToListenTo: Abstract.Component) {
       super(componentToListenTo);
@@ -25,10 +26,11 @@ export module Interaction {
     }
 
     /**
-     * Adds a callback to be called when the AreaInteraction triggers.
+     * Adds a callback to be called when the Drag triggers.
      *
-     * @param {(a: SelectionArea) => any} cb The function to be called. Takes in a SelectionArea in pixels.
-     * @returns {AreaInteraction} The calling AreaInteraction.
+     * @param {(a: SelectionArea) => any} cb The function to be called. Takes
+     * in a SelectionArea in pixels.
+     * @returns {Drag} The calling Drag.
      */
     public callback(cb?: (a: any) => any) {
       this.callbackToCall = cb;
