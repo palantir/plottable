@@ -162,11 +162,13 @@ describe("Legends", () => {
     verifyCircleHeight();
 
     style.text(".plottable .legend text { font-size: 60px; }");
-    legend._computeLayout()._render();
+    legend._computeLayout();
+    legend._render();
     verifyCircleHeight();
 
     style.text(".plottable .legend text { font-size: 10px; }");
-    legend._computeLayout()._render();
+    legend._computeLayout();
+    legend._render();
     verifyCircleHeight();
 
     svg.remove();

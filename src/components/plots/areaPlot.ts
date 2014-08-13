@@ -32,7 +32,6 @@ export module Plot {
     public _setup() {
       super._setup();
       this.areaPath = this.renderArea.append("path").classed("area", true);
-      return this;
     }
 
     public _onDataSourceUpdate() {
@@ -42,7 +41,7 @@ export module Plot {
       }
     }
 
-    public _updateYDomainer(): Area {
+    public _updateYDomainer() {
       super._updateYDomainer();
       var scale = <Abstract.QuantitativeScale> this.yScale;
 
@@ -60,7 +59,6 @@ export module Plot {
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         scale._autoDomainIfAutomaticMode();
       }
-      return this;
     }
 
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
@@ -101,6 +99,13 @@ export module Plot {
         .y1(yFunction);
       this._applyAnimatedAttributes(this.areaPath, "area", attrToProjector);
     }
+
+    public _wholeDatumAttributes() {
+      var wholeDatumAttributes = super._wholeDatumAttributes();
+      wholeDatumAttributes.push("y0");
+      return wholeDatumAttributes;
+    }
+
   }
 }
 }

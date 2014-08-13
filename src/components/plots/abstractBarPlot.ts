@@ -43,7 +43,6 @@ export module Abstract {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
       this._bars = this.renderArea.selectAll("rect").data([]);
-      return this;
     }
 
     public _paint() {
@@ -205,7 +204,6 @@ export module Abstract {
             // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         qscale._autoDomainIfAutomaticMode();
       }
-      return this;
     }
 
     public _generateAttrToProjector() {

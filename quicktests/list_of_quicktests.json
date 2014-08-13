@@ -29,7 +29,7 @@
   },  {
     "name":"category_project",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate", "Title", "Label"]
-  },  {
+  },  {  
     "name":"category_verticalBar",
     "categories":["Data", "Datasource", "Ordinal Scale", "Category Axis", "Linear Scale", "Numeric Axis", "Vertical Bar Plot", "Project", "Animate"]
   },  {
@@ -69,6 +69,9 @@
     "name":"project_scatter",
     "categories":["Linear Scale", "Numeric Axis", "Project", "Accessor", "Scatter Plot", "Title"]
   },  {
+    "name":"project_width",
+    "categories":["Linear Scale", "Numeric Axis", "Ordinal Scale", "Category Axis", "Vertical Bar Plot", "Gridlines", "Accessor", "Project", "Click Interaction"]
+  },  {    
     "name":"scale_date",
     "categories":["Data", "Time Scale", "Linear Scale", "Numeric Axis", "Project", "Accessor", "Line Plot"]
   },  {

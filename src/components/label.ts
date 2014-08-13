@@ -65,7 +65,6 @@ export module Component {
       this.textContainer = this.content.append("g");
       this.measurer = Util.Text.getTextMeasurer(this.textContainer.append("text"));
       this.text(this._text);
-      return this;
     }
 
     /**
@@ -103,7 +102,6 @@ export module Component {
         Util.Text.writeLineVertically(truncatedText, this.textContainer, this.availableWidth, this.availableHeight,
                                         this.xAlignment, this.yAlignment, this.orientation);
       }
-      return this;
     }
 
     public _computeLayout(xOffset?: number, yOffset?: number, availableWidth?: number, availableHeight?: number) {

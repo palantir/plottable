@@ -110,7 +110,8 @@ export module Axis {
       }
       var textHeight = this._measureTextHeight(this._majorTickLabels) + this._measureTextHeight(this._minorTickLabels);
       this.tickLength(textHeight);
-      this._computedHeight = textHeight + 2 * this.tickLabelPadding();
+      this.endTickLength(textHeight);
+      this._computedHeight = this._maxLabelTickLength() + 2 * this.tickLabelPadding();
       return this._computedHeight;
     }
 
@@ -141,7 +142,6 @@ export module Axis {
       this._majorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       this._minorTickLabels = this.content.append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       this.measurer = Util.Text.getTextMeasurer(this._majorTickLabels.append("text"));
-      return this;
     }
 
     // returns a number to index into the major/minor intervals
@@ -216,8 +216,8 @@ export module Axis {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(Abstract.Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = shouldCenterText ? 0 : this.tickLabelPadding();
-      var yTranslate = (this._orientation === "bottom" ? (this.tickLength() / 2 * height) :
-          (this.availableHeight - this.tickLength() / 2 * height + 2 * this.tickLabelPadding()));
+      var yTranslate = (this._orientation === "bottom" ? (this._maxLabelTickLength() / 2 * height) :
+          (this.availableHeight - this._maxLabelTickLength() / 2 * height + 2 * this.tickLabelPadding()));
       var textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
         Util.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -284,10 +284,9 @@ export module Axis {
         this.generateLabellessTicks(index - 1);
       }
       // make minor ticks shorter
-      this.adjustTickLength(this.tickLength() / 2, Time.minorIntervals[index]);
+      this.adjustTickLength(this._maxLabelTickLength() / 2, Time.minorIntervals[index]);
       // however, we need to make major ticks longer, since they may have overlapped with some minor ticks
-      this.adjustTickLength(this.tickLength(), Time.majorIntervals[index]);
-      return this;
+      this.adjustTickLength(this._maxLabelTickLength(), Time.majorIntervals[index]);
     }
   }
 }
