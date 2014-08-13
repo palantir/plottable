@@ -15,6 +15,12 @@ export module Plot {
       super(xScale, yScale);
     }
 
+    public _addDataset(key: string, dataset: any) {
+      super._addDataset(key, dataset);
+      // this seems rather inefficient, but we don't want to call stackedData in paint() (#821)
+      this.stackedData = this.stack(this._projectors["y"].accessor);
+    }
+
     public _updateAllProjectors() {
       super._updateAllProjectors();
       if (this.yScale == null) {
@@ -68,8 +74,7 @@ export module Plot {
     public _paint() {
       var accessor = this._projectors["y"].accessor;
       var attrHash = this._generateAttrToProjector();
-      var stackedData = this.stack(accessor);
-      this._getDrawersInOrder().forEach((d, i) => d.draw(stackedData[i], attrHash));
+      this._getDrawersInOrder().forEach((d, i) => d.draw(this.stackedData[i], attrHash));
     }
   }
 }

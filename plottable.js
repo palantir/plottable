@@ -5254,6 +5254,10 @@ var Plottable;
                 this._baselineValue = 0;
                 this.stackedExtent = [];
             }
+            StackedBar.prototype._addDataset = function (key, dataset) {
+                _super.prototype._addDataset.call(this, key, dataset);
+                this.stackedData = this.stack(this._projectors["y"].accessor);
+            };
             StackedBar.prototype._updateAllProjectors = function () {
                 _super.prototype._updateAllProjectors.call(this);
                 if (this.yScale == null) {
@@ -5302,10 +5306,10 @@ var Plottable;
                 return stacks;
             };
             StackedBar.prototype._paint = function () {
+                var _this = this;
                 var accessor = this._projectors["y"].accessor;
                 var attrHash = this._generateAttrToProjector();
-                var stackedData = this.stack(accessor);
-                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(stackedData[i], attrHash); });
+                this._getDrawersInOrder().forEach(function (d, i) { return d.draw(_this.stackedData[i], attrHash); });
             };
             return StackedBar;
         })(Plottable.Abstract.NewStyleBarPlot);
