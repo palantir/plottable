@@ -10,7 +10,7 @@ module Plottable {
 export module Abstract {
   export class NewStylePlot extends XYPlot {
     private nextSeriesIndex = 0;
-    public _key2DatasetDrawerKey: {[key: string]: DatasetDrawerKey; } = {};
+    public _key2DatasetDrawerKey: { [key: string]: DatasetDrawerKey; } = {};
     public _datasetKeysInOrder: string[] = [];
 
     /**
@@ -50,7 +50,7 @@ export module Abstract {
     public addDataset(dataset: any[]): NewStylePlot;
     public addDataset(keyOrDataset: any, dataset?: any): NewStylePlot {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
-        throw new Error("addDataset takes string keys");
+        throw new Error("invalid input to addDataset");
       }
       if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
         Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");

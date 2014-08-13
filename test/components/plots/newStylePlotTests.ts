@@ -65,5 +65,22 @@ describe("Plots", () => {
       assert.equal(warned, 1);
       assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
     });
+
+    it("Has proper warnings", () => {
+      var warned = 0;
+      Plottable.Util.Methods.warn = () => warned++;
+      p.addDataset("_foo", []);
+      assert.equal(warned, 1);
+      p.addDataset("2", []);
+      p.addDataset("4", []);
+
+      // get warning for not a permutation
+      p.datasetOrder(["_bar", "4", "2"]);
+      assert.equal(warned, 2);
+
+      // do not get warning for a permutation
+      p.datasetOrder(["2", "_foo", "4"]);
+      assert.equal(warned, 2);
+    });
   });
 });

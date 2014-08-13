@@ -1398,6 +1398,18 @@ describe("Plots", function () {
             assert.equal(warned, 1);
             assert.deepEqual(p.datasetOrder(), ["bar", "baz", "foo"]);
         });
+        it("Has proper warnings", function () {
+            var warned = 0;
+            Plottable.Util.Methods.warn = function () { return warned++; };
+            p.addDataset("_foo", []);
+            assert.equal(warned, 1);
+            p.addDataset("2", []);
+            p.addDataset("4", []);
+            p.datasetOrder(["_bar", "4", "2"]);
+            assert.equal(warned, 2);
+            p.datasetOrder(["2", "_foo", "4"]);
+            assert.equal(warned, 2);
+        });
     });
 });
 
@@ -2100,6 +2112,9 @@ describe("Plots", function () {
         beforeEach(function () {
             verifier.start();
         });
+        afterEach(function () {
+            verifier.end();
+        });
         after(function () {
             if (verifier.passed) {
                 svg.remove();
@@ -2132,7 +2147,6 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar1, "y"), (400 - axisHeight) / 3, 0.01, "y is correct for bar1");
             assert.closeTo(numAttr(bar2, "y"), 0, 0.01, "y is correct for bar2");
             assert.closeTo(numAttr(bar3, "y"), 0, 0.01, "y is correct for bar3");
-            verifier.end();
         });
     });
 });
@@ -2178,6 +2192,9 @@ describe("Plots", function () {
         beforeEach(function () {
             verifier.start();
         });
+        afterEach(function () {
+            verifier.end();
+        });
         after(function () {
             if (verifier.passed) {
                 svg.remove();
@@ -2208,7 +2225,6 @@ describe("Plots", function () {
             assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
             assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
             assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
-            verifier.end();
         });
     });
 });

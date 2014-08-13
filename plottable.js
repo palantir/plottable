@@ -2110,7 +2110,7 @@ var Plottable;
             };
             NewStylePlot.prototype.addDataset = function (keyOrDataset, dataset) {
                 if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
-                    throw new Error("addDataset takes string keys");
+                    throw new Error("invalid input to addDataset");
                 }
                 if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
                     Plottable.Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");

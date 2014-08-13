@@ -47,6 +47,10 @@ describe("Plots", () => {
     beforeEach(() => {
       verifier.start();
     });
+    
+    afterEach(() => {
+      verifier.end();
+    });
 
     after(() => {
       if (verifier.passed) {svg.remove();};
@@ -79,7 +83,6 @@ describe("Plots", () => {
       assert.closeTo(numAttr(bar1, "x") + numAttr(bar1, "width") / 2, xScale.scale(bar1X) + bandWidth / 2 - off, 0.01, "x pos correct for bar1");
       assert.closeTo(numAttr(bar2, "x") + numAttr(bar2, "width") / 2, xScale.scale(bar2X) + bandWidth / 2 + off, 0.01, "x pos correct for bar2");
       assert.closeTo(numAttr(bar3, "x") + numAttr(bar3, "width") / 2, xScale.scale(bar3X) + bandWidth / 2 + off, 0.01, "x pos correct for bar3");
-      verifier.end();
     });
   });
 });
