@@ -5000,7 +5000,7 @@ var Plottable;
                     "baseline": new Plottable.Animator.Null()
                 };
                 this.classed("bar-plot", true);
-                this.project("fill", function () { return "steelblue"; });
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this.baseline(this._baselineValue);
             }
             NewStyleBarPlot.prototype._getDrawer = function (key) {

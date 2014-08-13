@@ -26,7 +26,7 @@ export module Abstract {
     constructor(xScale: Abstract.Scale, yScale: Abstract.Scale) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this.project("fill", () => "steelblue");
+      this.project("fill", () => Core.Colors.INDIGO);
       // super() doesn't set baseline
       this.baseline(this._baselineValue);
     }

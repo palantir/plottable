@@ -15,9 +15,9 @@
         data2 = [{name: "jon", y: 2, type: "q2"}, {name: "dan", y: 4, type: "q2"}, {name: "zoo", y: 2, type: "q2"}];
         data3 = [{name: "jon", y: 4, type: "q3"}, {name: "dan", y: 15, type: "q3"}, {name: "zoo", y: 15, type: "q3"}];
 
-        xScale = new Plottable.Scale.Ordinal().domain(["jon", "dan", "zoo"]);
+        xScale = new Plottable.Scale.Ordinal();
         yScale = new Plottable.Scale.Linear();
-        var colorScale = new Plottable.Scale.Color("10").domain(["q1", "q2", "q3"]);
+        var colorScale = new Plottable.Scale.Color();
 
         var xAxis = new Plottable.Axis.Category(xScale, "bottom");
         var yAxis = new Plottable.Axis.Numeric(yScale, "left");
