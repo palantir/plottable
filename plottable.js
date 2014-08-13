@@ -5247,9 +5247,7 @@ var Plottable;
                 var widthF = attrToProjector["width"];
                 this.innerScale.range([0, widthF(null, 0)]);
                 attrToProjector["width"] = function (d, i) { return _this.innerScale.rangeBand(); };
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var getX = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_X; };
-                attrToProjector["x"] = getX;
+                attrToProjector["x"] = function (d) { return d._PLOTTABLE_PROTECTED_FIELD_X; };
                 return attrToProjector;
             };
             ClusteredBar.prototype.cluster = function (accessor) {

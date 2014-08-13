@@ -19,10 +19,7 @@ export module Plot {
       var widthF = attrToProjector["width"];
       this.innerScale.range([0, widthF(null, 0)]);
       attrToProjector["width"] = (d: any, i: number) => this.innerScale.rangeBand();
-
-      var primaryScale = this._isVertical ? this.yScale : this.xScale;
-      var getX = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_X;
-      attrToProjector["x"] = getX;
+      attrToProjector["x"] = (d: any) => d._PLOTTABLE_PROTECTED_FIELD_X;
       return attrToProjector;
     }
 
