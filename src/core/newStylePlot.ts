@@ -21,7 +21,7 @@ export module Abstract {
      * @param [Scale] yScale The y scale to use
      */
     constructor(xScale?: Abstract.Scale, yScale?: Abstract.Scale) {
-      // make a dummy dataSource to satisfy the base Plot (hackhack)
+      // make a dummy dataSource to satisfy the base Plot (HACKHACK)
       super(new Plottable.DataSource(), xScale, yScale);
     }
 
@@ -49,15 +49,15 @@ export module Abstract {
     public addDataset(key: string, dataset: any[]): Plot;
     public addDataset(dataset: DataSource): Plot;
     public addDataset(dataset: any[]): Plot;
-    public addDataset(first: any, second?: any): Plot {
-      if (typeof(first) !== "string" && second !== undefined) {
+    public addDataset(keyOrDataset: any, dataset?: any): Plot {
+      if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("addDataset takes string keys");
       }
-      if (typeof(first) === "string" && first[0] === "_") {
+      if (typeof(keyOrDataset) === "string" && keyOrDataset[0] === "_") {
         Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
       }
-      var key  = typeof(first) === "string" ? first : "_" + this.nextSeriesIndex++;
-      var data = typeof(first) !== "string" ? first : second;
+      var key  = typeof(keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
+      var data = typeof(keyOrDataset) !== "string" ? keyOrDataset : dataset;
       var dataset = (data instanceof DataSource) ? data : new DataSource(data);
 
       this._addDataset(key, dataset);
@@ -80,17 +80,11 @@ export module Abstract {
       this._onDataSourceUpdate();
     }
 
-    /**
-     * Gets a drawer by key.
-     *
-     * @param {string} key The key to use.
-     */
-
     public _getDrawer(key: string): Abstract._Drawer {
       throw new Error("Abstract Method Not Implemented");
     }
 
-    public updateProjector(attr: string) {
+    public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         d3.values(this._key2DatasetDrawerKey).forEach((ddk) => {
@@ -125,7 +119,7 @@ export module Abstract {
       }
       function isPermutation(l1: string[], l2: string[]) {
         var intersection = Util.Methods.intersection(d3.set(l1), d3.set(l2));
-        var size = (<any> intersection).size(); // hackhack pending on borisyankov/definitelytyped/ pr #2653
+        var size = (<any> intersection).size(); // HACKHACK pending on borisyankov/definitelytyped/ pr #2653
         return size === l1.length && size === l2.length;
       }
       if (isPermutation(order, this._datasetKeysInOrder)) {

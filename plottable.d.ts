@@ -387,7 +387,6 @@ declare module Plottable {
         class Plot extends Component {
             renderArea: D3.Selection;
             element: D3.Selection;
-            animateOnNextRender: boolean;
             constructor();
             constructor(dataset: any[]);
             constructor(dataset: DataSource);
@@ -397,7 +396,6 @@ declare module Plottable {
             project(attrToSet: string, accessor: any, scale?: Scale): Plot;
             animate(enabled: boolean): Plot;
             detach(): Plot;
-            updateProjector(attr: string): Plot;
             animator(animatorKey: string): Plottable.Animator.IPlotAnimator;
             animator(animatorKey: string, animator: Plottable.Animator.IPlotAnimator): Plot;
         }
@@ -431,7 +429,6 @@ declare module Plottable {
             addDataset(key: string, dataset: any[]): Plot;
             addDataset(dataset: DataSource): Plot;
             addDataset(dataset: any[]): Plot;
-            updateProjector(attr: string): NewStylePlot;
             datasetOrder(): string[];
             datasetOrder(order: string[]): NewStylePlot;
             removeDataset(key: string): Plot;
@@ -936,10 +933,10 @@ declare module Plottable {
 declare module Plottable {
     module Abstract {
         class NewStyleBarPlot extends NewStylePlot {
-            static DEFAULT_WIDTH: number;
-            static _BarAlignmentToFactor: {
+            static _barAlignmentToFactor: {
                 [x: string]: number;
             };
+            static DEFAULT_WIDTH: number;
             constructor(xScale: Scale, yScale: Scale);
             baseline(value: number): any;
         }

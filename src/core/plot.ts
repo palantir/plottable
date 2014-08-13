@@ -8,13 +8,11 @@ export module Abstract {
 
     public renderArea: D3.Selection;
     public element: D3.Selection;
-    private scales: Abstract.Scale[];
-    public _colorAccessor: IAccessor;
     public _animate: boolean = false;
     public _animators: Animator.IPlotAnimatorMap = {};
     public _ANIMATION_DURATION = 250; // milliseconds
     public _projectors: { [attrToSet: string]: _IProjector; } = {};
-    public animateOnNextRender = true;
+    private animateOnNextRender = true;
 
     /**
      * Creates a Plot.
@@ -113,7 +111,7 @@ export module Abstract {
       }
       var activatedAccessor = Util.Methods._applyAccessor(accessor, this);
       this._projectors[attrToSet] = {accessor: activatedAccessor, scale: scale, attribute: attrToSet};
-      this.updateProjector(attrToSet);
+      this._updateProjector(attrToSet);
       this._render(); // queue a re-render upon changing projector
       return this;
     }
@@ -171,11 +169,11 @@ export module Abstract {
      * have an extent that includes all the data that is projected onto them.
      */
     public _updateAllProjectors(): Plot {
-      d3.keys(this._projectors).forEach((attr: string) => this.updateProjector(attr));
+      d3.keys(this._projectors).forEach((attr: string) => this._updateProjector(attr));
       return this;
     }
 
-    public updateProjector(attr: string) {
+    public _updateProjector(attr: string) {
       var projector = this._projectors[attr];
       if (projector.scale != null) {
         var extent = this.dataSource()._getExtent(projector.accessor);

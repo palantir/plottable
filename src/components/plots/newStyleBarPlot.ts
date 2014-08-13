@@ -3,11 +3,11 @@
 module Plottable {
 export module Abstract {
   export class NewStyleBarPlot extends NewStylePlot {
+    public static _barAlignmentToFactor: {[alignment: string]: number} = {};
     public static DEFAULT_WIDTH = 10;
     public _baseline: D3.Selection;
     public _baselineValue = 0;
     public _barAlignmentFactor = 0;
-    public static _BarAlignmentToFactor: {[alignment: string]: number} = {};
     public _isVertical: boolean;
 
     public _animators: Animator.IPlotAnimatorMap = {
@@ -27,9 +27,7 @@ export module Abstract {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.project("fill", () => "steelblue");
-      // because this._baselineValue was not initialized during the super()
-      // call, we must call this in order to get this._baselineValue
-      // to be used by the Domainer.
+      // super() doesn't set baseline
       this.baseline(this._baselineValue);
     }
 

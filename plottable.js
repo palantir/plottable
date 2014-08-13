@@ -2088,7 +2088,7 @@ var Plottable;
                 }
                 var activatedAccessor = Plottable.Util.Methods._applyAccessor(accessor, this);
                 this._projectors[attrToSet] = { accessor: activatedAccessor, scale: scale, attribute: attrToSet };
-                this.updateProjector(attrToSet);
+                this._updateProjector(attrToSet);
                 this._render();
                 return this;
             };
@@ -2130,10 +2130,10 @@ var Plottable;
             };
             Plot.prototype._updateAllProjectors = function () {
                 var _this = this;
-                d3.keys(this._projectors).forEach(function (attr) { return _this.updateProjector(attr); });
+                d3.keys(this._projectors).forEach(function (attr) { return _this._updateProjector(attr); });
                 return this;
             };
-            Plot.prototype.updateProjector = function (attr) {
+            Plot.prototype._updateProjector = function (attr) {
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
                     var extent = this.dataSource()._getExtent(projector.accessor);
@@ -2261,15 +2261,15 @@ var Plottable;
                 _super.prototype.remove.call(this);
                 this._datasetKeysInOrder.forEach(function (k) { return _this.removeDataset(k); });
             };
-            NewStylePlot.prototype.addDataset = function (first, second) {
-                if (typeof (first) !== "string" && second !== undefined) {
+            NewStylePlot.prototype.addDataset = function (keyOrDataset, dataset) {
+                if (typeof (keyOrDataset) !== "string" && dataset !== undefined) {
                     throw new Error("addDataset takes string keys");
                 }
-                if (typeof (first) === "string" && first[0] === "_") {
+                if (typeof (keyOrDataset) === "string" && keyOrDataset[0] === "_") {
                     Plottable.Util.Methods.warn("Warning: Using _named series keys may produce collisions with unlabeled data sources");
                 }
-                var key = typeof (first) === "string" ? first : "_" + this.nextSeriesIndex++;
-                var data = typeof (first) !== "string" ? first : second;
+                var key = typeof (keyOrDataset) === "string" ? keyOrDataset : "_" + this.nextSeriesIndex++;
+                var data = typeof (keyOrDataset) !== "string" ? keyOrDataset : dataset;
                 var dataset = (data instanceof Plottable.DataSource) ? data : new Plottable.DataSource(data);
                 this._addDataset(key, dataset);
                 return this;
@@ -2293,7 +2293,7 @@ var Plottable;
             NewStylePlot.prototype._getDrawer = function (key) {
                 throw new Error("Abstract Method Not Implemented");
             };
-            NewStylePlot.prototype.updateProjector = function (attr) {
+            NewStylePlot.prototype._updateProjector = function (attr) {
                 var _this = this;
                 var projector = this._projectors[attr];
                 if (projector.scale != null) {
@@ -5169,8 +5169,8 @@ var Plottable;
             NewStyleBarPlot.prototype._updateYDomainer = function () {
                 return Abstract.BarPlot.prototype._updateYDomainer.apply(this);
             };
+            NewStyleBarPlot._barAlignmentToFactor = {};
             NewStyleBarPlot.DEFAULT_WIDTH = 10;
-            NewStyleBarPlot._BarAlignmentToFactor = {};
             return NewStyleBarPlot;
         })(Abstract.NewStylePlot);
         Abstract.NewStyleBarPlot = NewStyleBarPlot;
@@ -5307,7 +5307,6 @@ var Plottable;
             };
             StackedBar.prototype._paint = function () {
                 var _this = this;
-                var accessor = this._projectors["y"].accessor;
                 var attrHash = this._generateAttrToProjector();
                 this._getDrawersInOrder().forEach(function (d, i) { return d.draw(_this.stackedData[i], attrHash); });
             };

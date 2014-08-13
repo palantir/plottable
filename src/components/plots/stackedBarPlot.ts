@@ -17,7 +17,7 @@ export module Plot {
 
     public _addDataset(key: string, dataset: any) {
       super._addDataset(key, dataset);
-      // this seems rather inefficient, but we don't want to call stackedData in paint() (#821)
+      // HACKHACK: this seems rather inefficient, but we don't want to call this.stack() in paint() (#821)
       this.stackedData = this.stack(this._projectors["y"].accessor);
     }
 
@@ -72,7 +72,6 @@ export module Plot {
     }
 
     public _paint() {
-      var accessor = this._projectors["y"].accessor;
       var attrHash = this._generateAttrToProjector();
       this._getDrawersInOrder().forEach((d, i) => d.draw(this.stackedData[i], attrHash));
     }
