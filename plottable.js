@@ -920,6 +920,41 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
+    (function (Core) {
+        var Colors = (function () {
+            function Colors() {
+            }
+            Colors.CORAL_RED = "#fd373e";
+            Colors.INDIGO = "#5177c4";
+            Colors.ROBINS_EGG_BLUE = "#06bdbd";
+            Colors.FERN = "#62bb60";
+            Colors.BURNING_ORANGE = "#ff7939";
+            Colors.ROYAL_HEATH = "#962565";
+            Colors.CONIFER = "#99ce50";
+            Colors.CERISE_RED = "#db2e65";
+            Colors.BRIGHT_SUN = "#ffe43d";
+            Colors.JACARTA = "#2c2b6f";
+            Colors.PLOTTABLE_COLORS = [
+                Colors.CORAL_RED,
+                Colors.INDIGO,
+                Colors.ROBINS_EGG_BLUE,
+                Colors.FERN,
+                Colors.BURNING_ORANGE,
+                Colors.ROYAL_HEATH,
+                Colors.CONIFER,
+                Colors.CERISE_RED,
+                Colors.BRIGHT_SUN,
+                Colors.JACARTA
+            ];
+            return Colors;
+        })();
+        Core.Colors = Colors;
+    })(Plottable.Core || (Plottable.Core = {}));
+    var Core = Plottable.Core;
+})(Plottable || (Plottable = {}));
+
+var Plottable;
+(function (Plottable) {
     (function (Abstract) {
         var PlottableObject = (function () {
             function PlottableObject() {
@@ -2642,6 +2677,10 @@ var Plottable;
             function Color(scaleType) {
                 var scale;
                 switch (scaleType) {
+                    case null:
+                    case undefined:
+                        scale = d3.scale.ordinal().range(Plottable.Core.Colors.PLOTTABLE_COLORS);
+                        break;
                     case "Category10":
                     case "category10":
                     case "10":
@@ -2661,10 +2700,6 @@ var Plottable;
                     case "category20c":
                     case "20c":
                         scale = d3.scale.category20c();
-                        break;
-                    case null:
-                    case undefined:
-                        scale = d3.scale.ordinal();
                         break;
                     default:
                         throw new Error("Unsupported ColorScale type");
@@ -2921,8 +2956,8 @@ var Plottable;
                 this._height = "auto";
                 this._endTickLength = 5;
                 this._tickLength = 5;
-                this._tickLabelPadding = 3;
-                this._gutter = 10;
+                this._tickLabelPadding = 10;
+                this._gutter = 15;
                 this._showEndTickLabels = false;
                 if (scale == null || orientation == null) {
                     throw new Error("Axis requires a scale and orientation");
@@ -4274,7 +4309,8 @@ var Plottable;
                 };
                 this.classed("scatter-plot", true);
                 this.project("r", 3);
-                this.project("fill", function () { return "steelblue"; });
+                this.project("opacity", 0.6);
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
             }
             Scatter.prototype.project = function (attrToSet, accessor, scale) {
                 attrToSet = attrToSet === "cx" ? "x" : attrToSet;
@@ -4376,7 +4412,7 @@ var Plottable;
                     "baseline": new Plottable.Animator.Null()
                 };
                 this.classed("bar-plot", true);
-                this.project("fill", function () { return "steelblue"; });
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
                 this.baseline(this._baselineValue);
             }
             BarPlot.prototype._setup = function () {
@@ -4603,7 +4639,7 @@ var Plottable;
                     "line": new Plottable.Animator.Default().duration(600).easing("exp-in-out")
                 };
                 this.classed("line-plot", true);
-                this.project("stroke", function () { return "steelblue"; });
+                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this.project("stroke-width", function () { return "2px"; });
             }
             Line.prototype._setup = function () {
@@ -4684,9 +4720,9 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this.classed("area-plot", true);
                 this.project("y0", 0, yScale);
-                this.project("fill", function () { return "steelblue"; });
-                this.project("fill-opacity", function () { return 0.5; });
-                this.project("stroke", function () { return "none"; });
+                this.project("fill", function () { return Plottable.Core.Colors.INDIGO; });
+                this.project("fill-opacity", function () { return 0.25; });
+                this.project("stroke", function () { return Plottable.Core.Colors.INDIGO; });
                 this._animators["area-reset"] = new Plottable.Animator.Null();
                 this._animators["area"] = new Plottable.Animator.Default().duration(600).easing("exp-in-out");
             }
@@ -5219,8 +5255,8 @@ var Plottable;
             DragBox.prototype._anchor = function (hitBox) {
                 _super.prototype._anchor.call(this, hitBox);
                 var cname = DragBox.CLASS_DRAG_BOX;
-                var foreground = this.componentToListenTo.foregroundContainer;
-                this.dragBox = foreground.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
+                var background = this.componentToListenTo.backgroundContainer;
+                this.dragBox = background.append("rect").classed(cname, true).attr("x", 0).attr("y", 0);
                 return this;
             };
             DragBox.CLASS_DRAG_BOX = "drag-box";

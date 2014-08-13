@@ -174,6 +174,25 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Core {
+        class Colors {
+            static CORAL_RED: string;
+            static INDIGO: string;
+            static ROBINS_EGG_BLUE: string;
+            static FERN: string;
+            static BURNING_ORANGE: string;
+            static ROYAL_HEATH: string;
+            static CONIFER: string;
+            static CERISE_RED: string;
+            static BRIGHT_SUN: string;
+            static JACARTA: string;
+            static PLOTTABLE_COLORS: string[];
+        }
+    }
+}
+
+
+declare module Plottable {
     module Abstract {
         class PlottableObject {
         }

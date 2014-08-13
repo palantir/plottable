@@ -23,7 +23,8 @@ export module Plot {
       super(dataset, xScale, yScale);
       this.classed("scatter-plot", true);
       this.project("r", 3); // default
-      this.project("fill", () => "steelblue"); // default
+      this.project("opacity", 0.6); // default
+      this.project("fill", () => Core.Colors.INDIGO); // default
     }
 
     public project(attrToSet: string, accessor: any, scale?: Abstract.Scale) {
