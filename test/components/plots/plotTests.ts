@@ -26,7 +26,8 @@ describe("Plots", () => {
       var svg = generateSVG(400, 300);
       var d1 = new Plottable.DataSource(["foo"], {cssClass: "bar"});
       var r = new Plottable.Abstract.Plot(d1);
-      r._anchor(svg)._computeLayout();
+      r._anchor(svg);
+      r._computeLayout();
       var renderArea = r.content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       svg.remove();
@@ -157,8 +158,8 @@ describe("Plots", () => {
       var s = new Plottable.Scale.Linear();
       r.project("attr", "a", s);
       r.remove();
-      var listener2Callback = (<any> s).broadcaster.listener2Callback;
-      assert.isUndefined(listener2Callback.get(r), "the plot is no longer attached to the scale");
+      var key2callback = (<any> s).broadcaster.key2callback;
+      assert.isUndefined(key2callback.get(r), "the plot is no longer attached to the scale");
     });
   });
 });

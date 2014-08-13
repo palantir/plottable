@@ -15,9 +15,9 @@ export module Axis {
      * @constructor
      * @param {OrdinalScale} scale The scale to base the Axis on.
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right)
-     * @param {formatter} [formatter] The Formatter for the Axis (default Formatter.Identity)
+     * @param {Formatter} [formatter] The Formatter for the Axis (default Formatters.identity())
      */
-    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter: any = new Plottable.Formatter.Identity()) {
+    constructor(scale: Scale.Ordinal, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
       if (scale.rangeType() !== "bands") {
@@ -29,12 +29,11 @@ export module Axis {
     public _setup() {
       super._setup();
       this.measurer = new Util.Text.CachingCharacterMeasurer(this._tickLabelContainer);
-      return this;
     }
 
     public _requestedSpace(offeredWidth: number, offeredHeight: number): ISpaceRequest {
-      var widthRequiredByTicks = this._isHorizontal() ? 0 : this.tickLength() + this.tickLabelPadding();
-      var heightRequiredByTicks = this._isHorizontal() ? this.tickLength() + this.tickLabelPadding() : 0;
+      var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+      var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
 
       if (this._scale.domain().length === 0) {
         return {width: 0, height: 0, wantsWidth: false, wantsHeight: false };
@@ -81,8 +80,8 @@ export module Axis {
 
       iterator(function (d: string) {
         var bandWidth = scale.fullBandStartAndWidth(d)[1];
-        var width  = self._isHorizontal() ? bandWidth  : axisWidth - self.tickLength() - self.tickLabelPadding();
-        var height = self._isHorizontal() ? axisHeight - self.tickLength() - self.tickLabelPadding() : bandWidth;
+        var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+        var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
 
         var textWriteResult: Util.Text.IWriteTextResult;
         var formatter = self._formatter;
@@ -90,13 +89,13 @@ export module Axis {
           var d3this = d3.select(this);
           var xAlign: {[s: string]: string} = {left: "right",  right: "left",   top: "center", bottom: "center"};
           var yAlign: {[s: string]: string} = {left: "center", right: "center", top: "bottom", bottom: "top"};
-          textWriteResult = Util.Text.writeText(formatter.format(d), width, height, tm, true, {
+          textWriteResult = Util.Text.writeText(formatter(d), width, height, tm, true, {
                                                     g: d3this,
                                                     xAlign: xAlign[self._orientation],
                                                     yAlign: yAlign[self._orientation]
           });
         } else {
-          textWriteResult = Util.Text.writeText(formatter.format(d), width, height, tm, true);
+          textWriteResult = Util.Text.writeText(formatter(d), width, height, tm, true);
         }
 
         textWriteResults.push(textWriteResult);
@@ -130,11 +129,10 @@ export module Axis {
       this.measureTicks(this.availableWidth, this.availableHeight, this._scale, tickLabels);
       var translate = this._isHorizontal() ? [this._scale.rangeBand() / 2, 0] : [0, this._scale.rangeBand() / 2];
 
-      var xTranslate = this._orientation === "right" ? this.tickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this._orientation === "bottom" ? this.tickLength() + this.tickLabelPadding() : 0;
+      var xTranslate = this._orientation === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this._orientation === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       Util.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       Util.DOM.translate(this._tickMarkContainer, translate[0], translate[1]);
-      return this;
     }
 
 

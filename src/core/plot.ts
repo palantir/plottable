@@ -46,7 +46,6 @@ export module Abstract {
       this.animateOnNextRender = true;
       this._dataChanged = true;
       this._updateAllProjectors();
-      return this;
     }
 
     public remove() {
@@ -128,13 +127,12 @@ export module Abstract {
       return h;
     }
 
-    public _doRender(): Plot {
-      if (this.element != null) {
+    public _doRender() {
+      if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
         this.animateOnNextRender = false;
       }
-      return this;
     }
 
     public _paint() {
@@ -144,7 +142,6 @@ export module Abstract {
     public _setup() {
       super._setup();
       this.renderArea = this.content.append("g").classed("render-area", true);
-      return this;
     }
 
     /**
@@ -168,9 +165,8 @@ export module Abstract {
      * This function makes sure that all of the scales in this._projectors
      * have an extent that includes all the data that is projected onto them.
      */
-    public _updateAllProjectors(): Plot {
+    public _updateAllProjectors() {
       d3.keys(this._projectors).forEach((attr: string) => this._updateProjector(attr));
-      return this;
     }
 
     public _updateProjector(attr: string) {
@@ -183,7 +179,6 @@ export module Abstract {
           projector.scale.updateExtent(this._plottableID.toString(), attr, extent);
         }
       }
-      return this;
     }
 
     /**

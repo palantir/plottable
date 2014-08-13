@@ -31,7 +31,6 @@ export module Plot {
       } else {
         this.yScale.removeExtent(this._plottableID.toString(), "_PLOTTABLE_PROTECTED_FIELD_STACK_EXTENT");
       }
-      return this;
     }
 
     public _generateAttrToProjector() {

@@ -17,6 +17,7 @@
 ///<reference path="components/legendTests.ts" />
 ///<reference path="components/plots/plotTests.ts" />
 ///<reference path="components/plots/newStylePlotTests.ts" />
+///<reference path="components/plots/linePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
 ///<reference path="components/plots/barPlotTests.ts" />
 ///<reference path="components/plots/gridPlotTests.ts" />
@@ -37,7 +38,7 @@
 ///<reference path="scales/timeScaleTests.ts" />
 
 ///<reference path="utils/domUtilsTests.ts" />
-///<reference path="utils/formatterTests.ts" />
+///<reference path="utils/formattersTests.ts" />
 ///<reference path="utils/idCounterTests.ts" />
 ///<reference path="utils/strictEqualityAssociativeArrayTests.ts" />
 ///<reference path="utils/cachingCharacterMeasurerTests.ts" />

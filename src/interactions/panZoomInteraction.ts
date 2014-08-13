@@ -12,12 +12,17 @@ export module Interaction {
      *
      * @constructor
      * @param {Component} componentToListenTo The component to listen for interactions on.
-     * @param {QuantitativeScale} xScale The X scale to update on panning/zooming.
-     * @param {QuantitativeScale} yScale The Y scale to update on panning/zooming.
+     * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+     * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
      */
-    constructor(componentToListenTo: Abstract.Component, xScale: Abstract.QuantitativeScale, yScale: Abstract.QuantitativeScale) {
+    constructor(componentToListenTo: Abstract.Component, xScale?: Abstract.QuantitativeScale, yScale?: Abstract.QuantitativeScale) {
       super(componentToListenTo);
-      if (xScale == null || yScale == null) {throw new Error("panZoomInteractions require an xScale and yScale");}
+      if (xScale == null) {
+        xScale = new Plottable.Scale.Linear();
+      }
+      if (yScale == null) {
+        yScale = new Plottable.Scale.Linear();
+      }
       this.xScale = xScale;
       this.yScale = yScale;
       this.zoom = d3.behavior.zoom();

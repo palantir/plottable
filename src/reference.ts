@@ -6,17 +6,11 @@
 /// <reference path="utils/textUtils.ts" />
 /// <reference path="utils/wordWrapUtils.ts" />
 /// <reference path="utils/domUtils.ts" />
-/// <reference path="utils/formatters/formatter.ts" />
-/// <reference path="utils/formatters/identityFormatter.ts" />
-/// <reference path="utils/formatters/generalFormatter.ts" />
-/// <reference path="utils/formatters/fixedFormatter.ts" />
-/// <reference path="utils/formatters/currencyFormatter.ts" />
-/// <reference path="utils/formatters/percentageFormatter.ts" />
-/// <reference path="utils/formatters/SISuffixFormatter.ts" />
-/// <reference path="utils/formatters/customFormatter.ts" />
-/// <reference path="utils/formatters/timeFormatter.ts" />
+
+/// <reference path="utils/formatters.ts" />
 
 /// <reference path="core/version.ts" />
+/// <reference path="core/colors.ts" />
 /// <reference path="core/plottableObject.ts" />
 /// <reference path="core/broadcaster.ts" />
 /// <reference path="core/dataSource.ts" />
@@ -55,7 +49,6 @@
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
 /// <reference path="components/gridlines.ts" />
-/// <reference path="components/axisUtils.ts" />
 
 /// <reference path="components/plots/scatterPlot.ts" />
 /// <reference path="components/plots/gridPlot.ts" />

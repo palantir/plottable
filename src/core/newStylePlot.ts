@@ -28,7 +28,6 @@ export module Abstract {
     public _setup() {
       super._setup();
       this._getDrawersInOrder().forEach((d) => d.renderArea = this.renderArea.append("g"));
-      return this;
     }
 
     public remove() {
@@ -45,11 +44,11 @@ export module Abstract {
      * @param {any[]|DataSource} dataset dataset to add.
      * @return {NewStylePlot} The calling NewStylePlot.
      */
-    public addDataset(key: string, dataset: DataSource): Plot;
-    public addDataset(key: string, dataset: any[]): Plot;
-    public addDataset(dataset: DataSource): Plot;
-    public addDataset(dataset: any[]): Plot;
-    public addDataset(keyOrDataset: any, dataset?: any): Plot {
+    public addDataset(key: string, dataset: DataSource): NewStylePlot;
+    public addDataset(key: string, dataset: any[]): NewStylePlot;
+    public addDataset(dataset: DataSource): NewStylePlot;
+    public addDataset(dataset: any[]): NewStylePlot;
+    public addDataset(keyOrDataset: any, dataset?: any): NewStylePlot {
       if (typeof(keyOrDataset) !== "string" && dataset !== undefined) {
         throw new Error("addDataset takes string keys");
       }
@@ -95,10 +94,8 @@ export module Abstract {
           } else {
             projector.scale.updateExtent(scaleKey, attr, extent);
           }
-
         });
       }
-      return this;
     }
 
     /**
@@ -137,7 +134,7 @@ export module Abstract {
      * @param {string} key The key of the dataset
      * @return {NewStylePlot} The calling NewStylePlot.
      */
-    public removeDataset(key: string): Plot {
+    public removeDataset(key: string): NewStylePlot {
       if (this._key2DatasetDrawerKey[key] != null) {
         var ddk = this._key2DatasetDrawerKey[key];
         ddk.drawer.remove();

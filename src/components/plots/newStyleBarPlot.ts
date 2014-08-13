@@ -38,7 +38,6 @@ export module Abstract {
     public _setup() {
       super._setup();
       this._baseline = this.renderArea.append("line").classed("baseline", true);
-      return this;
     }
 
     public _paint() {
