@@ -122,7 +122,7 @@ export module Axis {
         // this offset is too large, so just return available width
         return this.availableWidth;
       }
-      // meausre how much space one date can get
+      // measure how much space one date can get
       var stepLength = Math.abs(this._scale.scale(endDate) - this._scale.scale(startDate));
       return stepLength;
     }
