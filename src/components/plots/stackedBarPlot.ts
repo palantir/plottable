@@ -45,8 +45,7 @@ export module Plot {
         Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
       }
       var currentBase = Util.Methods.createFilledArray(0, lengths[0]);
-      var datasetsInStackOrder = this._datasetKeysInOrder.map((k) => this._key2DatasetDrawerKey[k].dataset);
-      var stacks = datasetsInStackOrder.map((dataset) => {
+      var stacks = this._getDatasetsInOrder.map((dataset) => {
         var data = dataset.data();
         var base = currentBase.slice();
         var vals = data.map(accessor);
