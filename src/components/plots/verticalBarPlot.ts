@@ -16,12 +16,6 @@ export module Plot {
     constructor(dataset: any, xScale: Abstract.Scale, yScale: Abstract.QuantitativeScale) {
       super(dataset, xScale, yScale);
     }
-
-    public _updateYDomainer() {
-      this._updateDomainer(this.yScale);
-      return this;
-    }
-
   }
 }
 }

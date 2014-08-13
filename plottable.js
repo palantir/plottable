@@ -4852,6 +4852,24 @@ var Plottable;
                 }
                 return this;
             };
+            BarPlot.prototype._updateYDomainer = function () {
+                if (this._isVertical) {
+                    this._updateDomainer(this.yScale);
+                }
+                else {
+                    _super.prototype._updateYDomainer.call(this);
+                }
+                return this;
+            };
+            BarPlot.prototype._updateXDomainer = function () {
+                if (!this._isVertical) {
+                    this._updateDomainer(this.xScale);
+                }
+                else {
+                    _super.prototype._updateXDomainer.call(this);
+                }
+                return this;
+            };
             BarPlot.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
@@ -4908,10 +4926,6 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this._isVertical = true;
             }
-            VerticalBar.prototype._updateYDomainer = function () {
-                this._updateDomainer(this.yScale);
-                return this;
-            };
             VerticalBar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             return VerticalBar;
         })(Plottable.Abstract.BarPlot);
@@ -4935,10 +4949,6 @@ var Plottable;
                 _super.call(this, dataset, xScale, yScale);
                 this.isVertical = false;
             }
-            HorizontalBar.prototype._updateXDomainer = function () {
-                this._updateDomainer(this.xScale);
-                return this;
-            };
             HorizontalBar.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var widthF = attrToProjector["width"];
@@ -5145,76 +5155,19 @@ var Plottable;
                 this._applyAnimatedAttributes(this._baseline, "baseline", baselineAttr);
             };
             NewStyleBarPlot.prototype.baseline = function (value) {
-                this._baselineValue = value;
-                this._updateXDomainer();
-                this._updateYDomainer();
-                this._render();
-                return this;
+                return Abstract.BarPlot.prototype.baseline.apply(this, [value]);
             };
             NewStyleBarPlot.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Abstract.QuantitativeScale) {
-                    var qscale = scale;
-                    if (!qscale._userSetDomainer) {
-                        if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID).addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-                        }
-                        else {
-                            qscale.domainer().removePaddingException("BAR_PLOT+" + this._plottableID).removeIncludedValue("BAR_PLOT+" + this._plottableID);
-                        }
-                    }
-                    qscale._autoDomainIfAutomaticMode();
-                }
-                return this;
+                return Abstract.BarPlot.prototype._updateDomainer.apply(this, [scale]);
             };
             NewStyleBarPlot.prototype._generateAttrToProjector = function () {
-                var _this = this;
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var primaryScale = this._isVertical ? this.yScale : this.xScale;
-                var secondaryScale = this._isVertical ? this.xScale : this.yScale;
-                var primaryAttr = this._isVertical ? "y" : "x";
-                var secondaryAttr = this._isVertical ? "x" : "y";
-                var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal) && secondaryScale.rangeType() === "bands";
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
-                if (attrToProjector["width"] == null) {
-                    var constantWidth = bandsMode ? secondaryScale.rangeBand() : NewStyleBarPlot.DEFAULT_WIDTH;
-                    attrToProjector["width"] = function (d, i) { return constantWidth; };
-                }
-                var positionF = attrToProjector[secondaryAttr];
-                var widthF = attrToProjector["width"];
-                if (!bandsMode) {
-                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) * _this._barAlignmentFactor; };
-                }
-                else {
-                    var bandWidth = secondaryScale.rangeBand();
-                    attrToProjector[secondaryAttr] = function (d, i) { return positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2; };
-                }
-                var originalPositionFn = attrToProjector[primaryAttr];
-                attrToProjector[primaryAttr] = function (d, i) {
-                    var originalPos = originalPositionFn(d, i);
-                    return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
-                };
-                attrToProjector["height"] = function (d, i) {
-                    return Math.abs(scaledBaseline - originalPositionFn(d, i));
-                };
-                return attrToProjector;
-            };
-            NewStyleBarPlot.prototype._updateYDomainer = function () {
-                if (this._isVertical) {
-                    this._updateDomainer(this.yScale);
-                }
-                else {
-                    _super.prototype._updateYDomainer.call(this);
-                }
-                return this;
+                return Abstract.BarPlot.prototype._generateAttrToProjector.apply(this);
             };
             NewStyleBarPlot.prototype._updateXDomainer = function () {
-                if (!this._isVertical) {
-                    this._updateDomainer(this.xScale);
-                }
-                else {
-                    _super.prototype._updateXDomainer.call(this);
-                }
-                return this;
+                return Abstract.BarPlot.prototype._updateXDomainer.apply(this);
+            };
+            NewStyleBarPlot.prototype._updateYDomainer = function () {
+                return Abstract.BarPlot.prototype._updateYDomainer.apply(this);
             };
             NewStyleBarPlot.DEFAULT_WIDTH = 10;
             NewStyleBarPlot._BarAlignmentToFactor = {};
@@ -5253,7 +5206,7 @@ var Plottable;
             ClusteredBar.prototype.cluster = function (accessor) {
                 var _this = this;
                 this.innerScale.domain(this._datasetKeysInOrder);
-                var lengths = this._datasetKeysInOrder.map(function (e) { return _this._key2DatasetDrawerKey[e].dataset.data().length; });
+                var lengths = this._getDatasetsInOrder().map(function (d) { return d.data().length; });
                 if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to cluster data when datasets are of unequal length");
                 }
@@ -5324,15 +5277,13 @@ var Plottable;
                 return attrToProjector;
             };
             StackedBar.prototype.stack = function (accessor) {
-                var _this = this;
                 var datasets = d3.values(this._key2DatasetDrawerKey);
                 var lengths = datasets.map(function (d) { return d.dataset.data().length; });
                 if (Plottable.Util.Methods.uniqNumbers(lengths).length > 1) {
                     Plottable.Util.Methods.warn("Warning: Attempting to stack data when datasets are of unequal length");
                 }
                 var currentBase = Plottable.Util.Methods.createFilledArray(0, lengths[0]);
-                var datasetsInStackOrder = this._datasetKeysInOrder.map(function (k) { return _this._key2DatasetDrawerKey[k].dataset; });
-                var stacks = datasetsInStackOrder.map(function (dataset) {
+                var stacks = this._getDatasetsInOrder().map(function (dataset) {
                     var data = dataset.data();
                     var base = currentBase.slice();
                     var vals = data.map(accessor);

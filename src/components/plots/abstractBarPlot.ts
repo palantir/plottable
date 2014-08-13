@@ -203,6 +203,24 @@ export module Abstract {
       return this;
     }
 
+    public _updateYDomainer() {
+      if (this._isVertical) {
+        this._updateDomainer(this.yScale);
+      } else {
+        super._updateYDomainer();
+      }
+      return this;
+    }
+
+    public _updateXDomainer() {
+      if (!this._isVertical) {
+        this._updateDomainer(this.xScale);
+      } else {
+        super._updateXDomainer();
+      }
+      return this;
+    }
+
     public _generateAttrToProjector() {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
@@ -243,6 +261,7 @@ export module Abstract {
 
       return attrToProjector;
     }
+
   }
 }
 }

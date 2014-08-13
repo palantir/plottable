@@ -64,90 +64,22 @@ export module Abstract {
      * @return {NewStyleBarPlot} The calling NewStyleBarPlot.
      */
     public baseline(value: number) {
-      this._baselineValue = value;
-      this._updateXDomainer();
-      this._updateYDomainer();
-      this._render();
-      return this;
+      return Abstract.BarPlot.prototype.baseline.apply(this, [value]);
     }
 
     public _updateDomainer(scale: Scale) {
-      if (scale instanceof Abstract.QuantitativeScale) {
-        var qscale = <Abstract.QuantitativeScale> scale;
-        if (!qscale._userSetDomainer) {
-          if (this._baselineValue != null) {
-            qscale.domainer()
-              .addPaddingException(this._baselineValue, "BAR_PLOT+" + this._plottableID)
-              .addIncludedValue(this._baselineValue, "BAR_PLOT+" + this._plottableID);
-          } else {
-            qscale.domainer()
-              .removePaddingException("BAR_PLOT+" + this._plottableID)
-              .removeIncludedValue("BAR_PLOT+" + this._plottableID);
-          }
-        }
-            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        qscale._autoDomainIfAutomaticMode();
-      }
-      return this;
+      return Abstract.BarPlot.prototype._updateDomainer.apply(this, [scale]);
     }
 
-    public _generateAttrToProjector() {
-      // Primary scale/direction: the "length" of the bars
-      // Secondary scale/direction: the "width" of the bars
-      var attrToProjector = super._generateAttrToProjector();
-      var primaryScale    = this._isVertical ? this.yScale : this.xScale;
-      var secondaryScale  = this._isVertical ? this.xScale : this.yScale;
-      var primaryAttr     = this._isVertical ? "y" : "x";
-      var secondaryAttr   = this._isVertical ? "x" : "y";
-      var bandsMode = (secondaryScale instanceof Plottable.Scale.Ordinal)
-                      && (<Plottable.Scale.Ordinal> secondaryScale).rangeType() === "bands";
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
-      if (attrToProjector["width"] == null) {
-        var constantWidth = bandsMode ? (<Scale.Ordinal> secondaryScale).rangeBand() : NewStyleBarPlot.DEFAULT_WIDTH;
-        attrToProjector["width"] = (d: any, i: number) => constantWidth;
-      }
-
-      var positionF = attrToProjector[secondaryAttr];
-      var widthF = attrToProjector["width"];
-      if (!bandsMode) {
-        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) * this._barAlignmentFactor;
-      } else {
-        var bandWidth = (<Plottable.Scale.Ordinal> secondaryScale).rangeBand();
-        attrToProjector[secondaryAttr] = (d: any, i: number) => positionF(d, i) - widthF(d, i) / 2 + bandWidth / 2;
-      }
-
-      var originalPositionFn = attrToProjector[primaryAttr];
-      attrToProjector[primaryAttr] = (d: any, i: number) => {
-        var originalPos = originalPositionFn(d, i);
-        // If it is past the baseline, it should start at the baselin then width/height
-        // carries it over. If it's not past the baseline, leave it at original position and
-        // then width/height carries it to baseline
-        return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
-      };
-
-      attrToProjector["height"] = (d: any, i: number) => {
-        return Math.abs(scaledBaseline - originalPositionFn(d, i));
-      };
-
-      return attrToProjector;
-    }
-
-    public _updateYDomainer() {
-      if (this._isVertical) {
-        this._updateDomainer(this.yScale);
-      } else {
-        super._updateYDomainer();
-      }
-      return this;
+    public _generateAttrToProjector(): IAttributeToProjector {
+      return Abstract.BarPlot.prototype._generateAttrToProjector.apply(this);
     }
 
     public _updateXDomainer() {
-      if (!this._isVertical) {
-        this._updateDomainer(this.xScale);
-      } else {
-        super._updateXDomainer();
-      }
-      return this;
+      return Abstract.BarPlot.prototype._updateXDomainer.apply(this);
+    }
+    public _updateYDomainer() {
+      return Abstract.BarPlot.prototype._updateYDomainer.apply(this);
     }
   }
 }

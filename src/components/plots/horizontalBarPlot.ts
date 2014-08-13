@@ -17,12 +17,6 @@ export module Plot {
       super(dataset, xScale, yScale);
     }
 
-
-    public _updateXDomainer() {
-      this._updateDomainer(this.xScale);
-      return this;
-    }
-
     public _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       // by convention, for API users the 2ndary dimension of a bar is always called its "width", so

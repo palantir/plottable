@@ -941,7 +941,7 @@ declare module Plottable {
                 [x: string]: number;
             };
             constructor(xScale: Scale, yScale: Scale);
-            baseline(value: number): NewStyleBarPlot;
+            baseline(value: number): any;
         }
     }
 }
